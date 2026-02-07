@@ -16,7 +16,7 @@ export function Footer() {
                                 <Landmark size={24} className="text-primary" />
                             </div>
                             <div>
-                                <h2 className="text-xl font-serif tracking-tight text-white leading-none">JCT Institute</h2>
+                                <h2 className="text-xl font-serif tracking-tight text-white leading-none">JCT Institutions</h2>
                                 <span className="text-[10px] text-white/60 font-medium tracking-[0.2em] uppercase">Est. 1998</span>
                             </div>
                         </div>
@@ -97,7 +97,7 @@ export function Footer() {
                                 allowFullScreen
                                 loading="lazy"
                                 referrerPolicy="no-referrer-when-downgrade"
-                                title="JCT Institute Location"
+                                title="JCT Institutions Location"
                             />
                         </div>
                         <Link

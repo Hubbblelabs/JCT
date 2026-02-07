@@ -62,7 +62,7 @@ export function Navbar() {
                                 "text-lg font-serif font-bold tracking-tight leading-none",
                                 isOpen ? "text-white" : scrolled ? "text-primary" : "text-white"
                             )}>
-                                JCT Institute
+                                JCT Institutions
                             </span>
                             <span className={cn(
                                 "text-[10px] font-medium tracking-[0.15em] uppercase mt-0.5",

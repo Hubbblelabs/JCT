@@ -13,7 +13,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "JCT Institute",
+  title: "JCT Institutions",
   description: "Cultivating character, competence, and leadership since 1998.",
 };
 

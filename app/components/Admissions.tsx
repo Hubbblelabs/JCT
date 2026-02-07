@@ -26,7 +26,7 @@ const admissionSteps = [
     {
         icon: GraduationCap,
         title: "Enrollment",
-        desc: "Begin your journey at JCT Institute.",
+        desc: "Begin your journey at JCT Institutions.",
         date: "June 2026"
     }
 ];
