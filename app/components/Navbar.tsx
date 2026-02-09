@@ -46,7 +46,7 @@ export function Navbar() {
                     "fixed top-0 left-0 right-0 z-50 transition-all duration-500 ease-in-out border-b border-transparent",
                     scrolled
                         ? "bg-white/95 backdrop-blur-sm py-4 border-stone-200 shadow-sm"
-                        : "bg-transparent py-6"
+                        : "bg-black/20 backdrop-blur-sm py-4"
                 )}
             >
                 <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
@@ -81,7 +81,7 @@ export function Navbar() {
                                 href={link.href}
                                 className={cn(
                                     "text-sm font-medium transition-all duration-200 hover:text-accent",
-                                    scrolled ? "text-stone-600 hover:text-primary" : "text-white/90 hover:text-white"
+                                    scrolled ? "text-stone-900 hover:text-primary" : "text-white/90 hover:text-white"
                                 )}
                             >
                                 {link.name}
