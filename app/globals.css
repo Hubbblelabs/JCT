@@ -2,13 +2,13 @@
 
 :root {
   /* JCT Brand Colors - Royal Blue Theme */
-  --color-primary: #1E3A8A;
+  --color-primary: #021a60;
   /* Royal Blue 800 - Deep, authoritative */
   --color-primary-foreground: #FFFFFF;
 
   --color-accent: #FBBF24;
   /* Amber 400 - Engineering accent */
-  --color-accent-foreground: #1E3A8A;
+  --color-accent-foreground: #021a60;
 
   --color-background: #F8FAFC;
   /* Slate 50 - Subtle professional background */
@@ -27,7 +27,7 @@
   /* Slate 200 */
 
   /* Institution-specific colors */
-  --color-engineering-primary: #1E40AF;
+  --color-engineering-primary: #021a60;
   /* Blue 800 */
   --color-engineering-accent: #FBBF24;
   /* Yellow/Amber */

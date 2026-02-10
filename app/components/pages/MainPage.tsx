@@ -5,6 +5,10 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import { Navbar } from "@/app/components/Navbar";
 import { Footer } from "@/app/components/Footer";
+import { TrustIndicators } from "@/app/components/TrustIndicators";
+import { ReverseRoadmap } from "@/app/components/ReverseRoadmap";
+import { FloatingCTA } from "@/app/components/FloatingCTA";
+import { HomeInstitutions } from "@/app/components/HomeInstitutions";
 import Link from "next/link";
 import {
     ArrowUpRight,
@@ -29,15 +33,7 @@ import {
     Send,
 } from "lucide-react";
 
-/* ─── Timeline milestones ─── */
-const milestones = [
-    { year: "1998", title: "Foundation Year", desc: "JCT Institutions was established in Coimbatore with a clear mandate: build an educational group rooted in ethics and practical learning." },
-    { year: "2001", title: "Engineering College Launched", desc: "JCT College of Engineering and Technology opened its doors with four core departments and 240 students in the inaugural batch." },
-    { year: "2006", title: "Arts & Science College Added", desc: "Responding to demand for broader academic pathways, JCT College of Arts and Science began operations with six undergraduate programs." },
-    { year: "2010", title: "Polytechnic College Established", desc: "JCT Polytechnic College was founded to provide diploma-level technical education with strong workshop-based training." },
-    { year: "2018", title: "Two Decades of Impact", desc: "Over 12,000 alumni across three institutions. New departments in AI, Cyber Security, and Data Science introduced." },
-    { year: "2026", title: "Looking Ahead", desc: "Expanding research collaborations, industry tie-ups, and international academic partnerships for a future-ready ecosystem." },
-];
+
 
 /* ─── Group-level achievements ─── */
 const achievements = [
@@ -56,38 +52,7 @@ const values = [
 ];
 
 /* ─── Institution cards ─── */
-const institutions = [
-    {
-        name: "JCT College of Engineering & Technology",
-        href: "/institutions/engineering",
-        icon: GraduationCap,
-        image: "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=2686&auto=format&fit=crop",
-        tagline: "Technical depth. Research exposure. Industry-ready graduates.",
-        programs: "B.E. / B.Tech / M.E.",
-        students: "3,000+",
-        highlight: "96% placement rate",
-    },
-    {
-        name: "JCT College of Arts & Science",
-        href: "/institutions/arts-science",
-        icon: Microscope,
-        image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2673&auto=format&fit=crop",
-        tagline: "Broad foundations in science, commerce, and the humanities.",
-        programs: "B.Sc / B.Com / BBA / BA / M.Sc / M.Com",
-        students: "2,500+",
-        highlight: "9 academic programs",
-    },
-    {
-        name: "JCT Polytechnic College",
-        href: "/institutions/polytechnic",
-        icon: PenTool,
-        image: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?q=80&w=2670&auto=format&fit=crop",
-        tagline: "Skill-based diploma programs built around workshop training.",
-        programs: "Diploma Courses",
-        students: "1,200+",
-        highlight: "Direct lateral entry to B.E.",
-    },
-];
+
 
 export default function MainPage() {
     const heroRef = useRef(null);
@@ -103,7 +68,7 @@ export default function MainPage() {
             <Navbar />
 
             {/* ═══ HERO — Full-screen editorial statement ═══ */}
-            <section ref={heroRef} className="relative min-h-[85vh] flex items-center overflow-hidden bg-primary text-white">
+            <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden bg-primary text-white pt-20">
                 <motion.div style={{ y: backgroundY }} className="absolute inset-0 z-0">
                     <div
                         className="absolute inset-0 bg-cover bg-center scale-110"
@@ -181,87 +146,11 @@ export default function MainPage() {
                 </motion.div>
             </section>
 
+            <TrustIndicators />
+
             {/* ═══ OUR INSTITUTIONS — Alternating horizontal cards ═══ */}
-            <section id="institutions" className="py-20 bg-white">
-                <div className="container mx-auto px-4 md:px-6">
-                    <div className="max-w-3xl mb-12">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
-                        >
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Our Institutions</h2>
-                            <h3 className="text-3xl md:text-5xl font-serif text-primary leading-tight mb-4">
-                                Three distinct colleges. <br />
-                                <span className="text-stone-300 italic font-light">One shared standard.</span>
-                            </h3>
-                            <p className="text-stone-500 font-light leading-relaxed text-base max-w-xl">
-                                Each institution serves a different purpose and a different student — but all of them maintain the same academic rigor and ethical foundation.
-                            </p>
-                        </motion.div>
-                    </div>
-
-                    <div className="space-y-8">
-                        {institutions.map((inst, index) => (
-                            <motion.div
-                                key={inst.href}
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.7, delay: index * 0.15 }}
-                            >
-                                <Link href={inst.href} className="group block">
-                                    <div className={`grid grid-cols-1 lg:grid-cols-12 gap-0 bg-stone-50 rounded-3xl overflow-hidden border border-stone-100 hover:border-accent/30 hover:shadow-2xl hover:shadow-accent/5 transition-all duration-500`}>
-                                        {/* Image */}
-                                        <div className={`lg:col-span-5 aspect-16/10 lg:aspect-auto overflow-hidden relative ${index === 1 ? 'lg:order-2' : ''}`}>
-                                            <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-500 z-10" />
-                                            <img
-                                                src={inst.image}
-                                                alt={inst.name}
-                                                className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
-                                            />
-                                        </div>
-
-                                        {/* Content */}
-                                        <div className={`lg:col-span-7 p-10 md:p-14 flex flex-col justify-center ${index === 1 ? 'lg:order-1' : ''}`}>
-                                            <div className="flex items-center gap-3 mb-6">
-                                                <div className="p-3 bg-white rounded-xl text-primary shadow-sm border border-stone-100">
-                                                    <inst.icon size={22} strokeWidth={1.5} />
-                                                </div>
-                                                <span className="text-xs font-bold text-accent uppercase tracking-[0.15em]">{inst.programs}</span>
-                                            </div>
-
-                                            <h4 className="text-3xl md:text-4xl font-serif text-primary mb-4 group-hover:text-accent transition-colors leading-tight">
-                                                {inst.name}
-                                            </h4>
-
-                                            <p className="text-stone-500 text-lg font-light leading-relaxed mb-8 max-w-lg">
-                                                {inst.tagline}
-                                            </p>
-
-                                            <div className="flex flex-wrap items-center gap-6 mb-8">
-                                                <div className="flex items-center gap-2">
-                                                    <Users size={16} className="text-accent" />
-                                                    <span className="text-sm font-bold text-primary">{inst.students}</span>
-                                                    <span className="text-sm text-stone-400">students</span>
-                                                </div>
-                                                <div className="w-px h-4 bg-stone-200" />
-                                                <span className="text-sm font-medium text-accent">{inst.highlight}</span>
-                                            </div>
-
-                                            <div className="flex items-center gap-2 text-primary font-bold text-sm group-hover:text-accent transition-colors">
-                                                Explore this institution
-                                                <ArrowUpRight size={16} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </Link>
-                            </motion.div>
-                        ))}
-                    </div>
-                </div>
-            </section>
+            {/* ═══ OUR INSTITUTIONS — Alternating horizontal cards ═══ */}
+            <HomeInstitutions />
 
             {/* ═══ LEGACY & VALUES — Timeline + values ═══ */}
             <section id="about" className="py-20 bg-stone-50">
@@ -292,59 +181,8 @@ export default function MainPage() {
                         </motion.div>
                     </div>
 
-                    {/* Horizontal Curly Roadmap */}
-                    <div className="relative mb-24 overflow-hidden">
-                        {/* Curly connecting path - SVG */}
-                        <svg className="absolute inset-0 w-full h-32 top-12 hidden lg:block" preserveAspectRatio="none" viewBox="0 0 1200 100" role="presentation" aria-hidden="true">
-                            <path
-                                d="M 0 50 Q 100 20, 200 50 T 400 50 T 600 50 T 800 50 T 1000 50 T 1200 50"
-                                stroke="url(#roadmapGradient)"
-                                strokeWidth="2"
-                                fill="none"
-                                strokeDasharray="8,4"
-                            />
-                            <defs>
-                                <linearGradient id="roadmapGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" className="[stop-color:#E2E8F0]" />
-                                    <stop offset="50%" className="[stop-color:#FBBF24]" />
-                                    <stop offset="100%" className="[stop-color:#1E3A8A]" />
-                                </linearGradient>
-                            </defs>
-                        </svg>
-
-                        {/* Milestone cards - Horizontal scrolling on mobile, grid on desktop */}
-                        <div className="relative z-10 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0">
-                            <div className="flex lg:grid lg:grid-cols-6 gap-6 lg:gap-4 min-w-max lg:min-w-0">
-                                {milestones.map((milestone, index) => (
-                                    <motion.div
-                                        key={milestone.year}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        whileInView={{ opacity: 1, y: 0 }}
-                                        viewport={{ once: true, margin: "-50px" }}
-                                        transition={{ duration: 0.5, delay: index * 0.08 }}
-                                        className="flex-shrink-0 w-56 lg:w-auto relative"
-                                    >
-                                        {/* Dot marker */}
-                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-accent border-4 border-white shadow-md hidden lg:block" />
-                                        
-                                        {/* Card */}
-                                        <div className="bg-white p-5 rounded-2xl border border-stone-200 hover:border-accent/30 hover:shadow-lg transition-all duration-300 h-full">
-                                            <span className="inline-block px-3 py-1 bg-accent/10 text-accent text-xs font-black rounded-lg mb-3">
-                                                {milestone.year}
-                                            </span>
-                                            <h4 className="text-base font-serif text-primary mb-2 leading-tight">{milestone.title}</h4>
-                                            <p className="text-stone-500 text-xs font-light leading-relaxed">{milestone.desc}</p>
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Mobile scroll hint */}
-                        <div className="lg:hidden text-center mt-4">
-                            <span className="text-xs text-stone-400">← Scroll to see timeline →</span>
-                        </div>
-                    </div>
+                    {/* Reverse Roadmap */}
+                    <ReverseRoadmap />
 
                     {/* Values grid */}
                     <div className="mb-8">
@@ -355,7 +193,7 @@ export default function MainPage() {
                             transition={{ duration: 0.6 }}
                             className="text-center max-w-2xl mx-auto mb-16"
                         >
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">What We Stand For</h2>
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Why Choose Us</h2>
                             <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight">
                                 Principles, Not <span className="italic text-stone-400 font-light">Slogans</span>
                             </h3>
@@ -503,7 +341,7 @@ export default function MainPage() {
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="mt-12 p-6 bg-gradient-to-r from-primary to-primary/90 rounded-2xl text-white text-center max-w-2xl mx-auto border-2 border-accent/30 shadow-2xl"
+                            className="mt-12 p-6 bg-linear-to-r from-primary to-primary/90 rounded-2xl text-white text-center max-w-2xl mx-auto border-2 border-accent/30 shadow-2xl"
                         >
                             <div className="flex items-center justify-center gap-3 mb-3">
                                 <Phone size={24} className="text-accent" />
@@ -611,6 +449,7 @@ export default function MainPage() {
                 </div>
             </section>
 
+            <FloatingCTA />
             <Footer />
         </main>
     );
