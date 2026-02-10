@@ -2,12 +2,14 @@
 
 import { motion } from "framer-motion";
 import { ArrowUpRight, GraduationCap, Microscope, PenTool } from "lucide-react";
+import Link from "next/link";
 
 
 const institutions = [
     {
         name: "JCT College of Engineering and Technology",
         slug: "engineering",
+        href: "/institutions/engineering",
         icon: GraduationCap,
         image: "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=2686&auto=format&fit=crop",
         description: "Pioneering technical education with state-of-the-art laboratories and industry-aligned curriculum.",
@@ -16,6 +18,7 @@ const institutions = [
     {
         name: "JCT College of Arts and Science",
         slug: "arts-science",
+        href: "/institutions/arts-science",
         icon: Microscope,
         image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2673&auto=format&fit=crop",
         description: "Fostering creativity and scientific inquiry through comprehensive arts and science programs.",
@@ -24,6 +27,7 @@ const institutions = [
     {
         name: "JCT Polytechnic College",
         slug: "polytechnic",
+        href: "/institutions/polytechnic",
         icon: PenTool,
         image: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2670&auto=format&fit=crop",
         description: "Empowering students with practical skills and hands-on technical training for industry readiness.",
@@ -55,6 +59,7 @@ export function Institutions() {
                             transition={{ duration: 0.6, delay: index * 0.2 }}
                             className="group relative"
                         >
+                          <Link href={inst.href}>
                             <div className="h-full bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-accent/10 transition-all duration-500 flex flex-col border border-stone-100">
                                 {/* Image Container */}
                                 <div className="aspect-[16/10] overflow-hidden relative">
@@ -85,7 +90,6 @@ export function Institutions() {
                                             <span className="text-xs font-bold text-primary/70 bg-stone-100 px-3 py-1 rounded-full uppercase tracking-wider">
                                                 {inst.programs}
                                             </span>
-                                            {/* Since the page was deleted, we just scroll to top or maybe link to a contact section for now if no specific page exists */}
                                             <span className="w-8 h-8 rounded-full border border-stone-200 flex items-center justify-center text-stone-400 group-hover:bg-accent group-hover:border-accent group-hover:text-primary transition-all">
                                                 <ArrowUpRight size={14} />
                                             </span>
@@ -93,6 +97,7 @@ export function Institutions() {
                                     </div>
                                 </div>
                             </div>
+                          </Link>
                         </motion.div>
                     ))}
                 </div>

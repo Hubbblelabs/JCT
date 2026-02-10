@@ -10,6 +10,15 @@ import { cn } from "@/lib/utils";
 const navLinks = [
     { name: "About", href: "#about" },
     { name: "Academics", href: "#academics" },
+    {
+        name: "Institutions",
+        href: "#institutions",
+        children: [
+            { name: "College of Engineering", href: "/institutions/engineering" },
+            { name: "College of Arts & Science", href: "/institutions/arts-science" },
+            { name: "Polytechnic College", href: "/institutions/polytechnic" },
+        ],
+    },
     { name: "Admissions", href: "#admissions" },
     { name: "Placements", href: "#placements" },
     { name: "Contact", href: "#contact" },
@@ -76,16 +85,32 @@ export function Navbar() {
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex items-center gap-8">
                         {navLinks.map((link) => (
-                            <Link
-                                key={link.name}
-                                href={link.href}
-                                className={cn(
-                                    "text-sm font-medium transition-all duration-200 hover:text-accent",
-                                    scrolled ? "text-stone-900 hover:text-primary" : "text-white/90 hover:text-white"
+                            <div key={link.name} className="relative group/nav">
+                                <Link
+                                    href={link.href}
+                                    className={cn(
+                                        "text-sm font-medium transition-all duration-200 hover:text-accent",
+                                        scrolled ? "text-stone-900 hover:text-primary" : "text-white/90 hover:text-white"
+                                    )}
+                                >
+                                    {link.name}
+                                </Link>
+                                {link.children && (
+                                    <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover/nav:opacity-100 group-hover/nav:visible transition-all duration-200 z-50">
+                                        <div className="bg-white rounded-2xl shadow-xl border border-stone-100 py-3 px-2 min-w-[240px]">
+                                            {link.children.map((child) => (
+                                                <Link
+                                                    key={child.name}
+                                                    href={child.href}
+                                                    className="block px-4 py-3 text-sm text-stone-700 hover:text-primary hover:bg-stone-50 rounded-xl transition-colors font-medium"
+                                                >
+                                                    {child.name}
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </div>
                                 )}
-                            >
-                                {link.name}
-                            </Link>
+                            </div>
                         ))}
                         <Button
                             variant="default"
