@@ -295,7 +295,7 @@ export default function MainPage() {
                     {/* Horizontal Curly Roadmap */}
                     <div className="relative mb-24 overflow-hidden">
                         {/* Curly connecting path - SVG */}
-                        <svg className="absolute inset-0 w-full h-32 top-12 hidden lg:block" preserveAspectRatio="none" viewBox="0 0 1200 100">
+                        <svg className="absolute inset-0 w-full h-32 top-12 hidden lg:block" preserveAspectRatio="none" viewBox="0 0 1200 100" role="presentation" aria-hidden="true">
                             <path
                                 d="M 0 50 Q 100 20, 200 50 T 400 50 T 600 50 T 800 50 T 1000 50 T 1200 50"
                                 stroke="url(#roadmapGradient)"
@@ -305,9 +305,9 @@ export default function MainPage() {
                             />
                             <defs>
                                 <linearGradient id="roadmapGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                    <stop offset="0%" style={{ stopColor: '#E2E8F0', stopOpacity: 1 }} />
-                                    <stop offset="50%" style={{ stopColor: '#FBBF24', stopOpacity: 1 }} />
-                                    <stop offset="100%" style={{ stopColor: '#1E3A8A', stopOpacity: 1 }} />
+                                    <stop offset="0%" className="[stop-color:#E2E8F0]" />
+                                    <stop offset="50%" className="[stop-color:#FBBF24]" />
+                                    <stop offset="100%" className="[stop-color:#1E3A8A]" />
                                 </linearGradient>
                             </defs>
                         </svg>
