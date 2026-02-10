@@ -103,7 +103,7 @@ export default function MainPage() {
             <Navbar />
 
             {/* ═══ HERO — Full-screen editorial statement ═══ */}
-            <section ref={heroRef} className="relative h-screen min-h-200 flex items-center overflow-hidden bg-primary text-white">
+            <section ref={heroRef} className="relative min-h-[85vh] flex items-center overflow-hidden bg-primary text-white">
                 <motion.div style={{ y: backgroundY }} className="absolute inset-0 z-0">
                     <div
                         className="absolute inset-0 bg-cover bg-center scale-110"
@@ -121,7 +121,7 @@ export default function MainPage() {
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.6 }}
-                            className="mb-10"
+                            className="mb-6"
                         >
                             <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-sm text-sm font-bold tracking-widest uppercase text-white/80">
                                 <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
@@ -133,7 +133,7 @@ export default function MainPage() {
                             initial={{ opacity: 0, y: 50 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-                            className="text-5xl md:text-7xl lg:text-[6.5rem] font-serif text-white mb-10 tracking-tighter leading-[0.88]"
+                            className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-6 tracking-tighter leading-[0.92]"
                         >
                             Three Colleges. <br />
                             One Commitment to <br />
@@ -144,7 +144,7 @@ export default function MainPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.35 }}
-                            className="text-lg md:text-xl text-white/60 max-w-2xl leading-relaxed font-light mb-12"
+                            className="text-base md:text-lg text-white/60 max-w-2xl leading-relaxed font-light mb-8"
                         >
                             JCT Institutions is a group of three colleges in Coimbatore — Engineering, Arts & Science, and Polytechnic — working under a shared belief that education should build competence and character in equal measure.
                         </motion.p>
@@ -155,11 +155,11 @@ export default function MainPage() {
                             transition={{ duration: 0.8, delay: 0.5 }}
                             className="flex flex-wrap gap-4"
                         >
-                            <Button size="lg" className="h-16 px-10 text-lg bg-accent text-primary hover:bg-accent/90 font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 group shadow-xl shadow-accent/20">
-                                Explore Our Institutions <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            <Button size="lg" className="h-14 px-8 text-base bg-accent text-primary hover:bg-accent/90 font-bold rounded-xl transition-all hover:scale-105 active:scale-95 group shadow-xl shadow-accent/20">
+                                Apply Now <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
                             </Button>
-                            <Button variant="outline" size="lg" className="h-16 px-10 text-lg bg-transparent border-white/20 text-white hover:bg-white/10 font-bold rounded-2xl transition-all">
-                                Admissions 2026
+                            <Button variant="outline" size="lg" className="h-14 px-8 text-base bg-transparent border-white/20 text-white hover:bg-white/10 font-bold rounded-xl transition-all">
+                                Enquire Now
                             </Button>
                         </motion.div>
                     </div>
@@ -170,33 +170,33 @@ export default function MainPage() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.5 }}
-                    className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
+                    className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
                 >
                     <span className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold">Scroll</span>
                     <motion.div
                         animate={{ y: [0, 8, 0] }}
                         transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                        className="w-px h-8 bg-linear-to-b from-white/40 to-transparent"
+                        className="w-px h-6 bg-linear-to-b from-white/40 to-transparent"
                     />
                 </motion.div>
             </section>
 
             {/* ═══ OUR INSTITUTIONS — Alternating horizontal cards ═══ */}
-            <section id="institutions" className="py-32 bg-white">
+            <section id="institutions" className="py-20 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
-                    <div className="max-w-3xl mb-20">
+                    <div className="max-w-3xl mb-12">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.6 }}
                         >
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Our Institutions</h2>
-                            <h3 className="text-4xl md:text-6xl font-serif text-primary leading-tight mb-6">
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Our Institutions</h2>
+                            <h3 className="text-3xl md:text-5xl font-serif text-primary leading-tight mb-4">
                                 Three distinct colleges. <br />
                                 <span className="text-stone-300 italic font-light">One shared standard.</span>
                             </h3>
-                            <p className="text-stone-500 font-light leading-relaxed text-lg max-w-xl">
+                            <p className="text-stone-500 font-light leading-relaxed text-base max-w-xl">
                                 Each institution serves a different purpose and a different student — but all of them maintain the same academic rigor and ethical foundation.
                             </p>
                         </motion.div>
@@ -264,17 +264,17 @@ export default function MainPage() {
             </section>
 
             {/* ═══ LEGACY & VALUES — Timeline + values ═══ */}
-            <section id="about" className="py-32 bg-stone-50">
+            <section id="about" className="py-20 bg-stone-50">
                 <div className="container mx-auto px-4 md:px-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-24">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ duration: 0.6 }}
                         >
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Our Story</h2>
-                            <h3 className="text-4xl md:text-6xl font-serif text-primary leading-tight">
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Our Story</h2>
+                            <h3 className="text-3xl md:text-5xl font-serif text-primary leading-tight">
                                 A Quarter Century of <br />
                                 <span className="text-stone-400 italic font-light">Steady Growth.</span>
                             </h3>
@@ -286,38 +286,63 @@ export default function MainPage() {
                             transition={{ duration: 0.6, delay: 0.1 }}
                             className="flex items-end"
                         >
-                            <p className="text-stone-500 text-lg font-light leading-relaxed max-w-lg">
+                            <p className="text-stone-500 text-base font-light leading-relaxed max-w-lg">
                                 JCT Institutions wasn't built in a single stroke. It grew institution by institution, responding to what students and the region actually needed — first engineers, then broadly educated graduates, then skilled technicians.
                             </p>
                         </motion.div>
                     </div>
 
-                    {/* Timeline */}
-                    <div className="relative mb-32">
-                        <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-stone-200 -translate-x-1/2 hidden md:block" />
-                        <div className="absolute left-6 top-0 bottom-0 w-px bg-stone-200 md:hidden" />
+                    {/* Horizontal Curly Roadmap */}
+                    <div className="relative mb-24 overflow-hidden">
+                        {/* Curly connecting path - SVG */}
+                        <svg className="absolute inset-0 w-full h-32 top-12 hidden lg:block" preserveAspectRatio="none" viewBox="0 0 1200 100">
+                            <path
+                                d="M 0 50 Q 100 20, 200 50 T 400 50 T 600 50 T 800 50 T 1000 50 T 1200 50"
+                                stroke="url(#roadmapGradient)"
+                                strokeWidth="2"
+                                fill="none"
+                                strokeDasharray="8,4"
+                            />
+                            <defs>
+                                <linearGradient id="roadmapGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style={{ stopColor: '#E2E8F0', stopOpacity: 1 }} />
+                                    <stop offset="50%" style={{ stopColor: '#FBBF24', stopOpacity: 1 }} />
+                                    <stop offset="100%" style={{ stopColor: '#1E3A8A', stopOpacity: 1 }} />
+                                </linearGradient>
+                            </defs>
+                        </svg>
 
-                        <div className="space-y-12">
-                            {milestones.map((milestone, index) => (
-                                <motion.div
-                                    key={milestone.year}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true, margin: "-50px" }}
-                                    transition={{ duration: 0.5, delay: index * 0.05 }}
-                                    className={`relative flex flex-col md:flex-row items-start gap-8 ${index % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}
-                                >
-                                    <div className="absolute left-6 md:left-1/2 -translate-x-1/2 w-3 h-3 rounded-full bg-accent border-4 border-stone-50 z-10" />
+                        {/* Milestone cards - Horizontal scrolling on mobile, grid on desktop */}
+                        <div className="relative z-10 overflow-x-auto lg:overflow-visible pb-4 lg:pb-0">
+                            <div className="flex lg:grid lg:grid-cols-6 gap-6 lg:gap-4 min-w-max lg:min-w-0">
+                                {milestones.map((milestone, index) => (
+                                    <motion.div
+                                        key={milestone.year}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true, margin: "-50px" }}
+                                        transition={{ duration: 0.5, delay: index * 0.08 }}
+                                        className="flex-shrink-0 w-56 lg:w-auto relative"
+                                    >
+                                        {/* Dot marker */}
+                                        <div className="absolute -top-8 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-accent border-4 border-white shadow-md hidden lg:block" />
+                                        
+                                        {/* Card */}
+                                        <div className="bg-white p-5 rounded-2xl border border-stone-200 hover:border-accent/30 hover:shadow-lg transition-all duration-300 h-full">
+                                            <span className="inline-block px-3 py-1 bg-accent/10 text-accent text-xs font-black rounded-lg mb-3">
+                                                {milestone.year}
+                                            </span>
+                                            <h4 className="text-base font-serif text-primary mb-2 leading-tight">{milestone.title}</h4>
+                                            <p className="text-stone-500 text-xs font-light leading-relaxed">{milestone.desc}</p>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
 
-                                    <div className={`ml-14 md:ml-0 md:w-[calc(50%-3rem)] ${index % 2 === 0 ? 'md:pr-0 md:text-right' : 'md:pl-0'}`}>
-                                        <span className="text-3xl font-sans font-black text-accent tracking-tight">{milestone.year}</span>
-                                        <h4 className="text-xl font-serif text-primary mt-2 mb-3">{milestone.title}</h4>
-                                        <p className="text-stone-500 text-sm font-light leading-relaxed">{milestone.desc}</p>
-                                    </div>
-
-                                    <div className="hidden md:block md:w-[calc(50%-3rem)]" />
-                                </motion.div>
-                            ))}
+                        {/* Mobile scroll hint */}
+                        <div className="lg:hidden text-center mt-4">
+                            <span className="text-xs text-stone-400">← Scroll to see timeline →</span>
                         </div>
                     </div>
 
@@ -363,7 +388,7 @@ export default function MainPage() {
             </section>
 
             {/* ═══ GROUP ACHIEVEMENTS — Numeric impact ═══ */}
-            <section className="py-24 bg-primary text-white relative overflow-hidden">
+            <section className="py-16 bg-primary text-white relative overflow-hidden">
                 <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
 
                 <div className="container mx-auto px-4 md:px-6 relative z-10">
@@ -372,10 +397,10 @@ export default function MainPage() {
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
-                        className="text-center mb-16"
+                        className="text-center mb-12"
                     >
-                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">By the Numbers</h2>
-                        <h3 className="text-4xl md:text-5xl font-serif leading-tight">
+                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">By the Numbers</h2>
+                        <h3 className="text-3xl md:text-4xl font-serif leading-tight">
                             Twenty-Five Years <span className="text-white/60 italic font-light">in Sum</span>
                         </h3>
                     </motion.div>
@@ -401,7 +426,7 @@ export default function MainPage() {
             </section>
 
             {/* ═══ ADMISSIONS CTA — Guidance section ═══ */}
-            <section id="admissions" className="py-32 bg-white">
+            <section id="admissions" className="py-20 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="max-w-4xl mx-auto text-center">
                         <motion.div
@@ -410,12 +435,12 @@ export default function MainPage() {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6 }}
                         >
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Admissions 2026</h2>
-                            <h3 className="text-4xl md:text-6xl font-serif text-primary leading-tight mb-8">
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Admissions 2026</h2>
+                            <h3 className="text-3xl md:text-5xl font-serif text-primary leading-tight mb-6">
                                 Not Sure Which <br />
                                 <span className="text-stone-400 italic font-light">College Is Right for You?</span>
                             </h3>
-                            <p className="text-stone-500 text-lg font-light leading-relaxed mb-16 max-w-2xl mx-auto">
+                            <p className="text-stone-500 text-base font-light leading-relaxed mb-12 max-w-2xl mx-auto">
                                 Whether you're coming from 10th, 12th, or completing a diploma — there's a clear pathway for you at JCT. Our admissions team can help you find the right fit based on your background and goals.
                             </p>
                         </motion.div>
@@ -464,38 +489,52 @@ export default function MainPage() {
                             ))}
                         </div>
 
-                        <div className="flex flex-col sm:flex-row justify-center gap-4">
-                            <Button size="lg" className="h-16 px-10 text-lg bg-accent text-primary hover:bg-accent/90 font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-accent/20">
+                        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
+                            <Button size="lg" className="h-14 px-8 text-base bg-accent text-primary hover:bg-accent/90 font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-accent/20">
                                 Apply Online
                             </Button>
-                            <Button variant="outline" size="lg" className="h-16 px-10 text-lg border-stone-200 text-primary hover:bg-stone-50 font-bold rounded-2xl transition-all">
+                            <Button variant="outline" size="lg" className="h-14 px-8 text-base border-stone-200 text-primary hover:bg-stone-50 font-bold rounded-xl transition-all">
                                 Download Prospectus
                             </Button>
                         </div>
+
+                        {/* Prominent Admission Contact Banner */}
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="mt-12 p-6 bg-gradient-to-r from-primary to-primary/90 rounded-2xl text-white text-center max-w-2xl mx-auto border-2 border-accent/30 shadow-2xl"
+                        >
+                            <div className="flex items-center justify-center gap-3 mb-3">
+                                <Phone size={24} className="text-accent" />
+                                <h4 className="text-accent font-serif text-2xl font-bold">Admissions Helpline</h4>
+                            </div>
+                            <a href="tel:+919876548801" className="block">
+                                <p className="text-3xl md:text-4xl font-black text-white tracking-wide hover:text-accent transition-colors mb-2">
+                                    +91 98765 48801
+                                </p>
+                            </a>
+                            <p className="text-sm text-blue-200/70 font-light">Mon–Sat, 9:00 AM – 5:00 PM</p>
+                            <p className="text-xs text-white/60 mt-2">Call for personalized guidance on admissions, programs, and campus visits</p>
+                        </motion.div>
 
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
-                            className="mt-16 p-8 bg-primary rounded-3xl text-white text-left max-w-xl mx-auto"
+                            className="mt-8 p-6 bg-stone-50 rounded-2xl text-left max-w-xl mx-auto"
                         >
-                            <h4 className="text-accent font-serif text-xl mb-3">Talk to Our Admissions Team</h4>
-                            <p className="text-sm text-blue-200/70 mb-4 font-light">Mon–Sat, 9:00 AM – 5:00 PM. We'll help you understand your options without pressure.</p>
-                            <div className="flex flex-col sm:flex-row gap-4 text-sm">
-                                <a href="tel:+919876543210" className="flex items-center gap-2 text-white hover:text-accent transition-colors">
-                                    <Phone size={16} className="text-accent" /> +91 98765 43210
-                                </a>
-                                <a href="mailto:admissions@jct.edu" className="flex items-center gap-2 text-white hover:text-accent transition-colors">
-                                    <Mail size={16} className="text-accent" /> admissions@jct.edu
-                                </a>
-                            </div>
+                            <h4 className="text-primary font-serif text-lg mb-2 font-bold">Email Us</h4>
+                            <a href="mailto:admissions@jct.edu" className="flex items-center gap-2 text-primary hover:text-accent transition-colors text-base font-medium">
+                                <Mail size={18} className="text-accent" /> admissions@jct.edu
+                            </a>
                         </motion.div>
                     </div>
                 </div>
             </section>
 
             {/* ═══ CONTACT — Visit & form ═══ */}
-            <section id="contact" className="py-24 bg-stone-50 border-t border-stone-100">
+            <section id="contact" className="py-16 bg-stone-50 border-t border-stone-100">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
                         <div>
@@ -517,7 +556,7 @@ export default function MainPage() {
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <Phone size={20} className="text-accent shrink-0" />
-                                    <a href="tel:+919876543210" className="text-stone-600 text-sm hover:text-primary transition-colors">+91 98765 43210</a>
+                                    <a href="tel:+919876548801" className="text-stone-600 text-sm hover:text-primary transition-colors">+91 98765 48801</a>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <Mail size={20} className="text-accent shrink-0" />

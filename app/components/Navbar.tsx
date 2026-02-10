@@ -2,25 +2,24 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Menu, X, Landmark } from "lucide-react";
+import Image from "next/image";
+import { Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
     { name: "About", href: "#about" },
-    { name: "Academics", href: "#academics" },
     {
         name: "Institutions",
         href: "#institutions",
         children: [
-            { name: "College of Engineering", href: "/institutions/engineering" },
-            { name: "College of Arts & Science", href: "/institutions/arts-science" },
-            { name: "Polytechnic College", href: "/institutions/polytechnic" },
+            { name: "Engineering", href: "/institutions/engineering" },
+            { name: "Arts & Science", href: "/institutions/arts-science" },
+            { name: "Polytechnic", href: "/institutions/polytechnic" },
         ],
     },
     { name: "Admissions", href: "#admissions" },
-    { name: "Placements", href: "#placements" },
     { name: "Contact", href: "#contact" },
 ];
 
@@ -61,10 +60,16 @@ export function Navbar() {
                 <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
                     <Link href="/" className="flex items-center gap-3 group z-50">
                         <div className={cn(
-                            "p-2.5 rounded-xl transition-colors duration-300",
-                            isOpen ? "bg-accent text-primary" : scrolled ? "bg-primary text-white" : "bg-white/10 text-white backdrop-blur-sm"
+                            "transition-all duration-300",
+                            isOpen ? "" : ""
                         )}>
-                            <Landmark size={24} />
+                            <Image 
+                                src="/jct-logo.svg" 
+                                alt="JCT Institutions Logo" 
+                                width={40} 
+                                height={40}
+                                className="w-10 h-10"
+                            />
                         </div>
                         <div className="flex flex-col">
                             <span className={cn(

@@ -1,33 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  /* JCT Brand Colors - Modernized */
-  --color-primary: #0F172A;
-  /* Slate 900 */
+  /* JCT Brand Colors - Royal Blue Theme */
+  --color-primary: #1E3A8A;
+  /* Royal Blue 800 - Deep, authoritative */
   --color-primary-foreground: #FFFFFF;
 
   --color-accent: #FBBF24;
-  /* Amber 400 */
-  --color-accent-foreground: #0F172A;
+  /* Amber 400 - Engineering accent */
+  --color-accent-foreground: #1E3A8A;
 
-  --color-background: #FAFAF9;
-  /* Stone 50 */
-  --color-foreground: #1C1917;
-  /* Stone 900 */
+  --color-background: #F8FAFC;
+  /* Slate 50 - Subtle professional background */
+  --color-foreground: #0F172A;
+  /* Slate 900 */
 
-  --color-muted: #F5F5F4;
-  /* Stone 100 */
-  --color-muted-foreground: #78716C;
-  /* Stone 500 */
+  --color-muted: #F1F5F9;
+  /* Slate 100 */
+  --color-muted-foreground: #64748B;
+  /* Slate 500 */
 
   --color-card: #FFFFFF;
-  --color-card-foreground: #1C1917;
+  --color-card-foreground: #0F172A;
 
-  --color-border: #E7E5E4;
-  /* Stone 200 */
+  --color-border: #E2E8F0;
+  /* Slate 200 */
 
-  --radius: 1rem;
-  /* rounded-2xl equivalent */
+  /* Institution-specific colors */
+  --color-engineering-primary: #1E40AF;
+  /* Blue 800 */
+  --color-engineering-accent: #FBBF24;
+  /* Yellow/Amber */
+  
+  --color-polytechnic-primary: #0F766E;
+  /* Teal 700 - Professional technical */
+  --color-polytechnic-accent: #14B8A6;
+  /* Teal 500 */
+  
+  --color-arts-primary: #7C3AED;
+  /* Purple 600 - Calm academic */
+  --color-arts-accent: #A78BFA;
+  /* Purple 400 */
+
+  --radius: 0.75rem;
+  /* Slightly reduced for more compact feel */
 }
 
 @theme inline {
@@ -59,6 +75,9 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-image: 
+    radial-gradient(circle at 20% 80%, rgba(30, 58, 138, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(30, 58, 138, 0.03) 0%, transparent 50%);
 }
 
 h1,

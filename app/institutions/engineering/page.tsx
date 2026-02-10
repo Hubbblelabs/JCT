@@ -408,7 +408,7 @@ export default function EngineeringPage() {
                                 <a href="tel:+919876543210" className="flex items-center gap-4 text-white/70 hover:text-white transition-colors">
                                     <div className="p-3 bg-white/5 rounded-xl"><Phone size={18} className="text-accent" /></div>
                                     <div>
-                                        <span className="block text-sm font-bold text-white">+91 98765 43210</span>
+                                        <span className="block text-sm font-bold text-white">+91 98765 48801</span>
                                         <span className="text-xs text-white/40">Mon — Sat, 9 AM — 5 PM</span>
                                     </div>
                                 </a>

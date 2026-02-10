@@ -66,7 +66,7 @@ export function Admissions() {
                             <div className="mt-16 p-8 bg-white/5 border border-white/10 rounded-3xl backdrop-blur-sm">
                                 <h4 className="text-accent font-serif text-xl mb-3">Need Guidance?</h4>
                                 <p className="text-sm text-blue-200 mb-6 font-light">Our admissions office is open Mon-Sat, 9AM - 5PM.</p>
-                                <p className="text-lg font-medium text-white tracking-widest">+91 98765 43210</p>
+                                <p className="text-lg font-medium text-white tracking-widest">+91 98765 48801</p>
                             </div>
                         </motion.div>
                     </div>
