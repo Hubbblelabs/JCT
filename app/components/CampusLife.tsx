@@ -60,7 +60,7 @@ export function CampusLife() {
                         transition={{ duration: 0.6, delay: index * 0.1 }}
                         className="flex-none w-[85vw] md:w-[45vw] lg:w-[30vw] snap-center cursor-pointer group"
                     >
-                        <div className="aspect-[4/5] md:aspect-[3/4] rounded-3xl overflow-hidden relative mb-6 shadow-md group-hover:shadow-xl transition-all duration-500">
+                        <div className="aspect-4/5 md:aspect-3/4 rounded-3xl overflow-hidden relative mb-6 shadow-md group-hover:shadow-xl transition-all duration-500">
                             <div className="absolute inset-0 bg-primary/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
                             <img
                                 src={item.src}

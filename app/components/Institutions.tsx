@@ -62,7 +62,7 @@ export function Institutions() {
                           <Link href={inst.href}>
                             <div className="h-full bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl hover:shadow-accent/10 transition-all duration-500 flex flex-col border border-stone-100">
                                 {/* Image Container */}
-                                <div className="aspect-[16/10] overflow-hidden relative">
+                                <div className="aspect-16/10 overflow-hidden relative">
                                     <div className="absolute inset-0 bg-primary/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
                                     <img
                                         src={inst.image}

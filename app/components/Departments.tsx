@@ -75,8 +75,8 @@ export function Departments() {
                             <Link href={`/academics/${dept.slug}`} className="group block h-full">
                                 <div className="bg-white border border-stone-100 rounded-3xl overflow-hidden hover:shadow-2xl hover:shadow-accent/10 transition-all duration-500 hover:-translate-y-2 h-full flex flex-col">
                                     {/* Image */}
-                                    <div className="aspect-[4/3] overflow-hidden relative">
-                                        <div className="absolute inset-0 bg-gradient-to-t from-primary/80 via-primary/20 to-transparent z-10 opacity-60 group-hover:opacity-40 transition-opacity" />
+                                    <div className="aspect-4/3 overflow-hidden relative">
+                                        <div className="absolute inset-0 bg-linear-to-t from-primary/80 via-primary/20 to-transparent z-10 opacity-60 group-hover:opacity-40 transition-opacity" />
                                         <img
                                             src={dept.image}
                                             alt={dept.name}

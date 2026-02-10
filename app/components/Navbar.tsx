@@ -97,7 +97,7 @@ export function Navbar() {
                                 </Link>
                                 {link.children && (
                                     <div className="absolute top-full left-1/2 -translate-x-1/2 pt-4 opacity-0 invisible group-hover/nav:opacity-100 group-hover/nav:visible transition-all duration-200 z-50">
-                                        <div className="bg-white rounded-2xl shadow-xl border border-stone-100 py-3 px-2 min-w-[240px]">
+                                        <div className="bg-white rounded-2xl shadow-xl border border-stone-100 py-3 px-2 min-w-60">
                                             {link.children.map((child) => (
                                                 <Link
                                                     key={child.name}
