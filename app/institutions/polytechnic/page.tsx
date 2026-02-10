@@ -104,24 +104,25 @@ const facilities = [
 
 export default function PolytechnicPage() {
     return (
-        <main className="min-h-screen bg-background text-foreground overflow-x-hidden">
+        <main className="min-h-screen bg-background text-foreground overflow-x-hidden polytechnic-theme">
             <Navbar />
 
             {/* ═══ HERO — Split layout (text left + stats right) ═══ */}
-            <section className="relative min-h-[85vh] bg-primary text-white overflow-hidden">
-                <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
+            <section className="relative min-h-[80vh] bg-[#0F766E] text-white overflow-hidden">
+                {/* Technical pattern overlay */}
+                <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2314B8A6' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
 
                 <div className="container mx-auto px-4 md:px-6 relative z-10">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[85vh] py-32">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[80vh] py-24">
                         {/* Left — Text */}
                         <div>
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.6 }}
-                                className="mb-8"
+                                className="mb-6"
                             >
-                                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-accent/30 bg-accent/10 text-sm font-bold tracking-widest uppercase text-accent">
+                                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#14B8A6]/30 bg-[#14B8A6]/10 text-sm font-bold tracking-widest uppercase text-[#14B8A6]">
                                     <Wrench size={14} />
                                     Diploma Programs — AICTE Approved
                                 </span>
@@ -131,7 +132,7 @@ export default function PolytechnicPage() {
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.1 }}
-                                className="text-5xl md:text-6xl lg:text-7xl font-serif text-white mb-8 tracking-tighter leading-[0.9]"
+                                className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6 tracking-tighter leading-[0.95]"
                             >
                                 Learn a Trade. <br />
                                 <span className="text-white/70 font-light italic">Build a Career.</span>
@@ -141,7 +142,7 @@ export default function PolytechnicPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.6, delay: 0.25 }}
-                                className="text-lg text-white/60 max-w-lg leading-relaxed font-light mb-10"
+                                className="text-base text-white/70 max-w-lg leading-relaxed font-light mb-8"
                             >
                                 JCT Polytechnic College offers three-year diploma programs where students spend as much time in workshops as they do in classrooms. The goal is simple: graduate with skills that employers actually need.
                             </motion.p>
@@ -152,10 +153,10 @@ export default function PolytechnicPage() {
                                 transition={{ duration: 0.6, delay: 0.35 }}
                                 className="flex flex-wrap gap-4"
                             >
-                                <Button size="lg" className="h-14 px-8 bg-accent text-primary hover:bg-accent/90 font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-accent/20">
+                                <Button size="lg" className="h-12 px-8 bg-[#14B8A6] text-white hover:bg-[#0D9488] font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-[#14B8A6]/20">
                                     View Programs <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
-                                <Button variant="outline" size="lg" className="h-14 px-8 bg-transparent border-white/20 text-white hover:bg-white/10 font-bold rounded-2xl">
+                                <Button variant="outline" size="lg" className="h-12 px-8 bg-transparent border-white/20 text-white hover:bg-white/10 font-bold rounded-xl">
                                     Download Brochure
                                 </Button>
                             </motion.div>
@@ -166,7 +167,7 @@ export default function PolytechnicPage() {
                             initial={{ opacity: 0, x: 30 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.8, delay: 0.2 }}
-                            className="grid grid-cols-2 gap-4"
+                            className="grid grid-cols-2 gap-3"
                         >
                             {[
                                 { value: "1,200+", label: "Students Enrolled", sub: "Across 6 streams" },
@@ -174,10 +175,10 @@ export default function PolytechnicPage() {
                                 { value: "85%", label: "Placement Rate", sub: "Within 6 months" },
                                 { value: "3 Yrs", label: "Program Duration", sub: "10th standard entry" },
                             ].map((stat, i) => (
-                                <div key={i} className="bg-white/5 border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-colors">
-                                    <span className="block text-3xl md:text-4xl font-sans font-black text-accent tracking-tight mb-2">{stat.value}</span>
-                                    <h4 className="text-sm font-bold text-white/90 uppercase tracking-wider mb-1">{stat.label}</h4>
-                                    <p className="text-xs text-white/40 font-light">{stat.sub}</p>
+                                <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-5 hover:bg-white/10 transition-colors">
+                                    <span className="block text-2xl md:text-3xl font-sans font-black text-[#14B8A6] tracking-tight mb-2">{stat.value}</span>
+                                    <h4 className="text-xs font-bold text-white/90 uppercase tracking-wider mb-1">{stat.label}</h4>
+                                    <p className="text-xs text-white/50 font-light">{stat.sub}</p>
                                 </div>
                             ))}
                         </motion.div>

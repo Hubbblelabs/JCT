@@ -72,30 +72,32 @@ export default function EngineeringPage() {
     const heroScale = useTransform(scrollYProgress, [0, 0.6], [1, 1.08]);
 
     return (
-        <main className="min-h-screen bg-background text-foreground overflow-x-hidden">
+        <main className="min-h-screen bg-background text-foreground overflow-x-hidden engineering-theme">
             <Navbar />
 
             {/* ═══ HERO — Full-bleed, impact-driven ═══ */}
-            <section ref={heroRef} className="relative min-h-screen flex items-center overflow-hidden">
+            <section ref={heroRef} className="relative min-h-[85vh] flex items-center overflow-hidden bg-[#1E40AF]">
                 <motion.div style={{ opacity: heroOpacity, scale: heroScale }} className="absolute inset-0 z-0">
                     <img
                         src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=2670&auto=format&fit=crop"
                         alt="Engineering campus"
                         className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-linear-to-r from-primary/95 via-primary/80 to-primary/40" />
+                    <div className="absolute inset-0 bg-linear-to-r from-[#1E40AF]/95 via-[#1E40AF]/85 to-[#1E40AF]/50" />
+                    {/* Subtle grid pattern overlay */}
+                    <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 50px, #FBBF24 50px, #FBBF24 52px), repeating-linear-gradient(90deg, transparent, transparent 50px, #FBBF24 50px, #FBBF24 52px)' }} />
                 </motion.div>
 
-                <div className="container mx-auto px-4 md:px-6 relative z-10 pt-32 pb-20">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div className="container mx-auto px-4 md:px-6 relative z-10 pt-28 pb-16">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
                         <div>
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.5 }}
-                                className="mb-8"
+                                className="mb-6"
                             >
-                                <span className="text-xs font-bold tracking-[0.2em] uppercase text-accent">
+                                <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#FBBF24]">
                                     JCT College of Engineering & Technology
                                 </span>
                             </motion.div>
@@ -104,17 +106,17 @@ export default function EngineeringPage() {
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                                className="text-5xl md:text-6xl lg:text-7xl font-serif text-white mb-8 tracking-tighter leading-[0.92]"
+                                className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6 tracking-tighter leading-[0.95]"
                             >
                                 Engineer the <br />
-                                Future <span className="text-accent">.</span>
+                                Future <span className="text-[#FBBF24]">.</span>
                             </motion.h1>
 
                             <motion.p
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.2 }}
-                                className="text-lg text-white/60 font-light leading-relaxed max-w-lg mb-10"
+                                className="text-base text-white/70 font-light leading-relaxed max-w-lg mb-8"
                             >
                                 An autonomous institution affiliated to Anna University. Five engineering departments, industry-grade labs, and a placement record that speaks for itself.
                             </motion.p>
@@ -125,10 +127,10 @@ export default function EngineeringPage() {
                                 transition={{ duration: 0.8, delay: 0.35 }}
                                 className="flex flex-wrap gap-4"
                             >
-                                <Button size="lg" className="h-14 px-8 bg-accent text-primary hover:bg-accent/90 font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-accent/20">
+                                <Button size="lg" className="h-12 px-8 bg-[#FBBF24] text-[#1E40AF] hover:bg-[#F59E0B] font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-[#FBBF24]/20">
                                     Apply Now <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
-                                <Button variant="outline" size="lg" className="h-14 px-8 border-white/20 bg-transparent text-white hover:bg-white/10 font-bold rounded-2xl">
+                                <Button variant="outline" size="lg" className="h-12 px-8 border-white/20 bg-transparent text-white hover:bg-white/10 font-bold rounded-xl">
                                     View Placements
                                 </Button>
                             </motion.div>
@@ -139,7 +141,7 @@ export default function EngineeringPage() {
                             initial={{ opacity: 0, x: 40 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.8, delay: 0.3 }}
-                            className="hidden lg:grid grid-cols-2 gap-4"
+                            className="hidden lg:grid grid-cols-2 gap-3"
                         >
                             {[
                                 { val: "5", label: "Departments", accent: true },
@@ -149,10 +151,10 @@ export default function EngineeringPage() {
                             ].map((s) => (
                                 <div
                                     key={s.label}
-                                    className={`p-8 rounded-2xl border ${s.accent ? "bg-accent/15 border-accent/20" : "bg-white/5 border-white/10"}`}
+                                    className={`p-6 rounded-xl border ${s.accent ? "bg-[#FBBF24]/15 border-[#FBBF24]/30" : "bg-white/5 border-white/10"}`}
                                 >
-                                    <span className={`block text-4xl font-sans font-black mb-2 ${s.accent ? "text-accent" : "text-white"}`}>{s.val}</span>
-                                    <span className="text-xs text-white/40 font-bold uppercase tracking-wider">{s.label}</span>
+                                    <span className={`block text-3xl font-sans font-black mb-2 ${s.accent ? "text-[#FBBF24]" : "text-white"}`}>{s.val}</span>
+                                    <span className="text-xs text-white/50 font-bold uppercase tracking-wider">{s.label}</span>
                                 </div>
                             ))}
                         </motion.div>
@@ -161,11 +163,13 @@ export default function EngineeringPage() {
             </section>
 
             {/* ═══ ENGINEERING DOMAINS — Horizontal cards ═══ */}
-            <section className="py-28 bg-white">
-                <div className="container mx-auto px-4 md:px-6">
-                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+            <section className="py-20 bg-white relative">
+                {/* Subtle background pattern */}
+                <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #1E40AF 0px, #1E40AF 2px, transparent 2px, transparent 10px)' }} />
+                <div className="container mx-auto px-4 md:px-6 relative z-10">
+                    <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                         <div>
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Engineering Domains</h2>
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-[#FBBF24] mb-4">Engineering Domains</h2>
                             <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight">
                                 Five Disciplines, <span className="text-stone-300 italic font-light">One Standard.</span>
                             </h3>
