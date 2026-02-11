@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, ChevronDown, GraduationCap, Microscope, PenTool, ArrowRight, Phone, BookOpen } from "lucide-react";
+import { Menu, X, ChevronDown, GraduationCap, Microscope, PenTool, ArrowRight, Phone, BookOpen, ShieldCheck } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -92,8 +92,8 @@ export function Navbar() {
             >
                 <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center gap-3 z-50 relative group">
-                        <div className="transition-transform duration-300 group-hover:scale-105">
+                    <Link href="/" className="flex items-center z-50 relative">
+                        <div className="origin-left scale-140 transition-transform duration-300">
                             <Image
                                 src="/jct_logo.svg"
                                 alt="JCT Institutions Logo"
@@ -102,21 +102,8 @@ export function Navbar() {
                                 className="w-40 h-10 md:w-48 md:h-12"
                             />
                         </div>
-                        {/* <div className="flex flex-col">
-                            <span className={cn(
-                                "text-lg md:text-xl font-serif font-bold tracking-tight leading-none transition-colors",
-                                scrolled ? "text-primary" : "text-white"
-                            )}>
-                                JCT Institutions
-                            </span>
-                            <span className={cn(
-                                "text-[10px] font-medium tracking-[0.15em] uppercase mt-0.5 transition-colors",
-                                scrolled ? "text-stone-500" : "text-white/70"
-                            )}>
-                                Coimbatore • Est. 1998
-                            </span>
-                        </div> */}
                     </Link>
+
 
                     {/* Desktop Navigation */}
                     <div className="hidden lg:flex items-center gap-6 xl:gap-8">
@@ -188,7 +175,30 @@ export function Navbar() {
                     </div>
 
                     {/* Desktop Right Actions */}
-                    <div className="hidden lg:flex items-center gap-4">
+                    <div className="hidden lg:flex items-center gap-3">
+                        {/* Accreditation Badges */}
+                        <div className={cn(
+                            "hidden xl:flex items-center gap-2 mr-1 transition-all duration-300",
+                            scrolled ? "opacity-100" : "opacity-90"
+                        )}>
+                            {[
+                                { label: "NAAC", color: scrolled ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-white/20 bg-white/10 text-white" },
+                                { label: "AICTE", color: scrolled ? "border-blue-200 bg-blue-50 text-blue-700" : "border-white/20 bg-white/10 text-white" },
+                                { label: "Anna University", color: scrolled ? "border-purple-200 bg-purple-50 text-purple-700" : "border-white/20 bg-white/10 text-white" },
+                            ].map((badge) => (
+                                <span
+                                    key={badge.label}
+                                    className={cn(
+                                        "inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider transition-all duration-300",
+                                        badge.color
+                                    )}
+                                >
+                                    <ShieldCheck size={10} strokeWidth={2.5} />
+                                    {badge.label}
+                                </span>
+                            ))}
+                        </div>
+
                         <Link
                             href="#admissions"
                             className={cn(

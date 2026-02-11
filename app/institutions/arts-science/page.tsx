@@ -59,15 +59,15 @@ export default function ArtsSciencePage() {
             <Navbar />
 
             {/* ═══ HERO — Text-led, calm, editorial ═══ */}
-            <section className="relative min-h-[90vh] md:min-h-screen flex items-center overflow-hidden bg-[#2E1065]">
+            <section className="relative min-h-[90vh] md:min-h-screen flex items-center overflow-hidden bg-[#1E1B4B]">
                 {/* Background Image & Overlay */}
                 <div className="absolute inset-0 z-0">
                     <img
                         src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=2670&auto=format&fit=crop"
                         alt="Arts and Science Campus"
-                        className="w-full h-full object-cover opacity-50"
+                        className="w-full h-full object-cover opacity-40"
                     />
-                    <div className="absolute inset-0 bg-linear-to-r from-[#2E1065]/95 via-[#2E1065]/90 to-[#2E1065]/50" />
+                    <div className="absolute inset-0 bg-linear-to-r from-[#1E1B4B]/95 via-[#1E1B4B]/85 to-[#1E1B4B]/40" />
                     {/* Artistic pattern overlay */}
                     <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, transparent 0%, transparent 2%, #A78BFA 2%, #A78BFA 2.2%, transparent 2.2%)', backgroundSize: '40px 40px' }} />
                 </div>
@@ -82,7 +82,7 @@ export default function ArtsSciencePage() {
                                 transition={{ duration: 0.6 }}
                                 className="mb-4 md:mb-6"
                             >
-                                <span className="inline-block py-1 px-3 rounded-full bg-[#A78BFA]/10 border border-[#A78BFA]/20 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase text-[#A78BFA] backdrop-blur-md">
+                                <span className="inline-block py-1 px-3 rounded-full bg-[#C4B5FD]/10 border border-[#C4B5FD]/20 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase text-[#C4B5FD] backdrop-blur-md">
                                     JCT College of Arts & Science
                                 </span>
                             </motion.div>
@@ -112,7 +112,7 @@ export default function ArtsSciencePage() {
                                 transition={{ duration: 0.8, delay: 0.3 }}
                                 className="flex flex-col sm:flex-row gap-4"
                             >
-                                <Button size="lg" className="h-12 md:h-14 px-8 bg-[#A78BFA] text-[#2E1065] hover:bg-[#8B5CF6] font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-[#A78BFA]/20 w-full sm:w-auto">
+                                <Button size="lg" className="h-12 md:h-14 px-8 bg-[#C4B5FD] text-[#1E1B4B] hover:bg-[#A78BFA] font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-[#C4B5FD]/20 w-full sm:w-auto">
                                     Explore Programs <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
                                 <Button variant="outline" size="lg" className="h-12 md:h-14 px-8 border-white/20 bg-white/5 backdrop-blur-sm text-white hover:bg-white/10 font-bold rounded-xl w-full sm:w-auto">
@@ -136,9 +136,9 @@ export default function ArtsSciencePage() {
                             ].map((stat) => (
                                 <div
                                     key={stat.label}
-                                    className={`p-4 md:p-6 rounded-2xl border backdrop-blur-md ${stat.accent ? "bg-[#A78BFA]/15 border-[#A78BFA]/30" : "bg-white/5 border-white/10"}`}
+                                    className={`p-4 md:p-6 rounded-2xl border backdrop-blur-md ${stat.accent ? "bg-[#C4B5FD]/15 border-[#C4B5FD]/30" : "bg-white/8 border-white/15"}`}
                                 >
-                                    <span className={`block text-2xl md:text-4xl font-sans font-black mb-1 md:mb-2 ${stat.accent ? "text-[#A78BFA]" : "text-white"}`}>{stat.value}</span>
+                                    <span className={`block text-2xl md:text-4xl font-sans font-black mb-1 md:mb-2 ${stat.accent ? "text-[#C4B5FD]" : "text-white"}`}>{stat.value}</span>
                                     <span className="text-[10px] md:text-xs text-white/60 font-bold uppercase tracking-wider">{stat.label}</span>
                                 </div>
                             ))}
@@ -220,7 +220,7 @@ export default function ArtsSciencePage() {
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.4, delay: index * 0.06 }}
-                                className="bg-white p-8 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 group min-w-[250px] md:min-w-[300px] snap-center shrink-0 flex flex-col justify-between"
+                                className="bg-white p-6 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 group min-w-[220px] md:min-w-[260px] max-w-[280px] snap-center shrink-0 flex flex-col justify-between"
                                 draggable={false}
                             >
                                 <div>
@@ -267,7 +267,7 @@ export default function ArtsSciencePage() {
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.4, delay: index * 0.08 }}
-                                className="bg-white p-8 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 min-w-[250px] md:min-w-[300px] snap-center shrink-0 flex flex-col justify-between"
+                                className="bg-white p-6 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 min-w-[220px] md:min-w-[260px] max-w-[280px] snap-center shrink-0 flex flex-col justify-between"
                                 draggable={false}
                             >
                                 <div>

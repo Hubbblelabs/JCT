@@ -15,7 +15,7 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: "JCT Institutions",
-  description: "Cultivating character, competence, and leadership since 1998.",
+  description: "Cultivating character, competence, and leadership since 2009.",
 };
 
 export default function RootLayout({

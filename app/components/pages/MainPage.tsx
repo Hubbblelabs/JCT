@@ -8,7 +8,8 @@ import { Footer } from "@/app/components/Footer";
 import { TrustIndicators } from "@/app/components/TrustIndicators";
 import { ReverseRoadmap } from "@/app/components/ReverseRoadmap";
 import { FloatingCTA } from "@/app/components/FloatingCTA";
-import { HomeInstitutions } from "@/app/components/HomeInstitutions";
+import { CompanyCarousel } from "@/app/components/CompanyCarousel";
+import { Institutions } from "@/app/components/Institutions";
 import Link from "next/link";
 import {
     ArrowUpRight,
@@ -39,7 +40,7 @@ import {
 const achievements = [
     { icon: Users, value: "12,000+", label: "Alumni Network", desc: "Graduates working across India and 15+ countries" },
     { icon: Building2, value: "3", label: "Institutions", desc: "Engineering, Arts & Science, and Polytechnic" },
-    { icon: Trophy, value: "25+", label: "Years of Service", desc: "Continuous operation since 1998" },
+    { icon: Trophy, value: "15+", label: "Years of Service", desc: "Continuous operation since 2009" },
     { icon: Globe, value: "500+", label: "Recruiting Partners", desc: "Companies hiring from our campuses" },
 ];
 
@@ -90,7 +91,7 @@ export default function MainPage() {
                         >
                             <span className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-white/15 bg-white/5 backdrop-blur-sm text-sm font-bold tracking-widest uppercase text-white/80">
                                 <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                                Coimbatore, Tamil Nadu — Since 1998
+                                Coimbatore, Tamil Nadu — Since 2009
                             </span>
                         </motion.div>
 
@@ -149,8 +150,10 @@ export default function MainPage() {
             <TrustIndicators />
 
             {/* ═══ OUR INSTITUTIONS — Alternating horizontal cards ═══ */}
-            {/* ═══ OUR INSTITUTIONS — Alternating horizontal cards ═══ */}
-            <HomeInstitutions />
+            <Institutions />
+
+            {/* ═══ COMPANY CAROUSEL — Recruiting partners ═══ */}
+            <CompanyCarousel />
 
             {/* ═══ LEGACY & VALUES — Timeline + values ═══ */}
             <section id="about" className="py-20 bg-stone-50">
@@ -164,7 +167,7 @@ export default function MainPage() {
                         >
                             <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Our Story</h2>
                             <h3 className="text-3xl md:text-5xl font-serif text-primary leading-tight">
-                                A Quarter Century of <br />
+                                Over a Decade of <br />
                                 <span className="text-stone-400 italic font-light">Steady Growth.</span>
                             </h3>
                         </motion.div>
@@ -176,7 +179,7 @@ export default function MainPage() {
                             className="flex items-end"
                         >
                             <p className="text-stone-500 text-base font-light leading-relaxed max-w-lg">
-                                JCT Institutions wasn't built in a single stroke. It grew institution by institution, responding to what students and the region actually needed — first engineers, then broadly educated graduates, then skilled technicians.
+                                JCT Institutions wasn't built in a single stroke. Since 2009, it grew institution by institution, responding to what students and the region actually needed — first engineers, then broadly educated graduates, then skilled technicians.
                             </p>
                         </motion.div>
                     </div>
@@ -239,7 +242,7 @@ export default function MainPage() {
                     >
                         <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">By the Numbers</h2>
                         <h3 className="text-3xl md:text-4xl font-serif leading-tight">
-                            Twenty-Five Years <span className="text-white/60 italic font-light">in Sum</span>
+                            Fifteen+ Years <span className="text-white/60 italic font-light">in Sum</span>
                         </h3>
                     </motion.div>
 

@@ -89,3 +89,37 @@ h6 {
   font-family: var(--font-serif);
   letter-spacing: -0.02em;
 }
+
+/* ─── Company Carousel Animations ─── */
+@keyframes scroll-left {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scroll-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.animate-scroll-left {
+  animation: scroll-left 30s linear infinite;
+  width: max-content;
+}
+
+.animate-scroll-right {
+  animation: scroll-right 35s linear infinite;
+  width: max-content;
+}
+
+.animate-scroll-left:hover,
+.animate-scroll-right:hover {
+  animation-play-state: paused;
+}

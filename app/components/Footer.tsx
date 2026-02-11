@@ -17,7 +17,7 @@ export function Footer() {
                             </div>
                             <div>
                                 <h2 className="text-xl font-serif tracking-tight text-white leading-none">JCT Institutions</h2>
-                                <span className="text-[10px] text-white/60 font-medium tracking-[0.2em] uppercase">Est. 1998</span>
+                                <span className="text-[10px] text-white/60 font-medium tracking-[0.2em] uppercase">Est. 2009</span>
                             </div>
                         </div>
                         <p className="text-white/70 text-sm leading-relaxed mb-6">
@@ -88,7 +88,7 @@ export function Footer() {
                     {/* Google Map */}
                     <div>
                         <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-accent mb-6">Location</h3>
-                        <div className="rounded-2xl overflow-hidden border-2 border-white/10 h-64">
+                        <div className="rounded-2xl overflow-hidden border-2 border-white/10 h-72">
                             <iframe
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.3087446879744!2d77.0244!3d11.0168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTHCsDAxJzAwLjUiTiA3N8KwMDEnMjcuOCJF!5e0!3m2!1sen!2sin!4v1234567890"
                                 width="100%"
@@ -108,6 +108,32 @@ export function Footer() {
                             <MapPin size={16} />
                             Get Directions
                         </Link>
+                    </div>
+                </div>
+
+                {/* Accreditation Logos Strip */}
+                <div className="border-t border-white/10 pt-10 pb-6 mb-6">
+                    <div className="flex flex-col items-center gap-6">
+                        <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/40">Approved & Accredited By</span>
+                        <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10">
+                            {[
+                                { name: "AICTE", sub: "Approved", color: "#FBBF24" },
+                                { name: "NAAC", sub: "Accredited", color: "#34D399" },
+                                { name: "Anna\nUniversity", sub: "Affiliated", color: "#60A5FA" },
+                                { name: "UGC", sub: "Recognized", color: "#F87171" },
+                                { name: "ISO\n9001:2015", sub: "Certified", color: "#A78BFA" },
+                            ].map((acc) => (
+                                <div key={acc.name} className="flex flex-col items-center gap-2 group cursor-default">
+                                    <div className="w-18 h-18 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-3 group-hover:bg-white/10 group-hover:border-white/25 transition-all duration-300">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={acc.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-1 opacity-80">
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                                        </svg>
+                                        <span className="text-[10px] font-black text-white/90 tracking-tight text-center leading-tight whitespace-pre-line">{acc.name}</span>
+                                    </div>
+                                    <span className="text-[9px] text-white/40 font-medium uppercase tracking-wider">{acc.sub}</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
