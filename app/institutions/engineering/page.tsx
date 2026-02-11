@@ -1,5 +1,7 @@
 "use client";
 
+import { DragScroll } from "@/app/components/ui/DragScroll";
+
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
@@ -76,28 +78,28 @@ export default function EngineeringPage() {
             <Navbar />
 
             {/* ═══ HERO — Full-bleed, impact-driven ═══ */}
-            <section ref={heroRef} className="relative min-h-[85vh] flex items-center overflow-hidden bg-[#1E40AF]">
+            <section ref={heroRef} className="relative min-h-[90vh] md:min-h-screen flex items-center overflow-hidden bg-[#0F172A]">
                 <motion.div style={{ opacity: heroOpacity, scale: heroScale }} className="absolute inset-0 z-0">
                     <img
                         src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=2670&auto=format&fit=crop"
                         alt="Engineering campus"
-                        className="w-full h-full object-cover"
+                        className="w-full h-full object-cover opacity-40"
                     />
-                    <div className="absolute inset-0 bg-linear-to-r from-[#1E40AF]/95 via-[#1E40AF]/85 to-[#1E40AF]/50" />
+                    <div className="absolute inset-0 bg-linear-to-r from-[#0F172A]/95 via-[#0F172A]/80 to-[#0F172A]/40" />
                     {/* Subtle grid pattern overlay */}
-                    <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 50px, #FBBF24 50px, #FBBF24 52px), repeating-linear-gradient(90deg, transparent, transparent 50px, #FBBF24 50px, #FBBF24 52px)' }} />
+                    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 50px, #FBBF24 50px, #FBBF24 51px), repeating-linear-gradient(90deg, transparent, transparent 50px, #FBBF24 50px, #FBBF24 51px)' }} />
                 </motion.div>
 
-                <div className="container mx-auto px-4 md:px-6 relative z-10 pt-28 pb-16">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                        <div>
+                <div className="container mx-auto px-4 md:px-6 relative z-10 pt-32 pb-16 md:pt-0">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                        <div className="max-w-2xl">
                             <motion.div
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 transition={{ duration: 0.5 }}
-                                className="mb-6"
+                                className="mb-4 md:mb-6"
                             >
-                                <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#FBBF24]">
+                                <span className="inline-block py-1 px-3 rounded-full bg-[#FBBF24]/10 border border-[#FBBF24]/20 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase text-[#FBBF24] backdrop-blur-md">
                                     JCT College of Engineering & Technology
                                 </span>
                             </motion.div>
@@ -106,7 +108,7 @@ export default function EngineeringPage() {
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                                className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6 tracking-tighter leading-[0.95]"
+                                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-white mb-6 tracking-tight leading-[1.1] md:leading-none"
                             >
                                 Engineer the <br />
                                 Future <span className="text-[#FBBF24]">.</span>
@@ -116,32 +118,32 @@ export default function EngineeringPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.2 }}
-                                className="text-base text-white/70 font-light leading-relaxed max-w-lg mb-8"
+                                className="text-sm md:text-base lg:text-lg text-white/80 font-light leading-relaxed max-w-lg mb-8"
                             >
-                                An autonomous institution affiliated to Anna University. Five engineering departments, industry-grade labs, and a placement record that speaks for itself.
+                                An autonomous institution affiliated to Anna University. Five cutting-edge engineering departments, industry-grade labs, and a placement record that speaks for itself.
                             </motion.p>
 
                             <motion.div
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.35 }}
-                                className="flex flex-wrap gap-4"
+                                className="flex flex-col sm:flex-row gap-4"
                             >
-                                <Button size="lg" className="h-12 px-8 bg-[#FBBF24] text-[#1E40AF] hover:bg-[#F59E0B] font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-[#FBBF24]/20">
+                                <Button size="lg" className="h-12 md:h-14 px-8 bg-[#FBBF24] text-[#0F172A] hover:bg-[#F59E0B] font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-[#FBBF24]/20 w-full sm:w-auto">
                                     Apply Now <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
-                                <Button variant="outline" size="lg" className="h-12 px-8 border-white/20 bg-transparent text-white hover:bg-white/10 font-bold rounded-xl">
+                                <Button variant="outline" size="lg" className="h-12 md:h-14 px-8 border-white/20 bg-white/5 backdrop-blur-sm text-white hover:bg-white/10 font-bold rounded-xl w-full sm:w-auto">
                                     View Placements
                                 </Button>
                             </motion.div>
                         </div>
 
-                        {/* Right side: quick stats grid */}
+                        {/* Right side: quick stats grid - Visible on mobile now */}
                         <motion.div
-                            initial={{ opacity: 0, x: 40 }}
-                            animate={{ opacity: 1, x: 0 }}
+                            initial={{ opacity: 0, y: 40 }}
+                            animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.3 }}
-                            className="hidden lg:grid grid-cols-2 gap-3"
+                            className="grid grid-cols-2 gap-3 md:gap-4 mt-8 lg:mt-0"
                         >
                             {[
                                 { val: "5", label: "Departments", accent: true },
@@ -151,10 +153,10 @@ export default function EngineeringPage() {
                             ].map((s) => (
                                 <div
                                     key={s.label}
-                                    className={`p-6 rounded-xl border ${s.accent ? "bg-[#FBBF24]/15 border-[#FBBF24]/30" : "bg-white/5 border-white/10"}`}
+                                    className={`p-4 md:p-6 rounded-2xl border backdrop-blur-md ${s.accent ? "bg-[#FBBF24]/15 border-[#FBBF24]/30" : "bg-white/5 border-white/10"}`}
                                 >
-                                    <span className={`block text-3xl font-sans font-black mb-2 ${s.accent ? "text-[#FBBF24]" : "text-white"}`}>{s.val}</span>
-                                    <span className="text-xs text-white/50 font-bold uppercase tracking-wider">{s.label}</span>
+                                    <span className={`block text-2xl md:text-4xl font-sans font-black mb-1 md:mb-2 ${s.accent ? "text-[#FBBF24]" : "text-white"}`}>{s.val}</span>
+                                    <span className="text-[10px] md:text-xs text-white/60 font-bold uppercase tracking-wider">{s.label}</span>
                                 </div>
                             ))}
                         </motion.div>
@@ -165,7 +167,7 @@ export default function EngineeringPage() {
             {/* ═══ ENGINEERING DOMAINS — Horizontal cards ═══ */}
             <section className="py-20 bg-white relative">
                 {/* Subtle background pattern */}
-                <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #1E40AF 0px, #1E40AF 2px, transparent 2px, transparent 10px)' }} />
+                <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #0F172A 0px, #0F172A 2px, transparent 2px, transparent 10px)' }} />
                 <div className="container mx-auto px-4 md:px-6 relative z-10">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
                         <div>
@@ -179,18 +181,19 @@ export default function EngineeringPage() {
                         </p>
                     </div>
 
-                    <div className="space-y-4">
+                    <DragScroll className="flex gap-4 md:gap-6 pb-8 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory scroll-smooth">
                         {departments.map((dept, index) => (
                             <motion.div
                                 key={dept.abbr}
-                                initial={{ opacity: 0, y: 10 }}
-                                whileInView={{ opacity: 1, y: 0 }}
+                                initial={{ opacity: 0, x: 20 }}
+                                whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.35, delay: index * 0.05 }}
-                                className="group bg-white border border-stone-100 rounded-2xl p-6 md:p-8 hover:border-accent/20 hover:shadow-lg transition-all duration-300"
+                                className="group bg-white border border-stone-100 rounded-2xl p-6 md:p-8 hover:border-accent/20 hover:shadow-lg transition-all duration-300 min-w-[250px] md:min-w-[290px] snap-center shrink-0 flex flex-col justify-between"
+                                draggable={false}
                             >
-                                <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8">
-                                    <div className="flex items-center gap-4 md:w-1/3">
+                                <div className="flex flex-col gap-4">
+                                    <div className="flex items-center gap-4">
                                         <div className="p-3 bg-stone-50 rounded-xl text-primary group-hover:bg-accent/10 group-hover:text-accent transition-colors shrink-0">
                                             <dept.icon size={24} strokeWidth={1.5} />
                                         </div>
@@ -199,20 +202,21 @@ export default function EngineeringPage() {
                                             <span className="text-xs font-bold text-accent uppercase tracking-wider">{dept.abbr}</span>
                                         </div>
                                     </div>
-                                    <div className="md:w-1/3">
+                                    <div>
                                         <p className="text-stone-500 text-sm font-light">{dept.highlight}</p>
                                     </div>
-                                    <div className="md:w-1/6 flex items-center gap-2">
+                                </div>
+
+                                <div className="flex items-center justify-between mt-6 pt-6 border-t border-stone-100">
+                                    <div className="flex items-center gap-2">
                                         <Users size={14} className="text-stone-300" />
                                         <span className="text-sm text-stone-400 font-bold">{dept.seats} Seats</span>
                                     </div>
-                                    <div className="md:w-1/6 flex justify-end">
-                                        <ArrowRight size={18} className="text-stone-300 group-hover:text-accent group-hover:translate-x-1 transition-all" />
-                                    </div>
+                                    <ArrowRight size={18} className="text-stone-300 group-hover:text-accent group-hover:translate-x-1 transition-all" />
                                 </div>
                             </motion.div>
                         ))}
-                    </div>
+                    </DragScroll>
                 </div>
             </section>
 
@@ -246,9 +250,9 @@ export default function EngineeringPage() {
             </section>
 
             {/* ═══ RESEARCH & INNOVATION ═══ */}
-            <section className="py-28 bg-stone-50">
+            <section className="py-20 bg-stone-50">
                 <div className="container mx-auto px-4 md:px-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
                         {/* Left: text content */}
                         <div>
                             <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Research & Innovation</h2>
@@ -283,18 +287,18 @@ export default function EngineeringPage() {
                         </div>
 
                         {/* Right: facility cards */}
-                        <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
                             {facilities.map((fac, index) => (
                                 <motion.div
                                     key={fac.title}
-                                    initial={{ opacity: 0, x: 20 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.4, delay: index * 0.08 }}
-                                    className="bg-white p-8 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-md transition-all duration-300 group"
+                                    className="bg-white p-6 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-md transition-all duration-300 group"
                                 >
-                                    <div className="flex items-start gap-5">
-                                        <div className="p-3 bg-stone-50 rounded-xl text-primary group-hover:bg-accent/10 group-hover:text-accent transition-colors shrink-0">
+                                    <div className="flex flex-col gap-4">
+                                        <div className="p-3 bg-stone-50 rounded-xl text-primary group-hover:bg-accent/10 group-hover:text-accent transition-colors shrink-0 w-fit">
                                             <fac.icon size={24} strokeWidth={1.5} />
                                         </div>
                                         <div>
