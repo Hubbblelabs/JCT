@@ -1,6 +1,5 @@
 "use client";
 
-import { DragScroll } from "@/app/components/ui/DragScroll";
 import { motion } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
@@ -109,29 +108,21 @@ export default function PolytechnicPage() {
             <Navbar />
 
             {/* ═══ HERO — Split layout (text left + stats right) ═══ */}
-            <section className="relative min-h-[90vh] md:min-h-screen bg-[#0F766E] text-white overflow-hidden flex items-center">
-                {/* Background Image & Overlay */}
-                <div className="absolute inset-0 z-0">
-                    <img
-                        src="https://images.unsplash.com/photo-1581092918056-0c4c3acd9009?q=80&w=2670&auto=format&fit=crop"
-                        alt="Polytechnic workshop"
-                        className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-linear-to-r from-[#0F766E]/95 via-[#0F766E]/90 to-[#0F766E]/60" />
-                    <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2314B8A6' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
-                </div>
+            <section className="relative min-h-[80vh] bg-[#0F766E] text-white overflow-hidden">
+                {/* Technical pattern overlay */}
+                <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2314B8A6' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
 
-                <div className="container mx-auto px-4 md:px-6 relative z-10 pt-32 pb-16 md:pt-0">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <div className="container mx-auto px-4 md:px-6 relative z-10">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center min-h-[80vh] py-24">
                         {/* Left — Text */}
-                        <div className="max-w-2xl">
+                        <div>
                             <motion.div
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ duration: 0.6 }}
-                                className="mb-4 md:mb-6"
+                                className="mb-6"
                             >
-                                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#14B8A6]/40 bg-[#14B8A6]/20 backdrop-blur-md text-[10px] md:text-sm font-bold tracking-widest uppercase text-[#5EEAD4]">
+                                <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#14B8A6]/30 bg-[#14B8A6]/10 text-sm font-bold tracking-widest uppercase text-[#14B8A6]">
                                     <Wrench size={14} />
                                     Diploma Programs — AICTE Approved
                                 </span>
@@ -141,7 +132,7 @@ export default function PolytechnicPage() {
                                 initial={{ opacity: 0, y: 30 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.8, delay: 0.1 }}
-                                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-white mb-6 tracking-tight leading-[1.1] md:leading-none"
+                                className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6 tracking-tighter leading-[0.95]"
                             >
                                 Learn a Trade. <br />
                                 <span className="text-white/70 font-light italic">Build a Career.</span>
@@ -151,7 +142,7 @@ export default function PolytechnicPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.6, delay: 0.25 }}
-                                className="text-sm md:text-base lg:text-lg text-white/80 max-w-lg leading-relaxed font-light mb-8"
+                                className="text-base text-white/70 max-w-lg leading-relaxed font-light mb-8"
                             >
                                 JCT Polytechnic College offers three-year diploma programs where students spend as much time in workshops as they do in classrooms. The goal is simple: graduate with skills that employers actually need.
                             </motion.p>
@@ -160,12 +151,12 @@ export default function PolytechnicPage() {
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ duration: 0.6, delay: 0.35 }}
-                                className="flex flex-col sm:flex-row gap-4"
+                                className="flex flex-wrap gap-4"
                             >
-                                <Button size="lg" className="h-12 md:h-14 px-8 bg-[#14B8A6] text-white hover:bg-[#0D9488] font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-[#14B8A6]/20 w-full sm:w-auto">
+                                <Button size="lg" className="h-12 px-8 bg-[#14B8A6] text-white hover:bg-[#0D9488] font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-[#14B8A6]/20">
                                     View Programs <ArrowRight className="ml-2 w-5 h-5" />
                                 </Button>
-                                <Button variant="outline" size="lg" className="h-12 md:h-14 px-8 bg-white/5 backdrop-blur-sm border-white/20 text-white hover:bg-white/10 font-bold rounded-xl w-full sm:w-auto">
+                                <Button variant="outline" size="lg" className="h-12 px-8 bg-transparent border-white/20 text-white hover:bg-white/10 font-bold rounded-xl">
                                     Download Brochure
                                 </Button>
                             </motion.div>
@@ -176,7 +167,7 @@ export default function PolytechnicPage() {
                             initial={{ opacity: 0, x: 30 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ duration: 0.8, delay: 0.2 }}
-                            className="grid grid-cols-2 gap-3 md:gap-4 mt-8 lg:mt-0"
+                            className="grid grid-cols-2 gap-3"
                         >
                             {[
                                 { value: "1,200+", label: "Students Enrolled", sub: "Across 6 streams" },
@@ -184,10 +175,10 @@ export default function PolytechnicPage() {
                                 { value: "85%", label: "Placement Rate", sub: "Within 6 months" },
                                 { value: "3 Yrs", label: "Program Duration", sub: "10th standard entry" },
                             ].map((stat, i) => (
-                                <div key={i} className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-5 hover:bg-white/10 transition-colors">
-                                    <span className="block text-2xl md:text-4xl font-sans font-black text-[#5EEAD4] tracking-tight mb-1 md:mb-2">{stat.value}</span>
-                                    <h4 className="text-[10px] md:text-xs font-bold text-white/90 uppercase tracking-wider mb-1">{stat.label}</h4>
-                                    <p className="text-[10px] text-white/50 font-light">{stat.sub}</p>
+                                <div key={i} className="bg-white/5 border border-white/10 rounded-xl p-5 hover:bg-white/10 transition-colors">
+                                    <span className="block text-2xl md:text-3xl font-sans font-black text-[#14B8A6] tracking-tight mb-2">{stat.value}</span>
+                                    <h4 className="text-xs font-bold text-white/90 uppercase tracking-wider mb-1">{stat.label}</h4>
+                                    <p className="text-xs text-white/50 font-light">{stat.sub}</p>
                                 </div>
                             ))}
                         </motion.div>
@@ -208,50 +199,47 @@ export default function PolytechnicPage() {
                         </p>
                     </div>
 
-                    <DragScroll className="flex gap-6 pb-8 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory scroll-smooth">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {diplomaPrograms.map((prog, index) => (
                             <motion.div
                                 key={prog.name}
-                                initial={{ opacity: 0, x: 20 }}
-                                whileInView={{ opacity: 1, x: 0 }}
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.5, delay: index * 0.08 }}
-                                className="bg-stone-50 rounded-2xl p-8 border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 group min-w-[250px] md:min-w-[300px] snap-center shrink-0 flex flex-col justify-between"
-                                draggable={false}
+                                className="bg-stone-50 rounded-2xl p-8 border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 group"
                             >
-                                <div>
-                                    <div className="flex items-start justify-between mb-6">
-                                        <div className="flex items-center gap-3">
-                                            <div className="p-2.5 rounded-xl bg-white text-primary border border-stone-100 group-hover:bg-accent/10 group-hover:text-accent transition-colors">
-                                                <prog.icon size={22} strokeWidth={1.5} />
-                                            </div>
-                                            <div>
-                                                <h4 className="text-lg font-serif text-primary font-bold leading-tight">{prog.name}</h4>
-                                                <span className="text-xs text-stone-400">{prog.duration} — Full Time</span>
-                                            </div>
+                                <div className="flex items-start justify-between mb-6">
+                                    <div className="flex items-center gap-3">
+                                        <div className="p-2.5 rounded-xl bg-white text-primary border border-stone-100 group-hover:bg-accent/10 group-hover:text-accent transition-colors">
+                                            <prog.icon size={22} strokeWidth={1.5} />
                                         </div>
-                                    </div>
-
-                                    <div className="mb-5">
-                                        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-accent mb-3 block">What You'll Learn</span>
-                                        <div className="grid grid-cols-1 gap-2">
-                                            {prog.outcomes.slice(0, 3).map((outcome) => (
-                                                <div key={outcome} className="flex items-center gap-2 text-sm text-stone-600 font-light">
-                                                    <CheckCircle2 size={13} className="text-accent shrink-0" />
-                                                    {outcome}
-                                                </div>
-                                            ))}
+                                        <div>
+                                            <h4 className="text-lg font-serif text-primary font-bold leading-tight">{prog.name}</h4>
+                                            <span className="text-xs text-stone-400">{prog.duration} — Full Time</span>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="pt-5 border-t border-stone-200 mt-auto">
+                                <div className="mb-5">
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-accent mb-3 block">What You'll Learn</span>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {prog.outcomes.map((outcome) => (
+                                            <div key={outcome} className="flex items-center gap-2 text-sm text-stone-600 font-light">
+                                                <CheckCircle2 size={13} className="text-accent shrink-0" />
+                                                {outcome}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="pt-5 border-t border-stone-200">
                                     <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400">Career Paths</span>
                                     <p className="text-sm text-primary font-medium mt-1">{prog.career}</p>
                                 </div>
                             </motion.div>
                         ))}
-                    </DragScroll>
+                    </div>
                 </div>
             </section>
 

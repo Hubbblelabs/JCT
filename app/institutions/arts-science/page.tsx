@@ -1,6 +1,5 @@
 "use client";
 
-import { DragScroll } from "@/app/components/ui/DragScroll";
 import { motion } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
@@ -59,90 +58,80 @@ export default function ArtsSciencePage() {
             <Navbar />
 
             {/* ═══ HERO — Text-led, calm, editorial ═══ */}
-            <section className="relative min-h-[90vh] md:min-h-screen flex items-center overflow-hidden bg-[#2E1065]">
-                {/* Background Image & Overlay */}
+            <section className="relative min-h-[75vh] flex flex-col justify-end overflow-hidden bg-linear-to-br from-[#7C3AED] to-[#6D28D9]">
+                {/* Subtle background with academic pattern */}
                 <div className="absolute inset-0 z-0">
-                    <img
-                        src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=2670&auto=format&fit=crop"
-                        alt="Arts and Science Campus"
-                        className="w-full h-full object-cover opacity-50"
+                    <div
+                        className="absolute inset-0 bg-cover bg-center opacity-[0.12]"
+                        style={{
+                            backgroundImage: "url('https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2673&auto=format&fit=crop')",
+                        }}
                     />
-                    <div className="absolute inset-0 bg-linear-to-r from-[#2E1065]/95 via-[#2E1065]/90 to-[#2E1065]/50" />
-                    {/* Artistic pattern overlay */}
-                    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, transparent 0%, transparent 2%, #A78BFA 2%, #A78BFA 2.2%, transparent 2.2%)', backgroundSize: '40px 40px' }} />
+                    {/* Book pattern overlay */}
+                    <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: 'repeating-linear-gradient(90deg, transparent, transparent 40px, #A78BFA 40px, #A78BFA 42px), repeating-linear-gradient(0deg, transparent, transparent 40px, #A78BFA 40px, #A78BFA 42px)' }} />
                 </div>
 
-                <div className="container mx-auto px-4 md:px-6 relative z-10 pt-32 pb-16 md:pt-0">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-                        {/* Left — Text */}
-                        <div className="max-w-2xl">
-                            <motion.div
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ duration: 0.6 }}
-                                className="mb-4 md:mb-6"
-                            >
-                                <span className="inline-block py-1 px-3 rounded-full bg-[#A78BFA]/10 border border-[#A78BFA]/20 text-[10px] md:text-xs font-bold tracking-[0.2em] uppercase text-[#A78BFA] backdrop-blur-md">
-                                    JCT College of Arts & Science
-                                </span>
-                            </motion.div>
-
-                            <motion.h1
-                                initial={{ opacity: 0, y: 30 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 1, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-white mb-6 tracking-tight leading-[1.1] md:leading-none"
-                            >
-                                Where Curiosity <br />
-                                Becomes <span className="text-[#A78BFA] italic font-light">Understanding.</span>
-                            </motion.h1>
-
-                            <motion.p
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, delay: 0.3 }}
-                                className="text-sm md:text-base lg:text-lg text-white/80 max-w-lg leading-relaxed font-light mb-8"
-                            >
-                                We offer undergraduate and postgraduate programs across science, commerce, and the humanities. The emphasis here is on thinking clearly, reading widely, and developing the discipline to pursue ideas to their conclusions.
-                            </motion.p>
-
-                            <motion.div
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ duration: 0.8, delay: 0.3 }}
-                                className="flex flex-col sm:flex-row gap-4"
-                            >
-                                <Button size="lg" className="h-12 md:h-14 px-8 bg-[#A78BFA] text-[#2E1065] hover:bg-[#8B5CF6] font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-[#A78BFA]/20 w-full sm:w-auto">
-                                    Explore Programs <ArrowRight className="ml-2 w-5 h-5" />
-                                </Button>
-                                <Button variant="outline" size="lg" className="h-12 md:h-14 px-8 border-white/20 bg-white/5 backdrop-blur-sm text-white hover:bg-white/10 font-bold rounded-xl w-full sm:w-auto">
-                                    Campus Tour
-                                </Button>
-                            </motion.div>
-                        </div>
-
-                        {/* Right — Stats Grid (Moved from bottom bar) */}
+                <div className="container mx-auto px-4 md:px-6 relative z-10 pt-28 pb-12">
+                    <div className="max-w-4xl">
                         <motion.div
-                            initial={{ opacity: 0, y: 40 }}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ duration: 0.6 }}
+                            className="mb-6"
+                        >
+                            <span className="text-xs font-bold tracking-[0.2em] uppercase text-[#A78BFA]">
+                                JCT College of Arts & Science — Coimbatore
+                            </span>
+                        </motion.div>
+
+                        <motion.h1
+                            initial={{ opacity: 0, y: 30 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 1, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+                            className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-8 tracking-tighter leading-[0.95]"
+                        >
+                            Where Curiosity <br />
+                            Becomes <span className="text-white/70 italic font-light">Understanding.</span>
+                        </motion.h1>
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.3 }}
-                            className="grid grid-cols-2 gap-3 md:gap-4 mt-8 lg:mt-0"
+                            className="flex flex-col md:flex-row gap-12"
                         >
+                            <p className="text-lg md:text-xl text-stone-500 max-w-xl leading-relaxed font-light border-l-2 border-accent/30 pl-6">
+                                We offer undergraduate and postgraduate programs across science, commerce, and the humanities. The emphasis here is on thinking clearly, reading widely, and developing the discipline to pursue ideas to their conclusions.
+                            </p>
+
+                            <div className="flex flex-col gap-4 justify-end">
+                                <Button size="lg" className="h-14 px-8 bg-accent text-primary hover:bg-accent/90 font-bold rounded-2xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-accent/20">
+                                    Explore Programs <ArrowRight className="ml-2 w-5 h-5" />
+                                </Button>
+                                <Button variant="outline" size="lg" className="h-14 px-8 border-stone-200 text-primary hover:bg-stone-50 font-bold rounded-2xl">
+                                    Campus Tour
+                                </Button>
+                            </div>
+                        </motion.div>
+                    </div>
+                </div>
+
+                {/* Bottom stats bar */}
+                <div className="w-full bg-primary z-10">
+                    <div className="container mx-auto px-4 md:px-6">
+                        <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-white/10">
                             {[
-                                { value: "2,500+", label: "Students", accent: true },
-                                { value: "9", label: "Programs", accent: false },
-                                { value: "60+", label: "Faculty Members", accent: false },
-                                { value: "15+", label: "Years of Excellence", accent: true },
+                                { value: "2,500+", label: "Students" },
+                                { value: "9", label: "Programs" },
+                                { value: "60+", label: "Faculty" },
+                                { value: "15+", label: "Years" },
                             ].map((stat) => (
-                                <div
-                                    key={stat.label}
-                                    className={`p-4 md:p-6 rounded-2xl border backdrop-blur-md ${stat.accent ? "bg-[#A78BFA]/15 border-[#A78BFA]/30" : "bg-white/5 border-white/10"}`}
-                                >
-                                    <span className={`block text-2xl md:text-4xl font-sans font-black mb-1 md:mb-2 ${stat.accent ? "text-[#A78BFA]" : "text-white"}`}>{stat.value}</span>
-                                    <span className="text-[10px] md:text-xs text-white/60 font-bold uppercase tracking-wider">{stat.label}</span>
+                                <div key={stat.label} className="py-6 px-6 text-center">
+                                    <span className="text-2xl md:text-3xl font-sans font-black text-accent tracking-tight">{stat.value}</span>
+                                    <span className="block text-[10px] text-white/50 uppercase tracking-[0.15em] font-bold mt-1">{stat.label}</span>
                                 </div>
                             ))}
-                        </motion.div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -196,51 +185,51 @@ export default function ArtsSciencePage() {
             {/* ═══ UG PROGRAMS — Conceptually grouped ═══ */}
             <section className="py-28 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
-                    <div className="mb-12">
-                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Undergraduate Programs</h2>
-                        <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-6">
-                            Six Paths <br />
-                            <span className="text-stone-300 italic font-light">to a Degree</span>
-                        </h3>
-                        <div className="flex flex-col md:flex-row gap-8 justify-between items-end">
-                            <p className="text-stone-500 font-light leading-relaxed text-lg max-w-2xl">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+                        {/* Sticky header */}
+                        <div className="lg:col-span-4 lg:sticky lg:top-32 lg:self-start">
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Undergraduate Programs</h2>
+                            <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-6">
+                                Six Paths <br />
+                                <span className="text-stone-300 italic font-light">to a Degree</span>
+                            </h3>
+                            <p className="text-stone-500 font-light leading-relaxed text-lg mb-8">
                                 Three-year programs that build strong foundations in theory and application — from pure mathematics to English literature, from physics labs to business case studies.
                             </p>
-                            <div className="p-4 bg-stone-50 rounded-xl border border-stone-100 text-sm text-stone-500 font-light leading-relaxed max-w-sm">
-                                <span className="text-primary font-bold">Affiliated to</span> Bharathiar University, Coimbatore.
+                            <div className="p-6 bg-stone-50 rounded-2xl border border-stone-100">
+                                <p className="text-sm text-stone-500 font-light leading-relaxed">
+                                    <span className="text-primary font-bold">Affiliated to</span> Bharathiar University, Coimbatore. All programs lead to university-awarded degrees.
+                                </p>
                             </div>
                         </div>
-                    </div>
 
-                    <DragScroll className="flex gap-6 pb-8 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory scroll-smooth">
-                        {ugPrograms.map((prog, index) => (
-                            <motion.div
-                                key={prog.name}
-                                initial={{ opacity: 0, x: 20 }}
-                                whileInView={{ opacity: 1, x: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.4, delay: index * 0.06 }}
-                                className="bg-white p-8 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 group min-w-[250px] md:min-w-[300px] snap-center shrink-0 flex flex-col justify-between"
-                                draggable={false}
-                            >
-                                <div>
-                                    <div className="flex items-start gap-5 mb-6">
+                        {/* Program list */}
+                        <div className="lg:col-span-8 space-y-6">
+                            {ugPrograms.map((prog, index) => (
+                                <motion.div
+                                    key={prog.name}
+                                    initial={{ opacity: 0, y: 15 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    viewport={{ once: true }}
+                                    transition={{ duration: 0.4, delay: index * 0.06 }}
+                                    className="bg-white p-8 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 group"
+                                >
+                                    <div className="flex items-start gap-5">
                                         <div className="p-3 bg-stone-50 rounded-xl text-primary group-hover:bg-accent/10 group-hover:text-accent transition-colors shrink-0">
                                             <prog.icon size={22} strokeWidth={1.5} />
                                         </div>
                                         <div className="flex-1">
-                                            <h4 className="text-xl font-serif text-primary font-bold leading-tight mb-2">{prog.name}</h4>
-                                            <span className="text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider">{prog.duration}</span>
+                                            <div className="flex items-start justify-between mb-3">
+                                                <h4 className="text-xl font-serif text-primary font-bold">{prog.name}</h4>
+                                                <span className="text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider shrink-0 ml-4">{prog.duration}</span>
+                                            </div>
+                                            <p className="text-stone-500 text-sm font-light leading-relaxed">{prog.desc}</p>
                                         </div>
                                     </div>
-                                    <p className="text-stone-500 text-sm font-light leading-relaxed mb-4">{prog.desc}</p>
-                                </div>
-                                <div className="flex justify-end pt-4 border-t border-stone-50">
-                                    <ArrowRight size={18} className="text-stone-300 group-hover:text-accent group-hover:translate-x-1 transition-all" />
-                                </div>
-                            </motion.div>
-                        ))}
-                    </DragScroll>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -259,33 +248,27 @@ export default function ArtsSciencePage() {
                         </p>
                     </div>
 
-                    <DragScroll className="flex gap-6 pb-8 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory scroll-smooth">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {pgPrograms.map((prog, index) => (
                             <motion.div
                                 key={prog.name}
-                                initial={{ opacity: 0, x: 20 }}
-                                whileInView={{ opacity: 1, x: 0 }}
+                                initial={{ opacity: 0, y: 15 }}
+                                whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.4, delay: index * 0.08 }}
-                                className="bg-white p-8 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 min-w-[250px] md:min-w-[300px] snap-center shrink-0 flex flex-col justify-between"
-                                draggable={false}
+                                className="bg-white p-8 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300"
                             >
-                                <div>
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className="p-3 bg-stone-50 rounded-xl text-primary">
-                                            <prog.icon size={22} strokeWidth={1.5} />
-                                        </div>
-                                        <span className="text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider">{prog.duration}</span>
+                                <div className="flex justify-between items-start mb-6">
+                                    <div className="p-3 bg-stone-50 rounded-xl text-primary">
+                                        <prog.icon size={22} strokeWidth={1.5} />
                                     </div>
-                                    <h4 className="text-xl font-serif text-primary mb-3 font-bold">{prog.name}</h4>
-                                    <p className="text-stone-500 text-sm font-light leading-relaxed mb-4">{prog.desc}</p>
+                                    <span className="text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider">{prog.duration}</span>
                                 </div>
-                                <div className="flex justify-end pt-4 border-t border-stone-50">
-                                    <ArrowRight size={18} className="text-stone-300 hover:text-accent transition-colors" />
-                                </div>
+                                <h4 className="text-xl font-serif text-primary mb-3 font-bold">{prog.name}</h4>
+                                <p className="text-stone-500 text-sm font-light leading-relaxed">{prog.desc}</p>
                             </motion.div>
                         ))}
-                    </DragScroll>
+                    </div>
                 </div>
             </section>
 
@@ -302,16 +285,15 @@ export default function ArtsSciencePage() {
                         </p>
                     </div>
 
-                    <DragScroll className="flex gap-6 pb-8 -mx-4 px-4 md:mx-0 md:px-0 snap-x snap-mandatory scroll-smooth">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {academicLife.map((item, index) => (
                             <motion.div
                                 key={item.title}
-                                initial={{ opacity: 0, x: 20 }}
-                                whileInView={{ opacity: 1, x: 0 }}
+                                initial={{ opacity: 0, y: 15 }}
+                                whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.4, delay: index * 0.06 }}
-                                className="p-8 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-md transition-all duration-300 group min-w-[240px] md:min-w-[280px] snap-center shrink-0 bg-white"
-                                draggable={false}
+                                className="p-8 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-md transition-all duration-300 group"
                             >
                                 <div className="p-3 bg-stone-50 rounded-xl text-primary w-fit mb-5 group-hover:bg-accent/10 group-hover:text-accent transition-colors">
                                     <item.icon size={22} strokeWidth={1.5} />
@@ -320,7 +302,7 @@ export default function ArtsSciencePage() {
                                 <p className="text-stone-500 text-sm font-light leading-relaxed">{item.desc}</p>
                             </motion.div>
                         ))}
-                    </DragScroll>
+                    </div>
                 </div>
             </section>
 
