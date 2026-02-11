@@ -97,12 +97,12 @@ export function Navbar() {
                             <Image
                                 src="/jct_logo.svg"
                                 alt="JCT Institutions Logo"
-                                width={48}
-                                height={48}
-                                className="w-10 h-10 md:w-12 md:h-12"
+                                width={240}
+                                height={120}
+                                className="w-40 h-10 md:w-48 md:h-12"
                             />
                         </div>
-                        <div className="flex flex-col">
+                        {/* <div className="flex flex-col">
                             <span className={cn(
                                 "text-lg md:text-xl font-serif font-bold tracking-tight leading-none transition-colors",
                                 scrolled ? "text-primary" : "text-white"
@@ -115,7 +115,7 @@ export function Navbar() {
                             )}>
                                 Coimbatore • Est. 1998
                             </span>
-                        </div>
+                        </div> */}
                     </Link>
 
                     {/* Desktop Navigation */}
