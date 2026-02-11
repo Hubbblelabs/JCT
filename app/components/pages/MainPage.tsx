@@ -347,9 +347,9 @@ export default function MainPage() {
                                 <Phone size={24} className="text-accent" />
                                 <h4 className="text-accent font-serif text-2xl font-bold">Admissions Helpline</h4>
                             </div>
-                            <a href="tel:+919876548801" className="block">
+                            <a href="tel:+919361488801" className="block">
                                 <p className="text-3xl md:text-4xl font-black text-white tracking-wide hover:text-accent transition-colors mb-2">
-                                    +91 98765 48801
+                                    +91 93614 88801
                                 </p>
                             </a>
                             <p className="text-sm text-blue-200/70 font-light">Mon–Sat, 9:00 AM – 5:00 PM</p>
@@ -394,7 +394,7 @@ export default function MainPage() {
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <Phone size={20} className="text-accent shrink-0" />
-                                    <a href="tel:+919876548801" className="text-stone-600 text-sm hover:text-primary transition-colors">+91 98765 48801</a>
+                                    <a href="tel:+919361488801" className="text-stone-600 text-sm hover:text-primary transition-colors">+91 93614 88801</a>
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <Mail size={20} className="text-accent shrink-0" />

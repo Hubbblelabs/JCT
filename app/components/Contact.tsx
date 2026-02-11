@@ -24,7 +24,7 @@ export function Contact() {
                         <ContactCard
                             icon={Phone}
                             title="Call Us"
-                            content="+91 98765 48801"
+                            content="+91 93614 88801"
                             subContent="Mon-Fri, 9am - 5pm"
                         />
                         <ContactCard
