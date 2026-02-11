@@ -401,8 +401,8 @@ export default function ArtsSciencePage() {
                         <div className="bg-white p-8 rounded-2xl border border-stone-100 max-w-md mx-auto">
                             <h4 className="font-serif text-lg text-primary mb-4">Questions? Reach Out.</h4>
                             <div className="space-y-3 text-sm">
-                                <a href="tel:+919876543211" className="flex items-center gap-3 text-stone-500 hover:text-primary transition-colors">
-                                    <Phone size={16} className="text-accent" /> +91 98765 43211
+                                <a href="tel:+919361488801" className="flex items-center gap-3 text-stone-500 hover:text-primary transition-colors">
+                                    <Phone size={16} className="text-accent" /> +91 93614 88801
                                 </a>
                                 <a href="mailto:artsscience@jct.edu" className="flex items-center gap-3 text-stone-500 hover:text-primary transition-colors">
                                     <Mail size={16} className="text-accent" /> artsscience@jct.edu

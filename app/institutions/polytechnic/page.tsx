@@ -470,8 +470,8 @@ export default function PolytechnicPage() {
                             </form>
 
                             <div className="mt-6 pt-6 border-t border-stone-200 flex flex-col sm:flex-row gap-4 text-sm">
-                                <a href="tel:+919876548801" className="flex items-center gap-2 text-stone-500 hover:text-primary transition-colors">
-                                    <Phone size={14} className="text-accent" /> +91 98765 48801
+                                <a href="tel:+919361488801" className="flex items-center gap-2 text-stone-500 hover:text-primary transition-colors">
+                                    <Phone size={14} className="text-accent" /> +91 93614 88801
                                 </a>
                                 <a href="mailto:polytechnic@jct.edu" className="flex items-center gap-2 text-stone-500 hover:text-primary transition-colors">
                                     <Mail size={14} className="text-accent" /> polytechnic@jct.edu
