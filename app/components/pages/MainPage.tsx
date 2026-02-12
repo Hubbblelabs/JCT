@@ -71,7 +71,7 @@ export default function MainPage() {
                     <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-primary" />
                 </motion.div>
 
-                <div className="container relative z-20 px-4 md:px-6 3xl:px-8">
+                <div className="container relative z-10 px-4 md:px-6 3xl:px-8">
                     <div className="max-w-5xl 3xl:max-w-6xl">
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
@@ -311,7 +311,7 @@ export default function MainPage() {
                         </motion.div>
                     </div>
                 </div>
-            </section> 
+            </section>
 
             {/* ═══ CONTACT — Visit & form ═══ */}
             {/*}

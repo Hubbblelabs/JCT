@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, ChevronDown, GraduationCap, Microscope, PenTool, ArrowRight, Phone, BookOpen } from "lucide-react";
+import { Menu, X, ChevronDown, ArrowRight, Phone, BookOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -17,31 +18,21 @@ const navLinks = [
                 name: "Engineering",
                 href: "/institutions/engineering",
                 description: "Technical depth & research exposure",
-                icon: GraduationCap,
-                color: "text-blue-700",
-                bgColor: "bg-blue-50",
-                hoverBg: "group-hover/item:bg-blue-50",
+                logo: "/jct_engineering.png",
                 hoverText: "group-hover/item:text-blue-700"
             },
             {
                 name: "Arts & Science",
                 href: "/institutions/arts-science",
                 description: "Science, commerce & humanities",
-                icon: Microscope,
-                color: "text-purple-700",
-                bgColor: "bg-purple-50",
-                hoverBg: "group-hover/item:bg-purple-50",
+                logo: "/jct_arts.png",
                 hoverText: "group-hover/item:text-purple-700"
-
             },
             {
                 name: "Polytechnic",
                 href: "/institutions/polytechnic",
                 description: "Skill-based diploma programs",
-                icon: PenTool,
-                color: "text-teal-700",
-                bgColor: "bg-teal-50",
-                hoverBg: "group-hover/item:bg-teal-50",
+                logo: "/jct_polytechnic.png",
                 hoverText: "group-hover/item:text-teal-700"
             },
         ],
@@ -53,10 +44,30 @@ const navLinks = [
 ];
 
 export function Navbar() {
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const [scrolled, setScrolled] = useState(false);
     const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
     const [mobileExpanded, setMobileExpanded] = useState<string | null>("Institutions");
+
+    const isEngineering = pathname?.startsWith("/institutions/engineering");
+    const isArts = pathname?.startsWith("/institutions/arts-science");
+    const isPolytechnic = pathname?.startsWith("/institutions/polytechnic");
+
+    const logoSrc = isEngineering ? "/jct_engineering.png" :
+        isArts ? "/jct_arts.png" :
+            isPolytechnic ? "/jct_polytechnic.png" :
+                "/jct_logo.svg";
+
+    // Engineering logo is very wide (landscape with NAAC/NBA badges) and fills its canvas — height-based sizing works.
+    // Arts & Polytechnic logo PNGs are wide landscape images with the actual logo content centered
+    // and significant whitespace on both sides. Using width-based sizing ensures the actual logo content
+    // appears similar in visual size to engineering without taking up too much horizontal navbar space.
+    const logoClassName = isEngineering
+        ? "h-10 md:h-12 lg:h-16 w-auto object-contain"
+        : (isArts || isPolytechnic)
+            ? "h-10 md:h-12 lg:h-16 w-auto object-contain"
+            : "h-10 md:h-12 lg:h-16 w-auto object-contain";
 
     useEffect(() => {
         const handleScroll = () => {
@@ -84,7 +95,7 @@ export function Navbar() {
         <>
             <nav
                 className={cn(
-                    "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out border-b border-transparent",
+                    "fixed top-0 left-0 right-0 z-100 transition-all duration-300 ease-in-out border-b border-transparent",
                     scrolled
                         ? "bg-white/95 backdrop-blur-md py-3 border-stone-100 shadow-sm"
                         : "bg-transparent py-5"
@@ -92,14 +103,16 @@ export function Navbar() {
             >
                 <div className="container mx-auto px-4 md:px-6 3xl:px-8 flex items-center justify-between">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center z-50 relative">
-                        <div className="origin-left scale-140 transition-transform duration-300">
+                    <Link href="/" className="flex items-center z-110 relative">
+                        <div className="origin-left transition-transform duration-300">
                             <Image
-                                src="/jct_logo.svg"
+                                src={logoSrc}
                                 alt="JCT Institutions Logo"
-                                width={240}
-                                height={120}
-                                className="w-40 h-10 md:w-48 md:h-12"
+                                width={0}
+                                height={0}
+                                sizes="100vw"
+                                className={logoClassName}
+                                priority
                             />
                         </div>
                     </Link>
@@ -145,12 +158,8 @@ export function Navbar() {
                                                             href={child.href}
                                                             className="flex items-start gap-4 p-3 rounded-xl hover:bg-stone-50 transition-colors group/item"
                                                         >
-                                                            <div className={cn(
-                                                                "mt-1 p-2.5 rounded-lg transition-colors shrink-0",
-                                                                child.bgColor,
-                                                                child.color
-                                                            )}>
-                                                                <child.icon size={20} strokeWidth={2} />
+                                                            <div className="mt-1 p-1 rounded-lg transition-colors shrink-0 h-10 w-10 flex items-center justify-center bg-white border border-stone-100">
+                                                                <Image src={child.logo} alt={child.name} width={32} height={32} className="object-contain" />
                                                             </div>
                                                             <div>
                                                                 <div className={cn(
@@ -215,7 +224,7 @@ export function Navbar() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
+                            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-90 lg:hidden"
                             onClick={() => setIsOpen(false)}
                         />
 
@@ -225,7 +234,7 @@ export function Navbar() {
                             animate={{ x: 0 }}
                             exit={{ x: "100%" }}
                             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                            className="fixed inset-y-0 right-0 z-50 w-full sm:w-100 md:w-105 bg-white shadow-2xl flex flex-col lg:hidden"
+                            className="fixed inset-y-0 right-0 z-110 w-full sm:w-100 md:w-105 bg-white shadow-2xl flex flex-col lg:hidden"
                         >
                             {/* Mobile Header */}
                             <div className="flex items-center justify-between p-6 border-b border-stone-100">
@@ -285,8 +294,8 @@ export function Navbar() {
                                                                             onClick={() => setIsOpen(false)}
                                                                             className="flex items-start gap-3 p-3 rounded-xl hover:bg-stone-50 transition-colors"
                                                                         >
-                                                                            <div className={cn("mt-0.5", child.color)}>
-                                                                                <child.icon size={18} />
+                                                                            <div className="mt-0.5 h-6 w-6 relative shrink-0">
+                                                                                <Image src={child.logo} alt={child.name} fill className="object-contain" />
                                                                             </div>
                                                                             <div>
                                                                                 <div className="font-bold text-stone-800 text-sm">{child.name}</div>

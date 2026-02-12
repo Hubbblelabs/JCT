@@ -19,11 +19,11 @@ export function About() {
                             transition={{ duration: 1, ease: "easeOut" }}
                             className="relative z-10"
                         >
-                            <div className="aspect-[3/4] relative overflow-hidden rounded-3xl bg-stone-200 shadow-2xl">
+                            <div className="aspect-3/4 relative overflow-hidden rounded-3xl bg-stone-200 shadow-2xl">
                                 <img
                                     src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop"
                                     alt="Students in discussion at JCT Library"
-                                    className="object-cover w-full h-full grayscale-[20%] hover:grayscale-0 transition-all duration-1000"
+                                    className="object-cover w-full h-full grayscale-20 hover:grayscale-0 transition-all duration-1000"
                                 />
                             </div>
 

@@ -2,14 +2,15 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { GraduationCap, Microscope, PenTool, Users, ArrowUpRight } from "lucide-react";
+import Image from "next/image";
+import { Users, ArrowUpRight } from "lucide-react";
 
 /* ─── Institution cards ─── */
 const institutions = [
     {
         name: "JCT College of Engineering & Technology",
         href: "/institutions/engineering",
-        icon: GraduationCap,
+        logo: "/jct_engineering.png",
         image: "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=2686&auto=format&fit=crop",
         tagline: "Technical depth. Research exposure. Industry-ready graduates.",
         programs: "B.E. / B.Tech / M.E.",
@@ -19,7 +20,7 @@ const institutions = [
     {
         name: "JCT College of Arts & Science",
         href: "/institutions/arts-science",
-        icon: Microscope,
+        logo: "/jct_arts.png",
         image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2673&auto=format&fit=crop",
         tagline: "Broad foundations in science, commerce, and the humanities.",
         programs: "B.Sc / B.Com / BBA / BA / M.Sc / M.Com",
@@ -29,7 +30,7 @@ const institutions = [
     {
         name: "JCT Polytechnic College",
         href: "/institutions/polytechnic",
-        icon: PenTool,
+        logo: "/jct_polytechnic.png",
         image: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?q=80&w=2670&auto=format&fit=crop",
         tagline: "Skill-based diploma programs built around workshop training.",
         programs: "Diploma Courses",
@@ -84,8 +85,14 @@ export function HomeInstitutions() {
                                     {/* Content */}
                                     <div className={`lg:col-span-7 p-6 sm:p-8 md:p-10 lg:p-14 flex flex-col justify-center ${index === 1 ? 'lg:order-1' : ''}`}>
                                         <div className="flex items-center gap-3 mb-6">
-                                            <div className="p-3 bg-white rounded-xl text-primary shadow-sm border border-stone-100">
-                                                <inst.icon size={22} strokeWidth={1.5} />
+                                            <div className="p-3 bg-white rounded-xl text-primary shadow-sm border border-stone-100 h-16 w-16 flex items-center justify-center">
+                                                <Image
+                                                    src={inst.logo}
+                                                    alt={`${inst.name} Logo`}
+                                                    width={40}
+                                                    height={40}
+                                                    className="w-full h-full object-contain"
+                                                />
                                             </div>
                                             <span className="text-xs font-bold text-accent uppercase tracking-[0.15em]">{inst.programs}</span>
                                         </div>

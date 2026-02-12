@@ -72,7 +72,7 @@ export default function ArtsSciencePage() {
                     <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 20% 50%, transparent 0%, transparent 2%, #A78BFA 2%, #A78BFA 2.2%, transparent 2.2%)', backgroundSize: '40px 40px' }} />
                 </div>
 
-                <div className="container mx-auto px-4 md:px-6 relative z-10 pt-32 pb-16 md:pt-0">
+                <div className="container mx-auto px-4 md:px-6 relative z-10 pt-32 pb-16 md:pt-40 lg:pt-44">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
                         {/* Left — Text */}
                         <div className="max-w-2xl">
