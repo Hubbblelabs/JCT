@@ -64,10 +64,10 @@ export function Navbar() {
     // and significant whitespace on both sides. Using width-based sizing ensures the actual logo content
     // appears similar in visual size to engineering without taking up too much horizontal navbar space.
     const logoClassName = isEngineering
-        ? "h-10 md:h-12 lg:h-16 w-auto object-contain"
+        ? "h-12 md:h-12 lg:h-16 w-auto object-contain"
         : (isArts || isPolytechnic)
-            ? "h-10 md:h-12 lg:h-16 w-auto object-contain"
-            : "h-10 md:h-12 lg:h-16 w-auto object-contain";
+            ? "h-12 md:h-12 lg:h-16 w-auto object-contain"
+            : "h-12 md:h-12 lg:h-16 w-auto object-contain";
 
     useEffect(() => {
         const handleScroll = () => {
@@ -97,7 +97,7 @@ export function Navbar() {
                 className={cn(
                     "fixed top-0 left-0 right-0 z-100 transition-all duration-300 ease-in-out border-b border-transparent",
                     scrolled
-                        ? "bg-white/95 backdrop-blur-md py-3 border-stone-100 shadow-sm"
+                        ? "bg-white/95 backdrop-blur-md py-1 border-stone-100 shadow-sm"
                         : "bg-transparent py-5"
                 )}
             >

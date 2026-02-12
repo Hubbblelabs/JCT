@@ -113,11 +113,11 @@ export default function PolytechnicPage() {
                 {/* Background Image & Overlay */}
                 <div className="absolute inset-0 z-0">
                     <img
-                        src="https://images.unsplash.com/photo-1581092918056-0c4c3acd9009?q=80&w=2670&auto=format&fit=crop"
+                        src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2670&auto=format&fit=crop"
                         alt="Polytechnic workshop"
                         className="w-full h-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-linear-to-r from-[#0F766E]/95 via-[#0F766E]/90 to-[#0F766E]/60" />
+                    <div className="absolute inset-0 bg-linear-to-r from-[#0F766E]/75 via-[#0F766E]/70 to-[#0F766E]/40" />
                     <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2314B8A6' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
                 </div>
 
