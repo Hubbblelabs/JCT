@@ -9,6 +9,7 @@ import { TrustIndicators } from "@/app/components/TrustIndicators";
 import { ReverseRoadmap } from "@/app/components/ReverseRoadmap";
 import { FloatingCTA } from "@/app/components/FloatingCTA";
 import { CompanyCarousel } from "@/app/components/CompanyCarousel";
+import { Accreditations } from "@/app/components/Accreditations";
 import { Institutions } from "@/app/components/Institutions";
 import Link from "next/link";
 import {
@@ -148,6 +149,7 @@ export default function MainPage() {
             </section>
 
             <TrustIndicators />
+            <Accreditations />
 
             {/* ═══ OUR INSTITUTIONS — Alternating horizontal cards ═══ */}
             <Institutions />

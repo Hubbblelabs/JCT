@@ -110,12 +110,12 @@ h6 {
 }
 
 .animate-scroll-left {
-  animation: scroll-left 30s linear infinite;
+  animation: scroll-left 60s linear infinite;
   width: max-content;
 }
 
 .animate-scroll-right {
-  animation: scroll-right 35s linear infinite;
+  animation: scroll-right 70s linear infinite;
   width: max-content;
 }
 

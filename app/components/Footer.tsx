@@ -111,31 +111,7 @@ export function Footer() {
                     </div>
                 </div>
 
-                {/* Accreditation Logos Strip */}
-                <div className="border-t border-white/10 pt-10 pb-6 mb-6">
-                    <div className="flex flex-col items-center gap-6">
-                        <span className="text-[10px] font-bold tracking-[0.25em] uppercase text-white/40">Approved & Accredited By</span>
-                        <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10">
-                            {[
-                                { name: "AICTE", sub: "Approved", color: "#FBBF24" },
-                                { name: "NAAC", sub: "Accredited", color: "#34D399" },
-                                { name: "Anna\nUniversity", sub: "Affiliated", color: "#60A5FA" },
-                                { name: "UGC", sub: "Recognized", color: "#F87171" },
-                                { name: "ISO\n9001:2015", sub: "Certified", color: "#A78BFA" },
-                            ].map((acc) => (
-                                <div key={acc.name} className="flex flex-col items-center gap-2 group cursor-default">
-                                    <div className="w-18 h-18 rounded-2xl bg-white/5 border border-white/10 flex flex-col items-center justify-center p-3 group-hover:bg-white/10 group-hover:border-white/25 transition-all duration-300">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={acc.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mb-1 opacity-80">
-                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                                        </svg>
-                                        <span className="text-[10px] font-black text-white/90 tracking-tight text-center leading-tight whitespace-pre-line">{acc.name}</span>
-                                    </div>
-                                    <span className="text-[9px] text-white/40 font-medium uppercase tracking-wider">{acc.sub}</span>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
+
 
                 {/* Bottom Bar */}
                 <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/60">
