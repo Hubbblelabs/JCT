@@ -5,10 +5,10 @@ import { Facebook, Twitter, Instagram, Linkedin, Landmark, MapPin, Phone, Mail, 
 
 export function Footer() {
     return (
-        <footer className="bg-primary text-white pt-24 pb-8 border-t border-white/5">
-            <div className="container mx-auto px-4 md:px-6">
+        <footer className="bg-primary text-white pt-16 md:pt-24 3xl:pt-32 pb-6 md:pb-8 border-t border-white/5">
+            <div className="container mx-auto px-4 md:px-6 3xl:px-8">
                 {/* Main Footer Content */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-12 mb-12 md:mb-16">
                     {/* Brand & About */}
                     <div className="lg:col-span-1">
                         <div className="flex items-center gap-3 mb-6">
@@ -57,7 +57,7 @@ export function Footer() {
                             <li className="flex items-start gap-3">
                                 <MapPin size={18} className="text-accent shrink-0 mt-0.5" />
                                 <div className="text-sm text-white/70 leading-relaxed">
-                                    <p className="font-medium text-white mb-1">JCT Institute of Technology</p>
+                                    <p className="font-medium text-white mb-1">JCT Institutions</p>
                                     <p>Knowledge Park, Pichanur</p>
                                     <p>Coimbatore - 641105</p>
                                     <p>Tamil Nadu, India</p>
@@ -88,7 +88,7 @@ export function Footer() {
                     {/* Google Map */}
                     <div>
                         <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-accent mb-6">Location</h3>
-                        <div className="rounded-2xl overflow-hidden border-2 border-white/10 h-72">
+                        <div className="rounded-2xl overflow-hidden border-2 border-white/10 h-48 sm:h-60 md:h-72">
                             <iframe
                                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.3087446879744!2d77.0244!3d11.0168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTHCsDAxJzAwLjUiTiA3N8KwMDEnMjcuOCJF!5e0!3m2!1sen!2sin!4v1234567890"
                                 width="100%"
@@ -114,9 +114,9 @@ export function Footer() {
 
 
                 {/* Bottom Bar */}
-                <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/60">
+                <div className="border-t border-white/10 pt-6 md:pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs sm:text-sm text-white/60">
                     <p>
-                        © {new Date().getFullYear()} JCT Institute of Technology. All rights reserved.
+                        © {new Date().getFullYear()} JCT Institutions. All rights reserved.
                     </p>
                     <div className="flex gap-6">
                         <Link href="#" className="hover:text-white transition-colors">Privacy Policy</Link>

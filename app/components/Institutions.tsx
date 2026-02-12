@@ -37,19 +37,19 @@ const institutions = [
 
 export function Institutions() {
     return (
-        <section id="institutions" className="py-24 bg-stone-50">
-            <div className="container mx-auto px-4 md:px-6">
-                <div className="text-center max-w-3xl mx-auto mb-16">
-                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Our Institutions</h2>
-                    <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-6">
+        <section id="institutions" className="py-16 md:py-24 3xl:py-32 bg-stone-50">
+            <div className="container mx-auto px-4 md:px-6 3xl:px-8">
+                <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16">
+                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4 md:mb-6">Our Institutions</h2>
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl 2xl:text-6xl font-serif text-primary leading-tight mb-4 md:mb-6">
                         Three Pathways to <span className="italic text-stone-400 font-light">Excellence</span>
                     </h3>
-                    <p className="text-stone-500 font-light leading-relaxed text-lg">
+                    <p className="text-stone-500 font-light leading-relaxed text-sm sm:text-base md:text-lg">
                         JCT Institutions comprises three premier colleges, each dedicated to shaping future leaders in their respective fields.
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
                     {institutions.map((inst, index) => (
                         <motion.div
                             key={inst.slug}
@@ -77,8 +77,8 @@ export function Institutions() {
                                 </div>
 
                                 {/* Content */}
-                                <div className="p-8 flex-1 flex flex-col">
-                                    <h4 className="text-xl font-serif font-bold text-primary mb-3 group-hover:text-accent transition-colors leading-tight">
+                                <div className="p-5 sm:p-6 md:p-8 3xl:p-10 flex-1 flex flex-col">
+                                    <h4 className="text-base sm:text-lg md:text-xl font-serif font-bold text-primary mb-2 md:mb-3 group-hover:text-accent transition-colors leading-tight">
                                         {inst.name}
                                     </h4>
                                     <p className="text-stone-500 text-sm font-light leading-relaxed mb-6 flex-1">

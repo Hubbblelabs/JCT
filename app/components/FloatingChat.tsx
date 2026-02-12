@@ -9,7 +9,7 @@ export function FloatingChat() {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <div className="fixed bottom-24 right-4 lg:bottom-8 lg:right-8 z-50 flex flex-col gap-4 items-end">
+        <div className="fixed bottom-28 right-3 sm:right-4 lg:bottom-8 lg:right-8 z-50 flex flex-col gap-3 sm:gap-4 items-end">
             {/* AI Agent Chat Button */}
             <motion.div
                 initial={{ scale: 0 }}
@@ -19,7 +19,7 @@ export function FloatingChat() {
                 <Button
                     onClick={() => setIsOpen(!isOpen)}
                     size="icon"
-                    className="h-14 w-14 rounded-full shadow-xl bg-blue-600 hover:bg-blue-700 text-white border-2 border-white/20"
+                    className="h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-xl bg-blue-600 hover:bg-blue-700 text-white border-2 border-white/20"
                 >
                     {isOpen ? <X size={24} /> : <Bot size={28} />}
                 </Button>
@@ -35,7 +35,7 @@ export function FloatingChat() {
                     href="https://wa.me/919361488801"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center h-14 w-14 rounded-full shadow-xl bg-[#25D366] hover:bg-[#20bd5a] text-white border-2 border-white/20 transition-colors"
+                    className="flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-xl bg-[#25D366] hover:bg-[#20bd5a] text-white border-2 border-white/20 transition-colors"
                 >
                     {/* Simple WhatsApp-like SVG icon using simple shapes or MessageCircle as fallback */}
                     <svg viewBox="0 0 24 24" width="28" height="28" fill="currentColor" className="fill-white">
@@ -51,7 +51,7 @@ export function FloatingChat() {
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="absolute bottom-20 right-0 w-80 md:w-96 bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden"
+                        className="absolute bottom-20 right-0 w-[calc(100vw-1.5rem)] sm:w-80 md:w-96 max-w-[calc(100vw-2rem)] bg-white rounded-2xl shadow-2xl border border-stone-200 overflow-hidden"
                     >
                         <div className="bg-blue-600 p-4 flex justify-between items-center text-white">
                             <div className="flex items-center gap-3">

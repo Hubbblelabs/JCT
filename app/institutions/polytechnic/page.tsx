@@ -196,7 +196,7 @@ export default function PolytechnicPage() {
             </section>
 
             {/* ═══ PROGRAMS — Skill & outcome blocks ═══ */}
-            <section className="py-28 bg-white">
+            <section className="py-16 md:py-28 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="max-w-3xl mb-16">
                         <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Programs Offered</h2>
@@ -256,7 +256,7 @@ export default function PolytechnicPage() {
             </section>
 
             {/* ═══ WHY POLYTECHNIC — Advantages ═══ */}
-            <section className="py-28 bg-stone-50">
+            <section className="py-16 md:py-28 bg-stone-50">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="grid grid-cols-1 lg:grid-cols-5 gap-16">
                         <div className="lg:col-span-2">
@@ -310,7 +310,7 @@ export default function PolytechnicPage() {
             </section>
 
             {/* ═══ FACILITIES — Bento grid ═══ */}
-            <section className="py-28 bg-white">
+            <section className="py-16 md:py-28 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="text-center max-w-2xl mx-auto mb-16">
                         <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Facilities</h2>
@@ -348,7 +348,7 @@ export default function PolytechnicPage() {
             </section>
 
             {/* ═══ PATHWAY — After diploma ═══ */}
-            <section className="py-24 bg-primary text-white relative overflow-hidden">
+            <section className="py-16 md:py-24 bg-primary text-white relative overflow-hidden">
                 <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
 
                 <div className="container mx-auto px-4 md:px-6 relative z-10">
@@ -403,7 +403,7 @@ export default function PolytechnicPage() {
             </section>
 
             {/* ═══ ADMISSIONS — Steps + contact form ═══ */}
-            <section className="py-28 bg-white">
+            <section className="py-16 md:py-28 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
                         <div>
@@ -450,7 +450,7 @@ export default function PolytechnicPage() {
                             <h4 className="font-serif text-xl text-primary mb-2">Have Questions?</h4>
                             <p className="text-stone-400 text-sm font-light mb-6">Our admissions office responds within one working day.</p>
                             <form className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <input type="text" className="w-full px-4 py-3.5 rounded-xl bg-white border border-stone-200 focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all outline-none text-sm" placeholder="Your Name" />
                                     <input type="tel" className="w-full px-4 py-3.5 rounded-xl bg-white border border-stone-200 focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all outline-none text-sm" placeholder="Phone Number" />
                                 </div>

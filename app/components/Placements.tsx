@@ -10,13 +10,13 @@ const companies = [
 
 export function Placements() {
     return (
-        <section id="placements" className="py-24 bg-white border-t border-gray-100">
-            <div className="container mx-auto px-4 md:px-6">
-                <div className="flex flex-col lg:flex-row gap-16 mb-20">
+        <section id="placements" className="py-16 md:py-24 bg-white border-t border-gray-100">
+            <div className="container mx-auto px-4 md:px-6 3xl:px-8">
+                <div className="flex flex-col lg:flex-row gap-10 md:gap-16 mb-12 md:mb-20">
                     {/* Header & Context */}
                     <div className="lg:w-1/3">
                         <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Career Impact</h2>
-                        <h3 className="text-3xl md:text-4xl font-serif text-primary mb-6 leading-tight">
+                        <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif text-primary mb-4 md:mb-6 leading-tight">
                             Launching <span className="italic text-gray-400 font-light">Global Careers</span>
                         </h3>
                         <p className="text-gray-600 text-lg leading-relaxed mb-8 font-light">

@@ -148,7 +148,7 @@ export default function ArtsSciencePage() {
             </section>
 
             {/* ═══ PHILOSOPHY — About section, text-forward ═══ */}
-            <section className="py-32 bg-stone-50">
+            <section className="py-16 md:py-32 bg-stone-50">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="max-w-3xl mx-auto">
                         <motion.div
@@ -174,7 +174,7 @@ export default function ArtsSciencePage() {
                                 </p>
                             </div>
 
-                            <div className="mt-14 pt-10 border-t border-stone-200 grid grid-cols-3 gap-8">
+                            <div className="mt-14 pt-10 border-t border-stone-200 grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8">
                                 <div>
                                     <span className="block text-4xl font-sans font-black text-primary mb-1">6</span>
                                     <span className="text-xs text-stone-400 font-bold uppercase tracking-wider">Departments</span>
@@ -194,11 +194,11 @@ export default function ArtsSciencePage() {
             </section>
 
             {/* ═══ UG PROGRAMS — Conceptually grouped ═══ */}
-            <section className="py-28 bg-white">
+            <section className="py-16 md:py-28 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
-                    <div className="mb-12">
-                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Undergraduate Programs</h2>
-                        <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-6">
+                    <div className="mb-10 md:mb-12">
+                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4 md:mb-6">Undergraduate Programs</h2>
+                        <h3 className="text-3xl sm:text-4xl md:text-5xl font-serif text-primary leading-tight mb-4 md:mb-6">
                             Six Paths <br />
                             <span className="text-stone-300 italic font-light">to a Degree</span>
                         </h3>
@@ -245,7 +245,7 @@ export default function ArtsSciencePage() {
             </section>
 
             {/* ═══ PG PROGRAMS — Compact row ═══ */}
-            <section className="py-20 bg-stone-50">
+            <section className="py-16 md:py-20 bg-stone-50">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
                         <div>
@@ -290,9 +290,9 @@ export default function ArtsSciencePage() {
             </section>
 
             {/* ═══ ACADEMIC LIFE — Activities & culture ═══ */}
-            <section className="py-28 bg-white">
+            <section className="py-16 md:py-28 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
-                    <div className="text-center max-w-2xl mx-auto mb-16">
+                    <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16">
                         <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Beyond the Classroom</h2>
                         <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-6">
                             Research, Seminars, <span className="italic text-stone-300 font-light">& Student Life</span>
@@ -349,7 +349,7 @@ export default function ArtsSciencePage() {
             </section>
 
             {/* ═══ ADMISSIONS — Gentle CTA ═══ */}
-            <section className="py-28 bg-stone-50">
+            <section className="py-16 md:py-28 bg-stone-50">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="max-w-3xl mx-auto text-center">
                         <motion.div

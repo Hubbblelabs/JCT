@@ -33,12 +33,12 @@ const admissionSteps = [
 
 export function Admissions() {
     return (
-        <section id="admissions" className="py-32 bg-primary text-white relative overflow-hidden">
+        <section id="admissions" className="py-16 md:py-32 bg-primary text-white relative overflow-hidden">
             {/* Background Texture */}
             <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)", backgroundSize: "30px 30px" }}></div>
 
-            <div className="container mx-auto px-4 md:px-6 relative z-10">
-                <div className="flex flex-col lg:flex-row gap-20">
+            <div className="container mx-auto px-4 md:px-6 3xl:px-8 relative z-10">
+                <div className="flex flex-col lg:flex-row gap-12 md:gap-20">
 
                     <div className="w-full lg:w-1/3 pt-10">
                         <motion.div

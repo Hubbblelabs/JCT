@@ -24,7 +24,7 @@ export function FloatingCTA() {
                     initial={{ y: 100, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     exit={{ y: 100, opacity: 0 }}
-                    className="fixed bottom-0 left-0 right-0 z-40 p-4 bg-white/80 backdrop-blur-md border-t border-stone-200 lg:hidden shadow-[0_-5px_20px_rgba(0,0,0,0.05)]"
+                    className="fixed bottom-0 left-0 right-0 z-40 p-3 sm:p-4 bg-white/90 backdrop-blur-md border-t border-stone-200 lg:hidden shadow-[0_-5px_20px_rgba(0,0,0,0.05)]"
                 >
                     <div className="grid grid-cols-2 gap-3">
                         <Button variant="outline" className="w-full bg-white font-bold text-primary border-stone-300">

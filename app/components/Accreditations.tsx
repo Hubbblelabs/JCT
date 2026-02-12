@@ -16,8 +16,8 @@ const accreditations = [
 
 export function Accreditations() {
     return (
-        <section className="bg-white py-8 border-b border-stone-100">
-            <div className="container mx-auto px-4 md:px-6">
+        <section className="bg-white py-6 md:py-8 3xl:py-10 border-b border-stone-100">
+            <div className="container mx-auto px-4 md:px-6 3xl:px-8">
                 <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="text-center md:text-left">
                         <h3 className="text-sm font-bold uppercase tracking-wider text-stone-500 mb-1">
@@ -28,10 +28,10 @@ export function Accreditations() {
                         </p>
                     </div>
 
-                    <div className="flex flex-wrap justify-center md:justify-end gap-6 md:gap-8 items-center grayscale hover:grayscale-0 transition-all duration-300">
+                    <div className="flex flex-wrap justify-center md:justify-end gap-4 sm:gap-6 md:gap-8 items-center grayscale hover:grayscale-0 transition-all duration-300">
                         {accreditations.map((item) => (
                             <div key={item.name} className="relative group">
-                                <div className="relative h-12 w-12 md:h-14 md:w-14 transition-transform duration-300 group-hover:scale-110">
+                                <div className="relative h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 2xl:h-16 2xl:w-16 transition-transform duration-300 group-hover:scale-110">
                                     <Image
                                         src={item.logo}
                                         alt={item.name}

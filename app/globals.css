@@ -67,6 +67,9 @@
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-playfair), ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
 
+  /* Large-screen breakpoints for TVs, smartboards, 4K displays */
+  --breakpoint-3xl: 120rem;  /* 1920px */
+  --breakpoint-4xl: 160rem;  /* 2560px */
 }
 
 body {
@@ -122,4 +125,37 @@ h6 {
 .animate-scroll-left:hover,
 .animate-scroll-right:hover {
   animation-play-state: paused;
+}
+
+/* ─── Scrollbar Hide Utility ─── */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ─── Responsive container for very large screens ─── */
+@media (min-width: 1920px) {
+  .container {
+    max-width: 1800px;
+  }
+}
+@media (min-width: 2560px) {
+  .container {
+    max-width: 2200px;
+  }
+}
+
+/* ─── Responsive base font scaling for large displays ─── */
+@media (min-width: 1920px) {
+  html {
+    font-size: 18px;
+  }
+}
+@media (min-width: 2560px) {
+  html {
+    font-size: 20px;
+  }
 }

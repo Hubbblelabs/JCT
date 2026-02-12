@@ -43,11 +43,11 @@ const companies = [
 
 function CompanyCard({ company }: { company: { name: string; logo: string } }) {
     return (
-        <div className="w-48 h-20 bg-white rounded-2xl border border-stone-100 flex flex-col items-center justify-center px-5 py-3 hover:border-accent/30 hover:shadow-lg transition-all duration-300 hover:scale-105">
+        <div className="w-36 h-16 sm:w-44 sm:h-18 md:w-48 md:h-20 2xl:w-56 2xl:h-24 bg-white rounded-xl sm:rounded-2xl border border-stone-100 flex flex-col items-center justify-center px-3 sm:px-5 py-2 sm:py-3 hover:border-accent/30 hover:shadow-lg transition-all duration-300 hover:scale-105">
             <img
                 src={company.logo}
                 alt={company.name}
-                className="max-w-[100px] max-h-[32px] object-contain opacity-70 hover:opacity-100 transition-opacity duration-300"
+                className="max-w-25 max-h-8 object-contain opacity-70 hover:opacity-100 transition-opacity duration-300"
                 onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                 }}
@@ -61,8 +61,8 @@ function CompanyCard({ company }: { company: { name: string; logo: string } }) {
 
 export function CompanyCarousel() {
     return (
-        <section className="py-16 bg-stone-50 border-y border-stone-100 overflow-hidden">
-            <div className="container mx-auto px-4 md:px-6">
+        <section className="py-12 md:py-16 3xl:py-20 bg-stone-50 border-y border-stone-100 overflow-hidden">
+            <div className="container mx-auto px-4 md:px-6 3xl:px-8">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -73,7 +73,7 @@ export function CompanyCarousel() {
                     <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">
                         Our Recruiting Partners
                     </h2>
-                    <h3 className="text-3xl md:text-4xl font-serif text-primary leading-tight mb-3">
+                    <h3 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-serif text-primary leading-tight mb-3">
                         Top Companies{" "}
                         <span className="text-stone-400 italic font-light">Trust Our Graduates</span>
                     </h3>
@@ -113,12 +113,12 @@ export function CompanyCarousel() {
             </div>
 
             {/* Stats bar at the bottom */}
-            <div className="container mx-auto px-4 md:px-6 mt-12">
+            <div className="container mx-auto px-4 md:px-6 3xl:px-8 mt-10 md:mt-12">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    className="flex flex-wrap justify-center gap-8 md:gap-16"
+                    className="flex flex-wrap justify-center gap-6 sm:gap-8 md:gap-16"
                 >
                     {[
                         { value: "500+", label: "Recruiting Partners" },
@@ -127,7 +127,7 @@ export function CompanyCarousel() {
                         { value: "₹24 LPA", label: "Highest Package" },
                     ].map((stat) => (
                         <div key={stat.label} className="text-center">
-                            <span className="block text-2xl md:text-3xl font-sans font-black text-primary tracking-tight">
+                            <span className="block text-xl sm:text-2xl md:text-3xl 2xl:text-4xl font-sans font-black text-primary tracking-tight">
                                 {stat.value}
                             </span>
                             <span className="text-xs text-stone-500 font-medium uppercase tracking-wider">

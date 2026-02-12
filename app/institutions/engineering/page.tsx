@@ -165,7 +165,7 @@ export default function EngineeringPage() {
             </section>
 
             {/* ═══ ENGINEERING DOMAINS — Horizontal cards ═══ */}
-            <section className="py-20 bg-white relative">
+            <section className="py-16 md:py-20 bg-white relative">
                 {/* Subtle background pattern */}
                 <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: 'repeating-linear-gradient(45deg, #0F172A 0px, #0F172A 2px, transparent 2px, transparent 10px)' }} />
                 <div className="container mx-auto px-4 md:px-6 relative z-10">
@@ -221,7 +221,7 @@ export default function EngineeringPage() {
             </section>
 
             {/* ═══ METRICS — Numbers grid ═══ */}
-            <section className="py-20 bg-primary">
+            <section className="py-16 md:py-20 bg-primary">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="text-center mb-14">
                         <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">By the Numbers</h2>
@@ -250,7 +250,7 @@ export default function EngineeringPage() {
             </section>
 
             {/* ═══ RESEARCH & INNOVATION ═══ */}
-            <section className="py-20 bg-stone-50">
+            <section className="py-16 md:py-20 bg-stone-50">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
                         {/* Left: text content */}
@@ -314,7 +314,7 @@ export default function EngineeringPage() {
             </section>
 
             {/* ═══ PLACEMENTS — Data-driven showcase ═══ */}
-            <section className="py-28 bg-white">
+            <section className="py-20 md:py-28 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="text-center max-w-2xl mx-auto mb-16">
                         <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Placements</h2>
@@ -369,7 +369,7 @@ export default function EngineeringPage() {
             </section>
 
             {/* ═══ ADMISSIONS — Strong CTA ═══ */}
-            <section className="py-24 bg-primary">
+            <section className="py-16 md:py-24 bg-primary">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
                         {/* Left: CTA */}

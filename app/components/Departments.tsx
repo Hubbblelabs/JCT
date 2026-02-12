@@ -51,11 +51,11 @@ const departments = [
 
 export function Departments() {
     return (
-        <section id="academics" className="py-32 bg-white">
-            <div className="container mx-auto px-4 md:px-6">
-                <div className="text-center max-w-3xl mx-auto mb-20">
-                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Our Faculties</h2>
-                    <h3 className="text-4xl md:text-6xl font-serif text-primary leading-tight mb-6">
+        <section id="academics" className="py-16 md:py-32 bg-white">
+            <div className="container mx-auto px-4 md:px-6 3xl:px-8">
+                <div className="text-center max-w-3xl mx-auto mb-12 md:mb-20">
+                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4 md:mb-6">Our Faculties</h2>
+                    <h3 className="text-3xl sm:text-4xl md:text-6xl font-serif text-primary leading-tight mb-4 md:mb-6">
                         Schools of <span className="italic text-stone-300 font-light">Innovation</span>
                     </h3>
                     <p className="text-stone-500 font-light leading-relaxed text-lg">
@@ -63,7 +63,7 @@ export function Departments() {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
                     {departments.map((dept, index) => (
                         <motion.div
                             key={dept.slug}
@@ -90,7 +90,7 @@ export function Departments() {
                                     </div>
 
                                     {/* Content */}
-                                    <div className="p-8 flex-1 flex flex-col">
+                                    <div className="p-5 sm:p-6 md:p-8 flex-1 flex flex-col">
                                         <div className="mb-4">
                                             <span className="text-xl font-sans font-black text-accent/80 tracking-tighter">0{index + 1}</span>
                                         </div>

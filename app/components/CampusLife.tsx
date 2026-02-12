@@ -30,11 +30,11 @@ const campusImages = [
 
 export function CampusLife() {
     return (
-        <section className="py-32 bg-stone-50 overflow-hidden">
-            <div className="container mx-auto px-4 md:px-6 mb-16 flex justify-between items-end">
+        <section className="py-16 md:py-32 bg-stone-50 overflow-hidden">
+            <div className="container mx-auto px-4 md:px-6 3xl:px-8 mb-10 md:mb-16 flex justify-between items-end">
                 <div>
                     <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Campus Life</h2>
-                    <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight">
+                    <h3 className="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-serif text-primary leading-tight">
                         Life Beyond <br /><span className="text-stone-400 italic">The Classroom</span>
                     </h3>
                 </div>
@@ -50,7 +50,7 @@ export function CampusLife() {
             </div>
 
             {/* Horizontal Scroll Container */}
-            <div className="flex gap-6 overflow-x-auto pb-12 px-4 md:px-6 snap-x snap-mandatory scrollbar-hide -mx-4 md:mx-0 pl-[max(1rem,calc((100vw-80rem)/2))]">
+            <div className="flex gap-4 md:gap-6 overflow-x-auto pb-8 md:pb-12 px-4 md:px-6 snap-x snap-mandatory scrollbar-hide -mx-4 md:mx-0 pl-[max(1rem,calc((100vw-80rem)/2))]">
                 {campusImages.map((item, index) => (
                     <motion.div
                         key={index}
@@ -58,7 +58,7 @@ export function CampusLife() {
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
                         transition={{ duration: 0.6, delay: index * 0.1 }}
-                        className="flex-none w-[85vw] md:w-[45vw] lg:w-[30vw] snap-center cursor-pointer group"
+                        className="flex-none w-[75vw] sm:w-[60vw] md:w-[45vw] lg:w-[30vw] 2xl:w-[25vw] snap-center cursor-pointer group"
                     >
                         <div className="aspect-4/5 md:aspect-3/4 rounded-3xl overflow-hidden relative mb-6 shadow-md group-hover:shadow-xl transition-all duration-500">
                             <div className="absolute inset-0 bg-primary/20 group-hover:bg-transparent transition-colors duration-500 z-10" />

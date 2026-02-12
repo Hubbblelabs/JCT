@@ -56,7 +56,7 @@ export function Hero() {
                         initial={{ opacity: 0, y: 30 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 1, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-                        className="text-5xl md:text-7xl lg:text-8xl font-serif font-bold text-white mb-6 tracking-tight leading-[0.95] drop-shadow-sm"
+                        className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl 2xl:text-9xl font-serif font-bold text-white mb-6 tracking-tight leading-[0.95] drop-shadow-sm"
                     >
                         Engineers of <br />
                         <span className="text-white/90 italic font-medium">Conscience</span> & <br />
@@ -67,7 +67,7 @@ export function Hero() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
-                        className="text-lg md:text-xl text-stone-200 max-w-xl leading-relaxed font-light mb-10"
+                        className="text-base sm:text-lg md:text-xl text-stone-200 max-w-xl leading-relaxed font-light mb-10"
                     >
                         Empowering the next generation of leaders through world-class education in{' '}
                         <span className="font-semibold text-white">Engineering</span>,{' '}

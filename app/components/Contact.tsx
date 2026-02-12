@@ -6,11 +6,11 @@ import { MapPin, Phone, Mail, Send } from "lucide-react";
 
 export function Contact() {
     return (
-        <section id="contact" className="py-32 bg-stone-50">
-            <div className="container mx-auto px-4 md:px-6">
-                <div className="text-center max-w-3xl mx-auto mb-20">
-                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Get in Touch</h2>
-                    <h3 className="text-4xl md:text-5xl font-serif text-primary mb-6">
+        <section id="contact" className="py-16 md:py-32 bg-stone-50">
+            <div className="container mx-auto px-4 md:px-6 3xl:px-8">
+                <div className="text-center max-w-3xl mx-auto mb-12 md:mb-20">
+                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4 md:mb-6">Get in Touch</h2>
+                    <h3 className="text-3xl sm:text-4xl md:text-5xl font-serif text-primary mb-4 md:mb-6">
                         We're Here to <span className="italic text-stone-400 font-light">Help</span>
                     </h3>
                     <p className="text-stone-600 text-lg font-light">

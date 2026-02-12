@@ -90,7 +90,7 @@ export function Navbar() {
                         : "bg-transparent py-5"
                 )}
             >
-                <div className="container mx-auto px-4 md:px-6 flex items-center justify-between">
+                <div className="container mx-auto px-4 md:px-6 3xl:px-8 flex items-center justify-between">
                     {/* Logo */}
                     <Link href="/" className="flex items-center z-50 relative">
                         <div className="origin-left scale-140 transition-transform duration-300">
@@ -106,7 +106,7 @@ export function Navbar() {
 
 
                     {/* Desktop Navigation */}
-                    <div className="hidden lg:flex items-center gap-6 xl:gap-8">
+                    <div className="hidden lg:flex items-center gap-6 xl:gap-8 3xl:gap-10">
                         {navLinks.map((link) => (
                             <div
                                 key={link.name}
@@ -225,7 +225,7 @@ export function Navbar() {
                             animate={{ x: 0 }}
                             exit={{ x: "100%" }}
                             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                            className="fixed inset-y-0 right-0 z-50 w-full sm:w-100 bg-white shadow-2xl flex flex-col lg:hidden"
+                            className="fixed inset-y-0 right-0 z-50 w-full sm:w-100 md:w-105 bg-white shadow-2xl flex flex-col lg:hidden"
                         >
                             {/* Mobile Header */}
                             <div className="flex items-center justify-between p-6 border-b border-stone-100">

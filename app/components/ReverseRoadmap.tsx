@@ -16,11 +16,11 @@ export function ReverseRoadmap() {
     return (
         <div className="relative mb-24 overflow-hidden">
             {/* Curly connecting path - SVG (Simplified for reverse flow visually, or just straight line) */}
-            <div className="absolute top-14 left-0 right-0 h-0.5 bg-stone-100 hidden lg:block" />
+            <div className="absolute top-14 left-0 right-0 h-0.5 bg-stone-100 hidden xl:block" />
 
             {/* Content Container */}
-            <div className="mt-20 relative z-10 overflow-x-auto lg:overflow-visible pb-4 lg:pb-20">
-                <div className="flex lg:grid lg:grid-cols-6 gap-6 lg:gap-4 min-w-max lg:min-w-0">
+            <div className="mt-20 relative z-10 overflow-x-auto xl:overflow-visible pb-4 xl:pb-20 scrollbar-hide">
+                <div className="flex xl:grid xl:grid-cols-7 gap-4 sm:gap-6 xl:gap-4 min-w-max xl:min-w-0">
                     {milestones.map((milestone, index) => (
                         <motion.div
                             key={milestone.year}
@@ -28,14 +28,14 @@ export function ReverseRoadmap() {
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true, margin: "-50px" }}
                             transition={{ duration: 0.5, delay: index * 0.08 }}
-                            className="shrink-0 w-64 lg:w-auto relative group"
+                            className="shrink-0 w-56 sm:w-64 xl:w-auto relative group"
                         >
                             {/* Dot marker */}
-                            <div className="absolute -top-8 lg:top-8 lg:-mt-10 left-8 lg:left-1/2 lg:-translate-x-1/2 w-4 h-4 rounded-full bg-stone-200 border-4 border-white shadow-sm group-hover:bg-accent transition-colors duration-300 hidden lg:block z-20" />
+                            <div className="absolute -top-8 xl:top-8 xl:-mt-10 left-8 xl:left-1/2 xl:-translate-x-1/2 w-4 h-4 rounded-full bg-stone-200 border-4 border-white shadow-sm group-hover:bg-accent transition-colors duration-300 hidden xl:block z-20" />
 
                             {/* Card */}
-                            <div className="bg-white p-6 rounded-2xl border border-stone-100 hover:border-accent/30 hover:shadow-lg transition-all duration-300 h-full relative mt-4 lg:mt-12">
-                                <div className="absolute top-0 left-6 -translate-y-1/2 lg:hidden w-3 h-3 rounded-full bg-accent border-2 border-white shadow-sm" />
+                            <div className="bg-white p-4 sm:p-6 rounded-xl sm:rounded-2xl border border-stone-100 hover:border-accent/30 hover:shadow-lg transition-all duration-300 h-full relative mt-4 xl:mt-12">
+                                <div className="absolute top-0 left-6 -translate-y-1/2 xl:hidden w-3 h-3 rounded-full bg-accent border-2 border-white shadow-sm" />
 
                                 <span className="inline-block px-3 py-1 bg-primary/5 text-primary text-xs font-black rounded-lg mb-3 group-hover:bg-accent group-hover:text-primary transition-colors">
                                     {milestone.year}
@@ -49,7 +49,7 @@ export function ReverseRoadmap() {
             </div>
 
             {/* Mobile scroll hint */}
-            <div className="lg:hidden text-center mt-4">
+            <div className="xl:hidden text-center mt-4">
                 <span className="text-xs text-stone-400 font-medium">← Scroll to explore our history →</span>
             </div>
         </div>

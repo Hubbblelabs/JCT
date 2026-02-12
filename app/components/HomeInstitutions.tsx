@@ -40,8 +40,8 @@ const institutions = [
 
 export function HomeInstitutions() {
     return (
-        <section id="institutions" className="py-20 bg-white">
-            <div className="container mx-auto px-4 md:px-6">
+        <section id="institutions" className="py-16 md:py-20 3xl:py-28 bg-white">
+            <div className="container mx-auto px-4 md:px-6 3xl:px-8">
                 <div className="max-w-3xl mb-12">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -50,7 +50,7 @@ export function HomeInstitutions() {
                         transition={{ duration: 0.6 }}
                     >
                         <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Our Institutions</h2>
-                        <h3 className="text-3xl md:text-5xl font-serif text-primary leading-tight mb-4">
+                        <h3 className="text-2xl sm:text-3xl md:text-5xl 2xl:text-6xl font-serif text-primary leading-tight mb-4">
                             Three distinct colleges. <br />
                             <span className="text-stone-300 italic font-light">One shared standard.</span>
                         </h3>
@@ -82,7 +82,7 @@ export function HomeInstitutions() {
                                     </div>
 
                                     {/* Content */}
-                                    <div className={`lg:col-span-7 p-10 md:p-14 flex flex-col justify-center ${index === 1 ? 'lg:order-1' : ''}`}>
+                                    <div className={`lg:col-span-7 p-6 sm:p-8 md:p-10 lg:p-14 flex flex-col justify-center ${index === 1 ? 'lg:order-1' : ''}`}>
                                         <div className="flex items-center gap-3 mb-6">
                                             <div className="p-3 bg-white rounded-xl text-primary shadow-sm border border-stone-100">
                                                 <inst.icon size={22} strokeWidth={1.5} />
@@ -90,7 +90,7 @@ export function HomeInstitutions() {
                                             <span className="text-xs font-bold text-accent uppercase tracking-[0.15em]">{inst.programs}</span>
                                         </div>
 
-                                        <h4 className="text-3xl md:text-4xl font-serif text-primary mb-4 group-hover:text-accent transition-colors leading-tight">
+                                        <h4 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif text-primary mb-3 md:mb-4 group-hover:text-accent transition-colors leading-tight">
                                             {inst.name}
                                         </h4>
 

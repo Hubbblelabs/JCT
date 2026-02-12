@@ -71,8 +71,8 @@ export default function MainPage() {
                     <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-primary" />
                 </motion.div>
 
-                <div className="container relative z-20 px-4 md:px-6">
-                    <div className="max-w-5xl">
+                <div className="container relative z-20 px-4 md:px-6 3xl:px-8">
+                    <div className="max-w-5xl 3xl:max-w-6xl">
                         <motion.div
                             initial={{ opacity: 0, y: -10 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -89,7 +89,7 @@ export default function MainPage() {
                             initial={{ opacity: 0, y: 50 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 1, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-                            className="text-4xl md:text-6xl lg:text-7xl font-serif text-white mb-6 tracking-tighter leading-[0.92]"
+                            className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl 2xl:text-8xl 3xl:text-9xl font-serif text-white mb-6 tracking-tighter leading-[0.92]"
                         >
                             Three Colleges. <br />
                             One Commitment to <br />
@@ -100,7 +100,7 @@ export default function MainPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.35 }}
-                            className="text-base md:text-lg text-white/60 max-w-2xl leading-relaxed font-light mb-8"
+                            className="text-sm sm:text-base md:text-lg 2xl:text-xl text-white/60 max-w-2xl leading-relaxed font-light mb-8"
                         >
                             JCT Institutions is a group of three colleges in Coimbatore — Engineering, Arts & Science, and Polytechnic — working under a shared belief that education should build competence and character in equal measure.
                         </motion.p>
@@ -120,44 +120,6 @@ export default function MainPage() {
                         </motion.div>
                     </div>
                 </div>
-
-                {/* Accreditation Logos - Bottom Right */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.8, duration: 0.8 }}
-                    className="absolute bottom-10 left-0 right-0 z-30 pointer-events-none"
-                >
-                    <div className="container mx-auto px-4 md:px-6">
-                        <div className="flex flex-wrap items-center justify-center lg:justify-end gap-4 md:gap-6 lg:gap-8 pointer-events-auto lg:pr-28">
-                            {[
-                                { name: "AICTE", logo: "/aicte.png" },
-                                { name: "Anna University", logo: "/anna.png" },
-                                { name: "NAAC", logo: "/naac.png" },
-                                { name: "NBA", logo: "/nba.png" },
-                                { name: "ISO", logo: "/iso.png" },
-                                { name: "UGC", logo: "/ugc.png" },
-                                { name: "DOTE", logo: "/dote.png" },
-                                { name: "Bharathiar University", logo: "/bharathiar_university.png" },
-                            ].map((item) => (
-                                <div key={item.name} className="relative group/logo cursor-pointer">
-                                    <div className="relative h-12 w-12 md:h-16 md:w-16 lg:h-20 lg:w-20 transition-transform duration-300 group-hover/logo:scale-110 opacity-90 group-hover/logo:opacity-100">
-                                        <Image
-                                            src={item.logo}
-                                            alt={item.name}
-                                            fill
-                                            className="object-contain filter drop-shadow-xl"
-                                        />
-                                    </div>
-                                    {/* Tooltip */}
-                                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white/90 text-primary text-[10px] font-bold px-2 py-1 rounded-md opacity-0 group-hover/logo:opacity-100 transition-opacity whitespace-nowrap">
-                                        {item.name}
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </motion.div>
             </section>
 
             <TrustIndicators />
@@ -170,9 +132,9 @@ export default function MainPage() {
             <CompanyCarousel />
 
             {/* ═══ LEGACY & VALUES — Timeline + values ═══ */}
-            <section id="about" className="py-20 bg-stone-50">
-                <div className="container mx-auto px-4 md:px-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+            <section id="about" className="py-16 md:py-20 3xl:py-28 bg-stone-50">
+                <div className="container mx-auto px-4 md:px-6 3xl:px-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 3xl:gap-16 mb-16">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             whileInView={{ opacity: 1, y: 0 }}
@@ -180,7 +142,7 @@ export default function MainPage() {
                             transition={{ duration: 0.6 }}
                         >
                             <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Our Story</h2>
-                            <h3 className="text-3xl md:text-5xl font-serif text-primary leading-tight">
+                            <h3 className="text-2xl sm:text-3xl md:text-5xl 2xl:text-6xl font-serif text-primary leading-tight">
                                 Over a Decade of <br />
                                 <span className="text-stone-400 italic font-light">Steady Growth.</span>
                             </h3>
@@ -206,10 +168,10 @@ export default function MainPage() {
             </section>
 
             {/* ═══ GROUP ACHIEVEMENTS — Numeric impact ═══ */}
-            <section className="py-16 bg-primary text-white relative overflow-hidden">
+            <section className="py-12 md:py-16 3xl:py-24 bg-primary text-white relative overflow-hidden">
                 <div className="absolute inset-0 opacity-5 pointer-events-none" style={{ backgroundImage: "radial-gradient(#ffffff 1px, transparent 1px)", backgroundSize: "30px 30px" }} />
 
-                <div className="container mx-auto px-4 md:px-6 relative z-10">
+                <div className="container mx-auto px-4 md:px-6 3xl:px-8 relative z-10">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
@@ -218,12 +180,12 @@ export default function MainPage() {
                         className="text-center mb-12"
                     >
                         <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">By the Numbers</h2>
-                        <h3 className="text-3xl md:text-4xl font-serif leading-tight">
+                        <h3 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-serif leading-tight">
                             Fifteen+ Years <span className="text-white/60 italic font-light">in Sum</span>
                         </h3>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
                         {achievements.map((stat, index) => (
                             <motion.div
                                 key={stat.label}
@@ -231,12 +193,12 @@ export default function MainPage() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                                className="text-center p-10 bg-white/5 rounded-3xl border border-white/10 hover:bg-white/10 transition-all duration-300"
+                                className="text-center p-6 sm:p-8 md:p-10 3xl:p-12 bg-white/5 rounded-2xl sm:rounded-3xl border border-white/10 hover:bg-white/10 transition-all duration-300"
                             >
-                                <stat.icon size={28} className="text-accent mx-auto mb-6" strokeWidth={1.5} />
-                                <span className="block text-5xl font-sans font-black text-white tracking-tight mb-3">{stat.value}</span>
-                                <h4 className="text-sm font-bold uppercase tracking-[0.15em] text-accent mb-2">{stat.label}</h4>
-                                <p className="text-blue-200/60 text-sm font-light">{stat.desc}</p>
+                                <stat.icon size={28} className="text-accent mx-auto mb-4 sm:mb-6" strokeWidth={1.5} />
+                                <span className="block text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-sans font-black text-white tracking-tight mb-2 sm:mb-3">{stat.value}</span>
+                                <h4 className="text-[10px] sm:text-sm font-bold uppercase tracking-[0.15em] text-accent mb-1 sm:mb-2">{stat.label}</h4>
+                                <p className="text-blue-200/60 text-xs sm:text-sm font-light hidden sm:block">{stat.desc}</p>
                             </motion.div>
                         ))}
                     </div>
@@ -244,8 +206,8 @@ export default function MainPage() {
             </section>
 
             {/* ═══ ADMISSIONS CTA — Guidance section ═══ */}
-            <section id="admissions" className="py-20 bg-white">
-                <div className="container mx-auto px-4 md:px-6">
+            <section id="admissions" className="py-16 md:py-20 3xl:py-28 bg-white">
+                <div className="container mx-auto px-4 md:px-6 3xl:px-8">
                     <div className="max-w-4xl mx-auto text-center">
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
@@ -254,7 +216,7 @@ export default function MainPage() {
                             transition={{ duration: 0.6 }}
                         >
                             <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Admissions 2026</h2>
-                            <h3 className="text-3xl md:text-5xl font-serif text-primary leading-tight mb-6">
+                            <h3 className="text-2xl sm:text-3xl md:text-5xl 2xl:text-6xl font-serif text-primary leading-tight mb-6">
                                 Not Sure Which <br />
                                 <span className="text-stone-400 italic font-light">College Is Right for You?</span>
                             </h3>
@@ -263,7 +225,7 @@ export default function MainPage() {
                             </p>
                         </motion.div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 mb-16">
                             {[
                                 {
                                     icon: FileText,
@@ -349,15 +311,16 @@ export default function MainPage() {
                         </motion.div>
                     </div>
                 </div>
-            </section>
+            </section> 
 
             {/* ═══ CONTACT — Visit & form ═══ */}
-            <section id="contact" className="py-16 bg-stone-50 border-t border-stone-100">
-                <div className="container mx-auto px-4 md:px-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
+            {/*}
+            <section id="contact" className="py-12 md:py-16 3xl:py-24 bg-stone-50 border-t border-stone-100">
+                <div className="container mx-auto px-4 md:px-6 3xl:px-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 3xl:gap-20">
                         <div>
                             <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Visit Us</h2>
-                            <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-8">
+                            <h3 className="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-serif text-primary leading-tight mb-8">
                                 Come See <span className="text-stone-400 italic font-light">for Yourself.</span>
                             </h3>
                             <p className="text-stone-500 text-lg font-light leading-relaxed mb-10 max-w-md">
@@ -396,7 +359,7 @@ export default function MainPage() {
                             >
                                 <h4 className="font-serif text-xl text-primary mb-6">Schedule a Campus Visit</h4>
                                 <form className="space-y-5">
-                                    <div className="grid grid-cols-2 gap-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
                                             <label className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Name</label>
                                             <input type="text" className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all outline-none text-sm" placeholder="Your Name" />
@@ -427,7 +390,7 @@ export default function MainPage() {
                         </div>
                     </div>
                 </div>
-            </section>
+            </section> */}
 
             <FloatingCTA />
             <Footer />

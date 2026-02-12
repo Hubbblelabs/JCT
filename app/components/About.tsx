@@ -6,8 +6,8 @@ import { ArrowUpRight } from "lucide-react";
 
 export function About() {
     return (
-        <section id="about" className="py-32 bg-stone-50/50 relative overflow-hidden">
-            <div className="container mx-auto px-4 md:px-6">
+        <section id="about" className="py-16 md:py-32 bg-stone-50/50 relative overflow-hidden">
+            <div className="container mx-auto px-4 md:px-6 3xl:px-8">
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
 
                     {/* Image Composition - Left offset */}
@@ -51,11 +51,11 @@ export function About() {
                             <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-8">
                                 History & Philosophy
                             </h2>
-                            <h3 className="text-5xl md:text-6xl font-serif text-primary mb-10 leading-[1.1]">
+                            <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-primary mb-8 md:mb-10 leading-[1.1]">
                                 More than a degree.<br />
                                 <span className="text-stone-400">A transformation.</span>
                             </h3>
-                            <div className="space-y-8 text-stone-600 text-xl leading-relaxed font-light max-w-2xl">
+                            <div className="space-y-6 md:space-y-8 text-stone-600 text-base md:text-xl leading-relaxed font-light max-w-2xl">
                                 <p>
                                     Since 1998, we have believed that true education happens in the margins—in the late-night debates, the lab failures that lead to breakthroughs, and the quiet moments of reflection.
                                 </p>
