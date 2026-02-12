@@ -11,7 +11,7 @@ const indicators = [
     },
     {
         icon: Award,
-        label: "NAAC Accredited",
+        label: "NBA & NAAC Accredited",
         sub: "Quality Education"
     },
     {

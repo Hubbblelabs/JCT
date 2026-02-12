@@ -80,7 +80,7 @@ export function Admissions() {
                                     whileInView={{ opacity: 1, y: 0 }}
                                     viewport={{ once: true }}
                                     transition={{ duration: 0.5, delay: index * 0.1 }}
-                                    className="bg-white/5 hover:bg-white/10 border border-white/10 p-10 rounded-3xl transition-all duration-300 hover:translate-y-[-4px]"
+                                    className="bg-white/5 hover:bg-white/10 border border-white/10 p-10 rounded-3xl transition-all duration-300 hover:-translate-y-1"
                                 >
                                     <div className="flex justify-between items-start mb-8">
                                         <div className="p-4 bg-white/10 rounded-2xl text-accent">

@@ -10,6 +10,8 @@ const accreditations = [
     { name: "NBA Accredited", logo: "/nba.png" },
     { name: "ISO Certified", logo: "/iso.png" },
     { name: "UGC Recognized", logo: "/ugc.png" },
+    { name: "DOTE Approved", logo: "/dote.png" },
+    { name: "Bharathiar University Affiliated", logo: "/bharathiar_university.png" },
 ];
 
 export function Accreditations() {

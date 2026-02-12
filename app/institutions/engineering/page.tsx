@@ -189,7 +189,7 @@ export default function EngineeringPage() {
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.35, delay: index * 0.05 }}
-                                className="group bg-white border border-stone-100 rounded-2xl p-6 md:p-8 hover:border-accent/20 hover:shadow-lg transition-all duration-300 min-w-[250px] md:min-w-[290px] snap-center shrink-0 flex flex-col justify-between"
+                                className="group bg-white border border-stone-100 rounded-2xl p-6 md:p-8 hover:border-accent/20 hover:shadow-lg transition-all duration-300 min-w-62.5 md:min-w-72.5 snap-center shrink-0 flex flex-col justify-between"
                                 draggable={false}
                             >
                                 <div className="flex flex-col gap-4">

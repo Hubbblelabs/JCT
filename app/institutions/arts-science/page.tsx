@@ -220,7 +220,7 @@ export default function ArtsSciencePage() {
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.4, delay: index * 0.06 }}
-                                className="bg-white p-6 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 group min-w-[220px] md:min-w-[260px] max-w-[280px] snap-center shrink-0 flex flex-col justify-between"
+                                className="bg-white p-6 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 group min-w-55 md:min-w-65 max-w-70 snap-center shrink-0 flex flex-col justify-between"
                                 draggable={false}
                             >
                                 <div>
@@ -267,7 +267,7 @@ export default function ArtsSciencePage() {
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.4, delay: index * 0.08 }}
-                                className="bg-white p-6 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 min-w-[220px] md:min-w-[260px] max-w-[280px] snap-center shrink-0 flex flex-col justify-between"
+                                className="bg-white p-6 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 min-w-55 md:min-w-65 max-w-70 snap-center shrink-0 flex flex-col justify-between"
                                 draggable={false}
                             >
                                 <div>
@@ -310,7 +310,7 @@ export default function ArtsSciencePage() {
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.4, delay: index * 0.06 }}
-                                className="p-8 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-md transition-all duration-300 group min-w-[240px] md:min-w-[280px] snap-center shrink-0 bg-white"
+                                className="p-8 rounded-2xl border border-stone-100 hover:border-accent/20 hover:shadow-md transition-all duration-300 group min-w-60 md:min-w-70 snap-center shrink-0 bg-white"
                                 draggable={false}
                             >
                                 <div className="p-3 bg-stone-50 rounded-xl text-primary w-fit mb-5 group-hover:bg-accent/10 group-hover:text-accent transition-colors">

@@ -216,7 +216,7 @@ export default function PolytechnicPage() {
                                 whileInView={{ opacity: 1, x: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.5, delay: index * 0.08 }}
-                                className="bg-stone-50 rounded-2xl p-8 border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 group min-w-[250px] md:min-w-[300px] snap-center shrink-0 flex flex-col justify-between"
+                                className="bg-stone-50 rounded-2xl p-8 border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 group min-w-62.5 md:min-w-75 snap-center shrink-0 flex flex-col justify-between"
                                 draggable={false}
                             >
                                 <div>

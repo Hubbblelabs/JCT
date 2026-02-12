@@ -12,6 +12,7 @@ import { CompanyCarousel } from "@/app/components/CompanyCarousel";
 import { Accreditations } from "@/app/components/Accreditations";
 import { Institutions } from "@/app/components/Institutions";
 import Link from "next/link";
+import Image from "next/image";
 import {
     ArrowUpRight,
     ArrowRight,
@@ -92,7 +93,7 @@ export default function MainPage() {
                         >
                             Three Colleges. <br />
                             One Commitment to <br />
-                            <span className="text-accent italic font-light">Honest Education.</span>
+                            <span className="text-accent italic font-light">your success starts here</span>
                         </motion.h1>
 
                         <motion.p
@@ -108,7 +109,7 @@ export default function MainPage() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.8, delay: 0.5 }}
-                            className="flex flex-wrap gap-4"
+                            className="flex flex-wrap items-center gap-4"
                         >
                             <Button size="lg" className="h-14 px-8 text-base bg-accent text-primary hover:bg-accent/90 font-bold rounded-xl transition-all hover:scale-105 active:scale-95 group shadow-xl shadow-accent/20">
                                 Apply Now <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -120,7 +121,43 @@ export default function MainPage() {
                     </div>
                 </div>
 
-
+                {/* Accreditation Logos - Bottom Right */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8, duration: 0.8 }}
+                    className="absolute bottom-10 left-0 right-0 z-30 pointer-events-none"
+                >
+                    <div className="container mx-auto px-4 md:px-6">
+                        <div className="flex flex-wrap items-center justify-center lg:justify-end gap-4 md:gap-6 lg:gap-8 pointer-events-auto lg:pr-28">
+                            {[
+                                { name: "AICTE", logo: "/aicte.png" },
+                                { name: "Anna University", logo: "/anna.png" },
+                                { name: "NAAC", logo: "/naac.png" },
+                                { name: "NBA", logo: "/nba.png" },
+                                { name: "ISO", logo: "/iso.png" },
+                                { name: "UGC", logo: "/ugc.png" },
+                                { name: "DOTE", logo: "/dote.png" },
+                                { name: "Bharathiar University", logo: "/bharathiar_university.png" },
+                            ].map((item) => (
+                                <div key={item.name} className="relative group/logo cursor-pointer">
+                                    <div className="relative h-12 w-12 md:h-16 md:w-16 lg:h-20 lg:w-20 transition-transform duration-300 group-hover/logo:scale-110 opacity-90 group-hover/logo:opacity-100">
+                                        <Image
+                                            src={item.logo}
+                                            alt={item.name}
+                                            fill
+                                            className="object-contain filter drop-shadow-xl"
+                                        />
+                                    </div>
+                                    {/* Tooltip */}
+                                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-white/90 text-primary text-[10px] font-bold px-2 py-1 rounded-md opacity-0 group-hover/logo:opacity-100 transition-opacity whitespace-nowrap">
+                                        {item.name}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </motion.div>
             </section>
 
             <TrustIndicators />

@@ -176,37 +176,6 @@ export function Navbar() {
 
                     {/* Desktop Right Actions */}
                     <div className="hidden lg:flex items-center gap-3">
-                        {/* Accreditation Logos */}
-                        <div className={cn(
-                            "flex items-center gap-2 mr-1 transition-all duration-300",
-                            scrolled ? "opacity-100" : "opacity-90"
-                        )}>
-                            {[
-                                { label: "NAAC", src: "/naac.png" },
-                                { label: "AICTE", src: "/aicte.png" },
-                                { label: "Anna University", src: "/anna.png" },
-                            ].map((badge) => (
-                                <div
-                                    key={badge.label}
-                                    className={cn(
-                                        "rounded-full p-1 border transition-all duration-300 flex items-center justify-center",
-                                        scrolled
-                                            ? "border-stone-200 bg-white shadow-sm"
-                                            : "border-white/20 bg-white/10 backdrop-blur-sm"
-                                    )}
-                                    title={badge.label}
-                                >
-                                    <Image
-                                        src={badge.src}
-                                        alt={badge.label}
-                                        width={28}
-                                        height={28}
-                                        className="w-7 h-7 rounded-full object-contain"
-                                    />
-                                </div>
-                            ))}
-                        </div>
-
                         <Link
                             href="#admissions"
                             className={cn(
@@ -359,29 +328,6 @@ export function Navbar() {
                                     <Link href="#" className="hover:text-primary">Admissions</Link>
                                     <Link href="#" className="hover:text-primary">Contact</Link>
                                     <Link href="#" className="hover:text-primary">Login</Link>
-                                </div>
-
-                                {/* Accreditation Logos */}
-                                <div className="flex items-center justify-center gap-3 pt-4 border-t border-stone-100 mt-3">
-                                    {[
-                                        { label: "NAAC", src: "/naac.png" },
-                                        { label: "AICTE", src: "/aicte.png" },
-                                        { label: "Anna University", src: "/anna.png" },
-                                    ].map((badge) => (
-                                        <div
-                                            key={badge.label}
-                                            className="rounded-full p-1 border border-stone-200 bg-white shadow-sm flex items-center justify-center"
-                                            title={badge.label}
-                                        >
-                                            <Image
-                                                src={badge.src}
-                                                alt={badge.label}
-                                                width={32}
-                                                height={32}
-                                                className="w-8 h-8 rounded-full object-contain"
-                                            />
-                                        </div>
-                                    ))}
                                 </div>
                             </div>
                         </motion.div>
