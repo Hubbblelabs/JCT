@@ -4,11 +4,10 @@ import { motion } from "framer-motion";
 
 const milestones = [
     { year: "2026", title: "Looking Ahead", desc: "Expanding research collaborations, industry tie-ups, and international academic partnerships for a future-ready ecosystem." },
-    { year: "2018", title: "Two Decades of Impact", desc: "Over 12,000 alumni across three institutions. New departments in AI, Cyber Security, and Data Science introduced." },
-    { year: "2010", title: "Polytechnic College Established", desc: "JCT Polytechnic College was founded to provide diploma-level technical education with strong workshop-based training." },
-    { year: "2006", title: "Arts & Science College Added", desc: "Responding to demand for broader academic pathways, JCT College of Arts and Science began operations with six undergraduate programs." },
-    { year: "2001", title: "Engineering College Launched", desc: "JCT College of Engineering and Technology opened its doors with four core departments and 240 students in the inaugural batch." },
-    { year: "1998", title: "Foundation Year", desc: "JCT Institutions was established in Coimbatore with a clear mandate: build an educational group rooted in ethics and practical learning." },
+    { year: "2024", title: "Arts & Science College Added", desc: "Responding to demand for broader academic pathways, JCT College of Arts and Science began operations with undergraduate programs." },
+    { year: "2019", title: "Decade of Excellence", desc: "Celebrated 10 years of educational service with over 12,000 alumni and new departments in emerging technologies." },
+    { year: "2014", title: "Polytechnic College Established", desc: "JCT Polytechnic College was founded to provide diploma-level technical education with strong workshop-based training." },
+    { year: "2009", title: "Foundation & Engineering", desc: "JCT Institutions was established in Coimbatore, launching the College of Engineering and Technology with 240 students." },
 ];
 
 export function ReverseRoadmap() {

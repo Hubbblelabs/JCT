@@ -16,16 +16,10 @@ import {
     ArrowUpRight,
     ArrowRight,
     GraduationCap,
-    Microscope,
-    PenTool,
     Users,
     Building2,
     Trophy,
     Globe,
-    Heart,
-    Target,
-    Lightbulb,
-    Award,
     Clock,
     FileText,
     CalendarCheck,
@@ -45,13 +39,7 @@ const achievements = [
     { icon: Globe, value: "500+", label: "Recruiting Partners", desc: "Companies hiring from our campuses" },
 ];
 
-/* ─── Core values ─── */
-const values = [
-    { icon: Heart, title: "Character First", desc: "We believe that technical skill without integrity is incomplete. Our programs emphasize ethical responsibility alongside academic excellence." },
-    { icon: Target, title: "Outcome-Oriented", desc: "Every program is designed to lead somewhere — whether that's a career, higher education, or entrepreneurship. We track outcomes, not just enrollment." },
-    { icon: Lightbulb, title: "Practical Learning", desc: "Labs, workshops, project work, and industry internships are not optional extras. They are central to how we teach across all three colleges." },
-    { icon: Award, title: "Institutional Integrity", desc: "Transparent admissions, regular academic audits, and honest communication with students and parents. We earn trust by being straightforward." },
-];
+
 
 /* ─── Institution cards ─── */
 
@@ -132,20 +120,7 @@ export default function MainPage() {
                     </div>
                 </div>
 
-                {/* Scroll indicator */}
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.5 }}
-                    className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2"
-                >
-                    <span className="text-[10px] text-white/40 uppercase tracking-[0.3em] font-bold">Scroll</span>
-                    <motion.div
-                        animate={{ y: [0, 8, 0] }}
-                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
-                        className="w-px h-6 bg-linear-to-b from-white/40 to-transparent"
-                    />
-                </motion.div>
+
             </section>
 
             <TrustIndicators />
@@ -181,7 +156,7 @@ export default function MainPage() {
                             className="flex items-end"
                         >
                             <p className="text-stone-500 text-base font-light leading-relaxed max-w-lg">
-                                JCT Institutions wasn't built in a single stroke. Since 2009, it grew institution by institution, responding to what students and the region actually needed — first engineers, then broadly educated graduates, then skilled technicians.
+                                JCT Institutions wasn't built in a single stroke. Since 2009, it grew institution by institution, responding to what students and the region actually needed — first engineers, then skilled technicians, then broadly educated graduates.
                             </p>
                         </motion.div>
                     </div>
@@ -189,44 +164,7 @@ export default function MainPage() {
                     {/* Reverse Roadmap */}
                     <ReverseRoadmap />
 
-                    {/* Values grid */}
-                    <div className="mb-8">
-                        <motion.div
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
-                            className="text-center max-w-2xl mx-auto mb-16"
-                        >
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Why Choose Us</h2>
-                            <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight">
-                                Principles, Not <span className="italic text-stone-400 font-light">Slogans</span>
-                            </h3>
-                        </motion.div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {values.map((value, index) => (
-                                <motion.div
-                                    key={value.title}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ duration: 0.5, delay: index * 0.1 }}
-                                    className="bg-white p-10 rounded-3xl border border-stone-100 hover:border-accent/20 hover:shadow-lg transition-all duration-300 group"
-                                >
-                                    <div className="flex items-start gap-5">
-                                        <div className="p-3 bg-stone-50 rounded-xl text-primary group-hover:bg-accent/10 group-hover:text-accent transition-colors shrink-0">
-                                            <value.icon size={24} strokeWidth={1.5} />
-                                        </div>
-                                        <div>
-                                            <h4 className="text-xl font-serif text-primary mb-3">{value.title}</h4>
-                                            <p className="text-stone-500 text-sm font-light leading-relaxed">{value.desc}</p>
-                                        </div>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
                 </div>
             </section>
 

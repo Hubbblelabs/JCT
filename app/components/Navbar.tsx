@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, ChevronDown, GraduationCap, Microscope, PenTool, ArrowRight, Phone, BookOpen, ShieldCheck } from "lucide-react";
+import { Menu, X, ChevronDown, GraduationCap, Microscope, PenTool, ArrowRight, Phone, BookOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -176,26 +176,34 @@ export function Navbar() {
 
                     {/* Desktop Right Actions */}
                     <div className="hidden lg:flex items-center gap-3">
-                        {/* Accreditation Badges */}
+                        {/* Accreditation Logos */}
                         <div className={cn(
-                            "hidden xl:flex items-center gap-2 mr-1 transition-all duration-300",
+                            "flex items-center gap-2 mr-1 transition-all duration-300",
                             scrolled ? "opacity-100" : "opacity-90"
                         )}>
                             {[
-                                { label: "NAAC", color: scrolled ? "border-emerald-200 bg-emerald-50 text-emerald-700" : "border-white/20 bg-white/10 text-white" },
-                                { label: "AICTE", color: scrolled ? "border-blue-200 bg-blue-50 text-blue-700" : "border-white/20 bg-white/10 text-white" },
-                                { label: "Anna University", color: scrolled ? "border-purple-200 bg-purple-50 text-purple-700" : "border-white/20 bg-white/10 text-white" },
+                                { label: "NAAC", src: "/naac.png" },
+                                { label: "AICTE", src: "/aicte.png" },
+                                { label: "Anna University", src: "/anna.png" },
                             ].map((badge) => (
-                                <span
+                                <div
                                     key={badge.label}
                                     className={cn(
-                                        "inline-flex items-center gap-1 px-2.5 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider transition-all duration-300",
-                                        badge.color
+                                        "rounded-full p-1 border transition-all duration-300 flex items-center justify-center",
+                                        scrolled
+                                            ? "border-stone-200 bg-white shadow-sm"
+                                            : "border-white/20 bg-white/10 backdrop-blur-sm"
                                     )}
+                                    title={badge.label}
                                 >
-                                    <ShieldCheck size={10} strokeWidth={2.5} />
-                                    {badge.label}
-                                </span>
+                                    <Image
+                                        src={badge.src}
+                                        alt={badge.label}
+                                        width={28}
+                                        height={28}
+                                        className="w-7 h-7 rounded-full object-contain"
+                                    />
+                                </div>
                             ))}
                         </div>
 
@@ -351,6 +359,29 @@ export function Navbar() {
                                     <Link href="#" className="hover:text-primary">Admissions</Link>
                                     <Link href="#" className="hover:text-primary">Contact</Link>
                                     <Link href="#" className="hover:text-primary">Login</Link>
+                                </div>
+
+                                {/* Accreditation Logos */}
+                                <div className="flex items-center justify-center gap-3 pt-4 border-t border-stone-100 mt-3">
+                                    {[
+                                        { label: "NAAC", src: "/naac.png" },
+                                        { label: "AICTE", src: "/aicte.png" },
+                                        { label: "Anna University", src: "/anna.png" },
+                                    ].map((badge) => (
+                                        <div
+                                            key={badge.label}
+                                            className="rounded-full p-1 border border-stone-200 bg-white shadow-sm flex items-center justify-center"
+                                            title={badge.label}
+                                        >
+                                            <Image
+                                                src={badge.src}
+                                                alt={badge.label}
+                                                width={32}
+                                                height={32}
+                                                className="w-8 h-8 rounded-full object-contain"
+                                            />
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         </motion.div>
