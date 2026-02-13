@@ -119,6 +119,7 @@ export function Navbar() {
                                 priority
                             />
                         </div>
+                        {isPolytechnic && (
                         <div className={`${montserrat.className} leading-tight pl-2 `}>
                             <span className="block font-extrabold text-[24px] tracking-[0.24em] text-[#0b1f3a]">
                                 JCT
@@ -127,7 +128,9 @@ export function Navbar() {
                             <span className="block font-semibold text-[16px] tracking-[0.05em] uppercase text-[#1f3b5c]">
                                 Polytechnic College
                             </span>
-                        </div>            </Link>
+                        </div>
+                        )}
+                    </Link>
 
 
                     {/* Desktop Navigation */}
