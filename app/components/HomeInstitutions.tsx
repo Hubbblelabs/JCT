@@ -11,7 +11,7 @@ const institutions = [
         name: "JCT College of Engineering & Technology",
         href: "/institutions/engineering",
         logo: "/jct_engineering.png",
-        image: "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=2686&auto=format&fit=crop",
+        image: "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=800&auto=format&fit=crop",
         tagline: "Technical depth. Research exposure. Industry-ready graduates.",
         programs: "B.E. / B.Tech / M.E.",
         students: "3,000+",
@@ -21,7 +21,7 @@ const institutions = [
         name: "JCT College of Arts & Science",
         href: "/institutions/arts-science",
         logo: "/jct_arts.png",
-        image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2673&auto=format&fit=crop",
+        image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=800&auto=format&fit=crop",
         tagline: "Broad foundations in science, commerce, and the humanities.",
         programs: "B.Sc / B.Com / BBA / BA / M.Sc / M.Com",
         students: "2,500+",
@@ -31,7 +31,7 @@ const institutions = [
         name: "JCT Polytechnic College",
         href: "/institutions/polytechnic",
         logo: "/jct_polytechnic.png",
-        image: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?q=80&w=2670&auto=format&fit=crop",
+        image: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?q=80&w=800&auto=format&fit=crop",
         tagline: "Skill-based diploma programs built around workshop training.",
         programs: "Diploma Courses",
         students: "1,200+",
@@ -50,7 +50,7 @@ export function HomeInstitutions() {
                         viewport={{ once: true }}
                         transition={{ duration: 0.6 }}
                     >
-                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Our Institutions</h2>
+                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-4">Our Institutions</h2>
                         <h3 className="text-2xl sm:text-3xl md:text-5xl 2xl:text-6xl font-serif text-primary leading-tight mb-4">
                             Three distinct colleges. <br />
                             <span className="text-stone-300 italic font-light">One shared standard.</span>
@@ -75,10 +75,14 @@ export function HomeInstitutions() {
                                     {/* Image */}
                                     <div className={`lg:col-span-5 aspect-16/10 lg:aspect-auto overflow-hidden relative ${index === 1 ? 'lg:order-2' : ''}`}>
                                         <div className="absolute inset-0 bg-primary/10 group-hover:bg-transparent transition-colors duration-500 z-10" />
-                                        <img
+                                        <Image
                                             src={inst.image}
                                             alt={inst.name}
+                                            width={800}
+                                            height={500}
                                             className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                                            sizes="(max-width: 1024px) 100vw, 42vw"
+                                            loading="lazy"
                                         />
                                     </div>
 
@@ -97,9 +101,9 @@ export function HomeInstitutions() {
                                             <span className="text-xs font-bold text-accent uppercase tracking-[0.15em]">{inst.programs}</span>
                                         </div>
 
-                                        <h4 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif text-primary mb-3 md:mb-4 group-hover:text-accent transition-colors leading-tight">
+                                        <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-serif text-primary mb-3 md:mb-4 group-hover:text-accent transition-colors leading-tight">
                                             {inst.name}
-                                        </h4>
+                                        </h3>
 
                                         <p className="text-stone-500 text-lg font-light leading-relaxed mb-8 max-w-lg">
                                             {inst.tagline}

@@ -3,26 +3,27 @@
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
+import Image from "next/image";
 
 // Using placeholder images from Unsplash
 const campusImages = [
     {
-        src: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1500&auto=format&fit=crop&q=80",
+        src: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800&auto=format&fit=crop&q=80",
         title: "State-of-the-Art Libraries",
         desc: "24/7 Access to global digital resources"
     },
     {
-        src: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=1500&auto=format&fit=crop&q=80",
+        src: "https://images.unsplash.com/photo-1532094349884-543bc11b234d?w=800&auto=format&fit=crop&q=80",
         title: "Modern Research Labs",
         desc: "Where innovation meets execution"
     },
     {
-        src: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=1500&auto=format&fit=crop&q=80",
+        src: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=800&auto=format&fit=crop&q=80",
         title: "Active Student Life",
         desc: "Over 50+ clubs and student chapters"
     },
     {
-        src: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1500&auto=format&fit=crop&q=80",
+        src: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80",
         title: "Collaborative Spaces",
         desc: "Designed for teamwork and creativity"
     }
@@ -33,9 +34,9 @@ export function CampusLife() {
         <section className="py-16 md:py-32 bg-stone-50 overflow-hidden">
             <div className="container mx-auto px-4 md:px-6 3xl:px-8 mb-10 md:mb-16 flex justify-between items-end">
                 <div>
-                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Campus Life</h2>
+                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-6">Campus Life</h2>
                     <h3 className="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-serif text-primary leading-tight">
-                        Life Beyond <br /><span className="text-stone-400 italic">The Classroom</span>
+                        Life Beyond <br /><span className="text-stone-500 italic">The Classroom</span>
                     </h3>
                 </div>
 
@@ -62,16 +63,20 @@ export function CampusLife() {
                     >
                         <div className="aspect-4/5 md:aspect-3/4 rounded-3xl overflow-hidden relative mb-6 shadow-md group-hover:shadow-xl transition-all duration-500">
                             <div className="absolute inset-0 bg-primary/20 group-hover:bg-transparent transition-colors duration-500 z-10" />
-                            <img
+                            <Image
                                 src={item.src}
                                 alt={item.title}
+                                width={800}
+                                height={1000}
                                 className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                sizes="(max-width: 640px) 75vw, (max-width: 768px) 60vw, (max-width: 1024px) 45vw, 30vw"
+                                loading="lazy"
                             />
                             <div className="absolute bottom-0 left-0 p-8 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 translate-y-4 group-hover:translate-y-0">
                                 <span className="inline-block px-3 py-1 bg-accent text-primary text-xs font-bold uppercase tracking-wider rounded-full mb-2">View Gallery</span>
                             </div>
                         </div>
-                        <h4 className="text-2xl font-serif text-primary mb-2 group-hover:text-accent transition-colors">{item.title}</h4>
+                        <h3 className="text-2xl font-serif text-primary mb-2 group-hover:text-accent transition-colors">{item.title}</h3>
                         <p className="text-stone-500 font-light">{item.desc}</p>
                     </motion.div>
                 ))}

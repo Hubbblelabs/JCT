@@ -9,10 +9,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import { Montserrat } from "next/font/google";
-
-const montserrat = Montserrat({ subsets: ["latin"] });
-
 const navLinks = [
     {
         name: "Institutions",
@@ -61,7 +57,7 @@ export function Navbar() {
     const logoSrc = isEngineering ? "/jct_engineering.png" :
         isArts ? "/jct_arts.png" :
             isPolytechnic ? "/jct_logo_blue.png" :
-                "/jct_logo.svg";
+                "/jct_logo.png";
 
     // Engineering logo is very wide (landscape with NAAC/NBA badges) and fills its canvas — height-based sizing works.
     // Arts & Polytechnic logo PNGs are wide landscape images with the actual logo content centered
@@ -120,7 +116,7 @@ export function Navbar() {
                             />
                         </div>
                         {isPolytechnic && (
-                        <div className={`${montserrat.className} leading-tight pl-2 `}>
+                        <div className="font-[family-name:var(--font-montserrat)] leading-tight pl-2 ">
                             <span className="block font-extrabold text-[24px] tracking-[0.24em] text-[#0b1f3a]">
                                 JCT
                             </span>
@@ -255,7 +251,7 @@ export function Navbar() {
                             <div className="flex items-center justify-between p-6 border-b border-stone-100">
                                 <div className="flex items-center gap-2">
                                     <Image
-                                        src="/jct_logo.svg"
+                                        src="/jct_logo.png"
                                         alt="Logo"
                                         width={36}
                                         height={36}

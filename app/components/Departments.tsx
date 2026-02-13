@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 const departments = [
     {
@@ -54,7 +55,7 @@ export function Departments() {
         <section id="academics" className="py-16 md:py-32 bg-white">
             <div className="container mx-auto px-4 md:px-6 3xl:px-8">
                 <div className="text-center max-w-3xl mx-auto mb-12 md:mb-20">
-                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4 md:mb-6">Our Faculties</h2>
+                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-4 md:mb-6">Our Faculties</h2>
                     <h3 className="text-3xl sm:text-4xl md:text-6xl font-serif text-primary leading-tight mb-4 md:mb-6">
                         Schools of <span className="italic text-stone-300 font-light">Innovation</span>
                     </h3>
@@ -77,10 +78,14 @@ export function Departments() {
                                     {/* Image */}
                                     <div className="aspect-4/3 overflow-hidden relative">
                                         <div className="absolute inset-0 bg-linear-to-t from-primary/80 via-primary/20 to-transparent z-10 opacity-60 group-hover:opacity-40 transition-opacity" />
-                                        <img
+                                        <Image
                                             src={dept.image}
                                             alt={dept.name}
+                                            width={800}
+                                            height={600}
                                             className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
+                                            sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw"
+                                            loading="lazy"
                                         />
                                         <div className="absolute top-4 right-4 z-20">
                                             <div className="w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center text-primary group-hover:bg-accent group-hover:text-primary transition-all shadow-lg">
@@ -94,9 +99,9 @@ export function Departments() {
                                         <div className="mb-4">
                                             <span className="text-xl font-sans font-black text-accent/80 tracking-tighter">0{index + 1}</span>
                                         </div>
-                                        <h4 className="text-2xl font-serif text-primary mb-3 group-hover:text-accent transition-colors">
+                                        <h3 className="text-2xl font-serif text-primary mb-3 group-hover:text-accent transition-colors">
                                             {dept.name}
-                                        </h4>
+                                        </h3>
                                         <p className="text-stone-500 text-sm font-light leading-relaxed mb-4 flex-1">
                                             {dept.description}
                                         </p>

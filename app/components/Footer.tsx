@@ -24,10 +24,16 @@ export function Footer() {
                             Empowering the next generation of engineers and leaders through innovative education and ethical values.
                         </p>
                         <div className="flex gap-3">
-                            {[Facebook, Twitter, Instagram, Linkedin].map((Icon, i) => (
+                            {[
+                                { Icon: Facebook, label: "Facebook" },
+                                { Icon: Twitter, label: "Twitter" },
+                                { Icon: Instagram, label: "Instagram" },
+                                { Icon: Linkedin, label: "LinkedIn" },
+                            ].map(({ Icon, label }) => (
                                 <Link
-                                    key={i}
+                                    key={label}
                                     href="#"
+                                    aria-label={label}
                                     className="w-10 h-10 rounded-xl bg-white/10 hover:bg-accent flex items-center justify-center text-white hover:text-primary transition-all"
                                 >
                                     <Icon size={18} strokeWidth={2} />

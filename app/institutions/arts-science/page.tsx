@@ -1,6 +1,7 @@
 "use client";
 
 import { DragScroll } from "@/app/components/ui/DragScroll";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
@@ -62,10 +63,13 @@ export default function ArtsSciencePage() {
             <section className="relative min-h-[90vh] md:min-h-screen flex items-center overflow-hidden bg-[#1E1B4B]">
                 {/* Background Image & Overlay */}
                 <div className="absolute inset-0 z-0">
-                    <img
-                        src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=2670&auto=format&fit=crop"
+                    <Image
+                        src="https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=800&auto=format&fit=crop"
                         alt="Arts and Science Campus"
-                        className="w-full h-full object-cover opacity-40"
+                        fill
+                        sizes="100vw"
+                        className="object-cover opacity-40"
+                        priority
                     />
                     <div className="absolute inset-0 bg-linear-to-r from-[#1E1B4B]/95 via-[#1E1B4B]/85 to-[#1E1B4B]/40" />
                     {/* Artistic pattern overlay */}
@@ -157,9 +161,9 @@ export default function ArtsSciencePage() {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6 }}
                         >
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-8">Our Philosophy</h2>
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-8">Our Philosophy</h2>
                             <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-10">
-                                Education That <span className="text-stone-400 italic font-light">Changes How You Think</span>
+                                Education That <span className="text-stone-500 italic font-light">Changes How You Think</span>
                             </h3>
 
                             <div className="prose prose-lg max-w-none">
@@ -177,15 +181,15 @@ export default function ArtsSciencePage() {
                             <div className="mt-14 pt-10 border-t border-stone-200 grid grid-cols-2 sm:grid-cols-3 gap-6 sm:gap-8">
                                 <div>
                                     <span className="block text-4xl font-sans font-black text-primary mb-1">6</span>
-                                    <span className="text-xs text-stone-400 font-bold uppercase tracking-wider">Departments</span>
+                                    <span className="text-xs text-stone-500 font-bold uppercase tracking-wider">Departments</span>
                                 </div>
                                 <div>
                                     <span className="block text-4xl font-sans font-black text-primary mb-1">30:1</span>
-                                    <span className="text-xs text-stone-400 font-bold uppercase tracking-wider">Student-Faculty Ratio</span>
+                                    <span className="text-xs text-stone-500 font-bold uppercase tracking-wider">Student-Faculty Ratio</span>
                                 </div>
                                 <div>
                                     <span className="block text-4xl font-sans font-black text-primary mb-1">UGC</span>
-                                    <span className="text-xs text-stone-400 font-bold uppercase tracking-wider">Recognized</span>
+                                    <span className="text-xs text-stone-500 font-bold uppercase tracking-wider">Recognized</span>
                                 </div>
                             </div>
                         </motion.div>
@@ -197,7 +201,7 @@ export default function ArtsSciencePage() {
             <section className="py-16 md:py-28 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="mb-10 md:mb-12">
-                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4 md:mb-6">Undergraduate Programs</h2>
+                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-4 md:mb-6">Undergraduate Programs</h2>
                         <h3 className="text-3xl sm:text-4xl md:text-5xl font-serif text-primary leading-tight mb-4 md:mb-6">
                             Six Paths <br />
                             <span className="text-stone-300 italic font-light">to a Degree</span>
@@ -229,7 +233,7 @@ export default function ArtsSciencePage() {
                                             <prog.icon size={22} strokeWidth={1.5} />
                                         </div>
                                         <div className="flex-1">
-                                            <h4 className="text-xl font-serif text-primary font-bold leading-tight mb-2">{prog.name}</h4>
+                                            <h3 className="text-xl font-serif text-primary font-bold leading-tight mb-2">{prog.name}</h3>
                                             <span className="text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider">{prog.duration}</span>
                                         </div>
                                     </div>
@@ -249,9 +253,9 @@ export default function ArtsSciencePage() {
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12">
                         <div>
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Postgraduate Programs</h2>
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-4">Postgraduate Programs</h2>
                             <h3 className="text-3xl md:text-4xl font-serif text-primary leading-tight">
-                                For Deeper <span className="italic text-stone-400 font-light">Specialization</span>
+                                For Deeper <span className="italic text-stone-500 font-light">Specialization</span>
                             </h3>
                         </div>
                         <p className="text-stone-500 font-light text-sm max-w-md">
@@ -277,7 +281,7 @@ export default function ArtsSciencePage() {
                                         </div>
                                         <span className="text-xs font-bold text-accent bg-accent/10 px-3 py-1 rounded-full uppercase tracking-wider">{prog.duration}</span>
                                     </div>
-                                    <h4 className="text-xl font-serif text-primary mb-3 font-bold">{prog.name}</h4>
+                                    <h3 className="text-xl font-serif text-primary mb-3 font-bold">{prog.name}</h3>
                                     <p className="text-stone-500 text-sm font-light leading-relaxed mb-4">{prog.desc}</p>
                                 </div>
                                 <div className="flex justify-end pt-4 border-t border-stone-50">
@@ -293,7 +297,7 @@ export default function ArtsSciencePage() {
             <section className="py-16 md:py-28 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="text-center max-w-3xl mx-auto mb-10 md:mb-16">
-                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Beyond the Classroom</h2>
+                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-6">Beyond the Classroom</h2>
                         <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-6">
                             Research, Seminars, <span className="italic text-stone-300 font-light">& Student Life</span>
                         </h3>
@@ -316,7 +320,7 @@ export default function ArtsSciencePage() {
                                 <div className="p-3 bg-stone-50 rounded-xl text-primary w-fit mb-5 group-hover:bg-accent/10 group-hover:text-accent transition-colors">
                                     <item.icon size={22} strokeWidth={1.5} />
                                 </div>
-                                <h4 className="text-lg font-serif text-primary mb-2 font-bold">{item.title}</h4>
+                                <h3 className="text-lg font-serif text-primary mb-2 font-bold">{item.title}</h3>
                                 <p className="text-stone-500 text-sm font-light leading-relaxed">{item.desc}</p>
                             </motion.div>
                         ))}
@@ -326,10 +330,12 @@ export default function ArtsSciencePage() {
 
             {/* ═══ IMAGE BREAK — Calm campus image ═══ */}
             <section className="relative h-[50vh] min-h-100 overflow-hidden">
-                <img
-                    src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=2670&auto=format&fit=crop"
+                <Image
+                    src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop"
                     alt="Students studying on campus"
-                    className="w-full h-full object-cover"
+                    fill
+                    sizes="100vw"
+                    className="object-cover"
                 />
                 <div className="absolute inset-0 bg-primary/60" />
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -358,10 +364,10 @@ export default function ArtsSciencePage() {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6 }}
                         >
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Admissions</h2>
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-6">Admissions</h2>
                             <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-8">
                                 Join a College That <br />
-                                <span className="text-stone-400 italic font-light">Values Substance.</span>
+                                <span className="text-stone-500 italic font-light">Values Substance.</span>
                             </h3>
                             <p className="text-stone-500 text-lg font-light leading-relaxed mb-12">
                                 Admissions are open for undergraduate and postgraduate programs. We follow a transparent, merit-based process aligned with Bharathiar University guidelines. No pressure, no complicated steps.
@@ -375,7 +381,7 @@ export default function ArtsSciencePage() {
                                 { title: "How to Apply", items: ["Fill out the online application", "Attend counseling with original documents", "Confirm enrollment with fee payment"] },
                             ].map((block) => (
                                 <div key={block.title} className="bg-white p-8 rounded-2xl border border-stone-100">
-                                    <h4 className="font-serif text-lg text-primary font-bold mb-4">{block.title}</h4>
+                                    <h3 className="font-serif text-lg text-primary font-bold mb-4">{block.title}</h3>
                                     <ul className="space-y-3">
                                         {block.items.map((item) => (
                                             <li key={item} className="flex items-start gap-2 text-sm text-stone-600 font-light">
@@ -399,7 +405,7 @@ export default function ArtsSciencePage() {
 
                         {/* Contact info */}
                         <div className="bg-white p-8 rounded-2xl border border-stone-100 max-w-md mx-auto">
-                            <h4 className="font-serif text-lg text-primary mb-4">Questions? Reach Out.</h4>
+                            <h3 className="font-serif text-lg text-primary mb-4">Questions? Reach Out.</h3>
                             <div className="space-y-3 text-sm">
                                 <a href="tel:+919361488801" className="flex items-center gap-3 text-stone-500 hover:text-primary transition-colors">
                                     <Phone size={16} className="text-accent" /> +91 93614 88801

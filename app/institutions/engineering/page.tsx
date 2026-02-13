@@ -1,6 +1,7 @@
 "use client";
 
 import { DragScroll } from "@/app/components/ui/DragScroll";
+import Image from "next/image";
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
@@ -80,10 +81,13 @@ export default function EngineeringPage() {
             {/* ═══ HERO — Full-bleed, impact-driven ═══ */}
             <section ref={heroRef} className="relative min-h-[90vh] md:min-h-screen flex items-center overflow-hidden bg-[#0F172A]">
                 <motion.div style={{ opacity: heroOpacity, scale: heroScale }} className="absolute inset-0 z-0">
-                    <img
-                        src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=2670&auto=format&fit=crop"
+                    <Image
+                        src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=800&auto=format&fit=crop"
                         alt="Engineering campus"
-                        className="w-full h-full object-cover opacity-40"
+                        fill
+                        sizes="100vw"
+                        className="object-cover opacity-40"
+                        priority
                     />
                     <div className="absolute inset-0 bg-linear-to-r from-[#0F172A]/95 via-[#0F172A]/80 to-[#0F172A]/40" />
                     {/* Subtle grid pattern overlay */}
@@ -198,8 +202,8 @@ export default function EngineeringPage() {
                                             <dept.icon size={24} strokeWidth={1.5} />
                                         </div>
                                         <div>
-                                            <h4 className="text-lg font-serif text-primary font-bold">{dept.name}</h4>
-                                            <span className="text-xs font-bold text-accent uppercase tracking-wider">{dept.abbr}</span>
+                                            <h3 className="text-lg font-serif text-primary font-bold">{dept.name}</h3>
+                                            <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">{dept.abbr}</span>
                                         </div>
                                     </div>
                                     <div>
@@ -210,7 +214,7 @@ export default function EngineeringPage() {
                                 <div className="flex items-center justify-between mt-6 pt-6 border-t border-stone-100">
                                     <div className="flex items-center gap-2">
                                         <Users size={14} className="text-stone-300" />
-                                        <span className="text-sm text-stone-400 font-bold">{dept.seats} Seats</span>
+                                        <span className="text-sm text-stone-500 font-bold">{dept.seats} Seats</span>
                                     </div>
                                     <ArrowRight size={18} className="text-stone-300 group-hover:text-accent group-hover:translate-x-1 transition-all" />
                                 </div>
@@ -255,7 +259,7 @@ export default function EngineeringPage() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
                         {/* Left: text content */}
                         <div>
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Research & Innovation</h2>
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-6">Research & Innovation</h2>
                             <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-8">
                                 Where Theory <br />
                                 <span className="text-stone-300 italic font-light">Meets Application</span>
@@ -302,7 +306,7 @@ export default function EngineeringPage() {
                                             <fac.icon size={24} strokeWidth={1.5} />
                                         </div>
                                         <div>
-                                            <h4 className="text-lg font-serif text-primary font-bold mb-2">{fac.title}</h4>
+                                            <h3 className="text-lg font-serif text-primary font-bold mb-2">{fac.title}</h3>
                                             <p className="text-stone-500 text-sm font-light leading-relaxed">{fac.desc}</p>
                                         </div>
                                     </div>
@@ -317,7 +321,7 @@ export default function EngineeringPage() {
             <section className="py-20 md:py-28 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="text-center max-w-2xl mx-auto mb-16">
-                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Placements</h2>
+                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-6">Placements</h2>
                         <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-6">
                             From Campus to <span className="text-stone-300 italic font-light">Career.</span>
                         </h3>
@@ -340,7 +344,7 @@ export default function EngineeringPage() {
                                     </div>
                                     <span className="text-3xl font-sans font-black text-primary">{s.val}</span>
                                 </div>
-                                <h4 className="text-sm font-bold text-primary uppercase tracking-wider mb-2">{s.label}</h4>
+                                <h3 className="text-sm font-bold text-primary uppercase tracking-wider mb-2">{s.label}</h3>
                                 <p className="text-stone-500 text-sm font-light leading-relaxed">{s.desc}</p>
                             </div>
                         ))}
@@ -360,7 +364,7 @@ export default function EngineeringPage() {
                                     key={`${name}-${i}`}
                                     className="inline-flex items-center justify-center px-8 py-4 bg-stone-50 border border-stone-100 rounded-xl min-w-40"
                                 >
-                                    <span className="text-sm font-bold text-stone-400">{name}</span>
+                                    <span className="text-sm font-bold text-stone-500">{name}</span>
                                 </div>
                             ))}
                         </motion.div>
@@ -409,7 +413,7 @@ export default function EngineeringPage() {
 
                         {/* Right: Contact card */}
                         <div className="bg-white/5 border border-white/10 rounded-2xl p-10">
-                            <h4 className="font-serif text-2xl text-white mb-2">Admissions Office</h4>
+                            <h3 className="font-serif text-2xl text-white mb-2">Admissions Office</h3>
                             <p className="text-white/40 text-sm mb-8">Reach out for queries about eligibility, scholarships, or campus visits.</p>
 
                             <div className="space-y-5 mb-10">

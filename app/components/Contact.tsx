@@ -9,9 +9,9 @@ export function Contact() {
         <section id="contact" className="py-16 md:py-32 bg-stone-50">
             <div className="container mx-auto px-4 md:px-6 3xl:px-8">
                 <div className="text-center max-w-3xl mx-auto mb-12 md:mb-20">
-                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4 md:mb-6">Get in Touch</h2>
+                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-4 md:mb-6">Get in Touch</h2>
                     <h3 className="text-3xl sm:text-4xl md:text-5xl font-serif text-primary mb-4 md:mb-6">
-                        We're Here to <span className="italic text-stone-400 font-light">Help</span>
+                        We're Here to <span className="italic text-stone-500 font-light">Help</span>
                     </h3>
                     <p className="text-stone-600 text-lg font-light">
                         Have questions? Our team is ready to assist you with admissions, campus visits, or general inquiries.
@@ -96,7 +96,7 @@ function ContactCard({ icon: Icon, title, content, subContent }: { icon: any, ti
                 <Icon size={24} strokeWidth={1.5} />
             </div>
             <div>
-                <h4 className="font-serif font-bold text-primary mb-1 text-lg">{title}</h4>
+                <h3 className="font-serif font-bold text-primary mb-1 text-lg">{title}</h3>
                 <p className="text-stone-600 text-sm mb-1">{content}</p>
                 <p className="text-[10px] text-stone-400 uppercase tracking-widest">{subContent}</p>
             </div>

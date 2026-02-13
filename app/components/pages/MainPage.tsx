@@ -141,10 +141,10 @@ export default function MainPage() {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6 }}
                         >
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Our Story</h2>
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-4">Our Story</h2>
                             <h3 className="text-2xl sm:text-3xl md:text-5xl 2xl:text-6xl font-serif text-primary leading-tight">
                                 Over a Decade of <br />
-                                <span className="text-stone-400 italic font-light">Steady Growth.</span>
+                                <span className="text-stone-500 italic font-light">Steady Growth.</span>
                             </h3>
                         </motion.div>
                         <motion.div
@@ -197,7 +197,7 @@ export default function MainPage() {
                             >
                                 <stat.icon size={28} className="text-accent mx-auto mb-4 sm:mb-6" strokeWidth={1.5} />
                                 <span className="block text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-sans font-black text-white tracking-tight mb-2 sm:mb-3">{stat.value}</span>
-                                <h4 className="text-[10px] sm:text-sm font-bold uppercase tracking-[0.15em] text-accent mb-1 sm:mb-2">{stat.label}</h4>
+                                <h3 className="text-[10px] sm:text-sm font-bold uppercase tracking-[0.15em] text-accent mb-1 sm:mb-2">{stat.label}</h3>
                                 <p className="text-blue-200/60 text-xs sm:text-sm font-light hidden sm:block">{stat.desc}</p>
                             </motion.div>
                         ))}
@@ -215,10 +215,10 @@ export default function MainPage() {
                             viewport={{ once: true }}
                             transition={{ duration: 0.6 }}
                         >
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">Admissions 2026</h2>
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-4">Admissions 2026</h2>
                             <h3 className="text-2xl sm:text-3xl md:text-5xl 2xl:text-6xl font-serif text-primary leading-tight mb-6">
                                 Not Sure Which <br />
-                                <span className="text-stone-400 italic font-light">College Is Right for You?</span>
+                                <span className="text-stone-500 italic font-light">College Is Right for You?</span>
                             </h3>
                             <p className="text-stone-500 text-base font-light leading-relaxed mb-12 max-w-2xl mx-auto">
                                 Whether you're coming from 10th, 12th, or completing a diploma — there's a clear pathway for you at JCT. Our admissions team can help you find the right fit based on your background and goals.
@@ -260,7 +260,7 @@ export default function MainPage() {
                                     <div className="p-3 bg-white rounded-xl text-primary mb-6 inline-block shadow-sm group-hover:bg-accent/10 group-hover:text-accent transition-colors">
                                         <item.icon size={24} strokeWidth={1.5} />
                                     </div>
-                                    <h4 className="text-xl font-serif text-primary mb-3">{item.title}</h4>
+                                    <h3 className="text-xl font-serif text-primary mb-3">{item.title}</h3>
                                     <p className="text-stone-500 text-sm font-light leading-relaxed mb-6">{item.desc}</p>
                                     <Link href={item.link} className="text-sm font-bold text-primary hover:text-accent transition-colors inline-flex items-center gap-1">
                                         {item.linkText} <ArrowUpRight size={14} />
@@ -287,7 +287,7 @@ export default function MainPage() {
                         >
                             <div className="flex items-center justify-center gap-3 mb-3">
                                 <Phone size={24} className="text-accent" />
-                                <h4 className="text-accent font-serif text-2xl font-bold">Admissions Helpline</h4>
+                                <h3 className="text-accent font-serif text-2xl font-bold">Admissions Helpline</h3>
                             </div>
                             <a href="tel:+919361488801" className="block">
                                 <p className="text-3xl md:text-4xl font-black text-white tracking-wide hover:text-accent transition-colors mb-2">
@@ -304,7 +304,7 @@ export default function MainPage() {
                             viewport={{ once: true }}
                             className="mt-8 p-6 bg-stone-50 rounded-2xl text-left max-w-xl mx-auto"
                         >
-                            <h4 className="text-primary font-serif text-lg mb-2 font-bold">Email Us</h4>
+                            <h3 className="text-primary font-serif text-lg mb-2 font-bold">Email Us</h3>
                             <a href="mailto:admissions@jct.edu" className="flex items-center gap-2 text-primary hover:text-accent transition-colors text-base font-medium">
                                 <Mail size={18} className="text-accent" /> admissions@jct.edu
                             </a>
@@ -319,9 +319,9 @@ export default function MainPage() {
                 <div className="container mx-auto px-4 md:px-6 3xl:px-8">
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-16 3xl:gap-20">
                         <div>
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Visit Us</h2>
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-6">Visit Us</h2>
                             <h3 className="text-3xl sm:text-4xl md:text-5xl 2xl:text-6xl font-serif text-primary leading-tight mb-8">
-                                Come See <span className="text-stone-400 italic font-light">for Yourself.</span>
+                                Come See <span className="text-stone-500 italic font-light">for Yourself.</span>
                             </h3>
                             <p className="text-stone-500 text-lg font-light leading-relaxed mb-10 max-w-md">
                                 The best way to understand JCT is to walk through the campus. We welcome prospective students and parents for guided visits throughout the academic year.
@@ -357,20 +357,20 @@ export default function MainPage() {
                                 viewport={{ once: true }}
                                 className="bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-stone-100"
                             >
-                                <h4 className="font-serif text-xl text-primary mb-6">Schedule a Campus Visit</h4>
+                                <h3 className="font-serif text-xl text-primary mb-6">Schedule a Campus Visit</h3>
                                 <form className="space-y-5">
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Name</label>
+                                            <label className="text-[10px] font-bold uppercase tracking-wider text-stone-500">Name</label>
                                             <input type="text" className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all outline-none text-sm" placeholder="Your Name" />
                                         </div>
                                         <div className="space-y-1.5">
-                                            <label className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Phone</label>
+                                            <label className="text-[10px] font-bold uppercase tracking-wider text-stone-500">Phone</label>
                                             <input type="tel" className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all outline-none text-sm" placeholder="Phone Number" />
                                         </div>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Interested In</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-stone-500">Interested In</label>
                                         <select className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all outline-none text-sm text-stone-600">
                                             <option>Engineering College</option>
                                             <option>Arts & Science College</option>
@@ -379,7 +379,7 @@ export default function MainPage() {
                                         </select>
                                     </div>
                                     <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold uppercase tracking-wider text-stone-400">Message (optional)</label>
+                                        <label className="text-[10px] font-bold uppercase tracking-wider text-stone-500">Message (optional)</label>
                                         <textarea rows={3} className="w-full px-4 py-3.5 rounded-xl bg-stone-50 border border-stone-200 focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all outline-none text-sm resize-none" placeholder="Anything else we should know?" />
                                     </div>
                                     <Button className="w-full px-8 py-5 font-bold text-sm rounded-2xl bg-accent text-primary hover:bg-accent/90 transition-all shadow-lg shadow-accent/20 hover:scale-[1.02] active:scale-95">

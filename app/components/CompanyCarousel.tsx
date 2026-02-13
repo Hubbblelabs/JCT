@@ -47,12 +47,15 @@ function CompanyCard({ company }: { company: { name: string; logo: string } }) {
             <img
                 src={company.logo}
                 alt={company.name}
+                width={100}
+                height={32}
                 className="max-w-25 max-h-8 object-contain opacity-70 hover:opacity-100 transition-opacity duration-300"
+                loading="lazy"
                 onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                 }}
             />
-            <span className="mt-1.5 text-[10px] font-bold text-stone-400 uppercase tracking-wider leading-none">
+            <span className="mt-1.5 text-[10px] font-bold text-stone-500 uppercase tracking-wider leading-none">
                 {company.name}
             </span>
         </div>
@@ -70,12 +73,12 @@ export function CompanyCarousel() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-12"
                 >
-                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-4">
+                    <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-4">
                         Our Recruiting Partners
                     </h2>
                     <h3 className="text-2xl sm:text-3xl md:text-4xl 2xl:text-5xl font-serif text-primary leading-tight mb-3">
                         Top Companies{" "}
-                        <span className="text-stone-400 italic font-light">Trust Our Graduates</span>
+                        <span className="text-stone-500 italic font-light">Trust Our Graduates</span>
                     </h3>
                     <p className="text-stone-500 text-sm font-light max-w-xl mx-auto">
                         Leading organizations across IT, engineering, and consulting regularly recruit from JCT campuses.

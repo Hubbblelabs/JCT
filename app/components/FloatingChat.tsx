@@ -19,6 +19,7 @@ export function FloatingChat() {
                 <Button
                     onClick={() => setIsOpen(!isOpen)}
                     size="icon"
+                    aria-label={isOpen ? "Close chat" : "Open AI chat assistant"}
                     className="h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-xl bg-blue-600 hover:bg-blue-700 text-white border-2 border-white/20"
                 >
                     {isOpen ? <X size={24} /> : <Bot size={28} />}
@@ -35,6 +36,7 @@ export function FloatingChat() {
                     href="https://wa.me/919361488801"
                     target="_blank"
                     rel="noopener noreferrer"
+                    aria-label="Chat on WhatsApp"
                     className="flex items-center justify-center h-12 w-12 sm:h-14 sm:w-14 rounded-full shadow-xl bg-[#25D366] hover:bg-[#20bd5a] text-white border-2 border-white/20 transition-colors"
                 >
                     {/* Simple WhatsApp-like SVG icon using simple shapes or MessageCircle as fallback */}

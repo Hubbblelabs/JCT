@@ -1,6 +1,7 @@
 "use client";
 
 import { DragScroll } from "@/app/components/ui/DragScroll";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import Link from "next/link";
@@ -84,22 +85,22 @@ const facilities = [
     {
         title: "Mechanical Workshop",
         desc: "Lathes, milling machines, welding stations, and a dedicated fitting shop where students learn by building actual components.",
-        image: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1500&auto=format&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&auto=format&fit=crop&q=80",
     },
     {
         title: "Electrical Lab",
         desc: "Transformers, motor test benches, and PLC trainers. Students wire real circuits and troubleshoot faults as part of their coursework.",
-        image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=1500&auto=format&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&auto=format&fit=crop&q=80",
     },
     {
         title: "Computer Lab",
         desc: "Networked workstations with CAD software, programming environments, and simulation tools updated each academic year.",
-        image: "https://images.unsplash.com/photo-1606761568499-6d2451b23c66?w=1500&auto=format&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1606761568499-6d2451b23c66?w=800&auto=format&fit=crop&q=80",
     },
     {
         title: "Library & Study Hall",
         desc: "Technical reference books, periodicals, past question papers, and a quiet reading area that stays open until evening.",
-        image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=1500&auto=format&fit=crop&q=80",
+        image: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800&auto=format&fit=crop&q=80",
     },
 ];
 
@@ -112,10 +113,13 @@ export default function PolytechnicPage() {
             <section className="relative min-h-[90vh] md:min-h-screen bg-[#0F766E] text-white overflow-hidden flex items-center">
                 {/* Background Image & Overlay */}
                 <div className="absolute inset-0 z-0">
-                    <img
-                        src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2670&auto=format&fit=crop"
+                    <Image
+                        src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=800&auto=format&fit=crop"
                         alt="Polytechnic workshop"
-                        className="w-full h-full object-cover"
+                        fill
+                        sizes="100vw"
+                        className="object-cover"
+                        priority
                     />
                     <div className="absolute inset-0 bg-linear-to-r from-[#0F766E]/75 via-[#0F766E]/70 to-[#0F766E]/40" />
                     <div className="absolute inset-0 opacity-[0.05]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2314B8A6' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")" }} />
@@ -186,7 +190,7 @@ export default function PolytechnicPage() {
                             ].map((stat, i) => (
                                 <div key={i} className="bg-white/5 border border-white/10 backdrop-blur-md rounded-2xl p-5 hover:bg-white/10 transition-colors">
                                     <span className="block text-2xl md:text-4xl font-sans font-black text-[#5EEAD4] tracking-tight mb-1 md:mb-2">{stat.value}</span>
-                                    <h4 className="text-[10px] md:text-xs font-bold text-white/90 uppercase tracking-wider mb-1">{stat.label}</h4>
+                                    <h3 className="text-[10px] md:text-xs font-bold text-white/90 uppercase tracking-wider mb-1">{stat.label}</h3>
                                     <p className="text-[10px] text-white/50 font-light">{stat.sub}</p>
                                 </div>
                             ))}
@@ -199,7 +203,7 @@ export default function PolytechnicPage() {
             <section className="py-16 md:py-28 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="max-w-3xl mb-16">
-                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Programs Offered</h2>
+                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-6">Programs Offered</h2>
                         <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-6">
                             Six Streams. <span className="text-stone-300 italic font-light">Clear Outcomes.</span>
                         </h3>
@@ -226,14 +230,14 @@ export default function PolytechnicPage() {
                                                 <prog.icon size={22} strokeWidth={1.5} />
                                             </div>
                                             <div>
-                                                <h4 className="text-lg font-serif text-primary font-bold leading-tight">{prog.name}</h4>
-                                                <span className="text-xs text-stone-400">{prog.duration} — Full Time</span>
+                                                <h3 className="text-lg font-serif text-primary font-bold leading-tight">{prog.name}</h3>
+                                                <span className="text-xs text-stone-500">{prog.duration} — Full Time</span>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="mb-5">
-                                        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-accent mb-3 block">What You'll Learn</span>
+                                        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-amber-600 mb-3 block">What You'll Learn</span>
                                         <div className="grid grid-cols-1 gap-2">
                                             {prog.outcomes.slice(0, 3).map((outcome) => (
                                                 <div key={outcome} className="flex items-center gap-2 text-sm text-stone-600 font-light">
@@ -246,7 +250,7 @@ export default function PolytechnicPage() {
                                 </div>
 
                                 <div className="pt-5 border-t border-stone-200 mt-auto">
-                                    <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-400">Career Paths</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-stone-500">Career Paths</span>
                                     <p className="text-sm text-primary font-medium mt-1">{prog.career}</p>
                                 </div>
                             </motion.div>
@@ -266,19 +270,22 @@ export default function PolytechnicPage() {
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.6 }}
                             >
-                                <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Why JCT Polytechnic</h2>
+                                <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-6">Why JCT Polytechnic</h2>
                                 <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-8">
                                     A Practical Start <br />
-                                    <span className="text-stone-400 italic font-light">to Working Life.</span>
+                                    <span className="text-stone-500 italic font-light">to Working Life.</span>
                                 </h3>
                                 <p className="text-stone-500 text-lg font-light leading-relaxed mb-8">
                                     Not every good career begins with a four-year degree. Our diploma programs offer focused, affordable, workshop-driven training — and a clear path forward, whether you join the workforce or continue studying.
                                 </p>
 
                                 <div className="aspect-4/3 rounded-2xl overflow-hidden bg-stone-200 hidden lg:block">
-                                    <img
-                                        src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1500&auto=format&fit=crop&q=80"
+                                    <Image
+                                        src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&auto=format&fit=crop&q=80"
                                         alt="Students in the polytechnic workshop"
+                                        width={800}
+                                        height={600}
+                                        sizes="(max-width: 1024px) 100vw, 40vw"
                                         className="w-full h-full object-cover hover:scale-105 transition-transform duration-700"
                                     />
                                 </div>
@@ -299,7 +306,7 @@ export default function PolytechnicPage() {
                                         <item.icon size={22} strokeWidth={1.5} />
                                     </div>
                                     <div>
-                                        <h4 className="text-lg font-serif text-primary mb-2 font-bold">{item.title}</h4>
+                                        <h3 className="text-lg font-serif text-primary mb-2 font-bold">{item.title}</h3>
                                         <p className="text-stone-500 text-sm font-light leading-relaxed">{item.desc}</p>
                                     </div>
                                 </motion.div>
@@ -313,7 +320,7 @@ export default function PolytechnicPage() {
             <section className="py-16 md:py-28 bg-white">
                 <div className="container mx-auto px-4 md:px-6">
                     <div className="text-center max-w-2xl mx-auto mb-16">
-                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Facilities</h2>
+                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-6">Facilities</h2>
                         <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight">
                             Where Training <span className="italic text-stone-300 font-light">Happens</span>
                         </h3>
@@ -330,14 +337,16 @@ export default function PolytechnicPage() {
                                 className={`group rounded-3xl overflow-hidden relative ${index === 0 ? 'md:row-span-2' : ''}`}
                             >
                                 <div className={`${index === 0 ? 'aspect-auto h-full min-h-100' : 'aspect-16/10'} relative`}>
-                                    <img
+                                    <Image
                                         src={item.image}
                                         alt={item.title}
-                                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                                        fill
+                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                        className="object-cover group-hover:scale-105 transition-transform duration-700"
                                     />
                                     <div className="absolute inset-0 bg-linear-to-t from-primary/90 via-primary/30 to-transparent" />
                                     <div className="absolute bottom-0 left-0 right-0 p-8">
-                                        <h4 className="text-2xl font-serif text-white mb-2">{item.title}</h4>
+                                        <h3 className="text-2xl font-serif text-white mb-2">{item.title}</h3>
                                         <p className="text-white/70 text-sm font-light leading-relaxed max-w-md">{item.desc}</p>
                                     </div>
                                 </div>
@@ -374,7 +383,7 @@ export default function PolytechnicPage() {
                                 className="bg-white/5 border border-white/10 p-10 rounded-3xl text-left"
                             >
                                 <Briefcase size={28} className="text-accent mb-6" />
-                                <h4 className="text-2xl font-serif text-white mb-4">Start Working</h4>
+                                <h3 className="text-2xl font-serif text-white mb-4">Start Working</h3>
                                 <p className="text-blue-200/70 font-light leading-relaxed text-sm mb-6">
                                     Diploma holders are eligible for technical positions in manufacturing, construction, IT support, government departments, and more. Many of our graduates are placed through campus recruitment itself.
                                 </p>
@@ -389,7 +398,7 @@ export default function PolytechnicPage() {
                                 className="bg-white/5 border border-white/10 p-10 rounded-3xl text-left"
                             >
                                 <GraduationCap size={28} className="text-accent mb-6" />
-                                <h4 className="text-2xl font-serif text-white mb-4">Continue to B.E.</h4>
+                                <h3 className="text-2xl font-serif text-white mb-4">Continue to B.E.</h3>
                                 <p className="text-blue-200/70 font-light leading-relaxed text-sm mb-6">
                                     Through lateral entry, you can join the second year of B.E./B.Tech programs at JCT College of Engineering and Technology or any Anna University-affiliated college. Skip a year, save a year.
                                 </p>
@@ -413,10 +422,10 @@ export default function PolytechnicPage() {
                                 viewport={{ once: true }}
                                 transition={{ duration: 0.6 }}
                             >
-                                <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-6">Admissions</h2>
+                                <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-6">Admissions</h2>
                                 <h3 className="text-4xl md:text-5xl font-serif text-primary leading-tight mb-8">
                                     Simple Entry. <br />
-                                    <span className="text-stone-400 italic font-light">Clear Requirements.</span>
+                                    <span className="text-stone-500 italic font-light">Clear Requirements.</span>
                                 </h3>
 
                                 <div className="space-y-8 mb-10">
@@ -428,7 +437,7 @@ export default function PolytechnicPage() {
                                         <div key={item.step} className="flex gap-5">
                                             <span className="text-3xl font-sans font-black text-accent/30">{item.step}</span>
                                             <div>
-                                                <h4 className="font-serif text-lg text-primary font-bold mb-1">{item.title}</h4>
+                                                <h3 className="font-serif text-lg text-primary font-bold mb-1">{item.title}</h3>
                                                 <p className="text-stone-500 text-sm font-light leading-relaxed">{item.desc}</p>
                                             </div>
                                         </div>
@@ -447,8 +456,8 @@ export default function PolytechnicPage() {
                             viewport={{ once: true }}
                             className="bg-stone-50 p-8 md:p-10 rounded-3xl border border-stone-100"
                         >
-                            <h4 className="font-serif text-xl text-primary mb-2">Have Questions?</h4>
-                            <p className="text-stone-400 text-sm font-light mb-6">Our admissions office responds within one working day.</p>
+                            <h3 className="font-serif text-xl text-primary mb-2">Have Questions?</h3>
+                            <p className="text-stone-500 text-sm font-light mb-6">Our admissions office responds within one working day.</p>
                             <form className="space-y-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <input type="text" className="w-full px-4 py-3.5 rounded-xl bg-white border border-stone-200 focus:border-accent focus:ring-1 focus:ring-accent/50 transition-all outline-none text-sm" placeholder="Your Name" />

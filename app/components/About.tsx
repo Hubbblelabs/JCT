@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
 
 export function About() {
     return (
@@ -20,10 +21,14 @@ export function About() {
                             className="relative z-10"
                         >
                             <div className="aspect-3/4 relative overflow-hidden rounded-3xl bg-stone-200 shadow-2xl">
-                                <img
-                                    src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop"
+                                <Image
+                                    src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=800&auto=format&fit=crop"
                                     alt="Students in discussion at JCT Library"
+                                    width={800}
+                                    height={1067}
                                     className="object-cover w-full h-full grayscale-20 hover:grayscale-0 transition-all duration-1000"
+                                    sizes="(max-width: 1024px) 100vw, 42vw"
+                                    loading="lazy"
                                 />
                             </div>
 
@@ -48,12 +53,12 @@ export function About() {
                             viewport={{ once: true }}
                             transition={{ duration: 0.8 }}
                         >
-                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-accent mb-8">
+                            <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-8">
                                 History & Philosophy
                             </h2>
                             <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif text-primary mb-8 md:mb-10 leading-[1.1]">
                                 More than a degree.<br />
-                                <span className="text-stone-400">A transformation.</span>
+                                <span className="text-stone-500">A transformation.</span>
                             </h3>
                             <div className="space-y-6 md:space-y-8 text-stone-600 text-base md:text-xl leading-relaxed font-light max-w-2xl">
                                 <p>
@@ -67,11 +72,11 @@ export function About() {
                             <div className="mt-12 pt-12 border-t border-stone-200 flex flex-wrap gap-12">
                                 <div>
                                     <span className="block text-5xl font-sans font-black text-primary mb-2">25+</span>
-                                    <span className="text-xs text-stone-400 font-bold uppercase tracking-wider">Years of Excellence</span>
+                                    <span className="text-xs text-stone-500 font-bold uppercase tracking-wider">Years of Excellence</span>
                                 </div>
                                 <div>
                                     <span className="block text-5xl font-sans font-black text-primary mb-2">12k</span>
-                                    <span className="text-xs text-stone-400 font-bold uppercase tracking-wider">Global Alumni</span>
+                                    <span className="text-xs text-stone-500 font-bold uppercase tracking-wider">Global Alumni</span>
                                 </div>
                             </div>
                         </motion.div>

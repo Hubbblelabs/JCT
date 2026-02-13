@@ -52,7 +52,7 @@ export function Stats() {
                                 <span className="text-3xl sm:text-4xl md:text-5xl font-sans font-black text-primary tracking-tight">{stat.value}</span>
                             </div>
                             <div>
-                                <h3 className="font-bold text-xs text-primary/60 uppercase tracking-widest mb-1 group-hover:text-primary transition-colors">{stat.label}</h3>
+                                <h2 className="font-bold text-xs text-primary/60 uppercase tracking-widest mb-1 group-hover:text-primary transition-colors">{stat.label}</h2>
                                 <p className="text-sm text-stone-500 font-light leading-relaxed">{stat.description}</p>
                             </div>
                         </motion.div>

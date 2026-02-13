@@ -40,7 +40,7 @@ export function ReverseRoadmap() {
                                 <span className="inline-block px-3 py-1 bg-primary/5 text-primary text-xs font-black rounded-lg mb-3 group-hover:bg-accent group-hover:text-primary transition-colors">
                                     {milestone.year}
                                 </span>
-                                <h4 className="text-base font-serif text-primary mb-2 leading-tight font-bold">{milestone.title}</h4>
+                                <h3 className="text-base font-serif text-primary mb-2 leading-tight font-bold">{milestone.title}</h3>
                                 <p className="text-stone-500 text-xs font-light leading-relaxed">{milestone.desc}</p>
                             </div>
                         </motion.div>
@@ -50,7 +50,7 @@ export function ReverseRoadmap() {
 
             {/* Mobile scroll hint */}
             <div className="xl:hidden text-center mt-4">
-                <span className="text-xs text-stone-400 font-medium">← Scroll to explore our history →</span>
+                <span className="text-xs text-stone-500 font-medium">← Scroll to explore our history →</span>
             </div>
         </div>
     );

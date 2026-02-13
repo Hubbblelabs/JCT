@@ -23,7 +23,7 @@ export function Accreditations() {
                         <h3 className="text-sm font-bold uppercase tracking-wider text-stone-500 mb-1">
                             Recognized & Accredited By
                         </h3>
-                        <p className="text-stone-400 text-xs max-w-xs">
+                        <p className="text-stone-500 text-xs max-w-xs">
                             Upholding the highest standards of education and infrastructure.
                         </p>
                     </div>
