@@ -1,9 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Facebook, Twitter, Instagram, Linkedin, Landmark, MapPin, Phone, Mail, Clock } from "lucide-react";
+import { Button } from "./ui/button";
 
 export function Footer() {
+    const [showMap, setShowMap] = useState(false);
+
     return (
         <footer className="bg-primary text-white pt-16 md:pt-24 3xl:pt-32 pb-6 md:pb-8 border-t border-white/5">
             <div className="container mx-auto px-4 md:px-6 3xl:px-8">
@@ -91,29 +95,40 @@ export function Footer() {
                         </ul>
                     </div>
 
-                    {/* Google Map */}
+                    {/* Google Map - Facade Pattern Optimization */}
                     <div>
                         <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-accent mb-6">Location</h3>
-                        <div className="rounded-2xl overflow-hidden border-2 border-white/10 h-48 sm:h-60 md:h-72">
-                            <iframe
-                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.3087446879744!2d77.0244!3d11.0168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTHCsDAxJzAwLjUiTiA3N8KwMDEnMjcuOCJF!5e0!3m2!1sen!2sin!4v1234567890"
-                                width="100%"
-                                height="100%"
-                                style={{ border: 0 }}
-                                allowFullScreen
-                                loading="lazy"
-                                referrerPolicy="no-referrer-when-downgrade"
-                                title="JCT Institutions Location"
-                            />
+                        <div className="rounded-2xl overflow-hidden border-2 border-white/10 h-48 sm:h-60 md:h-72 relative bg-white/5 group">
+                            {!showMap ? (
+                                <div className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-white/10 transition-colors" onClick={() => setShowMap(true)}>
+                                    <MapPin size={32} className="text-accent mb-2" />
+                                    <span className="text-sm font-medium text-white">Click to Load Map</span>
+                                    <div className="absolute inset-x-0 bottom-0 top-0 bg-linear-to-b from-transparent to-black/30 pointer-events-none mix-blend-multiply" />
+                                    {/* Optional: Add a static image preview here instead of just a gray box if available */}
+                                </div>
+                            ) : (
+                                <iframe
+                                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3916.3087446879744!2d77.0244!3d11.0168!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTHCsDAxJzAwLjUiTiA3N8KwMDEnMjcuOCJF!5e0!3m2!1sen!2sin!4v1234567890"
+                                    width="100%"
+                                    height="100%"
+                                    style={{ border: 0 }}
+                                    allowFullScreen
+                                    loading="lazy"
+                                    referrerPolicy="no-referrer-when-downgrade"
+                                    title="JCT Institutions Location"
+                                />
+                            )}
                         </div>
-                        <Link
-                            href="https://maps.google.com/?q=JCT+Institute+Coimbatore"
-                            target="_blank"
-                            className="inline-flex items-center gap-2 mt-4 text-sm text-accent hover:text-white transition-colors"
-                        >
-                            <MapPin size={16} />
-                            Get Directions
-                        </Link>
+                        <div className="flex flex-col gap-2 mt-4">
+                            <Link
+                                href="https://maps.google.com/?q=JCT+Institute+Coimbatore"
+                                target="_blank"
+                                className="inline-flex items-center gap-2 text-sm text-accent hover:text-white transition-colors"
+                            >
+                                <MapPin size={16} />
+                                Get Directions
+                            </Link>
+                        </div>
                     </div>
                 </div>
 

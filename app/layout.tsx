@@ -1,21 +1,28 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display, Montserrat } from "next/font/google";
-import { FloatingChat } from "@/app/components/FloatingChat";
+import dynamic from "next/dynamic";
 import "./globals.css";
+
+const FloatingChat = dynamic(() => import("@/app/components/FloatingChat").then(mod => mod.FloatingChat), {
+  ssr: true,
+});
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
+  display: 'swap',
 });
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
   subsets: ["latin"],
+  display: 'swap',
 });
 
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {

@@ -43,18 +43,16 @@ const companies = [
 
 function CompanyCard({ company }: { company: { name: string; logo: string } }) {
     return (
-        <div className="w-36 h-16 sm:w-44 sm:h-18 md:w-48 md:h-20 2xl:w-56 2xl:h-24 bg-white rounded-xl sm:rounded-2xl border border-stone-100 flex flex-col items-center justify-center px-3 sm:px-5 py-2 sm:py-3 hover:border-accent/30 hover:shadow-lg transition-all duration-300 hover:scale-105">
-            <img
-                src={company.logo}
-                alt={company.name}
-                width={100}
-                height={32}
-                className="max-w-25 max-h-8 object-contain opacity-70 hover:opacity-100 transition-opacity duration-300"
-                loading="lazy"
-                onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                }}
-            />
+        <div className="w-36 h-16 sm:w-44 sm:h-18 md:w-48 md:h-20 2xl:w-56 2xl:h-24 bg-white rounded-xl sm:rounded-2xl border border-stone-100 flex flex-col items-center justify-center px-3 sm:px-5 py-2 sm:py-3 hover:border-accent/30 hover:shadow-lg transition-all duration-300 hover:scale-105 relative">
+            <div className="relative w-full h-8 sm:h-10">
+                <Image
+                    src={company.logo}
+                    alt={company.name}
+                    fill
+                    sizes="(max-width: 640px) 144px, 200px"
+                    className="object-contain opacity-70 hover:opacity-100 transition-opacity duration-300"
+                />
+            </div>
             <span className="mt-1.5 text-[10px] font-bold text-stone-500 uppercase tracking-wider leading-none">
                 {company.name}
             </span>

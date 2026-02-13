@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, ChevronDown, ArrowRight, Phone, BookOpen } from "lucide-react";
+import { Menu, X, ChevronDown, ArrowRight, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/app/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -54,30 +54,44 @@ export function Navbar() {
     const isArts = pathname?.startsWith("/institutions/arts-science");
     const isPolytechnic = pathname?.startsWith("/institutions/polytechnic");
 
-    const logoSrc = isEngineering ? "/jct_engineering.png" :
-        isArts ? "/jct_arts.png" :
-            isPolytechnic ? "/jct_logo_blue.png" :
-                "/jct_logo.png";
+    const logoSrc = isEngineering || isArts || isPolytechnic ? "/jct_logo_blue.png" : "/jct_logo.png";
+    const logoClassName = "h-12 md:h-12 lg:h-16 w-auto object-contain";
 
-    // Engineering logo is very wide (landscape with NAAC/NBA badges) and fills its canvas — height-based sizing works.
-    // Arts & Polytechnic logo PNGs are wide landscape images with the actual logo content centered
-    // and significant whitespace on both sides. Using width-based sizing ensures the actual logo content
-    // appears similar in visual size to engineering without taking up too much horizontal navbar space.
-    const logoClassName = isEngineering
-        ? "h-12 md:h-12 lg:h-16 w-auto object-contain"
-        : (isArts || isPolytechnic)
-            ? "h-12 md:h-12 lg:h-16 w-auto object-contain"
-            : "h-12 md:h-12 lg:h-16 w-auto object-contain";
+    const collegeName = isEngineering
+        ? "College of Engineering and Technology"
+        : isArts
+            ? "College of Arts and Science"
+            : isPolytechnic
+                ? "Polytechnic College"
+                : null;
+
+
+    const logotextcolor1 = scrolled ? "#0b1f3a" : "#E6EDF7"
+    const logotextcolor2 = scrolled ? "#1f3b5c" : "#E6EDF7"
 
     useEffect(() => {
+        let rafId: number;
         const handleScroll = () => {
-            setScrolled(window.scrollY > 20);
+            if (window.scrollY > 20) {
+                if (!scrolled) setScrolled(true);
+            } else {
+                if (scrolled) setScrolled(false);
+            }
         };
-        window.addEventListener("scroll", handleScroll);
+
+        const onScroll = () => {
+            cancelAnimationFrame(rafId);
+            rafId = requestAnimationFrame(handleScroll);
+        }
+
+        window.addEventListener("scroll", onScroll, { passive: true });
         // Initial check
         handleScroll();
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
+        return () => {
+            window.removeEventListener("scroll", onScroll);
+            cancelAnimationFrame(rafId);
+        };
+    }, [scrolled]);
 
     // Prevent body scroll when menu is open
     useEffect(() => {
@@ -95,7 +109,7 @@ export function Navbar() {
         <>
             <nav
                 className={cn(
-                    "fixed top-0 left-0 right-0 z-100 transition-all duration-300 ease-in-out border-b border-transparent",
+                    "fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out border-b border-transparent",
                     scrolled
                         ? "bg-white/95 backdrop-blur-md py-1 border-stone-100 shadow-sm"
                         : "bg-transparent py-5"
@@ -103,29 +117,37 @@ export function Navbar() {
             >
                 <div className="container mx-auto px-4 md:px-6 3xl:px-8 flex items-center justify-between">
                     {/* Logo */}
-                    <Link href="/" className="flex items-center z-110 relative">
+                    <Link href="/" className="flex items-center z-50 relative">
                         <div className="origin-left transition-transform duration-300">
                             <Image
                                 src={logoSrc}
                                 alt="JCT Institutions Logo"
-                                width={0}
-                                height={0}
-                                sizes="100vw"
+                                width={180}
+                                height={64}
                                 className={logoClassName}
                                 priority
                             />
                         </div>
-                        {isPolytechnic && (
-                        <div className="font-[family-name:var(--font-montserrat)] leading-tight pl-2 ">
-                            <span className="block font-extrabold text-[24px] tracking-[0.24em] text-[#0b1f3a]">
-                                JCT
-                            </span>
-                            <span className="block w-14 h-[2px] bg-[#1f3b5c]/30 my-0.5"></span>
-                            <span className="block font-semibold text-[16px] tracking-[0.05em] uppercase text-[#1f3b5c]">
-                                Polytechnic College
-                            </span>
-                        </div>
+                        {collegeName && (
+                            <div
+                                style={{
+                                    "--logo1": logotextcolor1,
+                                    "--logo2": logotextcolor2,
+                                }}
+                                className="font-(family-name:--font-montserrat) leading-tight pl-2"
+                            >
+                                <span className="block font-extrabold text-[24px] tracking-[0.24em] text-(--logo1) transition-colors duration-300">
+                                    JCT
+                                </span>
+
+                                <span className="block w-14 h-[2px] bg-(--logo1)/30 my-0.5 transition-colors duration-300" />
+
+                                <span className="block font-semibold text-[16px] tracking-[0.05em] uppercase text-(--logo2) transition-colors duration-300">
+                                    {collegeName}
+                                </span>
+                            </div>
                         )}
+
                     </Link>
 
 
@@ -160,7 +182,7 @@ export function Navbar() {
                                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                                 exit={{ opacity: 0, y: 5, scale: 0.98 }}
                                                 transition={{ duration: 0.2, ease: "easeOut" }}
-                                                className="absolute top-full -left-4 pt-4 w-100"
+                                                className="absolute top-full -left-4 pt-4 w-96"
                                             >
                                                 <div className="bg-white rounded-2xl shadow-xl shadow-stone-200/50 border border-stone-100 overflow-hidden p-2 grid gap-1">
                                                     {link.children.map((child) => (
@@ -235,7 +257,7 @@ export function Navbar() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
-                            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-90 lg:hidden"
+                            className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 lg:hidden"
                             onClick={() => setIsOpen(false)}
                         />
 
@@ -245,7 +267,7 @@ export function Navbar() {
                             animate={{ x: 0 }}
                             exit={{ x: "100%" }}
                             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-                            className="fixed inset-y-0 right-0 z-110 w-full sm:w-100 md:w-105 bg-white shadow-2xl flex flex-col lg:hidden"
+                            className="fixed inset-y-0 right-0 z-50 w-full sm:w-96 bg-white shadow-2xl flex flex-col lg:hidden"
                         >
                             {/* Mobile Header */}
                             <div className="flex items-center justify-between p-6 border-b border-stone-100">
