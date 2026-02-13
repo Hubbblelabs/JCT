@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -133,7 +133,7 @@ export function Navbar() {
                                 style={{
                                     "--logo1": logotextcolor1,
                                     "--logo2": logotextcolor2,
-                                }}
+                                } as CSSProperties}
                                 className="font-(family-name:--font-montserrat) leading-tight pl-2"
                             >
                                 <span className="block font-extrabold text-[24px] tracking-[0.24em] text-(--logo1) transition-colors duration-300">
