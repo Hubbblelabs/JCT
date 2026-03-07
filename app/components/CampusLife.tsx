@@ -61,6 +61,7 @@ const photos = [
 export function CampusLife() {
   const [activeFilter, setActiveFilter] =
     useState<(typeof categories)[number]>("All");
+  const [showAllPhotos, setShowAllPhotos] = useState(false);
   const filtered =
     activeFilter === "All"
       ? photos
@@ -73,7 +74,7 @@ export function CampusLife() {
     >
       <div className="absolute top-0 left-1/3 w-[500px] h-[500px] bg-gold/3 rounded-full blur-[200px] pointer-events-none" />
       <div className="container mx-auto px-4 md:px-6 relative z-10">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 md:mb-14 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-6 md:mb-14 gap-4 md:gap-6">
           <div>
             <motion.span
               initial={{ opacity: 0, y: 10 }}
@@ -98,13 +99,13 @@ export function CampusLife() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="flex flex-wrap gap-2"
+            className="flex flex-nowrap gap-2 overflow-x-auto scrollbar-hide md:flex-wrap"
           >
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setActiveFilter(cat)}
-                className={`px-4 py-2 rounded-full text-xs font-sans font-semibold transition-all duration-300 ${activeFilter === cat ? "bg-gold text-navy" : "bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 hover:text-white"}`}
+                className={`px-4 py-2 rounded-full text-xs font-sans font-semibold transition-all duration-300 shrink-0 ${activeFilter === cat ? "bg-gold text-navy" : "bg-white/5 text-white/60 border border-white/10 hover:bg-white/10 hover:text-white"}`}
               >
                 {cat}
               </button>
@@ -124,7 +125,7 @@ export function CampusLife() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.4, delay: i * 0.05 }}
-              className={`relative group rounded-2xl overflow-hidden cursor-pointer ${photo.span} aspect-[4/3]`}
+              className={`relative group rounded-2xl overflow-hidden cursor-pointer ${photo.span} aspect-[4/3] ${!showAllPhotos && i >= 4 ? "hidden md:block" : ""}`}
             >
               <img
                 src={photo.src}
@@ -132,7 +133,7 @@ export function CampusLife() {
                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 loading="lazy"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4 md:p-5">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3 md:p-5">
                 <div className="flex items-center gap-2">
                   <Camera size={14} className="text-gold" />
                   <span className="text-white text-sm font-sans font-medium">
@@ -143,6 +144,18 @@ export function CampusLife() {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* Mobile Show More */}
+        {!showAllPhotos && filtered.length > 4 && (
+          <div className="md:hidden text-center mt-6">
+            <button
+              onClick={() => setShowAllPhotos(true)}
+              className="inline-flex items-center gap-2 text-sm font-sans font-semibold text-white/70 hover:text-white transition-colors px-5 py-2.5 rounded-full border border-white/15 hover:border-white/30"
+            >
+              View All Photos <ArrowRight size={14} />
+            </button>
+          </div>
+        )}
 
         <motion.div
           initial={{ opacity: 0 }}

@@ -60,7 +60,7 @@ export function Testimonials() {
   return (
     <section className="section-padding bg-white overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 md:mb-14 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-6 md:mb-14 gap-4 md:gap-6">
           <div>
             <motion.span initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="inline-block text-xs font-sans font-bold tracking-[0.2em] uppercase text-gold mb-4">Student Stories</motion.span>
             <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="text-3xl sm:text-4xl md:text-5xl font-serif text-navy leading-tight">
@@ -76,7 +76,7 @@ export function Testimonials() {
         <div ref={scrollRef} className="flex gap-5 overflow-x-auto snap-container scrollbar-hide pb-4">
           {testimonials.map((t, i) => (
             <motion.div key={t.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="snap-item shrink-0 w-[320px] sm:w-[380px] md:w-[420px]">
-              <div className="h-full p-6 md:p-8 bg-surface rounded-2xl border border-border hover:border-gold/30 transition-all group">
+              <div className="h-full p-5 md:p-8 bg-surface rounded-2xl border border-border hover:border-gold/30 transition-all group">
                 <Quote size={28} className="text-gold/30 mb-4" strokeWidth={1.5} />
                 <p className="text-foreground/80 font-sans text-sm md:text-base leading-relaxed mb-6 min-h-[80px]">&ldquo;{t.quote}&rdquo;</p>
                 <div className="flex items-center gap-3 pt-5 border-t border-border">

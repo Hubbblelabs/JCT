@@ -9,37 +9,43 @@ const newsItems = [
   {
     date: "04 Mar 2026",
     title: "JCT Engineering Students Win National Hackathon at IIT Madras",
-    excerpt: "A team of 4 CSE students bagged first prize at CodeSprint 2026, competing against 200+ teams from across India.",
+    excerpt:
+      "A team of 4 CSE students bagged first prize at CodeSprint 2026, competing against 200+ teams from across India.",
     category: "Achievement",
   },
   {
     date: "28 Feb 2026",
     title: "MoU Signed with TCS for Industry-Integrated Learning",
-    excerpt: "JCT College of Engineering partners with TCS to offer hands-on training modules and guaranteed internship placements.",
+    excerpt:
+      "JCT College of Engineering partners with TCS to offer hands-on training modules and guaranteed internship placements.",
     category: "Partnership",
   },
   {
     date: "22 Feb 2026",
     title: "NAAC Re-Accreditation Process Successfully Completed",
-    excerpt: "JCT Institutions undergoes peer review for NAAC re-accreditation, with preliminary reports indicating strong outcomes.",
+    excerpt:
+      "JCT Institutions undergoes peer review for NAAC re-accreditation, with preliminary reports indicating strong outcomes.",
     category: "Accreditation",
   },
   {
     date: "15 Feb 2026",
     title: "Annual Sports Day 2026 — Record Participation",
-    excerpt: "Over 1,500 students participated in inter-department sports events spanning athletics, cricket, basketball, and chess.",
+    excerpt:
+      "Over 1,500 students participated in inter-department sports events spanning athletics, cricket, basketball, and chess.",
     category: "Campus Life",
   },
   {
     date: "10 Feb 2026",
     title: "Guest Lecture by Dr. A.P.J. Abdul Kalam Foundation",
-    excerpt: "Students attended an inspiring lecture on innovation and scientific temper by the A.P.J. Abdul Kalam Foundation delegation.",
+    excerpt:
+      "Students attended an inspiring lecture on innovation and scientific temper by the A.P.J. Abdul Kalam Foundation delegation.",
     category: "Events",
   },
   {
     date: "05 Feb 2026",
     title: "Placement Drive: 150+ Offers from Top Recruiters",
-    excerpt: "The 2025-26 placement season sees record offers from Infosys, Wipro, CTS, and 40+ other companies visiting campus.",
+    excerpt:
+      "The 2025-26 placement season sees record offers from Infosys, Wipro, CTS, and 40+ other companies visiting campus.",
     category: "Placements",
   },
 ];
@@ -82,12 +88,13 @@ const categoryColors: Record<string, string> = {
 
 export function NewsEvents() {
   const [activeTab, setActiveTab] = useState<"news" | "events">("news");
+  const [showAllNews, setShowAllNews] = useState(false);
 
   return (
     <section className="section-padding bg-white">
       <div className="container mx-auto px-4 md:px-6">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-10 md:mb-14 gap-6">
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between mb-6 md:mb-14 gap-4 md:gap-6">
           <div>
             <motion.span
               initial={{ opacity: 0, y: 10 }}
@@ -105,7 +112,9 @@ export function NewsEvents() {
               className="text-3xl sm:text-4xl md:text-5xl font-serif text-navy leading-tight"
             >
               Happenings at{" "}
-              <span className="italic text-muted-foreground font-light">JCT</span>
+              <span className="italic text-muted-foreground font-light">
+                JCT
+              </span>
             </motion.h2>
           </div>
 
@@ -145,33 +154,39 @@ export function NewsEvents() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"
+              className="flex md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5 overflow-x-auto md:overflow-visible snap-container scrollbar-hide pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0"
             >
-              {newsItems.map((item, i) => (
-                <motion.article
-                  key={item.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="group p-6 bg-surface rounded-2xl border border-border hover:border-gold/30 card-hover-lift cursor-pointer"
-                >
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className={`text-[10px] font-sans font-bold tracking-wider uppercase px-2.5 py-1 rounded-full ${categoryColors[item.category] || "bg-gray-50 text-gray-600"}`}>
-                      {item.category}
+              {(showAllNews ? newsItems : newsItems.slice(0, 6)).map(
+                (item, i) => (
+                  <motion.article
+                    key={item.title}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    className="group p-5 md:p-6 bg-surface rounded-2xl border border-border hover:border-gold/30 card-hover-lift cursor-pointer snap-item shrink-0 w-[280px] sm:w-[320px] md:w-auto"
+                  >
+                    <div className="flex items-center gap-3 mb-4">
+                      <span
+                        className={`text-[10px] font-sans font-bold tracking-wider uppercase px-2.5 py-1 rounded-full ${categoryColors[item.category] || "bg-gray-50 text-gray-600"}`}
+                      >
+                        {item.category}
+                      </span>
+                      <span className="text-xs text-muted-foreground font-sans">
+                        {item.date}
+                      </span>
+                    </div>
+                    <h3 className="text-base font-sans font-semibold text-navy mb-2 leading-snug group-hover:text-gold transition-colors line-clamp-2">
+                      {item.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground font-sans leading-relaxed line-clamp-2 mb-4">
+                      {item.excerpt}
+                    </p>
+                    <span className="text-xs font-sans font-semibold text-gold flex items-center gap-1 group-hover:gap-2 transition-all">
+                      Read More <ArrowRight size={12} />
                     </span>
-                    <span className="text-xs text-muted-foreground font-sans">{item.date}</span>
-                  </div>
-                  <h3 className="text-base font-sans font-semibold text-navy mb-2 leading-snug group-hover:text-gold transition-colors line-clamp-2">
-                    {item.title}
-                  </h3>
-                  <p className="text-sm text-muted-foreground font-sans leading-relaxed line-clamp-2 mb-4">
-                    {item.excerpt}
-                  </p>
-                  <span className="text-xs font-sans font-semibold text-gold flex items-center gap-1 group-hover:gap-2 transition-all">
-                    Read More <ArrowRight size={12} />
-                  </span>
-                </motion.article>
-              ))}
+                  </motion.article>
+                ),
+              )}
             </motion.div>
           ) : (
             <motion.div
@@ -180,7 +195,7 @@ export function NewsEvents() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.3 }}
-              className="grid grid-cols-1 md:grid-cols-2 gap-5"
+              className="flex md:grid md:grid-cols-2 gap-4 md:gap-5 overflow-x-auto md:overflow-visible snap-container scrollbar-hide pb-4 md:pb-0 -mx-4 px-4 md:mx-0 md:px-0"
             >
               {events.map((event, i) => (
                 <motion.div
@@ -188,7 +203,7 @@ export function NewsEvents() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.08 }}
-                  className="group flex gap-5 p-6 bg-surface rounded-2xl border border-border hover:border-gold/30 card-hover-lift cursor-pointer"
+                  className="group flex gap-4 md:gap-5 p-5 md:p-6 bg-surface rounded-2xl border border-border hover:border-gold/30 card-hover-lift cursor-pointer snap-item shrink-0 w-[300px] sm:w-[360px] md:w-auto"
                 >
                   {/* Date Badge */}
                   <div className="w-16 h-16 bg-navy rounded-xl flex flex-col items-center justify-center shrink-0">
@@ -212,7 +227,10 @@ export function NewsEvents() {
                       </span>
                     </div>
                   </div>
-                  <ArrowRight size={16} className="text-muted-foreground group-hover:text-gold transition-colors shrink-0 mt-1" />
+                  <ArrowRight
+                    size={16}
+                    className="text-muted-foreground group-hover:text-gold transition-colors shrink-0 mt-1"
+                  />
                 </motion.div>
               ))}
             </motion.div>

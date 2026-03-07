@@ -224,7 +224,7 @@ export function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] lg:hidden"
               onClick={() => setIsOpen(false)}
             />
             <motion.div
@@ -232,10 +232,10 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="fixed inset-y-0 right-0 w-full sm:w-96 bg-navy z-50 lg:hidden flex flex-col"
+              className="fixed inset-y-0 right-0 w-full sm:w-96 bg-navy z-[61] lg:hidden flex flex-col"
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-white/5">
+              <div className="flex items-center justify-between p-4 pt-6 border-b border-white/5">
                 <div className="flex items-center gap-3">
                   <div className="relative w-9 h-9">
                     <Image
@@ -258,7 +258,7 @@ export function Navbar() {
               </div>
 
               {/* Links */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-1">
+              <div className="flex-1 overflow-y-auto px-4 py-3 space-y-0">
                 {navLinks.map((link, i) => (
                   <motion.div
                     key={link.name}
@@ -268,16 +268,16 @@ export function Navbar() {
                   >
                     {link.children ? (
                       <div className="py-2">
-                        <p className="text-xs font-sans font-bold text-gold uppercase tracking-[0.2em] mb-3 mt-3">
+                        <p className="text-[10px] font-sans font-bold text-gold uppercase tracking-[0.2em] mb-2 mt-2">
                           {link.name}
                         </p>
-                        <div className="space-y-2">
+                        <div className="space-y-1">
                           {link.children.map((child) => (
                             <Link
                               key={child.short}
                               href={child.href}
                               onClick={() => setIsOpen(false)}
-                              className="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group"
+                              className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/5 transition-colors group"
                             >
                               <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center p-1.5 shrink-0">
                                 <Image
@@ -304,7 +304,7 @@ export function Navbar() {
                       <Link
                         href={link.href}
                         onClick={() => setIsOpen(false)}
-                        className="block py-3 text-base font-sans font-medium text-white/80 hover:text-white transition-colors border-b border-white/5"
+                        className="block py-2.5 text-[15px] font-sans font-medium text-white/80 hover:text-white transition-colors border-b border-white/5"
                       >
                         {link.name}
                       </Link>
@@ -314,7 +314,7 @@ export function Navbar() {
               </div>
 
               {/* Footer */}
-              <div className="p-6 border-t border-white/5 space-y-3">
+              <div className="p-4 border-t border-white/5 space-y-2.5">
                 <a
                   href="tel:+919361488801"
                   className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-white/5 text-white font-sans font-medium text-sm hover:bg-white/10 transition-colors"

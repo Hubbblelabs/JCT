@@ -57,7 +57,15 @@ const counters = [
   { value: 100, suffix: "+", label: "Industry Awards" },
 ];
 
-function AnimatedNumber({ value, suffix, inView }: { value: number; suffix: string; inView: boolean }) {
+function AnimatedNumber({
+  value,
+  suffix,
+  inView,
+}: {
+  value: number;
+  suffix: string;
+  inView: boolean;
+}) {
   const [count, setCount] = useState(0);
   useEffect(() => {
     if (!inView) return;
@@ -66,23 +74,33 @@ function AnimatedNumber({ value, suffix, inView }: { value: number; suffix: stri
     const inc = value / (duration / 16);
     const timer = setInterval(() => {
       start += inc;
-      if (start >= value) { setCount(value); clearInterval(timer); }
-      else setCount(Math.floor(start));
+      if (start >= value) {
+        setCount(value);
+        clearInterval(timer);
+      } else setCount(Math.floor(start));
     }, 16);
     return () => clearInterval(timer);
   }, [inView, value]);
 
-  return <span>{count >= 10000 ? `${Math.floor(count / 1000)}K` : count.toLocaleString()}{suffix}</span>;
+  return (
+    <span>
+      {count >= 10000 ? `${Math.floor(count / 1000)}K` : count.toLocaleString()}
+      {suffix}
+    </span>
+  );
 }
 
 export function WhyJCT() {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
+  const [showAllFeatures, setShowAllFeatures] = useState(false);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setInView(true); },
-      { threshold: 0.3 }
+      ([entry]) => {
+        if (entry.isIntersecting) setInView(true);
+      },
+      { threshold: 0.3 },
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();
@@ -92,7 +110,7 @@ export function WhyJCT() {
     <section id="about" className="section-padding bg-surface">
       <div className="container mx-auto px-4 md:px-6">
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-8 md:mb-16">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -109,7 +127,9 @@ export function WhyJCT() {
             className="text-3xl sm:text-4xl md:text-5xl font-serif text-navy leading-tight mb-5"
           >
             Built for{" "}
-            <span className="italic text-muted-foreground font-light">Your Success</span>
+            <span className="italic text-muted-foreground font-light">
+              Your Success
+            </span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 15 }}
@@ -118,13 +138,13 @@ export function WhyJCT() {
             transition={{ delay: 0.2 }}
             className="text-muted-foreground font-sans text-base md:text-lg leading-relaxed"
           >
-            JCT Institutions combines academic rigor with practical exposure, creating
-            an ecosystem where students thrive and succeed.
+            JCT Institutions combines academic rigor with practical exposure,
+            creating an ecosystem where students thrive and succeed.
           </motion.p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-16 md:mb-20">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-6 mb-10 md:mb-20">
           {features.map((feature, i) => (
             <motion.div
               key={feature.title}
@@ -132,20 +152,38 @@ export function WhyJCT() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="group p-6 md:p-8 bg-white rounded-2xl border border-border hover:border-gold/30 card-hover-lift"
+              className={`group p-4 md:p-8 bg-white rounded-2xl border border-border hover:border-gold/30 card-hover-lift ${!showAllFeatures && i >= 4 ? "hidden sm:block" : ""}`}
             >
-              <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
-                <feature.icon size={22} className="text-navy" strokeWidth={1.5} />
+              <div
+                className={`w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gradient-to-br ${feature.gradient} flex items-center justify-center mb-3 md:mb-5 group-hover:scale-110 transition-transform`}
+              >
+                <feature.icon
+                  size={20}
+                  className="text-navy"
+                  strokeWidth={1.5}
+                />
               </div>
-              <h3 className="text-lg font-sans font-semibold text-navy mb-2">
+              <h3 className="text-sm md:text-lg font-sans font-semibold text-navy mb-1 md:mb-2">
                 {feature.title}
               </h3>
-              <p className="text-sm text-muted-foreground font-sans leading-relaxed">
+              <p className="text-xs md:text-sm text-muted-foreground font-sans leading-relaxed">
                 {feature.desc}
               </p>
             </motion.div>
           ))}
         </div>
+
+        {/* Mobile Show More */}
+        {!showAllFeatures && features.length > 4 && (
+          <div className="sm:hidden text-center mb-8">
+            <button
+              onClick={() => setShowAllFeatures(true)}
+              className="inline-flex items-center gap-2 text-sm font-sans font-semibold text-navy hover:text-gold transition-colors"
+            >
+              Show All Features →
+            </button>
+          </div>
+        )}
 
         {/* Counter Strip */}
         <motion.div
@@ -167,7 +205,11 @@ export function WhyJCT() {
                 className="text-center"
               >
                 <div className="text-3xl md:text-4xl lg:text-5xl font-sans font-black text-white tracking-tight mb-2">
-                  <AnimatedNumber value={item.value} suffix={item.suffix} inView={inView} />
+                  <AnimatedNumber
+                    value={item.value}
+                    suffix={item.suffix}
+                    inView={inView}
+                  />
                 </div>
                 <div className="text-xs md:text-sm text-white/50 font-sans font-medium">
                   {item.label}

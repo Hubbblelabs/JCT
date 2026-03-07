@@ -64,7 +64,7 @@ export function HomeHero() {
   return (
     <section
       ref={heroRef}
-      className="relative min-h-screen flex items-center overflow-hidden pt-[100px] md:pt-[120px]"
+      className="relative min-h-[100svh] flex items-center overflow-hidden pt-20 md:pt-[120px]"
     >
       {/* Background */}
       <motion.div style={{ y: bgY }} className="absolute inset-0 -top-20 z-0">
@@ -85,7 +85,7 @@ export function HomeHero() {
       </motion.div>
 
       {/* Content */}
-      <div className="container relative z-10 mx-auto px-4 md:px-6 pb-20 md:pb-28">
+      <div className="container relative z-10 mx-auto px-4 md:px-6 pb-8 md:pb-28">
         <div className="max-w-3xl">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -107,7 +107,7 @@ export function HomeHero() {
               delay: 0.15,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-serif text-white leading-[0.95] tracking-tight mb-6"
+            className="text-[2rem] sm:text-5xl md:text-6xl lg:text-7xl font-serif text-white leading-[0.95] tracking-tight mb-4 md:mb-6"
           >
             Three Institutions.
             <br />
@@ -118,7 +118,7 @@ export function HomeHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
-            className="text-base md:text-lg text-white/50 max-w-xl leading-relaxed font-sans mb-8"
+            className="text-sm md:text-lg text-white/50 max-w-xl leading-relaxed font-sans mb-6 md:mb-8"
           >
             Empowering the next generation through world-class education in{" "}
             <span className="text-white font-medium">Engineering</span>,{" "}
@@ -134,13 +134,13 @@ export function HomeHero() {
           >
             <Link
               href="#admissions"
-              className="h-13 px-7 bg-gold text-navy font-sans font-bold text-sm rounded-full hover:bg-gold-light transition-all inline-flex items-center gap-2 hover:scale-105 active:scale-95 shadow-lg shadow-gold/20"
+              className="h-11 md:h-13 px-5 md:px-7 bg-gold text-navy font-sans font-bold text-sm rounded-full hover:bg-gold-light transition-all inline-flex items-center gap-2 hover:scale-105 active:scale-95 shadow-lg shadow-gold/20"
             >
               Apply Now <ArrowRight size={16} />
             </Link>
             <a
               href="tel:+919361488801"
-              className="h-13 px-7 border border-white/15 text-white font-sans font-semibold text-sm rounded-full hover:bg-white/5 transition-all inline-flex items-center gap-2 backdrop-blur-sm"
+              className="h-11 md:h-13 px-5 md:px-7 border border-white/15 text-white font-sans font-semibold text-sm rounded-full hover:bg-white/5 transition-all inline-flex items-center gap-2 backdrop-blur-sm"
             >
               <Phone size={14} /> Enquire Now
             </a>
@@ -152,14 +152,14 @@ export function HomeHero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.7 }}
-          className="mt-16 md:mt-24 grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 pt-8 border-t border-white/10"
+          className="mt-10 md:mt-24 grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-8 pt-6 md:pt-8 border-t border-white/10"
         >
           {stats.map((stat) => (
             <div key={stat.label}>
-              <span className="text-3xl md:text-4xl font-sans font-black text-white tracking-tight">
+              <span className="text-xl sm:text-3xl md:text-4xl font-sans font-black text-white tracking-tight">
                 <AnimatedCounter value={stat.value} suffix={stat.suffix} />
               </span>
-              <span className="block text-xs font-sans font-semibold text-white/30 uppercase tracking-[0.15em] mt-1">
+              <span className="block text-[10px] sm:text-xs font-sans font-semibold text-white/30 uppercase tracking-[0.15em] mt-1">
                 {stat.label}
               </span>
             </div>
