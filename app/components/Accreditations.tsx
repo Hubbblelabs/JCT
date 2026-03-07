@@ -1,52 +1,47 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Image from "next/image";
 
-const accreditations = [
-    { name: "AICTE Approved", logo: "/aicte.png" },
-    { name: "Anna University Affiliated", logo: "/anna.png" },
-    { name: "NAAC Accredited", logo: "/naac.png" },
-    { name: "NBA Accredited", logo: "/nba.png" },
-    { name: "ISO Certified", logo: "/iso.png" },
-    { name: "UGC Recognized", logo: "/ugc.png" },
-    { name: "DOTE Approved", logo: "/dote.png" },
-    { name: "Bharathiar University Affiliated", logo: "/bharathiar_university.png" },
+const logos = [
+  { src: "/aicte.png", name: "AICTE Approved" },
+  { src: "/anna.png", name: "Anna University" },
+  { src: "/naac.png", name: "NAAC Accredited" },
+  { src: "/nba.png", name: "NBA Accredited" },
+  { src: "/iso.png", name: "ISO 9001:2015" },
+  { src: "/ugc.png", name: "UGC Recognized" },
+  { src: "/dote.png", name: "DOTE Approved" },
+  { src: "/bharathiar_university.png", name: "Bharathiar University" },
 ];
 
 export function Accreditations() {
-    return (
-        <section className="bg-white py-6 md:py-8 3xl:py-10 border-b border-stone-100">
-            <div className="container mx-auto px-4 md:px-6 3xl:px-8">
-                <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-                    <div className="text-center md:text-left">
-                        <h3 className="text-sm font-bold uppercase tracking-wider text-stone-500 mb-1">
-                            Recognized & Accredited By
-                        </h3>
-                        <p className="text-stone-500 text-xs max-w-xs">
-                            Upholding the highest standards of education and infrastructure.
-                        </p>
-                    </div>
+  const doubled = [...logos, ...logos];
+  return (
+    <section className="py-5 md:py-6 bg-white border-b border-border overflow-hidden relative">
+      {/* Fade Edges */}
+      <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+      <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
-                    <div className="flex flex-wrap justify-center md:justify-end gap-4 sm:gap-6 md:gap-8 items-center grayscale hover:grayscale-0 transition-all duration-300">
-                        {accreditations.map((item) => (
-                            <div key={item.name} className="relative group">
-                                <div className="relative h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14 2xl:h-16 2xl:w-16 transition-transform duration-300 group-hover:scale-110">
-                                    <Image
-                                        src={item.logo}
-                                        alt={item.name}
-                                        fill
-                                        className="object-contain"
-                                    />
-                                </div>
-                                <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-stone-800 text-white text-[10px] py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
-                                    {item.name}
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+      <div className="flex animate-marquee gap-10 md:gap-16 items-center">
+        {doubled.map((logo, i) => (
+          <div
+            key={`${logo.name}-${i}`}
+            className="flex items-center gap-2.5 shrink-0 opacity-40 hover:opacity-100 transition-opacity duration-300"
+          >
+            <div className="relative w-8 h-8 md:w-10 md:h-10 shrink-0">
+              <Image
+                src={logo.src}
+                alt={logo.name}
+                fill
+                className="object-contain"
+                sizes="40px"
+              />
             </div>
-        </section>
-    );
+            <span className="text-[11px] md:text-xs font-sans font-semibold text-muted-foreground whitespace-nowrap tracking-wide uppercase">
+              {logo.name}
+            </span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }

@@ -2,123 +2,69 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Button } from "@/app/components/ui/button";
-import {
-    FileText,
-    CalendarCheck,
-    GraduationCap,
-    ArrowUpRight,
-    Phone,
-    Mail
-} from "lucide-react";
+import { FileText, CalendarCheck, GraduationCap, ArrowRight, Phone, Mail } from "lucide-react";
+
+const pathways = [
+  { icon: FileText, title: "After 10th Standard", desc: "Join JCT Polytechnic College for a 3-year diploma in engineering. Hands-on training from day one.", link: "/institutions/polytechnic", linkText: "View Polytechnic", gradient: "from-emerald-50 to-teal-50", iconColor: "text-polytechnic" },
+  { icon: CalendarCheck, title: "After 12th Standard", desc: "Choose B.E./B.Tech at Engineering or B.Sc/B.Com/BBA at Arts & Science — depending on your stream.", link: "/institutions/engineering", linkText: "Compare Options", gradient: "from-blue-50 to-indigo-50", iconColor: "text-navy" },
+  { icon: GraduationCap, title: "After Diploma", desc: "Lateral entry directly into the second year of B.E. programs at JCT College of Engineering.", link: "/institutions/engineering", linkText: "Lateral Entry Details", gradient: "from-rose-50 to-pink-50", iconColor: "text-burgundy" },
+];
 
 export function AdmissionsCTA() {
-    return (
-        <section id="admissions" className="py-16 md:py-20 3xl:py-28 bg-white">
-            <div className="container mx-auto px-4 md:px-6 3xl:px-8">
-                <div className="max-w-4xl mx-auto text-center">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <h2 className="text-xs font-bold tracking-[0.2em] uppercase text-amber-600 mb-4">Admissions 2026</h2>
-                        <h3 className="text-2xl sm:text-3xl md:text-5xl 2xl:text-6xl font-serif text-primary leading-tight mb-6">
-                            Not Sure Which <br />
-                            <span className="text-stone-500 italic font-light">College Is Right for You?</span>
-                        </h3>
-                        <p className="text-stone-500 text-base font-light leading-relaxed mb-12 max-w-2xl mx-auto">
-                            Whether you're coming from 10th, 12th, or completing a diploma — there's a clear pathway for you at JCT. Our admissions team can help you find the right fit based on your background and goals.
-                        </p>
-                    </motion.div>
+  return (
+    <section id="admissions" className="section-padding bg-surface">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12 md:mb-16">
+            <motion.span initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="inline-block text-xs font-sans font-bold tracking-[0.2em] uppercase text-gold mb-4">Admissions 2026</motion.span>
+            <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="text-3xl sm:text-4xl md:text-5xl font-serif text-navy leading-tight mb-5">
+              Not Sure Which College{" "}<br className="hidden sm:block" /><span className="italic text-muted-foreground font-light">Is Right for You?</span>
+            </motion.h2>
+            <motion.p initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-muted-foreground font-sans text-base leading-relaxed max-w-2xl mx-auto">
+              Whether you&apos;re coming from 10th, 12th, or completing a diploma — there&apos;s a clear pathway for you at JCT.
+            </motion.p>
+          </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8 mb-16">
-                        {[
-                            {
-                                icon: FileText,
-                                title: "After 10th Standard",
-                                desc: "Join JCT Polytechnic College for a 3-year diploma in engineering disciplines. Hands-on training from day one.",
-                                link: "/institutions/polytechnic",
-                                linkText: "View Polytechnic",
-                            },
-                            {
-                                icon: CalendarCheck,
-                                title: "After 12th Standard",
-                                desc: "Choose between B.E./B.Tech at the Engineering College or B.Sc/B.Com/BBA at Arts & Science — depending on your stream.",
-                                link: "/institutions/engineering",
-                                linkText: "Compare Options",
-                            },
-                            {
-                                icon: GraduationCap,
-                                title: "After Diploma",
-                                desc: "Lateral entry directly into the second year of B.E. programs at JCT College of Engineering and Technology.",
-                                link: "/institutions/engineering",
-                                linkText: "Lateral Entry Details",
-                            },
-                        ].map((item, index) => (
-                            <motion.div
-                                key={item.title}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 0.5, delay: index * 0.1 }}
-                                className="bg-stone-50 p-10 rounded-3xl border border-stone-100 text-left hover:border-accent/20 hover:shadow-lg transition-all duration-300 group"
-                            >
-                                <div className="p-3 bg-white rounded-xl text-primary mb-6 inline-block shadow-sm group-hover:bg-accent/10 group-hover:text-accent transition-colors">
-                                    <item.icon size={24} strokeWidth={1.5} />
-                                </div>
-                                <h3 className="text-xl font-serif text-primary mb-3">{item.title}</h3>
-                                <p className="text-stone-500 text-sm font-light leading-relaxed mb-6">{item.desc}</p>
-                                <Link href={item.link} className="text-sm font-bold text-primary hover:text-accent transition-colors inline-flex items-center gap-1">
-                                    {item.linkText} <ArrowUpRight size={14} />
-                                </Link>
-                            </motion.div>
-                        ))}
-                    </div>
-
-                    <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-                        <Button size="lg" className="h-14 px-8 text-base bg-accent text-primary hover:bg-accent/90 font-bold rounded-xl transition-all hover:scale-105 active:scale-95 shadow-xl shadow-accent/20">
-                            Apply Online
-                        </Button>
-                        <Button variant="outline" size="lg" className="h-14 px-8 text-base border-stone-200 text-primary hover:bg-stone-50 font-bold rounded-xl transition-all">
-                            Download Prospectus
-                        </Button>
-                    </div>
-
-                    {/* Prominent Admission Contact Banner */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="mt-12 p-6 bg-linear-to-r from-primary to-primary/90 rounded-2xl text-white text-center max-w-2xl mx-auto border-2 border-accent/30 shadow-2xl"
-                    >
-                        <div className="flex items-center justify-center gap-3 mb-3">
-                            <Phone size={24} className="text-accent" />
-                            <h3 className="text-accent font-serif text-2xl font-bold">Admissions Helpline</h3>
-                        </div>
-                        <a href="tel:+919361488801" className="block">
-                            <p className="text-3xl md:text-4xl font-black text-white tracking-wide hover:text-accent transition-colors mb-2">
-                                +91 93614 88801
-                            </p>
-                        </a>
-                        <p className="text-sm text-blue-200/70 font-light">Mon–Sat, 9:00 AM – 5:00 PM</p>
-                        <p className="text-xs text-white/60 mt-2">Call for personalized guidance on admissions, programs, and campus visits</p>
-                    </motion.div>
-
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        className="mt-8 p-6 bg-stone-50 rounded-2xl text-left max-w-xl mx-auto"
-                    >
-                        <h3 className="text-primary font-serif text-lg mb-2 font-bold">Email Us</h3>
-                        <a href="mailto:admissions@jct.edu" className="flex items-center gap-2 text-primary hover:text-accent transition-colors text-base font-medium">
-                            <Mail size={18} className="text-accent" /> admissions@jct.edu
-                        </a>
-                    </motion.div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 mb-12 md:mb-16">
+            {pathways.map((item, i) => (
+              <motion.div key={item.title} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+                <div className="group h-full p-6 md:p-8 bg-white rounded-2xl border border-border hover:border-gold/30 card-hover-lift">
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${item.gradient} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
+                    <item.icon size={22} className={item.iconColor} strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-xl font-serif text-navy mb-3">{item.title}</h3>
+                  <p className="text-sm text-muted-foreground font-sans leading-relaxed mb-6">{item.desc}</p>
+                  <Link href={item.link} className="text-sm font-sans font-semibold text-navy hover:text-gold transition-colors inline-flex items-center gap-1 group-hover:gap-2">{item.linkText} <ArrowRight size={14} /></Link>
                 </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
+            <Link href="#contact" className="inline-flex items-center justify-center gap-2 h-14 px-8 bg-gold text-navy font-sans font-bold rounded-full hover:bg-gold-light transition-all hover:scale-105 active:scale-95 shadow-lg shadow-gold/20 text-base">Apply Online <ArrowRight size={16} /></Link>
+            <Link href="#" className="inline-flex items-center justify-center h-14 px-8 border-2 border-border text-navy font-sans font-semibold rounded-full hover:bg-muted transition-all text-base">Download Prospectus</Link>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative rounded-3xl overflow-hidden">
+            <div className="bg-gradient-to-br from-navy via-navy-light to-navy-mid p-8 md:p-12 text-center noise-overlay relative">
+              <div className="absolute inset-0 bg-gradient-to-r from-gold/5 via-transparent to-gold/5 pointer-events-none" />
+              <div className="relative z-10">
+                <div className="flex items-center justify-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-gold/10 border border-gold/20 flex items-center justify-center animate-pulse-glow"><Phone size={22} className="text-gold" /></div>
+                </div>
+                <h3 className="text-gold font-serif text-2xl md:text-3xl font-bold mb-3">Admissions Helpline</h3>
+                <a href="tel:+919361488801"><p className="text-3xl md:text-4xl font-sans font-black text-white tracking-wide hover:text-gold transition-colors mb-3">+91 93614 88801</p></a>
+                <p className="text-sm text-white/50 font-sans mb-1">Mon – Sat, 9:00 AM – 5:00 PM</p>
+                <p className="text-xs text-white/30 font-sans">Call for personalized guidance on admissions, programs, and campus visits</p>
+                <div id="contact" className="mt-8 pt-6 border-t border-white/10 flex items-center justify-center gap-2">
+                  <Mail size={16} className="text-gold" />
+                  <a href="mailto:admissions@jct.edu" className="text-white/70 hover:text-white font-sans text-sm transition-colors">admissions@jct.edu</a>
+                </div>
+              </div>
             </div>
-        </section>
-    );
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
 }
