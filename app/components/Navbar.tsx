@@ -267,37 +267,39 @@ export function Navbar() {
                     transition={{ delay: 0.05 * i }}
                   >
                     {link.children ? (
-                      <div className="py-2">
-                        <p className="text-[10px] font-sans font-bold text-gold uppercase tracking-[0.2em] mb-2 mt-2">
-                          {link.name}
-                        </p>
-                        <div className="space-y-1">
-                          {link.children.map((child) => (
-                            <Link
-                              key={child.short}
-                              href={child.href}
-                              onClick={() => setIsOpen(false)}
-                              className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-white/5 transition-colors group"
-                            >
-                              <div className="w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center p-1.5 shrink-0">
-                                <Image
-                                  src={child.logo}
-                                  alt=""
-                                  width={24}
-                                  height={24}
-                                  className="object-contain"
-                                />
-                              </div>
-                              <div>
+                      <div className="py-2 relative mt-1 mb-2 rounded-2xl bg-white/[0.02] border border-white/5 overflow-hidden p-3 shadow-inner">
+                        {/* Background logo watermark */}
+                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                          <Image
+                            src="/jct_logo_blue.png"
+                            alt=""
+                            width={180}
+                            height={180}
+                            className="object-contain opacity-[0.04]"
+                          />
+                        </div>
+
+                        <div className="relative z-10">
+                          <p className="text-[10px] font-sans font-bold text-gold uppercase tracking-[0.2em] mb-2 px-1">
+                            {link.name}
+                          </p>
+                          <div className="space-y-1">
+                            {link.children.map((child) => (
+                              <Link
+                                key={child.short}
+                                href={child.href}
+                                onClick={() => setIsOpen(false)}
+                                className="block p-2.5 rounded-xl hover:bg-white/5 transition-colors group"
+                              >
                                 <p className="text-sm font-sans font-medium text-white group-hover:text-gold transition-colors">
                                   {child.short}
                                 </p>
-                                <p className="text-[11px] text-white/40 font-sans">
+                                <p className="text-[11px] text-white/40 font-sans mt-0.5">
                                   {child.desc}
                                 </p>
-                              </div>
-                            </Link>
-                          ))}
+                              </Link>
+                            ))}
+                          </div>
                         </div>
                       </div>
                     ) : (
