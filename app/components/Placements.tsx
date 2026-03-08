@@ -66,24 +66,70 @@ function CompanyCard({ company }: { company: { name: string; logo: string } }) {
 
 export function Placements() {
   return (
-    <section id="placements" className="section-padding bg-surface overflow-hidden">
+    <section
+      id="placements"
+      className="section-padding bg-surface overflow-hidden"
+    >
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-8 md:mb-16">
-          <motion.span initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="inline-block text-xs font-sans font-bold tracking-[0.2em] uppercase text-gold mb-4">Placement Highlights</motion.span>
-          <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.1 }} className="text-3xl sm:text-4xl md:text-5xl font-serif text-navy leading-tight mb-5">
-            Our Recruiters{" "}<span className="italic text-muted-foreground font-light">Trust Our Graduates</span>
+          <motion.span
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="inline-block text-xs font-sans font-bold tracking-[0.2em] uppercase text-gold mb-4"
+          >
+            Placement Highlights
+          </motion.span>
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="text-3xl sm:text-4xl md:text-5xl font-serif text-navy leading-tight mb-5"
+          >
+            Our Recruiters{" "}
+            <span className="italic text-muted-foreground font-light">
+              Trust Our Graduates
+            </span>
           </motion.h2>
-          <motion.p initial={{ opacity: 0, y: 15 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="text-muted-foreground font-sans text-base max-w-xl mx-auto">
-            Leading organizations across IT, engineering, and consulting regularly recruit from JCT campuses.
+          <motion.p
+            initial={{ opacity: 0, y: 15 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="text-muted-foreground font-sans text-base max-w-xl mx-auto"
+          >
+            Leading organizations across IT, engineering, and consulting
+            regularly recruit from JCT campuses.
           </motion.p>
         </div>
 
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-14 md:mb-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-14 md:mb-16"
+        >
           {placementStats.map((stat, i) => (
-            <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }} className="text-center p-4 md:p-6 bg-white rounded-2xl border border-border">
-              <stat.icon size={20} className="mx-auto text-gold mb-2" strokeWidth={1.5} />
-              <span className="block text-xl md:text-3xl font-sans font-black text-navy tracking-tight mb-1">{stat.value}</span>
-              <span className="text-[10px] md:text-xs font-sans font-semibold text-muted-foreground uppercase tracking-wider">{stat.label}</span>
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="text-center p-4 md:p-6 bg-white rounded-2xl border border-border"
+            >
+              <stat.icon
+                size={20}
+                className="mx-auto text-gold mb-2"
+                strokeWidth={1.5}
+              />
+              <span className="block text-xl md:text-3xl font-sans font-black text-navy tracking-tight mb-1">
+                {stat.value}
+              </span>
+              <span className="text-[10px] md:text-xs font-sans font-semibold text-muted-foreground uppercase tracking-wider">
+                {stat.label}
+              </span>
             </motion.div>
           ))}
         </motion.div>
@@ -95,14 +141,21 @@ export function Placements() {
         <div className="mb-4">
           <div className="flex animate-scroll-left gap-4">
             {[...companies, ...companies].map((company, i) => (
-              <div key={`r1-${i}`} className="shrink-0"><CompanyCard company={company} /></div>
+              <div key={`r1-${i}`} className="shrink-0">
+                <CompanyCard company={company} />
+              </div>
             ))}
           </div>
         </div>
         <div>
           <div className="flex animate-scroll-right gap-4">
-            {[...companies.slice().reverse(), ...companies.slice().reverse()].map((company, i) => (
-              <div key={`r2-${i}`} className="shrink-0"><CompanyCard company={company} /></div>
+            {[
+              ...companies.slice().reverse(),
+              ...companies.slice().reverse(),
+            ].map((company, i) => (
+              <div key={`r2-${i}`} className="shrink-0">
+                <CompanyCard company={company} />
+              </div>
             ))}
           </div>
         </div>

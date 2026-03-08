@@ -86,18 +86,18 @@ export function Navbar() {
           <Link href="/" className="flex items-center gap-3 shrink-0">
             <div className="relative w-10 h-10 md:w-11 md:h-11">
               <Image
-                src="/jct_logo.png"
+                src="/jct_logo_yellow.png"
                 alt="JCT"
                 fill
                 className="object-contain"
                 priority
               />
             </div>
-            <div className="hidden sm:block">
-              <h1 className="text-base md:text-lg font-serif font-bold text-white leading-none tracking-tight">
+            <div className="flex flex-col">
+              <h1 className="text-sm md:text-lg font-serif font-bold text-white leading-none tracking-tight">
                 JCT Institutions
               </h1>
-              <span className="text-[10px] text-white/40 font-sans font-medium tracking-[0.2em] uppercase">
+              <span className="hidden sm:block text-[10px] text-white/40 font-sans font-medium tracking-[0.2em] uppercase mt-0.5">
                 Est. 2009
               </span>
             </div>
@@ -239,7 +239,7 @@ export function Navbar() {
                 <div className="flex items-center gap-3">
                   <div className="relative w-9 h-9">
                     <Image
-                      src="/jct_logo.png"
+                      src="/jct_logo_yellow.png"
                       alt="JCT"
                       fill
                       className="object-contain"

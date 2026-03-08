@@ -64,10 +64,10 @@ export function HomeHero() {
   return (
     <section
       ref={heroRef}
-      className="relative min-h-[100svh] flex items-center overflow-hidden pt-20 md:pt-[120px]"
+      className="relative min-h-svh w-full flex flex-col overflow-hidden"
     >
       {/* Background */}
-      <motion.div style={{ y: bgY }} className="absolute inset-0 -top-20 z-0">
+      <motion.div style={{ y: bgY }} className="absolute inset-0 z-0">
         <Image
           src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2670&auto=format&fit=crop"
           alt="JCT Campus"
@@ -80,20 +80,22 @@ export function HomeHero() {
           style={{ opacity: overlayOpacity }}
           className="absolute inset-0 bg-navy"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/80 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-t from-navy via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-navy via-navy/80 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-navy via-transparent to-transparent" />
       </motion.div>
 
-      {/* Content */}
-      <div className="container relative z-10 mx-auto px-4 md:px-6 pb-8 md:pb-28">
-        <div className="max-w-3xl">
+      {/* Content wrapper taking exactly screen height with safe padding */}
+      <div className="container relative z-10 mx-auto px-4 md:px-6 flex flex-col flex-1 justify-between pt-[90px] md:pt-[100px] pb-5 md:pb-6">
+        
+        {/* Main Text Center Box (flex-1 to push bottom bar down, justify-center to center itself) */}
+        <div className="flex-1 flex flex-col justify-center max-w-4xl py-2 md:py-4">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="mb-6"
+            className="mb-4 md:mb-6"
           >
-            <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs font-sans font-bold tracking-[0.15em] uppercase text-gold">
+            <span className="inline-flex items-center gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-[10px] md:text-xs font-sans font-bold tracking-[0.15em] uppercase text-gold">
               <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
               Est. 2009 · Coimbatore, Tamil Nadu
             </span>
@@ -102,28 +104,24 @@ export function HomeHero() {
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{
-              duration: 0.8,
-              delay: 0.15,
-              ease: [0.22, 1, 0.36, 1],
-            }}
-            className="text-[2rem] sm:text-5xl md:text-6xl lg:text-7xl font-serif text-white leading-[0.95] tracking-tight mb-4 md:mb-6"
+            transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            className="text-[2.25rem] sm:text-5xl md:text-5xl lg:text-7xl font-serif text-white leading-[1.05] tracking-tight mb-3 md:mb-5"
           >
-            Three Institutions.
-            <br />
-            <span className="gradient-text italic font-light">One Future.</span>
+            Three Colleges.
+            <br className="hidden md:block" />
+            <span className="gradient-text italic font-light ml-1 md:ml-0">One Commitment to Your Success.</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
-            className="text-sm md:text-lg text-white/50 max-w-xl leading-relaxed font-sans mb-6 md:mb-8"
+            className="text-sm md:text-base lg:text-lg text-white/50 max-w-2xl leading-relaxed font-sans mb-5 md:mb-7"
           >
-            Empowering the next generation through world-class education in{" "}
+            JCT Institutions is a group of three colleges in Coimbatore—{" "}
             <span className="text-white font-medium">Engineering</span>,{" "}
             <span className="text-white font-medium">Arts & Science</span>, and{" "}
-            <span className="text-white font-medium">Polytechnic</span> studies.
+            <span className="text-white font-medium">Polytechnic</span>—united by a shared belief that education should build both knowledge and real-world competence.
           </motion.p>
 
           <motion.div
@@ -134,13 +132,13 @@ export function HomeHero() {
           >
             <Link
               href="#admissions"
-              className="h-11 md:h-13 px-5 md:px-7 bg-gold text-navy font-sans font-bold text-sm rounded-full hover:bg-gold-light transition-all inline-flex items-center gap-2 hover:scale-105 active:scale-95 shadow-lg shadow-gold/20"
+              className="h-11 md:h-13 px-6 md:px-7 bg-gold text-navy font-sans font-bold text-sm rounded-full hover:bg-gold-light transition-all inline-flex items-center gap-2 hover:scale-105 active:scale-95 shadow-lg shadow-gold/20"
             >
               Apply Now <ArrowRight size={16} />
             </Link>
             <a
               href="tel:+919361488801"
-              className="h-11 md:h-13 px-5 md:px-7 border border-white/15 text-white font-sans font-semibold text-sm rounded-full hover:bg-white/5 transition-all inline-flex items-center gap-2 backdrop-blur-sm"
+              className="h-11 md:h-13 px-6 md:px-7 border border-white/15 text-white font-sans font-semibold text-sm rounded-full hover:bg-white/5 transition-all inline-flex items-center gap-2 backdrop-blur-sm"
             >
               <Phone size={14} /> Enquire Now
             </a>
@@ -152,14 +150,14 @@ export function HomeHero() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.7 }}
-          className="mt-10 md:mt-24 grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-8 pt-6 md:pt-8 border-t border-white/10"
+          className="w-full shrink-0 grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-6 pt-4 md:pt-6 border-t border-white/10"
         >
           {stats.map((stat) => (
             <div key={stat.label}>
-              <span className="text-xl sm:text-3xl md:text-4xl font-sans font-black text-white tracking-tight">
+              <span className="text-2xl sm:text-3xl lg:text-[2.25rem] font-sans font-black text-white tracking-tight">
                 <AnimatedCounter value={stat.value} suffix={stat.suffix} />
               </span>
-              <span className="block text-[10px] sm:text-xs font-sans font-semibold text-white/30 uppercase tracking-[0.15em] mt-1">
+              <span className="block text-[10px] md:text-[11px] font-sans font-semibold text-white/40 uppercase tracking-[0.15em] mt-0.5 md:mt-1">
                 {stat.label}
               </span>
             </div>

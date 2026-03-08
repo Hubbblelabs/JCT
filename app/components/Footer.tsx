@@ -77,7 +77,7 @@ export function Footer() {
             <div className="flex items-center gap-3 mb-6">
               <div className="relative w-11 h-11">
                 <Image
-                  src="/jct_logo.png"
+                  src="/jct_logo_yellow.png"
                   alt="JCT"
                   fill
                   className="object-contain"

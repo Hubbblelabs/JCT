@@ -21,7 +21,7 @@ export function Accreditations() {
       <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
       <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
 
-      <div className="flex animate-marquee gap-10 md:gap-16 items-center">
+      <div className="flex animate-[marquee_20s_linear_infinite] md:animate-[marquee_35s_linear_infinite] gap-10 md:gap-16 items-center">
         {doubled.map((logo, i) => (
           <div
             key={`${logo.name}-${i}`}
@@ -36,7 +36,7 @@ export function Accreditations() {
                 sizes="40px"
               />
             </div>
-            <span className="text-[11px] md:text-xs font-sans font-semibold text-muted-foreground whitespace-nowrap tracking-wide uppercase">
+            <span className="hidden md:inline-block text-xs font-sans font-semibold text-muted-foreground whitespace-nowrap tracking-wide uppercase">
               {logo.name}
             </span>
           </div>
