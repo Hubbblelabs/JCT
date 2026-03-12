@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Camera, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -125,15 +126,15 @@ export function CampusLife() {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.4, delay: i * 0.05 }}
-              className={`group relative cursor-pointer overflow-hidden rounded-2xl ${photo.span} aspect-[4/3] ${!showAllPhotos && i >= 4 ? "hidden md:block" : ""}`}
+              className={`group relative cursor-pointer overflow-hidden rounded-2xl ${photo.span} aspect-4/3 ${!showAllPhotos && i >= 4 ? "hidden md:block" : ""}`}
             >
-              <img
+              <Image
                 src={photo.src}
                 alt={photo.caption}
-                className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-                loading="lazy"
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-110"
               />
-              <div className="absolute inset-0 flex items-end bg-gradient-to-t from-black/70 via-black/10 to-transparent p-3 transition-opacity duration-300 md:p-5 md:opacity-0 md:group-hover:opacity-100">
+              <div className="absolute inset-0 flex items-end bg-linear-to-t from-black/70 via-black/10 to-transparent p-3 transition-opacity duration-300 md:p-5 md:opacity-0 md:group-hover:opacity-100">
                 <div className="flex items-center gap-2">
                   <Camera size={14} className="text-gold" />
                   <span className="font-sans text-sm font-medium text-white">

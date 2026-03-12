@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 
@@ -134,11 +135,14 @@ export function Testimonials() {
                   &ldquo;{t.quote}&rdquo;
                 </p>
                 <div className="border-border flex items-center gap-3 border-t pt-5">
-                  <img
-                    src={t.avatar}
-                    alt={t.name}
-                    className="border-gold/20 h-11 w-11 rounded-full border-2 object-cover"
-                  />
+                  <div className="relative h-11 w-11 shrink-0">
+                    <Image
+                      src={t.avatar}
+                      alt={t.name}
+                      fill
+                      className="border-gold/20 rounded-full border-2 object-cover"
+                    />
+                  </div>
                   <div>
                     <h4 className="text-navy font-sans text-sm font-semibold">
                       {t.name}

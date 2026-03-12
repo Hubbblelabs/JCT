@@ -30,7 +30,7 @@ export function Testimonials() {
             >
               <Quote className="mb-6 h-10 w-10 text-stone-300" />
               <p className="mb-8 flex-1 text-lg leading-relaxed font-medium text-[#800020]">
-                "{testy.quote}"
+                &ldquo;{testy.quote}&rdquo;
               </p>
 
               <div className="mt-auto flex items-center gap-4">

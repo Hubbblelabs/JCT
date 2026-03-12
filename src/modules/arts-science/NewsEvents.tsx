@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { newsUpdates, campusEvents } from "@/data/arts-science";
-import { ArrowRight, ChevronRight, Calendar, MapPin, Tag } from "lucide-react";
+import { ChevronRight, Calendar, MapPin, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function NewsEvents() {

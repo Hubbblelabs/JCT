@@ -5,7 +5,6 @@ import Image from "next/image";
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
@@ -15,8 +14,6 @@ import {
   Zap,
   Building2,
   Wrench,
-  GraduationCap,
-  BookOpen,
   Trophy,
   Users,
   Target,
@@ -469,7 +466,7 @@ export default function EngineeringPage() {
             <p className="leading-relaxed font-light text-stone-500">
               The Training & Placement Cell works year-round — aptitude
               coaching, mock interviews, resume workshops, and direct industry
-              connects. Here's who hires from us.
+              connects. Here&apos;s who hires from us.
             </p>
           </div>
 

@@ -23,7 +23,7 @@ export function ImageBreak() {
           className="max-w-2xl px-4 text-center"
         >
           <p className="font-serif text-3xl leading-snug font-light text-white italic drop-shadow-md md:text-4xl">
-            "The unexamined life is not worth living."
+            &ldquo;The unexamined life is not worth living.&rdquo;
           </p>
           <span className="mt-4 block text-sm font-bold tracking-widest text-[#D4AF37] uppercase drop-shadow-sm">
             — Socrates

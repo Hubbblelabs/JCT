@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Calendar, MapPin, ArrowRight, Clock } from "lucide-react";
-import Link from "next/link";
+import { MapPin, ArrowRight, Clock } from "lucide-react";
 
 const newsItems = [
   {
@@ -88,7 +87,7 @@ const categoryColors: Record<string, string> = {
 
 export function NewsEvents() {
   const [activeTab, setActiveTab] = useState<"news" | "events">("news");
-  const [showAllNews, setShowAllNews] = useState(false);
+  const [showAllNews] = useState(false);
 
   return (
     <section className="section-padding bg-white">

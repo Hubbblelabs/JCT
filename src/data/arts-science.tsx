@@ -3,8 +3,6 @@ import {
   Atom,
   BarChart3,
   Briefcase,
-  Languages,
-  FlaskConical,
   BookOpen,
   Feather,
   Lightbulb,

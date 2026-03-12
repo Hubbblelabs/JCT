@@ -306,8 +306,8 @@ export default function PolytechnicPage() {
               </span>
             </h3>
             <p className="text-lg leading-relaxed font-light text-stone-500">
-              Each diploma program is structured around what you'll actually be
-              able to do when you finish — not just what you'll know in theory.
+              Each diploma program is structured around what you&apos;ll actually be
+              able to do when you finish — not just what you&apos;ll know in theory.
             </p>
           </div>
 
@@ -341,7 +341,7 @@ export default function PolytechnicPage() {
 
                   <div className="mb-5">
                     <span className="mb-3 block text-[10px] font-bold tracking-[0.15em] text-amber-600 uppercase">
-                      What You'll Learn
+                      What You&apos;ll Learn
                     </span>
                     <div className="grid grid-cols-1 gap-2">
                       {prog.outcomes.slice(0, 3).map((outcome) => (

@@ -1,10 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { heroStats } from "@/data/arts-science";
 
 export function Hero() {
   return (
@@ -35,7 +32,7 @@ export function Hero() {
             <p className="mb-8 text-base leading-relaxed font-light text-white/90 md:text-lg">
               Join thousands of students who have transformed their careers
               through rigorous academics and real-world experience. Our campus
-              offers the foundation you need to lead in tomorrow's world.
+              offers the foundation you need to lead in tomorrow&apos;s world.
             </p>
 
             <div className="relative z-20 mb-16 flex flex-col gap-4 sm:flex-row lg:mb-0">
