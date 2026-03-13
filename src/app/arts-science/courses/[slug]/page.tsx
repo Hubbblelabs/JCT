@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -10,14 +11,36 @@ import {
   FileCheck,
 } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "@/components/ui/button";
 import * as motion from "framer-motion/client";
 import { Variants } from "framer-motion";
+
+export const dynamicParams = false;
 
 export function generateStaticParams() {
   return ugPrograms.map((course) => ({
     slug: course.slug,
   }));
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const course = ugPrograms.find((c) => c.slug === slug);
+  if (!course) return {};
+  return {
+    title: `${course.name} | JCT College of Arts & Science`,
+    description: course.desc,
+    openGraph: {
+      title: `${course.name} | JCT College of Arts & Science`,
+      description: course.desc,
+      type: "website",
+    },
+  };
 }
 
 // Fade in up animation variant
@@ -65,7 +88,7 @@ export default async function CoursePage({
         />
 
         {/* Large subtle glow */}
-        <div className="pointer-events-none absolute top-0 right-0 h-[800px] w-[800px] translate-x-1/3 -translate-y-1/2 rounded-full bg-[#D4AF37]/10 blur-[120px]" />
+        <div className="pointer-events-none absolute top-0 right-0 h-200 w-200 translate-x-1/3 -translate-y-1/2 rounded-full bg-[#D4AF37]/10 blur-[120px]" />
 
         <div className="relative z-10 container mx-auto px-4 md:px-6">
           <motion.div
@@ -120,35 +143,21 @@ export default async function CoursePage({
                 transition={{ duration: 0.6 }}
               >
                 <div className="mb-8 flex items-center gap-4">
-                  <div className="h-[2px] w-12 bg-[#D4AF37]"></div>
+                  <div className="h-0.5 w-12 bg-[#D4AF37]"></div>
                   <h2 className="font-serif text-3xl text-[#800020] md:text-4xl">
                     Program Overview
                   </h2>
                 </div>
 
                 <div className="prose prose-stone prose-lg mb-16 max-w-none space-y-6 text-[#2C2C2C]">
-                  <p className="text-xl leading-relaxed font-medium text-[#2C2C2C]">
-                    The {course.name} program at JCT College of Arts & Science
-                    is designed to equip students with both the theoretical
-                    foundations and the practical skills necessary for a
-                    successful career in the modern landscape.
-                  </p>
-                  <p className="leading-relaxed">
-                    Our curriculum is frequently updated in consultation with
-                    industry experts to ensure that our graduates are
-                    immediately employable and ready to contribute meaningfully
-                    in their chosen fields. Through a combination of rigorous
-                    coursework, hands-on projects, and real-world experiences,
-                    this {course.duration.toLowerCase()} degree challenges
-                    students to think critically and solve complex problems.
-                  </p>
-                  <p className="leading-relaxed">
-                    By fostering an environment of innovation and academic
-                    rigor, we prepare our students to become leaders and
-                    visionaries. You will learn from dedicated faculty who bring
-                    both academic excellence and industry experience into the
-                    classroom.
-                  </p>
+                  {course.longDesc.map((paragraph, i) => (
+                    <p
+                      key={i}
+                      className={i === 0 ? "text-xl leading-relaxed font-medium text-[#2C2C2C]" : "leading-relaxed"}
+                    >
+                      {paragraph}
+                    </p>
+                  ))}
                 </div>
               </motion.div>
 
@@ -163,15 +172,9 @@ export default async function CoursePage({
                     Key Learning Outcomes
                   </h3>
                   <ul className="space-y-6">
-                    {[
-                      "Understand the core principles and underlying theories governing the field.",
-                      "Develop strong analytical and problem-solving skills applied to practical scenarios.",
-                      "Grasp modern tools, technologies, and methodologies relevant to the industry.",
-                      "Build a professional portfolio through capstone projects and continuous assessment.",
-                      "Enhance communication and leadership abilities essential for professional success.",
-                    ].map((item, i) => (
+                    {course.outcomes.map((item, i) => (
                       <motion.li
-                        key={i}
+                        key={item.slice(0, 40)}
                         initial={{ opacity: 0, x: -10 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
@@ -254,15 +257,24 @@ export default async function CoursePage({
                     </div>
 
                     <div className="flex flex-col gap-4">
-                      <Button className="h-14 w-full rounded-xl bg-[#D4AF37] text-lg font-bold text-[#800020] shadow-md transition-all hover:-translate-y-0.5 hover:bg-[#B6952F] hover:shadow-lg">
+                      <Link
+                        href="/arts-science#admissions"
+                        className={cn(
+                          buttonVariants(),
+                          "h-14 w-full rounded-full border border-[#f1d892]/70 bg-linear-to-r from-[#f0ce74] to-[#D4AF37] text-lg font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
+                        )}
+                      >
                         Apply Now
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="h-14 w-full rounded-xl border-2 border-stone-200 text-lg font-bold text-[#800020] transition-all hover:border-[#800020] hover:bg-stone-50"
+                      </Link>
+                      <Link
+                        href={`/syllabus/${course.slug}.pdf`}
+                        className={cn(
+                          buttonVariants({ variant: "outline" }),
+                          "h-14 w-full rounded-full border-2 border-[#800020]/35 bg-white/80 text-lg font-bold text-[#800020] transition-all hover:-translate-y-0.5 hover:bg-white"
+                        )}
                       >
                         Download Syllabus
-                      </Button>
+                      </Link>
                     </div>
                   </div>
                 </motion.div>
@@ -290,12 +302,24 @@ export default async function CoursePage({
               rewarding career.
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <Button className="h-14 rounded-xl bg-[#800020] px-8 text-lg font-bold text-white shadow-lg transition-all hover:-translate-y-0.5 hover:bg-[#5e0017] hover:shadow-xl">
+              <Link
+                href="/arts-science#admissions"
+                className={cn(
+                  buttonVariants(),
+                  "h-14 rounded-full border border-[#800020] bg-[#800020] px-8 text-lg font-bold text-white shadow-[0_10px_24px_rgba(128,0,32,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#5e0017]"
+                )}
+              >
                 Start Your Application
-              </Button>
-              <Button className="h-14 rounded-xl border-2 border-[#800020] bg-transparent px-8 text-lg font-bold text-[#800020] transition-all hover:bg-[#800020]/10">
+              </Link>
+              <Link
+                href="/arts-science#contact"
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "h-14 rounded-full border-2 border-[#800020]/45 bg-white/40 px-8 text-lg font-bold text-[#800020] transition-all hover:-translate-y-0.5 hover:bg-white/70"
+                )}
+              >
                 Contact Admissions
-              </Button>
+              </Link>
             </div>
           </motion.div>
         </div>

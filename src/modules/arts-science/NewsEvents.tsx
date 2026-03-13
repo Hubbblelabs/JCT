@@ -48,7 +48,7 @@ export function NewsEvents() {
           </div>
 
           <div className="mt-12 flex justify-center">
-            <Button className="h-14 rounded-none border-none bg-[#D4AF37] px-8 font-bold text-[#800020] shadow-md hover:bg-[#b8962e]">
+            <Button className="h-14 rounded-full border border-[#f1d892]/70 bg-linear-to-r from-[#f0ce74] to-[#D4AF37] px-8 font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95">
               View all news
             </Button>
           </div>
@@ -78,12 +78,12 @@ export function NewsEvents() {
                       <MapPin className="h-4 w-4" /> {event.location}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Calendar className="h-4 w-4" /> {event.date}
+                      <Calendar className="h-4 w-4" /> {event.time}
                     </span>
                   </div>
                 </div>
                 <a
-                  href="#"
+                  href="/arts-science/events"
                   className="group flex shrink-0 items-center font-semibold text-[#800020] hover:underline"
                 >
                   View event{" "}
@@ -94,7 +94,7 @@ export function NewsEvents() {
           </div>
 
           <div className="mt-12 flex justify-center text-center">
-            <Button className="h-14 rounded-none border-none bg-[#D4AF37] px-8 font-bold text-[#800020] shadow-md hover:bg-[#b8962e]">
+            <Button className="h-14 rounded-full border border-[#f1d892]/70 bg-linear-to-r from-[#f0ce74] to-[#D4AF37] px-8 font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95">
               View all events
             </Button>
           </div>

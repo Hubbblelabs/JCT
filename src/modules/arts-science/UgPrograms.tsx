@@ -3,7 +3,6 @@
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { ugPrograms } from "@/data/arts-science";
 
 export function UgPrograms() {
@@ -60,19 +59,14 @@ export function UgPrograms() {
           ))}
         </div>
 
-        <div className="flex flex-col items-center gap-4 border-t border-stone-200 pt-10">
-          <Button
-            variant="outline"
-            className="h-14 w-full cursor-pointer rounded-none border-stone-300 bg-transparent px-8 text-[#2C2C2C] hover:bg-stone-50 sm:w-auto"
+        <div className="flex items-center justify-center gap-4 border-t border-stone-200 pt-10">
+          <Link
+            href="/arts-science/courses"
+            className="group inline-flex h-12 items-center gap-2 rounded-full bg-[#800020] px-8 font-semibold text-sm text-white shadow-[0_8px_20px_rgba(128,0,32,0.25)] transition-all hover:-translate-y-0.5 hover:bg-[#5e0017] hover:shadow-[0_12px_24px_rgba(128,0,32,0.3)]"
           >
-            Browse
-          </Button>
-          <a
-            href="#all"
-            className="mt-2 flex items-center text-sm font-semibold text-[#800020] hover:underline"
-          >
-            All &gt;
-          </a>
+            Browse all programs
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </Link>
         </div>
       </div>
     </section>

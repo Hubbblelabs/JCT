@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
 export function Hero() {
@@ -38,45 +39,36 @@ export function Hero() {
             <div className="relative z-20 mb-16 flex flex-col gap-4 sm:flex-row lg:mb-0">
               <Button
                 size="lg"
-                className="h-14 rounded-none bg-[#D4AF37] px-8 font-semibold text-[#800020] hover:bg-[#b8962e]"
+                className="h-14 rounded-full border border-[#f1d892]/60 bg-linear-to-r from-[#f0ce74] to-[#D4AF37] px-8 font-semibold text-[#70001b] shadow-[0_10px_25px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
               >
                 Explore
               </Button>
               <Button
                 variant="outline"
                 size="lg"
-                className="h-14 rounded-none border-white/30 bg-transparent px-8 font-semibold text-white hover:bg-white/10"
+                className="h-14 rounded-full border-2 border-white/50 bg-white/5 px-8 font-semibold text-white backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:bg-white/15"
               >
                 Learn
               </Button>
             </div>
           </motion.div>
 
-          {/* Right Column: Image Placeholder */}
+          {/* Right Column: Campus image */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-            className="relative flex aspect-square w-full shrink-0 flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm lg:aspect-[4/3]"
+            className="relative flex aspect-square w-full shrink-0 flex-col items-center justify-center overflow-hidden rounded-2xl border border-white/20 bg-white/10 backdrop-blur-sm lg:aspect-4/3"
           >
-            {/* Relume style image placeholder */}
-            <div className="text-white/40">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="64"
-                height="64"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
-                <circle cx="9" cy="9" r="2" />
-                <path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21" />
-              </svg>
-            </div>
+            <Image
+              src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1600&auto=format&fit=crop"
+              alt="Students collaborating on campus"
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 bg-linear-to-tr from-[#800020]/25 via-transparent to-[#D4AF37]/10" />
           </motion.div>
         </div>
       </div>

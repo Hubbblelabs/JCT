@@ -31,7 +31,7 @@ export function Distinction() {
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button
                 size="lg"
-                className="h-14 rounded-none border-none bg-[#D4AF37] px-8 font-bold text-[#800020] shadow-md hover:bg-[#b8962e]"
+                className="h-14 rounded-full border border-[#f1d892]/70 bg-linear-to-r from-[#f0ce74] to-[#D4AF37] px-8 font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
               >
                 Discover
               </Button>

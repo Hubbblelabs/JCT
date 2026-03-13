@@ -63,14 +63,14 @@ export function Admissions() {
           <div className="mb-12 flex flex-col justify-center gap-4 sm:flex-row">
             <Button
               size="lg"
-              className="h-14 rounded-2xl bg-[#D4AF37] px-10 font-bold text-[#800020] shadow-xl shadow-[#D4AF37]/20 transition-all hover:scale-105 hover:bg-[#b8962e] active:scale-95"
+              className="h-14 rounded-full border border-[#f1d892]/70 bg-linear-to-r from-[#f0ce74] to-[#D4AF37] px-10 font-bold text-[#70001b] shadow-[0_12px_28px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
             >
               Apply for Admission <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
             <Button
               variant="outline"
               size="lg"
-              className="h-14 rounded-2xl border-stone-200 px-10 font-bold text-[#800020] hover:bg-stone-50/80"
+              className="h-14 rounded-full border-2 border-[#800020]/35 bg-white/80 px-10 font-bold text-[#800020] transition-all hover:-translate-y-0.5 hover:bg-white"
             >
               Download Prospectus
             </Button>

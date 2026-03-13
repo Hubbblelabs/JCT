@@ -26,14 +26,14 @@ export function CTA() {
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button
                 size="lg"
-                className="h-14 w-full rounded-none bg-[#D4AF37] px-8 font-bold text-[#800020] shadow-xl hover:bg-[#b8962e] sm:w-auto"
+                className="h-14 w-full rounded-full border border-[#f1d892]/70 bg-linear-to-r from-[#f0ce74] to-[#D4AF37] px-8 font-bold text-[#70001b] shadow-[0_12px_28px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95 sm:w-auto"
               >
                 Apply
               </Button>
               <Button
                 variant="outline"
                 size="lg"
-                className="h-14 w-full rounded-none border-white/30 bg-transparent px-8 font-bold text-white hover:bg-white/10 sm:w-auto"
+                className="h-14 w-full rounded-full border-2 border-white/55 bg-white/5 px-8 font-bold text-white backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:bg-white/15 sm:w-auto"
               >
                 Visit
               </Button>
