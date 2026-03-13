@@ -189,6 +189,64 @@ h6 {
   display: none;
 }
 
+/* ─── Themed Scrollbar ─── */
+:root {
+  --scrollbar-size: 11px;
+  --scrollbar-track: color-mix(in srgb, var(--color-navy-mid) 16%, transparent);
+  --scrollbar-thumb: var(--color-gold);
+  --scrollbar-thumb-hover: var(--color-gold-light);
+  --scrollbar-corner: transparent;
+}
+
+:root[data-college-theme="engineering"] {
+  --scrollbar-track: color-mix(in srgb, #0f172a 18%, transparent);
+  --scrollbar-thumb: #fbbf24;
+  --scrollbar-thumb-hover: #f59e0b;
+}
+
+:root[data-college-theme="arts-science"] {
+  --scrollbar-track: color-mix(in srgb, #800020 18%, transparent);
+  --scrollbar-thumb: #d4af37;
+  --scrollbar-thumb-hover: #e6c85c;
+}
+
+:root[data-college-theme="polytechnic"] {
+  --scrollbar-track: color-mix(in srgb, #1a237e 18%, transparent);
+  --scrollbar-thumb: #ffb300;
+  --scrollbar-thumb-hover: #ffc533;
+}
+
+html,
+body,
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+  height: var(--scrollbar-size);
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb);
+  border-radius: 9999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--scrollbar-corner);
+}
+
 /* ─── Institution Themes ─── */
 .polytechnic-theme {
   --color-primary: #1a237e;

@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState, type ElementType } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useRef, useState, type ElementType } from "react";
+import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -18,13 +18,13 @@ import {
   Newspaper,
   TrendingUp,
   MessageSquare,
-  Menu,
-  X,
   ChevronRight,
   CheckCircle2,
   Star,
   Microscope,
   Quote,
+  ArrowLeft,
+  Trophy,
 } from "lucide-react";
 import type { DepartmentData } from "@/types/department";
 import { Navbar } from "@/components/layout/Navbar";
@@ -54,33 +54,83 @@ const SIDEBAR_ITEMS = [
   { id: "feedback", label: "Feedback", icon: MessageSquare },
 ] as const;
 
+function FadeUp({
+  children,
+  delay = 0,
+  className,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  className?: string;
+}) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 28 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 function SectionHeading({
   id,
   icon: Icon,
   title,
   accentColor,
+  index,
 }: {
   id: string;
   icon: ElementType;
   title: string;
   accentColor: string;
+  index: number;
 }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-60px" });
   return (
-    <div id={id} className="mb-8 scroll-mt-28">
-      <div className="mb-3 flex items-center gap-3">
+    <motion.div
+      ref={ref}
+      id={id}
+      initial={{ opacity: 0, y: 20 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className="mb-10 scroll-mt-28"
+    >
+      <div className="flex items-start gap-4">
         <div
-          className="flex h-10 w-10 items-center justify-center rounded-xl"
-          style={{ backgroundColor: `${accentColor}18` }}
+          className="mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl"
+          style={{
+            backgroundColor: `${accentColor}15`,
+            border: `1.5px solid ${accentColor}30`,
+          }}
         >
           <Icon className="h-5 w-5" style={{ color: accentColor }} />
         </div>
-        <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
+        <div className="min-w-0 flex-1">
+          <p
+            className="text-[10px] font-black uppercase tracking-[0.18em]"
+            style={{ color: `${accentColor}90` }}
+          >
+            Section {String(index).padStart(2, "0")}
+          </p>
+          <h2 className="font-serif text-2xl font-bold tracking-tight text-gray-900 md:text-3xl">
+            {title}
+          </h2>
+        </div>
       </div>
       <div
-        className="h-0.5 w-16 rounded-full"
-        style={{ backgroundColor: accentColor }}
+        className="mt-4 h-px w-full"
+        style={{
+          background: `linear-gradient(to right, ${accentColor}45, ${accentColor}10, transparent)`,
+        }}
       />
-    </div>
+    </motion.div>
   );
 }
 
@@ -101,20 +151,36 @@ function SidebarItem({
   return (
     <button
       onClick={onClick}
-      className={`mb-0.5 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all ${
+      className="group mb-0.5 flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all duration-200"
+      style={
         active
-          ? "font-semibold text-white shadow-md"
-          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-      }`}
-      style={active ? { backgroundColor: accentColor } : {}}
+          ? {
+              backgroundColor: `${accentColor}20`,
+              borderLeft: `3px solid ${accentColor}`,
+            }
+          : { borderLeft: "3px solid transparent" }
+      }
     >
       <span
-        className={`w-5 shrink-0 text-xs font-bold ${active ? "text-white/50" : "text-gray-300"}`}
+        className="w-5 shrink-0 text-[10px] font-black tabular-nums"
+        style={active ? { color: accentColor } : { color: "rgba(255,255,255,0.25)" }}
       >
         {String(index).padStart(2, "0")}
       </span>
-      <Icon className="h-4 w-4 shrink-0" />
-      <span className="text-sm leading-tight">{item.label}</span>
+      <Icon
+        className="h-3.5 w-3.5 shrink-0 transition-colors"
+        style={active ? { color: accentColor } : { color: "rgba(255,255,255,0.4)" }}
+      />
+      <span
+        className="text-xs leading-tight transition-colors"
+        style={
+          active
+            ? { color: accentColor, fontWeight: 600 }
+            : { color: "rgba(255,255,255,0.55)", fontWeight: 400 }
+        }
+      >
+        {item.label}
+      </span>
     </button>
   );
 }
@@ -127,27 +193,30 @@ function BoardTable({
   accentColor: string;
 }) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
+    <div className="overflow-x-auto rounded-2xl border border-border bg-white shadow-sm">
       <table className="w-full text-sm">
         <thead>
-          <tr style={{ backgroundColor: `${accentColor}12` }}>
+          <tr style={{ backgroundColor: `${accentColor}0d` }}>
             {["Name", "Designation", "Organization", "Role"].map((h) => (
-              <th key={h} className="px-4 py-3 text-left font-bold text-gray-700">
+              <th
+                key={h}
+                className="px-5 py-3.5 text-left text-[11px] font-black uppercase tracking-wider text-gray-500"
+              >
                 {h}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody>
+        <tbody className="divide-y divide-gray-50">
           {members.map((m, i) => (
-            <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/60"}>
-              <td className="px-4 py-3 font-medium text-gray-900">{m.name}</td>
-              <td className="px-4 py-3 text-gray-700">{m.designation}</td>
-              <td className="px-4 py-3 text-gray-600">{m.organization}</td>
-              <td className="px-4 py-3">
+            <tr key={i} className="transition-colors hover:bg-surface/60">
+              <td className="px-5 py-3.5 font-semibold text-gray-900">{m.name}</td>
+              <td className="px-5 py-3.5 text-gray-600">{m.designation}</td>
+              <td className="px-5 py-3.5 text-gray-500">{m.organization}</td>
+              <td className="px-5 py-3.5">
                 {m.role && (
                   <span
-                    className="rounded-full px-2 py-0.5 text-xs font-semibold text-white"
+                    className="rounded-full px-2.5 py-0.5 text-xs font-semibold text-white"
                     style={{ backgroundColor: accentColor }}
                   >
                     {m.role}
@@ -172,28 +241,64 @@ function AchievementGrid({
   return (
     <div className="grid gap-4 md:grid-cols-2">
       {achievements.map((a, i) => (
-        <div
-          key={i}
-          className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm"
-        >
-          <div className="flex items-start gap-3">
+        <FadeUp key={i} delay={i * 0.05}>
+          <div className="relative overflow-hidden rounded-2xl border border-border bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
             <div
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-              style={{ backgroundColor: `${accentColor}15` }}
-            >
-              <Award className="h-5 w-5" style={{ color: accentColor }} />
-            </div>
-            <div>
-              <span className="text-xs font-bold" style={{ color: accentColor }}>
-                {a.year}
-              </span>
-              <h4 className="mt-0.5 font-bold text-gray-900">{a.name}</h4>
-              <p className="text-sm font-medium text-gray-700">{a.title}</p>
-              <p className="mt-1 text-xs text-gray-500">{a.detail}</p>
+              className="pointer-events-none absolute right-0 top-0 h-20 w-20 rounded-bl-[2.5rem] opacity-[0.06]"
+              style={{ backgroundColor: accentColor }}
+            />
+            <div className="flex items-start gap-4">
+              <div
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+                style={{
+                  backgroundColor: `${accentColor}12`,
+                  border: `1px solid ${accentColor}25`,
+                }}
+              >
+                <Trophy className="h-5 w-5" style={{ color: accentColor }} />
+              </div>
+              <div className="flex-1">
+                <span
+                  className="rounded-full px-2.5 py-0.5 text-xs font-bold text-white"
+                  style={{ backgroundColor: accentColor }}
+                >
+                  {a.year}
+                </span>
+                <h4 className="mt-1.5 font-bold text-gray-900">{a.name}</h4>
+                <p className="text-sm font-medium text-gray-700">{a.title}</p>
+                <p className="mt-1 text-xs text-gray-400">{a.detail}</p>
+              </div>
             </div>
           </div>
-        </div>
+        </FadeUp>
       ))}
+    </div>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  accentColor,
+}: {
+  label: string;
+  value: string | number;
+  accentColor: string;
+}) {
+  return (
+    <div
+      className="rounded-2xl border bg-white p-5 text-center shadow-sm"
+      style={{ borderColor: `${accentColor}22` }}
+    >
+      <p
+        className="font-serif text-2xl font-black md:text-3xl"
+        style={{ color: accentColor }}
+      >
+        {value}
+      </p>
+      <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+        {label}
+      </p>
     </div>
   );
 }
@@ -208,9 +313,9 @@ export function DepartmentPageLayout({
   backLabel: string;
 }) {
   const [activeId, setActiveId] = useState<string>("about");
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [activeSemester, setActiveSemester] = useState(0);
   const ac = dept.accentColor;
+  const bg = dept.bgColor;
 
   useEffect(() => {
     const observers: IntersectionObserver[] = [];
@@ -229,19 +334,37 @@ export function DepartmentPageLayout({
     return () => observers.forEach((o) => o.disconnect());
   }, []);
 
+  useEffect(() => {
+    const root = document.documentElement;
+    const previous = root.dataset.collegeTheme;
+    root.dataset.collegeTheme = dept.college;
+    return () => {
+      if (previous) {
+        root.dataset.collegeTheme = previous;
+      } else {
+        delete root.dataset.collegeTheme;
+      }
+    };
+  }, [dept.college]);
+
   function scrollTo(id: string) {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-    setMobileOpen(false);
   }
+
+  const collegeLabel =
+    dept.college === "engineering"
+      ? "B.E. Department"
+      : dept.college === "arts-science"
+        ? "UG Program"
+        : "Diploma Program";
 
   return (
     <>
       <Navbar />
 
-      {/* ── Hero ── */}
       <header
-        className="relative overflow-hidden py-24 pt-36"
-        style={{ backgroundColor: dept.bgColor }}
+        className="relative overflow-hidden"
+        style={{ backgroundColor: bg, minHeight: "520px" }}
       >
         <div className="absolute inset-0 z-0">
           <Image
@@ -249,112 +372,177 @@ export function DepartmentPageLayout({
             alt={dept.name}
             fill
             sizes="100vw"
-            className="object-cover opacity-20"
+            className="object-cover opacity-[0.14]"
           />
-          <div className="absolute inset-0 bg-linear-to-r from-black/70 via-black/50 to-black/20" />
-        </div>
-        <div className="relative z-10 container mx-auto px-4 md:px-6">
-          <Link
-            href={backHref}
-            className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-white/70 transition-colors hover:text-white"
-          >
-            ← {backLabel}
-          </Link>
+          <div className="absolute inset-0 bg-linear-to-br from-black/80 via-black/55 to-black/15" />
           <div
-            className="mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-bold tracking-widest uppercase"
+            className="absolute -bottom-32 -right-32 h-112 w-md rounded-full opacity-20 blur-3xl"
+            style={{ backgroundColor: ac }}
+          />
+          <div
+            className="absolute -left-16 top-1/3 h-64 w-64 rounded-full opacity-10 blur-2xl"
+            style={{ backgroundColor: ac }}
+          />
+        </div>
+
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div
+            className="absolute right-0 top-0 h-full w-2/5 opacity-[0.04]"
             style={{
-              backgroundColor: `${ac}25`,
-              color: ac,
-              borderColor: `${ac}40`,
+              background: `repeating-linear-gradient(-55deg, ${ac}, ${ac} 1px, transparent 1px, transparent 18px)`,
             }}
+          />
+        </div>
+
+        <div className="relative z-10 container mx-auto px-4 py-28 pt-40 md:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            {dept.college === "engineering"
-              ? "B.E. Department"
-              : dept.college === "arts-science"
-                ? "UG Program"
-                : "Diploma Program"}{" "}
-            · {dept.about.intake} Intake
-          </div>
-          <h1 className="mb-4 text-4xl font-black leading-tight text-white md:text-5xl lg:text-6xl">
-            {dept.name}
-          </h1>
-          <div className="flex flex-wrap gap-3 text-sm text-white/70">
-            <span>Est. {dept.about.established}</span>
-            <span>·</span>
-            <span>{dept.about.affiliation}</span>
-            <span>·</span>
-            <span>{dept.about.accreditation}</span>
+            <Link
+              href={backHref}
+              className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-2 text-xs font-semibold text-white/70 backdrop-blur-sm transition-all hover:bg-white/14 hover:text-white"
+            >
+              <ArrowLeft className="h-3.5 w-3.5" />
+              {backLabel}
+            </Link>
+          </motion.div>
+
+          <div className="grid gap-10 lg:grid-cols-[1fr_auto] lg:items-end">
+            <div className="max-w-3xl">
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+              >
+                <span
+                  className="mb-5 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em]"
+                  style={{
+                    backgroundColor: `${ac}20`,
+                    color: ac,
+                    borderColor: `${ac}35`,
+                  }}
+                >
+                  <span
+                    className="h-1.5 w-1.5 animate-pulse rounded-full"
+                    style={{ backgroundColor: ac }}
+                  />
+                  {collegeLabel} · {dept.about.intake} Seats
+                </span>
+              </motion.div>
+
+              <motion.h1
+                initial={{ opacity: 0, y: 32 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                className="mb-5 font-serif text-4xl font-black leading-[1.04] tracking-tight text-white md:text-5xl lg:text-6xl"
+              >
+                {dept.name}
+              </motion.h1>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.38 }}
+                className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/55"
+              >
+                {[
+                  dept.about.established && `Est. ${dept.about.established}`,
+                  dept.about.affiliation,
+                  dept.about.accreditation,
+                ]
+                  .filter(Boolean)
+                  .map((label, i) => (
+                    <span key={i} className="flex items-center gap-2">
+                      {i > 0 && <span className="h-1 w-1 rounded-full bg-white/30" />}
+                      {label}
+                    </span>
+                  ))}
+              </motion.div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex gap-3 lg:flex-col"
+            >
+              {[
+                { value: `${dept.about.intake}`, label: "Annual Intake" },
+                { value: dept.about.accreditation, label: "Accreditation" },
+              ].map((s) => (
+                <div
+                  key={s.label}
+                  className="rounded-2xl border border-white/10 bg-white/8 px-5 py-4 backdrop-blur-sm"
+                >
+                  <p
+                    className="font-serif text-xl font-black text-white"
+                    style={{ textShadow: `0 0 24px ${ac}70` }}
+                  >
+                    {s.value}
+                  </p>
+                  <p className="mt-0.5 text-xs text-white/45">{s.label}</p>
+                </div>
+              ))}
+            </motion.div>
           </div>
         </div>
+
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-surface to-transparent" />
       </header>
 
-      {/* ── Mobile topbar ── */}
-      <div className="sticky top-16 z-40 flex items-center justify-between border-b border-gray-100 bg-white px-4 py-3 lg:hidden">
-        <span className="text-sm font-semibold text-gray-700">
-          {SIDEBAR_ITEMS.find((i) => i.id === activeId)?.label ?? "Navigate"}
-        </span>
-        <button
-          onClick={() => setMobileOpen(true)}
-          className="flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-semibold text-white"
-          style={{ backgroundColor: ac }}
-        >
-          <Menu className="h-4 w-4" /> Sections
-        </button>
+      <div
+        className="sticky top-16 z-40 border-b border-border bg-white/95 backdrop-blur-md lg:hidden"
+        style={{ scrollbarWidth: "none" }}
+      >
+        <div className="flex items-center gap-1 overflow-x-auto px-4 py-2.5">
+          {SIDEBAR_ITEMS.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => scrollTo(item.id)}
+              className="shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-all"
+              style={
+                activeId === item.id
+                  ? { backgroundColor: ac, color: "#fff" }
+                  : { color: "#6b7280" }
+              }
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* ── Mobile drawer ── */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 z-50 bg-black/50 lg:hidden"
-              onClick={() => setMobileOpen(false)}
-            />
-            <motion.aside
-              initial={{ x: "-100%" }}
-              animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
-              transition={{ type: "spring", damping: 28, stiffness: 320 }}
-              className="fixed bottom-0 left-0 top-0 z-50 w-80 overflow-y-auto bg-white shadow-2xl lg:hidden"
-            >
-              <div className="flex items-center justify-between border-b p-4">
-                <h3 className="font-bold text-gray-900">Department Sections</h3>
-                <button
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-lg p-2 hover:bg-gray-100"
-                >
-                  <X className="h-5 w-5" />
-                </button>
-              </div>
-              <nav className="p-3">
-                {SIDEBAR_ITEMS.map((item, i) => (
-                  <SidebarItem
-                    key={item.id}
-                    item={item}
-                    active={activeId === item.id}
-                    accentColor={ac}
-                    index={i + 1}
-                    onClick={() => scrollTo(item.id)}
-                  />
-                ))}
-              </nav>
-            </motion.aside>
-          </>
-        )}
-      </AnimatePresence>
-
-      <div className="flex min-h-screen bg-gray-50">
-        {/* ── Desktop sidebar ── */}
+      <div className="flex min-h-screen bg-surface">
         <aside className="hidden w-72 shrink-0 lg:block">
-          <div className="sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto border-r border-gray-100 bg-white py-4">
-            <div className="mb-1 px-4 pb-3">
-              <p className="text-xs font-bold uppercase tracking-widest text-gray-400">
-                Department Sections
+          <div
+            className="sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto py-5"
+            style={{ backgroundColor: bg }}
+          >
+            <div className="mb-3 px-5">
+              <p
+                className="text-[10px] font-black uppercase tracking-[0.2em]"
+                style={{ color: `${ac}80` }}
+              >
+                {dept.college === "engineering"
+                  ? "B.E."
+                  : dept.college === "arts-science"
+                    ? "UG"
+                    : "Diploma"}
+                {" · "}
+                <span style={{ color: ac }}>
+                  {dept.name.split(" ").slice(0, 3).join(" ")}
+                </span>
               </p>
+              <div
+                className="mt-2 h-px"
+                style={{
+                  background: `linear-gradient(to right, ${ac}40, transparent)`,
+                }}
+              />
             </div>
+
             <nav className="px-3">
               {SIDEBAR_ITEMS.map((item, i) => (
                 <SidebarItem
@@ -370,42 +558,68 @@ export function DepartmentPageLayout({
           </div>
         </aside>
 
-        {/* ── Main content ── */}
-        <main className="min-w-0 flex-1 px-4 py-12 md:px-8 lg:px-12">
+        <main className="min-w-0 flex-1 px-4 py-14 md:px-8 lg:px-14">
+          <section className="mb-20">
+            <SectionHeading
+              id="about"
+              icon={BookOpen}
+              title="About the Department"
+              accentColor={ac}
+              index={1}
+            />
 
-          {/* 1 ── About */}
-          <section className="mb-16">
-            <SectionHeading id="about" icon={BookOpen} title="About the Department" accentColor={ac} />
-            <div className="space-y-4 leading-relaxed text-gray-700">
-              {dept.about.paragraphs.map((p, i) => <p key={i}>{p}</p>)}
-            </div>
-            <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-              {[
-                { label: "Established", value: dept.about.established },
-                { label: "Intake", value: `${dept.about.intake} Seats` },
-                { label: "Accreditation", value: dept.about.accreditation },
-                { label: "Affiliation", value: dept.about.affiliation },
-              ].map((s) => (
-                <div
-                  key={s.label}
-                  className="rounded-xl border border-gray-100 bg-white p-4 text-center shadow-sm"
-                >
-                  <p className="text-lg font-black text-gray-900">{s.value}</p>
-                  <p className="mt-1 text-xs text-gray-500">{s.label}</p>
+            <FadeUp delay={0.05}>
+              <div className="mb-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                {[
+                  { label: "Established", value: dept.about.established },
+                  { label: "Annual Intake", value: dept.about.intake },
+                  { label: "Accreditation", value: dept.about.accreditation },
+                  { label: "Affiliation", value: dept.about.affiliation },
+                ].map((s) => (
+                  <StatCard
+                    key={s.label}
+                    label={s.label}
+                    value={s.value}
+                    accentColor={ac}
+                  />
+                ))}
+              </div>
+            </FadeUp>
+
+            <FadeUp delay={0.12}>
+              <div className="rounded-2xl border border-border bg-white p-6 shadow-sm md:p-8">
+                <div className="space-y-4 leading-relaxed text-gray-700">
+                  {dept.about.paragraphs.map((p, i) => (
+                    <p key={i}>{p}</p>
+                  ))}
                 </div>
-              ))}
-            </div>
+              </div>
+            </FadeUp>
           </section>
 
-          {/* 2 ── HoD's Desk */}
-          <section className="mb-16">
-            <SectionHeading id="hod" icon={GraduationCap} title="HoD's Desk" accentColor={ac} />
-            <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm md:p-8">
-              <div className="flex flex-col gap-6 md:flex-row md:items-start">
-                <div className="shrink-0 text-center">
+          <section className="mb-20">
+            <SectionHeading
+              id="hod"
+              icon={GraduationCap}
+              title="HoD's Desk"
+              accentColor={ac}
+              index={2}
+            />
+
+            <FadeUp delay={0.08}>
+              <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+                <div
+                  className="flex flex-wrap items-center gap-4 px-6 py-5"
+                  style={{
+                    background: `linear-gradient(135deg, ${bg} 0%, color-mix(in srgb, ${bg} 80%, transparent) 100%)`,
+                  }}
+                >
                   <div
-                    className="mx-auto flex h-24 w-24 items-center justify-center rounded-2xl text-3xl font-black text-white"
-                    style={{ backgroundColor: ac }}
+                    className="flex h-16 w-16 items-center justify-center rounded-2xl text-2xl font-black text-white shadow-lg"
+                    style={{
+                      backgroundColor: ac,
+                      boxShadow: `0 8px 24px ${ac}50`,
+                    }}
                   >
                     {dept.hod.name
                       .split(" ")
@@ -413,468 +627,663 @@ export function DepartmentPageLayout({
                       .join("")
                       .slice(0, 2)}
                   </div>
-                  <p className="mt-3 text-sm font-bold text-gray-900">{dept.hod.name}</p>
-                  <p className="text-xs text-gray-500">{dept.hod.designation}</p>
-                  <p className="text-xs text-gray-400">{dept.hod.qualification}</p>
-                  <p className="mt-1 text-xs font-semibold" style={{ color: ac }}>
+                  <div className="flex-1">
+                    <p className="text-lg font-bold text-white">{dept.hod.name}</p>
+                    <p className="text-sm text-white/70">{dept.hod.designation}</p>
+                    <p className="text-xs text-white/50">{dept.hod.qualification}</p>
+                  </div>
+                  <span
+                    className="shrink-0 rounded-full px-4 py-1.5 text-xs font-bold"
+                    style={{ backgroundColor: `${ac}30`, color: ac }}
+                  >
                     {dept.hod.experience}
-                  </p>
+                  </span>
                 </div>
-                <div className="flex-1">
-                  <Quote className="mb-3 h-7 w-7 opacity-20" style={{ color: ac }} />
-                  <div className="space-y-3 leading-relaxed text-gray-700">
-                    {dept.hod.message.map((para, i) => <p key={i}>{para}</p>)}
+
+                <div className="px-6 py-6 md:px-8 md:py-8">
+                  <Quote className="mb-4 h-8 w-8 opacity-10" style={{ color: ac }} />
+                  <div className="space-y-4 leading-relaxed text-gray-700">
+                    {dept.hod.message.map((para, i) => (
+                      <p key={i}>{para}</p>
+                    ))}
                   </div>
                 </div>
               </div>
-            </div>
+            </FadeUp>
           </section>
 
-          {/* 3 ── Vision & Mission */}
-          <section className="mb-16">
-            <SectionHeading id="vision-mission" icon={Target} title="Vision & Mission" accentColor={ac} />
-            <div className="grid gap-6 md:grid-cols-2">
-              <div
-                className="rounded-2xl p-6 text-white"
-                style={{ backgroundColor: ac }}
-              >
-                <p className="mb-3 text-xs font-bold uppercase tracking-widest opacity-70">
-                  Vision
-                </p>
-                <p className="text-lg font-semibold leading-relaxed">
-                  {dept.visionMission.vision}
-                </p>
-              </div>
-              <div className="rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
-                <p
-                  className="mb-3 text-xs font-bold uppercase tracking-widest"
-                  style={{ color: ac }}
-                >
-                  Mission
-                </p>
-                <ul className="space-y-2">
-                  {dept.visionMission.mission.map((m, i) => (
-                    <li key={i} className="flex gap-2 text-sm text-gray-700">
-                      <CheckCircle2
-                        className="mt-0.5 h-4 w-4 shrink-0"
-                        style={{ color: ac }}
-                      />
-                      {m}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </section>
+          <section className="mb-20">
+            <SectionHeading
+              id="vision-mission"
+              icon={Target}
+              title="Vision & Mission"
+              accentColor={ac}
+              index={3}
+            />
 
-          {/* 4 ── Program Outcomes */}
-          <section className="mb-16">
-            <SectionHeading id="program-outcomes" icon={Award} title="Program Outcomes (POs)" accentColor={ac} />
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-              {dept.programOutcomes.map((po) => (
+            <div className="grid gap-5 md:grid-cols-2">
+              <FadeUp delay={0.08}>
                 <div
+                  className="h-full rounded-2xl p-6 text-white"
+                  style={{
+                    background: `linear-gradient(135deg, ${bg} 0%, color-mix(in srgb, ${bg} 85%, black) 100%)`,
+                  }}
+                >
+                  <div
+                    className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1 text-[11px] font-black uppercase tracking-widest"
+                    style={{ color: ac }}
+                  >
+                    <Target className="h-3 w-3" />
+                    Vision
+                  </div>
+                  <p className="text-lg font-medium leading-relaxed">
+                    {dept.visionMission.vision}
+                  </p>
+                </div>
+              </FadeUp>
+
+              <FadeUp delay={0.14}>
+                <div className="h-full rounded-2xl border border-border bg-white p-6 shadow-sm">
+                  <div
+                    className="mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-widest"
+                    style={{
+                      color: ac,
+                      borderColor: `${ac}30`,
+                      backgroundColor: `${ac}08`,
+                    }}
+                  >
+                    <CheckCircle2 className="h-3 w-3" />
+                    Mission
+                  </div>
+                  <ul className="space-y-3">
+                    {dept.visionMission.mission.map((m, i) => (
+                      <li key={i} className="flex gap-3 text-sm text-gray-700">
+                        <div
+                          className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black text-white"
+                          style={{ backgroundColor: ac }}
+                        >
+                          {i + 1}
+                        </div>
+                        {m}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </FadeUp>
+            </div>
+          </section>
+
+          <section className="mb-20">
+            <SectionHeading
+              id="program-outcomes"
+              icon={Award}
+              title="Program Outcomes (POs)"
+              accentColor={ac}
+              index={4}
+            />
+
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {dept.programOutcomes.map((po, idx) => (
+                <motion.div
                   key={po.code}
-                  className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm"
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.45, delay: idx * 0.04 }}
+                  className="rounded-2xl border border-border bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <span
-                    className="mb-2 inline-block rounded-md px-2 py-0.5 text-xs font-bold text-white"
+                    className="mb-3 inline-block rounded-lg px-2.5 py-0.5 text-xs font-black text-white"
                     style={{ backgroundColor: ac }}
                   >
                     {po.code}
                   </span>
-                  <h4 className="mb-1 font-bold text-gray-900">{po.title}</h4>
-                  <p className="text-sm text-gray-600">{po.description}</p>
-                </div>
+                  <h4 className="mb-1.5 font-bold text-gray-900">{po.title}</h4>
+                  <p className="text-sm leading-relaxed text-gray-500">{po.description}</p>
+                </motion.div>
               ))}
             </div>
           </section>
 
-          {/* 5 ── Advisory Board */}
-          <section className="mb-16">
-            <SectionHeading id="advisory-board" icon={Users} title="Department Advisory Board (DAB)" accentColor={ac} />
-            <BoardTable members={dept.advisoryBoard} accentColor={ac} />
+          <section className="mb-20">
+            <SectionHeading
+              id="advisory-board"
+              icon={Users}
+              title="Department Advisory Board (DAB)"
+              accentColor={ac}
+              index={5}
+            />
+            <FadeUp delay={0.08}>
+              <BoardTable members={dept.advisoryBoard} accentColor={ac} />
+            </FadeUp>
           </section>
 
-          {/* 6 ── PAC */}
-          <section className="mb-16">
-            <SectionHeading id="pac" icon={Clipboard} title="Program Assessment Committee (PAC)" accentColor={ac} />
-            <BoardTable members={dept.pac} accentColor={ac} />
+          <section className="mb-20">
+            <SectionHeading
+              id="pac"
+              icon={Clipboard}
+              title="Program Assessment Committee (PAC)"
+              accentColor={ac}
+              index={6}
+            />
+            <FadeUp delay={0.08}>
+              <BoardTable members={dept.pac} accentColor={ac} />
+            </FadeUp>
           </section>
 
-          {/* 7 ── BOS */}
-          <section className="mb-16">
-            <SectionHeading id="bos" icon={FileText} title="Board of Studies (BOS)" accentColor={ac} />
-            <BoardTable members={dept.bos} accentColor={ac} />
+          <section className="mb-20">
+            <SectionHeading
+              id="bos"
+              icon={FileText}
+              title="Board of Studies (BOS)"
+              accentColor={ac}
+              index={7}
+            />
+            <FadeUp delay={0.08}>
+              <BoardTable members={dept.bos} accentColor={ac} />
+            </FadeUp>
           </section>
 
-          {/* 8 ── Curriculum */}
-          <section className="mb-16">
-            <SectionHeading id="curriculum" icon={BookOpen} title="Curriculum & Syllabus" accentColor={ac} />
-            <div className="mb-5 flex flex-wrap gap-2">
-              {dept.curriculum.map((sem, i) => (
-                <button
-                  key={sem.semester}
-                  onClick={() => setActiveSemester(i)}
-                  className={`rounded-lg px-4 py-2 text-sm font-semibold transition-all ${
-                    activeSemester === i
-                      ? "text-white shadow-md"
-                      : "border border-gray-200 bg-white text-gray-600 hover:border-gray-300"
-                  }`}
-                  style={activeSemester === i ? { backgroundColor: ac } : {}}
-                >
-                  Semester {sem.semester}
-                </button>
-              ))}
-            </div>
-            {dept.curriculum[activeSemester] && (
-              <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr style={{ backgroundColor: `${ac}10` }}>
-                      {["Code", "Subject", "Credits", "Type"].map((h) => (
-                        <th key={h} className="px-4 py-3 text-left font-bold text-gray-700">
-                          {h}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {dept.curriculum[activeSemester].subjects.map((sub, i) => (
-                      <tr
-                        key={sub.code}
-                        className={i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}
-                      >
-                        <td className="px-4 py-3 font-mono text-xs text-gray-500">
-                          {sub.code}
-                        </td>
-                        <td className="px-4 py-3 font-medium text-gray-900">
-                          {sub.name}
-                        </td>
-                        <td className="px-4 py-3 text-center text-gray-700">
-                          {sub.credits}
-                        </td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
-                              sub.type === "Lab"
-                                ? "bg-green-100 text-green-700"
-                                : sub.type === "Elective"
-                                  ? "bg-purple-100 text-purple-700"
-                                  : sub.type === "Project"
-                                    ? "bg-orange-100 text-orange-700"
-                                    : "bg-blue-100 text-blue-700"
-                            }`}
-                          >
-                            {sub.type}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+          <section className="mb-20">
+            <SectionHeading
+              id="curriculum"
+              icon={BookOpen}
+              title="Curriculum & Syllabus"
+              accentColor={ac}
+              index={8}
+            />
+
+            <FadeUp delay={0.06}>
+              <div className="mb-5 flex flex-wrap gap-2">
+                {dept.curriculum.map((sem, i) => (
+                  <button
+                    key={sem.semester}
+                    onClick={() => setActiveSemester(i)}
+                    className="rounded-xl px-4 py-2 text-sm font-semibold transition-all"
+                    style={
+                      activeSemester === i
+                        ? {
+                            backgroundColor: ac,
+                            color: "#fff",
+                            boxShadow: `0 4px 14px ${ac}40`,
+                          }
+                        : {
+                            border: "1px solid var(--color-border)",
+                            backgroundColor: "#fff",
+                            color: "#4b5563",
+                          }
+                    }
+                  >
+                    Sem {sem.semester}
+                  </button>
+                ))}
               </div>
-            )}
+            </FadeUp>
+
+            <FadeUp delay={0.12}>
+              {dept.curriculum[activeSemester] && (
+                <div className="overflow-x-auto rounded-2xl border border-border bg-white shadow-sm">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr style={{ backgroundColor: `${ac}0d` }}>
+                        {["Code", "Subject", "Credits", "Type"].map((h) => (
+                          <th
+                            key={h}
+                            className="px-5 py-3.5 text-left text-[11px] font-black uppercase tracking-wider text-gray-500"
+                          >
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {dept.curriculum[activeSemester].subjects.map((sub) => (
+                        <tr key={sub.code} className="transition-colors hover:bg-surface/40">
+                          <td className="px-5 py-3.5 font-mono text-xs text-gray-400">
+                            {sub.code}
+                          </td>
+                          <td className="px-5 py-3.5 font-medium text-gray-900">
+                            {sub.name}
+                          </td>
+                          <td
+                            className="px-5 py-3.5 text-center font-bold"
+                            style={{ color: ac }}
+                          >
+                            {sub.credits}
+                          </td>
+                          <td className="px-5 py-3.5">
+                            <span
+                              className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                                sub.type === "Lab"
+                                  ? "bg-emerald-50 text-emerald-700"
+                                  : sub.type === "Elective"
+                                    ? "bg-violet-50 text-violet-700"
+                                    : sub.type === "Project"
+                                      ? "bg-orange-50 text-orange-700"
+                                      : "bg-blue-50 text-blue-700"
+                              }`}
+                            >
+                              {sub.type}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </FadeUp>
           </section>
 
-          {/* 9 ── Teaching Learning */}
-          <section className="mb-16">
-            <SectionHeading id="teaching" icon={Microscope} title="Teaching Learning Process" accentColor={ac} />
-            <p className="mb-6 leading-relaxed text-gray-700">
-              {dept.teachingLearning.overview}
-            </p>
+          <section className="mb-20">
+            <SectionHeading
+              id="teaching"
+              icon={Microscope}
+              title="Teaching Learning Process"
+              accentColor={ac}
+              index={9}
+            />
+
+            <FadeUp delay={0.06}>
+              <div className="mb-6 rounded-2xl border border-border bg-white p-6 shadow-sm">
+                <p className="leading-relaxed text-gray-700">
+                  {dept.teachingLearning.overview}
+                </p>
+              </div>
+            </FadeUp>
+
             <div className="grid gap-5 md:grid-cols-3">
               {[
                 { label: "Teaching Methods", items: dept.teachingLearning.methods },
                 { label: "Tools & Technologies", items: dept.teachingLearning.tools },
                 { label: "Best Practices", items: dept.teachingLearning.practices },
-              ].map((col) => (
-                <div
-                  key={col.label}
-                  className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm"
-                >
-                  <p
-                    className="mb-3 text-xs font-bold uppercase tracking-widest"
-                    style={{ color: ac }}
-                  >
-                    {col.label}
-                  </p>
-                  <ul className="space-y-2">
-                    {col.items.map((item) => (
-                      <li key={item} className="flex gap-2 text-sm text-gray-700">
-                        <span
-                          className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
-                          style={{ backgroundColor: ac }}
-                        />
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* 10 ── Value Added Courses */}
-          <section className="mb-16">
-            <SectionHeading id="value-added" icon={Star} title="Value Added Courses" accentColor={ac} />
-            <div className="grid gap-5 md:grid-cols-2">
-              {dept.valueAddedCourses.map((course) => (
-                <div
-                  key={course.name}
-                  className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm"
-                >
-                  <div className="mb-2 flex items-start justify-between gap-4">
-                    <h4 className="font-bold text-gray-900">{course.name}</h4>
-                    <span
-                      className="shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold text-white"
-                      style={{ backgroundColor: ac }}
+              ].map((col, ci) => (
+                <FadeUp key={col.label} delay={0.1 + ci * 0.06}>
+                  <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+                    <div
+                      className="mb-4 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-[11px] font-black uppercase tracking-wider"
+                      style={{ backgroundColor: `${ac}10`, color: ac }}
                     >
-                      {course.hours}
-                    </span>
-                  </div>
-                  <p className="mb-2 text-xs text-gray-400">{course.provider}</p>
-                  <p className="text-sm text-gray-600">{course.description}</p>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* 11 ── Faculty */}
-          <section className="mb-16">
-            <SectionHeading id="faculty" icon={Users} title="Faculty Details" accentColor={ac} />
-            <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr style={{ backgroundColor: `${ac}10` }}>
-                    {["Name", "Designation", "Qualification", "Experience", "Specialization"].map(
-                      (h) => (
-                        <th key={h} className="px-4 py-3 text-left font-bold text-gray-700">
-                          {h}
-                        </th>
-                      ),
-                    )}
-                  </tr>
-                </thead>
-                <tbody>
-                  {dept.faculty.map((f, i) => (
-                    <tr key={f.name} className={i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}>
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                            style={{ backgroundColor: ac }}
-                          >
-                            {f.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .slice(0, 2)}
-                          </div>
-                          <span className="font-medium text-gray-900">{f.name}</span>
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-gray-700">{f.designation}</td>
-                      <td className="px-4 py-3 text-gray-600">{f.qualification}</td>
-                      <td className="px-4 py-3 text-gray-600">{f.experience}</td>
-                      <td className="px-4 py-3 text-gray-600">{f.specialization}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          {/* 12 ── Labs */}
-          <section className="mb-16">
-            <SectionHeading id="labs" icon={FlaskConical} title="Laboratories" accentColor={ac} />
-            <div className="grid gap-5 md:grid-cols-2">
-              {dept.labs.map((lab) => (
-                <div
-                  key={lab.name}
-                  className="rounded-xl border border-gray-100 bg-white p-6 shadow-sm"
-                >
-                  <h4 className="mb-2 font-bold text-gray-900">{lab.name}</h4>
-                  <p className="mb-4 text-sm text-gray-600">{lab.description}</p>
-                  <p
-                    className="mb-2 text-xs font-bold uppercase tracking-widest"
-                    style={{ color: ac }}
-                  >
-                    Equipment
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {lab.equipment.map((eq) => (
-                      <span
-                        key={eq}
-                        className="rounded-md px-2 py-1 text-xs text-gray-700"
-                        style={{ backgroundColor: `${ac}12` }}
-                      >
-                        {eq}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* 13 ── Library */}
-          <section className="mb-16">
-            <SectionHeading id="library" icon={Library} title="Department Library" accentColor={ac} />
-            <p className="mb-6 leading-relaxed text-gray-700">{dept.library.description}</p>
-            <div className="mb-6 grid grid-cols-3 gap-4">
-              {[
-                { label: "Books", value: dept.library.books.toLocaleString() },
-                { label: "Journals", value: dept.library.journals },
-                { label: "Magazines", value: dept.library.magazines },
-              ].map((s) => (
-                <div
-                  key={s.label}
-                  className="rounded-xl border border-gray-100 bg-white p-4 text-center shadow-sm"
-                >
-                  <p className="text-3xl font-black" style={{ color: ac }}>
-                    {s.value}
-                  </p>
-                  <p className="mt-1 text-xs text-gray-500">{s.label}</p>
-                </div>
-              ))}
-            </div>
-            <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-              <p
-                className="mb-3 text-xs font-bold uppercase tracking-widest"
-                style={{ color: ac }}
-              >
-                Digital Access & Online Resources
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {dept.library.digitalAccess.map((r) => (
-                  <span
-                    key={r}
-                    className="rounded-lg px-3 py-1.5 text-sm text-gray-700"
-                    style={{ backgroundColor: `${ac}12` }}
-                  >
-                    {r}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          {/* 14 ── Events */}
-          <section className="mb-16">
-            <SectionHeading id="events" icon={Calendar} title="Events Organized" accentColor={ac} />
-            <div
-              className="relative border-l-2 pl-6"
-              style={{ borderColor: `${ac}30` }}
-            >
-              {dept.events.map((ev, i) => (
-                <div key={i} className="relative mb-8 last:mb-0">
-                  <div
-                    className="absolute -left-6.5 h-4 w-4 rounded-full border-2 border-white"
-                    style={{ backgroundColor: ac }}
-                  />
-                  <div className="ml-2 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-                    <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
-                      <h4 className="font-bold text-gray-900">{ev.title}</h4>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="rounded-full px-2 py-0.5 text-xs font-semibold text-white"
-                          style={{ backgroundColor: ac }}
-                        >
-                          {ev.type}
-                        </span>
-                        <span className="text-xs text-gray-400">{ev.date}</span>
-                      </div>
+                      {col.label}
                     </div>
-                    <p className="text-sm text-gray-600">{ev.description}</p>
-                    {ev.resourcePerson && (
-                      <p className="mt-2 text-xs font-semibold text-gray-500">
-                        Resource Person: {ev.resourcePerson}
-                      </p>
-                    )}
+                    <ul className="space-y-2.5">
+                      {col.items.map((item) => (
+                        <li key={item} className="flex items-start gap-2.5 text-sm text-gray-700">
+                          <div
+                            className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full"
+                            style={{ backgroundColor: ac }}
+                          />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                </div>
+                </FadeUp>
               ))}
             </div>
           </section>
 
-          {/* 15 ── Student Participation */}
-          <section className="mb-16">
-            <SectionHeading id="student-participation" icon={Users} title="Student Participation" accentColor={ac} />
-            <div className="mb-6">
-              <p
-                className="mb-3 text-xs font-bold uppercase tracking-widest"
-                style={{ color: ac }}
-              >
-                Clubs & Associations
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {dept.studentParticipation.clubs.map((club) => (
-                  <span
-                    key={club}
-                    className="rounded-lg px-3 py-1.5 text-sm font-semibold text-white"
-                    style={{ backgroundColor: ac }}
-                  >
-                    {club}
-                  </span>
-                ))}
-              </div>
-            </div>
+          <section className="mb-20">
+            <SectionHeading
+              id="value-added"
+              icon={Star}
+              title="Value Added Courses"
+              accentColor={ac}
+              index={10}
+            />
+
             <div className="grid gap-5 md:grid-cols-2">
-              {dept.studentParticipation.highlights.map((h) => (
-                <div
-                  key={h.title}
-                  className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm"
-                >
-                  <span className="text-xs font-bold" style={{ color: ac }}>
-                    {h.year}
-                  </span>
-                  <h4 className="mb-2 mt-1 font-bold text-gray-900">{h.title}</h4>
-                  <p className="text-sm text-gray-600">{h.description}</p>
-                </div>
+              {dept.valueAddedCourses.map((course, ci) => (
+                <FadeUp key={course.name} delay={ci * 0.07}>
+                  <div className="group relative overflow-hidden rounded-2xl border border-border bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+                    <div
+                      className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full opacity-[0.06] transition-all duration-300 group-hover:scale-125"
+                      style={{ backgroundColor: ac }}
+                    />
+                    <div className="mb-3 flex items-start justify-between gap-4">
+                      <h4 className="font-bold text-gray-900">{course.name}</h4>
+                      <span
+                        className="shrink-0 rounded-full px-3 py-0.5 text-xs font-bold text-white"
+                        style={{ backgroundColor: ac }}
+                      >
+                        {course.hours}
+                      </span>
+                    </div>
+                    <p className="mb-2 text-xs font-semibold" style={{ color: ac }}>
+                      {course.provider}
+                    </p>
+                    <p className="text-sm leading-relaxed text-gray-600">
+                      {course.description}
+                    </p>
+                  </div>
+                </FadeUp>
               ))}
             </div>
           </section>
 
-          {/* 16 ── Faculty Participation */}
-          <section className="mb-16">
-            <SectionHeading id="faculty-participation" icon={Users} title="Faculty Participation" accentColor={ac} />
-            <div className="mb-8">
-              <p
-                className="mb-4 text-xs font-bold uppercase tracking-widest"
-                style={{ color: ac }}
-              >
-                Conferences & Paper Presentations
-              </p>
-              <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
+          <section className="mb-20">
+            <SectionHeading
+              id="faculty"
+              icon={Users}
+              title="Faculty Details"
+              accentColor={ac}
+              index={11}
+            />
+
+            <FadeUp delay={0.08}>
+              <div className="overflow-x-auto rounded-2xl border border-border bg-white shadow-sm">
                 <table className="w-full text-sm">
                   <thead>
-                    <tr style={{ backgroundColor: `${ac}10` }}>
-                      {["Faculty", "Conference / Event", "Venue", "Year"].map((h) => (
-                        <th key={h} className="px-4 py-3 text-left font-bold text-gray-700">
+                    <tr style={{ backgroundColor: `${ac}0d` }}>
+                      {[
+                        "Faculty Member",
+                        "Designation",
+                        "Qualification",
+                        "Experience",
+                        "Specialization",
+                      ].map((h) => (
+                        <th
+                          key={h}
+                          className="px-5 py-3.5 text-left text-[11px] font-black uppercase tracking-wider text-gray-500"
+                        >
                           {h}
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody>
-                    {dept.facultyParticipation.conferences.map((c, i) => (
-                      <tr
-                        key={i}
-                        className={i % 2 === 0 ? "bg-white" : "bg-gray-50/50"}
-                      >
-                        <td className="px-4 py-3 font-medium text-gray-900">{c.faculty}</td>
-                        <td className="px-4 py-3 text-gray-700">{c.title}</td>
-                        <td className="px-4 py-3 text-gray-600">{c.venue}</td>
-                        <td className="px-4 py-3 text-gray-600">{c.year}</td>
+                  <tbody className="divide-y divide-gray-50">
+                    {dept.faculty.map((f) => (
+                      <tr key={f.name} className="transition-colors hover:bg-surface/50">
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-black text-white"
+                              style={{ backgroundColor: ac }}
+                            >
+                              {f.name
+                                .split(" ")
+                                .map((n) => n[0])
+                                .join("")
+                                .slice(0, 2)}
+                            </div>
+                            <span className="font-semibold text-gray-900">{f.name}</span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5 text-gray-600">{f.designation}</td>
+                        <td className="px-5 py-3.5 text-gray-500">{f.qualification}</td>
+                        <td className="px-5 py-3.5 text-gray-500">{f.experience}</td>
+                        <td className="px-5 py-3.5 text-gray-500">{f.specialization}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
+            </FadeUp>
+          </section>
+
+          <section className="mb-20">
+            <SectionHeading
+              id="labs"
+              icon={FlaskConical}
+              title="Laboratories"
+              accentColor={ac}
+              index={12}
+            />
+
+            <div className="grid gap-5 md:grid-cols-2">
+              {dept.labs.map((lab, li) => (
+                <FadeUp key={lab.name} delay={li * 0.07}>
+                  <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+                    <div
+                      className="flex items-center gap-3 px-5 py-4"
+                      style={{
+                        background: `linear-gradient(135deg, ${ac}12 0%, ${ac}05 100%)`,
+                      }}
+                    >
+                      <div
+                        className="flex h-10 w-10 items-center justify-center rounded-xl"
+                        style={{ backgroundColor: `${ac}18` }}
+                      >
+                        <FlaskConical className="h-5 w-5" style={{ color: ac }} />
+                      </div>
+                      <h4 className="font-bold text-gray-900">{lab.name}</h4>
+                    </div>
+
+                    <div className="p-5">
+                      <p className="mb-4 text-sm leading-relaxed text-gray-600">
+                        {lab.description}
+                      </p>
+                      <p
+                        className="mb-2.5 text-[10px] font-black uppercase tracking-widest"
+                        style={{ color: ac }}
+                      >
+                        Equipment
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {lab.equipment.map((eq) => (
+                          <span
+                            key={eq}
+                            className="rounded-lg border px-2.5 py-1 text-xs text-gray-700"
+                            style={{
+                              borderColor: `${ac}20`,
+                              backgroundColor: `${ac}08`,
+                            }}
+                          >
+                            {eq}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </FadeUp>
+              ))}
             </div>
-            <div>
+          </section>
+
+          <section className="mb-20">
+            <SectionHeading
+              id="library"
+              icon={Library}
+              title="Department Library"
+              accentColor={ac}
+              index={13}
+            />
+
+            <FadeUp delay={0.06}>
+              <div className="mb-5 rounded-2xl border border-border bg-white p-6 shadow-sm">
+                <p className="leading-relaxed text-gray-700">{dept.library.description}</p>
+              </div>
+            </FadeUp>
+
+            <FadeUp delay={0.1}>
+              <div className="mb-5 grid grid-cols-3 gap-4">
+                {[
+                  { label: "Books", value: dept.library.books.toLocaleString() },
+                  { label: "Journals", value: dept.library.journals },
+                  { label: "Magazines", value: dept.library.magazines },
+                ].map((s) => (
+                  <StatCard
+                    key={s.label}
+                    label={s.label}
+                    value={s.value}
+                    accentColor={ac}
+                  />
+                ))}
+              </div>
+            </FadeUp>
+
+            <FadeUp delay={0.15}>
+              <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+                <p
+                  className="mb-3 text-[10px] font-black uppercase tracking-widest"
+                  style={{ color: ac }}
+                >
+                  Digital Access & Online Resources
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {dept.library.digitalAccess.map((r) => (
+                    <span
+                      key={r}
+                      className="rounded-xl border px-3 py-1.5 text-sm font-medium text-gray-700"
+                      style={{ borderColor: `${ac}22`, backgroundColor: `${ac}08` }}
+                    >
+                      {r}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </FadeUp>
+          </section>
+
+          <section className="mb-20">
+            <SectionHeading
+              id="events"
+              icon={Calendar}
+              title="Events Organized"
+              accentColor={ac}
+              index={14}
+            />
+
+            <div className="relative border-l-2 pl-8" style={{ borderColor: `${ac}25` }}>
+              {dept.events.map((ev, i) => (
+                <FadeUp key={i} delay={i * 0.05}>
+                  <div className="relative mb-8 last:mb-0">
+                    <div
+                      className="absolute -left-[2.35rem] flex h-5 w-5 items-center justify-center rounded-full border-2 border-surface shadow"
+                      style={{ backgroundColor: ac }}
+                    >
+                      <div className="h-1.5 w-1.5 rounded-full bg-white" />
+                    </div>
+
+                    <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+                      <div className="mb-2.5 flex flex-wrap items-start justify-between gap-2">
+                        <h4 className="font-bold text-gray-900">{ev.title}</h4>
+                        <div className="flex items-center gap-2">
+                          <span
+                            className="rounded-full px-2.5 py-0.5 text-xs font-bold text-white"
+                            style={{ backgroundColor: ac }}
+                          >
+                            {ev.type}
+                          </span>
+                          <span className="text-xs text-gray-400">{ev.date}</span>
+                        </div>
+                      </div>
+                      <p className="text-sm leading-relaxed text-gray-600">{ev.description}</p>
+                      {ev.resourcePerson && (
+                        <p className="mt-2.5 text-xs font-semibold" style={{ color: ac }}>
+                          Resource Person: {ev.resourcePerson}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </FadeUp>
+              ))}
+            </div>
+          </section>
+
+          <section className="mb-20">
+            <SectionHeading
+              id="student-participation"
+              icon={Users}
+              title="Student Participation"
+              accentColor={ac}
+              index={15}
+            />
+
+            <FadeUp delay={0.06}>
+              <div className="mb-6 rounded-2xl border border-border bg-white p-5 shadow-sm">
+                <p
+                  className="mb-3 text-[10px] font-black uppercase tracking-widest"
+                  style={{ color: ac }}
+                >
+                  Clubs & Associations
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {dept.studentParticipation.clubs.map((club) => (
+                    <span
+                      key={club}
+                      className="rounded-xl px-3.5 py-1.5 text-sm font-semibold text-white"
+                      style={{
+                        backgroundColor: ac,
+                        boxShadow: `0 2px 8px ${ac}30`,
+                      }}
+                    >
+                      {club}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </FadeUp>
+
+            <div className="grid gap-5 md:grid-cols-2">
+              {dept.studentParticipation.highlights.map((h, hi) => (
+                <FadeUp key={h.title} delay={hi * 0.06}>
+                  <div className="rounded-2xl border border-border bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+                    <div
+                      className="mb-1.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold text-white"
+                      style={{ backgroundColor: ac }}
+                    >
+                      {h.year}
+                    </div>
+                    <h4 className="mb-2 font-bold text-gray-900">{h.title}</h4>
+                    <p className="text-sm leading-relaxed text-gray-600">{h.description}</p>
+                  </div>
+                </FadeUp>
+              ))}
+            </div>
+          </section>
+
+          <section className="mb-20">
+            <SectionHeading
+              id="faculty-participation"
+              icon={Users}
+              title="Faculty Participation"
+              accentColor={ac}
+              index={16}
+            />
+
+            <FadeUp delay={0.06}>
+              <div className="mb-6">
+                <p
+                  className="mb-3 text-[10px] font-black uppercase tracking-widest"
+                  style={{ color: ac }}
+                >
+                  Conferences & Paper Presentations
+                </p>
+                <div className="overflow-x-auto rounded-2xl border border-border bg-white shadow-sm">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr style={{ backgroundColor: `${ac}0d` }}>
+                        {["Faculty", "Conference / Event", "Venue", "Year"].map((h) => (
+                          <th
+                            key={h}
+                            className="px-5 py-3.5 text-left text-[11px] font-black uppercase tracking-wider text-gray-500"
+                          >
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {dept.facultyParticipation.conferences.map((c, i) => (
+                        <tr key={i} className="transition-colors hover:bg-surface/40">
+                          <td className="px-5 py-3.5 font-semibold text-gray-900">
+                            {c.faculty}
+                          </td>
+                          <td className="px-5 py-3.5 text-gray-700">{c.title}</td>
+                          <td className="px-5 py-3.5 text-gray-500">{c.venue}</td>
+                          <td className="px-5 py-3.5 text-gray-500">{c.year}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </FadeUp>
+
+            <FadeUp delay={0.12}>
               <p
-                className="mb-3 text-xs font-bold uppercase tracking-widest"
+                className="mb-3 text-[10px] font-black uppercase tracking-widest"
                 style={{ color: ac }}
               >
                 Workshops & FDPs Attended
@@ -883,168 +1292,232 @@ export function DepartmentPageLayout({
                 {dept.facultyParticipation.workshops.map((w) => (
                   <span
                     key={w}
-                    className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-700"
+                    className="rounded-xl border border-border bg-white px-3 py-1.5 text-sm text-gray-700 shadow-sm"
                   >
                     {w}
                   </span>
                 ))}
               </div>
-            </div>
+            </FadeUp>
           </section>
 
-          {/* 17 ── Student Achievements */}
-          <section className="mb-16">
-            <SectionHeading id="student-achievements" icon={Award} title="Student Achievements" accentColor={ac} />
+          <section className="mb-20">
+            <SectionHeading
+              id="student-achievements"
+              icon={Award}
+              title="Student Achievements"
+              accentColor={ac}
+              index={17}
+            />
             <AchievementGrid achievements={dept.studentAchievements} accentColor={ac} />
           </section>
 
-          {/* 18 ── Faculty Achievements */}
-          <section className="mb-16">
-            <SectionHeading id="faculty-achievements" icon={Award} title="Faculty Achievements" accentColor={ac} />
+          <section className="mb-20">
+            <SectionHeading
+              id="faculty-achievements"
+              icon={Award}
+              title="Faculty Achievements"
+              accentColor={ac}
+              index={18}
+            />
             <AchievementGrid achievements={dept.facultyAchievements} accentColor={ac} />
           </section>
 
-          {/* 19 ── Magazine */}
-          <section className="mb-16">
-            <SectionHeading id="magazine" icon={Newspaper} title="Department Magazine / Newsletter" accentColor={ac} />
-            <div
-              className="overflow-hidden rounded-2xl border-2"
-              style={{ borderColor: `${ac}30` }}
-            >
-              <div className="p-6 text-white" style={{ backgroundColor: ac }}>
-                <p className="mb-2 text-xs font-bold uppercase tracking-widest opacity-70">
-                  Department Publication
-                </p>
-                <h3 className="mb-1 text-2xl font-black">{dept.magazine.name}</h3>
-                <p className="opacity-80">{dept.magazine.description}</p>
-              </div>
-              <div className="bg-white p-6">
-                <div className="mb-6 flex gap-6 text-sm">
-                  <div>
-                    <p className="text-xs text-gray-400">Frequency</p>
-                    <p className="font-semibold text-gray-900">{dept.magazine.frequency}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-400">Latest Issue</p>
-                    <p className="font-semibold text-gray-900">{dept.magazine.latestIssue}</p>
-                  </div>
-                </div>
-                <p
-                  className="mb-3 text-xs font-bold uppercase tracking-widest"
-                  style={{ color: ac }}
-                >
-                  Recent Highlights
-                </p>
-                <ul className="space-y-2">
-                  {dept.magazine.highlights.map((h) => (
-                    <li key={h} className="flex gap-2 text-sm text-gray-700">
-                      <ChevronRight
-                        className="mt-0.5 h-4 w-4 shrink-0"
-                        style={{ color: ac }}
-                      />
-                      {h}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </section>
+          <section className="mb-20">
+            <SectionHeading
+              id="magazine"
+              icon={Newspaper}
+              title="Department Magazine / Newsletter"
+              accentColor={ac}
+              index={19}
+            />
 
-          {/* 20 ── Career Progression */}
-          <section className="mb-16">
-            <SectionHeading id="career" icon={TrendingUp} title="Career Progression" accentColor={ac} />
-            <div className="mb-8 grid grid-cols-2 gap-4">
-              {[
-                { label: "Placement Rate", value: dept.careerProgression.placementRate },
-                { label: "Avg. Package", value: dept.careerProgression.averagePackage },
-              ].map((s) => (
+            <FadeUp delay={0.08}>
+              <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
                 <div
-                  key={s.label}
-                  className="rounded-xl border-2 p-5 text-center"
-                  style={{ borderColor: `${ac}30` }}
+                  className="relative overflow-hidden px-6 py-8 text-white"
+                  style={{
+                    background: `linear-gradient(135deg, ${bg} 0%, color-mix(in srgb, ${bg} 75%, black) 60%, color-mix(in srgb, ${ac} 30%, ${bg}) 100%)`,
+                  }}
                 >
-                  <p className="text-3xl font-black" style={{ color: ac }}>
-                    {s.value}
+                  <div
+                    className="pointer-events-none absolute right-4 top-4 h-40 w-40 rounded-full opacity-10 blur-2xl"
+                    style={{ backgroundColor: ac }}
+                  />
+                  <p className="mb-1 text-[10px] font-black uppercase tracking-widest opacity-60">
+                    Department Publication
                   </p>
-                  <p className="mt-1 text-sm text-gray-500">{s.label}</p>
+                  <h3 className="mb-2 font-serif text-3xl font-black">{dept.magazine.name}</h3>
+                  <p className="leading-relaxed opacity-75">{dept.magazine.description}</p>
                 </div>
-              ))}
-            </div>
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-                <p
-                  className="mb-3 text-xs font-bold uppercase tracking-widest"
-                  style={{ color: ac }}
-                >
-                  Top Recruiters
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {dept.careerProgression.topRecruiters.map((r) => (
-                    <span
-                      key={r}
-                      className="rounded-lg px-3 py-1.5 text-sm font-semibold text-white"
-                      style={{ backgroundColor: ac }}
-                    >
-                      {r}
-                    </span>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
-                <p
-                  className="mb-3 text-xs font-bold uppercase tracking-widest"
-                  style={{ color: ac }}
-                >
-                  Higher Studies
-                </p>
-                <ul className="space-y-2">
-                  {dept.careerProgression.higherStudies.map((h) => (
-                    <li key={h} className="flex gap-2 text-sm text-gray-700">
-                      <ChevronRight
-                        className="mt-0.5 h-4 w-4 shrink-0"
-                        style={{ color: ac }}
-                      />
-                      {h}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </section>
 
-          {/* 21 ── Feedback */}
-          <section className="mb-16">
-            <SectionHeading id="feedback" icon={MessageSquare} title="Feedback (Curriculum / Facility)" accentColor={ac} />
-            <div className="grid gap-6 md:grid-cols-3">
-              {[
-                { label: "Curriculum Feedback Process", items: dept.feedback.curriculumProcess },
-                { label: "Facility Feedback Process", items: dept.feedback.facilityProcess },
-                { label: "Recent Improvements", items: dept.feedback.recentImprovements },
-              ].map((col) => (
-                <div
-                  key={col.label}
-                  className="rounded-xl border border-gray-100 bg-white p-5 shadow-sm"
-                >
+                <div className="p-6">
+                  <div className="mb-6 flex gap-8 text-sm">
+                    <div>
+                      <p className="text-xs text-gray-400">Frequency</p>
+                      <p className="font-bold text-gray-900">{dept.magazine.frequency}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-400">Latest Issue</p>
+                      <p className="font-bold text-gray-900">{dept.magazine.latestIssue}</p>
+                    </div>
+                  </div>
                   <p
-                    className="mb-3 text-xs font-bold uppercase tracking-widest"
+                    className="mb-3 text-[10px] font-black uppercase tracking-widest"
                     style={{ color: ac }}
                   >
-                    {col.label}
+                    Recent Highlights
                   </p>
-                  <ol className="space-y-3">
-                    {col.items.map((item, i) => (
-                      <li key={i} className="flex gap-3 text-sm text-gray-700">
-                        <span
-                          className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                          style={{ backgroundColor: ac }}
-                        >
-                          {i + 1}
-                        </span>
-                        {item}
+                  <ul className="space-y-2.5">
+                    {dept.magazine.highlights.map((h) => (
+                      <li key={h} className="flex items-start gap-2.5 text-sm text-gray-700">
+                        <ChevronRight className="mt-0.5 h-4 w-4 shrink-0" style={{ color: ac }} />
+                        {h}
                       </li>
                     ))}
-                  </ol>
+                  </ul>
                 </div>
+              </div>
+            </FadeUp>
+          </section>
+
+          <section className="mb-20">
+            <SectionHeading
+              id="career"
+              icon={TrendingUp}
+              title="Career Progression"
+              accentColor={ac}
+              index={20}
+            />
+
+            <FadeUp delay={0.06}>
+              <div className="mb-6 grid grid-cols-2 gap-4">
+                {[
+                  {
+                    label: "Placement Rate",
+                    value: dept.careerProgression.placementRate,
+                  },
+                  {
+                    label: "Avg. Package",
+                    value: dept.careerProgression.averagePackage,
+                  },
+                ].map((s) => (
+                  <div
+                    key={s.label}
+                    className="relative overflow-hidden rounded-2xl p-6 text-center"
+                    style={{
+                      background: `linear-gradient(135deg, ${bg} 0%, color-mix(in srgb, ${bg} 80%, black) 100%)`,
+                    }}
+                  >
+                    <div
+                      className="pointer-events-none absolute inset-0 opacity-10"
+                      style={{
+                        background: `radial-gradient(circle at top right, ${ac}, transparent 60%)`,
+                      }}
+                    />
+                    <p
+                      className="relative font-serif text-3xl font-black"
+                      style={{ color: ac }}
+                    >
+                      {s.value}
+                    </p>
+                    <p className="relative mt-1 text-sm text-white/55">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+            </FadeUp>
+
+            <div className="grid gap-5 md:grid-cols-2">
+              <FadeUp delay={0.1}>
+                <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+                  <p
+                    className="mb-4 text-[10px] font-black uppercase tracking-widest"
+                    style={{ color: ac }}
+                  >
+                    Top Recruiters
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {dept.careerProgression.topRecruiters.map((r) => (
+                      <span
+                        key={r}
+                        className="rounded-xl px-3.5 py-1.5 text-sm font-semibold text-white"
+                        style={{ backgroundColor: ac }}
+                      >
+                        {r}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </FadeUp>
+
+              <FadeUp delay={0.13}>
+                <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+                  <p
+                    className="mb-4 text-[10px] font-black uppercase tracking-widest"
+                    style={{ color: ac }}
+                  >
+                    Higher Studies
+                  </p>
+                  <ul className="space-y-2.5">
+                    {dept.careerProgression.higherStudies.map((h) => (
+                      <li key={h} className="flex items-start gap-2.5 text-sm text-gray-700">
+                        <ChevronRight className="mt-0.5 h-4 w-4 shrink-0" style={{ color: ac }} />
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </FadeUp>
+            </div>
+          </section>
+
+          <section className="mb-20">
+            <SectionHeading
+              id="feedback"
+              icon={MessageSquare}
+              title="Feedback (Curriculum / Facility)"
+              accentColor={ac}
+              index={21}
+            />
+
+            <div className="grid gap-5 md:grid-cols-3">
+              {[
+                {
+                  label: "Curriculum Feedback Process",
+                  items: dept.feedback.curriculumProcess,
+                },
+                {
+                  label: "Facility Feedback Process",
+                  items: dept.feedback.facilityProcess,
+                },
+                {
+                  label: "Recent Improvements",
+                  items: dept.feedback.recentImprovements,
+                },
+              ].map((col, ci) => (
+                <FadeUp key={col.label} delay={ci * 0.08}>
+                  <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+                    <div
+                      className="mb-4 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-[11px] font-black uppercase tracking-wider"
+                      style={{ backgroundColor: `${ac}10`, color: ac }}
+                    >
+                      {col.label}
+                    </div>
+                    <ol className="space-y-3">
+                      {col.items.map((item, i) => (
+                        <li key={i} className="flex gap-3 text-sm text-gray-700">
+                          <span
+                            className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black text-white"
+                            style={{ backgroundColor: ac }}
+                          >
+                            {i + 1}
+                          </span>
+                          {item}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                </FadeUp>
               ))}
             </div>
           </section>
