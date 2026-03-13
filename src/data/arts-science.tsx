@@ -207,6 +207,30 @@ export const testimonials = [
     image:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
   },
+  {
+    quote:
+      "The placement cell gave us structured preparation from the second year itself. That consistency helped me clear rounds at a product company.",
+    name: "Kirthika M.",
+    role: "Associate Analyst at Zoho",
+    image:
+      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+  },
+  {
+    quote:
+      "I joined with stage fear and left with confidence. Presentations, seminars, and project reviews made communication one of my strengths.",
+    name: "Vignesh R.",
+    role: "Business Operations at Accenture",
+    image:
+      "https://images.unsplash.com/photo-1552058544-f2b08422138a?q=80&w=200&auto=format&fit=crop",
+  },
+  {
+    quote:
+      "The faculty mentorship and practical assignments made a real difference. I could connect theory to real business and technology use-cases quickly.",
+    name: "Revathi S.",
+    role: "Data Associate at TCS",
+    image:
+      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop",
+  },
 ];
 
 export const newsUpdates = [

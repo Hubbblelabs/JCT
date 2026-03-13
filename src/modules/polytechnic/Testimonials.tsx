@@ -1,7 +1,7 @@
 "use client";
 
 import { CollegeTestimonials } from "@/components/layout/CollegeTestimonials";
-import { testimonials } from "@/data/arts-science";
+import { testimonials } from "@/data/polytechnic";
 
 export function Testimonials() {
   const categories = ["Alumini", "Student", "VIP"] as const;
@@ -9,9 +9,9 @@ export function Testimonials() {
   return (
     <CollegeTestimonials
       title="Testimonials"
-      subtitle="Hear directly from our graduates about how their experiences on campus prepared them for the challenges of tomorrow."
-      accentColor="#800020"
-      sectionBgClassName="bg-[#F8F8F8]"
+      subtitle="Voices from our polytechnic community on practical training, industry readiness, and career growth."
+      accentColor="#FFB300"
+      sectionBgClassName="bg-[#F3F4F6]"
       items={testimonials.map((item, index) => ({
         ...item,
         tag: categories[index % categories.length],

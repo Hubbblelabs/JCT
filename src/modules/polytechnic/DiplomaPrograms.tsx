@@ -35,7 +35,7 @@ export function DiplomaPrograms() {
               draggable={false}
             >
               <Link
-                href={`/polytechnic/courses/${prog.slug}`}
+                href={`/polytechnic/departments/${prog.slug}`}
                 className="absolute inset-0 z-10"
               >
                 <span className="sr-only">View {prog.name} details</span>

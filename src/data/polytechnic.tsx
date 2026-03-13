@@ -248,6 +248,30 @@ export const testimonials = [
     image:
       "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
   },
+  {
+    quote:
+      "Our workshop sessions were highly practical. I handled real machine components and maintenance drills that directly matched shop-floor work.",
+    name: "Ramesh K.",
+    role: "Production Technician at Bosch",
+    image:
+      "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=200&auto=format&fit=crop",
+  },
+  {
+    quote:
+      "I appreciated how instructors focused on discipline, safety, and documentation. Those habits helped me adapt quickly during my apprenticeship.",
+    name: "Dhanalakshmi T.",
+    role: "Apprentice Engineer at TVS",
+    image:
+      "https://images.unsplash.com/photo-1517841905240-472988babdf9?q=80&w=200&auto=format&fit=crop",
+  },
+  {
+    quote:
+      "The college encouraged us to participate in technical events and mini-projects. That exposure gave me confidence to pursue lateral entry successfully.",
+    name: "Sathish M.",
+    role: "B.E. EEE (Lateral Entry)",
+    image:
+      "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=200&auto=format&fit=crop",
+  },
 ];
 
 export const admissionsCriteria = [

@@ -33,7 +33,7 @@ export function UgPrograms() {
               className="group relative flex flex-col"
             >
               <Link
-                href={`/arts-science/courses/${prog.slug}`}
+                href={`/arts-science/departments/${prog.slug}`}
                 className="absolute inset-0 z-10"
               >
                 <span className="sr-only">View {prog.name} details</span>

@@ -9,6 +9,7 @@ import { CampusLife } from "@/modules/polytechnic/CampusLife";
 import { Recruiters } from "@/modules/polytechnic/Recruiters";
 import { NewsEvents } from "@/modules/polytechnic/NewsEvents";
 import { Admissions } from "@/modules/polytechnic/Admissions";
+import { Testimonials } from "@/modules/polytechnic/Testimonials";
 
 export const metadata: Metadata = {
   title: "Polytechnic | JCT Polytechnic College, Coimbatore",
@@ -32,6 +33,7 @@ export default function PolytechnicPage() {
       <Distinction />
       <CampusLife />
       <Recruiters />
+      <Testimonials />
       <NewsEvents />
       <Admissions />
       <Footer />

@@ -2,9 +2,11 @@
 
 import { DragScroll } from "@/components/ui/DragScroll";
 import Image from "next/image";
+import Link from "next/link";
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
+import { CollegeTestimonials } from "@/components/layout/CollegeTestimonials";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import {
@@ -33,6 +35,7 @@ const departments = [
   {
     name: "Computer Science & Engineering",
     abbr: "CSE",
+    slug: "cse",
     icon: Cpu,
     seats: 120,
     highlight: "AI/ML, Software Engineering, Cloud Computing",
@@ -40,6 +43,7 @@ const departments = [
   {
     name: "Mechanical Engineering",
     abbr: "MECH",
+    slug: "mech",
     icon: Cog,
     seats: 60,
     highlight: "CAD/CAM, Thermal Engineering, Robotics",
@@ -47,6 +51,7 @@ const departments = [
   {
     name: "Electrical & Electronics Engineering",
     abbr: "EEE",
+    slug: "eee",
     icon: Zap,
     seats: 60,
     highlight: "Power Systems, Control Systems, Embedded Design",
@@ -54,6 +59,7 @@ const departments = [
   {
     name: "Electronics & Communication Engineering",
     abbr: "ECE",
+    slug: "ece",
     icon: Globe,
     seats: 60,
     highlight: "VLSI Design, Signal Processing, IoT",
@@ -61,6 +67,7 @@ const departments = [
   {
     name: "Civil Engineering",
     abbr: "CE",
+    slug: "ce",
     icon: Building2,
     seats: 60,
     highlight: "Structural Analysis, Environmental Engineering",
@@ -119,6 +126,63 @@ const placementPartners = [
   "Mphasis",
   "Capgemini",
   "Tech Mahindra",
+];
+
+const testimonials = [
+  {
+    quote:
+      "Our final-year project was reviewed by industry mentors, and that experience changed how I approached problem-solving in real engineering teams.",
+    name: "Harish V.",
+    role: "Software Engineer at Infosys",
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
+    tag: "Alumini",
+  },
+  {
+    quote:
+      "The placement training and mock interviews made a huge difference. I stepped into campus recruitment with confidence and secured my offer early.",
+    name: "Keerthana M.",
+    role: "Graduate Engineer Trainee at Caterpillar",
+    image:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop",
+    tag: "Student",
+  },
+  {
+    quote:
+      "JCT students stand out for practical clarity. They arrive ready for production environments, not just textbook discussions.",
+    name: "R. Suresh",
+    role: "Senior Manager, Industry Partner",
+    image:
+      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
+    tag: "VIP",
+  },
+  {
+    quote:
+      "Faculty encouraged us to build beyond syllabus requirements. That project depth helped me during technical interviews and onboarding.",
+    name: "Vikram N.",
+    role: "Design Engineer at L&T",
+    image:
+      "https://images.unsplash.com/photo-1566492031773-4f4e44671857?q=80&w=200&auto=format&fit=crop",
+    tag: "Alumini",
+  },
+  {
+    quote:
+      "The coding and aptitude sessions were consistent and practical. I improved every month and was ready by placement season.",
+    name: "Janani P.",
+    role: "Final Year ECE Student",
+    image:
+      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop",
+    tag: "Student",
+  },
+  {
+    quote:
+      "The graduates we recruit from JCT show strong fundamentals and discipline in execution, especially in quality and documentation workflows.",
+    name: "Mohan Raj",
+    role: "Plant Operations Lead, Caterpillar",
+    image:
+      "https://images.unsplash.com/photo-1463453091185-61582044d556?q=80&w=200&auto=format&fit=crop",
+    tag: "VIP",
+  },
 ];
 
 export default function EngineeringPage() {
@@ -289,9 +353,12 @@ export default function EngineeringPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.35, delay: index * 0.05 }}
-                className="group hover:border-accent/20 flex min-w-62.5 shrink-0 snap-center flex-col justify-between rounded-2xl border border-stone-100 bg-white p-6 transition-all duration-300 hover:shadow-lg md:min-w-72.5 md:p-8"
+                className="group hover:border-accent/20 relative flex min-w-62.5 shrink-0 snap-center flex-col justify-between rounded-2xl border border-stone-100 bg-white p-6 transition-all duration-300 hover:shadow-lg md:min-w-72.5 md:p-8"
                 draggable={false}
               >
+                <Link href={`/engineering/departments/${dept.slug}`} className="absolute inset-0 z-10">
+                  <span className="sr-only">View {dept.name} department page</span>
+                </Link>
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-4">
                     <div className="text-primary group-hover:bg-accent/10 group-hover:text-accent shrink-0 rounded-xl bg-stone-50 p-3 transition-colors">
@@ -537,6 +604,14 @@ export default function EngineeringPage() {
           </div>
         </div>
       </section>
+
+      <CollegeTestimonials
+        title="Testimonials"
+        subtitle="Stories from engineering students, alumni, and hiring partners who have experienced JCT's outcome-focused learning."
+        accentColor="#FBBF24"
+        sectionBgClassName="bg-[#F8FAFC]"
+        items={testimonials}
+      />
 
       {/* ═══ ADMISSIONS — Strong CTA ═══ */}
       <section className="bg-primary py-12 md:py-16">
