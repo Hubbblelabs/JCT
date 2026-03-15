@@ -306,8 +306,9 @@ export default function PolytechnicPage() {
               </span>
             </h3>
             <p className="text-lg leading-relaxed font-light text-stone-500">
-              Each diploma program is structured around what you&apos;ll actually be
-              able to do when you finish — not just what you&apos;ll know in theory.
+              Each diploma program is structured around what you&apos;ll
+              actually be able to do when you finish — not just what you&apos;ll
+              know in theory.
             </p>
           </div>
 
