@@ -5,46 +5,19 @@ import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, ChevronDown, ArrowRight, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { navigationData } from "@/data/navigation";
+import { siteConfig } from "@/data/site";
 
-const navLinks = [
-  {
-    name: "Institutions",
-    href: "#institutions",
-    children: [
-      {
-        name: "JCT College of Engineering & Technology",
-        short: "Engineering",
-        href: "/engineering",
-        desc: "B.E. / B.Tech programs in CS, ECE, Mech, Civil, EEE & IT",
-        logo: "/jct_engineering1.png",
-      },
-      {
-        name: "JCT College of Arts & Science",
-        short: "Arts & Science",
-        href: "/arts-science",
-        desc: "B.Sc, B.Com, BBA programs with placement-focused training",
-        logo: "/jct_arts1.png",
-      },
-      {
-        name: "JCT Polytechnic College",
-        short: "Polytechnic",
-        href: "/polytechnic",
-        desc: "3-year diploma programs with hands-on lab training",
-        logo: "/jct_polytechnic1.png",
-      },
-    ],
-  },
-  { name: "About", href: "#about" },
-  { name: "Programs", href: "#programs" },
-  { name: "Placements", href: "#placements" },
-  { name: "Campus Life", href: "#campus-life" },
-  { name: "Admissions", href: "#admissions" },
-];
+// Primary nav items shown in the desktop bar (first 8 items)
+const primaryNav = navigationData.slice(0, 8);
+// Overflow nav items shown in a "More" dropdown
+const overflowNav = navigationData.slice(8);
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -60,13 +33,18 @@ export function Navbar() {
     };
   }, [isOpen]);
 
+  const toggleMobileSection = (name: string) => {
+    setMobileExpanded(mobileExpanded === name ? null : name);
+  };
+
   return (
     <>
-      {/* Announcement Bar */}
+      {/* Announcement Bar — Counselling Code */}
       <div className="bg-gold text-navy fixed top-0 right-0 left-0 z-[60] px-4 py-2 text-center font-sans text-xs font-bold tracking-wide">
-        🎓 Admissions Open 2026-27 —{" "}
+        🎓 Admissions Open 2026-27 | Counselling Code:{" "}
+        <span className="underline">{siteConfig.counsellingCode}</span> —{" "}
         <Link
-          href="#admissions"
+          href="/admissions/apply"
           className="underline underline-offset-2 hover:no-underline"
         >
           Apply Now
@@ -77,8 +55,8 @@ export function Navbar() {
       <nav
         className={`fixed top-[32px] right-0 left-0 z-50 transition-all duration-300 ${
           scrolled
-            ? "bg-navy/95 shadow-navy/10 py-3 shadow-lg backdrop-blur-xl"
-            : "bg-transparent py-5"
+            ? "bg-navy/95 shadow-navy/10 py-2 shadow-lg backdrop-blur-xl"
+            : "bg-transparent py-4"
         }`}
       >
         <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
@@ -94,9 +72,9 @@ export function Navbar() {
               />
             </div>
             <div className="flex flex-col">
-              <h1 className="font-serif text-sm leading-none font-bold tracking-tight text-white md:text-lg">
+              <span className="font-serif text-sm leading-none font-bold tracking-tight text-white md:text-lg">
                 JCT Institutions
-              </h1>
+              </span>
               <span className="mt-0.5 hidden font-sans text-[10px] font-medium tracking-[0.2em] text-white/40 uppercase sm:block">
                 Est. 2009
               </span>
@@ -104,8 +82,8 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Links */}
-          <div className="hidden items-center gap-1 lg:flex">
-            {navLinks.map((link) => (
+          <div className="hidden items-center gap-0.5 xl:flex">
+            {primaryNav.map((link) => (
               <div
                 key={link.name}
                 className="relative"
@@ -116,12 +94,12 @@ export function Navbar() {
               >
                 <Link
                   href={link.href}
-                  className="flex items-center gap-1 px-3 py-2 font-sans text-sm font-medium text-white/70 transition-colors hover:text-white"
+                  className="flex items-center gap-1 px-2.5 py-2 font-sans text-[13px] font-medium text-white/70 transition-colors hover:text-white"
                 >
                   {link.name}
                   {link.children && (
                     <ChevronDown
-                      size={13}
+                      size={12}
                       className={`transition-transform duration-200 ${
                         activeDropdown === link.name ? "rotate-180" : ""
                       }`}
@@ -129,56 +107,41 @@ export function Navbar() {
                   )}
                 </Link>
 
-                {/* Mega Menu */}
+                {/* Dropdown */}
                 {link.children && (
                   <AnimatePresence>
                     {activeDropdown === link.name && (
                       <motion.div
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 6 }}
-                        transition={{ duration: 0.2, ease: "easeOut" }}
-                        className="absolute top-full -left-4 w-110 pt-4"
+                        exit={{ opacity: 0, y: 4 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        className="absolute top-full -left-2 w-72 pt-3"
                       >
-                        <div className="bg-navy-mid/95 relative overflow-hidden rounded-2xl border border-white/10 p-3 shadow-2xl shadow-black/30 backdrop-blur-2xl">
-                          {/* Background logo watermark */}
-                          <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                            <Image
-                              src="/jct_logo_blue.png"
-                              alt=""
-                              width={200}
-                              height={200}
-                              className="object-contain opacity-[0.04]"
-                            />
-                          </div>
-
-                          <div className="relative z-10 space-y-1">
+                        <div className="bg-navy-mid/95 overflow-hidden rounded-xl border border-white/10 p-2 shadow-2xl shadow-black/30 backdrop-blur-2xl">
+                          <div className="space-y-0.5">
                             {link.children.map((child) => (
                               <Link
-                                key={child.short}
+                                key={child.name}
                                 href={child.href}
-                                className="group flex items-center gap-4 rounded-xl px-4 py-3.5 transition-all duration-200 hover:bg-white/6"
+                                className="group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all hover:bg-white/6"
                               >
-                                <div className="min-w-0 flex-1">
-                                  <p className="group-hover:text-gold font-sans text-sm font-semibold text-white transition-colors">
-                                    {child.short}
+                                <div>
+                                  <p className="group-hover:text-gold font-sans text-sm font-medium text-white/90 transition-colors">
+                                    {child.name}
                                   </p>
-                                  <p className="mt-0.5 font-sans text-[11px] leading-relaxed text-white/40 transition-colors group-hover:text-white/55">
-                                    {child.desc}
-                                  </p>
+                                  {child.desc && (
+                                    <p className="mt-0.5 font-sans text-[11px] text-white/35">
+                                      {child.desc}
+                                    </p>
+                                  )}
                                 </div>
-                                <div className="bg-gold/10 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg opacity-0 transition-all duration-200 group-hover:opacity-100">
-                                  <ArrowRight size={13} className="text-gold" />
-                                </div>
+                                <ArrowRight
+                                  size={12}
+                                  className="text-gold shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+                                />
                               </Link>
                             ))}
-                          </div>
-
-                          {/* Bottom accent line */}
-                          <div className="mt-2 border-t border-white/6 px-4 pt-3 pb-2">
-                            <p className="font-sans text-[10px] font-bold tracking-[0.15em] text-white/25 uppercase">
-                              3 Institutions · 50+ Programs · Since 2009
-                            </p>
                           </div>
                         </div>
                       </motion.div>
@@ -187,19 +150,67 @@ export function Navbar() {
                 )}
               </div>
             ))}
+
+            {/* More dropdown for overflow items */}
+            {overflowNav.length > 0 && (
+              <div
+                className="relative"
+                onMouseEnter={() => setActiveDropdown("__more__")}
+                onMouseLeave={() => setActiveDropdown(null)}
+              >
+                <button className="flex items-center gap-1 px-2.5 py-2 font-sans text-[13px] font-medium text-white/70 transition-colors hover:text-white">
+                  More
+                  <ChevronDown
+                    size={12}
+                    className={`transition-transform duration-200 ${
+                      activeDropdown === "__more__" ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                <AnimatePresence>
+                  {activeDropdown === "__more__" && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 4 }}
+                      transition={{ duration: 0.15, ease: "easeOut" }}
+                      className="absolute top-full right-0 w-64 pt-3"
+                    >
+                      <div className="bg-navy-mid/95 overflow-hidden rounded-xl border border-white/10 p-2 shadow-2xl shadow-black/30 backdrop-blur-2xl">
+                        {overflowNav.map((item) => (
+                          <Link
+                            key={item.name}
+                            href={item.href}
+                            className="group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all hover:bg-white/6"
+                          >
+                            <span className="group-hover:text-gold font-sans text-sm font-medium text-white/90 transition-colors">
+                              {item.name}
+                            </span>
+                            <ArrowRight
+                              size={12}
+                              className="text-gold shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+                            />
+                          </Link>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            )}
           </div>
 
           {/* Desktop Right */}
-          <div className="hidden items-center gap-4 lg:flex">
+          <div className="hidden items-center gap-3 xl:flex">
             <a
-              href="tel:+919361488801"
+              href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
               className="flex items-center gap-1.5 font-sans text-sm text-white/60 transition-colors hover:text-white"
             >
-              <Phone size={14} /> +91 93614 88801
+              <Phone size={14} /> {siteConfig.contact.phone}
             </a>
             <Link
-              href="#admissions"
-              className="bg-gold text-navy hover:bg-gold-light shadow-gold/20 inline-flex h-10 items-center gap-2 rounded-full px-6 font-sans text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
+              href="/admissions/apply"
+              className="bg-gold text-navy hover:bg-gold-light shadow-gold/20 inline-flex h-9 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
             >
               Apply Now <ArrowRight size={14} />
             </Link>
@@ -207,7 +218,7 @@ export function Navbar() {
 
           {/* Mobile Toggle */}
           <button
-            className="p-2 text-white/70 transition-colors hover:text-white lg:hidden"
+            className="p-2 text-white/70 transition-colors hover:text-white xl:hidden"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
@@ -224,7 +235,7 @@ export function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm xl:hidden"
               onClick={() => setIsOpen(false)}
             />
             <motion.div
@@ -232,7 +243,7 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="bg-navy fixed inset-y-0 right-0 z-[61] flex w-full flex-col sm:w-96 lg:hidden"
+              className="bg-navy fixed inset-y-0 right-0 z-[61] flex w-full flex-col sm:w-96 xl:hidden"
             >
               {/* Header */}
               <div className="flex items-center justify-between border-b border-white/5 p-4 pt-6">
@@ -258,73 +269,71 @@ export function Navbar() {
               </div>
 
               {/* Links */}
-              <div className="flex-1 space-y-0 overflow-y-auto px-4 py-3">
-                {navLinks.map((link, i) => (
-                  <motion.div
-                    key={link.name}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.05 * i }}
-                  >
+              <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-3">
+                {navigationData.map((link) => (
+                  <div key={link.name} className="border-b border-white/5">
                     {link.children ? (
-                      <div className="relative mt-1 mb-2 overflow-hidden rounded-2xl border border-white/5 bg-white/[0.02] p-3 py-2 shadow-inner">
-                        {/* Background logo watermark */}
-                        <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                          <Image
-                            src="/jct_logo_blue.png"
-                            alt=""
-                            width={180}
-                            height={180}
-                            className="object-contain opacity-[0.04]"
+                      <div>
+                        <button
+                          onClick={() => toggleMobileSection(link.name)}
+                          className="flex w-full items-center justify-between py-3 font-sans text-[15px] font-medium text-white/80 transition-colors hover:text-white"
+                        >
+                          {link.name}
+                          <ChevronDown
+                            size={16}
+                            className={`text-white/40 transition-transform duration-200 ${
+                              mobileExpanded === link.name ? "rotate-180" : ""
+                            }`}
                           />
-                        </div>
-
-                        <div className="relative z-10">
-                          <p className="text-gold mb-2 px-1 font-sans text-[10px] font-bold tracking-[0.2em] uppercase">
-                            {link.name}
-                          </p>
-                          <div className="space-y-1">
-                            {link.children.map((child) => (
-                              <Link
-                                key={child.short}
-                                href={child.href}
-                                onClick={() => setIsOpen(false)}
-                                className="group block rounded-xl p-2.5 transition-colors hover:bg-white/5"
-                              >
-                                <p className="group-hover:text-gold font-sans text-sm font-medium text-white transition-colors">
-                                  {child.short}
-                                </p>
-                                <p className="mt-0.5 font-sans text-[11px] text-white/40">
-                                  {child.desc}
-                                </p>
-                              </Link>
-                            ))}
-                          </div>
-                        </div>
+                        </button>
+                        <AnimatePresence>
+                          {mobileExpanded === link.name && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="overflow-hidden"
+                            >
+                              <div className="space-y-0.5 pb-3 pl-3">
+                                {link.children.map((child) => (
+                                  <Link
+                                    key={child.name}
+                                    href={child.href}
+                                    onClick={() => setIsOpen(false)}
+                                    className="hover:text-gold block rounded-lg px-2 py-2 font-sans text-sm text-white/60 transition-colors"
+                                  >
+                                    {child.name}
+                                  </Link>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
                       </div>
                     ) : (
                       <Link
                         href={link.href}
                         onClick={() => setIsOpen(false)}
-                        className="block border-b border-white/5 py-2.5 font-sans text-[15px] font-medium text-white/80 transition-colors hover:text-white"
+                        className="block py-3 font-sans text-[15px] font-medium text-white/80 transition-colors hover:text-white"
                       >
                         {link.name}
                       </Link>
                     )}
-                  </motion.div>
+                  </div>
                 ))}
               </div>
 
               {/* Footer */}
               <div className="space-y-2.5 border-t border-white/5 p-4">
                 <a
-                  href="tel:+919361488801"
+                  href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
                   className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-white/5 font-sans text-sm font-medium text-white transition-colors hover:bg-white/10"
                 >
-                  <Phone size={16} /> +91 93614 88801
+                  <Phone size={16} /> {siteConfig.contact.phone}
                 </a>
                 <Link
-                  href="#admissions"
+                  href="/admissions/apply"
                   onClick={() => setIsOpen(false)}
                   className="bg-gold text-navy hover:bg-gold-light flex h-12 w-full items-center justify-center gap-2 rounded-xl font-sans text-sm font-bold transition-colors"
                 >

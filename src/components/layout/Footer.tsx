@@ -13,29 +13,39 @@ import {
   FaEnvelope,
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
+import { siteConfig } from "@/data/site";
 
-const academicsLinks = [
-  { name: "Programs", href: "#programs" },
-  { name: "Admissions", href: "#admissions" },
-  { name: "Faculty", href: "#faculty" },
-  { name: "Research", href: "#research" },
-  { name: "Campus", href: "#campus" },
+const quickLinks = [
+  { name: "About JCT", href: "/about" },
+  { name: "Admissions", href: "/admissions" },
+  { name: "Programs", href: "/academics/programs" },
+  { name: "Placements", href: "/placements" },
+  { name: "Campus Life", href: "/campus-life" },
+  { name: "Contact", href: "/contact" },
 ];
 
-const studentLifeLinks = [
-  { name: "Housing", href: "#housing" },
-  { name: "Activities", href: "#activities" },
-  { name: "Athletics", href: "#athletics" },
-  { name: "Support", href: "#support" },
-  { name: "Connect", href: "#connect" },
+const governanceLinks = [
+  { name: "Anti-Ragging Cell", href: "/governance/anti-ragging" },
+  { name: "Grievance Redressal", href: "/governance/grievance" },
+  { name: "Women Empowerment", href: "/governance/women-empowerment" },
+  { name: "IQAC", href: "/quality/iqac" },
+  { name: "ICC", href: "/governance/icc" },
+  { name: "SC/ST Cell", href: "/governance/sc-st-cell" },
+];
+
+const disclosureLinks = [
+  { name: "Code of Conduct", href: "/mandatory-disclosure/code-of-conduct" },
+  { name: "Privacy Policy", href: "/mandatory-disclosure/privacy" },
+  { name: "Terms & Conditions", href: "/mandatory-disclosure/terms" },
+  { name: "Disclaimer", href: "/mandatory-disclosure/disclaimer" },
 ];
 
 const socialLinks = [
-  { Icon: FaFacebookF, label: "Facebook", href: "https://facebook.com" },
-  { Icon: FaInstagram, label: "Instagram", href: "https://instagram.com" },
-  { Icon: FaXTwitter, label: "X", href: "https://x.com" },
-  { Icon: FaLinkedinIn, label: "LinkedIn", href: "https://linkedin.com" },
-  { Icon: FaYoutube, label: "YouTube", href: "https://youtube.com" },
+  { Icon: FaFacebookF, label: "Facebook", href: siteConfig.social.facebook },
+  { Icon: FaInstagram, label: "Instagram", href: siteConfig.social.instagram },
+  { Icon: FaXTwitter, label: "X", href: siteConfig.social.twitter },
+  { Icon: FaLinkedinIn, label: "LinkedIn", href: siteConfig.social.linkedin },
+  { Icon: FaYoutube, label: "YouTube", href: siteConfig.social.youtube },
 ];
 
 export function Footer() {
@@ -48,7 +58,7 @@ export function Footer() {
         <div className="border-border bg-muted rounded-2xl border p-5 sm:p-7 lg:p-8">
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
             {/* Brand + Newsletter */}
-            <div className="flex flex-col gap-6 lg:col-span-5 lg:gap-7">
+            <div className="flex flex-col gap-6 lg:col-span-4 lg:gap-7">
               <div className="flex items-center gap-3">
                 <div className="relative h-10 w-10 shrink-0 sm:h-11 sm:w-11">
                   <Image
@@ -85,21 +95,40 @@ export function Footer() {
                     Subscribe
                   </button>
                 </form>
-                <p className="text-muted-foreground/70 mt-2 text-xs leading-relaxed">
-                  We respect your privacy and only send what matters to your
-                  future.
-                </p>
+              </div>
+
+              {/* Accreditation logos */}
+              <div>
+                <h3 className="text-foreground mb-3 text-xs font-semibold tracking-wide uppercase">
+                  Accreditations
+                </h3>
+                <div className="flex flex-wrap items-center gap-3">
+                  {siteConfig.accreditations.slice(0, 6).map((acc) => (
+                    <div
+                      key={acc.name}
+                      className="border-border/80 bg-surface relative h-10 w-10 overflow-hidden rounded-lg border p-1"
+                      title={acc.description}
+                    >
+                      <Image
+                        src={acc.logo}
+                        alt={acc.name}
+                        fill
+                        className="object-contain p-0.5"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
-            {/* Links + Social */}
-            <div className="grid grid-cols-1 gap-7 sm:grid-cols-2 lg:col-span-4 lg:gap-6">
+            {/* Links columns */}
+            <div className="grid grid-cols-1 gap-7 sm:grid-cols-3 lg:col-span-5 lg:gap-6">
               <div>
                 <h3 className="text-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
-                  Academics
+                  Quick Links
                 </h3>
                 <ul className="space-y-2.5">
-                  {academicsLinks.map((item) => (
+                  {quickLinks.map((item) => (
                     <li key={item.name}>
                       <Link
                         href={item.href}
@@ -114,10 +143,10 @@ export function Footer() {
 
               <div>
                 <h3 className="text-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
-                  Student Life
+                  Governance
                 </h3>
                 <ul className="space-y-2.5">
-                  {studentLifeLinks.map((item) => (
+                  {governanceLinks.map((item) => (
                     <li key={item.name}>
                       <Link
                         href={item.href}
@@ -130,27 +159,40 @@ export function Footer() {
                 </ul>
               </div>
 
-              <div className="sm:col-span-2">
+              <div>
                 <h3 className="text-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
+                  Disclosure
+                </h3>
+                <ul className="space-y-2.5">
+                  {disclosureLinks.map((item) => (
+                    <li key={item.name}>
+                      <Link
+                        href={item.href}
+                        className="text-muted-foreground hover:text-gold text-sm transition-colors"
+                      >
+                        {item.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+
+                <h3 className="text-foreground mt-6 mb-3 text-sm font-semibold tracking-wide uppercase">
                   Follow Us
                 </h3>
-                <ul className="grid grid-cols-2 gap-2.5">
+                <div className="flex gap-2">
                   {socialLinks.map(({ Icon, label, href }) => (
-                    <li key={label}>
-                      <a
-                        href={href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="border-border/90 bg-surface text-foreground hover:border-gold/50 hover:text-gold flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-medium transition-colors"
-                      >
-                        <span className="bg-foreground/90 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-white">
-                          <Icon size={11} />
-                        </span>
-                        {label}
-                      </a>
-                    </li>
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="border-border/90 bg-surface text-foreground hover:border-gold/50 hover:text-gold flex h-8 w-8 items-center justify-center rounded-full border transition-colors"
+                      aria-label={label}
+                    >
+                      <Icon size={13} />
+                    </a>
                   ))}
-                </ul>
+                </div>
               </div>
             </div>
 
@@ -166,37 +208,37 @@ export function Footer() {
                     size={14}
                   />
                   <span>
-                    JCT Institutions
+                    {siteConfig.address.line1}
                     <br />
-                    Knowledge Park, Pichanur
+                    {siteConfig.address.line2}
                     <br />
-                    Coimbatore - 641105, Tamil Nadu
+                    {siteConfig.address.city} - {siteConfig.address.pincode},{" "}
+                    {siteConfig.address.state}
                   </span>
                 </li>
                 <li>
                   <a
-                    href="tel:+919361488801"
+                    href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
                     className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm transition-colors"
                   >
                     <FaPhone className="text-gold shrink-0" size={13} />
-                    +91 93614 88801
+                    {siteConfig.contact.phone}
                   </a>
                 </li>
                 <li>
                   <a
-                    href="mailto:info@jct.ac.in"
+                    href={`mailto:${siteConfig.contact.email}`}
                     className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm transition-colors"
                   >
                     <FaEnvelope className="text-gold shrink-0" size={13} />
-                    info@jct.ac.in
+                    {siteConfig.contact.email}
                   </a>
                 </li>
               </ul>
 
-              {/* Compact map on small screens to prevent vertical dominance */}
               <div className="border-border overflow-hidden rounded-xl border">
                 <iframe
-                  src="https://www.google.com/maps?q=JCT+Institutions+Knowledge+Park+Pichanur+Coimbatore+641105&output=embed"
+                  src={siteConfig.address.mapEmbedUrl}
                   className="h-32 w-full sm:h-40"
                   style={{ border: 0 }}
                   allowFullScreen
@@ -213,25 +255,27 @@ export function Footer() {
       {/* Bottom bar */}
       <div className="container mx-auto px-4 pb-6 md:px-6">
         <div className="border-border/70 text-muted-foreground flex flex-col items-start justify-between gap-3 border-t pt-4 text-xs sm:flex-row sm:items-center">
-          <p>© {new Date().getFullYear()} JCT. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} JCT Institutions. All rights reserved.
+          </p>
           <div className="flex flex-wrap gap-4 pr-16 sm:gap-6 md:pr-20">
             <Link
-              href="/privacy"
+              href="/mandatory-disclosure/privacy"
               className="hover:text-foreground transition-colors"
             >
               Privacy policy
             </Link>
             <Link
-              href="/terms"
+              href="/mandatory-disclosure/terms"
               className="hover:text-foreground transition-colors"
             >
               Terms of service
             </Link>
             <Link
-              href="/cookies"
+              href="/contact"
               className="hover:text-foreground transition-colors"
             >
-              Cookies settings
+              Contact
             </Link>
           </div>
         </div>

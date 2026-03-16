@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
 import "@/styles/globals.css";
+import { StickyApplyButton } from "@/components/layout/StickyApplyButton";
+import { ChatbotButton } from "@/components/layout/ChatbotButton";
+import { siteConfig } from "@/data/site";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -32,7 +35,7 @@ export const metadata: Metadata = {
     title: "JCT Institutions — Three Colleges, One Commitment to Excellence",
     description:
       "Premier Engineering, Arts & Science, and Polytechnic colleges in Coimbatore. Established 2009. 96% Placement Rate.",
-    url: "https://jct.edu",
+    url: siteConfig.url,
     siteName: "JCT Institutions",
     locale: "en_IN",
     type: "website",
@@ -43,6 +46,39 @@ export const metadata: Metadata = {
     description:
       "Engineering, Arts & Science, and Polytechnic colleges. NAAC & NBA Accredited.",
   },
+  metadataBase: new URL(siteConfig.url),
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "EducationalOrganization",
+  name: siteConfig.name,
+  url: siteConfig.url,
+  logo: `${siteConfig.url}/jct_logo.png`,
+  description:
+    "JCT Institutions is a premier group of three colleges in Coimbatore offering Engineering, Arts & Science, and Polytechnic programs.",
+  foundingDate: "2009",
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "Knowledge Park, Pichanur",
+    addressLocality: "Coimbatore",
+    addressRegion: "Tamil Nadu",
+    postalCode: "641105",
+    addressCountry: "IN",
+  },
+  contactPoint: {
+    "@type": "ContactPoint",
+    telephone: siteConfig.contact.phone,
+    email: siteConfig.contact.email,
+    contactType: "admissions",
+  },
+  sameAs: [
+    siteConfig.social.facebook,
+    siteConfig.social.instagram,
+    siteConfig.social.twitter,
+    siteConfig.social.linkedin,
+    siteConfig.social.youtube,
+  ],
 };
 
 export default function RootLayout({
@@ -52,14 +88,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={`${playfair.variable} ${inter.variable} bg-surface text-foreground flex min-h-screen flex-col antialiased`}
       >
         {children}
 
+        {/* Global sticky elements */}
+        <StickyApplyButton />
+        <ChatbotButton />
+
         {/* Floating WhatsApp Button */}
         <a
-          href="https://wa.me/919361488801"
+          href={`https://wa.me/${siteConfig.contact.whatsapp}`}
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Chat on WhatsApp"
