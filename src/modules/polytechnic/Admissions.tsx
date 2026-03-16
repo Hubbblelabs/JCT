@@ -68,14 +68,14 @@ export function Admissions() {
           {/* CTAs */}
           <div className="mb-12 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
-              href="/polytechnic#admissions"
+              href="/institutions/polytechnic#admissions"
               className="group inline-flex h-14 items-center gap-2 rounded-full border border-[#ffd166]/70 bg-linear-to-r from-[#ffd166] to-[#FFB300] px-10 font-bold text-[#1A237E] shadow-[0_12px_28px_rgba(255,179,0,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
             >
               Apply for Admission
               <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
             <a
-              href="/polytechnic/prospectus.pdf"
+              href="/institutions/polytechnic/prospectus.pdf"
               className="inline-flex h-14 items-center gap-2 rounded-full border-2 border-white/30 bg-white/5 px-10 font-bold text-white backdrop-blur-sm transition-all hover:-translate-y-0.5 hover:bg-white/15"
             >
               Download Prospectus

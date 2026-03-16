@@ -356,8 +356,13 @@ export default function EngineeringPage() {
                 className="group hover:border-accent/20 relative flex min-w-62.5 shrink-0 snap-center flex-col justify-between rounded-2xl border border-stone-100 bg-white p-6 transition-all duration-300 hover:shadow-lg md:min-w-72.5 md:p-8"
                 draggable={false}
               >
-                <Link href={`/engineering/departments/${dept.slug}`} className="absolute inset-0 z-10">
-                  <span className="sr-only">View {dept.name} department page</span>
+                <Link
+                  href={`/institutions/engineering/departments/${dept.slug}`}
+                  className="absolute inset-0 z-10"
+                >
+                  <span className="sr-only">
+                    View {dept.name} department page
+                  </span>
                 </Link>
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-4">

@@ -560,7 +560,7 @@ export default function PolytechnicPage() {
                   year, save a year.
                 </p>
                 <Link
-                  href="/engineering"
+                  href="/institutions/engineering"
                   className="text-accent inline-flex items-center gap-1 text-sm font-bold hover:underline"
                 >
                   View Engineering Programs <ArrowUpRight size={14} />

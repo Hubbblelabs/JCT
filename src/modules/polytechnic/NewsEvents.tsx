@@ -50,7 +50,7 @@ export function NewsEvents() {
 
           <div className="mt-12 flex justify-center">
             <Link
-              href="/polytechnic/news"
+              href="/institutions/polytechnic/news"
               className="inline-flex h-14 items-center gap-2 rounded-full border border-[#ffd166]/70 bg-linear-to-r from-[#ffd166] to-[#FFB300] px-8 font-bold text-[#1A237E] shadow-[0_10px_24px_rgba(255,179,0,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
             >
               Read All News
@@ -87,7 +87,7 @@ export function NewsEvents() {
                   </div>
                 </div>
                 <Link
-                  href="/polytechnic/events"
+                  href="/institutions/polytechnic/events"
                   className="group flex shrink-0 items-center font-semibold text-[#1A237E] hover:underline"
                 >
                   View event{" "}

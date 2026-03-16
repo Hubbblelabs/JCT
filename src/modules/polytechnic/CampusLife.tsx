@@ -30,14 +30,14 @@ export function CampusLife() {
             <h2 className="mb-4 text-xs font-bold tracking-[0.2em] text-[#1A237E] uppercase">
               Life @ JCT
             </h2>
-            <h3 className="mb-6 font-sans text-4xl font-bold leading-tight text-[#1A237E] md:text-5xl">
+            <h3 className="mb-6 font-sans text-4xl leading-tight font-bold text-[#1A237E] md:text-5xl">
               More than a classroom
             </h3>
             <p className="mb-6 text-lg leading-relaxed font-light text-[#212121]/75">
               We want you to make the most of your time studying with us.
               Studying here is about the atmosphere and feeling like part of the
-              JCT Polytechnic community — whether you&apos;re in the workshop, the
-              library, or on the sports field.
+              JCT Polytechnic community — whether you&apos;re in the workshop,
+              the library, or on the sports field.
             </p>
             <p className="mb-10 leading-relaxed font-light text-[#212121]/75">
               Our campus offers dedicated labs, sports facilities, a library
@@ -45,7 +45,7 @@ export function CampusLife() {
               programme that keeps student life vibrant throughout the year.
             </p>
             <Link
-              href="/polytechnic/campus-life"
+              href="/institutions/polytechnic/campus-life"
               className="group inline-flex h-12 items-center gap-2 rounded-full border border-[#ffd166]/70 bg-linear-to-r from-[#ffd166] to-[#FFB300] px-8 text-sm font-semibold text-[#1A237E] shadow-[0_10px_24px_rgba(255,179,0,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
             >
               Find Out More
@@ -55,7 +55,7 @@ export function CampusLife() {
 
           {/* Right: Drag-scroll gallery */}
           <div>
-              <DragScroll className="relative flex h-110 w-full snap-x snap-mandatory gap-4 scroll-smooth pb-4 md:h-130">
+            <DragScroll className="relative flex h-110 w-full snap-x snap-mandatory gap-4 scroll-smooth pb-4 md:h-130">
               {campusImages.map((src, index) => (
                 <motion.div
                   key={index}

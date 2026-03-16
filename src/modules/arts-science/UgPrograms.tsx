@@ -33,7 +33,7 @@ export function UgPrograms() {
               className="group relative flex flex-col"
             >
               <Link
-                href={`/arts-science/departments/${prog.slug}`}
+                href={`/institutions/arts-science/departments/${prog.slug}`}
                 className="absolute inset-0 z-10"
               >
                 <span className="sr-only">View {prog.name} details</span>
@@ -61,7 +61,7 @@ export function UgPrograms() {
 
         <div className="flex items-center justify-center gap-4 border-t border-stone-200 pt-10">
           <Link
-            href="/arts-science/courses"
+            href="/institutions/arts-science/courses"
             className="group inline-flex h-12 items-center gap-2 rounded-full bg-[#800020] px-8 font-semibold text-sm text-white shadow-[0_8px_20px_rgba(128,0,32,0.25)] transition-all hover:-translate-y-0.5 hover:bg-[#5e0017] hover:shadow-[0_12px_24px_rgba(128,0,32,0.3)]"
           >
             Browse all programs

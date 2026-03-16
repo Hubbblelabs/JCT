@@ -58,7 +58,7 @@ export function DiplomaPrograms() {
               <div className="pointer-events-none absolute right-0 top-0 h-24 w-24 rounded-bl-[2.5rem] bg-[#1A237E]/5 transition-all duration-300 group-hover:scale-110 group-hover:bg-[#1A237E]/10" />
 
               <Link
-                href={`/polytechnic/departments/${prog.slug}`}
+                href={`/institutions/polytechnic/departments/${prog.slug}`}
                 className="absolute inset-0 z-10"
               >
                 <span className="sr-only">View {prog.name} details</span>
@@ -90,7 +90,7 @@ export function DiplomaPrograms() {
 
         <div className="mt-8 flex items-center justify-center border-t border-[#1A237E]/10 pt-10">
           <Link
-            href="/polytechnic/courses"
+            href="/institutions/polytechnic/courses"
             className="group inline-flex h-12 items-center gap-2 rounded-full border border-[#ffd166]/70 bg-linear-to-r from-[#ffd166] to-[#FFB300] px-8 text-sm font-semibold text-[#1A237E] shadow-[0_10px_24px_rgba(255,179,0,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
           >
             Browse all programs

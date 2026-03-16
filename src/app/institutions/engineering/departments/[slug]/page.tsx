@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DepartmentPageLayout } from "@/components/layout/DepartmentPageLayout";
-import { artsDepartments } from "@/data/arts-departments";
+import { engineeringDepartments } from "@/data/engineering-departments";
 
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return artsDepartments.map((dept) => ({ slug: dept.slug }));
+  return engineeringDepartments.map((dept) => ({ slug: dept.slug }));
 }
 
 export async function generateMetadata({
@@ -15,30 +15,30 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const dept = artsDepartments.find((item) => item.slug === slug);
+  const dept = engineeringDepartments.find((item) => item.slug === slug);
 
   if (!dept) {
     return {};
   }
 
   return {
-    title: `${dept.name} | JCT College of Arts & Science`,
+    title: `${dept.name} | JCT College of Engineering & Technology`,
     description: dept.about.paragraphs[0],
     openGraph: {
-      title: `${dept.name} | JCT College of Arts & Science`,
+      title: `${dept.name} | JCT College of Engineering & Technology`,
       description: dept.about.paragraphs[0],
       type: "website",
     },
   };
 }
 
-export default async function ArtsDepartmentPage({
+export default async function EngineeringDepartmentPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const dept = artsDepartments.find((item) => item.slug === slug);
+  const dept = engineeringDepartments.find((item) => item.slug === slug);
 
   if (!dept) {
     notFound();
@@ -47,8 +47,8 @@ export default async function ArtsDepartmentPage({
   return (
     <DepartmentPageLayout
       dept={dept}
-      backHref="/arts-science"
-      backLabel="Back to Arts & Science"
+      backHref="/institutions/engineering"
+      backLabel="Back to Engineering"
     />
   );
 }

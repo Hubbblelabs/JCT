@@ -20,19 +20,19 @@ export const metadata: Metadata = {
 const institutions = [
   {
     name: "JCT College of Engineering & Technology",
-    href: "/engineering",
+    href: "/institutions/engineering",
     description:
       "B.E. / B.Tech and M.E. / M.Tech programs in core and emerging engineering disciplines.",
   },
   {
     name: "JCT College of Arts & Science",
-    href: "/arts-science",
+    href: "/institutions/arts-science",
     description:
       "B.Sc., B.Com., BBA, BCA, M.Sc., and other undergraduate and postgraduate programs.",
   },
   {
     name: "JCT Polytechnic College",
-    href: "/polytechnic",
+    href: "/institutions/polytechnic",
     description:
       "Diploma programs in engineering and technology for a strong technical foundation.",
   },

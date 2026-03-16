@@ -15,6 +15,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/about/organizational-structure",
     "/about/governing-council",
     "/about/strategic-plan",
+    "/institutions",
+    "/institutions/engineering",
+    "/institutions/arts-science",
+    "/institutions/polytechnic",
     "/admissions",
     "/admissions/why-jct",
     "/admissions/programs",
@@ -32,9 +36,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/academics/regulations",
     "/academics/curriculum",
     "/academics/council",
-    "/engineering",
-    "/arts-science",
-    "/polytechnic",
     "/placements",
     "/placements/statistics",
     "/placements/recruiters",
@@ -91,10 +92,27 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/contact",
   ];
 
-  return staticRoutes.map((route) => ({
-    url: `${BASE_URL}${route}`,
-    lastModified: new Date(),
-    changeFrequency: route === "/" ? "weekly" : "monthly",
-    priority: route === "/" ? 1 : route.split("/").length <= 2 ? 0.8 : 0.6,
-  }));
+  return staticRoutes.map((route) => {
+    const isHome = route === "/";
+    const isAdmissions = route.startsWith("/admissions");
+    const isMainSection = route.split("/").length <= 2;
+
+    let priority: number;
+    if (isHome) {
+      priority = 1;
+    } else if (isAdmissions) {
+      priority = 0.9;
+    } else if (isMainSection) {
+      priority = 0.8;
+    } else {
+      priority = 0.6;
+    }
+
+    return {
+      url: `${BASE_URL}${route}`,
+      lastModified: new Date(),
+      changeFrequency: isHome ? "weekly" : "monthly",
+      priority,
+    };
+  });
 }

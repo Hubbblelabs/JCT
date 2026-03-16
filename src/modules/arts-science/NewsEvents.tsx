@@ -83,7 +83,7 @@ export function NewsEvents() {
                   </div>
                 </div>
                 <a
-                  href="/arts-science/events"
+                  href="/institutions/arts-science/events"
                   className="group flex shrink-0 items-center font-semibold text-[#800020] hover:underline"
                 >
                   View event{" "}

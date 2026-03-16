@@ -99,7 +99,7 @@ export default async function CoursePage({
           >
             <motion.div variants={fadeInUp}>
               <Link
-                href="/arts-science"
+                href="/institutions/arts-science"
                 className="group mb-8 inline-flex items-center text-sm font-medium text-[#D4AF37] transition-colors hover:text-white"
               >
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
@@ -258,7 +258,7 @@ export default async function CoursePage({
 
                     <div className="flex flex-col gap-4">
                       <Link
-                        href="/arts-science#admissions"
+                        href="/institutions/arts-science#admissions"
                         className={cn(
                           buttonVariants(),
                           "h-14 w-full rounded-full border border-[#f1d892]/70 bg-linear-to-r from-[#f0ce74] to-[#D4AF37] text-lg font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
@@ -303,7 +303,7 @@ export default async function CoursePage({
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <Link
-                href="/arts-science#admissions"
+                href="/institutions/arts-science#admissions"
                 className={cn(
                   buttonVariants(),
                   "h-14 rounded-full border border-[#800020] bg-[#800020] px-8 text-lg font-bold text-white shadow-[0_10px_24px_rgba(128,0,32,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#5e0017]"
@@ -312,7 +312,7 @@ export default async function CoursePage({
                 Start Your Application
               </Link>
               <Link
-                href="/arts-science#contact"
+                href="/institutions/arts-science#contact"
                 className={cn(
                   buttonVariants({ variant: "outline" }),
                   "h-14 rounded-full border-2 border-[#800020]/45 bg-white/40 px-8 text-lg font-bold text-[#800020] transition-all hover:-translate-y-0.5 hover:bg-white/70"

@@ -20,18 +20,18 @@ export const metadata: Metadata = {
 const colleges = [
   {
     name: "Engineering & Technology",
-    href: "/engineering",
+    href: "/institutions/engineering",
     description: "Departments of CSE, ECE, EEE, Mechanical, Civil, and more.",
   },
   {
     name: "Arts & Science",
-    href: "/arts-science",
+    href: "/institutions/arts-science",
     description:
       "Departments of Computer Science, Commerce, Business Administration, Mathematics, and more.",
   },
   {
     name: "Polytechnic",
-    href: "/polytechnic",
+    href: "/institutions/polytechnic",
     description:
       "Departments of Computer Engineering, Mechanical, Electrical, and more.",
   },

@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DepartmentPageLayout } from "@/components/layout/DepartmentPageLayout";
-import { engineeringDepartments } from "@/data/engineering-departments";
+import { polytechnicDepartments } from "@/data/polytechnic-departments";
 
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return engineeringDepartments.map((dept) => ({ slug: dept.slug }));
+  return polytechnicDepartments.map((dept) => ({ slug: dept.slug }));
 }
 
 export async function generateMetadata({
@@ -15,30 +15,30 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const dept = engineeringDepartments.find((item) => item.slug === slug);
+  const dept = polytechnicDepartments.find((item) => item.slug === slug);
 
   if (!dept) {
     return {};
   }
 
   return {
-    title: `${dept.name} | JCT College of Engineering & Technology`,
+    title: `${dept.name} | JCT Polytechnic College`,
     description: dept.about.paragraphs[0],
     openGraph: {
-      title: `${dept.name} | JCT College of Engineering & Technology`,
+      title: `${dept.name} | JCT Polytechnic College`,
       description: dept.about.paragraphs[0],
       type: "website",
     },
   };
 }
 
-export default async function EngineeringDepartmentPage({
+export default async function PolytechnicDepartmentPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const dept = engineeringDepartments.find((item) => item.slug === slug);
+  const dept = polytechnicDepartments.find((item) => item.slug === slug);
 
   if (!dept) {
     notFound();
@@ -47,8 +47,8 @@ export default async function EngineeringDepartmentPage({
   return (
     <DepartmentPageLayout
       dept={dept}
-      backHref="/engineering"
-      backLabel="Back to Engineering"
+      backHref="/institutions/polytechnic"
+      backLabel="Back to Polytechnic"
     />
   );
 }

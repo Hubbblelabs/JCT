@@ -9,7 +9,7 @@ const institutions = [
   {
     name: "JCT College of Engineering & Technology",
     slug: "engineering",
-    href: "/engineering",
+    href: "/institutions/engineering",
     logo: "/jct_engineering1.png",
     image:
       "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1200&auto=format&fit=crop",
@@ -22,7 +22,7 @@ const institutions = [
   {
     name: "JCT College of Arts & Science",
     slug: "arts-science",
-    href: "/arts-science",
+    href: "/institutions/arts-science",
     logo: "/jct_arts1.png",
     image:
       "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=1200&auto=format&fit=crop",
@@ -35,7 +35,7 @@ const institutions = [
   {
     name: "JCT Polytechnic College",
     slug: "polytechnic",
-    href: "/polytechnic",
+    href: "/institutions/polytechnic",
     logo: "/jct_polytechnic1.png",
     image:
       "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200&auto=format&fit=crop",

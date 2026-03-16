@@ -31,6 +31,15 @@ export const navigationData: NavItem[] = [
     ],
   },
   {
+    name: "Institutions",
+    href: "/institutions",
+    children: [
+      { name: "Engineering", href: "/institutions/engineering", desc: "B.E. / B.Tech programs" },
+      { name: "Arts & Science", href: "/institutions/arts-science", desc: "UG & PG programs" },
+      { name: "Polytechnic", href: "/institutions/polytechnic", desc: "Diploma programs" },
+    ],
+  },
+  {
     name: "Admissions",
     href: "/admissions",
     children: [
@@ -58,16 +67,7 @@ export const navigationData: NavItem[] = [
     ],
   },
   {
-    name: "Departments",
-    href: "#",
-    children: [
-      { name: "Engineering", href: "/engineering", desc: "B.E. / B.Tech programs" },
-      { name: "Arts & Science", href: "/arts-science", desc: "UG & PG programs" },
-      { name: "Polytechnic", href: "/polytechnic", desc: "Diploma programs" },
-    ],
-  },
-  {
-    name: "Training & Placement",
+    name: "Placements",
     href: "/placements",
     children: [
       { name: "Placement Overview", href: "/placements" },
@@ -132,7 +132,7 @@ export const navigationData: NavItem[] = [
     ],
   },
   {
-    name: "Quality Assurance",
+    name: "Quality",
     href: "/quality",
     children: [
       { name: "Accreditations & Recognitions", href: "/quality/accreditations" },
