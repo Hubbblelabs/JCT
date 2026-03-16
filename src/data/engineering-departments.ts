@@ -75,7 +75,9 @@ const ENGINEERING_PO = [
   },
 ] as const;
 
-function buildEngineeringCurriculum(prefix: string): DepartmentData["curriculum"] {
+function buildEngineeringCurriculum(
+  prefix: string,
+): DepartmentData["curriculum"] {
   return Array.from({ length: 8 }, (_, index) => {
     const semester = index + 1;
     return {
@@ -83,7 +85,10 @@ function buildEngineeringCurriculum(prefix: string): DepartmentData["curriculum"
       subjects: [
         {
           code: `${prefix}${semester}01`,
-          name: semester < 3 ? "Engineering Mathematics" : "Core Engineering Subject",
+          name:
+            semester < 3
+              ? "Engineering Mathematics"
+              : "Core Engineering Subject",
           credits: 4,
           type: "Core",
         },
@@ -101,7 +106,8 @@ function buildEngineeringCurriculum(prefix: string): DepartmentData["curriculum"
         },
         {
           code: `${prefix}${semester}04`,
-          name: semester === 8 ? "Project Work" : "Professional Skill Development",
+          name:
+            semester === 8 ? "Project Work" : "Professional Skill Development",
           credits: 3,
           type: semester === 8 ? "Project" : "Core",
         },
@@ -150,8 +156,7 @@ function createEngineeringDepartment(config: {
       ],
     },
     visionMission: {
-      vision:
-        `To be a center of excellence in ${config.shortName} education, research, and innovation for sustainable societal impact.`,
+      vision: `To be a center of excellence in ${config.shortName} education, research, and innovation for sustainable societal impact.`,
       mission: [
         "Provide quality technical education with strong theoretical and practical foundations.",
         "Promote interdisciplinary research, innovation, and entrepreneurship.",
@@ -251,8 +256,7 @@ function createEngineeringDepartment(config: {
         name: "Professional Certification Track",
         hours: "45 Hours",
         provider: "External Certification Partners",
-        description:
-          `Hands-on training in ${config.focusAreas[0]} with certification-oriented assessment.`,
+        description: `Hands-on training in ${config.focusAreas[0]} with certification-oriented assessment.`,
       },
     ],
     faculty: [
@@ -290,20 +294,35 @@ function createEngineeringDepartment(config: {
         name: `${config.shortName} Core Laboratory`,
         description:
           "Well-equipped lab supporting core experiments, design validation, and model implementation.",
-        equipment: ["Workstations", "Measurement Kits", "Simulation Licenses", "Prototype Tools"],
+        equipment: [
+          "Workstations",
+          "Measurement Kits",
+          "Simulation Licenses",
+          "Prototype Tools",
+        ],
       },
       {
         name: "Research & Innovation Lab",
         description:
           "Supports student innovation, interdisciplinary projects, and product prototype development.",
-        equipment: ["GPU Systems", "Rapid Prototyping Kit", "Domain-specific Toolchain", "IoT Devices"],
+        equipment: [
+          "GPU Systems",
+          "Rapid Prototyping Kit",
+          "Domain-specific Toolchain",
+          "IoT Devices",
+        ],
       },
     ],
     library: {
       books: 2650,
       journals: 38,
       magazines: 12,
-      digitalAccess: ["IEEE Xplore", "Springer Nature", "NPTEL", "National Digital Library"],
+      digitalAccess: [
+        "IEEE Xplore",
+        "Springer Nature",
+        "NPTEL",
+        "National Digital Library",
+      ],
       description:
         "The department library provides curated technical references, project reports, journals, and access to digital repositories.",
     },
@@ -325,7 +344,11 @@ function createEngineeringDepartment(config: {
       },
     ],
     studentParticipation: {
-      clubs: ["Professional Society Chapter", "Innovation Club", "Coding / Design Club"],
+      clubs: [
+        "Professional Society Chapter",
+        "Innovation Club",
+        "Coding / Design Club",
+      ],
       highlights: [
         {
           title: "National Hackathon Finalist",
@@ -336,7 +359,8 @@ function createEngineeringDepartment(config: {
         {
           title: "State-Level Technical Quiz Winner",
           year: "2023",
-          description: "Department students secured first place among 120+ participating teams.",
+          description:
+            "Department students secured first place among 120+ participating teams.",
         },
       ],
     },
@@ -365,13 +389,15 @@ function createEngineeringDepartment(config: {
       {
         name: "A. Karthi",
         title: "Best Project Award",
-        detail: "Won first prize for smart automation project in state-level expo.",
+        detail:
+          "Won first prize for smart automation project in state-level expo.",
         year: "2024",
       },
       {
         name: "P. Divya",
         title: "GATE Qualified",
-        detail: "Qualified with strong percentile and admitted for higher studies.",
+        detail:
+          "Qualified with strong percentile and admitted for higher studies.",
         year: "2025",
       },
     ],
@@ -391,7 +417,8 @@ function createEngineeringDepartment(config: {
     ],
     magazine: {
       name: "Engineer's Chronicle",
-      description: "A technical magazine curated by students and faculty each semester.",
+      description:
+        "A technical magazine curated by students and faculty each semester.",
       frequency: "Half-Yearly",
       latestIssue: "Vol. 9 Issue 2",
       highlights: [
@@ -402,7 +429,12 @@ function createEngineeringDepartment(config: {
     },
     careerProgression: {
       topRecruiters: config.topRecruiters,
-      higherStudies: ["M.E. / M.Tech.", "M.S. (Abroad)", "MBA", "Research Fellowships"],
+      higherStudies: [
+        "M.E. / M.Tech.",
+        "M.S. (Abroad)",
+        "MBA",
+        "Research Fellowships",
+      ],
       averagePackage: "INR 4.8 LPA",
       placementRate: "91%",
     },
@@ -464,7 +496,17 @@ export const engineeringDepartments: DepartmentData[] = [
     name: "Civil Engineering",
     shortName: "CE",
     intake: 60,
-    focusAreas: ["Structural Engineering", "Construction Management", "Environmental Engineering"],
-    topRecruiters: ["L&T Construction", "Ramco", "URC", "Sobha", "Shapoorji Pallonji"],
+    focusAreas: [
+      "Structural Engineering",
+      "Construction Management",
+      "Environmental Engineering",
+    ],
+    topRecruiters: [
+      "L&T Construction",
+      "Ramco",
+      "URC",
+      "Sobha",
+      "Shapoorji Pallonji",
+    ],
   }),
 ];

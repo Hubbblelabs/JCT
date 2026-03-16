@@ -62,7 +62,9 @@ export function CollegeTestimonials({
     return groups;
   }, [items]);
 
-  const [activeIndices, setActiveIndices] = useState<Record<TestimonialCategory, number>>({
+  const [activeIndices, setActiveIndices] = useState<
+    Record<TestimonialCategory, number>
+  >({
     Alumini: 0,
     Student: 0,
     VIP: 0,
@@ -97,7 +99,9 @@ export function CollegeTestimonials({
     <section className={`py-20 md:py-28 ${sectionBgClassName}`}>
       <div className="container mx-auto px-4 md:px-6">
         <div className="mb-14 text-center">
-          <h2 className="text-3xl font-bold text-[#111827] md:text-5xl">{title}</h2>
+          <h2 className="text-3xl font-bold text-[#111827] md:text-5xl">
+            {title}
+          </h2>
           {subtitle ? (
             <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-[#4B5563] md:text-base">
               {subtitle}
@@ -173,7 +177,9 @@ export function CollegeTestimonials({
                     >
                       {activeItem.name}
                     </h3>
-                    <p className="mt-2 text-lg text-[#6B7280]">{activeItem.role}</p>
+                    <p className="mt-2 text-lg text-[#6B7280]">
+                      {activeItem.role}
+                    </p>
                   </div>
                 </motion.div>
 

@@ -114,7 +114,7 @@ function SectionHeading({
         </div>
         <div className="min-w-0 flex-1">
           <p
-            className="text-[10px] font-black uppercase tracking-[0.18em]"
+            className="text-[10px] font-black tracking-[0.18em] uppercase"
             style={{ color: `${accentColor}90` }}
           >
             Section {String(index).padStart(2, "0")}
@@ -163,13 +163,17 @@ function SidebarItem({
     >
       <span
         className="w-5 shrink-0 text-[10px] font-black tabular-nums"
-        style={active ? { color: accentColor } : { color: "rgba(255,255,255,0.25)" }}
+        style={
+          active ? { color: accentColor } : { color: "rgba(255,255,255,0.25)" }
+        }
       >
         {String(index).padStart(2, "0")}
       </span>
       <Icon
         className="h-3.5 w-3.5 shrink-0 transition-colors"
-        style={active ? { color: accentColor } : { color: "rgba(255,255,255,0.4)" }}
+        style={
+          active ? { color: accentColor } : { color: "rgba(255,255,255,0.4)" }
+        }
       />
       <span
         className="text-xs leading-tight transition-colors"
@@ -193,14 +197,14 @@ function BoardTable({
   accentColor: string;
 }) {
   return (
-    <div className="overflow-x-auto rounded-2xl border border-border bg-white shadow-sm">
+    <div className="border-border overflow-x-auto rounded-2xl border bg-white shadow-sm">
       <table className="w-full text-sm">
         <thead>
           <tr style={{ backgroundColor: `${accentColor}0d` }}>
             {["Name", "Designation", "Organization", "Role"].map((h) => (
               <th
                 key={h}
-                className="px-5 py-3.5 text-left text-[11px] font-black uppercase tracking-wider text-gray-500"
+                className="px-5 py-3.5 text-left text-[11px] font-black tracking-wider text-gray-500 uppercase"
               >
                 {h}
               </th>
@@ -209,8 +213,10 @@ function BoardTable({
         </thead>
         <tbody className="divide-y divide-gray-50">
           {members.map((m, i) => (
-            <tr key={i} className="transition-colors hover:bg-surface/60">
-              <td className="px-5 py-3.5 font-semibold text-gray-900">{m.name}</td>
+            <tr key={i} className="hover:bg-surface/60 transition-colors">
+              <td className="px-5 py-3.5 font-semibold text-gray-900">
+                {m.name}
+              </td>
               <td className="px-5 py-3.5 text-gray-600">{m.designation}</td>
               <td className="px-5 py-3.5 text-gray-500">{m.organization}</td>
               <td className="px-5 py-3.5">
@@ -242,9 +248,9 @@ function AchievementGrid({
     <div className="grid gap-4 md:grid-cols-2">
       {achievements.map((a, i) => (
         <FadeUp key={i} delay={i * 0.05}>
-          <div className="relative overflow-hidden rounded-2xl border border-border bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+          <div className="border-border relative overflow-hidden rounded-2xl border bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
             <div
-              className="pointer-events-none absolute right-0 top-0 h-20 w-20 rounded-bl-[2.5rem] opacity-[0.06]"
+              className="pointer-events-none absolute top-0 right-0 h-20 w-20 rounded-bl-[2.5rem] opacity-[0.06]"
               style={{ backgroundColor: accentColor }}
             />
             <div className="flex items-start gap-4">
@@ -296,7 +302,7 @@ function StatCard({
       >
         {value}
       </p>
-      <p className="mt-1.5 text-[11px] font-semibold uppercase tracking-wider text-gray-400">
+      <p className="mt-1.5 text-[11px] font-semibold tracking-wider text-gray-400 uppercase">
         {label}
       </p>
     </div>
@@ -348,7 +354,9 @@ export function DepartmentPageLayout({
   }, [dept.college]);
 
   function scrollTo(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    document
+      .getElementById(id)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   const collegeLabel =
@@ -376,18 +384,18 @@ export function DepartmentPageLayout({
           />
           <div className="absolute inset-0 bg-linear-to-br from-black/80 via-black/55 to-black/15" />
           <div
-            className="absolute -bottom-32 -right-32 h-112 w-md rounded-full opacity-20 blur-3xl"
+            className="absolute -right-32 -bottom-32 h-112 w-md rounded-full opacity-20 blur-3xl"
             style={{ backgroundColor: ac }}
           />
           <div
-            className="absolute -left-16 top-1/3 h-64 w-64 rounded-full opacity-10 blur-2xl"
+            className="absolute top-1/3 -left-16 h-64 w-64 rounded-full opacity-10 blur-2xl"
             style={{ backgroundColor: ac }}
           />
         </div>
 
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div
-            className="absolute right-0 top-0 h-full w-2/5 opacity-[0.04]"
+            className="absolute top-0 right-0 h-full w-2/5 opacity-[0.04]"
             style={{
               background: `repeating-linear-gradient(-55deg, ${ac}, ${ac} 1px, transparent 1px, transparent 18px)`,
             }}
@@ -417,7 +425,7 @@ export function DepartmentPageLayout({
                 transition={{ duration: 0.5, delay: 0.1 }}
               >
                 <span
-                  className="mb-5 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[11px] font-black uppercase tracking-[0.15em]"
+                  className="mb-5 inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[11px] font-black tracking-[0.15em] uppercase"
                   style={{
                     backgroundColor: `${ac}20`,
                     color: ac,
@@ -435,8 +443,12 @@ export function DepartmentPageLayout({
               <motion.h1
                 initial={{ opacity: 0, y: 32 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
-                className="mb-5 font-serif text-4xl font-black leading-[1.04] tracking-tight text-white md:text-5xl lg:text-6xl"
+                transition={{
+                  duration: 0.7,
+                  delay: 0.18,
+                  ease: [0.22, 1, 0.36, 1],
+                }}
+                className="mb-5 font-serif text-4xl leading-[1.04] font-black tracking-tight text-white md:text-5xl lg:text-6xl"
               >
                 {dept.name}
               </motion.h1>
@@ -455,7 +467,9 @@ export function DepartmentPageLayout({
                   .filter(Boolean)
                   .map((label, i) => (
                     <span key={i} className="flex items-center gap-2">
-                      {i > 0 && <span className="h-1 w-1 rounded-full bg-white/30" />}
+                      {i > 0 && (
+                        <span className="h-1 w-1 rounded-full bg-white/30" />
+                      )}
                       {label}
                     </span>
                   ))}
@@ -489,11 +503,11 @@ export function DepartmentPageLayout({
           </div>
         </div>
 
-        <div className="absolute inset-x-0 bottom-0 h-20 bg-linear-to-t from-surface to-transparent" />
+        <div className="from-surface absolute inset-x-0 bottom-0 h-20 bg-linear-to-t to-transparent" />
       </header>
 
       <div
-        className="sticky top-16 z-40 border-b border-border bg-white/95 backdrop-blur-md lg:hidden"
+        className="border-border sticky top-16 z-40 border-b bg-white/95 backdrop-blur-md lg:hidden"
         style={{ scrollbarWidth: "none" }}
       >
         <div className="flex items-center gap-1 overflow-x-auto px-4 py-2.5">
@@ -514,7 +528,7 @@ export function DepartmentPageLayout({
         </div>
       </div>
 
-      <div className="flex min-h-screen bg-surface">
+      <div className="bg-surface flex min-h-screen">
         <aside className="hidden w-72 shrink-0 lg:block">
           <div
             className="sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto py-5"
@@ -522,7 +536,7 @@ export function DepartmentPageLayout({
           >
             <div className="mb-3 px-5">
               <p
-                className="text-[10px] font-black uppercase tracking-[0.2em]"
+                className="text-[10px] font-black tracking-[0.2em] uppercase"
                 style={{ color: `${ac}80` }}
               >
                 {dept.college === "engineering"
@@ -587,7 +601,7 @@ export function DepartmentPageLayout({
             </FadeUp>
 
             <FadeUp delay={0.12}>
-              <div className="rounded-2xl border border-border bg-white p-6 shadow-sm md:p-8">
+              <div className="border-border rounded-2xl border bg-white p-6 shadow-sm md:p-8">
                 <div className="space-y-4 leading-relaxed text-gray-700">
                   {dept.about.paragraphs.map((p, i) => (
                     <p key={i}>{p}</p>
@@ -607,7 +621,7 @@ export function DepartmentPageLayout({
             />
 
             <FadeUp delay={0.08}>
-              <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+              <div className="border-border overflow-hidden rounded-2xl border bg-white shadow-sm">
                 <div
                   className="flex flex-wrap items-center gap-4 px-6 py-5"
                   style={{
@@ -628,9 +642,15 @@ export function DepartmentPageLayout({
                       .slice(0, 2)}
                   </div>
                   <div className="flex-1">
-                    <p className="text-lg font-bold text-white">{dept.hod.name}</p>
-                    <p className="text-sm text-white/70">{dept.hod.designation}</p>
-                    <p className="text-xs text-white/50">{dept.hod.qualification}</p>
+                    <p className="text-lg font-bold text-white">
+                      {dept.hod.name}
+                    </p>
+                    <p className="text-sm text-white/70">
+                      {dept.hod.designation}
+                    </p>
+                    <p className="text-xs text-white/50">
+                      {dept.hod.qualification}
+                    </p>
                   </div>
                   <span
                     className="shrink-0 rounded-full px-4 py-1.5 text-xs font-bold"
@@ -641,7 +661,10 @@ export function DepartmentPageLayout({
                 </div>
 
                 <div className="px-6 py-6 md:px-8 md:py-8">
-                  <Quote className="mb-4 h-8 w-8 opacity-10" style={{ color: ac }} />
+                  <Quote
+                    className="mb-4 h-8 w-8 opacity-10"
+                    style={{ color: ac }}
+                  />
                   <div className="space-y-4 leading-relaxed text-gray-700">
                     {dept.hod.message.map((para, i) => (
                       <p key={i}>{para}</p>
@@ -670,22 +693,22 @@ export function DepartmentPageLayout({
                   }}
                 >
                   <div
-                    className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1 text-[11px] font-black uppercase tracking-widest"
+                    className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-1 text-[11px] font-black tracking-widest uppercase"
                     style={{ color: ac }}
                   >
                     <Target className="h-3 w-3" />
                     Vision
                   </div>
-                  <p className="text-lg font-medium leading-relaxed">
+                  <p className="text-lg leading-relaxed font-medium">
                     {dept.visionMission.vision}
                   </p>
                 </div>
               </FadeUp>
 
               <FadeUp delay={0.14}>
-                <div className="h-full rounded-2xl border border-border bg-white p-6 shadow-sm">
+                <div className="border-border h-full rounded-2xl border bg-white p-6 shadow-sm">
                   <div
-                    className="mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black uppercase tracking-widest"
+                    className="mb-4 inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-black tracking-widest uppercase"
                     style={{
                       color: ac,
                       borderColor: `${ac}30`,
@@ -730,7 +753,7 @@ export function DepartmentPageLayout({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-40px" }}
                   transition={{ duration: 0.45, delay: idx * 0.04 }}
-                  className="rounded-2xl border border-border bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
+                  className="border-border rounded-2xl border bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <span
                     className="mb-3 inline-block rounded-lg px-2.5 py-0.5 text-xs font-black text-white"
@@ -739,7 +762,9 @@ export function DepartmentPageLayout({
                     {po.code}
                   </span>
                   <h4 className="mb-1.5 font-bold text-gray-900">{po.title}</h4>
-                  <p className="text-sm leading-relaxed text-gray-500">{po.description}</p>
+                  <p className="text-sm leading-relaxed text-gray-500">
+                    {po.description}
+                  </p>
                 </motion.div>
               ))}
             </div>
@@ -822,14 +847,14 @@ export function DepartmentPageLayout({
 
             <FadeUp delay={0.12}>
               {dept.curriculum[activeSemester] && (
-                <div className="overflow-x-auto rounded-2xl border border-border bg-white shadow-sm">
+                <div className="border-border overflow-x-auto rounded-2xl border bg-white shadow-sm">
                   <table className="w-full text-sm">
                     <thead>
                       <tr style={{ backgroundColor: `${ac}0d` }}>
                         {["Code", "Subject", "Credits", "Type"].map((h) => (
                           <th
                             key={h}
-                            className="px-5 py-3.5 text-left text-[11px] font-black uppercase tracking-wider text-gray-500"
+                            className="px-5 py-3.5 text-left text-[11px] font-black tracking-wider text-gray-500 uppercase"
                           >
                             {h}
                           </th>
@@ -838,7 +863,10 @@ export function DepartmentPageLayout({
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                       {dept.curriculum[activeSemester].subjects.map((sub) => (
-                        <tr key={sub.code} className="transition-colors hover:bg-surface/40">
+                        <tr
+                          key={sub.code}
+                          className="hover:bg-surface/40 transition-colors"
+                        >
                           <td className="px-5 py-3.5 font-mono text-xs text-gray-400">
                             {sub.code}
                           </td>
@@ -885,7 +913,7 @@ export function DepartmentPageLayout({
             />
 
             <FadeUp delay={0.06}>
-              <div className="mb-6 rounded-2xl border border-border bg-white p-6 shadow-sm">
+              <div className="border-border mb-6 rounded-2xl border bg-white p-6 shadow-sm">
                 <p className="leading-relaxed text-gray-700">
                   {dept.teachingLearning.overview}
                 </p>
@@ -894,21 +922,33 @@ export function DepartmentPageLayout({
 
             <div className="grid gap-5 md:grid-cols-3">
               {[
-                { label: "Teaching Methods", items: dept.teachingLearning.methods },
-                { label: "Tools & Technologies", items: dept.teachingLearning.tools },
-                { label: "Best Practices", items: dept.teachingLearning.practices },
+                {
+                  label: "Teaching Methods",
+                  items: dept.teachingLearning.methods,
+                },
+                {
+                  label: "Tools & Technologies",
+                  items: dept.teachingLearning.tools,
+                },
+                {
+                  label: "Best Practices",
+                  items: dept.teachingLearning.practices,
+                },
               ].map((col, ci) => (
                 <FadeUp key={col.label} delay={0.1 + ci * 0.06}>
-                  <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+                  <div className="border-border rounded-2xl border bg-white p-5 shadow-sm">
                     <div
-                      className="mb-4 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-[11px] font-black uppercase tracking-wider"
+                      className="mb-4 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-[11px] font-black tracking-wider uppercase"
                       style={{ backgroundColor: `${ac}10`, color: ac }}
                     >
                       {col.label}
                     </div>
                     <ul className="space-y-2.5">
                       {col.items.map((item) => (
-                        <li key={item} className="flex items-start gap-2.5 text-sm text-gray-700">
+                        <li
+                          key={item}
+                          className="flex items-start gap-2.5 text-sm text-gray-700"
+                        >
                           <div
                             className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full"
                             style={{ backgroundColor: ac }}
@@ -935,9 +975,9 @@ export function DepartmentPageLayout({
             <div className="grid gap-5 md:grid-cols-2">
               {dept.valueAddedCourses.map((course, ci) => (
                 <FadeUp key={course.name} delay={ci * 0.07}>
-                  <div className="group relative overflow-hidden rounded-2xl border border-border bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+                  <div className="group border-border relative overflow-hidden rounded-2xl border bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                     <div
-                      className="pointer-events-none absolute -right-10 -top-10 h-28 w-28 rounded-full opacity-[0.06] transition-all duration-300 group-hover:scale-125"
+                      className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full opacity-[0.06] transition-all duration-300 group-hover:scale-125"
                       style={{ backgroundColor: ac }}
                     />
                     <div className="mb-3 flex items-start justify-between gap-4">
@@ -949,7 +989,10 @@ export function DepartmentPageLayout({
                         {course.hours}
                       </span>
                     </div>
-                    <p className="mb-2 text-xs font-semibold" style={{ color: ac }}>
+                    <p
+                      className="mb-2 text-xs font-semibold"
+                      style={{ color: ac }}
+                    >
                       {course.provider}
                     </p>
                     <p className="text-sm leading-relaxed text-gray-600">
@@ -971,7 +1014,7 @@ export function DepartmentPageLayout({
             />
 
             <FadeUp delay={0.08}>
-              <div className="overflow-x-auto rounded-2xl border border-border bg-white shadow-sm">
+              <div className="border-border overflow-x-auto rounded-2xl border bg-white shadow-sm">
                 <table className="w-full text-sm">
                   <thead>
                     <tr style={{ backgroundColor: `${ac}0d` }}>
@@ -984,7 +1027,7 @@ export function DepartmentPageLayout({
                       ].map((h) => (
                         <th
                           key={h}
-                          className="px-5 py-3.5 text-left text-[11px] font-black uppercase tracking-wider text-gray-500"
+                          className="px-5 py-3.5 text-left text-[11px] font-black tracking-wider text-gray-500 uppercase"
                         >
                           {h}
                         </th>
@@ -993,7 +1036,10 @@ export function DepartmentPageLayout({
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {dept.faculty.map((f) => (
-                      <tr key={f.name} className="transition-colors hover:bg-surface/50">
+                      <tr
+                        key={f.name}
+                        className="hover:bg-surface/50 transition-colors"
+                      >
                         <td className="px-5 py-3.5">
                           <div className="flex items-center gap-3">
                             <div
@@ -1006,13 +1052,23 @@ export function DepartmentPageLayout({
                                 .join("")
                                 .slice(0, 2)}
                             </div>
-                            <span className="font-semibold text-gray-900">{f.name}</span>
+                            <span className="font-semibold text-gray-900">
+                              {f.name}
+                            </span>
                           </div>
                         </td>
-                        <td className="px-5 py-3.5 text-gray-600">{f.designation}</td>
-                        <td className="px-5 py-3.5 text-gray-500">{f.qualification}</td>
-                        <td className="px-5 py-3.5 text-gray-500">{f.experience}</td>
-                        <td className="px-5 py-3.5 text-gray-500">{f.specialization}</td>
+                        <td className="px-5 py-3.5 text-gray-600">
+                          {f.designation}
+                        </td>
+                        <td className="px-5 py-3.5 text-gray-500">
+                          {f.qualification}
+                        </td>
+                        <td className="px-5 py-3.5 text-gray-500">
+                          {f.experience}
+                        </td>
+                        <td className="px-5 py-3.5 text-gray-500">
+                          {f.specialization}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -1033,7 +1089,7 @@ export function DepartmentPageLayout({
             <div className="grid gap-5 md:grid-cols-2">
               {dept.labs.map((lab, li) => (
                 <FadeUp key={lab.name} delay={li * 0.07}>
-                  <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+                  <div className="border-border overflow-hidden rounded-2xl border bg-white shadow-sm">
                     <div
                       className="flex items-center gap-3 px-5 py-4"
                       style={{
@@ -1044,7 +1100,10 @@ export function DepartmentPageLayout({
                         className="flex h-10 w-10 items-center justify-center rounded-xl"
                         style={{ backgroundColor: `${ac}18` }}
                       >
-                        <FlaskConical className="h-5 w-5" style={{ color: ac }} />
+                        <FlaskConical
+                          className="h-5 w-5"
+                          style={{ color: ac }}
+                        />
                       </div>
                       <h4 className="font-bold text-gray-900">{lab.name}</h4>
                     </div>
@@ -1054,7 +1113,7 @@ export function DepartmentPageLayout({
                         {lab.description}
                       </p>
                       <p
-                        className="mb-2.5 text-[10px] font-black uppercase tracking-widest"
+                        className="mb-2.5 text-[10px] font-black tracking-widest uppercase"
                         style={{ color: ac }}
                       >
                         Equipment
@@ -1090,15 +1149,20 @@ export function DepartmentPageLayout({
             />
 
             <FadeUp delay={0.06}>
-              <div className="mb-5 rounded-2xl border border-border bg-white p-6 shadow-sm">
-                <p className="leading-relaxed text-gray-700">{dept.library.description}</p>
+              <div className="border-border mb-5 rounded-2xl border bg-white p-6 shadow-sm">
+                <p className="leading-relaxed text-gray-700">
+                  {dept.library.description}
+                </p>
               </div>
             </FadeUp>
 
             <FadeUp delay={0.1}>
               <div className="mb-5 grid grid-cols-3 gap-4">
                 {[
-                  { label: "Books", value: dept.library.books.toLocaleString() },
+                  {
+                    label: "Books",
+                    value: dept.library.books.toLocaleString(),
+                  },
                   { label: "Journals", value: dept.library.journals },
                   { label: "Magazines", value: dept.library.magazines },
                 ].map((s) => (
@@ -1113,9 +1177,9 @@ export function DepartmentPageLayout({
             </FadeUp>
 
             <FadeUp delay={0.15}>
-              <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+              <div className="border-border rounded-2xl border bg-white p-5 shadow-sm">
                 <p
-                  className="mb-3 text-[10px] font-black uppercase tracking-widest"
+                  className="mb-3 text-[10px] font-black tracking-widest uppercase"
                   style={{ color: ac }}
                 >
                   Digital Access & Online Resources
@@ -1125,7 +1189,10 @@ export function DepartmentPageLayout({
                     <span
                       key={r}
                       className="rounded-xl border px-3 py-1.5 text-sm font-medium text-gray-700"
-                      style={{ borderColor: `${ac}22`, backgroundColor: `${ac}08` }}
+                      style={{
+                        borderColor: `${ac}22`,
+                        backgroundColor: `${ac}08`,
+                      }}
                     >
                       {r}
                     </span>
@@ -1144,18 +1211,21 @@ export function DepartmentPageLayout({
               index={14}
             />
 
-            <div className="relative border-l-2 pl-8" style={{ borderColor: `${ac}25` }}>
+            <div
+              className="relative border-l-2 pl-8"
+              style={{ borderColor: `${ac}25` }}
+            >
               {dept.events.map((ev, i) => (
                 <FadeUp key={i} delay={i * 0.05}>
                   <div className="relative mb-8 last:mb-0">
                     <div
-                      className="absolute -left-[2.35rem] flex h-5 w-5 items-center justify-center rounded-full border-2 border-surface shadow"
+                      className="border-surface absolute -left-[2.35rem] flex h-5 w-5 items-center justify-center rounded-full border-2 shadow"
                       style={{ backgroundColor: ac }}
                     >
                       <div className="h-1.5 w-1.5 rounded-full bg-white" />
                     </div>
 
-                    <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+                    <div className="border-border rounded-2xl border bg-white p-5 shadow-sm">
                       <div className="mb-2.5 flex flex-wrap items-start justify-between gap-2">
                         <h4 className="font-bold text-gray-900">{ev.title}</h4>
                         <div className="flex items-center gap-2">
@@ -1165,12 +1235,19 @@ export function DepartmentPageLayout({
                           >
                             {ev.type}
                           </span>
-                          <span className="text-xs text-gray-400">{ev.date}</span>
+                          <span className="text-xs text-gray-400">
+                            {ev.date}
+                          </span>
                         </div>
                       </div>
-                      <p className="text-sm leading-relaxed text-gray-600">{ev.description}</p>
+                      <p className="text-sm leading-relaxed text-gray-600">
+                        {ev.description}
+                      </p>
                       {ev.resourcePerson && (
-                        <p className="mt-2.5 text-xs font-semibold" style={{ color: ac }}>
+                        <p
+                          className="mt-2.5 text-xs font-semibold"
+                          style={{ color: ac }}
+                        >
                           Resource Person: {ev.resourcePerson}
                         </p>
                       )}
@@ -1191,9 +1268,9 @@ export function DepartmentPageLayout({
             />
 
             <FadeUp delay={0.06}>
-              <div className="mb-6 rounded-2xl border border-border bg-white p-5 shadow-sm">
+              <div className="border-border mb-6 rounded-2xl border bg-white p-5 shadow-sm">
                 <p
-                  className="mb-3 text-[10px] font-black uppercase tracking-widest"
+                  className="mb-3 text-[10px] font-black tracking-widest uppercase"
                   style={{ color: ac }}
                 >
                   Clubs & Associations
@@ -1218,7 +1295,7 @@ export function DepartmentPageLayout({
             <div className="grid gap-5 md:grid-cols-2">
               {dept.studentParticipation.highlights.map((h, hi) => (
                 <FadeUp key={h.title} delay={hi * 0.06}>
-                  <div className="rounded-2xl border border-border bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+                  <div className="border-border rounded-2xl border bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                     <div
                       className="mb-1.5 inline-block rounded-full px-2.5 py-0.5 text-xs font-bold text-white"
                       style={{ backgroundColor: ac }}
@@ -1226,7 +1303,9 @@ export function DepartmentPageLayout({
                       {h.year}
                     </div>
                     <h4 className="mb-2 font-bold text-gray-900">{h.title}</h4>
-                    <p className="text-sm leading-relaxed text-gray-600">{h.description}</p>
+                    <p className="text-sm leading-relaxed text-gray-600">
+                      {h.description}
+                    </p>
                   </div>
                 </FadeUp>
               ))}
@@ -1245,34 +1324,45 @@ export function DepartmentPageLayout({
             <FadeUp delay={0.06}>
               <div className="mb-6">
                 <p
-                  className="mb-3 text-[10px] font-black uppercase tracking-widest"
+                  className="mb-3 text-[10px] font-black tracking-widest uppercase"
                   style={{ color: ac }}
                 >
                   Conferences & Paper Presentations
                 </p>
-                <div className="overflow-x-auto rounded-2xl border border-border bg-white shadow-sm">
+                <div className="border-border overflow-x-auto rounded-2xl border bg-white shadow-sm">
                   <table className="w-full text-sm">
                     <thead>
                       <tr style={{ backgroundColor: `${ac}0d` }}>
-                        {["Faculty", "Conference / Event", "Venue", "Year"].map((h) => (
-                          <th
-                            key={h}
-                            className="px-5 py-3.5 text-left text-[11px] font-black uppercase tracking-wider text-gray-500"
-                          >
-                            {h}
-                          </th>
-                        ))}
+                        {["Faculty", "Conference / Event", "Venue", "Year"].map(
+                          (h) => (
+                            <th
+                              key={h}
+                              className="px-5 py-3.5 text-left text-[11px] font-black tracking-wider text-gray-500 uppercase"
+                            >
+                              {h}
+                            </th>
+                          ),
+                        )}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
                       {dept.facultyParticipation.conferences.map((c, i) => (
-                        <tr key={i} className="transition-colors hover:bg-surface/40">
+                        <tr
+                          key={i}
+                          className="hover:bg-surface/40 transition-colors"
+                        >
                           <td className="px-5 py-3.5 font-semibold text-gray-900">
                             {c.faculty}
                           </td>
-                          <td className="px-5 py-3.5 text-gray-700">{c.title}</td>
-                          <td className="px-5 py-3.5 text-gray-500">{c.venue}</td>
-                          <td className="px-5 py-3.5 text-gray-500">{c.year}</td>
+                          <td className="px-5 py-3.5 text-gray-700">
+                            {c.title}
+                          </td>
+                          <td className="px-5 py-3.5 text-gray-500">
+                            {c.venue}
+                          </td>
+                          <td className="px-5 py-3.5 text-gray-500">
+                            {c.year}
+                          </td>
                         </tr>
                       ))}
                     </tbody>
@@ -1283,7 +1373,7 @@ export function DepartmentPageLayout({
 
             <FadeUp delay={0.12}>
               <p
-                className="mb-3 text-[10px] font-black uppercase tracking-widest"
+                className="mb-3 text-[10px] font-black tracking-widest uppercase"
                 style={{ color: ac }}
               >
                 Workshops & FDPs Attended
@@ -1292,7 +1382,7 @@ export function DepartmentPageLayout({
                 {dept.facultyParticipation.workshops.map((w) => (
                   <span
                     key={w}
-                    className="rounded-xl border border-border bg-white px-3 py-1.5 text-sm text-gray-700 shadow-sm"
+                    className="border-border rounded-xl border bg-white px-3 py-1.5 text-sm text-gray-700 shadow-sm"
                   >
                     {w}
                   </span>
@@ -1309,7 +1399,10 @@ export function DepartmentPageLayout({
               accentColor={ac}
               index={17}
             />
-            <AchievementGrid achievements={dept.studentAchievements} accentColor={ac} />
+            <AchievementGrid
+              achievements={dept.studentAchievements}
+              accentColor={ac}
+            />
           </section>
 
           <section className="mb-20">
@@ -1320,7 +1413,10 @@ export function DepartmentPageLayout({
               accentColor={ac}
               index={18}
             />
-            <AchievementGrid achievements={dept.facultyAchievements} accentColor={ac} />
+            <AchievementGrid
+              achievements={dept.facultyAchievements}
+              accentColor={ac}
+            />
           </section>
 
           <section className="mb-20">
@@ -1333,7 +1429,7 @@ export function DepartmentPageLayout({
             />
 
             <FadeUp delay={0.08}>
-              <div className="overflow-hidden rounded-2xl border border-border bg-white shadow-sm">
+              <div className="border-border overflow-hidden rounded-2xl border bg-white shadow-sm">
                 <div
                   className="relative overflow-hidden px-6 py-8 text-white"
                   style={{
@@ -1341,37 +1437,51 @@ export function DepartmentPageLayout({
                   }}
                 >
                   <div
-                    className="pointer-events-none absolute right-4 top-4 h-40 w-40 rounded-full opacity-10 blur-2xl"
+                    className="pointer-events-none absolute top-4 right-4 h-40 w-40 rounded-full opacity-10 blur-2xl"
                     style={{ backgroundColor: ac }}
                   />
-                  <p className="mb-1 text-[10px] font-black uppercase tracking-widest opacity-60">
+                  <p className="mb-1 text-[10px] font-black tracking-widest uppercase opacity-60">
                     Department Publication
                   </p>
-                  <h3 className="mb-2 font-serif text-3xl font-black">{dept.magazine.name}</h3>
-                  <p className="leading-relaxed opacity-75">{dept.magazine.description}</p>
+                  <h3 className="mb-2 font-serif text-3xl font-black">
+                    {dept.magazine.name}
+                  </h3>
+                  <p className="leading-relaxed opacity-75">
+                    {dept.magazine.description}
+                  </p>
                 </div>
 
                 <div className="p-6">
                   <div className="mb-6 flex gap-8 text-sm">
                     <div>
                       <p className="text-xs text-gray-400">Frequency</p>
-                      <p className="font-bold text-gray-900">{dept.magazine.frequency}</p>
+                      <p className="font-bold text-gray-900">
+                        {dept.magazine.frequency}
+                      </p>
                     </div>
                     <div>
                       <p className="text-xs text-gray-400">Latest Issue</p>
-                      <p className="font-bold text-gray-900">{dept.magazine.latestIssue}</p>
+                      <p className="font-bold text-gray-900">
+                        {dept.magazine.latestIssue}
+                      </p>
                     </div>
                   </div>
                   <p
-                    className="mb-3 text-[10px] font-black uppercase tracking-widest"
+                    className="mb-3 text-[10px] font-black tracking-widest uppercase"
                     style={{ color: ac }}
                   >
                     Recent Highlights
                   </p>
                   <ul className="space-y-2.5">
                     {dept.magazine.highlights.map((h) => (
-                      <li key={h} className="flex items-start gap-2.5 text-sm text-gray-700">
-                        <ChevronRight className="mt-0.5 h-4 w-4 shrink-0" style={{ color: ac }} />
+                      <li
+                        key={h}
+                        className="flex items-start gap-2.5 text-sm text-gray-700"
+                      >
+                        <ChevronRight
+                          className="mt-0.5 h-4 w-4 shrink-0"
+                          style={{ color: ac }}
+                        />
                         {h}
                       </li>
                     ))}
@@ -1421,7 +1531,9 @@ export function DepartmentPageLayout({
                     >
                       {s.value}
                     </p>
-                    <p className="relative mt-1 text-sm text-white/55">{s.label}</p>
+                    <p className="relative mt-1 text-sm text-white/55">
+                      {s.label}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -1429,9 +1541,9 @@ export function DepartmentPageLayout({
 
             <div className="grid gap-5 md:grid-cols-2">
               <FadeUp delay={0.1}>
-                <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+                <div className="border-border rounded-2xl border bg-white p-5 shadow-sm">
                   <p
-                    className="mb-4 text-[10px] font-black uppercase tracking-widest"
+                    className="mb-4 text-[10px] font-black tracking-widest uppercase"
                     style={{ color: ac }}
                   >
                     Top Recruiters
@@ -1451,17 +1563,23 @@ export function DepartmentPageLayout({
               </FadeUp>
 
               <FadeUp delay={0.13}>
-                <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+                <div className="border-border rounded-2xl border bg-white p-5 shadow-sm">
                   <p
-                    className="mb-4 text-[10px] font-black uppercase tracking-widest"
+                    className="mb-4 text-[10px] font-black tracking-widest uppercase"
                     style={{ color: ac }}
                   >
                     Higher Studies
                   </p>
                   <ul className="space-y-2.5">
                     {dept.careerProgression.higherStudies.map((h) => (
-                      <li key={h} className="flex items-start gap-2.5 text-sm text-gray-700">
-                        <ChevronRight className="mt-0.5 h-4 w-4 shrink-0" style={{ color: ac }} />
+                      <li
+                        key={h}
+                        className="flex items-start gap-2.5 text-sm text-gray-700"
+                      >
+                        <ChevronRight
+                          className="mt-0.5 h-4 w-4 shrink-0"
+                          style={{ color: ac }}
+                        />
                         {h}
                       </li>
                     ))}
@@ -1496,16 +1614,19 @@ export function DepartmentPageLayout({
                 },
               ].map((col, ci) => (
                 <FadeUp key={col.label} delay={ci * 0.08}>
-                  <div className="rounded-2xl border border-border bg-white p-5 shadow-sm">
+                  <div className="border-border rounded-2xl border bg-white p-5 shadow-sm">
                     <div
-                      className="mb-4 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-[11px] font-black uppercase tracking-wider"
+                      className="mb-4 inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-[11px] font-black tracking-wider uppercase"
                       style={{ backgroundColor: `${ac}10`, color: ac }}
                     >
                       {col.label}
                     </div>
                     <ol className="space-y-3">
                       {col.items.map((item, i) => (
-                        <li key={i} className="flex gap-3 text-sm text-gray-700">
+                        <li
+                          key={i}
+                          className="flex gap-3 text-sm text-gray-700"
+                        >
                           <span
                             className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black text-white"
                             style={{ backgroundColor: ac }}

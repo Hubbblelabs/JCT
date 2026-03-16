@@ -62,7 +62,7 @@ export function UgPrograms() {
         <div className="flex items-center justify-center gap-4 border-t border-stone-200 pt-10">
           <Link
             href="/institutions/arts-science/courses"
-            className="group inline-flex h-12 items-center gap-2 rounded-full bg-[#800020] px-8 font-semibold text-sm text-white shadow-[0_8px_20px_rgba(128,0,32,0.25)] transition-all hover:-translate-y-0.5 hover:bg-[#5e0017] hover:shadow-[0_12px_24px_rgba(128,0,32,0.3)]"
+            className="group inline-flex h-12 items-center gap-2 rounded-full bg-[#800020] px-8 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(128,0,32,0.25)] transition-all hover:-translate-y-0.5 hover:bg-[#5e0017] hover:shadow-[0_12px_24px_rgba(128,0,32,0.3)]"
           >
             Browse all programs
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

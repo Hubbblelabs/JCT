@@ -153,7 +153,11 @@ export default async function CoursePage({
                   {course.longDesc.map((paragraph, i) => (
                     <p
                       key={i}
-                      className={i === 0 ? "text-xl leading-relaxed font-medium text-[#2C2C2C]" : "leading-relaxed"}
+                      className={
+                        i === 0
+                          ? "text-xl leading-relaxed font-medium text-[#2C2C2C]"
+                          : "leading-relaxed"
+                      }
                     >
                       {paragraph}
                     </p>
@@ -261,7 +265,7 @@ export default async function CoursePage({
                         href="/institutions/arts-science#admissions"
                         className={cn(
                           buttonVariants(),
-                          "h-14 w-full rounded-full border border-[#f1d892]/70 bg-linear-to-r from-[#f0ce74] to-[#D4AF37] text-lg font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
+                          "h-14 w-full rounded-full border border-[#f1d892]/70 bg-linear-to-r from-[#f0ce74] to-[#D4AF37] text-lg font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95",
                         )}
                       >
                         Apply Now
@@ -270,7 +274,7 @@ export default async function CoursePage({
                         href={`/syllabus/${course.slug}.pdf`}
                         className={cn(
                           buttonVariants({ variant: "outline" }),
-                          "h-14 w-full rounded-full border-2 border-[#800020]/35 bg-white/80 text-lg font-bold text-[#800020] transition-all hover:-translate-y-0.5 hover:bg-white"
+                          "h-14 w-full rounded-full border-2 border-[#800020]/35 bg-white/80 text-lg font-bold text-[#800020] transition-all hover:-translate-y-0.5 hover:bg-white",
                         )}
                       >
                         Download Syllabus
@@ -306,7 +310,7 @@ export default async function CoursePage({
                 href="/institutions/arts-science#admissions"
                 className={cn(
                   buttonVariants(),
-                  "h-14 rounded-full border border-[#800020] bg-[#800020] px-8 text-lg font-bold text-white shadow-[0_10px_24px_rgba(128,0,32,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#5e0017]"
+                  "h-14 rounded-full border border-[#800020] bg-[#800020] px-8 text-lg font-bold text-white shadow-[0_10px_24px_rgba(128,0,32,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#5e0017]",
                 )}
               >
                 Start Your Application
@@ -315,7 +319,7 @@ export default async function CoursePage({
                 href="/institutions/arts-science#contact"
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "h-14 rounded-full border-2 border-[#800020]/45 bg-white/40 px-8 text-lg font-bold text-[#800020] transition-all hover:-translate-y-0.5 hover:bg-white/70"
+                  "h-14 rounded-full border-2 border-[#800020]/45 bg-white/40 px-8 text-lg font-bold text-[#800020] transition-all hover:-translate-y-0.5 hover:bg-white/70",
                 )}
               >
                 Contact Admissions

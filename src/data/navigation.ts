@@ -25,7 +25,10 @@ export const navigationData: NavItem[] = [
       { name: "Principal's Message", href: "/about/principals-message" },
       { name: "History", href: "/about/history" },
       { name: "Leadership / Management", href: "/about/leadership" },
-      { name: "Organizational Structure", href: "/about/organizational-structure" },
+      {
+        name: "Organizational Structure",
+        href: "/about/organizational-structure",
+      },
       { name: "Governing Council", href: "/about/governing-council" },
       { name: "Strategic Plan", href: "/about/strategic-plan" },
     ],
@@ -34,9 +37,21 @@ export const navigationData: NavItem[] = [
     name: "Institutions",
     href: "/institutions",
     children: [
-      { name: "Engineering", href: "/institutions/engineering", desc: "B.E. / B.Tech programs" },
-      { name: "Arts & Science", href: "/institutions/arts-science", desc: "UG & PG programs" },
-      { name: "Polytechnic", href: "/institutions/polytechnic", desc: "Diploma programs" },
+      {
+        name: "Engineering",
+        href: "/institutions/engineering",
+        desc: "B.E. / B.Tech programs",
+      },
+      {
+        name: "Arts & Science",
+        href: "/institutions/arts-science",
+        desc: "UG & PG programs",
+      },
+      {
+        name: "Polytechnic",
+        href: "/institutions/polytechnic",
+        desc: "Diploma programs",
+      },
     ],
   },
   {
@@ -135,7 +150,10 @@ export const navigationData: NavItem[] = [
     name: "Quality",
     href: "/quality",
     children: [
-      { name: "Accreditations & Recognitions", href: "/quality/accreditations" },
+      {
+        name: "Accreditations & Recognitions",
+        href: "/quality/accreditations",
+      },
       { name: "IQAC", href: "/quality/iqac" },
       { name: "Feedback Systems", href: "/quality/feedback" },
       { name: "Awards & Achievements", href: "/quality/awards" },
@@ -145,11 +163,20 @@ export const navigationData: NavItem[] = [
     name: "Mandatory Disclosure",
     href: "/mandatory-disclosure",
     children: [
-      { name: "Code of Conduct", href: "/mandatory-disclosure/code-of-conduct" },
-      { name: "Policies & Regulations", href: "/mandatory-disclosure/policies" },
+      {
+        name: "Code of Conduct",
+        href: "/mandatory-disclosure/code-of-conduct",
+      },
+      {
+        name: "Policies & Regulations",
+        href: "/mandatory-disclosure/policies",
+      },
       { name: "Professional Ethics", href: "/mandatory-disclosure/ethics" },
       { name: "HR Manual", href: "/mandatory-disclosure/hr-manual" },
-      { name: "Student Satisfaction Survey", href: "/mandatory-disclosure/survey" },
+      {
+        name: "Student Satisfaction Survey",
+        href: "/mandatory-disclosure/survey",
+      },
       { name: "Privacy Policy", href: "/mandatory-disclosure/privacy" },
       { name: "Terms & Conditions", href: "/mandatory-disclosure/terms" },
       { name: "Disclaimer", href: "/mandatory-disclosure/disclaimer" },

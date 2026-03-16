@@ -20,10 +20,10 @@ export function Hero() {
           priority
         />
         <div className="absolute inset-0 bg-linear-to-b from-[#1A237E]/95 via-[#1A237E]/80 to-[#1A237E]" />
-        
+
         {/* Decorative circles */}
         <div className="absolute top-1/4 -left-64 h-[500px] w-[500px] rounded-full bg-[#FFB300]/10 blur-[120px]" />
-        <div className="absolute top-3/4 -right-64 h-[600px] w-[600px] rounded-full bg-[#1A237E] brightness-150 blur-[150px]" />
+        <div className="absolute top-3/4 -right-64 h-[600px] w-[600px] rounded-full bg-[#1A237E] blur-[150px] brightness-150" />
       </div>
 
       <div className="relative z-10 container mx-auto px-4 text-center md:px-6">
@@ -34,10 +34,10 @@ export function Hero() {
           className="mx-auto max-w-4xl"
         >
           <motion.div
-             initial={{ opacity: 0, scale: 0.9 }}
-             animate={{ opacity: 1, scale: 1 }}
-             transition={{ duration: 0.5 }}
-             className="mb-8 flex justify-center"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8 flex justify-center"
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-[#ffd166]/40 bg-[#1A237E]/80 px-5 py-2 text-xs font-bold tracking-widest text-[#FFB300] uppercase shadow-inner backdrop-blur-md">
               <Wrench size={14} className="text-[#ffd166]" />
@@ -49,10 +49,10 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
-            className="mb-8 font-sans text-5xl font-black leading-tight tracking-tight text-white md:text-7xl lg:text-8xl flex flex-col items-center"
+            className="mb-8 flex flex-col items-center font-sans text-5xl leading-tight font-black tracking-tight text-white md:text-7xl lg:text-8xl"
           >
             <span>Empowering</span>
-            <span className="text-[#FFB300] bg-clip-text text-transparent bg-linear-to-r from-[#FFB300] to-[#ffd166]">
+            <span className="bg-linear-to-r from-[#FFB300] to-[#ffd166] bg-clip-text text-[#FFB300] text-transparent">
               Future Innovators
             </span>
           </motion.h1>
@@ -61,11 +61,11 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="mx-auto mb-12 max-w-2xl text-lg font-medium leading-relaxed text-white/80 md:text-xl"
+            className="mx-auto mb-12 max-w-2xl text-lg leading-relaxed font-medium text-white/80 md:text-xl"
           >
-            Emerge as a leading Institute for Quality and Skill embedded
-            Diploma Education. Workshop-driven training that puts you in
-            industry-ready condition from day one.
+            Emerge as a leading Institute for Quality and Skill embedded Diploma
+            Education. Workshop-driven training that puts you in industry-ready
+            condition from day one.
           </motion.p>
 
           <motion.div

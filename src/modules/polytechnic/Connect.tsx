@@ -19,7 +19,7 @@ export function Connect() {
             <h2 className="mb-2 text-sm font-bold tracking-[0.2em] text-[#1A237E] uppercase">
               Connect
             </h2>
-            <h3 className="mb-6 font-sans text-4xl font-bold leading-tight text-[#1A237E] md:text-5xl">
+            <h3 className="mb-6 font-sans text-4xl leading-tight font-bold text-[#1A237E] md:text-5xl">
               Connect. Learn. Explore.
             </h3>
             <p className="mb-10 text-xl leading-relaxed font-light text-[#212121]/80 md:text-2xl">

@@ -74,8 +74,7 @@ function createArtsDepartment(config: {
       ],
     },
     visionMission: {
-      vision:
-        `To emerge as a vibrant department in ${config.shortName} education fostering innovation, employability, and social contribution.`,
+      vision: `To emerge as a vibrant department in ${config.shortName} education fostering innovation, employability, and social contribution.`,
       mission: [
         "Deliver quality education with strong conceptual and applied learning.",
         "Encourage skill development, research orientation, and entrepreneurial mindset.",
@@ -86,37 +85,44 @@ function createArtsDepartment(config: {
       {
         code: "PO1",
         title: "Domain Knowledge",
-        description: "Demonstrate strong understanding of core concepts in the program domain.",
+        description:
+          "Demonstrate strong understanding of core concepts in the program domain.",
       },
       {
         code: "PO2",
         title: "Analytical Thinking",
-        description: "Apply analytical and critical reasoning to solve practical and business problems.",
+        description:
+          "Apply analytical and critical reasoning to solve practical and business problems.",
       },
       {
         code: "PO3",
         title: "Communication",
-        description: "Communicate effectively in written and oral forms for academic and professional contexts.",
+        description:
+          "Communicate effectively in written and oral forms for academic and professional contexts.",
       },
       {
         code: "PO4",
         title: "Digital Competence",
-        description: "Use digital tools and modern technologies relevant to the program area.",
+        description:
+          "Use digital tools and modern technologies relevant to the program area.",
       },
       {
         code: "PO5",
         title: "Teamwork and Leadership",
-        description: "Work collaboratively and demonstrate leadership in multidisciplinary settings.",
+        description:
+          "Work collaboratively and demonstrate leadership in multidisciplinary settings.",
       },
       {
         code: "PO6",
         title: "Ethics and Social Responsibility",
-        description: "Exhibit ethical values, social concern, and environmental awareness.",
+        description:
+          "Exhibit ethical values, social concern, and environmental awareness.",
       },
       {
         code: "PO7",
         title: "Employability and Lifelong Learning",
-        description: "Develop employability skills and engage in continuous professional development.",
+        description:
+          "Develop employability skills and engage in continuous professional development.",
       },
     ],
     advisoryBoard: [
@@ -204,13 +210,15 @@ function createArtsDepartment(config: {
         name: "Career Readiness and Aptitude",
         hours: "30 Hours",
         provider: "JCT Placement Cell",
-        description: "Enhances logical reasoning, communication, and interview confidence.",
+        description:
+          "Enhances logical reasoning, communication, and interview confidence.",
       },
       {
         name: `${config.focusAreas[0]} Certification Basics`,
         hours: "40 Hours",
         provider: "Industry Academic Partner",
-        description: "Skill-based certification course aligned to current market demand.",
+        description:
+          "Skill-based certification course aligned to current market demand.",
       },
     ],
     faculty: [
@@ -241,13 +249,23 @@ function createArtsDepartment(config: {
         name: "Program Laboratory",
         description:
           "Dedicated lab with computing and subject-specific facilities to support practical components.",
-        equipment: ["Desktop Systems", "Licensed Software", "Projector", "Internet Access"],
+        equipment: [
+          "Desktop Systems",
+          "Licensed Software",
+          "Projector",
+          "Internet Access",
+        ],
       },
       {
         name: "Communication and Soft Skills Lab",
         description:
           "Supports language training, group discussion practice, and interview preparation.",
-        equipment: ["Audio-Visual Tools", "Language Software", "Training Modules", "Assessment Platform"],
+        equipment: [
+          "Audio-Visual Tools",
+          "Language Software",
+          "Training Modules",
+          "Assessment Platform",
+        ],
       },
     ],
     library: {
@@ -270,7 +288,8 @@ function createArtsDepartment(config: {
         title: "Career Guidance Conclave",
         date: "2025-02-08",
         type: "Seminar",
-        description: "Industry experts interacted with students on career pathways and emerging skills.",
+        description:
+          "Industry experts interacted with students on career pathways and emerging skills.",
         resourcePerson: "Senior HR and Domain Experts",
       },
     ],
@@ -280,12 +299,14 @@ function createArtsDepartment(config: {
         {
           title: "State-Level Presentation Winners",
           year: "2024",
-          description: "Students secured prizes in inter-collegiate paper presentation contests.",
+          description:
+            "Students secured prizes in inter-collegiate paper presentation contests.",
         },
         {
           title: "Community Outreach Program",
           year: "2023",
-          description: "Students organized awareness and social impact activities in nearby communities.",
+          description:
+            "Students organized awareness and social impact activities in nearby communities.",
         },
       ],
     },
@@ -340,7 +361,8 @@ function createArtsDepartment(config: {
     ],
     magazine: {
       name: "Campus Insight",
-      description: "Student-faculty newsletter showcasing achievements, ideas, and events.",
+      description:
+        "Student-faculty newsletter showcasing achievements, ideas, and events.",
       frequency: "Quarterly",
       latestIssue: "Vol. 5 Issue 4",
       highlights: [
@@ -350,8 +372,19 @@ function createArtsDepartment(config: {
       ],
     },
     careerProgression: {
-      topRecruiters: ["Infosys BPM", "Sutherland", "Wipro", "HDFC", "ICICI Bank"],
-      higherStudies: ["M.Sc.", "M.B.A.", "M.Com.", "Professional Certifications"],
+      topRecruiters: [
+        "Infosys BPM",
+        "Sutherland",
+        "Wipro",
+        "HDFC",
+        "ICICI Bank",
+      ],
+      higherStudies: [
+        "M.Sc.",
+        "M.B.A.",
+        "M.Com.",
+        "Professional Certifications",
+      ],
       averagePackage: "INR 3.2 LPA",
       placementRate: "86%",
     },
@@ -402,7 +435,11 @@ export const artsDepartments: DepartmentData[] = [
     name: "B.Com. Logistics & Supply Chain Management",
     shortName: "BCL",
     intake: 60,
-    focusAreas: ["Logistics Operations", "Supply Chain Analytics", "Warehouse Management"],
+    focusAreas: [
+      "Logistics Operations",
+      "Supply Chain Analytics",
+      "Warehouse Management",
+    ],
   }),
   createArtsDepartment({
     slug: "bba-logistics",

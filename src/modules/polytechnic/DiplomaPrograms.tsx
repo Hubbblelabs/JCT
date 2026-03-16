@@ -13,17 +13,17 @@ export function DiplomaPrograms() {
       className="relative overflow-hidden bg-linear-to-b from-[#F4F6FF] via-white to-[#FFF9EC] py-20 md:py-32"
     >
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -right-24 -top-20 h-72 w-72 rounded-full bg-[#1A237E]/8 blur-3xl" />
+        <div className="absolute -top-20 -right-24 h-72 w-72 rounded-full bg-[#1A237E]/8 blur-3xl" />
         <div className="absolute -bottom-16 -left-16 h-60 w-60 rounded-full bg-[#FFB300]/12 blur-3xl" />
       </div>
 
-      <div className="container relative mx-auto px-4 md:px-8">
+      <div className="relative container mx-auto px-4 md:px-8">
         <div className="mb-14 grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
           <div className="text-center md:text-left">
             <h2 className="mb-4 text-xs font-black tracking-[0.22em] text-[#1A237E] uppercase">
               Study @ JCT
             </h2>
-            <h3 className="mb-5 font-sans text-4xl font-black leading-tight text-[#1A237E] md:text-5xl lg:text-6xl">
+            <h3 className="mb-5 font-sans text-4xl leading-tight font-black text-[#1A237E] md:text-5xl lg:text-6xl">
               Six streams. One
               <span className="block text-[#FFB300]">polytechnic future.</span>
             </h3>
@@ -55,7 +55,7 @@ export function DiplomaPrograms() {
               className="group relative flex min-w-[18rem] shrink-0 snap-center flex-col overflow-hidden rounded-3xl border border-[#1A237E]/10 bg-white p-8 shadow-[0_12px_36px_-22px_rgba(26,35,126,0.45)] transition-all duration-300 hover:-translate-y-1 hover:border-[#1A237E]/30 hover:shadow-[0_24px_56px_-24px_rgba(26,35,126,0.45)] md:min-w-88"
               draggable={false}
             >
-              <div className="pointer-events-none absolute right-0 top-0 h-24 w-24 rounded-bl-[2.5rem] bg-[#1A237E]/5 transition-all duration-300 group-hover:scale-110 group-hover:bg-[#1A237E]/10" />
+              <div className="pointer-events-none absolute top-0 right-0 h-24 w-24 rounded-bl-[2.5rem] bg-[#1A237E]/5 transition-all duration-300 group-hover:scale-110 group-hover:bg-[#1A237E]/10" />
 
               <Link
                 href={`/institutions/polytechnic/departments/${prog.slug}`}
@@ -72,7 +72,7 @@ export function DiplomaPrograms() {
                 {prog.duration} · Full Time
               </span>
 
-              <h3 className="mb-3 font-sans text-2xl font-black leading-tight text-[#1A237E]">
+              <h3 className="mb-3 font-sans text-2xl leading-tight font-black text-[#1A237E]">
                 {prog.name}
               </h3>
 

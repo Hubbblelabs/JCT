@@ -26,7 +26,10 @@ function buildPolyCurriculum(prefix: string): DepartmentData["curriculum"] {
         },
         {
           code: `${prefix}${semester}04`,
-          name: semester === 6 ? "Industrial Training Project" : "Skill Enhancement",
+          name:
+            semester === 6
+              ? "Industrial Training Project"
+              : "Skill Enhancement",
           credits: 3,
           type: semester === 6 ? "Project" : "Elective",
         },
@@ -74,8 +77,7 @@ function createPolyDepartment(config: {
       ],
     },
     visionMission: {
-      vision:
-        `To develop competent diploma professionals in ${config.shortName} with technical expertise and ethical values.`,
+      vision: `To develop competent diploma professionals in ${config.shortName} with technical expertise and ethical values.`,
       mission: [
         "Provide quality diploma education with extensive practical training.",
         "Strengthen industry linkage through internships, visits, and expert sessions.",
@@ -86,32 +88,38 @@ function createPolyDepartment(config: {
       {
         code: "PO1",
         title: "Technical Knowledge",
-        description: "Apply core engineering principles and technical knowledge to routine industrial tasks.",
+        description:
+          "Apply core engineering principles and technical knowledge to routine industrial tasks.",
       },
       {
         code: "PO2",
         title: "Practical Skills",
-        description: "Perform laboratory and workshop operations using standard tools and procedures.",
+        description:
+          "Perform laboratory and workshop operations using standard tools and procedures.",
       },
       {
         code: "PO3",
         title: "Problem Solving",
-        description: "Identify and resolve technical issues in equipment, systems, and processes.",
+        description:
+          "Identify and resolve technical issues in equipment, systems, and processes.",
       },
       {
         code: "PO4",
         title: "Communication and Teamwork",
-        description: "Communicate effectively and work in teams for productive project execution.",
+        description:
+          "Communicate effectively and work in teams for productive project execution.",
       },
       {
         code: "PO5",
         title: "Safety and Ethics",
-        description: "Follow professional ethics, workplace safety, and environmental standards.",
+        description:
+          "Follow professional ethics, workplace safety, and environmental standards.",
       },
       {
         code: "PO6",
         title: "Career Readiness",
-        description: "Demonstrate employability skills and readiness for industry or higher technical education.",
+        description:
+          "Demonstrate employability skills and readiness for industry or higher technical education.",
       },
     ],
     advisoryBoard: [
@@ -199,13 +207,15 @@ function createPolyDepartment(config: {
         name: "Industrial Safety Practices",
         hours: "24 Hours",
         provider: "Department Training Cell",
-        description: "Focuses on safety standards, compliance, and shop-floor best practices.",
+        description:
+          "Focuses on safety standards, compliance, and shop-floor best practices.",
       },
       {
         name: `${config.focusAreas[0]} Skill Module`,
         hours: "36 Hours",
         provider: "Industry Trainer",
-        description: "Practical module to strengthen job-ready skills in core specialization.",
+        description:
+          "Practical module to strengthen job-ready skills in core specialization.",
       },
     ],
     faculty: [
@@ -236,13 +246,23 @@ function createPolyDepartment(config: {
         name: "Core Practical Lab",
         description:
           "Supports curriculum practicals and competency-based experiments for diploma students.",
-        equipment: ["Bench Tools", "Measuring Instruments", "Training Modules", "Safety Kits"],
+        equipment: [
+          "Bench Tools",
+          "Measuring Instruments",
+          "Training Modules",
+          "Safety Kits",
+        ],
       },
       {
         name: "Workshop and Skill Development Center",
         description:
           "Provides hands-on machining, fabrication, assembly, and maintenance training.",
-        equipment: ["Workshop Machines", "Electrical Panels", "Testing Equipment", "CAD Stations"],
+        equipment: [
+          "Workshop Machines",
+          "Electrical Panels",
+          "Testing Equipment",
+          "CAD Stations",
+        ],
       },
     ],
     library: {
@@ -258,13 +278,15 @@ function createPolyDepartment(config: {
         title: "Skill Expo",
         date: "2025-01-10",
         type: "Department Event",
-        description: "Students exhibited working models and practical innovations to industry visitors.",
+        description:
+          "Students exhibited working models and practical innovations to industry visitors.",
       },
       {
         title: "Industry Interaction Day",
         date: "2024-10-18",
         type: "Seminar",
-        description: "Experts shared expectations for diploma engineers and career growth pathways.",
+        description:
+          "Experts shared expectations for diploma engineers and career growth pathways.",
         resourcePerson: "Production and Maintenance Managers",
       },
     ],
@@ -274,12 +296,14 @@ function createPolyDepartment(config: {
         {
           title: "District Skill Competition Winners",
           year: "2024",
-          description: "Students secured top ranks in regional technical skill competitions.",
+          description:
+            "Students secured top ranks in regional technical skill competitions.",
         },
         {
           title: "Mini Project Showcase",
           year: "2023",
-          description: "Multiple student teams developed low-cost practical prototypes.",
+          description:
+            "Multiple student teams developed low-cost practical prototypes.",
         },
       ],
     },
@@ -322,19 +346,22 @@ function createPolyDepartment(config: {
       {
         name: "Mr. P. Balasubramaniam",
         title: "Excellence in Technical Mentoring",
-        detail: "Awarded for sustained student placement and training outcomes.",
+        detail:
+          "Awarded for sustained student placement and training outcomes.",
         year: "2024",
       },
       {
         name: "Mr. K. Manoj",
         title: "Industry Certification",
-        detail: "Completed advanced certification in industrial maintenance systems.",
+        detail:
+          "Completed advanced certification in industrial maintenance systems.",
         year: "2023",
       },
     ],
     magazine: {
       name: "PolyConnect",
-      description: "A practical-technical newsletter featuring projects, visits, and placement stories.",
+      description:
+        "A practical-technical newsletter featuring projects, visits, and placement stories.",
       frequency: "Half-Yearly",
       latestIssue: "Issue 7",
       highlights: [
@@ -345,7 +372,11 @@ function createPolyDepartment(config: {
     },
     careerProgression: {
       topRecruiters: ["Bosch", "L&T", "TVS", "Ashok Leyland", "Caterpillar"],
-      higherStudies: ["Lateral Entry B.E.", "Advanced Diploma", "Skill Certifications"],
+      higherStudies: [
+        "Lateral Entry B.E.",
+        "Advanced Diploma",
+        "Skill Certifications",
+      ],
       averagePackage: "INR 2.8 LPA",
       placementRate: "88%",
     },

@@ -23,7 +23,10 @@ function LogoCard({ company }: { company: { name: string; logo: string } }) {
 
 export function Recruiters() {
   const row1 = [...recruiters, ...recruiters];
-  const row2 = [...recruiters.slice().reverse(), ...recruiters.slice().reverse()];
+  const row2 = [
+    ...recruiters.slice().reverse(),
+    ...recruiters.slice().reverse(),
+  ];
 
   return (
     <section className="overflow-hidden bg-[#F8F9FA] py-16 md:py-24">

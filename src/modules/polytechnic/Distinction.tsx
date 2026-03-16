@@ -41,7 +41,7 @@ export function Distinction() {
             <h2 className="mb-4 text-xs font-bold tracking-[0.2em] text-[#1A237E] uppercase">
               Distinction
             </h2>
-            <h3 className="mb-6 font-sans text-4xl font-bold leading-tight text-[#1A237E] md:text-5xl">
+            <h3 className="mb-6 font-sans text-4xl leading-tight font-bold text-[#1A237E] md:text-5xl">
               Why JCT Polytechnic
             </h3>
             <p className="mx-auto max-w-2xl text-xl leading-relaxed font-light text-[#212121]/75">

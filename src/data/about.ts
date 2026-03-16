@@ -22,11 +22,30 @@ export const aboutData = {
       "To create an inclusive, supportive campus environment that promotes holistic development.",
     ],
     coreValues: [
-      { title: "Excellence", description: "Striving for the highest standards in everything we do." },
-      { title: "Integrity", description: "Upholding ethical principles and transparency in all activities." },
-      { title: "Innovation", description: "Encouraging creative thinking and problem-solving approaches." },
-      { title: "Inclusivity", description: "Embracing diversity and providing equal opportunities for all." },
-      { title: "Service", description: "Contributing to society through community engagement and outreach." },
+      {
+        title: "Excellence",
+        description: "Striving for the highest standards in everything we do.",
+      },
+      {
+        title: "Integrity",
+        description:
+          "Upholding ethical principles and transparency in all activities.",
+      },
+      {
+        title: "Innovation",
+        description:
+          "Encouraging creative thinking and problem-solving approaches.",
+      },
+      {
+        title: "Inclusivity",
+        description:
+          "Embracing diversity and providing equal opportunities for all.",
+      },
+      {
+        title: "Service",
+        description:
+          "Contributing to society through community engagement and outreach.",
+      },
     ],
   },
 
@@ -58,16 +77,65 @@ export const aboutData = {
     title: "Our Journey",
     subtitle: "From Vision to Excellence",
     milestones: [
-      { year: "2009", title: "Foundation", description: "JCT Group of Institutions founded with a vision to provide quality technical education in Coimbatore." },
-      { year: "2010", title: "Engineering College Established", description: "JCT College of Engineering & Technology commenced operations with 5 departments." },
-      { year: "2011", title: "Polytechnic College Launched", description: "JCT Polytechnic College established to offer diploma programs in engineering and technology." },
-      { year: "2013", title: "Arts & Science College", description: "JCT College of Arts & Science inaugurated, expanding our academic offerings." },
-      { year: "2015", title: "NAAC Accreditation", description: "Received NAAC accreditation, affirming our commitment to quality education." },
-      { year: "2017", title: "NBA Accreditation", description: "Key engineering programs received NBA accreditation." },
-      { year: "2019", title: "10 Years of Excellence", description: "Celebrated a decade of academic excellence with 10,000+ alumni worldwide." },
-      { year: "2021", title: "Research Expansion", description: "Established dedicated research centres and signed MoUs with leading industries." },
-      { year: "2023", title: "Digital Transformation", description: "Introduced smart classrooms, digital library, and online learning platforms." },
-      { year: "2024", title: "Continuing Growth", description: "Expanding programs, facilities, and international collaborations for a global future." },
+      {
+        year: "2009",
+        title: "Foundation",
+        description:
+          "JCT Group of Institutions founded with a vision to provide quality technical education in Coimbatore.",
+      },
+      {
+        year: "2010",
+        title: "Engineering College Established",
+        description:
+          "JCT College of Engineering & Technology commenced operations with 5 departments.",
+      },
+      {
+        year: "2011",
+        title: "Polytechnic College Launched",
+        description:
+          "JCT Polytechnic College established to offer diploma programs in engineering and technology.",
+      },
+      {
+        year: "2013",
+        title: "Arts & Science College",
+        description:
+          "JCT College of Arts & Science inaugurated, expanding our academic offerings.",
+      },
+      {
+        year: "2015",
+        title: "NAAC Accreditation",
+        description:
+          "Received NAAC accreditation, affirming our commitment to quality education.",
+      },
+      {
+        year: "2017",
+        title: "NBA Accreditation",
+        description: "Key engineering programs received NBA accreditation.",
+      },
+      {
+        year: "2019",
+        title: "10 Years of Excellence",
+        description:
+          "Celebrated a decade of academic excellence with 10,000+ alumni worldwide.",
+      },
+      {
+        year: "2021",
+        title: "Research Expansion",
+        description:
+          "Established dedicated research centres and signed MoUs with leading industries.",
+      },
+      {
+        year: "2023",
+        title: "Digital Transformation",
+        description:
+          "Introduced smart classrooms, digital library, and online learning platforms.",
+      },
+      {
+        year: "2024",
+        title: "Continuing Growth",
+        description:
+          "Expanding programs, facilities, and international collaborations for a global future.",
+      },
     ],
   },
 
@@ -75,39 +143,115 @@ export const aboutData = {
     title: "Leadership & Management",
     subtitle: "Guided by Experience, Driven by Vision",
     members: [
-      { name: "Dr. R. Jayaraman", designation: "Chairman", qualification: "Ph.D. in Management", experience: "30+ years in Education & Industry" },
-      { name: "Mrs. J. Lakshmi", designation: "Vice Chairperson", qualification: "M.A., M.Phil.", experience: "25+ years in Education Administration" },
-      { name: "Mr. R. Karthik", designation: "Secretary", qualification: "MBA", experience: "15+ years in Educational Management" },
-      { name: "Dr. S. Karthikeyan", designation: "Principal - Engineering", qualification: "Ph.D. in Mechanical Engineering", experience: "22+ years in Academia" },
-      { name: "Dr. P. Ramesh", designation: "Principal - Arts & Science", qualification: "Ph.D. in Computer Science", experience: "20+ years in Academia" },
-      { name: "Mr. K. Senthilkumar", designation: "Principal - Polytechnic", qualification: "M.E. in Electronics", experience: "18+ years in Technical Education" },
+      {
+        name: "Dr. R. Jayaraman",
+        designation: "Chairman",
+        qualification: "Ph.D. in Management",
+        experience: "30+ years in Education & Industry",
+      },
+      {
+        name: "Mrs. J. Lakshmi",
+        designation: "Vice Chairperson",
+        qualification: "M.A., M.Phil.",
+        experience: "25+ years in Education Administration",
+      },
+      {
+        name: "Mr. R. Karthik",
+        designation: "Secretary",
+        qualification: "MBA",
+        experience: "15+ years in Educational Management",
+      },
+      {
+        name: "Dr. S. Karthikeyan",
+        designation: "Principal - Engineering",
+        qualification: "Ph.D. in Mechanical Engineering",
+        experience: "22+ years in Academia",
+      },
+      {
+        name: "Dr. P. Ramesh",
+        designation: "Principal - Arts & Science",
+        qualification: "Ph.D. in Computer Science",
+        experience: "20+ years in Academia",
+      },
+      {
+        name: "Mr. K. Senthilkumar",
+        designation: "Principal - Polytechnic",
+        qualification: "M.E. in Electronics",
+        experience: "18+ years in Technical Education",
+      },
     ],
   },
 
   organizationalStructure: {
     title: "Organizational Structure",
-    subtitle: "A well-defined governance framework ensuring academic excellence and institutional integrity.",
+    subtitle:
+      "A well-defined governance framework ensuring academic excellence and institutional integrity.",
     levels: [
-      { title: "Governing Body", description: "The apex governing body responsible for strategic direction and policy making." },
-      { title: "Academic Council", description: "Oversees academic policies, curriculum development, and quality assurance." },
-      { title: "Board of Studies", description: "Department-level committees for curriculum design and assessment." },
-      { title: "Administrative Body", description: "Manages day-to-day operations, finance, and infrastructure." },
-      { title: "Student Affairs", description: "Handles student welfare, grievances, and co-curricular activities." },
+      {
+        title: "Governing Body",
+        description:
+          "The apex governing body responsible for strategic direction and policy making.",
+      },
+      {
+        title: "Academic Council",
+        description:
+          "Oversees academic policies, curriculum development, and quality assurance.",
+      },
+      {
+        title: "Board of Studies",
+        description:
+          "Department-level committees for curriculum design and assessment.",
+      },
+      {
+        title: "Administrative Body",
+        description:
+          "Manages day-to-day operations, finance, and infrastructure.",
+      },
+      {
+        title: "Student Affairs",
+        description:
+          "Handles student welfare, grievances, and co-curricular activities.",
+      },
     ],
   },
 
   governingCouncil: {
     title: "Governing Council",
-    subtitle: "Distinguished leaders guiding JCT's academic and administrative direction.",
+    subtitle:
+      "Distinguished leaders guiding JCT's academic and administrative direction.",
     members: [
-      { name: "Dr. R. Jayaraman", role: "Chairman", organization: "JCT Institutions" },
-      { name: "Mrs. J. Lakshmi", role: "Vice Chairperson", organization: "JCT Institutions" },
-      { name: "Dr. S. Karthikeyan", role: "Member Secretary", organization: "JCT Engineering" },
-      { name: "Prof. A. Venkatesh", role: "Nominee - Anna University", organization: "Anna University" },
+      {
+        name: "Dr. R. Jayaraman",
+        role: "Chairman",
+        organization: "JCT Institutions",
+      },
+      {
+        name: "Mrs. J. Lakshmi",
+        role: "Vice Chairperson",
+        organization: "JCT Institutions",
+      },
+      {
+        name: "Dr. S. Karthikeyan",
+        role: "Member Secretary",
+        organization: "JCT Engineering",
+      },
+      {
+        name: "Prof. A. Venkatesh",
+        role: "Nominee - Anna University",
+        organization: "Anna University",
+      },
       { name: "Dr. M. Selvam", role: "Nominee - AICTE", organization: "AICTE" },
-      { name: "Mr. T. Rajendran", role: "Industry Representative", organization: "TCS" },
+      {
+        name: "Mr. T. Rajendran",
+        role: "Industry Representative",
+        organization: "TCS",
+      },
       { name: "Dr. K. Priya", role: "UGC Nominee", organization: "UGC" },
-      { name: "Mr. S. Balasubramaniam", role: "Educationist Member", organization: "Senior Academician" },
+      {
+        name: "Mr. S. Balasubramaniam",
+        role: "Educationist Member",
+        organization: "Senior Academician",
+      },
     ],
   },
 
@@ -115,12 +259,36 @@ export const aboutData = {
     title: "Strategic Plan 2024-2029",
     subtitle: "A roadmap for institutional growth and academic excellence.",
     goals: [
-      { title: "Academic Excellence", description: "Achieve NAAC A+ grade and secure NBA accreditation for all eligible programs." },
-      { title: "Research & Innovation", description: "Establish 5 new research centres and file 50+ patents by 2029." },
-      { title: "Industry Partnerships", description: "Sign 100+ MoUs with national and international industries." },
-      { title: "Digital Campus", description: "Complete digital transformation with smart classrooms and AI-powered learning tools." },
-      { title: "100% Employability", description: "Achieve 100% placement and entrepreneurship for all graduating students." },
-      { title: "Global Recognition", description: "Establish international exchange programs and earn global rankings." },
+      {
+        title: "Academic Excellence",
+        description:
+          "Achieve NAAC A+ grade and secure NBA accreditation for all eligible programs.",
+      },
+      {
+        title: "Research & Innovation",
+        description:
+          "Establish 5 new research centres and file 50+ patents by 2029.",
+      },
+      {
+        title: "Industry Partnerships",
+        description:
+          "Sign 100+ MoUs with national and international industries.",
+      },
+      {
+        title: "Digital Campus",
+        description:
+          "Complete digital transformation with smart classrooms and AI-powered learning tools.",
+      },
+      {
+        title: "100% Employability",
+        description:
+          "Achieve 100% placement and entrepreneurship for all graduating students.",
+      },
+      {
+        title: "Global Recognition",
+        description:
+          "Establish international exchange programs and earn global rankings.",
+      },
     ],
   },
 };

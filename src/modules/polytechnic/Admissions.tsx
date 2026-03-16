@@ -20,9 +20,9 @@ export function Admissions() {
             <h2 className="mb-4 text-xs font-bold tracking-[0.2em] text-[#FFB300] uppercase">
               Admissions Open
             </h2>
-            <h3 className="mb-6 font-sans text-4xl font-bold leading-tight text-white md:text-5xl">
+            <h3 className="mb-6 font-sans text-4xl leading-tight font-bold text-white md:text-5xl">
               Begin your journey at{" "}
-              <span className="font-light italic text-[#FFB300]">
+              <span className="font-light text-[#FFB300] italic">
                 JCT Polytechnic.
               </span>
             </h3>
@@ -108,9 +108,7 @@ export function Admissions() {
               </a>
               <div className="flex items-start justify-center gap-3 text-white/75">
                 <MapPin size={15} className="mt-0.5 shrink-0 text-[#FFB300]" />
-                <span>
-                  Knowledge Park, Pichanur, Coimbatore — 641105
-                </span>
+                <span>Knowledge Park, Pichanur, Coimbatore — 641105</span>
               </div>
             </div>
           </motion.div>

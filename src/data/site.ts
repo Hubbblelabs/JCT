@@ -50,14 +50,42 @@ export const siteConfig = {
   },
 
   accreditations: [
-    { name: "NAAC", logo: "/naac.png", description: "National Assessment and Accreditation Council" },
-    { name: "NBA", logo: "/nba.png", description: "National Board of Accreditation" },
-    { name: "AICTE", logo: "/aicte.png", description: "All India Council for Technical Education" },
+    {
+      name: "NAAC",
+      logo: "/naac.png",
+      description: "National Assessment and Accreditation Council",
+    },
+    {
+      name: "NBA",
+      logo: "/nba.png",
+      description: "National Board of Accreditation",
+    },
+    {
+      name: "AICTE",
+      logo: "/aicte.png",
+      description: "All India Council for Technical Education",
+    },
     { name: "ISO", logo: "/iso.png", description: "ISO 9001:2015 Certified" },
-    { name: "Anna University", logo: "/anna.png", description: "Affiliated to Anna University" },
-    { name: "Bharathiar University", logo: "/bharathiar_university.png", description: "Affiliated to Bharathiar University" },
-    { name: "UGC", logo: "/ugc.png", description: "University Grants Commission" },
-    { name: "DOTE", logo: "/dote.png", description: "Directorate of Technical Education" },
+    {
+      name: "Anna University",
+      logo: "/anna.png",
+      description: "Affiliated to Anna University",
+    },
+    {
+      name: "Bharathiar University",
+      logo: "/bharathiar_university.png",
+      description: "Affiliated to Bharathiar University",
+    },
+    {
+      name: "UGC",
+      logo: "/ugc.png",
+      description: "University Grants Commission",
+    },
+    {
+      name: "DOTE",
+      logo: "/dote.png",
+      description: "Directorate of Technical Education",
+    },
   ],
 
   institutions: [

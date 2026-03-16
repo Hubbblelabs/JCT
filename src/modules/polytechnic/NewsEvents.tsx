@@ -15,7 +15,7 @@ export function NewsEvents() {
             <h2 className="mb-4 text-xs font-bold tracking-[0.2em] text-[#1A237E] uppercase">
               News &amp; Events
             </h2>
-            <h3 className="font-sans text-4xl font-bold leading-tight text-[#1A237E] md:text-5xl">
+            <h3 className="font-sans text-4xl leading-tight font-bold text-[#1A237E] md:text-5xl">
               Latest Updates
             </h3>
           </div>
@@ -41,7 +41,7 @@ export function NewsEvents() {
                 <div className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wider text-stone-400 uppercase">
                   <Calendar className="h-3.5 w-3.5" /> {news.date}
                 </div>
-                <h4 className="line-clamp-3 font-sans text-lg font-bold leading-relaxed text-[#1A237E]">
+                <h4 className="line-clamp-3 font-sans text-lg leading-relaxed font-bold text-[#1A237E]">
                   {news.title}
                 </h4>
               </motion.div>
@@ -60,7 +60,7 @@ export function NewsEvents() {
 
         {/* ── Events ── */}
         <div className="mx-auto max-w-4xl border-t border-stone-200 pt-24">
-          <h3 className="mb-12 font-sans text-3xl font-bold text-center text-[#1A237E] md:text-4xl">
+          <h3 className="mb-12 text-center font-sans text-3xl font-bold text-[#1A237E] md:text-4xl">
             Upcoming Events
           </h3>
 
