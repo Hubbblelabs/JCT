@@ -87,11 +87,11 @@ export function AdmissionsCTA() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="snap-item w-[260px] shrink-0 sm:w-[300px] md:w-auto"
+                className="snap-item w-65 shrink-0 sm:w-75 md:w-auto"
               >
                 <div className="group border-border hover:border-gold/30 card-hover-lift h-full rounded-2xl border bg-white p-5 md:p-8">
                   <div
-                    className={`h-12 w-12 rounded-xl bg-gradient-to-br ${item.gradient} mb-5 flex items-center justify-center transition-transform group-hover:scale-110`}
+                    className={`h-12 w-12 rounded-xl bg-linear-to-br ${item.gradient} mb-5 flex items-center justify-center transition-transform group-hover:scale-110`}
                   >
                     <item.icon
                       size={22}
@@ -142,8 +142,8 @@ export function AdmissionsCTA() {
             viewport={{ once: true }}
             className="relative overflow-hidden rounded-3xl"
           >
-            <div className="from-navy via-navy-light to-navy-mid noise-overlay relative bg-gradient-to-br p-6 text-center md:p-12">
-              <div className="from-gold/5 to-gold/5 pointer-events-none absolute inset-0 bg-gradient-to-r via-transparent" />
+            <div className="from-navy via-navy-light to-navy-mid noise-overlay relative bg-linear-to-br p-6 text-center md:p-12">
+              <div className="from-gold/5 to-gold/5 pointer-events-none absolute inset-0 bg-linear-to-r via-transparent" />
               <div className="relative z-10">
                 <div className="mb-4 flex items-center justify-center gap-3">
                   <div className="bg-gold/10 border-gold/20 animate-pulse-glow flex h-12 w-12 items-center justify-center rounded-full border">

@@ -97,7 +97,7 @@ export function Institutions() {
             className="lg:row-span-2"
           >
             <Link href={institutions[0].href} className="group block h-full">
-              <div className="relative h-full min-h-[280px] overflow-hidden rounded-3xl lg:min-h-[580px]">
+              <div className="relative h-full min-h-70 overflow-hidden rounded-3xl lg:min-h-145">
                 <Image
                   src={institutions[0].image}
                   alt={institutions[0].name}
@@ -106,9 +106,9 @@ export function Institutions() {
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
                 <div
-                  className={`absolute inset-0 bg-gradient-to-t ${institutions[0].color}`}
+                  className={`absolute inset-0 bg-linear-to-t ${institutions[0].color}`}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
 
                 {/* Content overlay */}
                 <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-8 lg:p-10">
@@ -164,7 +164,7 @@ export function Institutions() {
               transition={{ duration: 0.6, delay: 0.15 * (index + 1) }}
             >
               <Link href={inst.href} className="group block">
-                <div className="relative h-[200px] overflow-hidden rounded-3xl md:h-[280px]">
+                <div className="relative h-50 overflow-hidden rounded-3xl md:h-70">
                   <Image
                     src={inst.image}
                     alt={inst.name}
@@ -173,9 +173,9 @@ export function Institutions() {
                     sizes="(max-width: 1024px) 100vw, 50vw"
                   />
                   <div
-                    className={`absolute inset-0 bg-gradient-to-t ${inst.color}`}
+                    className={`absolute inset-0 bg-linear-to-t ${inst.color}`}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
 
                   <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-8">
                     <div className="mb-3 flex items-center gap-3">
@@ -219,10 +219,10 @@ export function Institutions() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="snap-item w-[280px] shrink-0 sm:w-[340px]"
+              className="snap-item w-70 shrink-0 sm:w-85"
             >
               <Link href={inst.href} className="group block">
-                <div className="relative h-[320px] overflow-hidden rounded-2xl sm:h-[360px]">
+                <div className="relative h-80 overflow-hidden rounded-2xl sm:h-90">
                   <Image
                     src={inst.image}
                     alt={inst.name}
@@ -231,9 +231,9 @@ export function Institutions() {
                     sizes="340px"
                   />
                   <div
-                    className={`absolute inset-0 bg-gradient-to-t ${inst.color}`}
+                    className={`absolute inset-0 bg-linear-to-t ${inst.color}`}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
 
                   <div className="absolute inset-0 z-10 flex flex-col justify-end p-5">
                     <div className="mb-3 flex items-center gap-2.5">

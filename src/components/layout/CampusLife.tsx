@@ -73,7 +73,7 @@ export function CampusLife() {
       id="campus-life"
       className="section-padding bg-navy noise-overlay relative overflow-hidden"
     >
-      <div className="bg-gold/3 pointer-events-none absolute top-0 left-1/3 h-[500px] w-[500px] rounded-full blur-[200px]" />
+      <div className="bg-gold/3 pointer-events-none absolute top-0 left-1/3 h-125 w-125 rounded-full blur-[200px]" />
       <div className="relative z-10 container mx-auto px-4 md:px-6">
         <div className="mb-6 flex flex-col gap-4 md:mb-14 md:flex-row md:items-end md:justify-between md:gap-6">
           <div>
