@@ -13,11 +13,16 @@ const primaryNav = navigationData.slice(0, 8);
 // Overflow nav items shown in a "More" dropdown
 const overflowNav = navigationData.slice(8);
 
-export function Navbar() {
+type NavbarProps = {
+  forceSolidOnTop?: boolean;
+};
+
+export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  const [bannerVisible, setBannerVisible] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -40,21 +45,30 @@ export function Navbar() {
   return (
     <>
       {/* Announcement Bar — Counselling Code */}
-      <div className="bg-gold text-navy fixed top-0 right-0 left-0 z-[60] px-4 py-2 text-center font-sans text-xs font-bold tracking-wide">
-        🎓 Admissions Open 2026-27 | Counselling Code:{" "}
-        <span className="underline">{siteConfig.counsellingCode}</span> —{" "}
-        <Link
-          href="/admissions/apply"
-          className="underline underline-offset-2 hover:no-underline"
-        >
-          Apply Now
-        </Link>
-      </div>
+      {bannerVisible && (
+        <div className="bg-gold text-navy fixed top-0 right-0 left-0 z-60 px-4 py-2 text-center font-sans text-xs font-bold tracking-wide">
+          🎓 Admissions Open 2026-27 | Counselling Code:{" "}
+          <span className="underline">{siteConfig.counsellingCode}</span> —{" "}
+          <Link
+            href="/admissions/apply"
+            className="underline underline-offset-2 hover:no-underline"
+          >
+            Apply Now
+          </Link>
+          <button
+            onClick={() => setBannerVisible(false)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded p-0.5 opacity-70 transition-opacity hover:opacity-100"
+            aria-label="Dismiss announcement"
+          >
+            <X size={14} />
+          </button>
+        </div>
+      )}
 
       {/* Main Nav */}
       <nav
-        className={`fixed top-[32px] right-0 left-0 z-50 transition-all duration-300 ${
-          scrolled
+        className={`fixed ${bannerVisible ? "top-8" : "top-0"} right-0 left-0 z-50 transition-all duration-300 ${
+          scrolled || forceSolidOnTop
             ? "bg-navy/95 shadow-navy/10 py-2 shadow-lg backdrop-blur-xl"
             : "bg-transparent py-4"
         }`}
@@ -235,7 +249,7 @@ export function Navbar() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm xl:hidden"
+              className="fixed inset-0 z-60 bg-black/40 backdrop-blur-sm xl:hidden"
               onClick={() => setIsOpen(false)}
             />
             <motion.div
@@ -243,7 +257,7 @@ export function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="bg-navy fixed inset-y-0 right-0 z-[61] flex w-full flex-col sm:w-96 xl:hidden"
+              className="bg-navy fixed inset-y-0 right-0 z-61 flex w-full flex-col sm:w-96 xl:hidden"
             >
               {/* Header */}
               <div className="flex items-center justify-between border-b border-white/5 p-4 pt-6">

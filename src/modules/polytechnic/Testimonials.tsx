@@ -10,7 +10,7 @@ export function Testimonials() {
     <CollegeTestimonials
       title="Testimonials"
       subtitle="Voices from our polytechnic community on practical training, industry readiness, and career growth."
-      accentColor="#FFB300"
+      accentColor="#D4A024"
       sectionBgClassName="bg-[#F3F4F6]"
       items={testimonials.map((item, index) => ({
         ...item,

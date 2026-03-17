@@ -11,13 +11,6 @@ const Accreditations = dynamic(
     ),
   { ssr: true },
 );
-const ProgramsExplorer = dynamic(
-  () =>
-    import("@/components/layout/ProgramsExplorer").then(
-      (mod) => mod.ProgramsExplorer,
-    ),
-  { ssr: true },
-);
 const Institutions = dynamic(
   () =>
     import("@/components/layout/Institutions").then((mod) => mod.Institutions),
@@ -62,7 +55,6 @@ export default function HomePage() {
       <Navbar />
       <HomeHero />
       <Accreditations />
-      <ProgramsExplorer />
       <Institutions />
       <WhyJCT />
       <NewsEvents />

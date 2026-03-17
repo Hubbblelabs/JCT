@@ -1,22 +1,45 @@
 @import "tailwindcss";
 
 :root {
-  /* ─── Core Navy Palette ─── */
+  /* ─── Brand: Navy ─── */
   --color-navy: #0a1628;
   --color-navy-mid: #0f1f3a;
   --color-navy-light: #162d50;
 
-  /* ─── Gold / Accent ─── */
+  /* ─── Brand: Gold ─── */
   --color-gold: #d4a024;
   --color-gold-light: #e8b84a;
+  --color-gold-dark: #b8891e;
 
-  /* ─── Institution Colors ─── */
-  --color-burgundy: #6b1d3a;
+  /* ─── Institution: Engineering ─── */
+  --color-engineering: #1e40af;
+  --color-engineering-light: #3b82f6;
+  --color-engineering-muted: #dbeafe;
+  --color-engineering-dark: #0f172a;
+
+  /* ─── Institution: Arts & Science ─── */
+  --color-arts-science: #9b1b30;
+  --color-arts-science-light: #c74b5c;
+  --color-arts-science-muted: #fde8ec;
+  --color-arts-science-dark: #800020;
+
+  /* ─── Institution: Polytechnic ─── */
   --color-polytechnic: #0f766e;
+  --color-polytechnic-light: #14b8a6;
+  --color-polytechnic-muted: #ccfbf1;
+  --color-polytechnic-dark: #042f2e;
 
-  /* ─── Semantic colors ─── */
-  --color-primary: #0a1628;
-  --color-accent: #d4a024;
+  /* ─── Semantic ─── */
+  --color-primary: var(--color-navy);
+  --color-primary-foreground: #ffffff;
+  --color-accent: var(--color-gold);
+  --color-accent-foreground: var(--color-navy);
+  --color-secondary: var(--color-navy-light);
+  --color-secondary-foreground: #ffffff;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-ring: var(--color-gold);
+  --color-input: var(--color-border);
 
   /* ─── Neutral Surface ─── */
   --color-surface: #f5f3ef;
@@ -33,10 +56,31 @@
   --color-navy-light: var(--color-navy-light);
   --color-gold: var(--color-gold);
   --color-gold-light: var(--color-gold-light);
-  --color-burgundy: var(--color-burgundy);
+  --color-gold-dark: var(--color-gold-dark);
+  --color-engineering: var(--color-engineering);
+  --color-engineering-light: var(--color-engineering-light);
+  --color-engineering-muted: var(--color-engineering-muted);
+  --color-engineering-dark: var(--color-engineering-dark);
+  --color-arts-science: var(--color-arts-science);
+  --color-arts-science-light: var(--color-arts-science-light);
+  --color-arts-science-muted: var(--color-arts-science-muted);
+  --color-arts-science-dark: var(--color-arts-science-dark);
   --color-polytechnic: var(--color-polytechnic);
+  --color-polytechnic-light: var(--color-polytechnic-light);
+  --color-polytechnic-muted: var(--color-polytechnic-muted);
+  --color-polytechnic-dark: var(--color-polytechnic-dark);
+
   --color-primary: var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
   --color-accent: var(--color-accent);
+  --color-accent-foreground: var(--color-accent-foreground);
+  --color-secondary: var(--color-secondary);
+  --color-secondary-foreground: var(--color-secondary-foreground);
+  --color-destructive: var(--color-destructive);
+  --color-destructive-foreground: var(--color-destructive-foreground);
+  --color-ring: var(--color-ring);
+  --color-input: var(--color-input);
+
   --color-surface: var(--color-surface);
   --color-background: var(--color-background);
   --color-foreground: var(--color-foreground);
@@ -199,21 +243,33 @@ h6 {
 }
 
 :root[data-college-theme="engineering"] {
-  --scrollbar-track: color-mix(in srgb, #0f172a 18%, transparent);
-  --scrollbar-thumb: #fbbf24;
-  --scrollbar-thumb-hover: #f59e0b;
+  --scrollbar-track: color-mix(
+    in srgb,
+    var(--color-engineering-dark) 18%,
+    transparent
+  );
+  --scrollbar-thumb: var(--color-gold);
+  --scrollbar-thumb-hover: var(--color-gold-light);
 }
 
 :root[data-college-theme="arts-science"] {
-  --scrollbar-track: color-mix(in srgb, #800020 18%, transparent);
-  --scrollbar-thumb: #d4af37;
-  --scrollbar-thumb-hover: #e6c85c;
+  --scrollbar-track: color-mix(
+    in srgb,
+    var(--color-arts-science-dark) 18%,
+    transparent
+  );
+  --scrollbar-thumb: var(--color-gold);
+  --scrollbar-thumb-hover: var(--color-gold-light);
 }
 
 :root[data-college-theme="polytechnic"] {
-  --scrollbar-track: color-mix(in srgb, #1a237e 18%, transparent);
-  --scrollbar-thumb: #ffb300;
-  --scrollbar-thumb-hover: #ffc533;
+  --scrollbar-track: color-mix(
+    in srgb,
+    var(--color-polytechnic-dark) 18%,
+    transparent
+  );
+  --scrollbar-thumb: var(--color-gold);
+  --scrollbar-thumb-hover: var(--color-gold-light);
 }
 
 html,
@@ -248,9 +304,19 @@ body,
 }
 
 /* ─── Institution Themes ─── */
+.engineering-theme {
+  --color-primary: var(--color-engineering-dark);
+  --color-accent: var(--color-gold);
+}
+
+.arts-science-theme {
+  --color-primary: var(--color-arts-science-dark);
+  --color-accent: var(--color-gold);
+}
+
 .polytechnic-theme {
-  --color-primary: #1a237e;
-  --color-accent: #ffb300;
+  --color-primary: var(--color-polytechnic-dark);
+  --color-accent: var(--color-gold);
   --color-background: #f8f9fa;
   --color-foreground: #212121;
 }

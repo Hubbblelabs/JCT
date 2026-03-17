@@ -37,7 +37,7 @@ const pathways = [
     link: "/institutions/engineering",
     linkText: "Lateral Entry Details",
     gradient: "from-rose-50 to-pink-50",
-    iconColor: "text-burgundy",
+    iconColor: "text-arts-science",
   },
 ];
 
@@ -124,7 +124,7 @@ export function AdmissionsCTA() {
           >
             <Link
               href="#contact"
-              className="bg-gold text-navy hover:bg-gold-light shadow-gold/20 inline-flex h-14 items-center justify-center gap-2 rounded-full px-8 font-sans text-base font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
+              className="bg-navy hover:bg-navy-light shadow-navy/20 inline-flex h-14 items-center justify-center gap-2 rounded-full px-8 font-sans text-base font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95"
             >
               Apply Online <ArrowRight size={16} />
             </Link>

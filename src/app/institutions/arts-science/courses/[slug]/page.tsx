@@ -76,19 +76,19 @@ export default async function CoursePage({
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative flex min-h-[65vh] items-center overflow-hidden bg-[#800020] pt-32 pb-20">
+      <section className="bg-arts-science-dark relative flex min-h-[65vh] items-center overflow-hidden pt-32 pb-20">
         {/* Subtle patterned background */}
         <div
           className="absolute inset-0 opacity-10"
           style={{
             backgroundImage:
-              "radial-gradient(circle at 2px 2px, #D4AF37 1px, transparent 0)",
+              "radial-gradient(circle at 2px 2px, var(--color-gold) 1px, transparent 0)",
             backgroundSize: "32px 32px",
           }}
         />
 
         {/* Large subtle glow */}
-        <div className="pointer-events-none absolute top-0 right-0 h-200 w-200 translate-x-1/3 -translate-y-1/2 rounded-full bg-[#D4AF37]/10 blur-[120px]" />
+        <div className="bg-gold/10 pointer-events-none absolute top-0 right-0 h-200 w-200 translate-x-1/3 -translate-y-1/2 rounded-full blur-[120px]" />
 
         <div className="relative z-10 container mx-auto px-4 md:px-6">
           <motion.div
@@ -100,7 +100,7 @@ export default async function CoursePage({
             <motion.div variants={fadeInUp}>
               <Link
                 href="/institutions/arts-science"
-                className="group mb-8 inline-flex items-center text-sm font-medium text-[#D4AF37] transition-colors hover:text-white"
+                className="group text-gold mb-8 inline-flex items-center text-sm font-medium transition-colors hover:text-white"
               >
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
                 Back to Arts & Science
@@ -108,7 +108,7 @@ export default async function CoursePage({
             </motion.div>
 
             <motion.div variants={fadeInUp}>
-              <span className="mb-6 inline-block rounded-full bg-[#D4AF37] px-4 py-1.5 text-xs font-bold tracking-widest text-[#800020] uppercase shadow-sm">
+              <span className="bg-gold text-arts-science-dark mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase shadow-sm">
                 UG Program &bull; {course.duration}
               </span>
             </motion.div>
@@ -143,8 +143,8 @@ export default async function CoursePage({
                 transition={{ duration: 0.6 }}
               >
                 <div className="mb-8 flex items-center gap-4">
-                  <div className="h-0.5 w-12 bg-[#D4AF37]"></div>
-                  <h2 className="font-serif text-3xl text-[#800020] md:text-4xl">
+                  <div className="bg-gold h-0.5 w-12"></div>
+                  <h2 className="text-arts-science-dark font-serif text-3xl md:text-4xl">
                     Program Overview
                   </h2>
                 </div>
@@ -172,7 +172,7 @@ export default async function CoursePage({
                 transition={{ duration: 0.6 }}
               >
                 <div className="mb-16 rounded-2xl border border-stone-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:p-10">
-                  <h3 className="mb-8 font-serif text-2xl font-bold text-[#800020]">
+                  <h3 className="text-arts-science-dark mb-8 font-serif text-2xl font-bold">
                     Key Learning Outcomes
                   </h3>
                   <ul className="space-y-6">
@@ -185,8 +185,8 @@ export default async function CoursePage({
                         transition={{ duration: 0.4, delay: i * 0.1 }}
                         className="group flex gap-4"
                       >
-                        <div className="mt-1 rounded-full bg-[#D4AF37]/20 p-1 transition-colors group-hover:bg-[#D4AF37]/30">
-                          <CheckCircle2 className="h-5 w-5 shrink-0 text-[#800020]" />
+                        <div className="bg-gold/20 group-hover:bg-gold/30 mt-1 rounded-full p-1 transition-colors">
+                          <CheckCircle2 className="text-arts-science-dark h-5 w-5 shrink-0" />
                         </div>
                         <span className="text-lg leading-relaxed text-[#2C2C2C]">
                           {item}
@@ -208,7 +208,7 @@ export default async function CoursePage({
                   className="overflow-hidden rounded-2xl border border-stone-100 bg-white shadow-[0_20px_40px_rgb(0,0,0,0.08)]"
                 >
                   {/* Card Header */}
-                  <div className="bg-[#800020] p-6 text-center">
+                  <div className="bg-arts-science-dark p-6 text-center">
                     <h3 className="font-serif text-2xl text-white">
                       At a Glance
                     </h3>
@@ -219,7 +219,7 @@ export default async function CoursePage({
                     <div className="mb-10 space-y-8">
                       <div className="flex items-start gap-4">
                         <div className="rounded-xl bg-stone-50 p-3">
-                          <Clock className="h-6 w-6 text-[#800020]" />
+                          <Clock className="text-arts-science-dark h-6 w-6" />
                         </div>
                         <div>
                           <span className="mb-1 block text-sm font-bold tracking-wider text-stone-500 uppercase">
@@ -233,7 +233,7 @@ export default async function CoursePage({
 
                       <div className="flex items-start gap-4">
                         <div className="rounded-xl bg-stone-50 p-3">
-                          <GraduationCap className="h-6 w-6 text-[#800020]" />
+                          <GraduationCap className="text-arts-science-dark h-6 w-6" />
                         </div>
                         <div>
                           <span className="mb-1 block text-sm font-bold tracking-wider text-stone-500 uppercase">
@@ -247,7 +247,7 @@ export default async function CoursePage({
 
                       <div className="flex items-start gap-4">
                         <div className="rounded-xl bg-stone-50 p-3">
-                          <FileCheck className="h-6 w-6 text-[#800020]" />
+                          <FileCheck className="text-arts-science-dark h-6 w-6" />
                         </div>
                         <div>
                           <span className="mb-1 block text-sm font-bold tracking-wider text-stone-500 uppercase">
@@ -265,7 +265,7 @@ export default async function CoursePage({
                         href="/institutions/arts-science#admissions"
                         className={cn(
                           buttonVariants(),
-                          "h-14 w-full rounded-full border border-[#f1d892]/70 bg-linear-to-r from-[#f0ce74] to-[#D4AF37] text-lg font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95",
+                          "from-gold-light to-gold h-14 w-full rounded-full border border-[#f1d892]/70 bg-linear-to-r text-lg font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95",
                         )}
                       >
                         Apply Now
@@ -274,7 +274,7 @@ export default async function CoursePage({
                         href={`/syllabus/${course.slug}.pdf`}
                         className={cn(
                           buttonVariants({ variant: "outline" }),
-                          "h-14 w-full rounded-full border-2 border-[#800020]/35 bg-white/80 text-lg font-bold text-[#800020] transition-all hover:-translate-y-0.5 hover:bg-white",
+                          "border-arts-science-dark/35 text-arts-science-dark h-14 w-full rounded-full border-2 bg-white/80 text-lg font-bold transition-all hover:-translate-y-0.5 hover:bg-white",
                         )}
                       >
                         Download Syllabus
@@ -289,7 +289,7 @@ export default async function CoursePage({
       </section>
 
       {/* Bottom CTA Banner */}
-      <section className="bg-[#D4AF37] py-20">
+      <section className="bg-gold py-20">
         <div className="container mx-auto px-4 md:px-6">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -298,10 +298,10 @@ export default async function CoursePage({
             transition={{ duration: 0.5 }}
             className="mx-auto max-w-3xl text-center"
           >
-            <h2 className="mb-6 font-serif text-3xl text-[#800020] md:text-5xl">
+            <h2 className="text-arts-science-dark mb-6 font-serif text-3xl md:text-5xl">
               Ready to Shape Your Future?
             </h2>
-            <p className="mb-10 text-xl font-bold text-[#800020]/90">
+            <p className="text-arts-science-dark/90 mb-10 text-xl font-bold">
               Join the {course.name} program and take the first step towards a
               rewarding career.
             </p>
@@ -310,7 +310,7 @@ export default async function CoursePage({
                 href="/institutions/arts-science#admissions"
                 className={cn(
                   buttonVariants(),
-                  "h-14 rounded-full border border-[#800020] bg-[#800020] px-8 text-lg font-bold text-white shadow-[0_10px_24px_rgba(128,0,32,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#5e0017]",
+                  "border-arts-science-dark bg-arts-science-dark h-14 rounded-full border px-8 text-lg font-bold text-white shadow-[0_10px_24px_rgba(128,0,32,0.28)] transition-all hover:-translate-y-0.5 hover:bg-[#5e0017]",
                 )}
               >
                 Start Your Application
@@ -319,7 +319,7 @@ export default async function CoursePage({
                 href="/institutions/arts-science#contact"
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "h-14 rounded-full border-2 border-[#800020]/45 bg-white/40 px-8 text-lg font-bold text-[#800020] transition-all hover:-translate-y-0.5 hover:bg-white/70",
+                  "border-arts-science-dark/45 text-arts-science-dark h-14 rounded-full border-2 bg-white/40 px-8 text-lg font-bold transition-all hover:-translate-y-0.5 hover:bg-white/70",
                 )}
               >
                 Contact Admissions

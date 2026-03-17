@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Hammer, Factory, Target, GraduationCap } from "lucide-react";
+import { PolySection, PolySectionHeader } from "@/modules/polytechnic/PolyUI";
 
 const advantages = [
   {
@@ -28,53 +29,42 @@ const advantages = [
 
 export function Distinction() {
   return (
-    <section className="bg-[#F8F9FA] py-20 md:py-32">
-      <div className="container mx-auto px-4 md:px-8">
-        <div className="mx-auto max-w-5xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
+    <PolySection tone="subtle">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
+        <PolySectionHeader
+          centered
+          eyebrow="Why JCT Polytechnic"
+          title="Focused Learning with Practical Outcomes"
+          description="A disciplined three-year diploma pathway that balances affordability, workshop competency, and clear progression opportunities."
+          className="mx-auto max-w-4xl"
+        />
+      </motion.div>
+
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {advantages.map((adv, index) => (
+          <motion.article
+            key={adv.title}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            className="mb-16 text-center"
+            transition={{ duration: 0.45, delay: index * 0.08 }}
+            className="rounded-xl border border-slate-200 bg-white p-6 shadow-[0_8px_20px_rgba(2,42,50,0.05)]"
           >
-            <h2 className="mb-4 text-xs font-bold tracking-[0.2em] text-[#1A237E] uppercase">
-              Distinction
-            </h2>
-            <h3 className="mb-6 font-sans text-4xl leading-tight font-bold text-[#1A237E] md:text-5xl">
-              Why JCT Polytechnic
+            <div className="bg-polytechnic-muted text-polytechnic mb-4 flex h-11 w-11 items-center justify-center rounded-lg">
+              <adv.icon size={20} strokeWidth={1.7} />
+            </div>
+            <h3 className="text-polytechnic-dark mb-2 text-lg font-semibold">
+              {adv.title}
             </h3>
-            <p className="mx-auto max-w-2xl text-xl leading-relaxed font-light text-[#212121]/75">
-              Not every great career begins with a four-year degree. Our diploma
-              programs offer focused, affordable, workshop-driven training — and
-              a clear path forward.
-            </p>
-          </motion.div>
-
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {advantages.map((adv, index) => (
-              <motion.div
-                key={adv.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="rounded-2xl border border-stone-100 bg-white p-8"
-              >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#F8F9FA] text-[#1A237E]">
-                  <adv.icon size={24} strokeWidth={1.5} />
-                </div>
-                <h4 className="mb-3 font-sans text-xl font-bold text-[#1A237E]">
-                  {adv.title}
-                </h4>
-                <p className="leading-relaxed font-light text-[#212121]/75">
-                  {adv.desc}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+            <p className="text-sm leading-relaxed text-slate-600">{adv.desc}</p>
+          </motion.article>
+        ))}
       </div>
-    </section>
+    </PolySection>
   );
 }

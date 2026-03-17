@@ -160,7 +160,7 @@ export default function PolytechnicPage() {
       <Navbar />
 
       {/* ═══ HERO — Split layout (text left + stats right) ═══ */}
-      <section className="relative flex min-h-[90vh] items-center overflow-hidden bg-[#0F766E] text-white md:min-h-screen">
+      <section className="bg-navy relative flex min-h-[90vh] items-center overflow-hidden text-white md:min-h-screen">
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -171,7 +171,7 @@ export default function PolytechnicPage() {
             className="object-cover"
             priority
           />
-          <div className="absolute inset-0 bg-linear-to-r from-[#0F766E]/75 via-[#0F766E]/70 to-[#0F766E]/40" />
+          <div className="from-navy/95 via-navy/80 to-polytechnic/40 absolute inset-0 bg-linear-to-r" />
           <div
             className="absolute inset-0 opacity-[0.05]"
             style={{
@@ -191,7 +191,7 @@ export default function PolytechnicPage() {
                 transition={{ duration: 0.6 }}
                 className="mb-4 md:mb-6"
               >
-                <span className="inline-flex items-center gap-2 rounded-full border border-[#14B8A6]/40 bg-[#14B8A6]/20 px-4 py-1.5 text-[10px] font-bold tracking-widest text-[#5EEAD4] uppercase backdrop-blur-md md:text-sm">
+                <span className="border-polytechnic-light/40 bg-polytechnic-light/20 text-polytechnic-muted inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase backdrop-blur-md md:text-sm">
                   <Wrench size={14} />
                   Diploma Programs — AICTE Approved
                 </span>
@@ -229,7 +229,7 @@ export default function PolytechnicPage() {
               >
                 <Button
                   size="lg"
-                  className="h-12 w-full rounded-xl bg-[#14B8A6] px-8 font-bold text-white shadow-xl shadow-[#14B8A6]/20 transition-all hover:scale-105 hover:bg-[#0D9488] active:scale-95 sm:w-auto md:h-14"
+                  className="bg-polytechnic-light shadow-polytechnic-light/20 hover:bg-polytechnic h-12 w-full rounded-xl px-8 font-bold text-white shadow-xl transition-all hover:scale-105 active:scale-95 sm:w-auto md:h-14"
                 >
                   View Programs <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -276,7 +276,7 @@ export default function PolytechnicPage() {
                   key={i}
                   className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md transition-colors hover:bg-white/10"
                 >
-                  <span className="mb-1 block font-sans text-2xl font-black tracking-tight text-[#5EEAD4] md:mb-2 md:text-4xl">
+                  <span className="text-polytechnic-light mb-1 block font-sans text-2xl font-black tracking-tight md:mb-2 md:text-4xl">
                     {stat.value}
                   </span>
                   <h3 className="mb-1 text-[10px] font-bold tracking-wider text-white/90 uppercase md:text-xs">
@@ -293,13 +293,13 @@ export default function PolytechnicPage() {
       </section>
 
       {/* ═══ PROGRAMS — Skill & outcome blocks ═══ */}
-      <section className="bg-white py-12 md:py-16">
+      <section className="bg-white py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mb-16 max-w-3xl">
-            <h2 className="mb-6 text-xs font-bold tracking-[0.2em] text-amber-600 uppercase">
+            <h2 className="text-polytechnic mb-6 text-xs font-bold tracking-[0.2em] uppercase">
               Programs Offered
             </h2>
-            <h3 className="text-primary mb-6 font-serif text-4xl leading-tight md:text-5xl">
+            <h3 className="text-navy mb-6 font-serif text-4xl leading-tight md:text-5xl">
               Six Streams.{" "}
               <span className="font-light text-stone-300 italic">
                 Clear Outcomes.
@@ -320,20 +320,20 @@ export default function PolytechnicPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.08 }}
-                className="hover:border-accent/20 group flex min-w-62.5 shrink-0 snap-center flex-col justify-between rounded-2xl border border-stone-100 bg-stone-50 p-8 transition-all duration-300 hover:shadow-lg md:min-w-75"
+                className="group border-border hover:border-polytechnic/30 card-hover-lift flex min-w-62.5 shrink-0 snap-center flex-col justify-between rounded-2xl border bg-white p-8 md:min-w-75"
                 draggable={false}
               >
                 <div>
                   <div className="mb-6 flex items-start justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="text-primary group-hover:bg-accent/10 group-hover:text-accent rounded-xl border border-stone-100 bg-white p-2.5 transition-colors">
+                      <div className="text-polytechnic group-hover:bg-polytechnic bg-polytechnic-muted rounded-xl p-2.5 transition-colors group-hover:text-white">
                         <prog.icon size={22} strokeWidth={1.5} />
                       </div>
                       <div>
-                        <h3 className="text-primary font-serif text-lg leading-tight font-bold">
+                        <h3 className="text-navy font-serif text-lg leading-tight font-bold">
                           {prog.name}
                         </h3>
-                        <span className="text-xs text-stone-500">
+                        <span className="text-muted-foreground text-xs">
                           {prog.duration} — Full Time
                         </span>
                       </div>
@@ -341,18 +341,18 @@ export default function PolytechnicPage() {
                   </div>
 
                   <div className="mb-5">
-                    <span className="mb-3 block text-[10px] font-bold tracking-[0.15em] text-amber-600 uppercase">
+                    <span className="text-polytechnic mb-3 block text-[10px] font-bold tracking-[0.15em] uppercase">
                       What You&apos;ll Learn
                     </span>
                     <div className="grid grid-cols-1 gap-2">
                       {prog.outcomes.slice(0, 3).map((outcome) => (
                         <div
                           key={outcome}
-                          className="flex items-center gap-2 text-sm font-light text-stone-600"
+                          className="text-muted-foreground flex items-center gap-2 text-sm font-light"
                         >
                           <CheckCircle2
                             size={13}
-                            className="text-accent shrink-0"
+                            className="text-polytechnic shrink-0"
                           />
                           {outcome}
                         </div>
@@ -361,11 +361,11 @@ export default function PolytechnicPage() {
                   </div>
                 </div>
 
-                <div className="mt-auto border-t border-stone-200 pt-5">
-                  <span className="text-[10px] font-bold tracking-[0.15em] text-stone-500 uppercase">
+                <div className="border-border mt-auto border-t pt-5">
+                  <span className="text-muted-foreground text-[10px] font-bold tracking-[0.15em] uppercase">
                     Career Paths
                   </span>
-                  <p className="text-primary mt-1 text-sm font-medium">
+                  <p className="text-navy mt-1 text-sm font-medium">
                     {prog.career}
                   </p>
                 </div>
@@ -376,7 +376,7 @@ export default function PolytechnicPage() {
       </section>
 
       {/* ═══ WHY POLYTECHNIC — Advantages ═══ */}
-      <section className="bg-stone-50 py-12 md:py-16">
+      <section className="bg-stone-50 py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 gap-16 lg:grid-cols-5">
             <div className="lg:col-span-2">
@@ -444,7 +444,7 @@ export default function PolytechnicPage() {
       </section>
 
       {/* ═══ FACILITIES — Bento grid ═══ */}
-      <section className="bg-white py-12 md:py-16">
+      <section className="bg-white py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mx-auto mb-16 max-w-2xl text-center">
             <h2 className="mb-6 text-xs font-bold tracking-[0.2em] text-amber-600 uppercase">
@@ -572,7 +572,7 @@ export default function PolytechnicPage() {
       </section>
 
       {/* ═══ ADMISSIONS — Steps + contact form ═══ */}
-      <section className="bg-white py-12 md:py-16">
+      <section className="bg-white py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 items-center gap-16 lg:grid-cols-2">
             <div>

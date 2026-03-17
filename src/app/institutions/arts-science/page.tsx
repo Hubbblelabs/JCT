@@ -28,7 +28,7 @@ import { CTA } from "@/modules/arts-science/CTA";
 export default function ArtsSciencePage() {
   return (
     <main className="bg-background text-foreground arts-science-theme min-h-screen overflow-x-hidden">
-      <Navbar />
+      <Navbar forceSolidOnTop />
 
       <Hero />
       <Philosophy />

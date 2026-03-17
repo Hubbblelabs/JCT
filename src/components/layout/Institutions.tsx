@@ -29,8 +29,8 @@ const institutions = [
     tagline: "Fostering Creativity & Inquiry",
     stat: "6 UG Programs",
     programs: ["Computer Science", "Mathematics", "Commerce", "BBA"],
-    color: "from-burgundy/90 to-burgundy/70",
-    accent: "border-l-burgundy",
+    color: "from-arts-science/90 to-arts-science/70",
+    accent: "border-l-arts-science",
   },
   {
     name: "JCT Polytechnic College",

@@ -7,15 +7,15 @@ import { newsUpdates, campusEvents } from "@/data/polytechnic";
 
 export function NewsEvents() {
   return (
-    <section className="bg-[#F8F9FA] py-20 md:py-32">
+    <section className="bg-[#F8F9FA] py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-8">
         {/* ── News ── */}
         <div className="mb-24">
           <div className="mb-12">
-            <h2 className="mb-4 text-xs font-bold tracking-[0.2em] text-[#1A237E] uppercase">
+            <h2 className="text-polytechnic-dark mb-4 text-xs font-bold tracking-[0.2em] uppercase">
               News &amp; Events
             </h2>
-            <h3 className="font-sans text-4xl leading-tight font-bold text-[#1A237E] md:text-5xl">
+            <h3 className="text-polytechnic-dark font-sans text-4xl leading-tight font-bold md:text-5xl">
               Latest Updates
             </h3>
           </div>
@@ -41,7 +41,7 @@ export function NewsEvents() {
                 <div className="mb-3 flex items-center gap-2 text-xs font-bold tracking-wider text-stone-400 uppercase">
                   <Calendar className="h-3.5 w-3.5" /> {news.date}
                 </div>
-                <h4 className="line-clamp-3 font-sans text-lg leading-relaxed font-bold text-[#1A237E]">
+                <h4 className="text-polytechnic-dark line-clamp-3 font-sans text-lg leading-relaxed font-bold">
                   {news.title}
                 </h4>
               </motion.div>
@@ -51,7 +51,7 @@ export function NewsEvents() {
           <div className="mt-12 flex justify-center">
             <Link
               href="/institutions/polytechnic/news"
-              className="inline-flex h-14 items-center gap-2 rounded-full border border-[#ffd166]/70 bg-linear-to-r from-[#ffd166] to-[#FFB300] px-8 font-bold text-[#1A237E] shadow-[0_10px_24px_rgba(255,179,0,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
+              className="to-gold text-polytechnic-dark inline-flex h-14 items-center gap-2 rounded-full border border-[#ffd166]/70 bg-linear-to-r from-[#ffd166] px-8 font-bold shadow-[0_10px_24px_rgba(255,179,0,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
             >
               Read All News
             </Link>
@@ -60,7 +60,7 @@ export function NewsEvents() {
 
         {/* ── Events ── */}
         <div className="mx-auto max-w-4xl border-t border-stone-200 pt-24">
-          <h3 className="mb-12 text-center font-sans text-3xl font-bold text-[#1A237E] md:text-4xl">
+          <h3 className="text-polytechnic-dark mb-12 text-center font-sans text-3xl font-bold md:text-4xl">
             Upcoming Events
           </h3>
 
@@ -71,7 +71,7 @@ export function NewsEvents() {
                 className="-mx-4 flex flex-col items-start justify-between gap-4 px-4 py-6 transition-colors hover:bg-white sm:flex-row sm:items-center"
               >
                 <div className="flex-1">
-                  <h4 className="mb-3 font-sans text-xl font-bold text-[#1A237E] md:text-2xl">
+                  <h4 className="text-polytechnic-dark mb-3 font-sans text-xl font-bold md:text-2xl">
                     {event.title}
                   </h4>
                   <div className="flex flex-wrap items-center gap-4 text-sm font-light text-stone-500">
@@ -88,7 +88,7 @@ export function NewsEvents() {
                 </div>
                 <Link
                   href="/institutions/polytechnic/events"
-                  className="group flex shrink-0 items-center font-semibold text-[#1A237E] hover:underline"
+                  className="group text-polytechnic-dark flex shrink-0 items-center font-semibold hover:underline"
                 >
                   View event{" "}
                   <ChevronRight className="ml-1 h-5 w-5 transition-transform group-hover:translate-x-1" />

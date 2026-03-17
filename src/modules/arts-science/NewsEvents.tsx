@@ -7,13 +7,13 @@ import { Button } from "@/components/ui/button";
 
 export function NewsEvents() {
   return (
-    <section className="bg-[#edeff2] py-20 md:py-32">
+    <section className="bg-[#edeff2] py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-8">
         {/* News Section */}
         <div className="mb-24">
           <div className="mb-12 flex flex-col items-end justify-between gap-6 md:flex-row">
             <div>
-              <h2 className="font-sans text-4xl leading-tight font-bold text-[#800020] md:text-5xl">
+              <h2 className="text-arts-science-dark font-sans text-4xl leading-tight font-bold md:text-5xl">
                 Updates
               </h2>
             </div>
@@ -40,7 +40,7 @@ export function NewsEvents() {
                 <div className="mb-4 flex items-center gap-2 text-xs font-bold tracking-wider text-stone-500 uppercase">
                   <Calendar className="h-4 w-4" /> {news.date}
                 </div>
-                <h3 className="line-clamp-3 font-sans text-xl leading-relaxed font-bold text-[#800020] transition-colors group-hover:text-[#800020]">
+                <h3 className="text-arts-science-dark group-hover:text-arts-science-dark line-clamp-3 font-sans text-xl leading-relaxed font-bold transition-colors">
                   {news.title}
                 </h3>
               </motion.div>
@@ -48,7 +48,7 @@ export function NewsEvents() {
           </div>
 
           <div className="mt-12 flex justify-center">
-            <Button className="h-14 rounded-full border border-[#f1d892]/70 bg-linear-to-r from-[#f0ce74] to-[#D4AF37] px-8 font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95">
+            <Button className="from-gold-light to-gold h-14 rounded-full border border-[#f1d892]/70 bg-linear-to-r px-8 font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95">
               View all news
             </Button>
           </div>
@@ -56,7 +56,7 @@ export function NewsEvents() {
 
         {/* Events Section */}
         <div className="mx-auto max-w-4xl border-t border-stone-300 pt-24 text-center">
-          <h2 className="mb-12 font-sans text-3xl font-bold text-[#800020] md:text-4xl">
+          <h2 className="text-arts-science-dark mb-12 font-sans text-3xl font-bold md:text-4xl">
             Upcoming events
           </h2>
 
@@ -67,7 +67,7 @@ export function NewsEvents() {
                 className="-mx-4 flex flex-col items-start justify-between gap-6 px-4 py-6 transition-colors hover:bg-white/50 sm:flex-row sm:items-center"
               >
                 <div className="flex-1">
-                  <h4 className="mb-3 font-sans text-xl font-bold text-[#800020] md:text-2xl">
+                  <h4 className="text-arts-science-dark mb-3 font-sans text-xl font-bold md:text-2xl">
                     {event.title}
                   </h4>
                   <div className="flex flex-wrap items-center gap-4 text-sm font-light text-stone-500">
@@ -84,7 +84,7 @@ export function NewsEvents() {
                 </div>
                 <a
                   href="/institutions/arts-science/events"
-                  className="group flex shrink-0 items-center font-semibold text-[#800020] hover:underline"
+                  className="group text-arts-science-dark flex shrink-0 items-center font-semibold hover:underline"
                 >
                   View event{" "}
                   <ChevronRight className="ml-1 h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -94,7 +94,7 @@ export function NewsEvents() {
           </div>
 
           <div className="mt-12 flex justify-center text-center">
-            <Button className="h-14 rounded-full border border-[#f1d892]/70 bg-linear-to-r from-[#f0ce74] to-[#D4AF37] px-8 font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95">
+            <Button className="from-gold-light to-gold h-14 rounded-full border border-[#f1d892]/70 bg-linear-to-r px-8 font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95">
               View all events
             </Button>
           </div>

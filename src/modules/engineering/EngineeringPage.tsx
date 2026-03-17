@@ -201,7 +201,7 @@ export default function EngineeringPage() {
       {/* ═══ HERO — Full-bleed, impact-driven ═══ */}
       <section
         ref={heroRef}
-        className="relative flex min-h-[90vh] items-center overflow-hidden bg-[#0F172A] md:min-h-screen"
+        className="bg-navy relative flex min-h-[90vh] items-center overflow-hidden md:min-h-screen"
       >
         <motion.div
           style={{ opacity: heroOpacity, scale: heroScale }}
@@ -215,13 +215,13 @@ export default function EngineeringPage() {
             className="object-cover opacity-40"
             priority
           />
-          <div className="absolute inset-0 bg-linear-to-r from-[#0F172A]/95 via-[#0F172A]/80 to-[#0F172A]/40" />
+          <div className="from-navy/95 via-navy/80 to-navy/40 absolute inset-0 bg-linear-to-r" />
           {/* Subtle grid pattern overlay */}
           <div
             className="absolute inset-0 opacity-10"
             style={{
               backgroundImage:
-                "repeating-linear-gradient(0deg, transparent, transparent 50px, #FBBF24 50px, #FBBF24 51px), repeating-linear-gradient(90deg, transparent, transparent 50px, #FBBF24 50px, #FBBF24 51px)",
+                "repeating-linear-gradient(0deg, transparent, transparent 50px, var(--color-engineering) 50px, var(--color-engineering) 51px), repeating-linear-gradient(90deg, transparent, transparent 50px, var(--color-engineering) 50px, var(--color-engineering) 51px)",
             }}
           />
         </motion.div>
@@ -235,7 +235,7 @@ export default function EngineeringPage() {
                 transition={{ duration: 0.5 }}
                 className="mb-4 md:mb-6"
               >
-                <span className="inline-block rounded-full border border-[#FBBF24]/20 bg-[#FBBF24]/10 px-3 py-1 text-[10px] font-bold tracking-[0.2em] text-[#FBBF24] uppercase backdrop-blur-md md:text-xs">
+                <span className="border-engineering-light/30 bg-engineering/20 text-engineering-muted inline-block rounded-full border px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase backdrop-blur-md md:text-xs">
                   JCT College of Engineering & Technology
                 </span>
               </motion.div>
@@ -247,7 +247,7 @@ export default function EngineeringPage() {
                 className="mb-6 font-serif text-4xl leading-[1.1] tracking-tight text-white sm:text-5xl md:text-6xl md:leading-none lg:text-7xl"
               >
                 Engineer the <br />
-                Future <span className="text-[#FBBF24]">.</span>
+                Future <span className="text-engineering-light">.</span>
               </motion.h1>
 
               <motion.p
@@ -269,7 +269,7 @@ export default function EngineeringPage() {
               >
                 <Button
                   size="lg"
-                  className="h-12 w-full rounded-xl bg-[#FBBF24] px-8 font-bold text-[#0F172A] shadow-xl shadow-[#FBBF24]/20 transition-all hover:scale-105 hover:bg-[#F59E0B] active:scale-95 sm:w-auto md:h-14"
+                  className="bg-engineering hover:bg-engineering-light shadow-engineering/20 h-12 w-full rounded-xl px-8 font-bold text-white shadow-xl transition-all hover:scale-105 active:scale-95 sm:w-auto md:h-14"
                 >
                   Apply Now <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
@@ -298,10 +298,10 @@ export default function EngineeringPage() {
               ].map((s) => (
                 <div
                   key={s.label}
-                  className={`rounded-2xl border p-4 backdrop-blur-md md:p-6 ${s.accent ? "border-[#FBBF24]/30 bg-[#FBBF24]/15" : "border-white/10 bg-white/5"}`}
+                  className={`rounded-2xl border p-4 backdrop-blur-md md:p-6 ${s.accent ? "border-engineering-light/30 bg-engineering/20" : "border-white/10 bg-white/5"}`}
                 >
                   <span
-                    className={`mb-1 block font-sans text-2xl font-black md:mb-2 md:text-4xl ${s.accent ? "text-[#FBBF24]" : "text-white"}`}
+                    className={`mb-1 block font-sans text-2xl font-black md:mb-2 md:text-4xl ${s.accent ? "text-engineering-muted" : "text-white"}`}
                   >
                     {s.val}
                   </span>
@@ -316,29 +316,29 @@ export default function EngineeringPage() {
       </section>
 
       {/* ═══ ENGINEERING DOMAINS — Horizontal cards ═══ */}
-      <section className="relative bg-white py-12 md:py-16">
+      <section className="relative bg-white py-16 md:py-24">
         {/* Subtle background pattern */}
         <div
           className="absolute inset-0 opacity-[0.02]"
           style={{
             backgroundImage:
-              "repeating-linear-gradient(45deg, #0F172A 0px, #0F172A 2px, transparent 2px, transparent 10px)",
+              "repeating-linear-gradient(45deg, var(--color-engineering-dark) 0px, var(--color-engineering-dark) 2px, transparent 2px, transparent 10px)",
           }}
         />
         <div className="relative z-10 container mx-auto px-4 md:px-6">
           <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <h2 className="mb-4 text-xs font-bold tracking-[0.2em] text-[#FBBF24] uppercase">
+              <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
                 Engineering Domains
               </h2>
-              <h3 className="text-primary font-serif text-4xl leading-tight md:text-5xl">
+              <h3 className="text-navy font-serif text-4xl leading-tight md:text-5xl">
                 Five Disciplines,{" "}
                 <span className="font-light text-stone-300 italic">
                   One Standard.
                 </span>
               </h3>
             </div>
-            <p className="max-w-sm text-sm font-light text-stone-500">
+            <p className="text-muted-foreground max-w-sm text-sm font-light">
               4-year B.E. programs approved by AICTE and affiliated to Anna
               University, Chennai. Each department has dedicated labs,
               workshops, and faculty with industry experience.
@@ -353,7 +353,7 @@ export default function EngineeringPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.35, delay: index * 0.05 }}
-                className="group hover:border-accent/20 relative flex min-w-62.5 shrink-0 snap-center flex-col justify-between rounded-2xl border border-stone-100 bg-white p-6 transition-all duration-300 hover:shadow-lg md:min-w-72.5 md:p-8"
+                className="group border-border hover:border-engineering/30 card-hover-lift relative flex min-w-62.5 shrink-0 snap-center flex-col justify-between rounded-2xl border bg-white p-6 md:min-w-72.5 md:p-8"
                 draggable={false}
               >
                 <Link
@@ -366,35 +366,35 @@ export default function EngineeringPage() {
                 </Link>
                 <div className="flex flex-col gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="text-primary group-hover:bg-accent/10 group-hover:text-accent shrink-0 rounded-xl bg-stone-50 p-3 transition-colors">
+                    <div className="text-engineering group-hover:bg-engineering bg-engineering-muted shrink-0 rounded-xl p-3 transition-colors group-hover:text-white">
                       <dept.icon size={24} strokeWidth={1.5} />
                     </div>
                     <div>
-                      <h3 className="text-primary font-serif text-lg font-bold">
+                      <h3 className="text-navy font-serif text-lg font-bold">
                         {dept.name}
                       </h3>
-                      <span className="text-xs font-bold tracking-wider text-amber-600 uppercase">
+                      <span className="text-engineering text-xs font-bold tracking-wider uppercase">
                         {dept.abbr}
                       </span>
                     </div>
                   </div>
                   <div>
-                    <p className="text-sm font-light text-stone-500">
+                    <p className="text-muted-foreground text-sm font-light">
                       {dept.highlight}
                     </p>
                   </div>
                 </div>
 
-                <div className="mt-6 flex items-center justify-between border-t border-stone-100 pt-6">
+                <div className="border-border mt-6 flex items-center justify-between border-t pt-6">
                   <div className="flex items-center gap-2">
-                    <Users size={14} className="text-stone-300" />
-                    <span className="text-sm font-bold text-stone-500">
+                    <Users size={14} className="text-muted-foreground/60" />
+                    <span className="text-muted-foreground text-sm font-bold">
                       {dept.seats} Seats
                     </span>
                   </div>
                   <ArrowRight
                     size={18}
-                    className="group-hover:text-accent text-stone-300 transition-all group-hover:translate-x-1"
+                    className="text-engineering/40 group-hover:text-engineering transition-all group-hover:translate-x-1"
                   />
                 </div>
               </motion.div>
@@ -404,7 +404,7 @@ export default function EngineeringPage() {
       </section>
 
       {/* ═══ METRICS — Numbers grid ═══ */}
-      <section className="bg-primary py-12 md:py-16">
+      <section className="bg-primary py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mb-14 text-center">
             <h2 className="text-accent mb-4 text-xs font-bold tracking-[0.2em] uppercase">
@@ -442,7 +442,7 @@ export default function EngineeringPage() {
       </section>
 
       {/* ═══ RESEARCH & INNOVATION ═══ */}
-      <section className="bg-stone-50 py-12 md:py-16">
+      <section className="bg-stone-50 py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2">
             {/* Left: text content */}
@@ -525,7 +525,7 @@ export default function EngineeringPage() {
       </section>
 
       {/* ═══ PLACEMENTS — Data-driven showcase ═══ */}
-      <section className="bg-white py-12 md:py-16">
+      <section className="bg-white py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mx-auto mb-16 max-w-2xl text-center">
             <h2 className="mb-6 text-xs font-bold tracking-[0.2em] text-amber-600 uppercase">
@@ -613,13 +613,13 @@ export default function EngineeringPage() {
       <CollegeTestimonials
         title="Testimonials"
         subtitle="Stories from engineering students, alumni, and hiring partners who have experienced JCT's outcome-focused learning."
-        accentColor="#FBBF24"
+        accentColor="#D4A024"
         sectionBgClassName="bg-[#F8FAFC]"
         items={testimonials}
       />
 
       {/* ═══ ADMISSIONS — Strong CTA ═══ */}
-      <section className="bg-primary py-12 md:py-16">
+      <section className="bg-primary py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-2">
             {/* Left: CTA */}

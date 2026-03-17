@@ -130,7 +130,7 @@ function createEngineeringDepartment(config: {
     shortName: config.shortName,
     college: "engineering",
     bgColor: "#0F172A",
-    accentColor: "#FBBF24",
+    accentColor: "#D4A024",
     heroImage:
       "https://images.unsplash.com/photo-1581092160607-ee22731d8f2f?q=80&w=1600&auto=format&fit=crop",
     about: {

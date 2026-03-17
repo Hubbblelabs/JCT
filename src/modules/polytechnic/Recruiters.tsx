@@ -35,7 +35,7 @@ export function Recruiters() {
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12 font-sans text-xl font-bold text-[#1A237E] md:text-2xl"
+          className="text-polytechnic-dark mb-12 font-sans text-xl font-bold md:text-2xl"
         >
           Where our graduates work
         </motion.h2>

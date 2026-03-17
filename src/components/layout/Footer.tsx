@@ -86,11 +86,11 @@ export function Footer() {
                     placeholder="Your email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="border-border text-foreground placeholder:text-muted-foreground/60 focus:border-foreground/30 h-10 w-full rounded-lg border bg-white px-4 text-sm focus:outline-none"
+                    className="border-border text-foreground placeholder:text-muted-foreground/60 focus:border-navy h-10 w-full rounded-lg border bg-white px-4 text-sm focus:outline-none"
                   />
                   <button
                     type="submit"
-                    className="bg-foreground hover:bg-foreground/85 h-10 shrink-0 rounded-lg px-5 text-sm font-medium text-white transition-colors"
+                    className="bg-navy hover:bg-navy-light h-10 shrink-0 rounded-lg px-5 text-sm font-medium text-white transition-colors"
                   >
                     Subscribe
                   </button>

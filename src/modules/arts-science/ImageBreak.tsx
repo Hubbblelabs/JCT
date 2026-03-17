@@ -13,7 +13,8 @@ export function ImageBreak() {
         sizes="100vw"
         className="object-cover"
       />
-      <div className="absolute inset-0 bg-[#800020]/60" />
+      <div className="bg-navy/80 absolute inset-0" />
+      <div className="from-arts-science/40 absolute inset-0 bg-linear-to-tr to-transparent" />
       <div className="absolute inset-0 flex items-center justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -25,7 +26,7 @@ export function ImageBreak() {
           <p className="font-serif text-3xl leading-snug font-light text-white italic drop-shadow-md md:text-4xl">
             &ldquo;The unexamined life is not worth living.&rdquo;
           </p>
-          <span className="mt-4 block text-sm font-bold tracking-widest text-[#D4AF37] uppercase drop-shadow-sm">
+          <span className="text-gold mt-4 block text-sm font-bold tracking-widest uppercase drop-shadow-sm">
             — Socrates
           </span>
         </motion.div>

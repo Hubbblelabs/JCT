@@ -49,7 +49,7 @@ export function PartnerLogos() {
           initial={{ opacity: 0, y: 12 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="mb-12 font-sans text-xl font-bold text-[#800020] md:text-2xl"
+          className="text-arts-science-dark mb-12 font-sans text-xl font-bold md:text-2xl"
         >
           Where our graduates work
         </motion.h2>

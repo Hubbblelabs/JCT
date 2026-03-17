@@ -7,7 +7,7 @@ import Link from "next/link";
 
 const tabs = [
   { id: "engineering", label: "Engineering", color: "bg-navy" },
-  { id: "arts", label: "Arts & Science", color: "bg-burgundy" },
+  { id: "arts", label: "Arts & Science", color: "bg-arts-science" },
   { id: "polytechnic", label: "Polytechnic", color: "bg-polytechnic" },
 ] as const;
 

@@ -13,13 +13,13 @@ const campusImages = [
 
 export function CampusLife() {
   return (
-    <section className="overflow-hidden bg-white py-20 md:py-32">
+    <section className="overflow-hidden bg-white py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-8">
         <div className="mb-16 text-center">
-          <h2 className="mb-6 text-sm font-bold tracking-[0.2em] text-[#800020] uppercase">
+          <h2 className="text-arts-science-dark mb-6 text-sm font-bold tracking-[0.2em] uppercase">
             Campus life
           </h2>
-          <h3 className="mb-6 font-sans text-4xl leading-tight font-bold text-[#800020] md:text-5xl">
+          <h3 className="text-arts-science-dark mb-6 font-sans text-4xl leading-tight font-bold md:text-5xl">
             See where learning happens beyond the classroom
           </h3>
         </div>
@@ -51,7 +51,7 @@ export function CampusLife() {
           {campusImages.map((_, i) => (
             <div
               key={i}
-              className={`h-2.5 w-2.5 rounded-full ${i === 0 ? "bg-[#800020]" : "bg-stone-300"}`}
+              className={`h-2.5 w-2.5 rounded-full ${i === 0 ? "bg-arts-science-dark" : "bg-stone-300"}`}
             />
           ))}
         </div>

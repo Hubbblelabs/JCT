@@ -16,7 +16,7 @@ const campusImages = [
 
 export function CampusLife() {
   return (
-    <section className="overflow-hidden bg-white py-20 md:py-32">
+    <section className="overflow-hidden bg-white py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-8">
         <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-2">
           {/* Left: Text */}
@@ -27,10 +27,10 @@ export function CampusLife() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="lg:sticky lg:top-32"
           >
-            <h2 className="mb-4 text-xs font-bold tracking-[0.2em] text-[#1A237E] uppercase">
+            <h2 className="text-polytechnic-dark mb-4 text-xs font-bold tracking-[0.2em] uppercase">
               Life @ JCT
             </h2>
-            <h3 className="mb-6 font-sans text-4xl leading-tight font-bold text-[#1A237E] md:text-5xl">
+            <h3 className="text-polytechnic-dark mb-6 font-sans text-4xl leading-tight font-bold md:text-5xl">
               More than a classroom
             </h3>
             <p className="mb-6 text-lg leading-relaxed font-light text-[#212121]/75">
@@ -46,7 +46,7 @@ export function CampusLife() {
             </p>
             <Link
               href="/institutions/polytechnic/campus-life"
-              className="group inline-flex h-12 items-center gap-2 rounded-full border border-[#ffd166]/70 bg-linear-to-r from-[#ffd166] to-[#FFB300] px-8 text-sm font-semibold text-[#1A237E] shadow-[0_10px_24px_rgba(255,179,0,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
+              className="group to-gold text-polytechnic-dark inline-flex h-12 items-center gap-2 rounded-full border border-[#ffd166]/70 bg-linear-to-r from-[#ffd166] px-8 text-sm font-semibold shadow-[0_10px_24px_rgba(255,179,0,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
             >
               Find Out More
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -82,7 +82,7 @@ export function CampusLife() {
               {campusImages.map((_, i) => (
                 <div
                   key={i}
-                  className={`rounded-full transition-all ${i === 0 ? "h-2 w-6 bg-[#1A237E]" : "h-2 w-2 bg-stone-300"}`}
+                  className={`rounded-full transition-all ${i === 0 ? "bg-polytechnic-dark h-2 w-6" : "h-2 w-2 bg-stone-300"}`}
                 />
               ))}
             </div>

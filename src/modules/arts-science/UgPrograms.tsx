@@ -7,16 +7,16 @@ import { ugPrograms } from "@/data/arts-science";
 
 export function UgPrograms() {
   return (
-    <section className="bg-white py-20 md:py-32">
+    <section className="bg-white py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-8">
         <div className="mb-16 text-center md:text-left">
-          <h2 className="mb-4 text-sm font-bold tracking-[0.2em] text-[#800020] uppercase">
+          <h2 className="text-arts-science mb-4 text-xs font-bold tracking-[0.2em] uppercase">
             Programs
           </h2>
-          <h3 className="mb-6 font-sans text-4xl leading-tight font-bold text-[#800020] md:text-5xl">
+          <h3 className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl">
             Study what moves you forward
           </h3>
-          <p className="mx-auto max-w-2xl text-lg leading-relaxed font-light text-[#2C2C2C] md:mx-0 md:text-xl">
+          <p className="text-muted-foreground mx-auto max-w-2xl text-lg leading-relaxed font-light md:mx-0 md:text-xl">
             Choose from diverse academic pathways designed to prepare you for
             meaningful careers in your field of choice.
           </p>
@@ -30,7 +30,7 @@ export function UgPrograms() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="group relative flex flex-col"
+              className="group border-border hover:border-arts-science/30 card-hover-lift flex h-full flex-col rounded-2xl border bg-white p-6 md:p-8"
             >
               <Link
                 href={`/institutions/arts-science/departments/${prog.slug}`}
@@ -40,29 +40,29 @@ export function UgPrograms() {
               </Link>
 
               <div className="mb-6">
-                <div className="mb-6 flex h-14 w-14 items-center justify-center rounded bg-stone-100 text-[#800020] transition-colors duration-300 group-hover:bg-[#800020] group-hover:text-white">
+                <div className="bg-arts-science-muted text-arts-science group-hover:bg-arts-science mb-4 flex h-14 w-14 items-center justify-center rounded-xl transition-colors duration-300 group-hover:text-white">
                   <prog.icon size={28} strokeWidth={1.5} />
                 </div>
-                <h3 className="mb-3 font-sans text-2xl leading-tight font-bold text-[#800020] transition-colors group-hover:text-[#800020]">
+                <h3 className="text-navy mb-3 font-serif text-2xl leading-tight font-bold transition-colors">
                   {prog.name}
                 </h3>
-                <p className="leading-relaxed font-light text-[#2C2C2C]">
+                <p className="text-muted-foreground text-sm leading-relaxed font-light">
                   {prog.desc}
                 </p>
               </div>
 
-              <div className="mt-auto flex items-center text-sm font-semibold text-[#800020] group-hover:text-[#800020]">
-                Learn more{" "}
-                <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              <div className="border-border text-arts-science mt-auto flex items-center justify-between border-t pt-4 text-sm font-semibold">
+                <span>Learn more</span>
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </div>
             </motion.div>
           ))}
         </div>
 
-        <div className="flex items-center justify-center gap-4 border-t border-stone-200 pt-10">
+        <div className="border-border flex items-center justify-center gap-4 border-t pt-10">
           <Link
             href="/institutions/arts-science/courses"
-            className="group inline-flex h-12 items-center gap-2 rounded-full bg-[#800020] px-8 text-sm font-semibold text-white shadow-[0_8px_20px_rgba(128,0,32,0.25)] transition-all hover:-translate-y-0.5 hover:bg-[#5e0017] hover:shadow-[0_12px_24px_rgba(128,0,32,0.3)]"
+            className="group bg-navy shadow-navy/20 hover:bg-navy-light inline-flex h-12 items-center gap-2 rounded-full px-8 text-sm font-semibold text-white shadow-xl transition-all hover:scale-105 active:scale-95"
           >
             Browse all programs
             <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
