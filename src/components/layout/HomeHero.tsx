@@ -135,10 +135,10 @@ export function HomeHero() {
         </AnimatePresence>
         <motion.div
           style={{ opacity: overlayOpacity }}
-          className="bg-navy absolute inset-0"
+          className="bg-navy/40 absolute inset-0 mix-blend-multiply"
         />
-        <div className="from-navy via-navy/80 absolute inset-0 bg-linear-to-r to-transparent" />
-        <div className="from-navy absolute inset-0 bg-linear-to-t via-transparent to-transparent" />
+        <div className="from-navy/70 via-navy/20 absolute inset-0 bg-gradient-to-r to-transparent" />
+        <div className="from-navy/60 absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
       </motion.div>
 
       {/* Content */}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Navbar } from "@/components/layout/Navbar";
+import { ArtsScienceNavbar } from "@/modules/arts-science/ArtsScienceNavbar";
 import { Footer } from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
@@ -28,7 +28,7 @@ import { CTA } from "@/modules/arts-science/CTA";
 export default function ArtsSciencePage() {
   return (
     <main className="bg-background text-foreground arts-science-theme min-h-screen overflow-x-hidden">
-      <Navbar forceSolidOnTop />
+      <ArtsScienceNavbar forceSolidOnTop />
 
       <Hero />
       <Philosophy />

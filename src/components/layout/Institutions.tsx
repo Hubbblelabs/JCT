@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { degrees, motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -16,6 +16,10 @@ const institutions = [
     tagline: "Pioneering Technical Education",
     // stat: "6 B.E./B.Tech Programs",
     degreePrograms: [
+      {
+        degree:"Autonomous  ",
+        courses:[],
+      },
       {
         degree: "B.E. / B.Tech",
         courses: ["CSE", "ECE", "Mechanical", "Civil", "EEE", "FT"],
