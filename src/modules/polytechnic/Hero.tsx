@@ -12,8 +12,8 @@ const fadeUp = (delay = 0) => ({
 
 export function Hero() {
   return (
-    <section className="flex min-h-svh flex-col bg-[#0d2e2e] pt-24 pb-16 md:pt-32 md:pb-24">
-      <div className="container mx-auto flex flex-1 flex-col px-4 md:px-6 lg:px-8 justify-center">
+    <section className="bg-polytechnic flex min-h-svh flex-col pt-24 pb-16 md:pt-32 md:pb-24">
+      <div className="container mx-auto flex flex-1 flex-col justify-center px-4 md:px-6 lg:px-8">
         {/* ─── Hero Header ─── */}
         <motion.div {...fadeUp(0)} className="mb-10 text-center md:mb-14">
           <h1 className="mb-4 font-serif text-4xl leading-tight font-bold text-white md:text-5xl lg:text-6xl">
@@ -46,8 +46,8 @@ export function Hero() {
             </div>
           </div>
           {/* Corner cutouts that reveal the dark background */}
-          <div className="absolute bottom-0 left-0 h-20 w-20 rounded-tr-full bg-[#0d2e2e] md:h-28 md:w-28" />
-          <div className="absolute right-0 bottom-0 h-20 w-20 rounded-tl-full bg-[#0d2e2e] md:h-28 md:w-28" />
+          <div className="bg-polytechnic-dark absolute bottom-0 left-0 h-20 w-20 rounded-tr-full md:h-28 md:w-28" />
+          <div className="bg-polytechnic-dark absolute right-0 bottom-0 h-20 w-20 rounded-tl-full md:h-28 md:w-28" />
         </motion.div>
       </div>
     </section>
