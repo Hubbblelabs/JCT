@@ -209,77 +209,28 @@ export function HomeHero() {
           </motion.div>
         </div>
 
-        {/* Bottom bar – stats + mini carousel */}
+        {/* Bottom bar – stats */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.7 }}
-            className="flex flex-col gap-4 border-t border-white/10 pt-3 md:flex-row md:items-end md:justify-between md:pt-5"
+          className="flex w-full justify-center border-t border-white/10 pt-5 md:pt-6"
         >
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4 md:gap-x-8">
+          <div className="grid grid-cols-2 gap-x-12 gap-y-6 sm:grid-cols-4 md:gap-x-20">
             {stats.map((stat) => (
-              <div key={stat.label}>
-                <span className="font-sans text-2xl font-black tracking-tight text-white sm:text-3xl lg:text-[2.25rem]">
+              <div key={stat.label} className="flex flex-col">
+                <span className="font-sans text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">
                   <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                 </span>
-                <span className="mt-0.5 block font-sans text-[10px] font-semibold tracking-[0.15em] text-white/40 uppercase md:mt-1 md:text-[11px]">
+                <span className="mt-1 block font-sans text-[11px] font-bold tracking-[0.18em] text-white/50 uppercase md:mt-2 md:text-xs">
                   {stat.label}
                 </span>
               </div>
             ))}
           </div>
 
-          {/* Mini carousel */}
-          <div className="hidden shrink-0 gap-2 lg:mr-52 lg:flex lg:gap-2.5">
-            {slides.map((slide, index) => (
-              <button
-                key={slide.id}
-                onClick={() => setActiveSlide(index)}
-                className={`group relative overflow-hidden rounded-xl border transition-all duration-300 focus:outline-none ${
-                  index === activeSlide
-                    ? "border-gold/60 ring-gold/40 w-30 opacity-100 ring-1 xl:w-36"
-                    : "w-18 border-white/10 opacity-50 hover:opacity-75 xl:w-22"
-                }`}
-              >
-                <div className="relative h-16 w-full xl:h-20">
-                  <Image
-                    src={slide.thumb}
-                    alt={slide.label}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    sizes="(max-width: 1280px) 72px, 144px"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  <div className="absolute bottom-0 left-0 p-2">
-                    <p className="font-sans text-[10px] leading-tight font-semibold text-white sm:text-xs">
-                      {slide.label}
-                    </p>
-                    <p className="font-mono text-[9px] text-white/50 sm:text-[10px]">
-                      {slide.subtitle}
-                    </p>
-                  </div>
-                  {index === activeSlide && (
-                    <div className="bg-gold absolute top-2 right-2 rounded-full p-1">
-                      <ArrowRight size={9} className="text-navy" />
-                    </div>
-                  )}
-                </div>
-                {/* Progress bar on active slide */}
-                {index === activeSlide && !isPaused && (
-                  <div className="absolute bottom-0 left-0 h-0.5 w-full overflow-hidden">
-                    <motion.div
-                      key={activeSlide}
-                      initial={{ scaleX: 0 }}
-                      animate={{ scaleX: 1 }}
-                      transition={{ duration: 5, ease: "linear" }}
-                      className="bg-gold h-full w-full origin-left"
-                    />
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
+          {/* Removed Mini carousel */}
         </motion.div>
       </div>
     </section>

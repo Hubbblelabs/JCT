@@ -25,8 +25,8 @@ const pathways = [
     icon: CalendarCheck,
     title: "After 12th Standard",
     desc: "Choose B.E./B.Tech at Engineering or B.Sc/B.Com/BBA at Arts & Science — depending on your stream.",
-    link: "/institutions/engineering",
-    linkText: "Compare Options",
+    link: "/admissions/apply",
+    linkText: "Apply now",
     gradient: "from-blue-50 to-indigo-50",
     iconColor: "text-navy",
   },
@@ -134,51 +134,6 @@ export function AdmissionsCTA() {
             >
               Download Prospectus
             </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="relative overflow-hidden rounded-3xl"
-          >
-            <div className="from-navy via-navy-light to-navy-mid noise-overlay relative bg-linear-to-br p-6 text-center md:p-12">
-              <div className="from-gold/5 to-gold/5 pointer-events-none absolute inset-0 bg-linear-to-r via-transparent" />
-              <div className="relative z-10">
-                <div className="mb-4 flex items-center justify-center gap-3">
-                  <div className="bg-gold/10 border-gold/20 animate-pulse-glow flex h-12 w-12 items-center justify-center rounded-full border">
-                    <Phone size={22} className="text-gold" />
-                  </div>
-                </div>
-                <h3 className="text-gold mb-3 font-serif text-2xl font-bold md:text-3xl">
-                  Admissions Helpline
-                </h3>
-                <a href="tel:+919361488801">
-                  <p className="hover:text-gold mb-3 font-sans text-3xl font-black tracking-wide text-white transition-colors md:text-4xl">
-                    +91 93614 88801
-                  </p>
-                </a>
-                <p className="mb-1 font-sans text-sm text-white/50">
-                  Mon – Sat, 9:00 AM – 5:00 PM
-                </p>
-                <p className="font-sans text-xs text-white/30">
-                  Call for personalized guidance on admissions, programs, and
-                  campus visits
-                </p>
-                <div
-                  id="contact"
-                  className="mt-8 flex items-center justify-center gap-2 border-t border-white/10 pt-6"
-                >
-                  <Mail size={16} className="text-gold" />
-                  <a
-                    href="mailto:admissions@jct.edu"
-                    className="font-sans text-sm text-white/70 transition-colors hover:text-white"
-                  >
-                    admissions@jct.edu
-                  </a>
-                </div>
-              </div>
-            </div>
           </motion.div>
         </div>
       </div>

@@ -14,13 +14,13 @@ export const siteConfig = {
   },
 
   address: {
-    line1: "JCT Institutions",
-    line2: "Knowledge Park, Pichanur",
+    line1: "Shri Jagannath Educational Health and Charitable Trust",
+    line2: "Velandhavalam Main Road, Pichanur",
     city: "Coimbatore",
     pincode: "641105",
-    state: "Tamil Nadu",
+    state: "TamilNadu",
     country: "India",
-    full: "JCT Institutions, Knowledge Park, Pichanur, Coimbatore - 641105, Tamil Nadu",
+    full: "Shri Jagannath Educational Health and Charitable Trust, Velandhavalam Main Road, Pichanur, Coimbatore - 641105, TamilNadu, India",
     mapEmbedUrl:
       "https://www.google.com/maps?q=JCT+Institutions+Knowledge+Park+Pichanur+Coimbatore+641105&output=embed",
     mapUrl:

@@ -10,12 +10,25 @@ const institutions = [
     name: "JCT College of Engineering & Technology",
     slug: "engineering",
     href: "/institutions/engineering",
-    logo: "/jct_engineering1.png",
+    // logo: "/jct_engineering1.png",
     image:
       "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1200&auto=format&fit=crop",
     tagline: "Pioneering Technical Education",
-    stat: "6 B.E./B.Tech Programs",
-    programs: ["Computer Science", "Electronics", "Mechanical", "Civil"],
+    // stat: "6 B.E./B.Tech Programs",
+    degreePrograms: [
+      {
+        degree: "B.E. / B.Tech",
+        courses: ["CSE", "ECE", "Mechanical", "Civil", "EEE", "FT"],
+      },
+      {
+        degree: "M.E. / M.Tech",
+        courses: ["Structural", "Power Systems", "Engg Design", "CSE"],
+      },
+      {
+        degree: "Ph.D",
+        courses: ["Computer Science", "Electrical"],
+      },
+    ],
     color: "from-navy/90 to-navy/70",
     accent: "border-l-gold",
   },
@@ -23,12 +36,17 @@ const institutions = [
     name: "JCT College of Arts & Science",
     slug: "arts-science",
     href: "/institutions/arts-science",
-    logo: "/jct_arts1.png",
+    // logo: "/jct_arts1.png",
     image:
       "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=1200&auto=format&fit=crop",
     tagline: "Fostering Creativity & Inquiry",
-    stat: "6 UG Programs",
-    programs: ["Computer Science", "Mathematics", "Commerce", "BBA"],
+    // stat: "6 UG Programs",
+    degreePrograms: [
+      {
+        degree: "Degrees Offered",
+        courses: ["B.Sc", "BCA", "BBA", "B.Com"],
+      },
+    ],
     color: "from-arts-science/90 to-arts-science/70",
     accent: "border-l-arts-science",
   },
@@ -36,12 +54,17 @@ const institutions = [
     name: "JCT Polytechnic College",
     slug: "polytechnic",
     href: "/institutions/polytechnic",
-    logo: "/jct_polytechnic1.png",
+    // logo: "/jct_polytechnic1.png",
     image:
       "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200&auto=format&fit=crop",
     tagline: "Hands-On Technical Training",
-    stat: "5 Diploma Programs",
-    programs: ["Computer", "Mechanical", "Electrical", "Electronics"],
+    // stat: "5 Diploma Programs",
+    degreePrograms: [
+      {
+        degree: "Diploma",
+        courses: ["Civil", "Mechanical", "Automobile", "EEE", "ECE"],
+      },
+    ],
     color: "from-polytechnic/90 to-polytechnic/70",
     accent: "border-l-polytechnic",
   },
@@ -88,13 +111,77 @@ export function Institutions() {
 
         {/* Bento Grid — Desktop | Horizontal Scroll — Mobile */}
         <div className="hidden lg:grid lg:grid-cols-2 lg:gap-6">
-          {/* Large Feature Card */}
+          {/* Smaller Cards Column (Column 1) */}
+          <div className="flex flex-col gap-6">
+            {institutions.slice(1).map((inst, index) => (
+              <motion.div
+                key={inst.slug}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.15 * index }}
+              >
+                <Link href={inst.href} className="group block">
+                  <div className="relative h-50 overflow-hidden rounded-3xl md:h-70">
+                    <Image
+                      src={inst.image}
+                      alt={inst.name}
+                      fill
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                    />
+                    <div
+                      className={`absolute inset-0 bg-linear-to-t ${inst.color}`}
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
+
+                    <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-8">
+                      <h3 className="mb-2 font-serif text-xl leading-tight font-bold text-white md:text-2xl">
+                        {inst.name}
+                      </h3>
+                      <p className="mb-5 font-sans text-sm text-white/70">
+                        {inst.tagline}
+                      </p>
+                      <div className="flex flex-1 items-end gap-3">
+                        <div className="flex flex-1 flex-col gap-3">
+                          {inst.degreePrograms.map((degProg) => (
+                            <div key={degProg.degree} className="flex flex-col gap-1.5">
+                              <span className="font-sans text-[10px] font-bold tracking-wider text-white/60 uppercase">
+                                {degProg.degree}
+                              </span>
+                              {degProg.courses.length > 0 && (
+                                <div className="flex flex-wrap gap-1.5">
+                                  {degProg.courses.map((course) => (
+                                    <span
+                                      key={course}
+                                      className="rounded-md bg-white/10 px-2 py-1 font-sans text-[11px] font-medium text-white/90 backdrop-blur-sm"
+                                    >
+                                      {course}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                        <span className="group-hover:bg-gold group-hover:border-gold group-hover:text-navy mb-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-all">
+                          <ArrowUpRight size={16} />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+
+          {/* Large Feature Card (Column 2) */}
           <motion.div
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="lg:row-span-2"
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="h-full"
           >
             <Link href={institutions[0].href} className="group block h-full">
               <div className="relative h-full min-h-70 overflow-hidden rounded-3xl lg:min-h-145">
@@ -112,20 +199,6 @@ export function Institutions() {
 
                 {/* Content overlay */}
                 <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-8 lg:p-10">
-                  <div className="mb-4 flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/90 p-2 shadow-lg backdrop-blur">
-                      <Image
-                        src={institutions[0].logo}
-                        alt=""
-                        width={32}
-                        height={32}
-                        className="object-contain"
-                      />
-                    </div>
-                    <span className="text-gold font-sans text-xs font-bold tracking-[0.15em] uppercase">
-                      {institutions[0].stat}
-                    </span>
-                  </div>
                   <h3 className="mb-2 font-serif text-2xl leading-tight font-bold text-white md:text-3xl">
                     {institutions[0].name}
                   </h3>
@@ -134,18 +207,29 @@ export function Institutions() {
                     and industry-aligned curriculum preparing engineers for
                     tomorrow.
                   </p>
-                  <div className="flex items-center gap-3">
-                    <div className="flex flex-wrap gap-2">
-                      {institutions[0].programs.map((p) => (
-                        <span
-                          key={p}
-                          className="rounded-full border border-white/10 bg-white/10 px-3 py-1 font-sans text-[10px] font-bold tracking-wider text-white/80 uppercase backdrop-blur-sm"
-                        >
-                          {p}
-                        </span>
+                  <div className="flex flex-1 items-end gap-3">
+                    <div className="flex flex-1 flex-col gap-4">
+                      {institutions[0].degreePrograms.map((degProg) => (
+                        <div key={degProg.degree} className="flex flex-col gap-2">
+                          <span className="font-sans text-[11px] font-bold tracking-[0.15em] text-white/60 uppercase">
+                            {degProg.degree}
+                          </span>
+                          {degProg.courses.length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {degProg.courses.map((course) => (
+                                <span
+                                  key={course}
+                                  className="rounded-md bg-white/10 px-2.5 py-1 font-sans text-[12px] font-medium text-white/90 backdrop-blur-sm"
+                                >
+                                  {course}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       ))}
                     </div>
-                    <span className="bg-gold text-navy ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-lg transition-transform group-hover:scale-110">
+                    <span className="bg-gold text-navy mb-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-lg transition-transform group-hover:scale-110">
                       <ArrowUpRight size={18} />
                     </span>
                   </div>
@@ -153,61 +237,6 @@ export function Institutions() {
               </div>
             </Link>
           </motion.div>
-
-          {/* Smaller Cards */}
-          {institutions.slice(1).map((inst, index) => (
-            <motion.div
-              key={inst.slug}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.15 * (index + 1) }}
-            >
-              <Link href={inst.href} className="group block">
-                <div className="relative h-50 overflow-hidden rounded-3xl md:h-70">
-                  <Image
-                    src={inst.image}
-                    alt={inst.name}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 1024px) 100vw, 50vw"
-                  />
-                  <div
-                    className={`absolute inset-0 bg-linear-to-t ${inst.color}`}
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
-
-                  <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-8">
-                    <div className="mb-3 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 p-1.5 shadow-lg backdrop-blur">
-                        <Image
-                          src={inst.logo}
-                          alt=""
-                          width={28}
-                          height={28}
-                          className="object-contain"
-                        />
-                      </div>
-                      <span className="text-gold font-sans text-[10px] font-bold tracking-[0.15em] uppercase">
-                        {inst.stat}
-                      </span>
-                    </div>
-                    <h3 className="mb-2 font-serif text-xl leading-tight font-bold text-white md:text-2xl">
-                      {inst.name}
-                    </h3>
-                    <div className="flex items-center justify-between">
-                      <p className="font-sans text-sm text-white/70">
-                        {inst.tagline}
-                      </p>
-                      <span className="group-hover:bg-gold group-hover:border-gold group-hover:text-navy ml-4 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-all">
-                        <ArrowUpRight size={16} />
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
         </div>
 
         {/* Mobile: Horizontal Scroll Cards */}
@@ -236,34 +265,33 @@ export function Institutions() {
                   <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
 
                   <div className="absolute inset-0 z-10 flex flex-col justify-end p-5">
-                    <div className="mb-3 flex items-center gap-2.5">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/90 p-1.5 shadow-lg backdrop-blur">
-                        <Image
-                          src={inst.logo}
-                          alt=""
-                          width={28}
-                          height={28}
-                          className="object-contain"
-                        />
-                      </div>
-                      <span className="text-gold font-sans text-[10px] font-bold tracking-[0.15em] uppercase">
-                        {inst.stat}
-                      </span>
-                    </div>
                     <h3 className="mb-1.5 font-serif text-lg leading-tight font-bold text-white">
                       {inst.name}
                     </h3>
                     <p className="mb-3 font-sans text-xs text-white/60">
                       {inst.tagline}
                     </p>
-                    <div className="flex flex-wrap gap-1.5">
-                      {inst.programs.map((p) => (
-                        <span
-                          key={p}
-                          className="rounded-full border border-white/10 bg-white/10 px-2.5 py-0.5 font-sans text-[9px] font-bold tracking-wider text-white/70 uppercase"
-                        >
-                          {p}
-                        </span>
+                    <div className="flex flex-col gap-2.5">
+                      {inst.degreePrograms.map((degProg) => (
+                        <div key={degProg.degree} className="flex flex-col gap-1">
+                          <span className="font-sans text-[9px] font-bold tracking-[0.1em] text-white/50 uppercase">
+                            {degProg.degree}
+                          </span>
+                          {degProg.courses.length > 0 && (
+                            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                              {degProg.courses.map((course, idx) => (
+                                <div key={course} className="flex items-center gap-1.5">
+                                  <span className="font-sans text-[10px] font-medium text-white/90">
+                                    {course}
+                                  </span>
+                                  {idx < degProg.courses.length - 1 && (
+                                    <span className="h-1 w-1 rounded-full bg-white/20" />
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
                       ))}
                     </div>
                   </div>

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { Phone, Mail } from "lucide-react";
 import {
   FaFacebookF,
   FaInstagram,
@@ -49,8 +49,6 @@ const socialLinks = [
 ];
 
 export function Footer() {
-  const [email, setEmail] = useState("");
-
   return (
     <footer className="bg-surface font-sans">
       {/* Main card */}
@@ -73,28 +71,30 @@ export function Footer() {
                 </span>
               </div>
 
-              <div className="border-border/80 bg-surface rounded-xl border p-4 sm:p-5">
-                <p className="text-muted-foreground mb-3 max-w-md text-sm leading-relaxed">
-                  Get campus news and admission updates delivered to your inbox.
-                </p>
-                <form
-                  onSubmit={(e) => e.preventDefault()}
-                  className="flex flex-col gap-2 sm:flex-row"
-                >
-                  <input
-                    type="email"
-                    placeholder="Your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="border-border text-foreground placeholder:text-muted-foreground/60 focus:border-navy h-10 w-full rounded-lg border bg-white px-4 text-sm focus:outline-none"
-                  />
-                  <button
-                    type="submit"
-                    className="bg-navy hover:bg-navy-light h-10 shrink-0 rounded-lg px-5 text-sm font-medium text-white transition-colors"
-                  >
-                    Subscribe
-                  </button>
-                </form>
+              <div className="relative overflow-hidden rounded-2xl bg-[#0F172A] p-6 text-center text-white shadow-lg">
+                <div className="absolute top-0 right-0 -mt-6 -mr-6 h-32 w-32 rounded-full bg-[#D4A024]/10 blur-2xl"></div>
+                <div className="absolute bottom-0 left-0 -mb-6 -ml-6 h-32 w-32 rounded-full bg-[#D4A024]/10 blur-2xl"></div>
+                
+                <div className="relative z-10 flex flex-col items-center">
+                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full border border-[rgba(212,160,36,0.3)] bg-[rgba(212,160,36,0.08)] shadow-[0_0_15px_rgba(212,160,36,0.15)]">
+                    <Phone className="h-6 w-6 text-[#D4A024]" strokeWidth={1.5} />
+                  </div>
+                  
+                  <h3 className="mb-1 font-sans text-[15px] font-semibold tracking-wide text-[#D4A024]">
+                    Admissions Helpline
+                  </h3>
+                  
+                  <a href="tel:+919361488801" className="mb-4 font-sans text-3xl font-black tracking-tight text-white transition-colors hover:text-[#D4A024]">
+                    +91 93614 88801
+                  </a>
+                  
+                  <div className="my-1 h-[1px] w-full max-w-[200px] bg-gradient-to-r from-transparent via-white/15 to-transparent"></div>
+                  
+                  <a href="mailto:admissions@jct.edu" className="mt-4 flex items-center justify-center gap-2.5 font-sans text-[13px] font-medium text-white/80 transition-colors hover:text-white">
+                    <Mail className="h-4 w-4 text-[#D4A024]" strokeWidth={2} />
+                    admissions@jct.edu
+                  </a>
+                </div>
               </div>
 
               {/* Accreditation logos */}

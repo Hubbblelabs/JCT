@@ -56,11 +56,11 @@ export default function HomePage() {
       <HomeHero />
       <Accreditations />
       <Institutions />
-      <WhyJCT />
+      {/* <WhyJCT /> */}
       <NewsEvents />
       <Placements />
       <Testimonials />
-      <CampusLife />
+      {/* <CampusLife /> */}
       <AdmissionsCTA />
       <Footer />
     </main>
