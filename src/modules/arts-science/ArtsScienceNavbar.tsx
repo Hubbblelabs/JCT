@@ -8,12 +8,12 @@ import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion"
 import { siteConfig } from "@/data/site";
 
 const artsNav = [
-  { name: "Home", href: "/" },
-  { name: "About JCT", href: "/about" },
-  { name: "Courses", href: "/academics/programs" },
-  { name: "Admission", href: "/admissions" },
-  { name: "Life @ JCT", href: "/campus-life" },
-  { name: "Contact Us", href: "/contact" },
+  { name: "Home", href: "#hero" },
+  { name: "About JCT", href: "#about" },
+  { name: "Courses", href: "#courses" },
+  { name: "Admission", href: "#admission" },
+  { name: "Life @ JCT", href: "#life" },
+  { name: "Contact Us", href: "#contact" },
 ];
 
 type NavbarProps = {
@@ -201,7 +201,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                   <Phone size={16} /> {siteConfig.contact.phone}
                 </a>
                 <Link
-                  href="/admissions/apply"
+                  href="#admission"
                   onClick={() => setIsOpen(false)}
                   className="bg-gold text-navy hover:bg-gold-light flex h-12 w-full items-center justify-center gap-2 rounded-xl font-sans text-sm font-bold transition-colors"
                 >

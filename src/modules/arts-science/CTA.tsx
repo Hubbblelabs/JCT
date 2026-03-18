@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export function CTA() {
   return (
-    <section className="border-arts-science bg-navy border-t-4 py-16 md:py-24">
+    <section id="admission" className="border-arts-science bg-navy border-t-4 py-16 md:py-24">
       <div className="container mx-auto px-4 text-center md:px-8">
         <div className="mx-auto max-w-3xl">
           <motion.div

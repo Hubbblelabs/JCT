@@ -40,7 +40,7 @@ function AnimatedNumber({ value }: { value: string }) {
 
 export function Hero() {
   return (
-    <section className="relative flex min-h-svh flex-col overflow-hidden bg-purple-50/30">
+    <section id="hero" className="relative flex min-h-svh flex-col overflow-hidden bg-purple-50/30">
       <div className="absolute inset-0 pointer-events-none origin-top">
         <ArtsAndScienceHeroBg />
       </div>

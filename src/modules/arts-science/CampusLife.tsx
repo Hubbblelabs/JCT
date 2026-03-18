@@ -13,7 +13,7 @@ const campusImages = [
 
 export function CampusLife() {
   return (
-    <section className="overflow-hidden bg-white py-16 md:py-24">
+    <section id="life" className="overflow-hidden bg-white py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-8">
         <div className="mb-16 text-center">
           <h2 className="text-arts-science-dark mb-6 text-sm font-bold tracking-[0.2em] uppercase">
