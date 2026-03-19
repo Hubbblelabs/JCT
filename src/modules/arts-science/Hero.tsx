@@ -39,10 +39,37 @@ function AnimatedNumber({ value }: { value: string }) {
 }
 
 export function Hero() {
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty("--mouse-x", `${x}px`);
+    e.currentTarget.style.setProperty("--mouse-y", `${y}px`);
+  };
+
   return (
-    <section id="hero" className="relative flex min-h-svh flex-col overflow-hidden bg-purple-50/30">
+    <section 
+      id="hero" 
+      className="group/section relative flex min-h-svh flex-col overflow-hidden bg-purple-50/30"
+      onMouseMove={handleMouseMove}
+    >
       <div className="absolute inset-0 pointer-events-none origin-top">
         <ArtsAndScienceHeroBg />
+      </div>
+
+      <div className="absolute inset-0 z-0 pointer-events-none [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_100%)]">
+        <div className="absolute inset-0 bg-slate-200 [mask-image:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] [mask-size:24px_24px] mix-blend-multiply opacity-20" />
+        
+        {/* Spotlight dots layer tracking the mouse */}
+        <div 
+          className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover/section:opacity-100"
+          style={{
+            WebkitMaskImage: `radial-gradient(circle 400px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%)`,
+            maskImage: `radial-gradient(circle 400px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%)`
+          }}
+        >
+          <div className="absolute inset-0 bg-arts-science [mask-image:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] [mask-size:24px_24px]" />
+        </div>
       </div>
 
       {/* Announcement Banner */}
