@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 export function NewsEvents() {
   return (
-    <section className="bg-[#edeff2] py-16 md:py-24">
+    <section className="bg-arts-science-muted py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-8">
         {/* News Section */}
         <div className="mb-24">
@@ -48,7 +48,7 @@ export function NewsEvents() {
           </div>
 
           <div className="mt-12 flex justify-center">
-            <Button className="from-gold-light to-gold h-14 rounded-full border border-[#f1d892]/70 bg-linear-to-r px-8 font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95">
+            <Button className="from-arts-science-accent to-orange-600 h-14 rounded-full border border-orange-400/70 bg-linear-to-r px-8 font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-110">
               View all news
             </Button>
           </div>
@@ -94,7 +94,7 @@ export function NewsEvents() {
           </div>
 
           <div className="mt-12 flex justify-center text-center">
-            <Button className="from-gold-light to-gold h-14 rounded-full border border-[#f1d892]/70 bg-linear-to-r px-8 font-bold text-[#70001b] shadow-[0_10px_24px_rgba(212,175,55,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95">
+            <Button className="from-arts-science-accent to-orange-600 h-14 rounded-full border border-orange-400/70 bg-linear-to-r px-8 font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-110">
               View all events
             </Button>
           </div>

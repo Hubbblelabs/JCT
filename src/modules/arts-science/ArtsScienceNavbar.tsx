@@ -29,13 +29,13 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const navBackground = useTransform(
     scrollY,
     [0, 50],
-    ["rgba(37, 10, 69, 0)", "rgba(37, 10, 69, 0.95)"]
+    ["rgba(17, 24, 39, 0)", "rgba(17, 24, 39, 0.95)"]
   );
   
   const navBorder = useTransform(
     scrollY,
     [0, 50],
-    ["rgba(168, 85, 247, 0)", "rgba(168, 85, 247, 0.2)"]
+    ["rgba(55, 65, 81, 0)", "rgba(55, 65, 81, 0.4)"]
   );
   
   const navY = useTransform(scrollY, [0, 50], [0, 0]);
@@ -65,8 +65,8 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
         style={{
-          backgroundColor: forceSolidOnTop ? "rgba(37, 10, 69, 0.95)" : navBackground,
-          borderColor: forceSolidOnTop ? "rgba(168, 85, 247, 0.2)" : navBorder,
+          backgroundColor: forceSolidOnTop ? "rgba(17, 24, 39, 0.95)" : navBackground,
+          borderColor: forceSolidOnTop ? "rgba(55, 65, 81, 0.4)" : navBorder,
           borderBottomWidth: "1px",
         }}
         className={`fixed ${bannerVisible ? "top-0" : "top-0"} right-0 left-0 z-50 transition-all duration-300 shadow-lg backdrop-blur-xl py-3`}
@@ -116,7 +116,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
             </a>
             <Link
               href="/admissions/apply"
-              className="bg-gold text-navy hover:bg-gold-light shadow-gold/20 inline-flex h-9 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
+              className="bg-arts-science-accent text-white hover:bg-orange-500 shadow-arts-science-accent/20 inline-flex h-9 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
             >
               Apply Now <ArrowRight size={14} />
             </Link>
@@ -149,7 +149,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="bg-[#1f093a] border-l border-purple-500/20 shadow-[-10px_0_30px_rgba(107,33,168,0.2)] fixed inset-y-0 right-0 z-61 flex w-full flex-col sm:w-96 lg:hidden"
+              className="bg-[#111827] border-l border-slate-700/50 shadow-[-10px_0_30px_rgba(0,0,0,0.5)] fixed inset-y-0 right-0 z-61 flex w-full flex-col sm:w-96 lg:hidden"
             >
               {/* Header */}
               <div className="flex items-center justify-between border-b border-white/5 p-4 pt-6">
@@ -203,7 +203,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 <Link
                   href="#admission"
                   onClick={() => setIsOpen(false)}
-                  className="bg-gold text-navy hover:bg-gold-light flex h-12 w-full items-center justify-center gap-2 rounded-xl font-sans text-sm font-bold transition-colors"
+                  className="bg-arts-science-accent text-white hover:bg-orange-500 flex h-12 w-full items-center justify-center gap-2 rounded-xl font-sans text-sm font-bold transition-colors"
                 >
                   Apply Now <ArrowRight size={14} />
                 </Link>

@@ -18,10 +18,11 @@
   --color-engineering-dark: #0f172a;
 
   /* ─── Institution: Arts & Science ─── */
-  --color-arts-science: #7c3aed;
-  --color-arts-science-light: #8b5cf6;
-  --color-arts-science-muted: #ede9fe;
-  --color-arts-science-dark: #4c1d95;
+  --color-arts-science: #111827;
+  --color-arts-science-light: #374151;
+  --color-arts-science-muted: #f9fafb;
+  --color-arts-science-dark: #000000;
+  --color-arts-science-accent: #f97316;
 
   /* ─── Institution: Polytechnic ─── */
   --color-polytechnic: #005cb9;
@@ -65,6 +66,7 @@
   --color-arts-science-light: var(--color-arts-science-light);
   --color-arts-science-muted: var(--color-arts-science-muted);
   --color-arts-science-dark: var(--color-arts-science-dark);
+  --color-arts-science-accent: var(--color-arts-science-accent);
   --color-polytechnic: var(--color-polytechnic);
   --color-polytechnic-light: var(--color-polytechnic-light);
   --color-polytechnic-muted: var(--color-polytechnic-muted);
@@ -311,7 +313,7 @@ body,
 
 .arts-science-theme {
   --color-primary: var(--color-arts-science-dark);
-  --color-accent: var(--color-gold);
+  --color-accent: var(--color-arts-science-accent);
 }
 
 .polytechnic-theme {

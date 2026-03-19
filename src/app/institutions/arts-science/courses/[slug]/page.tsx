@@ -72,11 +72,11 @@ export default async function CoursePage({
   }
 
   return (
-    <main className="arts-science-theme min-h-screen overflow-x-hidden bg-stone-50 font-sans text-[#2C2C2C]">
+    <main className="arts-science-theme min-h-screen overflow-x-hidden bg-stone-50 font-sans text-arts-science-light">
       <Navbar />
 
       {/* Hero Section */}
-      <section className="bg-arts-science-dark relative flex min-h-[65vh] items-center overflow-hidden pt-32 pb-20">
+      <section className="bg-arts-science relative flex min-h-[65vh] items-center overflow-hidden pt-32 pb-20">
         {/* Subtle patterned background */}
         <div
           className="absolute inset-0 opacity-10"
@@ -108,7 +108,7 @@ export default async function CoursePage({
             </motion.div>
 
             <motion.div variants={fadeInUp}>
-              <span className="bg-gold text-arts-science-dark mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase shadow-sm">
+              <span className="bg-arts-science-accent text-white mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase shadow-sm">
                 UG Program &bull; {course.duration}
               </span>
             </motion.div>
@@ -186,7 +186,7 @@ export default async function CoursePage({
                         className="group flex gap-4"
                       >
                         <div className="bg-gold/20 group-hover:bg-gold/30 mt-1 rounded-full p-1 transition-colors">
-                          <CheckCircle2 className="text-arts-science-dark h-5 w-5 shrink-0" />
+                          <CheckCircle2 className="text-arts-science-accent h-5 w-5 shrink-0" />
                         </div>
                         <span className="text-lg leading-relaxed text-[#2C2C2C]">
                           {item}

@@ -50,7 +50,7 @@ export function Hero() {
   return (
     <section 
       id="hero" 
-      className="group/section relative flex min-h-svh flex-col overflow-hidden bg-purple-50/30"
+      className="group/section relative flex min-h-svh flex-col overflow-hidden bg-arts-science-muted"
       onMouseMove={handleMouseMove}
     >
       <div className="absolute inset-0 pointer-events-none origin-top">
@@ -58,7 +58,7 @@ export function Hero() {
       </div>
 
       <div className="absolute inset-0 z-0 pointer-events-none [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_100%)]">
-        <div className="absolute inset-0 bg-slate-200 [mask-image:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] [mask-size:24px_24px] mix-blend-multiply opacity-20" />
+        <div className="absolute inset-0 bg-orange-200 [mask-image:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] [mask-size:24px_24px] mix-blend-multiply opacity-20" />
         
         {/* Spotlight dots layer tracking the mouse */}
         <div 
@@ -68,13 +68,13 @@ export function Hero() {
             maskImage: `radial-gradient(circle 400px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%)`
           }}
         >
-          <div className="absolute inset-0 bg-arts-science [mask-image:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] [mask-size:24px_24px]" />
+          <div className="absolute inset-0 bg-arts-science-accent [mask-image:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] [mask-size:24px_24px]" />
         </div>
       </div>
 
       {/* Announcement Banner */}
-      <div className="relative z-10 flex items-center justify-center gap-3 bg-black px-4 py-2.5 text-center text-sm text-white">
-        <span className="bg-arts-science rounded px-2 py-0.5 text-xs font-semibold text-white">
+      <div className="relative z-10 flex items-center justify-center gap-3 bg-arts-science px-4 py-2.5 text-center text-sm text-white">
+        <span className="bg-arts-science-accent rounded px-2 py-0.5 text-xs font-semibold text-white">
           NEW
         </span>
         <span>
@@ -93,7 +93,7 @@ export function Hero() {
           <h1 className="mb-6 font-serif text-5xl leading-tight font-bold text-gray-900 sm:text-6xl lg:text-7xl">
             Good Education
             <br />
-            <span className="text-arts-science/50 font-bold">for </span>
+            <span className="text-arts-science-accent font-bold">for </span>
             A Better Future
           </h1>
 
@@ -109,7 +109,7 @@ export function Hero() {
               href="/admissions"
               className={cn(
                 buttonVariants({ size: "lg" }),
-                "bg-arts-science hover:bg-arts-science-dark h-14 gap-2 px-8 font-medium text-white rounded-full text-base",
+                "bg-arts-science-accent hover:bg-arts-science h-14 gap-2 px-8 font-medium text-white rounded-full text-base transition-colors",
               )}
             >
               Apply Now <ArrowRight size={18} />
@@ -126,11 +126,11 @@ export function Hero() {
           </div>
 
           {/* Stats Row */}
-          <div className="flex flex-wrap justify-center gap-10 md:gap-16 border-t border-purple-200/50 pt-10">
+          <div className="flex flex-wrap justify-center gap-10 md:gap-16 border-t border-slate-200/50 pt-10">
             {heroStats.map((stat) => (
               <div key={stat.label} className="flex flex-col items-center">
                 <span
-                  className={`text-3xl md:text-4xl font-black ${stat.accent ? "text-arts-science" : "text-gray-900"}`}
+                  className={`text-3xl md:text-4xl font-black ${stat.accent ? "text-arts-science-accent" : "text-gray-900"}`}
                 >
                   <AnimatedNumber value={stat.value} />
                 </span>
@@ -152,7 +152,7 @@ export function Hero() {
           <div className="grid grid-cols-1 gap-8 divide-y divide-white/20 md:grid-cols-3 md:gap-4 md:divide-x md:divide-y-0">
             <div className="flex flex-col items-center px-4 pt-4 text-center md:px-8 md:pt-0">
               <div className="mb-3 flex items-center gap-2">
-                <Award size={20} className="text-white" />
+                <Award size={20} className="text-arts-science-accent" />
                 <h3 className="font-serif text-lg font-bold text-white md:text-xl">
                   Quality
                 </h3>
@@ -165,7 +165,7 @@ export function Hero() {
 
             <div className="flex flex-col items-center px-4 pt-4 text-center md:px-8 md:pt-0">
               <div className="mb-3 flex items-center gap-2">
-                <Users size={20} className="text-white" />
+                <Users size={20} className="text-arts-science-accent" />
                 <h3 className="font-serif text-lg font-bold text-white md:text-xl">
                   Leadership
                 </h3>
@@ -178,7 +178,7 @@ export function Hero() {
 
             <div className="flex flex-col items-center px-4 pt-4 text-center md:px-8 md:pt-0">
               <div className="mb-3 flex items-center gap-2">
-                <BookOpen size={20} className="text-white" />
+                <BookOpen size={20} className="text-arts-science-accent" />
                 <h3 className="font-serif text-lg font-bold text-white md:text-xl">
                   Experience
                 </h3>
