@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type MouseEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, ChevronDown, ArrowRight, Phone } from "lucide-react";
@@ -55,6 +55,45 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+
+  const isSamePageHashLink = (href: string) =>
+    href.startsWith("#") || href.startsWith("/institutions/polytechnic#");
+
+  const scrollToSection = (hash: string) => {
+    const target = document.querySelector(hash) as HTMLElement | null;
+    if (!target) return;
+
+    const nav = document.querySelector("nav") as HTMLElement | null;
+    const offset = (nav?.offsetHeight ?? 88) + 8;
+    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+
+    window.scrollTo({ top, behavior: "smooth" });
+    window.history.replaceState(null, "", `/institutions/polytechnic${hash}`);
+  };
+
+  const handleNavClick = (
+    e: MouseEvent<HTMLAnchorElement>,
+    href: string,
+    closeMobileMenu = false,
+  ) => {
+    if (closeMobileMenu) {
+      setIsOpen(false);
+      setMobileExpanded(null);
+    }
+
+    if (!isSamePageHashLink(href)) return;
+
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : href;
+    if (!hash || hash === "#") {
+      e.preventDefault();
+      return;
+    }
+
+    if (window.location.pathname !== "/institutions/polytechnic") return;
+
+    e.preventDefault();
+    scrollToSection(hash);
+  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -117,20 +156,36 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 }
                 onMouseLeave={() => setActiveDropdown(null)}
               >
-                <Link
-                  href={link.href}
-                  className="flex items-center gap-1 px-3 py-2 font-sans text-base font-medium text-white transition-colors hover:text-white/70"
-                >
-                  {link.name}
-                  {link.children && (
+                {link.children && link.href === "#" ? (
+                  <button
+                    type="button"
+                    className="flex items-center gap-1 px-3 py-2 font-sans text-base font-medium text-white transition-colors hover:text-white/70"
+                  >
+                    {link.name}
                     <ChevronDown
                       size={12}
                       className={`transition-transform duration-200 ${
                         activeDropdown === link.name ? "rotate-180" : ""
                       }`}
                     />
-                  )}
-                </Link>
+                  </button>
+                ) : (
+                  <Link
+                    href={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
+                    className="flex items-center gap-1 px-3 py-2 font-sans text-base font-medium text-white transition-colors hover:text-white/70"
+                  >
+                    {link.name}
+                    {link.children && (
+                      <ChevronDown
+                        size={12}
+                        className={`transition-transform duration-200 ${
+                          activeDropdown === link.name ? "rotate-180" : ""
+                        }`}
+                      />
+                    )}
+                  </Link>
+                )}
 
                 {/* Dropdown */}
                 {link.children && (
@@ -149,6 +204,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                               <Link
                                 key={child.name}
                                 href={child.href}
+                                onClick={(e) => handleNavClick(e, child.href)}
                                 className="group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all hover:bg-white/6"
                               >
                                 <div>
@@ -187,6 +243,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
             </a>
             <Link
               href="/institutions/polytechnic#admissions"
+              onClick={(e) => handleNavClick(e, "/institutions/polytechnic#admissions")}
               className="bg-gold text-polytechnic-dark hover:bg-gold-light shadow-gold/20 inline-flex h-10 items-center gap-2 rounded-full px-5 font-sans text-base font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
             >
               Apply Now <ArrowRight size={16} />
@@ -277,7 +334,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                   <Link
                                     key={child.name}
                                     href={child.href}
-                                    onClick={() => setIsOpen(false)}
+                                    onClick={(e) => handleNavClick(e, child.href, true)}
                                     className="hover:text-gold block rounded-lg px-2 py-2 font-sans text-base text-white/60 transition-colors"
                                   >
                                     {child.name}
@@ -291,7 +348,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                     ) : (
                       <Link
                         href={link.href}
-                        onClick={() => setIsOpen(false)}
+                        onClick={(e) => handleNavClick(e, link.href, true)}
                         className="block py-3 font-sans text-lg font-medium text-white/80 transition-colors hover:text-white"
                       >
                         {link.name}
@@ -312,7 +369,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 </a>
                 <Link
                   href="/institutions/polytechnic#admissions"
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => handleNavClick(e, "/institutions/polytechnic#admissions", true)}
                   className="bg-gold text-polytechnic-dark font-sans flex w-full items-center justify-center gap-2 rounded-xl py-3 text-lg font-bold transition-transform active:scale-[0.98]"
                 >
                   Apply Now <ArrowRight size={16} />

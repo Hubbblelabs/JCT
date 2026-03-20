@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, type MouseEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown, ArrowRight, Menu, Phone, X } from "lucide-react";
@@ -59,6 +59,45 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+
+  const isSamePageHashLink = (href: string) =>
+    href.startsWith("#") || href.startsWith("/institutions/arts-science#");
+
+  const scrollToSection = (hash: string) => {
+    const target = document.querySelector(hash) as HTMLElement | null;
+    if (!target) return;
+
+    const nav = document.querySelector("nav") as HTMLElement | null;
+    const offset = (nav?.offsetHeight ?? 88) + 8;
+    const top = target.getBoundingClientRect().top + window.scrollY - offset;
+
+    window.scrollTo({ top, behavior: "smooth" });
+    window.history.replaceState(null, "", `/institutions/arts-science${hash}`);
+  };
+
+  const handleNavClick = (
+    e: MouseEvent<HTMLAnchorElement>,
+    href: string,
+    closeMobileMenu = false,
+  ) => {
+    if (closeMobileMenu) {
+      setIsOpen(false);
+      setMobileExpanded(null);
+    }
+
+    if (!isSamePageHashLink(href)) return;
+
+    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : href;
+    if (!hash || hash === "#") {
+      e.preventDefault();
+      return;
+    }
+
+    if (window.location.pathname !== "/institutions/arts-science") return;
+
+    e.preventDefault();
+    scrollToSection(hash);
+  };
 
   const toggleMobileSection = (name: string) => {
     setMobileExpanded(mobileExpanded === name ? null : name);
@@ -150,6 +189,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 ) : (
                   <Link
                     href={link.href}
+                    onClick={(e) => handleNavClick(e, link.href)}
                     className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium text-white/70 transition-colors hover:text-white"
                   >
                     {link.name}
@@ -181,6 +221,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                               <Link
                                 key={child.name}
                                 href={child.href}
+                                onClick={(e) => handleNavClick(e, child.href)}
                                 className="group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all hover:bg-white/5"
                               >
                                 <div>
@@ -313,10 +354,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                   <Link
                                     key={child.name}
                                     href={child.href}
-                                    onClick={() => {
-                                      setIsOpen(false);
-                                      setMobileExpanded(null);
-                                    }}
+                                    onClick={(e) => handleNavClick(e, child.href, true)}
                                     className="block rounded-lg px-3 py-2 text-sm text-white/65 transition-colors hover:bg-white/5 hover:text-white"
                                   >
                                     {child.name}
@@ -330,7 +368,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                     ) : (
                       <Link
                         href={link.href}
-                        onClick={() => setIsOpen(false)}
+                        onClick={(e) => handleNavClick(e, link.href, true)}
                         className="block py-3 font-sans text-[15px] font-medium text-white/80 transition-colors hover:text-white"
                       >
                         {link.name}
@@ -350,7 +388,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 </a>
                 <Link
                   href="#admission"
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => handleNavClick(e, "#admission", true)}
                   className="bg-arts-science-accent text-white hover:bg-orange-500 flex h-12 w-full items-center justify-center gap-2 rounded-xl font-sans text-sm font-bold transition-colors"
                 >
                   Apply Now <ArrowRight size={14} />
