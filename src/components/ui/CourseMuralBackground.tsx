@@ -1,452 +1,521 @@
-    export function CourseMuralBackground() {
-    return (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <style>{`
-            @keyframes spin-cw   { from{transform:rotate(0deg)}   to{transform:rotate(360deg)}  }
-            @keyframes spin-ccw  { from{transform:rotate(0deg)}   to{transform:rotate(-360deg)} }
-            @keyframes sway      { 0%,100%{transform:rotate(-2.5deg)} 50%{transform:rotate(2.5deg)} }
-            @keyframes flow-dash { from{stroke-dashoffset:0} to{stroke-dashoffset:-44} }
-            @keyframes blink     { 0%,100%{opacity:.3} 50%{opacity:.9} }
+export function CourseMuralBackground() {
+  // ─────────────────────────────────────────────────────────
+  //  All coordinates use a 100×62.5 viewBox (16:9 ratio).
+  //  This means 1 unit = 1% of width on a 16:9 screen.
+  //  SVG scales everything automatically — no px anywhere.
+  // ─────────────────────────────────────────────────────────
 
-            .gcw1  { transform-box:fill-box; transform-origin:center; animation:spin-cw   10s linear infinite; }
-            .gccw1 { transform-box:fill-box; transform-origin:center; animation:spin-ccw   7s linear infinite; }
-            .gcw2  { transform-box:fill-box; transform-origin:center; animation:spin-cw   18s linear infinite; }
-            .gcw3  { transform-box:fill-box; transform-origin:center; animation:spin-cw   26s linear infinite; }
-            .gccw2 { transform-box:fill-box; transform-origin:center; animation:spin-ccw  13s linear infinite; }
-            .sw    { transform-box:fill-box; transform-origin:50% 100%; animation:sway 3.4s ease-in-out infinite; }
-            .fd    { animation:flow-dash 2.2s linear infinite; }
-            .bl    { animation:blink 2.8s ease-in-out infinite; }
-        `}</style>
+  // Gear teeth helper — r1=inner, r2=outer, n=count
+  const gearTeeth = (n: number, r1: number, r2: number, sw: number) =>
+    Array.from({ length: n }, (_, i) => {
+      const a = (i * 360) / n;
+      const ar = (a * Math.PI) / 180;
+      const a2 = (((a + 360 / n) * 0.72) * Math.PI) / 180;
+      const a3 = ((a + (360 / n) * 0.72) * Math.PI) / 180;
+      const a4 = ((a + 360 / n) * Math.PI) / 180;
+      return (
+        <path key={i} strokeWidth={sw}
+          d={`M${(Math.cos(ar)*r1).toFixed(2)} ${(Math.sin(ar)*r1).toFixed(2)} L${(Math.cos(ar)*r2).toFixed(2)} ${(Math.sin(ar)*r2).toFixed(2)} L${(Math.cos(a3)*r2).toFixed(2)} ${(Math.sin(a3)*r2).toFixed(2)} L${(Math.cos(a4)*r1).toFixed(2)} ${(Math.sin(a4)*r1).toFixed(2)}`}
+        />
+      );
+    });
 
-        <svg
-            className="w-full h-full"
-            viewBox="0 0 1440 900"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            preserveAspectRatio="xMidYMid slice"
-        >
-            <defs>
-            <pattern id="sg" width="28" height="28" patternUnits="userSpaceOnUse">
-                <path d="M28 0L0 0 0 28" stroke="white" strokeWidth="0.3" opacity="0.18" fill="none"/>
-            </pattern>
-            <pattern id="lg" width="140" height="140" patternUnits="userSpaceOnUse">
-                <path d="M140 0L0 0 0 140" stroke="white" strokeWidth="0.7" opacity="0.12" fill="none"/>
-            </pattern>
+  const gearSpokes = (n: number, r: number, sw: number) =>
+    Array.from({ length: n }, (_, i) => {
+      const ar = (i * (180 / n) * Math.PI) / 180;
+      return (
+        <line key={i}
+          x1={(Math.cos(ar) * r).toFixed(2)} y1={(Math.sin(ar) * r).toFixed(2)}
+          x2={(Math.cos(ar + Math.PI) * r).toFixed(2)} y2={(Math.sin(ar + Math.PI) * r).toFixed(2)}
+          strokeWidth={sw} opacity="0.4"
+        />
+      );
+    });
 
-            {/* Fade mask — strong in center to protect text */}
-            <radialGradient id="rg" cx="50%" cy="50%" r="55%">
-                <stop offset="0%"   stopColor="black" stopOpacity="1"/>
-                <stop offset="30%"  stopColor="black" stopOpacity="0.9"/>
-                <stop offset="55%"  stopColor="black" stopOpacity="0.3"/>
-                <stop offset="100%" stopColor="black" stopOpacity="0"/>
-            </radialGradient>
-            <mask id="mm">
-                <rect width="1440" height="900" fill="white"/>
-                <rect width="1440" height="900" fill="url(#rg)"/>
-            </mask>
-            </defs>
+  const boltRing = (n: number, r: number, br: number, sw: number) =>
+    Array.from({ length: n }, (_, i) => {
+      const ar = (i * (360 / n) * Math.PI) / 180;
+      return <circle key={i} cx={(r * Math.cos(ar)).toFixed(2)} cy={(r * Math.sin(ar)).toFixed(2)} r={br} strokeWidth={sw} />;
+    });
 
-            <rect width="1440" height="900" fill="url(#sg)"/>
-            <rect width="1440" height="900" fill="url(#lg)"/>
+  const wheelSpokes = (n: number, ro: number, ri: number, sw: number) =>
+    Array.from({ length: n }, (_, i) => {
+      const ar = (i * (360 / n) * Math.PI) / 180;
+      return (
+        <line key={i}
+          x1={(ro * Math.cos(ar)).toFixed(2)} y1={(ro * Math.sin(ar)).toFixed(2)}
+          x2={(ri * Math.cos(ar)).toFixed(2)} y2={(ri * Math.sin(ar)).toFixed(2)}
+          strokeWidth={sw}
+        />
+      );
+    });
 
-            <g mask="url(#mm)" stroke="white" fill="none" strokeLinecap="round" strokeLinejoin="round">
+  const treadLugs = (n: number, r1: number, r2: number, sw: number) =>
+    Array.from({ length: n }, (_, i) => {
+      const a = (i * 360) / n;
+      const ar = (a * Math.PI) / 180;
+      const a2 = ((a + (360 / n) * 0.5) * Math.PI) / 180;
+      return (
+        <path key={i} strokeWidth={sw}
+          d={`M${(Math.cos(ar)*r1).toFixed(2)} ${(Math.sin(ar)*r1).toFixed(2)} L${(Math.cos(ar)*r2).toFixed(2)} ${(Math.sin(ar)*r2).toFixed(2)} L${(Math.cos(a2)*r2).toFixed(2)} ${(Math.sin(a2)*r2).toFixed(2)} L${(Math.cos(a2)*r1).toFixed(2)} ${(Math.sin(a2)*r1).toFixed(2)}`}
+        />
+      );
+    });
 
-            {/* ═══════════════════════════════════════════
-                TOP-LEFT · MECHANICAL ENGINEERING
-                Entire zone: x=0→340, y=0→520
-                All elements start from y=250 downward
-                so they appear in lower-top-left, not behind navbar
-            ═══════════════════════════════════════════ */}
+  return (
+    <div className="absolute inset-0 pointer-events-none overflow-hidden">
+      <style>{`
+        @keyframes spin-cw   { from{transform:rotate(0deg)}   to{transform:rotate(360deg)}  }
+        @keyframes spin-ccw  { from{transform:rotate(0deg)}   to{transform:rotate(-360deg)} }
+        @keyframes sway      { 0%,100%{transform:rotate(-2.5deg)} 50%{transform:rotate(2.5deg)} }
+        @keyframes flow-dash { from{stroke-dashoffset:0} to{stroke-dashoffset:-3} }
+        @keyframes blink     { 0%,100%{opacity:.25} 50%{opacity:.9} }
+        .gcw1  { transform-box:fill-box; transform-origin:center; animation:spin-cw   10s linear infinite; }
+        .gccw1 { transform-box:fill-box; transform-origin:center; animation:spin-ccw   7s linear infinite; }
+        .gcw2  { transform-box:fill-box; transform-origin:center; animation:spin-cw   18s linear infinite; }
+        .gcw3  { transform-box:fill-box; transform-origin:center; animation:spin-cw   26s linear infinite; }
+        .gccw2 { transform-box:fill-box; transform-origin:center; animation:spin-ccw  13s linear infinite; }
+        .sw    { transform-box:fill-box; transform-origin:50% 100%; animation:sway 3.4s ease-in-out infinite; }
+        .fd    { animation:flow-dash 2.2s linear infinite; }
+        .bl    { animation:blink 2.8s ease-in-out infinite; }
+      `}</style>
 
-            {/* Big gear centre at (150, 390) */}
-            <g transform="translate(150,390)">
-                <g className="gcw1">
-                <circle cx="0" cy="0" r="70"  strokeWidth="1.5"/>
-                <circle cx="0" cy="0" r="61"  strokeWidth="0.6"/>
-                <circle cx="0" cy="0" r="20"  strokeWidth="1.3"/>
-                <circle cx="0" cy="0" r="9"   strokeWidth="0.6"/>
-                {Array.from({length:16},(_,i)=>{
-                    const a=i*22.5, ar=a*Math.PI/180, a2=(a+16)*Math.PI/180;
-                    return <path key={i} strokeWidth="1.4"
-                    d={`M${(Math.cos(ar)*70).toFixed(1)} ${(Math.sin(ar)*70).toFixed(1)} L${(Math.cos(ar)*84).toFixed(1)} ${(Math.sin(ar)*84).toFixed(1)} L${(Math.cos(a2)*84).toFixed(1)} ${(Math.sin(a2)*84).toFixed(1)} L${(Math.cos(a2)*70).toFixed(1)} ${(Math.sin(a2)*70).toFixed(1)}`}/>;
-                })}
-                {[0,30,60,90,120,150].map((a,i)=>{
-                    const ar=a*Math.PI/180;
-                    return <line key={i} x1={(Math.cos(ar)*61).toFixed(1)} y1={(Math.sin(ar)*61).toFixed(1)} x2={(Math.cos(ar+Math.PI)*61).toFixed(1)} y2={(Math.sin(ar+Math.PI)*61).toFixed(1)} strokeWidth="0.5" opacity="0.4"/>;
-                })}
-                {[0,60,120,180,240,300].map((a,i)=>{
-                    const ar=a*Math.PI/180;
-                    return <circle key={`b${i}`} cx={(36*Math.cos(ar)).toFixed(1)} cy={(36*Math.sin(ar)).toFixed(1)} r="3" strokeWidth="0.8"/>;
-                })}
+      {/*
+        viewBox="0 0 100 62.5"  →  1 unit = 1vw on 16:9
+        All coordinates are now % of viewport width.
+        On mobile (narrow), SVG shrinks and all elements scale together.
+      */}
+      <svg
+        className="w-full h-full"
+        viewBox="0 0 100 62.5"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="xMidYMid slice"
+      >
+        <defs>
+          {/* Blueprint grids — scaled to viewBox units */}
+          <pattern id="sg" width="1.94" height="1.94" patternUnits="userSpaceOnUse">
+            <path d="M1.94 0L0 0 0 1.94" stroke="white" strokeWidth="0.02" opacity="0.18" fill="none" />
+          </pattern>
+          <pattern id="lg" width="9.7" height="9.7" patternUnits="userSpaceOnUse">
+            <path d="M9.7 0L0 0 0 9.7" stroke="white" strokeWidth="0.05" opacity="0.12" fill="none" />
+          </pattern>
+
+          {/* Radial fade — protects center text */}
+          <radialGradient id="rg" cx="50%" cy="50%" r="55%">
+            <stop offset="0%"   stopColor="black" stopOpacity="1" />
+            <stop offset="30%"  stopColor="black" stopOpacity="0.9" />
+            <stop offset="55%"  stopColor="black" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="black" stopOpacity="0" />
+          </radialGradient>
+          <mask id="mm">
+            <rect width="100" height="62.5" fill="white" />
+            <rect width="100" height="62.5" fill="url(#rg)" />
+          </mask>
+        </defs>
+
+        <rect width="100" height="62.5" fill="url(#sg)" />
+        <rect width="100" height="62.5" fill="url(#lg)" />
+
+        <g mask="url(#mm)" stroke="white" fill="none" strokeLinecap="round" strokeLinejoin="round">
+
+          {/* ═══════════════════════════════════════════════════
+               TOP-LEFT · MECHANICAL ENGINEERING
+               Big gear at (10.4, 27)  — ~27% down the screen
+               All coords are % of 100×62.5 viewBox
+          ═══════════════════════════════════════════════════ */}
+
+          {/* PRIMARY gear — r=4.86 (~7% of width) */}
+          <g transform="translate(10.4,27)">
+            <g className="gcw1">
+              <circle cx="0" cy="0" r="4.86" strokeWidth="0.1" />
+              <circle cx="0" cy="0" r="4.24" strokeWidth="0.04" />
+              <circle cx="0" cy="0" r="1.39" strokeWidth="0.09" />
+              <circle cx="0" cy="0" r="0.63" strokeWidth="0.04" />
+              {gearTeeth(16, 4.86, 5.83, 0.1)}
+              {gearSpokes(6, 4.24, 0.04)}
+              {boltRing(6, 2.5, 0.2, 0.06)}
+            </g>
+          </g>
+
+          {/* SECONDARY gear — r=3.05 */}
+          <g transform="translate(19.3,21.2)">
+            <g className="gccw1">
+              <circle cx="0" cy="0" r="3.05" strokeWidth="0.09" />
+              <circle cx="0" cy="0" r="2.57" strokeWidth="0.04" />
+              <circle cx="0" cy="0" r="0.9"  strokeWidth="0.08" />
+              <circle cx="0" cy="0" r="0.42" strokeWidth="0.04" />
+              {gearTeeth(12, 3.05, 3.82, 0.08)}
+              {gearSpokes(3, 2.57, 0.04)}
+            </g>
+          </g>
+
+          {/* SMALL gear — r=1.8 */}
+          <g transform="translate(18.2,17.5)">
+            <g className="gcw2">
+              <circle cx="0" cy="0" r="1.8"  strokeWidth="0.08" />
+              <circle cx="0" cy="0" r="1.46" strokeWidth="0.03" />
+              <circle cx="0" cy="0" r="0.56" strokeWidth="0.07" />
+              {gearTeeth(9, 1.8, 2.36, 0.07)}
+            </g>
+          </g>
+
+          {/* Wrench */}
+          <g transform="translate(1.9,34) rotate(-28)">
+            <rect x="0" y="-0.42" width="7.5" height="0.83" rx="0.42" strokeWidth="0.1" />
+            <circle cx="0" cy="0" r="1.11" strokeWidth="0.1" />
+            <circle cx="0" cy="0" r="0.56" strokeWidth="0.04" />
+            <path d="M0-1.11 L-0.76-1.11 L-0.76-0.56 M0 1.11 L-0.76 1.11 L-0.76 0.56" strokeWidth="0.08" />
+            <path d="M7.5-0.49 L8.47 0 L7.5 0.49" strokeWidth="0.1" />
+          </g>
+
+          {/* Piston */}
+          <g transform="translate(1.5,37.5)">
+            <rect x="0" y="-1.11" width="4.03" height="2.22" rx="0.21" strokeWidth="0.1" />
+            <rect x="0.42" y="-0.69" width="3.19" height="1.39" rx="0.14" strokeWidth="0.04" />
+            <line x1="1.18" y1="-1.11" x2="1.18" y2="1.11" strokeWidth="0.04" opacity="0.4" />
+            <line x1="2.01" y1="-1.11" x2="2.01" y2="1.11" strokeWidth="0.04" opacity="0.4" />
+            <line x1="2.85" y1="-1.11" x2="2.85" y2="1.11" strokeWidth="0.04" opacity="0.4" />
+            <line x1="4.03" y1="-0.49" x2="7.92" y2="-0.49" strokeWidth="0.1" />
+            <line x1="4.03" y1=" 0.49" x2="7.92" y2=" 0.49" strokeWidth="0.1" />
+            <line x1="7.92" y1="-0.49" x2="7.92" y2=" 0.49" strokeWidth="0.1" />
+            <circle cx="7.92" cy="0" r="1.25" strokeWidth="0.1" />
+            <circle cx="7.92" cy="0" r="0.63" strokeWidth="0.04" />
+          </g>
+
+          {/* Keyway shaft */}
+          <g transform="translate(3.5,40.8)">
+            <rect x="0" y="-0.49" width="5.56" height="0.97" rx="0.21" strokeWidth="0.08" />
+            <rect x="1.88" y="-0.76" width="1.81" height="0.28" rx="0.07" strokeWidth="0.06" />
+            <rect x="1.88" y=" 0.49" width="1.81" height="0.28" rx="0.07" strokeWidth="0.06" />
+          </g>
+
+          {/* ═══════════════════════════════════════════════════
+               BOTTOM-LEFT · AGRICULTURAL
+               Wheat top at y≈46.3, Tractor anchored at y=62.5
+          ═══════════════════════════════════════════════════ */}
+
+          {/* Wheat stalks */}
+          <g transform="translate(0.35,46.3)">
+            {Array.from({ length: 15 }, (_, i) => {
+              const x = i * 1.46;
+              const f = i % 2 === 0;
+              return (
+                <g key={i} className="sw" style={{ animationDelay: `${i * 0.2}s` }}>
+                  <line x1={x} y1="6.1" x2={x + (f ? -0.28 : 0.28)} y2="0.56" strokeWidth="0.07" />
+                  <ellipse
+                    cx={x + (f ? -0.56 : 0.56)} cy="0" rx="0.28" ry="1.04"
+                    transform={`rotate(${f ? -20 : 20},${x + (f ? -0.56 : 0.56)},0)`}
+                    strokeWidth="0.06"
+                  />
+                  <line x1={x + (f ? -0.28 : 0.28)} y1="-0.49" x2={x + (f ? -0.83 : 0.83)} y2="-0.9" strokeWidth="0.04" />
+                  <line x1={x + (f ? -0.21 : 0.21)} y1=" 0.28" x2={x + (f ? -0.97 : 0.97)} y2="0.35" strokeWidth="0.04" />
+                  <line x1={x + (f ? -0.21 : 0.21)} y1=" 2.43" x2={x + (f ? -1.18 : 1.18)} y2="1.74" strokeWidth="0.06" />
+                  <line x1={x + (f ? -0.21 : 0.21)} y1=" 3.96" x2={x + (f ? -1.04 : 1.04)} y2="3.33" strokeWidth="0.06" />
                 </g>
-            </g>
+              );
+            })}
+          </g>
 
-            {/* Medium gear centre at (278, 305) — top = 305-44-12 = 249 ✓ */}
-            <g transform="translate(278,305)">
-                <g className="gccw1">
-                <circle cx="0" cy="0" r="44"  strokeWidth="1.3"/>
-                <circle cx="0" cy="0" r="37"  strokeWidth="0.5"/>
-                <circle cx="0" cy="0" r="13"  strokeWidth="1.2"/>
-                <circle cx="0" cy="0" r="6"   strokeWidth="0.5"/>
-                {Array.from({length:12},(_,i)=>{
-                    const a=i*30, ar=a*Math.PI/180, a2=(a+23)*Math.PI/180;
-                    return <path key={i} strokeWidth="1.2"
-                    d={`M${(Math.cos(ar)*44).toFixed(1)} ${(Math.sin(ar)*44).toFixed(1)} L${(Math.cos(ar)*55).toFixed(1)} ${(Math.sin(ar)*55).toFixed(1)} L${(Math.cos(a2)*55).toFixed(1)} ${(Math.sin(a2)*55).toFixed(1)} L${(Math.cos(a2)*44).toFixed(1)} ${(Math.sin(a2)*44).toFixed(1)}`}/>;
-                })}
-                {[0,60,120].map((a,i)=>{
-                    const ar=a*Math.PI/180;
-                    return <line key={i} x1={(Math.cos(ar)*37).toFixed(1)} y1={(Math.sin(ar)*37).toFixed(1)} x2={(Math.cos(ar+Math.PI)*37).toFixed(1)} y2={(Math.sin(ar+Math.PI)*37).toFixed(1)} strokeWidth="0.5" opacity="0.4"/>;
-                })}
-                </g>
+          {/* Tractor — all coords scaled to viewBox */}
+          <g transform="translate(0.97,62)">
+            {/* Body */}
+            <path d="M0 0 L10.42 0 L10.42-2.64 L7.92-2.64 L6.6-4.17 L3.75-4.17 L2.22-2.64 L0-2.64 Z" strokeWidth="0.12" />
+            {([-3.33,-2.78,-2.29,-1.81] as number[]).map((y, i) => (
+              <line key={i} x1="6.6" y1={y} x2="10.42" y2={y} strokeWidth="0.035" opacity="0.4" />
+            ))}
+            {/* Cab */}
+            <path d="M3.82-4.17 L3.82-7.22 L6.53-7.22 L6.53-4.17" strokeWidth="0.11" />
+            <path d="M3.82-7.22 L5.14-8.75 L6.53-7.22" strokeWidth="0.11" />
+            <rect x="4.17" y="-6.94" width="0.97" height="1.18" rx="0.1" strokeWidth="0.08" />
+            <rect x="5.42" y="-6.94" width="0.69" height="1.18" rx="0.1" strokeWidth="0.08" />
+            <line x1="4.38" y1="-5.97" x2="5.14" y2="-6.94" strokeWidth="0.04" />
+            {/* Exhaust */}
+            <line x1="4.38" y1="-8.75" x2="4.38" y2="-10.56" strokeWidth="0.15" />
+            <path d="M4.03-10.56 Q4.38-11.46 4.72-10.56" strokeWidth="0.1" />
+            <circle cx="4.38" cy="-11.18" r="0.35" strokeWidth="0.07" opacity="0.45" />
+            <circle cx="4.1"  cy="-12.08" r="0.49" strokeWidth="0.06" opacity="0.3" />
+            {/* Rear wheel */}
+            <g transform="translate(2.22,0)">
+              <g className="gccw2">
+                <circle cx="0" cy="0" r="2.78" strokeWidth="0.12" />
+                <circle cx="0" cy="0" r="2.29" strokeWidth="0.05" />
+                <circle cx="0" cy="0" r="0.76" strokeWidth="0.1" />
+                {wheelSpokes(8, 2.29, 0.76, 0.08)}
+                {treadLugs(10, 2.78, 3.47, 0.1)}
+              </g>
             </g>
+            {/* Front wheel */}
+            <g transform="translate(8.19,0)">
+              <g className="gcw3">
+                <circle cx="0" cy="0" r="1.74" strokeWidth="0.11" />
+                <circle cx="0" cy="0" r="1.32" strokeWidth="0.04" />
+                <circle cx="0" cy="0" r="0.49" strokeWidth="0.09" />
+                {wheelSpokes(6, 1.32, 0.49, 0.07)}
+              </g>
+            </g>
+            {/* Plough */}
+            <path d="M-0.21-0.35 L-3.61-0.35 L-4.86 1.39 L-2.78 1.39" strokeWidth="0.12" />
+            <path d="M-3.61-0.35 L-5-1.94 L-3.19 1.39" strokeWidth="0.1" />
+            <line x1="-0.21" y1="-0.35" x2="-0.21" y2="-2.5" strokeWidth="0.1" />
+          </g>
 
-            {/* Small gear centre at (262, 250) — top = 250-26-9 = 215 ✓ */}
-            <g transform="translate(262,252)">
-                <g className="gcw2">
-                <circle cx="0" cy="0" r="26"  strokeWidth="1.1"/>
-                <circle cx="0" cy="0" r="21"  strokeWidth="0.5"/>
-                <circle cx="0" cy="0" r="8"   strokeWidth="1"/>
-                {Array.from({length:9},(_,i)=>{
-                    const a=i*40, ar=a*Math.PI/180, a2=(a+29)*Math.PI/180;
-                    return <path key={i} strokeWidth="1"
-                    d={`M${(Math.cos(ar)*26).toFixed(1)} ${(Math.sin(ar)*26).toFixed(1)} L${(Math.cos(ar)*34).toFixed(1)} ${(Math.sin(ar)*34).toFixed(1)} L${(Math.cos(a2)*34).toFixed(1)} ${(Math.sin(a2)*34).toFixed(1)} L${(Math.cos(a2)*26).toFixed(1)} ${(Math.sin(a2)*26).toFixed(1)}`}/>;
-                })}
-                </g>
-            </g>
+          {/* ═══════════════════════════════════════════════════
+               TOP-RIGHT · COMPUTER TECHNOLOGY
+               Monitor top-left at (75, 18) — ~29% down
+          ═══════════════════════════════════════════════════ */}
+          <g transform="translate(75,18)">
+            {/* Monitor bezel */}
+            <rect x="0" y="0" width="11.81" height="7.5" rx="0.42" strokeWidth="0.11" />
+            <rect x="0.56" y="0.56" width="10.69" height="6.39" rx="0.21" strokeWidth="0.05" />
+            {/* Code lines on screen */}
+            {([
+              [0.97,1.67,4.03],
+              [1.53,2.5, 7.64],
+              [0.97,3.33,4.86],
+              [1.53,4.17,9.03],
+              [0.97,5.0, 4.31],
+              [1.53,5.83,6.39],
+            ] as [number,number,number][]).map(([x,y,w],i) => (
+              <line key={i} x1={x} y1={y} x2={w} y2={y} strokeWidth="0.08" opacity="0.7" />
+            ))}
+            {/* Cursor */}
+            <line x1="4.31" y1="5.83" x2="4.86" y2="5.83" strokeWidth="0.14" opacity="0.85" />
+            {/* Stand */}
+            <path d="M4.72 7.5 L4.72 9.03 L3.61 9.86 L8.19 9.86 L7.08 9.03 L7.08 7.5" strokeWidth="0.1" />
+            <ellipse cx="5.9" cy="9.93" rx="2.36" ry="0.35" strokeWidth="0.07" />
+            {/* Keyboard */}
+            <rect x="-0.97" y="10.42" width="13.75" height="2.92" rx="0.28" strokeWidth="0.1" />
+            {Array.from({ length: 13 }, (_, i) => (
+              <rect key={i} x={-0.56 + i * 0.97} y="10.83" width="0.76" height="0.56" rx="0.08" strokeWidth="0.06" />
+            ))}
+            {Array.from({ length: 12 }, (_, i) => (
+              <rect key={i} x={-0.07 + i * 0.97} y="11.6" width="0.76" height="0.56" rx="0.08" strokeWidth="0.06" />
+            ))}
+            {Array.from({ length: 11 }, (_, i) => (
+              <rect key={i} x={0.42 + i * 0.97} y="12.36" width="0.76" height="0.56" rx="0.08" strokeWidth="0.06" />
+            ))}
+            <rect x="3.75" y="12.36" width="4.31" height="0.56" rx="0.14" strokeWidth="0.06" />
+            {/* Mouse */}
+            <rect x="13.47" y="10.83" width="2.22" height="2.92" rx="1.04" strokeWidth="0.09" />
+            <line x1="14.58" y1="10.83" x2="14.58" y2="12.22" strokeWidth="0.05" />
+            <circle cx="14.58" cy="12.08" r="0.28" strokeWidth="0.06" />
+          </g>
 
-            {/* Wrench at y=490 */}
-            <g transform="translate(28,490) rotate(-28)">
-                <rect x="0" y="-6" width="108" height="12" rx="6" strokeWidth="1.4"/>
-                <circle cx="0" cy="0" r="16" strokeWidth="1.4"/>
-                <circle cx="0" cy="0" r="8"  strokeWidth="0.6"/>
-                <path d="M0-16 L-11-16 L-11-8 M0 16 L-11 16 L-11 8" strokeWidth="1.1"/>
-                <path d="M108-7 L122 0 L108 7" strokeWidth="1.4"/>
-            </g>
+          {/* PCB circuit board */}
+          <g transform="translate(80,40)">
+            {/* Board outline */}
+            <rect x="0" y="0" width="11.53" height="7.5" rx="0.28" strokeWidth="0.09" />
+            {/* Traces */}
+            <path d="M1.25 1.25 H3.75 V3.13 H6.25 V1.25 H8.75" strokeWidth="0.07" className="fd" strokeDasharray="0.4 0.35" />
+            <path d="M3.75 3.13 V5.63 H1.88 V4.38" strokeWidth="0.07" className="fd" strokeDasharray="0.4 0.35" style={{ animationDelay: '0.9s' }} />
+            <path d="M6.25 3.13 V5.0 H9.69 V6.25" strokeWidth="0.07" className="fd" strokeDasharray="0.4 0.35" style={{ animationDelay: '1.8s' }} />
+            {/* IC chip */}
+            <rect x="5" y="1.5" width="2.5" height="1.74" rx="0.17" strokeWidth="0.1" />
+            {([5.28,5.9,6.53,7.08] as number[]).map(x => (
+              <g key={x}>
+                <line x1={x} y1="1.5"  x2={x} y2="1.18" strokeWidth="0.07" />
+                <line x1={x} y1="3.24" x2={x} y2="3.54" strokeWidth="0.07" />
+              </g>
+            ))}
+            <line x1="5" y1="2.22" x2="7.5" y2="2.22" strokeWidth="0.04" opacity="0.4" />
+            {/* Resistors */}
+            <rect x="1.5"  y="3.54" width="1.11" height="0.63" rx="0.1" strokeWidth="0.08" />
+            <line x1="1.5"  y1="3.85" x2="0.88" y2="3.85" strokeWidth="0.07" />
+            <line x1="2.6"  y1="3.85" x2="3.4"  y2="3.85" strokeWidth="0.07" />
+            <rect x="8.75" y="4.38" width="1.11" height="0.63" rx="0.1" strokeWidth="0.08" />
+            <line x1="8.75" y1="4.69" x2="8.13" y2="4.69" strokeWidth="0.07" />
+            <line x1="9.86" y1="4.69" x2="10.63" y2="4.69" strokeWidth="0.07" />
+            {/* Capacitor */}
+            <line x1="1.53" y1="5.63" x2="1.53" y2="5.1" strokeWidth="0.14" />
+            <line x1="2.08" y1="5.63" x2="2.08" y2="5.1" strokeWidth="0.14" />
+            <line x1="1.81" y1="6.04" x2="1.81" y2="5.63" strokeWidth="0.07" />
+            <line x1="1.81" y1="4.86" x2="1.81" y2="4.44" strokeWidth="0.07" />
+            {/* LED */}
+            <circle cx="10.21" cy="1.25" r="0.35" strokeWidth="0.09" />
+            <line x1="10.21" y1="0.9" x2="10.21" y2="0.56" strokeWidth="0.07" />
+            {/* Solder nodes */}
+            {([[1.25,1.25],[3.75,1.25],[8.75,1.25],[3.75,5.63],[9.69,6.25]] as [number,number][]).map(([cx,cy],i) => (
+              <circle key={i} cx={cx} cy={cy} r="0.22" strokeWidth="0.08" className="bl" style={{ animationDelay: `${i * 0.5}s` }} />
+            ))}
+          </g>
 
-            {/* Piston at y=540 */}
-            <g transform="translate(22,540)">
-                <rect x="0" y="-16" width="58" height="32" rx="3" strokeWidth="1.4"/>
-                <rect x="6" y="-10" width="46" height="20" rx="2" strokeWidth="0.6"/>
-                <line x1="17" y1="-16" x2="17" y2="16" strokeWidth="0.5" opacity="0.4"/>
-                <line x1="29" y1="-16" x2="29" y2="16" strokeWidth="0.5" opacity="0.4"/>
-                <line x1="41" y1="-16" x2="41" y2="16" strokeWidth="0.5" opacity="0.4"/>
-                <line x1="58"  y1="-7" x2="114" y2="-7" strokeWidth="1.4"/>
-                <line x1="58"  y1=" 7" x2="114" y2=" 7" strokeWidth="1.4"/>
-                <line x1="114" y1="-7" x2="114" y2=" 7" strokeWidth="1.4"/>
-                <circle cx="114" cy="0" r="18" strokeWidth="1.4"/>
-                <circle cx="114" cy="0" r="9"  strokeWidth="0.6"/>
-            </g>
+          {/* Binary stream — far-right edge */}
+          <g transform="translate(99,18.5)" opacity="0.18" fontFamily="monospace" fontSize="0.9">
+            {(['1','0','1','1','0','0','1','0','1','0','1','1'] as string[]).map((b, i) => (
+              <text key={i} x="0" y={i * 1.88} stroke="white" fill="none" strokeWidth="0.03">{b}</text>
+            ))}
+          </g>
 
-            {/* Keyway shaft at y=588 */}
-            <g transform="translate(50,588)">
-                <rect x="0" y="-7" width="80" height="14" rx="3" strokeWidth="1.1"/>
-                <rect x="27" y="-11" width="26" height="4" rx="1" strokeWidth="0.8"/>
-                <rect x="27" y=" 7" width="26" height="4" rx="1" strokeWidth="0.8"/>
-            </g>
+          {/* ═══════════════════════════════════════════════════
+               BOTTOM-CENTER · CIVIL ENGINEERING
+               Bridge anchor at (42.9, 62.5)
+          ═══════════════════════════════════════════════════ */}
+          <g transform="translate(42.9,62.5)">
+            {/* Catenary cables */}
+            <path d="M-16.11-0.97 Q-8.06-15.28 0-18.89 Q8.06-15.28 16.11-0.97" strokeWidth="0.13" />
+            <path d="M-16.11-0.97 Q-8.06-13.89 0-17.36 Q8.06-13.89 16.11-0.97" strokeWidth="0.06" />
+            {/* Deck */}
+            <line x1="-17.36" y1="-0.97" x2="17.36" y2="-0.97" strokeWidth="0.15" />
+            <line x1="-17.36" y1="-0.28" x2="17.36" y2="-0.28" strokeWidth="0.08" />
+            {/* Lane dashes */}
+            {([-13.89,-10.83,-7.78,-4.72,-1.39,0.69,3.61,6.53,9.44,12.36] as number[]).map((x, i) => (
+              <line key={i} x1={x} y1="-0.63" x2={x + 1.39} y2="-0.63" strokeWidth="0.08" opacity="0.38" />
+            ))}
+            {/* Left tower */}
+            <path d="M-0.97-0.97 L-0.97-21.18 L0.97-21.18 L0.97-0.97" strokeWidth="0.14" />
+            <rect x="-2.5" y="-16.11" width="5" height="0.97" rx="0.14" strokeWidth="0.09" />
+            <rect x="-2.08" y="-19.86" width="4.17" height="0.97" rx="0.14" strokeWidth="0.09" />
+            <line x1="-0.49" y1="-21.18" x2="-0.49" y2="-22.78" strokeWidth="0.1" />
+            <line x1=" 0.49" y1="-21.18" x2=" 0.49" y2="-22.78" strokeWidth="0.1" />
+            {/* Right tower */}
+            <path d="M13.06-0.97 L13.06-21.18 L14.97-21.18 L14.97-0.97" strokeWidth="0.14" />
+            <rect x="11.53" y="-16.11" width="5" height="0.97" rx="0.14" strokeWidth="0.09" />
+            <rect x="11.94" y="-19.86" width="4.17" height="0.97" rx="0.14" strokeWidth="0.09" />
+            {/* Hangers */}
+            {([-14.58,-11.46,-9.03,-6.53,-4.03,-1.53] as number[]).map((x, i) => {
+              const y = -0.97 - (1 - Math.pow(x / 16.11, 2)) * 17.92;
+              return <line key={i} x1={x} y1={y.toFixed(2)} x2={x} y2="-0.97" strokeWidth="0.07" opacity="0.55" />;
+            })}
+            {([1.53,4.03,6.53,9.03,11.53,14.03,14.97] as number[]).map((x, i) => {
+              const cx = x - 6.94;
+              const y = -0.97 - (1 - Math.pow(cx / 16.11, 2)) * 17.92;
+              return <line key={i} x1={x} y1={y.toFixed(2)} x2={x} y2="-0.97" strokeWidth="0.07" opacity="0.55" />;
+            })}
+            {/* Water */}
+            <path d="M-18.61 1.25 Q-15.28 0.56-11.94 1.53 Q-8.61 2.22-4.72 1.11 Q-1.25 0 1.74 1.11 Q5.21 2.08 9.17 0.9 Q12.5-0.14 16.11 0.9" strokeWidth="0.08" opacity="0.38" />
+            {/* City LEFT */}
+            <rect x="-24.65" y="-9.72" width="3.06" height="9.72" strokeWidth="0.1" />
+            <rect x="-21.18" y="-13.61" width="3.47" height="13.61" strokeWidth="0.1" />
+            <rect x="-17.22" y="-11.04" width="2.64" height="11.04" strokeWidth="0.1" />
+            {([
+              [-24.44, [-8.89,-7.36,-5.83,-4.31,-2.78]],
+              [-20.97, [-12.64,-10.97,-9.31,-7.64,-5.97,-4.31]],
+              [-17.01, [-10.07,-8.47,-6.88,-5.28]],
+            ] as [number, number[]][]).map(([bx, ys], bi) =>
+              ys.map((y, j) =>
+                [0, 1, 2].map(c => (
+                  <rect key={`w${bi}${j}${c}`} x={bx + 0.35 + c * 0.9} y={y + 0.21} width="0.49" height="0.69" strokeWidth="0.05" opacity="0.42" />
+                ))
+              )
+            )}
+            {/* City RIGHT */}
+            <rect x="19.58" y="-10.42" width="3.06" height="10.42" strokeWidth="0.1" />
+            <rect x="23.06" y="-14.31" width="3.47" height="14.31" strokeWidth="0.1" />
+            <rect x="26.94" y="-8.47"  width="2.64" height="8.47"  strokeWidth="0.1" />
+          </g>
 
-            {/* ═══════════════════════════════════════════
-                TOP-RIGHT · COMPUTER TECHNOLOGY
-                Zone: x=1050→1440, y=0→480
-                Monitor top edge at y=260 (safely below navbar)
-            ═══════════════════════════════════════════ */}
-            <g transform="translate(1100,180)">
-                {/* Monitor */}
-                <rect x="0" y="0"   width="210" height="138" rx="7" strokeWidth="1.7"/>
-                <rect x="9" y="9"   width="192" height="120" rx="3" strokeWidth="0.7"/>
-                {/* Code lines */}
-                <line x1="16" y1="28"  x2="88"  y2="28"  strokeWidth="1.3" opacity="0.7"/>
-                <line x1="26" y1="42"  x2="138" y2="42"  strokeWidth="1.3" opacity="0.7"/>
-                <line x1="16" y1="56"  x2="110" y2="56"  strokeWidth="1.3" opacity="0.7"/>
-                <line x1="26" y1="70"  x2="160" y2="70"  strokeWidth="1.3" opacity="0.7"/>
-                <line x1="16" y1="84"  x2="94"  y2="84"  strokeWidth="1.3" opacity="0.7"/>
-                <line x1="26" y1="98"  x2="146" y2="98"  strokeWidth="1.3" opacity="0.7"/>
-                <line x1="16" y1="112" x2="82"  y2="112" strokeWidth="1.3" opacity="0.7"/>
-                <line x1="82" y1="112" x2="90"  y2="112" strokeWidth="2"   opacity="0.85"/>
-                {/* Status bar */}
-                <line x1="9"  y1="120" x2="201" y2="120" strokeWidth="0.6" opacity="0.28"/>
-                <rect x="13" y="123"  width="20" height="4" rx="1" strokeWidth="0.5" opacity="0.35"/>
-                {/* Stand */}
-                <path d="M84 138 L84 165 L64 180 L146 180 L126 165 L126 138" strokeWidth="1.6"/>
-                <ellipse cx="105" cy="181" rx="42" ry="6" strokeWidth="1.1"/>
-                {/* Keyboard */}
-                <rect x="16" y="190" width="178" height="42" rx="4" strokeWidth="1.6"/>
-                {Array.from({length:12},(_,i)=>(
-                <rect key={i} x={22+i*14} y="196" width="11" height="8" rx="1.2" strokeWidth="0.9"/>
-                ))}
-                {Array.from({length:11},(_,i)=>(
-                <rect key={i} x={29+i*14} y="208" width="11" height="8" rx="1.2" strokeWidth="0.9"/>
-                ))}
-                {Array.from({length:10},(_,i)=>(
-                <rect key={i} x={36+i*14} y="220" width="11" height="8" rx="1.2" strokeWidth="0.9"/>
-                ))}
-                <rect x="76" y="220" width="56" height="8" rx="2" strokeWidth="0.9"/>
-                {/* Mouse */}
-                <rect x="206" y="196" width="28" height="40" rx="13" strokeWidth="1.3"/>
-                <line x1="220" y1="196" x2="220" y2="214" strokeWidth="0.6"/>
-                <circle cx="220" cy="213" r="3.5" strokeWidth="0.7"/>
-            </g>
+          {/* ═══════════════════════════════════════════════════
+               BOTTOM-RIGHT · PETROCHEMICAL
+               Anchor at (64.2, 62.5)
+          ═══════════════════════════════════════════════════ */}
+          <g transform="translate(64.2,62.5)">
+            {/* Distillation column */}
+            <rect x="0" y="-31.11" width="3.33" height="31.11" rx="0.28" strokeWidth="0.12" />
+            <path d="M0-31.11 Q1.67-32.78 3.33-31.11" strokeWidth="0.1" />
+            <ellipse cx="1.67" cy="-31.11" rx="1.67" ry="0.63" strokeWidth="0.06" opacity="0.4" />
+            {([-27.78,-23.61,-19.44,-15.28,-11.11,-6.94,-3.61] as number[]).map((y, i) => (
+              <line key={i} x1="0.35" y1={y} x2="2.99" y2={y} strokeWidth="0.07" opacity="0.48" />
+            ))}
+            {([-29.58,-25.42,-21.25,-17.08,-12.92,-8.75,-4.58] as number[]).map((y, i) => (
+              <rect key={i} x="-0.35" y={y - 0.28} width="4.03" height="0.56" rx="0.17" strokeWidth="0.08" />
+            ))}
+            {/* Side pipes */}
+            <path d="M3.33-21.39 H6.94 V-1.81" strokeWidth="0.1" className="fd" strokeDasharray="0.7 0.56" />
+            <path d="M3.33-12.15 H8.61 V-1.81" strokeWidth="0.1" className="fd" strokeDasharray="0.7 0.56" style={{ animationDelay: '0.7s' }} />
+            <path d="M3.33-5.56 H5.56 V-1.81" strokeWidth="0.1" />
+            {/* Valves */}
+            <path d="M5.56-18.61 L6.39-17.78 L7.22-18.61 L6.39-19.44 Z" strokeWidth="0.1" />
+            <path d="M7.5-11.11 L8.33-10.28 L9.17-11.11 L8.33-11.94 Z" strokeWidth="0.1" />
+            {/* Large storage tank */}
+            <rect x="9.31" y="-10.42" width="5.28" height="10.42" rx="0.35" strokeWidth="0.12" />
+            <path d="M9.31-10.42 Q11.94-12.08 14.58-10.42" strokeWidth="0.1" />
+            <ellipse cx="11.94" cy="-10.42" rx="2.64" ry="0.76" strokeWidth="0.06" opacity="0.38" />
+            <line x1="9.31" y1="-7.78" x2="14.58" y2="-7.78" strokeWidth="0.07" opacity="0.38" />
+            <line x1="9.31" y1="-5.28" x2="14.58" y2="-5.28" strokeWidth="0.07" opacity="0.38" />
+            {/* Second tank */}
+            <rect x="15.28" y="-7.92" width="4.03" height="7.92" rx="0.28" strokeWidth="0.11" />
+            <path d="M15.28-7.92 Q17.29-9.31 19.31-7.92" strokeWidth="0.09" />
+            <line x1="15.28" y1="-5.56" x2="19.31" y2="-5.56" strokeWidth="0.06" opacity="0.35" />
+            {/* Flare stack */}
+            <line x1="-3.89" y1="-1.94" x2="-2.78" y2="-31.25" strokeWidth="0.11" />
+            <line x1="-3.26" y1="-1.94" x2="-2.15" y2="-31.25" strokeWidth="0.06" />
+            <path d="M-3.26-31.25 Q-3.82-32.99-2.71-34.44 Q-1.6-32.99-2.15-31.25 Z" strokeWidth="0.1" />
+            {/* Ground manifold */}
+            <line x1="-4.51" y1="-1.11" x2="20.14" y2="-1.11" strokeWidth="0.14" />
+            <line x1=" 4.17" y1="-1.11" x2=" 4.17" y2="0"   strokeWidth="0.11" />
+            <line x1=" 9.31" y1="-1.11" x2=" 9.31" y2="0"   strokeWidth="0.11" />
+            <line x1="15.28" y1="-1.11" x2="15.28" y2="0"   strokeWidth="0.11" />
+            {/* Pump */}
+            <rect x="4.17" y="-2.78" width="1.81" height="1.53" rx="0.17" strokeWidth="0.09" />
+            <circle cx="5.07" cy="-2.01" r="0.42" strokeWidth="0.07" />
+          </g>
 
-            {/* Circuit board shifted right 40px to match computer */}
-            <g transform="translate(1358,430)">
-                <path d="M0 0 H52 V-52 H84"     strokeWidth="1.3" className="fd" strokeDasharray="8 7"/>
-                <path d="M52-52 V-116 H24 V-156" strokeWidth="1.3" className="fd" strokeDasharray="8 7" style={{animationDelay:'1.1s'}}/>
-                <path d="M0 0 V58 H44"           strokeWidth="1.3" className="fd" strokeDasharray="8 7" style={{animationDelay:'2s'}}/>
-                {/* IC */}
-                <rect x="26" y="-112" width="34" height="24" rx="2" strokeWidth="1.6"/>
-                {[30,38,46].map(x=>(
-                <g key={x}>
-                    <line x1={x} y1="-112" x2={x} y2="-117" strokeWidth="1.1"/>
-                    <line x1={x} y1="-88"  x2={x} y2="-83"  strokeWidth="1.1"/>
-                </g>
-                ))}
-                {/* Resistor */}
-                <rect x="58" y="-32" width="16" height="10" rx="1.5" strokeWidth="1.3"/>
-                <line x1="58" y1="-27" x2="46" y2="-27" strokeWidth="1.1"/>
-                <line x1="74" y1="-27" x2="84" y2="-27" strokeWidth="1.1"/>
-                {/* Capacitor */}
-                <line x1="6"  y1="-52" x2="6"  y2="-44" strokeWidth="2"/>
-                <line x1="12" y1="-52" x2="12" y2="-44" strokeWidth="2"/>
-                <line x1="9"  y1="-44" x2="9"  y2="-36" strokeWidth="1.1"/>
-                <line x1="9"  y1="-60" x2="9"  y2="-52" strokeWidth="1.1"/>
-                {/* Nodes */}
-                {[[0,0],[52,0],[84,-52],[24,-156],[44,58]].map(([cx,cy],i)=>(
-                <circle key={i} cx={cx} cy={cy} r="4" strokeWidth="1.3" className="bl" style={{animationDelay:`${i*0.55}s`}}/>
-                ))}
-            </g>
+          {/* ═══════════════════════════════════════════════════
+               RIGHT SIDE · ELECTRICAL & ELECTRONICS
+               Pylon anchor at (97.6, 62.5) — far-right edge
+          ═══════════════════════════════════════════════════ */}
+          <g transform="translate(98.6,62.5)">
+            {/* Pylon legs */}
+            {/* <line x1="-0.97" y1="-1.53" x2="-2.78" y2="-29.17" strokeWidth="0.12" />
+            <line x1=" 0.97" y1="-1.53" x2=" 2.78" y2="-29.17" strokeWidth="0.12" /> */}
+            {/* Bracing */}
+            {/* {([
+              [-2.64,-26.74,-0.97,-22.36],[0.97,-26.74,2.64,-22.36],
+              [-2.36,-21.67,-0.83,-17.64],[0.83,-21.67,2.36,-17.64],
+              [-1.94,-16.94,-0.69,-13.47],[0.69,-16.94,1.94,-13.47],
+              [-1.53,-12.92,-0.49,-9.86], [0.49,-12.92,1.53,-9.86],
+              [-1.11,-9.31,-0.28,-7.08],  [0.28,-9.31,1.11,-7.08],
+            ] as [number,number,number,number][]).map(([x1,y1,x2,y2], i) => (
+              <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} strokeWidth="0.08" />
+            ))} */}
+            {/* Horizontal struts */}
+            {/* {([
+              [-2.78,-26.74,2.78],[-2.5,-22.36,2.5],[-2.08,-17.64,2.08],
+              [-1.67,-13.47,1.67],[-1.25,-9.86,1.25],[-0.83,-7.08,0.83],
+            ] as [number,number,number][]).map(([x1,y,x2], i) => (
+              <line key={i} x1={x1} y1={y} x2={x2} y2={y} strokeWidth="0.09" />
+            ))} */}
+            {/* Top crossarms */}
+            {/* <line x1="-4.31" y1="-28.19" x2="4.31" y2="-28.19" strokeWidth="0.14" />
+            <line x1="-3.61" y1="-24.03" x2="3.61" y2="-24.03" strokeWidth="0.11" /> */}
+            {/* Insulators */}
+            {/* {([-3.47,-1.53,0.42,2.36] as number[]).map((x, i) => (
+              <g key={i}>
+                <circle cx={x} cy="-28.19" r="0.31" strokeWidth="0.09" />
+                <circle cx={x} cy="-28.68" r="0.19" strokeWidth="0.07" />
+              </g>
+            ))} */}
+            {/* Power lines — exit RIGHT (off canvas) */}
+            {/* <path d="M4.31-28.19 Q6.25-27.64 9.03-28.68" strokeWidth="0.1" className="fd" strokeDasharray="0.6 0.45" />
+            <path d="M3.61-24.03 Q5.56-23.47 8.33-24.44" strokeWidth="0.08" className="fd" strokeDasharray="0.5 0.4" style={{ animationDelay: '0.7s' }} opacity="0.7" /> */}
+            {/* Lightning bolt */}
+            {/* <path d="M1.25-16.53 L0.35-14.03 L1.11-14.03 L0.14-11.67" strokeWidth="0.17" /> */}
+            {/* Transformer */}
+            {/* <rect x="-1.53" y="-11.25" width="3.06" height="2.78" rx="0.21" strokeWidth="0.11" />
+            <circle cx="0" cy="-9.86" r="0.76" strokeWidth="0.09" />
+            <line x1="-1.53" y1="-10.21" x2="1.53" y2="-10.21" strokeWidth="0.05" opacity="0.4" />
+            <line x1="-1.53" y1="-9.44"  x2="1.53" y2="-9.44"  strokeWidth="0.05" opacity="0.4" />
+            <line x1="0" y1="-8.47" x2="0" y2="-7.08" strokeWidth="0.1" /> */}
+            {/* Meter box */}
+            {/* <rect x="-1.25" y="-6.67" width="2.5" height="2.08" rx="0.17" strokeWidth="0.1" />
+            <circle cx="0" cy="-5.63" r="0.52" strokeWidth="0.08" /> */}
+            {/* Ground stakes */}
+            {/* <line x1="0"    y1="-4.58" x2="0"    y2="-3.19" strokeWidth="0.09" />
+            <line x1="-0.69" y1="-3.19" x2="0.69" y2="-3.19" strokeWidth="0.09" />
+            <line x1="-0.42" y1="-2.78" x2="0.42" y2="-2.78" strokeWidth="0.07" />
+            <line x1="-0.21" y1="-2.36" x2="0.21" y2="-2.36" strokeWidth="0.06" /> */}
+          </g>
 
-            {/* Binary — far right edge, y=270 */}
-            <g transform="translate(1432,270)" opacity="0.18" fontFamily="monospace" fontSize="13">
-                {['1','0','1','1','0','0','1','0','1','0','1'].map((b,i)=>(
-                <text key={i} x="0" y={i*30} stroke="white" fill="none" strokeWidth="0.5">{b}</text>
-                ))}
-            </g>
+          {/* Birds — positioned in safe empty mid zones */}
+          <g strokeWidth="0.11" opacity="0.32">
+            <path d="M30.7 20.2 Q31.6 19.4 32.5 20.2 Q33.4 19.4 34.3 20.2" />
+            <path d="M49.3 16.7 Q50.2 15.9 51.1 16.7 Q52 15.9 52.9 16.7" />
+            <path d="M59.4 37.5 Q60.2 36.8 61 37.5 Q61.8 36.8 62.6 37.5" />
+          </g>
 
-            {/* ═══════════════════════════════════════════
-                BOTTOM-LEFT · AGRICULTURAL
-                Wheat y=668, Tractor anchored at y=900
-            ═══════════════════════════════════════════ */}
-            <g transform="translate(5,668)">
-                {Array.from({length:15},(_,i)=>{
-                const x=i*21, f=i%2===0;
-                return (
-                    <g key={i} className="sw" style={{animationDelay:`${i*0.2}s`}}>
-                    <line x1={x} y1="88" x2={x+(f?-4:4)} y2="8" strokeWidth="1"/>
-                    <ellipse cx={x+(f?-8:8)} cy="0" rx="4" ry="15"
-                        transform={`rotate(${f?-20:20},${x+(f?-8:8)},0)`} strokeWidth="0.9"/>
-                    <line x1={x+(f?-4:4)} y1="-7"  x2={x+(f?-12:12)} y2="-13" strokeWidth="0.6"/>
-                    <line x1={x+(f?-3:3)} y1=" 4"  x2={x+(f?-12:12)} y2="  5" strokeWidth="0.6"/>
-                    <line x1={x+(f?-3:3)} y1="35"  x2={x+(f?-17:17)} y2="25"  strokeWidth="0.8"/>
-                    <line x1={x+(f?-3:3)} y1="57"  x2={x+(f?-15:15)} y2="48"  strokeWidth="0.8"/>
-                    </g>
-                );
-                })}
-            </g>
-
-            <g transform="translate(14,896)">
-                <path d="M0 0 L150 0 L150-38 L114-38 L95-60 L54-60 L32-38 L0-38 Z" strokeWidth="1.7"/>
-                {[-48,-40,-33,-26].map((y,i)=>(
-                <line key={i} x1="95" y1={y} x2="150" y2={y} strokeWidth="0.5" opacity="0.4"/>
-                ))}
-                <path d="M55-60 L55-104 L94-104 L94-60"  strokeWidth="1.6"/>
-                <path d="M55-104 L74-126 L94-104"          strokeWidth="1.6"/>
-                <rect x="60"  y="-100" width="14" height="17" rx="1.5" strokeWidth="1.1"/>
-                <rect x="78"  y="-100" width="10" height="17" rx="1.5" strokeWidth="1.1"/>
-                <line x1="63" y1="-86"  x2="73"  y2="-100" strokeWidth="0.6"/>
-                <line x1="63" y1="-126" x2="63"  y2="-152" strokeWidth="2"/>
-                <path d="M58-152 Q63-165 68-152" strokeWidth="1.4"/>
-                <circle cx="63" cy="-162" r="5"  strokeWidth="1" opacity="0.45"/>
-                <circle cx="59" cy="-174" r="7"  strokeWidth="0.8" opacity="0.3"/>
-                <g transform="translate(32,0)">
-                <g className="gccw2">
-                    <circle cx="0" cy="0" r="40"  strokeWidth="1.8"/>
-                    <circle cx="0" cy="0" r="33"  strokeWidth="0.7"/>
-                    <circle cx="0" cy="0" r="11"  strokeWidth="1.5"/>
-                    {Array.from({length:8},(_,i)=>{
-                    const ar=i*45*Math.PI/180;
-                    return <line key={i} x1={(33*Math.cos(ar)).toFixed(1)} y1={(33*Math.sin(ar)).toFixed(1)} x2={(11*Math.cos(ar)).toFixed(1)} y2={(11*Math.sin(ar)).toFixed(1)} strokeWidth="1.1"/>;
-                    })}
-                    {Array.from({length:10},(_,i)=>{
-                    const a=i*36, ar=a*Math.PI/180, a2=(a+18)*Math.PI/180;
-                    return <path key={`t${i}`} strokeWidth="1.4"
-                        d={`M${(Math.cos(ar)*40).toFixed(1)} ${(Math.sin(ar)*40).toFixed(1)} L${(Math.cos(ar)*50).toFixed(1)} ${(Math.sin(ar)*50).toFixed(1)} L${(Math.cos(a2)*50).toFixed(1)} ${(Math.sin(a2)*50).toFixed(1)} L${(Math.cos(a2)*40).toFixed(1)} ${(Math.sin(a2)*40).toFixed(1)}`}/>;
-                    })}
-                </g>
-                </g>
-                <g transform="translate(118,0)">
-                <g className="gcw3">
-                    <circle cx="0" cy="0" r="25"  strokeWidth="1.6"/>
-                    <circle cx="0" cy="0" r="19"  strokeWidth="0.6"/>
-                    <circle cx="0" cy="0" r="7"   strokeWidth="1.3"/>
-                    {Array.from({length:6},(_,i)=>{
-                    const ar=i*60*Math.PI/180;
-                    return <line key={i} x1={(19*Math.cos(ar)).toFixed(1)} y1={(19*Math.sin(ar)).toFixed(1)} x2={(7*Math.cos(ar)).toFixed(1)} y2={(7*Math.sin(ar)).toFixed(1)} strokeWidth="1"/>;
-                    })}
-                </g>
-                </g>
-                <path d="M-3-5 L-52-5 L-70 20 L-40 20"  strokeWidth="1.7"/>
-                <path d="M-52-5 L-72-28 L-46 20"          strokeWidth="1.4"/>
-                <line x1="-3" y1="-5"  x2="-3"  y2="-36" strokeWidth="1.4"/>
-            </g>
-
-            {/* ═══════════════════════════════════════════
-                BOTTOM-CENTER · CIVIL ENGINEERING
-            ═══════════════════════════════════════════ */}
-            <g transform="translate(618,900)">
-                <path d="M-232-12 Q-116-220 0-272 Q116-220 232-12" strokeWidth="1.9"/>
-                <path d="M-232-12 Q-116-200 0-250 Q116-200 232-12" strokeWidth="0.8"/>
-                <line x1="-250" y1="-12" x2="250" y2="-12" strokeWidth="2.2"/>
-                <line x1="-250" y1=" -4" x2="250" y2=" -4" strokeWidth="1.1"/>
-                {[-200,-158,-116,-74,-32,10,52,94,136,178].map((x,i)=>(
-                <line key={i} x1={x} y1="-8" x2={x+20} y2="-8" strokeWidth="1.1" opacity="0.38"/>
-                ))}
-                {/* Left tower */}
-                <path d="M-14-12 L-14-305 L14-305 L14-12" strokeWidth="2"/>
-                <rect x="-36" y="-232" width="72" height="14" rx="2" strokeWidth="1.4"/>
-                <rect x="-30" y="-286" width="60" height="14" rx="2" strokeWidth="1.4"/>
-                <line x1="-7"  y1="-305" x2="-7"  y2="-328" strokeWidth="1.4"/>
-                <line x1=" 7"  y1="-305" x2=" 7"  y2="-328" strokeWidth="1.4"/>
-                {/* Right tower */}
-                <path d="M188-12 L188-305 L216-305 L216-12" strokeWidth="2"/>
-                <rect x="166"  y="-232" width="72" height="14" rx="2" strokeWidth="1.4"/>
-                <rect x="172"  y="-286" width="60" height="14" rx="2" strokeWidth="1.4"/>
-                {/* Hangers */}
-                {[-202,-166,-130,-94,-58,-22].map((x,i)=>{
-                const y=-12-(1-Math.pow(x/232,2))*260;
-                return <line key={i} x1={x} y1={y.toFixed(1)} x2={x} y2="-12" strokeWidth="1" opacity="0.55"/>;
-                })}
-                {[22,58,94,130,166,202,216].map((x,i)=>{
-                const cx=x-100, y=-12-(1-Math.pow(cx/232,2))*260;
-                return <line key={i} x1={x} y1={y.toFixed(1)} x2={x} y2="-12" strokeWidth="1" opacity="0.55"/>;
-                })}
-                <path d="M-268 18 Q-218 8-168 20 Q-118 30-68 15 Q-18 0 32 15 Q82 28 132 13 Q182-2 232 13" strokeWidth="1.1" opacity="0.38"/>
-                {/* Left city */}
-                <rect x="-355" y="-140" width="44" height="140" strokeWidth="1.4"/>
-                <rect x="-305" y="-196" width="50" height="196" strokeWidth="1.4"/>
-                <rect x="-248" y="-158" width="38" height="158" strokeWidth="1.4"/>
-                {[[-351,-128,-106,-84,-62,-40],[-301,-184,-160,-136,-112,-88,-64],[-244,-146,-122,-98,-76]].map((ys,bi)=>{
-                const bx=[-351,-301,-244][bi];
-                return ys.slice(1).map((y,j)=>
-                    Array.from({length:3},(_,c)=>(
-                    <rect key={`w${bi}${j}${c}`} x={bx+5+c*13} y={y+3} width="7" height="10" strokeWidth="0.7" opacity="0.42"/>
-                    ))
-                );
-                })}
-                {/* Right city */}
-                <rect x="282"  y="-150" width="44" height="150" strokeWidth="1.4"/>
-                <rect x="332"  y="-206" width="50" height="206" strokeWidth="1.4"/>
-                <rect x="388"  y="-122" width="38" height="122" strokeWidth="1.4"/>
-            </g>
-
-            {/* ═══════════════════════════════════════════
-                BOTTOM-RIGHT · PETROCHEMICAL
-            ═══════════════════════════════════════════ */}
-            <g transform="translate(924,900)">
-                <rect x="0" y="-448" width="48" height="448" rx="4" strokeWidth="1.8"/>
-                <path d="M0-448 Q24-472 48-448" strokeWidth="1.5"/>
-                <ellipse cx="24" cy="-448" rx="24" ry="9" strokeWidth="0.9" opacity="0.4"/>
-                {[-400,-340,-280,-220,-160,-100,-52].map((y,i)=>(
-                <line key={i} x1="5" y1={y} x2="43" y2={y} strokeWidth="1" opacity="0.48"/>
-                ))}
-                {[-426,-366,-306,-246,-186,-126,-66].map((y,i)=>(
-                <rect key={i} x="-5" y={y-4} width="58" height="8" rx="2" strokeWidth="1.1"/>
-                ))}
-                <path d="M48-308 H100 V-26" strokeWidth="1.5" className="fd" strokeDasharray="10 8"/>
-                <path d="M48-175 H124 V-26" strokeWidth="1.5" className="fd" strokeDasharray="10 8" style={{animationDelay:'0.7s'}}/>
-                <path d="M48-80  H80  V-26" strokeWidth="1.4"/>
-                <path d="M80-268 L92-256 L104-268 L92-280 Z" strokeWidth="1.5"/>
-                <path d="M108-160 L120-148 L132-160 L120-172 Z" strokeWidth="1.5"/>
-                <rect x="134" y="-150" width="76" height="150" rx="5" strokeWidth="1.7"/>
-                <path d="M134-150 Q172-174 210-150" strokeWidth="1.4"/>
-                <ellipse cx="172" cy="-150" rx="38" ry="11" strokeWidth="0.8" opacity="0.38"/>
-                <line x1="134" y1="-112" x2="210" y2="-112" strokeWidth="1" opacity="0.38"/>
-                <line x1="134" y1="-76"  x2="210" y2="-76"  strokeWidth="1" opacity="0.38"/>
-                <rect x="220" y="-114" width="58" height="114" rx="4" strokeWidth="1.6"/>
-                <path d="M220-114 Q249-134 278-114" strokeWidth="1.3"/>
-                <line x1="220" y1="-80" x2="278" y2="-80" strokeWidth="0.9" opacity="0.35"/>
-                <line x1="-56" y1="-28" x2="-40" y2="-450" strokeWidth="1.6"/>
-                <line x1="-47" y1="-28" x2="-31" y2="-450" strokeWidth="0.8"/>
-                <path d="M-47-450 Q-55-474-39-496 Q-23-474-31-450 Z" strokeWidth="1.5"/>
-                <path d="M-53-456 Q-65-476-53-494" strokeWidth="1" opacity="0.5"/>
-                <path d="M-41-459 Q-28-480-38-498" strokeWidth="1" opacity="0.5"/>
-                <line x1="-65" y1="-16" x2="290" y2="-16" strokeWidth="2"/>
-                <line x1=" 60" y1="-16" x2=" 60" y2="0"   strokeWidth="1.6"/>
-                <line x1="134" y1="-16" x2="134" y2="0"   strokeWidth="1.6"/>
-                <line x1="220" y1="-16" x2="220" y2="0"   strokeWidth="1.6"/>
-                <rect x="60" y="-40" width="26" height="22" rx="2.5" strokeWidth="1.2"/>
-                <circle cx="73" cy="-29" r="6" strokeWidth="1"/>
-            </g>
-
-            {/* ═══════════════════════════════════════════
-                RIGHT · ELECTRICAL
-                Pylon strictly in right strip x=1260→1440
-                Narrower pylon — legs spread only ±55px
-                Top of legs = 892 - 460 = 432 ✓
-                Power lines go LEFT but stay above y=450
-                so they don't cut through center
-            ═══════════════════════════════════════════ */}
-            <g transform="translate(1360,892)">
-                {/* Pylon legs — narrower spread */}
-                <line x1="-16" y1="-25" x2="-55" y2="-460" strokeWidth="1.8"/>
-                <line x1=" 16" y1="-25" x2=" 55" y2="-460" strokeWidth="1.8"/>
-                {/* Bracing panels */}
-                {[
-                [-52,-422,-16,-354],[16,-422,52,-354],
-                [-46,-344,-14,-282],[14,-344,46,-282],
-                [-40,-272,-12,-214],[12,-272,40,-214],
-                [-32,-204,-8, -155],[8, -204,32,-155],
-                [-22,-145,-5, -110],[5, -145,22,-110]
-                ].map(([x1,y1,x2,y2],i)=>(
-                <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} strokeWidth="1.2"/>
-                ))}
-                {/* X diagonals — 2 top panels only */}
-                {[[-16,-422,-52,-354],[16,-422,-46,-354]].map(([x1,y1,x2,y2],i)=>(
-                <line key={`x${i}`} x1={x1} y1={y1} x2={x2} y2={y2} strokeWidth="0.7" opacity="0.3"/>
-                ))}
-                {/* Horizontal struts */}
-                {[[-54,-422,54],[-48,-354,48],[-42,-282,42],[-34,-214,34],[-24,-155,24],[-16,-110,16]].map(([x1,y,x2],i)=>(
-                <line key={`h${i}`} x1={x1} y1={y} x2={x2} y2={y} strokeWidth="1.4"/>
-                ))}
-                {/* Top crossarms */}
-                <line x1="-90" y1="-444" x2="90" y2="-444" strokeWidth="2"/>
-                <line x1="-75" y1="-380" x2="75" y2="-380" strokeWidth="1.7"/>
-                {/* Insulators */}
-                {[-72,-34,4,42].map((x,i)=>(
-                <g key={i}>
-                    <circle cx={x}   cy="-444" r="5" strokeWidth="1.4"/>
-                    <circle cx={x}   cy="-452" r="3" strokeWidth="1.1"/>
-                    <line   x1={x} y1="-438" x2={x} y2="-432" strokeWidth="1.1"/>
-                </g>
-                ))}
-                {/* Power lines — short, going only to right edge */}
-                <path d="M 90-444 Q 130-430 180-450" strokeWidth="1.4" className="fd" strokeDasharray="10 7"/>
-                <path d="M 75-380 Q 110-366 160-385" strokeWidth="1.2" className="fd" strokeDasharray="8 6" style={{animationDelay:'0.6s'}} opacity="0.7"/>
-                {/* Lightning bolt */}
-                <path d="M22-264 L7-226 L20-226 L4-188" strokeWidth="2.4"/>
-                {/* Transformer */}
-                <rect x="-26" y="-182" width="52" height="44" rx="3" strokeWidth="1.7"/>
-                <circle cx="0"   cy="-160" r="12" strokeWidth="1.4"/>
-                <line x1="-26" y1="-165" x2="26" y2="-165" strokeWidth="0.8" opacity="0.4"/>
-                <line x1="-26" y1="-155" x2="26" y2="-155" strokeWidth="0.8" opacity="0.4"/>
-                <line x1="0"   y1="-138" x2="0"  y2="-114" strokeWidth="1.5"/>
-                {/* Meter box */}
-                <rect x="-20" y="-110" width="40" height="32" rx="3" strokeWidth="1.5"/>
-                <circle cx="0" cy="-94" r="8" strokeWidth="1.3"/>
-                {/* Ground stakes */}
-                <line x1="0"   y1="-78" x2="0"  y2="-55"  strokeWidth="1.4"/>
-                <line x1="-11" y1="-55" x2="11" y2="-55"  strokeWidth="1.3"/>
-                <line x1="-7"  y1="-49" x2="7"  y2="-49"  strokeWidth="1.1"/>
-                <line x1="-3"  y1="-43" x2="3"  y2="-43"  strokeWidth="0.9"/>
-            </g>
-
-            {/* Birds in safe empty zones */}
-            <g strokeWidth="1.6" opacity="0.32">
-                <path d="M442 290 Q455 278 468 290 Q481 278 494 290"/>
-                <path d="M710 240 Q723 228 736 240 Q749 228 762 240"/>
-                <path d="M855 540 Q867 530 879 540 Q891 530 903 540"/>
-            </g>
-
-            </g>
-        </svg>
-        </div>
-    );
-    }
+        </g>
+      </svg>
+    </div>
+  );
+}

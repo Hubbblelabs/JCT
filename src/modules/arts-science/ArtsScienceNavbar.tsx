@@ -176,7 +176,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 {link.children && link.href === "#" ? (
                   <button
                     type="button"
-                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium text-white/70 transition-colors hover:text-white"
+                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium text-white transition-colors hover:text-white/70"
                   >
                     {link.name}
                     <ChevronDown
@@ -190,7 +190,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                   <Link
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium text-white/70 transition-colors hover:text-white"
+                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium text-white transition-colors hover:text-white/70"
                   >
                     {link.name}
                     {link.children && (
@@ -254,7 +254,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
           <div className="hidden items-center gap-3 lg:flex">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="hidden items-center gap-1.5 font-sans text-sm text-white/60 transition-colors hover:text-white xl:flex"
+              className="hidden items-center gap-1.5 font-sans text-sm text-white transition-colors hover:text-white/60 xl:flex"
             >
               <Phone size={14} /> {siteConfig.contact.phone}
             </a>

@@ -250,13 +250,13 @@ export function ChatbotButton() {
       <button
         aria-label={isOpen ? "Close chatbot" : "Open chatbot"}
         onClick={() => setIsOpen((open) => !open)}
-        className="bg-navy hover:bg-navy-mid fixed right-4 bottom-[4.5rem] z-50 flex h-11 w-11 items-center justify-center rounded-full shadow-lg transition-all hover:scale-105 active:scale-95 md:right-6 md:bottom-[5.5rem] md:h-12 md:w-12"
+        className="bg-navy hover:bg-navy-mid fixed left-4 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all hover:scale-105 active:scale-95 md:left-6 md:bottom-8 md:h-16 md:w-16"
       >
-        <MessageCircle size={20} className="text-white" />
+        <MessageCircle size={24} className="text-white md:scale-110" />
       </button>
 
       {isOpen && (
-        <div className="fixed right-4 bottom-[8rem] z-50 flex h-[32rem] w-[22rem] flex-col overflow-hidden rounded-2xl border border-white/20 bg-white shadow-2xl md:right-6 md:w-[24rem]">
+        <div className="fixed left-4 bottom-24 z-50 flex h-[32rem] w-[22rem] flex-col overflow-hidden rounded-2xl border border-white/20 bg-white shadow-2xl md:left-6 md:bottom-32 md:w-[24rem]">
           <div className="bg-navy text-white px-4 py-3">
             <p className="text-sm font-semibold">{meta.title}</p>
             <p className="text-xs text-white/80">JCT Admissions Assistant</p>

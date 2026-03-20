@@ -4,10 +4,22 @@ import { motion } from "framer-motion";
 import { PolySection, PolySectionHeader } from "@/modules/polytechnic/PolyUI";
 import Image from "next/image";
 import { Quote } from "lucide-react";
+import type { MouseEvent } from "react";
 
 export function AboutPolytechnic() {
+  const handleMouseMove = (e: MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    e.currentTarget.style.setProperty("--mouse-x", `${x}px`);
+    e.currentTarget.style.setProperty("--mouse-y", `${y}px`);
+  };
+
   return (
-    <div className="relative overflow-hidden bg-[#f6f8f7]">
+    <div
+      className="group/section relative overflow-hidden bg-[#f6f8f7]"
+      onMouseMove={handleMouseMove}
+    >
       {/* Global Engineering Drafting Paper Texture */}
       <div 
         className="absolute inset-0 z-0 pointer-events-none" 
@@ -16,20 +28,30 @@ export function AboutPolytechnic() {
           backgroundSize: '40px 40px'
         }}
       />
+      <div
+        className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-500 group-hover/section:opacity-100"
+        style={{
+          WebkitMaskImage:
+            "radial-gradient(circle 500px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%)",
+          maskImage:
+            "radial-gradient(circle 500px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%)",
+        }}
+      >
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(0, 92, 185, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 92, 185, 0.15) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
+          }}
+        />
+      </div>
 
       <PolySection 
         id="about-institution" 
         tone="transparent"
         className="relative"
       >
-        {/* Abstract Texture & Blobs */}
-        <div 
-          className="absolute inset-0 z-0 pointer-events-none opacity-[0.6]" 
-          style={{
-            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(212, 160, 36, 0.15) 1px, transparent 0)`,
-            backgroundSize: '28px 28px'
-          }}
-        />
         <div className="absolute top-0 right-0 -mr-32 -mt-32 w-[500px] h-[500px] bg-polytechnic-accent/5 rounded-full blur-3xl z-0 pointer-events-none"></div>
         <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-[400px] h-[400px] bg-polytechnic-dark/5 rounded-full blur-3xl z-0 pointer-events-none"></div>
 
@@ -74,8 +96,27 @@ export function AboutPolytechnic() {
       <PolySection 
         id="vision-mission" 
         tone="transparent"
-        className="relative"
+        className="relative group/section"
+        onMouseMove={handleMouseMove}
       >
+        <div
+          className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-500 group-hover/section:opacity-100"
+          style={{
+            WebkitMaskImage:
+              "radial-gradient(circle 500px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%)",
+            maskImage:
+              "radial-gradient(circle 500px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%)",
+          }}
+        >
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(0, 92, 185, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 92, 185, 0.15) 1px, transparent 1px)",
+              backgroundSize: "40px 40px",
+            }}
+          />
+        </div>
         <div className="relative z-10">
           <PolySectionHeader
             title="Vision & Mission"
@@ -127,8 +168,31 @@ export function AboutPolytechnic() {
         </div>
       </PolySection>
 
-      <PolySection id="principals-message" tone="transparent">
-        <div className="bg-[#fcfaf7] rounded-[2rem] p-6 md:p-12 border border-[#f0e6d5] shadow-lg relative overflow-hidden">
+      <PolySection 
+        id="principals-message" 
+        tone="transparent"
+        className="relative group/section"
+        onMouseMove={handleMouseMove}
+      >
+        <div
+          className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-500 group-hover/section:opacity-100"
+          style={{
+            WebkitMaskImage:
+              "radial-gradient(circle 500px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%)",
+            maskImage:
+              "radial-gradient(circle 500px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%)",
+          }}
+        >
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                "linear-gradient(rgba(0, 92, 185, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 92, 185, 0.15) 1px, transparent 1px)",
+              backgroundSize: "40px 40px",
+            }}
+          />
+        </div>
+        <div className="bg-[#fcfaf7] rounded-[2rem] p-6 md:p-12 border border-[#f0e6d5] shadow-lg relative overflow-hidden z-10">
           {/* Diagonal abstract texture */}
           <div 
             className="absolute inset-0 z-0 pointer-events-none opacity-20"
