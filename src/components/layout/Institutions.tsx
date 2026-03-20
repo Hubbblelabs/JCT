@@ -12,7 +12,7 @@ const institutions = [
     href: "/institutions/engineering",
     // logo: "/jct_engineering1.png",
     image:
-      "/assets/robot.png",
+      "/assets/engineering1-home.png",
     tagline: "Pioneering Technical Education",
     // stat: "6 B.E./B.Tech Programs",
     degreePrograms: [
@@ -42,7 +42,7 @@ const institutions = [
     href: "/institutions/arts-science",
     // logo: "/jct_arts1.png",
     image:
-      "/assets/arts-and-science-home.png",
+      "/assets/arts-and-science2-home.png",
     tagline: "Fostering Creativity & Inquiry",
     // stat: "6 UG Programs",
     degreePrograms: [
