@@ -124,18 +124,15 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
         className={`fixed ${bannerVisible && !isHomePage ? "top-10" : "top-4"} right-0 left-0 z-50 transition-all duration-300 px-4 md:px-8`}
       >
         <div className={`mx-auto flex w-full max-w-360 items-center lg:justify-between justify-end rounded-full border px-4 lg:px-7 py-2.5 transition-all duration-300 ${isSolid ? 'shadow-[0_8px_30px_rgba(0,0,0,0.4)] border-white/10 bg-[#0a1628]/95 backdrop-blur-md' : 'border-white/0 bg-transparent'}`}>
-          {/* Mobile Centered Logo */}
-          <div className="absolute left-1/2 -translate-x-1/2 lg:hidden flex flex-col items-center pointer-events-auto z-50 mt-1">
-            <Link href="/" className="flex flex-col items-center text-center">
-              <div className="relative h-[26px] w-[26px] mb-1">
+          {/* Mobile Logo */}
+          <div className="absolute left-1/2 -translate-x-1/2 lg:hidden flex items-center pointer-events-auto z-50">
+            <Link href="/" className="flex items-center gap-2">
+              <div className="relative h-8 w-8">
                 <Image src="/jct_logo_yellow.png" alt="JCT Logo" fill className="object-contain" />
               </div>
-              <span className="font-serif text-[20px] leading-none font-bold text-white tracking-[0.15em] drop-shadow-md">JCT</span>
-              <span className="font-sans text-[8px] leading-tight font-bold text-white tracking-[0.18em] uppercase mt-0.5 drop-shadow-md">Institutions</span>
-              <div className="flex items-center gap-1 opacity-90 mt-0.5">
-                <div className="h-px w-3 bg-white/70"></div>
-                <span className="font-sans text-[5px] font-bold text-white tracking-widest uppercase drop-shadow-sm">Est. 2009</span>
-                <div className="h-px w-3 bg-white/70"></div>
+              <div className="flex flex-col">
+                <span className="font-serif text-[18px] leading-none font-bold text-white tracking-[0.15em] drop-shadow-md">JCT</span>
+                <span className="font-sans text-[8px] leading-tight font-bold text-white tracking-[0.18em] uppercase drop-shadow-md">Institutions</span>
               </div>
             </Link>
           </div>
