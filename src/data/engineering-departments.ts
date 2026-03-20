@@ -78,42 +78,48 @@ const ENGINEERING_PO = [
 function buildEngineeringCurriculum(
   prefix: string,
 ): DepartmentData["curriculum"] {
-  const buildSemesters = (regYear: string) => Array.from({ length: 8 }, (_, index) => {
-    const semester = index + 1;
-    return {
-      semester,
-      subjects: [
-        {
-          code: `${prefix}${semester}01`,
-          name:
-            semester < 3
-              ? "Engineering Mathematics"
-              : `Core Engineering Subject`,
-          credits: 4,
-          type: "Core" as const,
-        },
-        {
-          code: `${prefix}${semester}02`,
-          name: semester < 3 ? "Engineering Science" : `Department Elective (${regYear})`,
-          credits: 3,
-          type: semester < 3 ? "Theory" as const : "Elective" as const,
-        },
-        {
-          code: `${prefix}${semester}03`,
-          name: "Laboratory / Practical",
-          credits: 2,
-          type: "Lab" as const,
-        },
-        {
-          code: `${prefix}${semester}04`,
-          name:
-            semester === 8 ? "Project Work" : "Professional Skill Development",
-          credits: regYear === "R2021" ? 3 : 2,
-          type: semester === 8 ? "Project" as const : "Core" as const,
-        },
-      ],
-    };
-  });
+  const buildSemesters = (regYear: string) =>
+    Array.from({ length: 8 }, (_, index) => {
+      const semester = index + 1;
+      return {
+        semester,
+        subjects: [
+          {
+            code: `${prefix}${semester}01`,
+            name:
+              semester < 3
+                ? "Engineering Mathematics"
+                : `Core Engineering Subject`,
+            credits: 4,
+            type: "Core" as const,
+          },
+          {
+            code: `${prefix}${semester}02`,
+            name:
+              semester < 3
+                ? "Engineering Science"
+                : `Department Elective (${regYear})`,
+            credits: 3,
+            type: semester < 3 ? ("Theory" as const) : ("Elective" as const),
+          },
+          {
+            code: `${prefix}${semester}03`,
+            name: "Laboratory / Practical",
+            credits: 2,
+            type: "Lab" as const,
+          },
+          {
+            code: `${prefix}${semester}04`,
+            name:
+              semester === 8
+                ? "Project Work"
+                : "Professional Skill Development",
+            credits: regYear === "R2021" ? 3 : 2,
+            type: semester === 8 ? ("Project" as const) : ("Core" as const),
+          },
+        ],
+      };
+    });
 
   return [
     {
@@ -123,7 +129,7 @@ function buildEngineeringCurriculum(
     {
       regulationName: "Regulation 2017",
       semesters: buildSemesters("R2017"),
-    }
+    },
   ];
 }
 

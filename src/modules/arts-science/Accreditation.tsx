@@ -21,7 +21,7 @@ export function Accreditation() {
               Rigorous curriculum meets global standards
             </h3>
 
-            <p className="mb-8 text-base leading-relaxed font-light text-arts-science-light md:text-lg">
+            <p className="text-arts-science-light mb-8 text-base leading-relaxed font-light md:text-lg">
               Our university is fully accredited by leading academic bodies and
               maintains academic partnerships across the globe. This ensures
               that every degree holds weight, opens doors, and prepares students
@@ -32,7 +32,7 @@ export function Accreditation() {
             <div className="flex flex-col gap-4 sm:flex-row">
               <Button
                 size="lg"
-                className="from-arts-science-accent to-orange-600 h-14 w-full rounded-full border border-orange-400/70 bg-linear-to-r px-8 font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-110 sm:w-auto"
+                className="from-arts-science-accent h-14 w-full rounded-full border border-orange-400/70 bg-linear-to-r to-orange-600 px-8 font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-110 sm:w-auto"
               >
                 Learn
               </Button>

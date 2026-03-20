@@ -5,7 +5,10 @@ import { Button } from "@/components/ui/button";
 
 export function CTA() {
   return (
-    <section id="admission" className="border-arts-science-accent bg-arts-science border-t-4 py-16 md:py-24">
+    <section
+      id="admission"
+      className="border-arts-science-accent bg-arts-science border-t-4 py-16 md:py-24"
+    >
       <div className="container mx-auto px-4 text-center md:px-8">
         <div className="mx-auto max-w-3xl">
           <motion.div
@@ -26,7 +29,7 @@ export function CTA() {
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button
                 size="lg"
-                className="border-arts-science-accent/70 from-arts-science-accent to-orange-600 h-14 w-full rounded-full border bg-linear-to-r px-8 font-bold text-white shadow-[0_12px_28px_rgba(249,115,22,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-110 sm:w-auto"
+                className="border-arts-science-accent/70 from-arts-science-accent h-14 w-full rounded-full border bg-linear-to-r to-orange-600 px-8 font-bold text-white shadow-[0_12px_28px_rgba(249,115,22,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-110 sm:w-auto"
               >
                 Apply
               </Button>

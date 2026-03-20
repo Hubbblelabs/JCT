@@ -21,7 +21,7 @@ export function Distinction() {
               Why we stand apart
             </h3>
 
-            <p className="mb-10 text-lg leading-relaxed font-light text-arts-science-light md:text-xl">
+            <p className="text-arts-science-light mb-10 text-lg leading-relaxed font-light md:text-xl">
               Our commitment to excellence is reflected in every aspect of
               campus life, from world-class faculty to industry partnerships. We
               ensure our students receive a holistic education that goes beyond

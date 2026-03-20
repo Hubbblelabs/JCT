@@ -11,14 +11,13 @@ const institutions = [
     slug: "engineering",
     href: "/institutions/engineering",
     // logo: "/jct_engineering1.png",
-    image:
-      "/assets/engineering1-home.png",
+    image: "/assets/engineering1-home.png",
     tagline: "Pioneering Technical Education",
     // stat: "6 B.E./B.Tech Programs",
     degreePrograms: [
       {
-        degree:"Autonomous  ",
-        courses:[],
+        degree: "Autonomous  ",
+        courses: [],
       },
       {
         degree: "B.E. / B.Tech",
@@ -41,8 +40,7 @@ const institutions = [
     slug: "arts-science",
     href: "/institutions/arts-science",
     // logo: "/jct_arts1.png",
-    image:
-      "/assets/arts-and-science2-home.png",
+    image: "/assets/arts-and-science2-home.png",
     tagline: "Fostering Creativity & Inquiry",
     // stat: "6 UG Programs",
     degreePrograms: [
@@ -59,8 +57,7 @@ const institutions = [
     slug: "polytechnic",
     href: "/institutions/polytechnic",
     // logo: "/jct_polytechnic1.png",
-    image:
-      "/assets/polytechnic-home.png",
+    image: "/assets/polytechnic-home.png",
     tagline: "Hands-On Technical Training",
     // stat: "5 Diploma Programs",
     degreePrograms: [
@@ -76,8 +73,11 @@ const institutions = [
 
 export function Institutions() {
   return (
-    <section id="institutions" className="section-padding bg-white relative overflow-hidden">
-      <div className="container mx-auto px-4 md:px-6 relative z-10">
+    <section
+      id="institutions"
+      className="section-padding relative overflow-hidden bg-white"
+    >
+      <div className="relative z-10 container mx-auto px-4 md:px-6">
         {/* Header */}
         <div className="mx-auto mb-8 max-w-3xl text-center md:mb-16">
           <motion.span
@@ -125,8 +125,11 @@ export function Institutions() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.15 * index }}
               >
-                <Link href={inst.href} className="group block focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 rounded-3xl">
-                  <div className="relative h-50 overflow-hidden rounded-3xl bg-white shadow-lg transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1.5 md:h-70">
+                <Link
+                  href={inst.href}
+                  className="group focus:ring-gold block rounded-3xl focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                >
+                  <div className="relative h-50 overflow-hidden rounded-3xl bg-white shadow-lg transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] md:h-70">
                     <Image
                       src={inst.image}
                       alt={inst.name}
@@ -135,7 +138,7 @@ export function Institutions() {
                       sizes="(max-width: 1024px) 100vw, 50vw"
                     />
                     {/* Dark gradient for text readability */}
-                    <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/40 to-black/0 opacity-80 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none" />
+                    <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/95 via-black/40 to-black/0 opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
 
                     <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-8">
                       <h3 className="mb-2 font-serif text-xl leading-tight font-bold text-white drop-shadow-md md:text-2xl">
@@ -147,7 +150,10 @@ export function Institutions() {
                       <div className="flex flex-1 items-end gap-3">
                         <div className="flex flex-1 flex-col gap-3">
                           {inst.degreePrograms.map((degProg) => (
-                            <div key={degProg.degree} className="flex flex-col gap-1.5">
+                            <div
+                              key={degProg.degree}
+                              className="flex flex-col gap-1.5"
+                            >
                               <span className="font-sans text-[10px] font-bold tracking-wider text-white/60 uppercase">
                                 {degProg.degree}
                               </span>
@@ -185,8 +191,11 @@ export function Institutions() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="h-full"
           >
-            <Link href={institutions[0].href} className="group block h-full focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 rounded-3xl">
-              <div className="relative h-full min-h-70 overflow-hidden rounded-3xl bg-white shadow-lg transition-all duration-500 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] hover:-translate-y-1.5 lg:min-h-145">
+            <Link
+              href={institutions[0].href}
+              className="group focus:ring-gold block h-full rounded-3xl focus:ring-2 focus:ring-offset-2 focus:outline-none"
+            >
+              <div className="relative h-full min-h-70 overflow-hidden rounded-3xl bg-white shadow-lg transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] lg:min-h-145">
                 <Image
                   src={institutions[0].image}
                   alt={institutions[0].name}
@@ -194,24 +203,29 @@ export function Institutions() {
                   className="object-cover transition-transform duration-700 group-hover:scale-110"
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
-                
+
                 {/* Dark gradient for text readability */}
-                <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/40 to-black/0 opacity-80 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none" />
+                <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/95 via-black/40 to-black/0 opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
 
                 {/* Content overlay */}
                 <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-8 lg:p-10">
                   <h3 className="mb-3 font-serif text-2xl leading-tight font-bold text-white drop-shadow-lg md:text-3xl lg:text-4xl">
                     {institutions[0].name}
                   </h3>
-                  <p className="mb-6 max-w-md font-sans text-base font-medium leading-relaxed text-white/80">
-                    <span className="font-semibold text-white">{institutions[0].tagline}</span> — State-of-the-art laboratories
-                    and industry-aligned curriculum preparing engineers for
-                    tomorrow.
+                  <p className="mb-6 max-w-md font-sans text-base leading-relaxed font-medium text-white/80">
+                    <span className="font-semibold text-white">
+                      {institutions[0].tagline}
+                    </span>{" "}
+                    — State-of-the-art laboratories and industry-aligned
+                    curriculum preparing engineers for tomorrow.
                   </p>
                   <div className="flex flex-1 items-end gap-3">
                     <div className="flex flex-1 flex-col gap-4">
                       {institutions[0].degreePrograms.map((degProg) => (
-                        <div key={degProg.degree} className="flex flex-col gap-2">
+                        <div
+                          key={degProg.degree}
+                          className="flex flex-col gap-2"
+                        >
                           <span className="font-sans text-[11px] font-bold tracking-[0.15em] text-white/60 uppercase">
                             {degProg.degree}
                           </span>
@@ -252,7 +266,10 @@ export function Institutions() {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className="snap-item w-70 shrink-0 sm:w-85"
             >
-              <Link href={inst.href} className="group block focus:outline-none rounded-2xl">
+              <Link
+                href={inst.href}
+                className="group block rounded-2xl focus:outline-none"
+              >
                 <div className="relative h-80 overflow-hidden rounded-2xl bg-white shadow-md transition-all duration-500 hover:shadow-xl sm:h-90">
                   <Image
                     src={inst.image}
@@ -262,7 +279,7 @@ export function Institutions() {
                     sizes="340px"
                   />
                   {/* Dark gradient for text readability */}
-                  <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/50 to-black/0 opacity-80 transition-opacity duration-500 group-hover:opacity-100 pointer-events-none" />
+                  <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-black/95 via-black/50 to-black/0 opacity-80 transition-opacity duration-500 group-hover:opacity-100" />
 
                   <div className="absolute inset-0 z-10 flex flex-col justify-end p-5">
                     <h3 className="mb-1.5 font-serif text-lg leading-tight font-bold text-white drop-shadow-md">
@@ -273,14 +290,20 @@ export function Institutions() {
                     </p>
                     <div className="flex flex-col gap-2.5">
                       {inst.degreePrograms.map((degProg) => (
-                        <div key={degProg.degree} className="flex flex-col gap-1">
+                        <div
+                          key={degProg.degree}
+                          className="flex flex-col gap-1"
+                        >
                           <span className="font-sans text-[9px] font-bold tracking-widest text-white/50 uppercase">
                             {degProg.degree}
                           </span>
                           {degProg.courses.length > 0 && (
                             <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
                               {degProg.courses.map((course, idx) => (
-                                <div key={course} className="flex items-center gap-1.5">
+                                <div
+                                  key={course}
+                                  className="flex items-center gap-1.5"
+                                >
                                   <span className="font-sans text-[10px] font-medium text-white/90">
                                     {course}
                                   </span>

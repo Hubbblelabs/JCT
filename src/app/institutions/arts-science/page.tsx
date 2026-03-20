@@ -27,16 +27,14 @@ export default function ArtsSciencePage() {
   return (
     <main className="bg-background text-foreground arts-science-theme min-h-screen overflow-x-hidden">
       <ArtsScienceNavbar forceSolidOnTop />
-
       <Hero />
       <AboutArtsScience />
       <UgPrograms />
       {/* <Distinction /> */}
-      <Accreditation />      <Placements />      <CampusLife />
+      <Accreditation /> <Placements /> <CampusLife />
       <Testimonials />
       <NewsEvents />
       {/* <CTA /> */}
-
       <Footer />
     </main>
   );

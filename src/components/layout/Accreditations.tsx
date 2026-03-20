@@ -16,7 +16,7 @@ const logos = [
 export function Accreditations() {
   const doubled = [...logos, ...logos, ...logos];
   return (
-    <section className="relative overflow-hidden bg-white py-5 md:py-6 shadow-inner border-b border-gray-100">
+    <section className="relative overflow-hidden border-b border-gray-100 bg-white py-5 shadow-inner md:py-6">
       {/* Fade Edges */}
       <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-12 bg-linear-to-r from-white to-transparent md:w-24" />
       <div className="pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-12 bg-linear-to-l from-white to-transparent md:w-24" />
@@ -25,7 +25,7 @@ export function Accreditations() {
         {doubled.map((logo, i) => (
           <div
             key={`${logo.name}-${i}`}
-            className="flex shrink-0 items-center gap-1.5 md:gap-2 opacity-70 transition-opacity duration-300 hover:opacity-100"
+            className="flex shrink-0 items-center gap-1.5 opacity-70 transition-opacity duration-300 hover:opacity-100 md:gap-2"
             title={logo.name}
           >
             <div className="relative h-10 w-24 shrink-0 md:h-12 md:w-28">
@@ -37,7 +37,7 @@ export function Accreditations() {
                 sizes="(max-width: 768px) 96px, 112px"
               />
             </div>
-            <span className="text-[#64748b] font-sans text-[10px] md:text-[11px] font-bold tracking-widest uppercase whitespace-nowrap pr-2">
+            <span className="pr-2 font-sans text-[10px] font-bold tracking-widest whitespace-nowrap text-[#64748b] uppercase md:text-[11px]">
               {logo.name}
             </span>
           </div>

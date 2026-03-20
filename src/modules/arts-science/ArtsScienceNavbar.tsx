@@ -4,14 +4,24 @@ import { useState, useEffect, type MouseEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown, ArrowRight, Menu, Phone, X } from "lucide-react";
-import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { siteConfig } from "@/data/site";
 
 type ArtsNavItem = {
   name: string;
   href: string;
   className?: string;
-  children?: { name: string; href: string; description?: string; className?: string }[];
+  children?: {
+    name: string;
+    href: string;
+    description?: string;
+    className?: string;
+  }[];
 };
 
 const artsNav: ArtsNavItem[] = [
@@ -45,14 +55,46 @@ const artsNav: ArtsNavItem[] = [
     name: "Explore More",
     href: "#",
     children: [
-      { name: "About Us", href: "#about", description: "About our institution", className: "xl:hidden" },
-      { name: "Courses", href: "#courses", description: "Programs offered", className: "xl:hidden" },
-      { name: "Admission", href: "#admission", description: "Admission process & criteria", className: "2xl:hidden" },
-      { name: "Contact", href: "#contact", description: "Get in touch with us", className: "2xl:hidden" },
-      { name: "Placements", href: "#placements", description: "Our recruitment partners & stats" },
-      { name: "Life @ JCT", href: "#life", description: "News, events & student life" },
-      { name: "Testimonials", href: "#testimonials", description: "Voices from our community" }
-    ]
+      {
+        name: "About Us",
+        href: "#about",
+        description: "About our institution",
+        className: "xl:hidden",
+      },
+      {
+        name: "Courses",
+        href: "#courses",
+        description: "Programs offered",
+        className: "xl:hidden",
+      },
+      {
+        name: "Admission",
+        href: "#admission",
+        description: "Admission process & criteria",
+        className: "2xl:hidden",
+      },
+      {
+        name: "Contact",
+        href: "#contact",
+        description: "Get in touch with us",
+        className: "2xl:hidden",
+      },
+      {
+        name: "Placements",
+        href: "#placements",
+        description: "Our recruitment partners & stats",
+      },
+      {
+        name: "Life @ JCT",
+        href: "#life",
+        description: "News, events & student life",
+      },
+      {
+        name: "Testimonials",
+        href: "#testimonials",
+        description: "Voices from our community",
+      },
+    ],
   },
 ];
 
@@ -112,15 +154,15 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const navBackground = useTransform(
     scrollY,
     [0, 50],
-    ["rgba(17, 24, 39, 0)", "rgba(17, 24, 39, 0.95)"]
+    ["rgba(17, 24, 39, 0)", "rgba(17, 24, 39, 0.95)"],
   );
-  
+
   const navBorder = useTransform(
     scrollY,
     [0, 50],
-    ["rgba(55, 65, 81, 0)", "rgba(55, 65, 81, 0.4)"]
+    ["rgba(55, 65, 81, 0)", "rgba(55, 65, 81, 0.4)"],
   );
-  
+
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "unset";
     return () => {
@@ -131,7 +173,6 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
   return (
     <>
       {/* Announcement Bar */}
-     
 
       {/* Main Nav */}
       <motion.nav
@@ -139,7 +180,9 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
         style={{
-          backgroundColor: forceSolidOnTop ? "rgba(17, 24, 39, 0.95)" : navBackground,
+          backgroundColor: forceSolidOnTop
+            ? "rgba(17, 24, 39, 0.95)"
+            : navBackground,
           borderColor: forceSolidOnTop ? "rgba(55, 65, 81, 0.4)" : navBorder,
           borderBottomWidth: "1px",
         }}
@@ -147,7 +190,10 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
       >
         <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
           {/* Logo */}
-          <Link href="/institutions/arts-science" className="flex shrink-0 items-center gap-3">
+          <Link
+            href="/institutions/arts-science"
+            className="flex shrink-0 items-center gap-3"
+          >
             <div className="relative h-10 w-10 md:h-11 md:w-11">
               <Image
                 src="/jct_logo_yellow.png"
@@ -161,7 +207,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               <span className="font-serif text-sm leading-none font-bold tracking-tight md:text-lg">
                 JCT
               </span>
-              <span className="font-sans text-[10px] font-medium tracking-[0.1em] text-white/70 uppercase pt-0.5 whitespace-nowrap">
+              <span className="pt-0.5 font-sans text-[10px] font-medium tracking-[0.1em] whitespace-nowrap text-white/70 uppercase">
                 Arts & Science
               </span>
             </div>
@@ -181,7 +227,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 {link.children && link.href === "#" ? (
                   <button
                     type="button"
-                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] whitespace-nowrap font-medium text-white transition-colors hover:text-white/70"
+                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium whitespace-nowrap text-white transition-colors hover:text-white/70"
                   >
                     {link.name}
                     <ChevronDown
@@ -220,7 +266,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                         transition={{ duration: 0.15, ease: "easeOut" }}
                         className="absolute top-full left-0 w-64 pt-3"
                       >
-                        <div className="bg-[#111827]/95 overflow-hidden rounded-xl border border-white/10 p-2 shadow-2xl shadow-black/30 backdrop-blur-2xl">
+                        <div className="overflow-hidden rounded-xl border border-white/10 bg-[#111827]/95 p-2 shadow-2xl shadow-black/30 backdrop-blur-2xl">
                           <div className="space-y-0.5">
                             {link.children.map((child) => (
                               <Link
@@ -230,7 +276,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all hover:bg-white/5 ${child.className || ""}`}
                               >
                                 <div>
-                                  <p className="font-sans text-[15px] whitespace-nowrap font-medium text-white/90 transition-colors group-hover:text-arts-science-primary group-hover:text-amber-500">
+                                  <p className="group-hover:text-arts-science-primary font-sans text-[15px] font-medium whitespace-nowrap text-white/90 transition-colors group-hover:text-amber-500">
                                     {child.name}
                                   </p>
                                   {child.description && (
@@ -259,13 +305,13 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
           <div className="hidden items-center gap-3 lg:flex">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="hidden items-center gap-1.5 font-sans whitespace-nowrap text-sm text-white transition-colors hover:text-white/60 xl:flex"
+              className="hidden items-center gap-1.5 font-sans text-sm whitespace-nowrap text-white transition-colors hover:text-white/60 xl:flex"
             >
               <Phone size={14} /> {siteConfig.contact.phone}
             </a>
             <Link
               href="/admissions/apply"
-              className="bg-arts-science-accent text-white hover:bg-orange-500 shadow-arts-science-accent/20 inline-flex whitespace-nowrap flex-shrink-0 h-9 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
+              className="bg-arts-science-accent shadow-arts-science-accent/20 inline-flex h-9 flex-shrink-0 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold whitespace-nowrap text-white shadow-lg transition-all hover:scale-105 hover:bg-orange-500 active:scale-95"
             >
               Apply Now <ArrowRight size={14} />
             </Link>
@@ -312,8 +358,10 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                     />
                   </div>
                   <div className="flex flex-col text-white">
-                    <span className="font-serif text-lg leading-none font-bold">JCT</span>
-                    <span className="font-sans text-[9px] font-medium tracking-[0.1em] text-white/70 uppercase mt-0.5">
+                    <span className="font-serif text-lg leading-none font-bold">
+                      JCT
+                    </span>
+                    <span className="mt-0.5 font-sans text-[9px] font-medium tracking-[0.1em] text-white/70 uppercase">
                       Arts & Science
                     </span>
                   </div>
@@ -329,74 +377,91 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               {/* Links */}
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
                 <div className="space-y-1">
-                  {(artsNav.flatMap(item => item.name === "Explore More" ? (item.children || []) : [item]) as any[])
-                    .filter(link => !link.className?.includes("hidden") || link.className?.includes("xl:hidden") || link.className?.includes("lg:hidden") || link.className?.includes("2xl:hidden"))
+                  {(
+                    artsNav.flatMap((item) =>
+                      item.name === "Explore More"
+                        ? item.children || []
+                        : [item],
+                    ) as any[]
+                  )
+                    .filter(
+                      (link) =>
+                        !link.className?.includes("hidden") ||
+                        link.className?.includes("xl:hidden") ||
+                        link.className?.includes("lg:hidden") ||
+                        link.className?.includes("2xl:hidden"),
+                    )
                     .map((link: any) => (
                       <div key={link.name} className="overflow-hidden">
-                      {link.children ? (
-                        <div>
-                          <button
-                            type="button"
-                            onClick={() => toggleMobileSection(link.name)}
-                            className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${mobileExpanded === link.name ? "bg-white/10 text-white shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                        {link.children ? (
+                          <div>
+                            <button
+                              type="button"
+                              onClick={() => toggleMobileSection(link.name)}
+                              className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${mobileExpanded === link.name ? "bg-white/10 text-white shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                            >
+                              {link.name}
+                              <ChevronDown
+                                size={16}
+                                className={`transition-transform duration-300 ${mobileExpanded === link.name ? "rotate-180" : ""}`}
+                              />
+                            </button>
+                            <AnimatePresence>
+                              {mobileExpanded === link.name && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{
+                                    duration: 0.25,
+                                    ease: "easeInOut",
+                                  }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="space-y-1 py-1 pr-2 pl-4">
+                                    {link.children.map((child: any) => (
+                                      <Link
+                                        key={child.name}
+                                        href={child.href}
+                                        onClick={(e) =>
+                                          handleNavClick(e, child.href, true)
+                                        }
+                                        className="hover:text-arts-science-accent block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5"
+                                      >
+                                        {child.name}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        ) : (
+                          <Link
+                            href={link.href}
+                            onClick={(e) => handleNavClick(e, link.href, true)}
+                            className={`block rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${link.href.includes("#") && typeof window !== "undefined" && window.location.hash === (link.href.includes("#") ? link.href.slice(link.href.indexOf("#")) : "") ? "text-arts-science-accent bg-white/10 shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
                           >
                             {link.name}
-                            <ChevronDown
-                              size={16}
-                              className={`transition-transform duration-300 ${mobileExpanded === link.name ? "rotate-180" : ""}`}
-                            />
-                          </button>
-                          <AnimatePresence>
-                            {mobileExpanded === link.name && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.25, ease: "easeInOut" }}
-                                className="overflow-hidden"
-                              >
-                                <div className="space-y-1 py-1 pl-4 pr-2">
-                                  {link.children.map((child: any) => (
-                                    <Link
-                                      key={child.name}
-                                      href={child.href}
-                                      onClick={(e) => handleNavClick(e, child.href, true)}
-                                      className="block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-arts-science-accent"
-                                    >
-                                      {child.name}
-                                    </Link>
-                                  ))}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      ) : (
-                        <Link
-                          href={link.href}
-                          onClick={(e) => handleNavClick(e, link.href, true)}
-                          className={`block rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${link.href.includes("#") && typeof window !== 'undefined' && window.location.hash === (link.href.includes("#") ? link.href.slice(link.href.indexOf("#")) : "") ? "bg-white/10 text-arts-science-accent shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
-                        >
-                          {link.name}
-                        </Link>
-                      )}
-                    </div>
-                  ))}
+                          </Link>
+                        )}
+                      </div>
+                    ))}
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="space-y-3 p-5 pt-2 border-t border-white/5">
+              <div className="space-y-3 border-t border-white/5 p-5 pt-2">
                 <a
                   href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-white/5 font-sans text-sm font-medium text-white transition-all hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98]"
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-white/5 font-sans text-sm font-medium text-white transition-all hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98]"
                 >
                   <Phone size={16} /> {siteConfig.contact.phone}
                 </a>
                 <Link
                   href="#admission"
                   onClick={(e) => handleNavClick(e, "#admission", true)}
-                  className="bg-arts-science-accent text-white hover:bg-orange-500 flex h-12 w-full items-center justify-center gap-2 rounded-2xl font-sans text-sm font-bold shadow-lg shadow-arts-science-accent/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  className="bg-arts-science-accent shadow-arts-science-accent/10 flex h-12 w-full items-center justify-center gap-2 rounded-2xl font-sans text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02] hover:bg-orange-500 active:scale-[0.98]"
                 >
                   Apply Now <ArrowRight size={14} />
                 </Link>
@@ -408,4 +473,3 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
     </>
   );
 }
-

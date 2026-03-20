@@ -11,7 +11,11 @@ import {
 
 export function Admissions() {
   return (
-    <PolySection id="admissions" tone="subtle" className="border-t border-slate-100">
+    <PolySection
+      id="admissions"
+      tone="subtle"
+      className="border-t border-slate-100"
+    >
       <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
         <div className="flex flex-col gap-6 border-b border-slate-200 pb-8 md:flex-row md:items-end md:justify-between">
           <PolySectionHeader
@@ -41,8 +45,14 @@ export function Admissions() {
               </h3>
               <ul className="space-y-2.5">
                 {block.items.map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-slate-600">
-                    <CheckCircle2 size={14} className="text-polytechnic mt-0.5 shrink-0" />
+                  <li
+                    key={item}
+                    className="flex items-start gap-2 text-sm text-slate-600"
+                  >
+                    <CheckCircle2
+                      size={14}
+                      className="text-polytechnic mt-0.5 shrink-0"
+                    />
                     {item}
                   </li>
                 ))}

@@ -2,29 +2,31 @@ import React from "react";
 
 export function ArtsAndScienceHeroBg() {
   return (
-    <div className="absolute inset-0 z-0 overflow-hidden bg-[#faf8fc] pointer-events-none">
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-[#faf8fc]">
       {/* Light radial glow for maximum text readability on the center-left */}
-      <div className="absolute -top-[20%] -left-[10%] w-[60%] sm:w-[50%] md:w-[45%] h-[70%] sm:h-[60%] md:h-[50%] rounded-full bg-white opacity-100 blur-[80px] sm:blur-[100px]" />
-      <div className="absolute top-[20%] left-[10%] w-[40%] sm:w-[35%] md:w-[30%] h-[40%] sm:h-[35%] md:h-[30%] rounded-full bg-[#fdfcff] opacity-90 blur-[60px] sm:blur-[80px]" />
-      
+      <div className="absolute -top-[20%] -left-[10%] h-[70%] w-[60%] rounded-full bg-white opacity-100 blur-[80px] sm:h-[60%] sm:w-[50%] sm:blur-[100px] md:h-[50%] md:w-[45%]" />
+      <div className="absolute top-[20%] left-[10%] h-[40%] w-[40%] rounded-full bg-[#fdfcff] opacity-90 blur-[60px] sm:h-[35%] sm:w-[35%] sm:blur-[80px] md:h-[30%] md:w-[30%]" />
+
       {/* Deep, rich soft glow behind the image card area on the right */}
-      <div className="absolute bottom-[0%] right-[0%] w-[50%] sm:w-[45%] md:w-[40%] h-[60%] sm:h-[55%] md:h-[50%] rounded-full bg-orange-500/15 blur-[100px] sm:blur-[130px]" />
-      <div className="absolute top-[30%] right-[5%] sm:right-[8%] md:right-[10%] w-[40%] sm:w-[35%] md:w-[30%] h-[40%] sm:h-[35%] md:h-[30%] rounded-full bg-orange-400/15 blur-[80px] sm:blur-[120px]" />
+      <div className="absolute right-[0%] bottom-[0%] h-[60%] w-[50%] rounded-full bg-orange-500/15 blur-[100px] sm:h-[55%] sm:w-[45%] sm:blur-[130px] md:h-[50%] md:w-[40%]" />
+      <div className="absolute top-[30%] right-[5%] h-[40%] w-[40%] rounded-full bg-orange-400/15 blur-[80px] sm:right-[8%] sm:h-[35%] sm:w-[35%] sm:blur-[120px] md:right-[10%] md:h-[30%] md:w-[30%]" />
 
       {/* Left side contrast texture: Dot grid representing "Science & Structure" */}
-      <div 
+      <div
         className="absolute inset-0 opacity-[0.25]"
         style={{
           backgroundImage: "radial-gradient(#f97316 1.5px, transparent 1.5px)",
           backgroundSize: "24px 24px",
-          maskImage: "radial-gradient(ellipse at 10% 60%, black 0%, transparent 50%)",
-          WebkitMaskImage: "radial-gradient(ellipse at 10% 60%, black 0%, transparent 50%)"
+          maskImage:
+            "radial-gradient(ellipse at 10% 60%, black 0%, transparent 50%)",
+          WebkitMaskImage:
+            "radial-gradient(ellipse at 10% 60%, black 0%, transparent 50%)",
         }}
       />
 
       {/* Primary Abstract Contour Waves gathering at the bottom right */}
       <svg
-        className="absolute top-0 left-0 w-full h-full opacity-95"
+        className="absolute top-0 left-0 h-full w-full opacity-95"
         preserveAspectRatio="xMidYMid slice"
         viewBox="0 0 1440 800"
         xmlns="http://www.w3.org/2000/svg"
@@ -52,48 +54,86 @@ export function ArtsAndScienceHeroBg() {
           </linearGradient>
 
           <filter id="shadowDepth" x="-10%" y="-10%" width="120%" height="120%">
-            <feDropShadow dx="-4" dy="-4" stdDeviation="16" floodColor="#111827" floodOpacity="0.08" />
+            <feDropShadow
+              dx="-4"
+              dy="-4"
+              stdDeviation="16"
+              floodColor="#111827"
+              floodOpacity="0.08"
+            />
           </filter>
         </defs>
 
         <g filter="url(#shadowDepth)">
-          <path d="M -100,800 C 200,600 400,750 800,450 C 1100,200 1300,100 1500,-50 L 1500,900 L -100,900 Z" fill="url(#contour1)" />
-          <path d="M 100,900 C 300,700 550,850 850,550 C 1050,350 1250,250 1500,100 L 1500,900 Z" fill="url(#contour2)" />
-          <path d="M 300,950 C 500,800 700,900 950,650 C 1150,450 1300,400 1500,300 L 1500,950 Z" fill="url(#contour3)" />
-          <path d="M 600,950 C 750,850 900,1000 1050,800 C 1200,600 1350,550 1500,450 L 1500,950 Z" fill="url(#contour4)" />
-          <path d="M 900,950 C 1050,900 1150,1050 1250,900 C 1350,750 1450,700 1550,600 L 1550,950 Z" fill="url(#contour5)" />
+          <path
+            d="M -100,800 C 200,600 400,750 800,450 C 1100,200 1300,100 1500,-50 L 1500,900 L -100,900 Z"
+            fill="url(#contour1)"
+          />
+          <path
+            d="M 100,900 C 300,700 550,850 850,550 C 1050,350 1250,250 1500,100 L 1500,900 Z"
+            fill="url(#contour2)"
+          />
+          <path
+            d="M 300,950 C 500,800 700,900 950,650 C 1150,450 1300,400 1500,300 L 1500,950 Z"
+            fill="url(#contour3)"
+          />
+          <path
+            d="M 600,950 C 750,850 900,1000 1050,800 C 1200,600 1350,550 1500,450 L 1500,950 Z"
+            fill="url(#contour4)"
+          />
+          <path
+            d="M 900,950 C 1050,900 1150,1050 1250,900 C 1350,750 1450,700 1550,600 L 1550,950 Z"
+            fill="url(#contour5)"
+          />
         </g>
       </svg>
 
       {/* Left side mirrored waves (faded) for perfect visual framing */}
-      <div 
-        className="absolute top-0 left-0 w-full h-full opacity-[0.65]"
+      <div
+        className="absolute top-0 left-0 h-full w-full opacity-[0.65]"
         style={{
           maskImage: "linear-gradient(to right, black 0%, transparent 45%)",
-          WebkitMaskImage: "linear-gradient(to right, black 0%, transparent 45%)"
+          WebkitMaskImage:
+            "linear-gradient(to right, black 0%, transparent 45%)",
         }}
       >
         <svg
-          className="absolute top-0 left-0 w-full h-full -scale-x-100"
+          className="absolute top-0 left-0 h-full w-full -scale-x-100"
           preserveAspectRatio="xMidYMid slice"
           viewBox="0 0 1440 800"
           xmlns="http://www.w3.org/2000/svg"
         >
           <g filter="url(#shadowDepth)">
-            <path d="M -100,800 C 200,600 400,750 800,450 C 1100,200 1300,100 1500,-50 L 1500,900 L -100,900 Z" fill="url(#contour1)" />
-            <path d="M 100,900 C 300,700 550,850 850,550 C 1050,350 1250,250 1500,100 L 1500,900 Z" fill="url(#contour2)" />
-            <path d="M 300,950 C 500,800 700,900 950,650 C 1150,450 1300,400 1500,300 L 1500,950 Z" fill="url(#contour3)" />
-            <path d="M 600,950 C 750,850 900,1000 1050,800 C 1200,600 1350,550 1500,450 L 1550,950 Z" fill="url(#contour4)" />
-            <path d="M 900,950 C 1050,900 1150,1050 1250,900 C 1350,750 1450,700 1550,600 L 1550,950 Z" fill="url(#contour5)" />
+            <path
+              d="M -100,800 C 200,600 400,750 800,450 C 1100,200 1300,100 1500,-50 L 1500,900 L -100,900 Z"
+              fill="url(#contour1)"
+            />
+            <path
+              d="M 100,900 C 300,700 550,850 850,550 C 1050,350 1250,250 1500,100 L 1500,900 Z"
+              fill="url(#contour2)"
+            />
+            <path
+              d="M 300,950 C 500,800 700,900 950,650 C 1150,450 1300,400 1500,300 L 1500,950 Z"
+              fill="url(#contour3)"
+            />
+            <path
+              d="M 600,950 C 750,850 900,1000 1050,800 C 1200,600 1350,550 1500,450 L 1550,950 Z"
+              fill="url(#contour4)"
+            />
+            <path
+              d="M 900,950 C 1050,900 1150,1050 1250,900 C 1350,750 1450,700 1550,600 L 1550,950 Z"
+              fill="url(#contour5)"
+            />
           </g>
         </svg>
       </div>
 
       {/* Ultra-fine minimalist noise overlay to give the vector a tactile aesthetic */}
-      <div 
-        className="absolute inset-0 mix-blend-overlay opacity-[0.25]"
-        style={{ 
-          backgroundImage: "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22 opacity=%221%22/%3E%3C/svg%3E')" 
+      <div
+        className="absolute inset-0 opacity-[0.25] mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.9%22 numOctaves=%224%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22 opacity=%221%22/%3E%3C/svg%3E')",
         }}
       />
     </div>

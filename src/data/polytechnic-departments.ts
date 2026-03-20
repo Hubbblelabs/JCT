@@ -1,41 +1,45 @@
 import type { DepartmentData } from "@/types/department";
 
 function buildPolyCurriculum(prefix: string): DepartmentData["curriculum"] {
-  const buildSemesters = (regYear: string) => Array.from({ length: 6 }, (_, index) => {
-    const semester = index + 1;
-    return {
-      semester,
-      subjects: [
-        {
-          code: `${prefix}${semester}01`,
-          name: semester <= 2 ? "Applied Science" : `Core Diploma Subject (${regYear})`,
-          credits: 4,
-          type: "Core" as const,
-        },
-        {
-          code: `${prefix}${semester}02`,
-          name: "Technical Drawing / Design",
-          credits: 3,
-          type: "Theory" as const,
-        },
-        {
-          code: `${prefix}${semester}03`,
-          name: "Workshop / Lab",
-          credits: 2,
-          type: "Lab" as const,
-        },
-        {
-          code: `${prefix}${semester}04`,
-          name:
-            semester === 6
-              ? "Industrial Training Project"
-              : "Skill Enhancement",
-          credits: regYear === "M Scheme" ? 3 : 2,
-          type: semester === 6 ? "Project" as const : "Elective" as const,
-        },
-      ],
-    };
-  });
+  const buildSemesters = (regYear: string) =>
+    Array.from({ length: 6 }, (_, index) => {
+      const semester = index + 1;
+      return {
+        semester,
+        subjects: [
+          {
+            code: `${prefix}${semester}01`,
+            name:
+              semester <= 2
+                ? "Applied Science"
+                : `Core Diploma Subject (${regYear})`,
+            credits: 4,
+            type: "Core" as const,
+          },
+          {
+            code: `${prefix}${semester}02`,
+            name: "Technical Drawing / Design",
+            credits: 3,
+            type: "Theory" as const,
+          },
+          {
+            code: `${prefix}${semester}03`,
+            name: "Workshop / Lab",
+            credits: 2,
+            type: "Lab" as const,
+          },
+          {
+            code: `${prefix}${semester}04`,
+            name:
+              semester === 6
+                ? "Industrial Training Project"
+                : "Skill Enhancement",
+            credits: regYear === "M Scheme" ? 3 : 2,
+            type: semester === 6 ? ("Project" as const) : ("Elective" as const),
+          },
+        ],
+      };
+    });
 
   return [
     {
@@ -45,7 +49,7 @@ function buildPolyCurriculum(prefix: string): DepartmentData["curriculum"] {
     {
       regulationName: "L Scheme",
       semesters: buildSemesters("L Scheme"),
-    }
+    },
   ];
 }
 

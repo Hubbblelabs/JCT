@@ -1,38 +1,40 @@
 import type { DepartmentData } from "@/types/department";
 
 function buildArtsCurriculum(prefix: string): DepartmentData["curriculum"] {
-  const buildSemesters = (regYear: string) => Array.from({ length: 6 }, (_, index) => {
-    const semester = index + 1;
-    return {
-      semester,
-      subjects: [
-        {
-          code: `${prefix}${semester}01`,
-          name: semester <= 2 ? "Foundation Course" : `Core Subject (${regYear})`,
-          credits: 4,
-          type: "Core" as const,
-        },
-        {
-          code: `${prefix}${semester}02`,
-          name: "Allied / Skill Course",
-          credits: 3,
-          type: "Elective" as const,
-        },
-        {
-          code: `${prefix}${semester}03`,
-          name: "Practical / Lab",
-          credits: 2,
-          type: "Lab" as const,
-        },
-        {
-          code: `${prefix}${semester}04`,
-          name: semester === 6 ? "Project / Internship" : "Value Education",
-          credits: regYear === "R2021" ? 3 : 2,
-          type: semester === 6 ? "Project" as const : "Theory" as const,
-        },
-      ],
-    };
-  });
+  const buildSemesters = (regYear: string) =>
+    Array.from({ length: 6 }, (_, index) => {
+      const semester = index + 1;
+      return {
+        semester,
+        subjects: [
+          {
+            code: `${prefix}${semester}01`,
+            name:
+              semester <= 2 ? "Foundation Course" : `Core Subject (${regYear})`,
+            credits: 4,
+            type: "Core" as const,
+          },
+          {
+            code: `${prefix}${semester}02`,
+            name: "Allied / Skill Course",
+            credits: 3,
+            type: "Elective" as const,
+          },
+          {
+            code: `${prefix}${semester}03`,
+            name: "Practical / Lab",
+            credits: 2,
+            type: "Lab" as const,
+          },
+          {
+            code: `${prefix}${semester}04`,
+            name: semester === 6 ? "Project / Internship" : "Value Education",
+            credits: regYear === "R2021" ? 3 : 2,
+            type: semester === 6 ? ("Project" as const) : ("Theory" as const),
+          },
+        ],
+      };
+    });
 
   return [
     {
@@ -42,7 +44,7 @@ function buildArtsCurriculum(prefix: string): DepartmentData["curriculum"] {
     {
       regulationName: "Regulation 2017",
       semesters: buildSemesters("R2017"),
-    }
+    },
   ];
 }
 

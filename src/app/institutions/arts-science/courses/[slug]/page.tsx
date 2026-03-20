@@ -72,7 +72,7 @@ export default async function CoursePage({
   }
 
   return (
-    <main className="arts-science-theme min-h-screen overflow-x-hidden bg-stone-50 font-sans text-arts-science-light">
+    <main className="arts-science-theme text-arts-science-light min-h-screen overflow-x-hidden bg-stone-50 font-sans">
       <Navbar />
 
       {/* Hero Section */}
@@ -108,7 +108,7 @@ export default async function CoursePage({
             </motion.div>
 
             <motion.div variants={fadeInUp}>
-              <span className="bg-arts-science-accent text-white mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase shadow-sm">
+              <span className="bg-arts-science-accent mb-6 inline-block rounded-full px-4 py-1.5 text-xs font-bold tracking-widest text-white uppercase shadow-sm">
                 UG Program &bull; {course.duration}
               </span>
             </motion.div>

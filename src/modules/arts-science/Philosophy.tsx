@@ -17,7 +17,7 @@ export function Philosophy() {
               Excellence matters
             </h2>
 
-            <p className="text-xl leading-relaxed font-light text-arts-science-light md:text-2xl">
+            <p className="text-arts-science-light text-xl leading-relaxed font-light md:text-2xl">
               We build leaders through innovation, integrity, and intellectual
               rigor across every discipline. Our programs in science, commerce,
               and the humanities are designed to develop analytical minds and

@@ -48,7 +48,7 @@ export function NewsEvents() {
           </div>
 
           <div className="mt-12 flex justify-center">
-            <Button className="from-arts-science-accent to-orange-600 h-14 rounded-full border border-orange-400/70 bg-linear-to-r px-8 font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-110">
+            <Button className="from-arts-science-accent h-14 rounded-full border border-orange-400/70 bg-linear-to-r to-orange-600 px-8 font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-110">
               View all news
             </Button>
           </div>
@@ -94,7 +94,7 @@ export function NewsEvents() {
           </div>
 
           <div className="mt-12 flex justify-center text-center">
-            <Button className="from-arts-science-accent to-orange-600 h-14 rounded-full border border-orange-400/70 bg-linear-to-r px-8 font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-110">
+            <Button className="from-arts-science-accent h-14 rounded-full border border-orange-400/70 bg-linear-to-r to-orange-600 px-8 font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-110">
               View all events
             </Button>
           </div>

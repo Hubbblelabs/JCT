@@ -90,7 +90,8 @@ const COLLEGE_JSON_BY_ID: Record<CollegeId, CollegeData> = {
     admissions: {
       mode: "Varies by institution",
       eligibility: {
-        engineering: "10+2 with PCM (or diploma for lateral entry) as per norms",
+        engineering:
+          "10+2 with PCM (or diploma for lateral entry) as per norms",
         "arts-and-science": "10+2 from a recognized board",
         polytechnic: "10th pass as per DOTE norms",
       },
@@ -101,14 +102,19 @@ const COLLEGE_JSON_BY_ID: Record<CollegeId, CollegeData> = {
         "Confirm admission through fee payment",
       ],
     },
-    courses: [...engineeringData.courses, ...artsScienceData.courses, ...polytechnicData.courses],
+    courses: [
+      ...engineeringData.courses,
+      ...artsScienceData.courses,
+      ...polytechnicData.courses,
+    ],
     facilities: [
       ...engineeringData.facilities,
       ...artsScienceData.facilities,
       ...polytechnicData.facilities,
     ],
     placements: {
-      description: "Placement support and outcomes vary by institution and program.",
+      description:
+        "Placement support and outcomes vary by institution and program.",
       highlights: [
         ...engineeringData.placements.highlights,
         ...artsScienceData.placements.highlights,
@@ -116,7 +122,11 @@ const COLLEGE_JSON_BY_ID: Record<CollegeId, CollegeData> = {
       ],
       top_recruiters: engineeringData.placements.top_recruiters,
     },
-    faq: [...engineeringData.faq, ...artsScienceData.faq, ...polytechnicData.faq],
+    faq: [
+      ...engineeringData.faq,
+      ...artsScienceData.faq,
+      ...polytechnicData.faq,
+    ],
   },
 };
 
@@ -130,8 +140,9 @@ function getUserMessages(messages: Message[]): string[] {
 function isFollowUpPrompt(text: string): boolean {
   const t = text.toLowerCase();
   return (
-    /^(explain|elaborate|details|detail|more|continue|what about|and what about)/.test(t) ||
-    /\b(those|that|them|it|this)\b/.test(t)
+    /^(explain|elaborate|details|detail|more|continue|what about|and what about)/.test(
+      t,
+    ) || /\b(those|that|them|it|this)\b/.test(t)
   );
 }
 
@@ -144,7 +155,7 @@ function deriveEffectiveQuestion(messages: Message[]): string {
 
   const latestHasStandaloneIntent =
     /\b(course|program|degree|diplom[a-z]*|engineering|polytechnic|arts|science|admission|placement|hostel|fees?)\b/i.test(
-      latest
+      latest,
     );
   if (latestHasStandaloneIntent) {
     return latest;
@@ -189,8 +200,13 @@ function getCollegeData(collegeId: CollegeId): CollegeData {
   return COLLEGE_JSON_BY_ID[collegeId] ?? COLLEGE_JSON_BY_ID.all;
 }
 
-function buildSystemPrompt(d: CollegeData, currentCollegeId: CollegeId): string {
-  const contactPhone = Array.isArray(d.college.phone) ? d.college.phone.join(" / ") : d.college.phone;
+function buildSystemPrompt(
+  d: CollegeData,
+  currentCollegeId: CollegeId,
+): string {
+  const contactPhone = Array.isArray(d.college.phone)
+    ? d.college.phone.join(" / ")
+    : d.college.phone;
   const admissionMode =
     d.admissions.mode ??
     (d.admissions.entranceExams && d.admissions.entranceExams.length > 0
@@ -203,13 +219,14 @@ function buildSystemPrompt(d: CollegeData, currentCollegeId: CollegeId): string 
       .join("\n") || "- Not specified in current data";
 
   const processText =
-    d.admissions.process.map((step, i) => `${i + 1}. ${step}`).join("\n") || "- Not specified in current data";
+    d.admissions.process.map((step, i) => `${i + 1}. ${step}`).join("\n") ||
+    "- Not specified in current data";
 
   const coursesText =
     d.courses
       .map(
         (course) =>
-          `- ${course.name} (${course.duration})${course.seats ? ` | Seats: ${course.seats}` : ""}${course.description ? ` | ${course.description}` : ""}`
+          `- ${course.name} (${course.duration})${course.seats ? ` | Seats: ${course.seats}` : ""}${course.description ? ` | ${course.description}` : ""}`,
       )
       .join("\n") || "- Not specified in current data";
 
@@ -284,13 +301,15 @@ ${d.faq.map((f) => `Q: ${f.q}\nA: ${f.a}`).join("\n\n")}
   `.trim();
 }
 
-function normalizeMessages(messages: Message[]): Array<{ role: "user" | "model"; parts: Array<{ text: string }> }> {
+function normalizeMessages(
+  messages: Message[],
+): Array<{ role: "user" | "model"; parts: Array<{ text: string }> }> {
   return messages
     .filter(
       (m): m is Message =>
         (m.role === "user" || m.role === "assistant") &&
         typeof m.content === "string" &&
-        m.content.trim().length > 0
+        m.content.trim().length > 0,
     )
     .slice(-10)
     .map((m) => ({
@@ -312,16 +331,25 @@ function findFaqAnswer(question: string, d: CollegeData): string | undefined {
       return true;
     }
 
-    const overlapCount = queryWords.filter((w) => faqQuestion.includes(w)).length;
+    const overlapCount = queryWords.filter((w) =>
+      faqQuestion.includes(w),
+    ).length;
     return overlapCount >= 2;
   });
   return match?.a;
 }
 
-function generateLocalReply(question: string, d: CollegeData, collegeId: CollegeId): string {
+function generateLocalReply(
+  question: string,
+  d: CollegeData,
+  collegeId: CollegeId,
+): string {
   const q = question.toLowerCase();
-  const phone = Array.isArray(d.college.phone) ? d.college.phone.join(" / ") : d.college.phone;
-  const findFacility = (keyword: string) => d.facilities.find((f) => f.toLowerCase().includes(keyword));
+  const phone = Array.isArray(d.college.phone)
+    ? d.college.phone.join(" / ")
+    : d.college.phone;
+  const findFacility = (keyword: string) =>
+    d.facilities.find((f) => f.toLowerCase().includes(keyword));
 
   if (/(kill|bomb|weapon|attack|violence|violent)/i.test(question)) {
     return "Jagannath: **_Support Scope_**\n- I can help only with admissions and college information.\n- Please ask about courses, admissions, facilities, placements, or contact details.";
@@ -337,12 +365,20 @@ function generateLocalReply(question: string, d: CollegeData, collegeId: College
     return "Jagannath: **_Nice to meet you!_**\n- My name is Jagannath.\n- I am the AI admissions assistant for JCT.\n- I can help with courses, admissions, facilities, placements, and contact details.";
   }
 
-  if (q.includes("course") || q.includes("program") || q.includes("degree") || q.includes("diploma") || q.includes("diplom")) {
+  if (
+    q.includes("course") ||
+    q.includes("program") ||
+    q.includes("degree") ||
+    q.includes("diploma") ||
+    q.includes("diplom")
+  ) {
     if (collegeId === "all") {
       const engineeringCourses = COLLEGE_JSON_BY_ID.engineering.courses
         .map((course) => `- ${course.name} (${course.duration})`)
         .join("\n");
-      const artsCourses = COLLEGE_JSON_BY_ID.arts.courses.map((course) => `- ${course.name} (${course.duration})`).join("\n");
+      const artsCourses = COLLEGE_JSON_BY_ID.arts.courses
+        .map((course) => `- ${course.name} (${course.duration})`)
+        .join("\n");
       const polytechnicCourses = COLLEGE_JSON_BY_ID.polytechnic.courses
         .map((course) => `- ${course.name} (${course.duration})`)
         .join("\n");
@@ -350,20 +386,38 @@ function generateLocalReply(question: string, d: CollegeData, collegeId: College
       return `Jagannath: **_Programs Across JCT Institutions_**\n\n**_Engineering_**\n${engineeringCourses}\n\n**_Arts and Science_**\n${artsCourses}\n\n**_Polytechnic (Diploma)_**\n${polytechnicCourses}`;
     }
 
-    const courseLines = d.courses.slice(0, 12).map((course) => `- ${course.name} (${course.duration})`).join("\n");
+    const courseLines = d.courses
+      .slice(0, 12)
+      .map((course) => `- ${course.name} (${course.duration})`)
+      .join("\n");
     return `Jagannath: **_Available Programs in our college_**\n${courseLines}\n\nYou can ask me about eligibility, admission process, or facilities for any specific program.`;
   }
 
-  if (q.includes("admission") || q.includes("apply") || q.includes("eligibility") || q.includes("selection")) {
-    const mode = d.admissions.mode ?? d.admissions.selection ?? d.admissions.entranceExams?.join(", ") ?? "Not specified in current data";
+  if (
+    q.includes("admission") ||
+    q.includes("apply") ||
+    q.includes("eligibility") ||
+    q.includes("selection")
+  ) {
+    const mode =
+      d.admissions.mode ??
+      d.admissions.selection ??
+      d.admissions.entranceExams?.join(", ") ??
+      "Not specified in current data";
     const eligibility = Object.entries(d.admissions.eligibility)
       .map(([k, v]) => `- ${k}: ${v}`)
       .join("\n");
-    const process = d.admissions.process.map((step, i) => `${i + 1}. ${step}`).join("\n");
+    const process = d.admissions.process
+      .map((step, i) => `${i + 1}. ${step}`)
+      .join("\n");
     return `Jagannath: **_Admission Details for our college_**\n- Mode: ${mode}\n- Application window: ${d.admissions.applicationWindow ?? "Not specified in current data"}\n\n**_Eligibility_**\n${eligibility}\n\n**_Process_**\n${process}`;
   }
 
-  if (q.includes("placement") || q.includes("recruiter") || q.includes("intern")) {
+  if (
+    q.includes("placement") ||
+    q.includes("recruiter") ||
+    q.includes("intern")
+  ) {
     const recruiters = d.placements.top_recruiters?.length
       ? `\nTop recruiters:\n${d.placements.top_recruiters.map((r) => `- ${r}`).join("\n")}`
       : "";
@@ -393,7 +447,8 @@ function generateLocalReply(question: string, d: CollegeData, collegeId: College
 
   if (q.includes("lab") || q.includes("laboratory") || q.includes("workshop")) {
     const labs = d.facilities.filter(
-      (f) => f.toLowerCase().includes("lab") || f.toLowerCase().includes("workshop")
+      (f) =>
+        f.toLowerCase().includes("lab") || f.toLowerCase().includes("workshop"),
     );
     return labs.length > 0
       ? `Jagannath: **_Labs and Workshops_**\n${labs.map((f) => `- ${f}`).join("\n")}`
@@ -401,7 +456,11 @@ function generateLocalReply(question: string, d: CollegeData, collegeId: College
   }
 
   if (q.includes("sport")) {
-    const sports = d.facilities.filter((f) => f.toLowerCase().includes("sport") || f.toLowerCase().includes("recreation"));
+    const sports = d.facilities.filter(
+      (f) =>
+        f.toLowerCase().includes("sport") ||
+        f.toLowerCase().includes("recreation"),
+    );
     return sports.length > 0
       ? `Jagannath: **_Sports Facilities_**\n${sports.map((f) => `- ${f}`).join("\n")}`
       : "Jagannath: I do not have that information in the current college data.";
@@ -411,7 +470,13 @@ function generateLocalReply(question: string, d: CollegeData, collegeId: College
     return `Jagannath: **_Campus Facilities in our college_**\n${d.facilities.map((f) => `- ${f}`).join("\n")}`;
   }
 
-  if (q.includes("contact") || q.includes("phone") || q.includes("email") || q.includes("website") || q.includes("location")) {
+  if (
+    q.includes("contact") ||
+    q.includes("phone") ||
+    q.includes("email") ||
+    q.includes("website") ||
+    q.includes("location")
+  ) {
     return `Jagannath: **_Contact Details for our college_**\n- Phone: ${phone}\n- Email: ${d.college.email}\n- Website: ${d.college.website}\n- Location: ${d.college.location}`;
   }
 
@@ -437,7 +502,10 @@ export async function POST(req: Request) {
     const body = (await req.json()) as ChatRequestBody;
     const { collegeId, messages } = body;
 
-    if (!collegeId || !["engineering", "arts", "polytechnic", "all"].includes(collegeId)) {
+    if (
+      !collegeId ||
+      !["engineering", "arts", "polytechnic", "all"].includes(collegeId)
+    ) {
       return new Response(JSON.stringify({ error: "Invalid collegeId" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
@@ -453,7 +521,11 @@ export async function POST(req: Request) {
 
     const collegeData = getCollegeData(collegeId);
     const effectiveQuestion = deriveEffectiveQuestion(messages);
-    const fallbackReply = generateLocalReply(effectiveQuestion, collegeData, collegeId);
+    const fallbackReply = generateLocalReply(
+      effectiveQuestion,
+      collegeData,
+      collegeId,
+    );
 
     const apiKey = getApiKey();
     if (!apiKey) {
@@ -481,7 +553,7 @@ export async function POST(req: Request) {
             maxOutputTokens: 1024,
           },
         }),
-      }
+      },
     );
 
     if (!geminiResponse.ok) {
@@ -522,7 +594,8 @@ export async function POST(req: Request) {
     return toSseResponse(text);
   } catch (error) {
     console.error("Chat API error:", error);
-    const safeFallback = "Jagannath: I am currently running in limited mode. Please ask about admissions, courses, facilities, placements, or contact details.";
+    const safeFallback =
+      "Jagannath: I am currently running in limited mode. Please ask about admissions, courses, facilities, placements, or contact details.";
     return toSseResponse(safeFallback);
   }
 }

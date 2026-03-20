@@ -26,7 +26,10 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setDesktopExpanded(null);
       }
     }
@@ -37,43 +40,46 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const navItems = isHomePage
     ? ["Home", "Institutions", "Placements", "Testimonials", "Campus Life"]
 
-      .map((name) => {
-        if (name === "Testimonials") {
-          return { name: "Testimonials", href: "/#testimonials" } as typeof navigationData[0];
-        }
-        return navigationData.find((item) => item.name === name);
-      })
-      .filter((item): item is NonNullable<typeof item> => Boolean(item))
-      .map((item) => {
-        if (item.name === "Institutions") {
-          return {
-            ...item,
-            href: "#",
-          };
-        }
+        .map((name) => {
+          if (name === "Testimonials") {
+            return {
+              name: "Testimonials",
+              href: "/#testimonials",
+            } as (typeof navigationData)[0];
+          }
+          return navigationData.find((item) => item.name === name);
+        })
+        .filter((item): item is NonNullable<typeof item> => Boolean(item))
+        .map((item) => {
+          if (item.name === "Institutions") {
+            return {
+              ...item,
+              href: "#",
+            };
+          }
 
-        if (item.name === "Placements") {
+          if (item.name === "Placements") {
+            return {
+              ...item,
+              href: "/#placements",
+              children: undefined,
+            };
+          }
+
+          if (item.name === "Campus Life") {
+            return {
+              ...item,
+              name: "Life@JCT",
+              href: "/campus-life",
+              children: undefined,
+            };
+          }
+
           return {
             ...item,
-            href: "/#placements",
             children: undefined,
           };
-        }
-
-        if (item.name === "Campus Life") {
-          return {
-            ...item,
-            name: "Life@JCT",
-            href: "/campus-life",
-            children: undefined,
-          };
-        }
-
-        return {
-          ...item,
-          children: undefined,
-        };
-      })
+        })
     : navigationData;
 
   useEffect(() => {
@@ -105,11 +111,15 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
         { name: "Engineering College", href: "/institutions/engineering" },
         { name: "Arts & Science College", href: "/institutions/arts-science" },
         { name: "Polytechnic College", href: "/institutions/polytechnic" },
-      ]
+      ],
     },
     { name: "Admissions", href: "/admissions", className: "hidden lg:block" },
     { name: "Placements", href: "/#placements", className: "hidden xl:block" },
-    { name: "Testimonials", href: "/#testimonials", className: "hidden xl:block" },
+    {
+      name: "Testimonials",
+      href: "/#testimonials",
+      className: "hidden xl:block",
+    },
     { name: "Life@JCT", href: "/#happenings", className: "hidden 2xl:block" },
     {
       name: "Explore More",
@@ -117,10 +127,14 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
       className: "lg:block 2xl:hidden",
       children: [
         { name: "Placements", href: "/#placements", className: "xl:hidden" },
-        { name: "Testimonials", href: "/#testimonials", className: "xl:hidden" },
+        {
+          name: "Testimonials",
+          href: "/#testimonials",
+          className: "xl:hidden",
+        },
         { name: "Life@JCT", href: "/#happenings", className: "2xl:hidden" },
-      ]
-    }
+      ],
+    },
   ];
 
   return (
@@ -148,12 +162,17 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
 
       {/* Main Nav */}
       <nav
-        className={`fixed ${bannerVisible && !isHomePage ? "top-10" : "top-4"} right-0 left-0 z-50 transition-all duration-300 px-4 md:px-8`}
+        className={`fixed ${bannerVisible && !isHomePage ? "top-10" : "top-4"} right-0 left-0 z-50 px-4 transition-all duration-300 md:px-8`}
       >
-        <div className={`mx-auto flex w-full max-w-360 items-center justify-between rounded-full border px-4 lg:px-7 py-2.5 transition-all duration-300 ${isSolid ? 'shadow-[0_8px_30px_rgba(0,0,0,0.4)] border-white/10 bg-[#0a1628]/95 backdrop-blur-md' : 'border-white/0 bg-transparent'}`}>
+        <div
+          className={`mx-auto flex w-full max-w-360 items-center justify-between rounded-full border px-4 py-2.5 transition-all duration-300 lg:px-7 ${isSolid ? "border-white/10 bg-[#0a1628]/95 shadow-[0_8px_30px_rgba(0,0,0,0.4)] backdrop-blur-md" : "border-white/0 bg-transparent"}`}
+        >
           {/* Logo Container */}
-          <div className="flex items-center lg:flex-1 justify-start shrink-0 z-50">
-            <Link href="/" className="flex shrink-0 items-center gap-2 lg:gap-3">
+          <div className="z-50 flex shrink-0 items-center justify-start lg:flex-1">
+            <Link
+              href="/"
+              className="flex shrink-0 items-center gap-2 lg:gap-3"
+            >
               <div className="relative h-7 w-7 lg:h-10 lg:w-10">
                 <Image
                   src="/jct_logo_yellow.png"
@@ -162,46 +181,60 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                   className="object-contain"
                 />
               </div>
-              <span className="font-sans text-lg lg:text-xl xl:text-[24px] font-bold tracking-tight transition-colors drop-shadow-sm whitespace-nowrap text-white">
+              <span className="font-sans text-lg font-bold tracking-tight whitespace-nowrap text-white drop-shadow-sm transition-colors lg:text-xl xl:text-[24px]">
                 JCT Institutions
               </span>
             </Link>
           </div>
 
           {/* Desktop Links */}
-          <div className="hidden items-center justify-center lg:flex whitespace-nowrap" ref={dropdownRef}>
+          <div
+            className="hidden items-center justify-center whitespace-nowrap lg:flex"
+            ref={dropdownRef}
+          >
             {navigationLinks.map((link) => {
-              const isActive = link.href === "/" ? pathname === "/" : (pathname.startsWith(link.href) && !link.href.includes("#"));
+              const isActive =
+                link.href === "/"
+                  ? pathname === "/"
+                  : pathname.startsWith(link.href) && !link.href.includes("#");
               const hasDropdown = !!link.children;
               const isExpanded = desktopExpanded === link.name;
 
               return (
-                <div key={link.name} className={`relative ${(link as any).className || ""}`}>
+                <div
+                  key={link.name}
+                  className={`relative ${(link as any).className || ""}`}
+                >
                   {hasDropdown ? (
                     <button
                       onClick={(e) => {
                         e.preventDefault();
                         setDesktopExpanded(isExpanded ? null : link.name);
                       }}
-                      className={`relative flex items-center justify-center gap-1.5 px-3 xl:px-5 py-2 font-sans text-sm xl:text-[15px] font-medium transition-colors ${isExpanded
-                        ? "text-[#d4a024]"
-                        : "text-white/90 hover:text-white"
-                        }`}
+                      className={`relative flex items-center justify-center gap-1.5 px-3 py-2 font-sans text-sm font-medium transition-colors xl:px-5 xl:text-[15px] ${
+                        isExpanded
+                          ? "text-[#d4a024]"
+                          : "text-white/90 hover:text-white"
+                      }`}
                     >
                       {link.name}
-                      <ChevronDown size={14} className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+                      <ChevronDown
+                        size={14}
+                        className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+                      />
                     </button>
                   ) : (
                     <Link
                       href={link.href}
-                      className={`relative flex items-center justify-center px-3 xl:px-5 py-2 font-sans text-sm xl:text-[15px] font-medium transition-colors ${isActive
-                        ? "text-[#d4a024]"
-                        : "text-white/90 hover:text-white"
-                        }`}
+                      className={`relative flex items-center justify-center px-3 py-2 font-sans text-sm font-medium transition-colors xl:px-5 xl:text-[15px] ${
+                        isActive
+                          ? "text-[#d4a024]"
+                          : "text-white/90 hover:text-white"
+                      }`}
                     >
                       {link.name}
                       {isActive && (
-                        <span className="absolute bottom-1 left-3 right-3 xl:left-5 xl:right-5 h-[2px] bg-[#d4a024]" />
+                        <span className="absolute right-3 bottom-1 left-3 h-[2px] bg-[#d4a024] xl:right-5 xl:left-5" />
                       )}
                     </Link>
                   )}
@@ -214,14 +247,14 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute left-0 top-full mt-2 w-60 rounded-xl border border-white/10 bg-[#0a1628]/95 p-2 shadow-xl backdrop-blur-md"
+                          className="absolute top-full left-0 mt-2 w-60 rounded-xl border border-white/10 bg-[#0a1628]/95 p-2 shadow-xl backdrop-blur-md"
                         >
                           {link.children?.map((child: any) => (
                             <Link
                               key={child.name}
                               href={child.href}
                               onClick={() => setDesktopExpanded(null)}
-                              className={`block rounded-lg px-4 py-2.5 font-sans whitespace-nowrap text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white ${child.className || ""}`}
+                              className={`block rounded-lg px-4 py-2.5 font-sans text-sm font-medium whitespace-nowrap text-white/90 transition-colors hover:bg-white/10 hover:text-white ${child.className || ""}`}
                             >
                               {child.name}
                             </Link>
@@ -236,20 +269,21 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
           </div>
 
           {/* Desktop Right */}
-          <div className="hidden items-center justify-end gap-3 xl:gap-6 lg:flex lg:flex-1 shrink-0 z-50 whitespace-nowrap">
+          <div className="z-50 hidden shrink-0 items-center justify-end gap-3 whitespace-nowrap lg:flex lg:flex-1 xl:gap-6">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="flex items-center gap-1.5 xl:gap-2 font-sans text-sm xl:text-[15px] font-medium transition-colors text-white/90 hover:text-white"
+              className="flex items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white xl:gap-2 xl:text-[15px]"
             >
-              <Phone size={16} className="xl:w-4 xl:h-4 w-3.5 h-3.5" />
+              <Phone size={16} className="h-3.5 w-3.5 xl:h-4 xl:w-4" />
               {siteConfig.contact.phone}
             </a>
             <Link
               href="/admissions/apply"
-              className={`inline-flex h-[38px] xl:h-[42px] items-center justify-center rounded-full px-5 xl:px-8 font-sans text-sm xl:text-[15px] font-medium transition-all hover:scale-105 active:scale-95 ${isSolid
-                ? 'bg-[#d4a024] text-[#0a1628] hover:bg-[#e8b84a] shadow-lg shadow-black/20 font-semibold'
-                : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
-                }`}
+              className={`inline-flex h-[38px] items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-[42px] xl:px-8 xl:text-[15px] ${
+                isSolid
+                  ? "bg-[#d4a024] font-semibold text-[#0a1628] shadow-lg shadow-black/20 hover:bg-[#e8b84a]"
+                  : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
+              }`}
             >
               Apply Now
             </Link>
@@ -257,11 +291,15 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
 
           {/* Mobile Toggle */}
           <button
-            className="p-2 transition-colors lg:hidden text-white hover:text-white/80 z-50 ml-auto"
+            className="z-50 ml-auto p-2 text-white transition-colors hover:text-white/80 lg:hidden"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
-            {isOpen ? <X size={32} strokeWidth={1.5} /> : <Menu size={32} strokeWidth={1.5} />}
+            {isOpen ? (
+              <X size={32} strokeWidth={1.5} />
+            ) : (
+              <Menu size={32} strokeWidth={1.5} />
+            )}
           </button>
         </div>
       </nav>
@@ -296,10 +334,10 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                     />
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-serif text-lg font-bold text-white leading-none">
+                    <span className="font-serif text-lg leading-none font-bold text-white">
                       JCT
                     </span>
-                    <span className="text-[10px] uppercase tracking-widest text-white/50 font-medium mt-0.5">
+                    <span className="mt-0.5 text-[10px] font-medium tracking-widest text-white/50 uppercase">
                       Institutions
                     </span>
                   </div>
@@ -315,73 +353,88 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               {/* Links */}
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
                 <div className="space-y-1">
-                  {(navigationLinks.flatMap(item => item.name === "Explore More" ? (item.children || []) : [item]) as any[])
-                    .filter(link => !link.className?.includes("hidden") || link.className?.includes("xl:hidden") || link.className?.includes("lg:hidden") || link.className?.includes("2xl:hidden"))
+                  {(
+                    navigationLinks.flatMap((item) =>
+                      item.name === "Explore More"
+                        ? item.children || []
+                        : [item],
+                    ) as any[]
+                  )
+                    .filter(
+                      (link) =>
+                        !link.className?.includes("hidden") ||
+                        link.className?.includes("xl:hidden") ||
+                        link.className?.includes("lg:hidden") ||
+                        link.className?.includes("2xl:hidden"),
+                    )
                     .map((link) => (
                       <div key={link.name} className="overflow-hidden">
-                      {link.children ? (
-                        <div>
-                          <button
-                            onClick={() => toggleMobileSection(link.name)}
-                            className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${mobileExpanded === link.name ? "bg-white/10 text-white shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                        {link.children ? (
+                          <div>
+                            <button
+                              onClick={() => toggleMobileSection(link.name)}
+                              className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${mobileExpanded === link.name ? "bg-white/10 text-white shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                            >
+                              {link.name}
+                              <ChevronDown
+                                size={16}
+                                className={`transition-transform duration-300 ${mobileExpanded === link.name ? "rotate-180" : ""}`}
+                              />
+                            </button>
+                            <AnimatePresence>
+                              {mobileExpanded === link.name && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{
+                                    duration: 0.25,
+                                    ease: "easeInOut",
+                                  }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="space-y-1 py-1 pr-2 pl-4">
+                                    {link.children.map((child: any) => (
+                                      <Link
+                                        key={child.name}
+                                        href={child.href}
+                                        onClick={() => setIsOpen(false)}
+                                        className="block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-[#d4a024]"
+                                      >
+                                        {child.name}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        ) : (
+                          <Link
+                            href={link.href}
+                            onClick={() => setIsOpen(false)}
+                            className={`block rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${pathname === link.href ? "bg-white/10 text-[#d4a024] shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
                           >
                             {link.name}
-                            <ChevronDown
-                              size={16}
-                              className={`transition-transform duration-300 ${mobileExpanded === link.name ? "rotate-180" : ""}`}
-                            />
-                          </button>
-                          <AnimatePresence>
-                            {mobileExpanded === link.name && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.25, ease: "easeInOut" }}
-                                className="overflow-hidden"
-                              >
-                                <div className="space-y-1 py-1 pl-4 pr-2">
-                                  {link.children.map((child: any) => (
-                                    <Link
-                                      key={child.name}
-                                      href={child.href}
-                                      onClick={() => setIsOpen(false)}
-                                      className="block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-[#d4a024]"
-                                    >
-                                      {child.name}
-                                    </Link>
-                                  ))}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      ) : (
-                        <Link
-                          href={link.href}
-                          onClick={() => setIsOpen(false)}
-                          className={`block rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${pathname === link.href ? "bg-white/10 text-[#d4a024] shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
-                        >
-                          {link.name}
-                        </Link>
-                      )}
-                    </div>
-                  ))}
+                          </Link>
+                        )}
+                      </div>
+                    ))}
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="space-y-3 p-5 pt-2 border-t border-white/5">
+              <div className="space-y-3 border-t border-white/5 p-5 pt-2">
                 <a
                   href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-white/5 font-sans text-sm font-medium text-white transition-all hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98]"
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-white/5 font-sans text-sm font-medium text-white transition-all hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98]"
                 >
                   <Phone size={16} /> {siteConfig.contact.phone}
                 </a>
                 <Link
                   href="/admissions/apply"
                   onClick={() => setIsOpen(false)}
-                  className="bg-[#d4a024] text-[#0a1628] hover:bg-[#e8b84a] flex h-12 w-full items-center justify-center gap-2 rounded-2xl font-sans text-sm font-bold shadow-lg shadow-[#d4a024]/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#d4a024] font-sans text-sm font-bold text-[#0a1628] shadow-lg shadow-[#d4a024]/10 transition-all hover:scale-[1.02] hover:bg-[#e8b84a] active:scale-[0.98]"
                 >
                   Apply Now <ArrowRight size={14} />
                 </Link>

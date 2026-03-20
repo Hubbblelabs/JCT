@@ -391,68 +391,75 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
               {/* Links */}
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
                 <div className="space-y-1">
-                  {mobileNavItems.map((link: EngineeringNavItem, index: number) => (
-                    <div key={`${link.name}-${link.href}-${index}`} className="overflow-hidden">
-                      {link.children ? (
-                        <div>
-                          <button
-                            type="button"
-                            onClick={() => toggleMobileSection(link.name)}
-                            className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${
-                              mobileExpanded === link.name
-                                ? "bg-white/10 text-white shadow-sm"
-                                : "text-white/70 hover:bg-white/5 hover:text-white"
-                            }`}
+                  {mobileNavItems.map(
+                    (link: EngineeringNavItem, index: number) => (
+                      <div
+                        key={`${link.name}-${link.href}-${index}`}
+                        className="overflow-hidden"
+                      >
+                        {link.children ? (
+                          <div>
+                            <button
+                              type="button"
+                              onClick={() => toggleMobileSection(link.name)}
+                              className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${
+                                mobileExpanded === link.name
+                                  ? "bg-white/10 text-white shadow-sm"
+                                  : "text-white/70 hover:bg-white/5 hover:text-white"
+                              }`}
+                            >
+                              {link.name}
+                              <ChevronDown
+                                size={16}
+                                className={`transition-transform duration-300 ${
+                                  mobileExpanded === link.name
+                                    ? "rotate-180"
+                                    : ""
+                                }`}
+                              />
+                            </button>
+                            <AnimatePresence>
+                              {mobileExpanded === link.name && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{
+                                    duration: 0.25,
+                                    ease: "easeInOut",
+                                  }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="space-y-1 py-1 pr-2 pl-4">
+                                    {link.children.map((child) => (
+                                      <Link
+                                        key={child.name}
+                                        href={child.href}
+                                        onClick={(e) =>
+                                          handleNavClick(e, child.href, true)
+                                        }
+                                        className="block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-amber-400"
+                                      >
+                                        {child.name}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        ) : (
+                          <Link
+                            href={link.href}
+                            onClick={(e) => handleNavClick(e, link.href, true)}
+                            className="block rounded-xl px-4 py-3 font-sans text-[15px] font-medium text-white/70 transition-all hover:bg-white/5 hover:text-white"
                           >
                             {link.name}
-                            <ChevronDown
-                              size={16}
-                              className={`transition-transform duration-300 ${
-                                mobileExpanded === link.name ? "rotate-180" : ""
-                              }`}
-                            />
-                          </button>
-                          <AnimatePresence>
-                            {mobileExpanded === link.name && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{
-                                  duration: 0.25,
-                                  ease: "easeInOut",
-                                }}
-                                className="overflow-hidden"
-                              >
-                                <div className="space-y-1 py-1 pr-2 pl-4">
-                                  {link.children.map((child) => (
-                                    <Link
-                                      key={child.name}
-                                      href={child.href}
-                                      onClick={(e) =>
-                                        handleNavClick(e, child.href, true)
-                                      }
-                                      className="block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-amber-400"
-                                    >
-                                      {child.name}
-                                    </Link>
-                                  ))}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      ) : (
-                        <Link
-                          href={link.href}
-                          onClick={(e) => handleNavClick(e, link.href, true)}
-                          className="block rounded-xl px-4 py-3 font-sans text-[15px] font-medium text-white/70 transition-all hover:bg-white/5 hover:text-white"
-                        >
-                          {link.name}
-                        </Link>
-                      )}
-                    </div>
-                  ))}
+                          </Link>
+                        )}
+                      </div>
+                    ),
+                  )}
                 </div>
               </div>
 

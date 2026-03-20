@@ -46,7 +46,7 @@ export function Admissions() {
                   {block.items.map((item) => (
                     <li
                       key={item}
-                      className="flex items-start gap-2 text-sm font-light text-arts-science-light"
+                      className="text-arts-science-light flex items-start gap-2 text-sm font-light"
                     >
                       <CheckCircle2
                         size={14}
@@ -63,7 +63,7 @@ export function Admissions() {
           <div className="mb-12 flex flex-col justify-center gap-4 sm:flex-row">
             <Button
               size="lg"
-              className="from-arts-science-accent to-orange-600 h-14 rounded-full border border-orange-400/70 bg-linear-to-r px-10 font-bold text-white shadow-[0_12px_28px_rgba(249,115,22,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-110"
+              className="from-arts-science-accent h-14 rounded-full border border-orange-400/70 bg-linear-to-r to-orange-600 px-10 font-bold text-white shadow-[0_12px_28px_rgba(249,115,22,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-110"
             >
               Apply for Admission <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
@@ -86,16 +86,21 @@ export function Admissions() {
                 href="tel:+919361488801"
                 className="hover:text-arts-science-dark flex items-center gap-3 text-stone-500 transition-colors"
               >
-                <Phone size={16} className="text-arts-science-accent" /> +91 93614 88801
+                <Phone size={16} className="text-arts-science-accent" /> +91
+                93614 88801
               </a>
               <a
                 href="mailto:artsscience@jct.edu"
                 className="hover:text-arts-science-dark flex items-center gap-3 text-stone-500 transition-colors"
               >
-                <Mail size={16} className="text-arts-science-accent" /> artsscience@jct.edu
+                <Mail size={16} className="text-arts-science-accent" />{" "}
+                artsscience@jct.edu
               </a>
               <div className="flex items-start gap-3 text-stone-500">
-                <MapPin size={16} className="text-arts-science-accent mt-0.5 shrink-0" />
+                <MapPin
+                  size={16}
+                  className="text-arts-science-accent mt-0.5 shrink-0"
+                />
                 <span>Knowledge Park, Pichanur, Coimbatore — 641105</span>
               </div>
             </div>

@@ -9,7 +9,13 @@ import {
 } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Phone, Settings, Palette, PencilRuler } from "lucide-react";
+import {
+  ArrowRight,
+  Phone,
+  Settings,
+  Palette,
+  PencilRuler,
+} from "lucide-react";
 
 const slides = [
   {
@@ -150,7 +156,7 @@ export function HomeHero() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="hidden md:block mb-5 md:mb-7"
+            className="mb-5 hidden md:mb-7 md:block"
           >
             <span className="inline-flex items-center rounded-md border border-white/20 bg-black/20 px-3 py-1.5 font-sans text-xs font-medium text-white/85 backdrop-blur-sm md:px-4 md:py-2">
               Established 2009 • Coimbatore, Tamil Nadu
@@ -165,12 +171,12 @@ export function HomeHero() {
               delay: 0.15,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="mb-10 md:mb-4 text-center md:text-left font-sans text-[42px] leading-[1.1] font-bold tracking-tight text-white md:font-serif md:text-5xl lg:text-6xl drop-shadow-lg"
+            className="mb-10 text-center font-sans text-[42px] leading-[1.1] font-bold tracking-tight text-white drop-shadow-lg md:mb-4 md:text-left md:font-serif md:text-5xl lg:text-6xl"
           >
             <span className="block md:inline">Three Colleges.</span>
             <span className="block md:hidden">One Commitment</span>
-            <span className="block md:hidden mt-0">to Your Success.</span>
-            <span className="hidden md:inline gradient-text ml-1 font-light italic md:ml-0">
+            <span className="mt-0 block md:hidden">to Your Success.</span>
+            <span className="gradient-text ml-1 hidden font-light italic md:ml-0 md:inline">
               One Commitment to Your Success.
             </span>
           </motion.h1>
@@ -197,7 +203,7 @@ export function HomeHero() {
           >
             <Link
               href="#admissions"
-              className="bg-gold text-navy hover:bg-gold-light shadow-gold/20 hidden md:inline-flex h-11 items-center gap-2 rounded-full px-6 font-sans text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95 md:h-13 md:px-7"
+              className="bg-gold text-navy hover:bg-gold-light shadow-gold/20 hidden h-11 items-center gap-2 rounded-full px-6 font-sans text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95 md:inline-flex md:h-13 md:px-7"
             >
               Apply Now <ArrowRight size={16} />
             </Link>

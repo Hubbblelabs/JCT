@@ -43,7 +43,7 @@ export function PartnerLogos() {
   const row2 = [...companies.slice().reverse(), ...companies.slice().reverse()];
 
   return (
-    <section className="overflow-hidden bg-arts-science-muted py-16 md:py-24">
+    <section className="bg-arts-science-muted overflow-hidden py-16 md:py-24">
       <div className="container mx-auto px-4 text-center md:px-8">
         <motion.h2
           initial={{ opacity: 0, y: 12 }}
@@ -57,8 +57,8 @@ export function PartnerLogos() {
 
       <div className="relative">
         {/* Fade edges */}
-        <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-16 bg-linear-to-r from-arts-science-muted to-transparent md:w-32" />
-        <div className="pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-16 bg-linear-to-l from-arts-science-muted to-transparent md:w-32" />
+        <div className="from-arts-science-muted pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-16 bg-linear-to-r to-transparent md:w-32" />
+        <div className="from-arts-science-muted pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-16 bg-linear-to-l to-transparent md:w-32" />
 
         {/* Row 1 — scrolls left */}
         <div className="mb-4">

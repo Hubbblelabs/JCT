@@ -58,34 +58,67 @@ function formatAssistantMessage(content: string): string {
 function getAssistantIcon(content: string) {
   const text = content.toLowerCase();
 
-  if (text.includes("support scope") || text.includes("limited mode")) return ShieldAlert;
-  if (text.includes("placement") || text.includes("recruiter") || text.includes("intern")) return Briefcase;
-  if (text.includes("course") || text.includes("program") || text.includes("degree") || text.includes("diplom")) return GraduationCap;
-  if (text.includes("admission") || text.includes("eligibility") || text.includes("apply") || text.includes("process")) return BookOpen;
+  if (text.includes("support scope") || text.includes("limited mode"))
+    return ShieldAlert;
+  if (
+    text.includes("placement") ||
+    text.includes("recruiter") ||
+    text.includes("intern")
+  )
+    return Briefcase;
+  if (
+    text.includes("course") ||
+    text.includes("program") ||
+    text.includes("degree") ||
+    text.includes("diplom")
+  )
+    return GraduationCap;
+  if (
+    text.includes("admission") ||
+    text.includes("eligibility") ||
+    text.includes("apply") ||
+    text.includes("process")
+  )
+    return BookOpen;
   if (text.includes("library")) return Library;
   if (text.includes("lab") || text.includes("workshop")) return FlaskConical;
-  if (text.includes("hostel") || text.includes("facility") || text.includes("campus")) return Building2;
+  if (
+    text.includes("hostel") ||
+    text.includes("facility") ||
+    text.includes("campus")
+  )
+    return Building2;
   if (text.includes("transport") || text.includes("bus")) return Bus;
-  if (text.includes("contact") || text.includes("phone") || text.includes("email") || text.includes("website")) return Phone;
+  if (
+    text.includes("contact") ||
+    text.includes("phone") ||
+    text.includes("email") ||
+    text.includes("website")
+  )
+    return Phone;
   return Bot;
 }
 
 const COLLEGE_META: Record<CollegeId, { title: string; welcome: string }> = {
   all: {
     title: "Jagannath",
-    welcome: "Jagannath: Hello. I can help with Engineering, Arts and Science, and Polytechnic programs.",
+    welcome:
+      "Jagannath: Hello. I can help with Engineering, Arts and Science, and Polytechnic programs.",
   },
   engineering: {
     title: "Jagannath",
-    welcome: "Jagannath: Hello. I can help with engineering programs, admissions, and facilities.",
+    welcome:
+      "Jagannath: Hello. I can help with engineering programs, admissions, and facilities.",
   },
   arts: {
     title: "Jagannath",
-    welcome: "Jagannath: Hello. I can help with arts and science courses, eligibility, and admissions.",
+    welcome:
+      "Jagannath: Hello. I can help with arts and science courses, eligibility, and admissions.",
   },
   polytechnic: {
     title: "Jagannath",
-    welcome: "Jagannath: Hello. I can help with diploma programs, admissions, and practical training.",
+    welcome:
+      "Jagannath: Hello. I can help with diploma programs, admissions, and practical training.",
   },
 };
 
@@ -131,7 +164,10 @@ export function ChatbotButton() {
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const collegeId = useMemo(() => getCollegeIdFromPath(pathname || ""), [pathname]);
+  const collegeId = useMemo(
+    () => getCollegeIdFromPath(pathname || ""),
+    [pathname],
+  );
   const meta = COLLEGE_META[collegeId];
   const frequentQuestions = FREQUENT_QUESTIONS[collegeId];
 
@@ -159,7 +195,11 @@ export function ChatbotButton() {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
 
-    const userMsg: Message = { id: String(Date.now()), role: "user", content: trimmed };
+    const userMsg: Message = {
+      id: String(Date.now()),
+      role: "user",
+      content: trimmed,
+    };
     const assistantMsg: Message = {
       id: String(Date.now() + 1),
       role: "assistant",
@@ -177,7 +217,9 @@ export function ChatbotButton() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           collegeId,
-          messages: nextMessages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+          messages: nextMessages
+            .slice(-10)
+            .map((m) => ({ role: m.role, content: m.content })),
         }),
       });
 
@@ -215,7 +257,11 @@ export function ChatbotButton() {
             const parsed = JSON.parse(payload) as { text?: string };
             if (parsed.text) {
               setMessages((prev) =>
-                prev.map((m) => (m.id === assistantMsg.id ? { ...m, content: m.content + parsed.text } : m))
+                prev.map((m) =>
+                  m.id === assistantMsg.id
+                    ? { ...m, content: m.content + parsed.text }
+                    : m,
+                ),
               );
             }
           } catch {
@@ -224,7 +270,10 @@ export function ChatbotButton() {
         }
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Sorry, I could not process that request. Please try again.";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Sorry, I could not process that request. Please try again.";
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantMsg.id
@@ -232,8 +281,8 @@ export function ChatbotButton() {
                 ...m,
                 content: `Jagannath: ${message}`,
               }
-            : m
-        )
+            : m,
+        ),
       );
     } finally {
       setIsLoading(false);
@@ -250,43 +299,52 @@ export function ChatbotButton() {
       <button
         aria-label={isOpen ? "Close chatbot" : "Open chatbot"}
         onClick={() => setIsOpen((open) => !open)}
-        className="bg-navy hover:bg-navy-mid fixed left-4 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all hover:scale-105 active:scale-95 md:left-6 md:bottom-8 md:h-16 md:w-16"
+        className="bg-navy hover:bg-navy-mid fixed bottom-6 left-4 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all hover:scale-105 active:scale-95 md:bottom-8 md:left-6 md:h-16 md:w-16"
       >
         <MessageCircle size={24} className="text-white md:scale-110" />
       </button>
 
       {isOpen && (
-        <div className="fixed left-4 bottom-24 z-50 flex h-[32rem] w-[22rem] flex-col overflow-hidden rounded-2xl border border-white/20 bg-white shadow-2xl md:left-6 md:bottom-32 md:w-[24rem]">
-          <div className="bg-navy text-white px-4 py-3">
+        <div className="fixed bottom-24 left-4 z-50 flex h-[32rem] w-[22rem] flex-col overflow-hidden rounded-2xl border border-white/20 bg-white shadow-2xl md:bottom-32 md:left-6 md:w-[24rem]">
+          <div className="bg-navy px-4 py-3 text-white">
             <p className="text-sm font-semibold">{meta.title}</p>
             <p className="text-xs text-white/80">JCT Admissions Assistant</p>
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto bg-slate-50 p-3">
             {messages.map((msg) => (
-              <div key={msg.id} className={msg.role === "user" ? "flex justify-end" : "flex justify-start"}>
+              <div
+                key={msg.id}
+                className={
+                  msg.role === "user"
+                    ? "flex justify-end"
+                    : "flex justify-start"
+                }
+              >
                 <div
                   className={
                     msg.role === "user"
-                      ? "max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-br-md bg-[#0D3B66] px-3 py-2 text-sm text-white"
-                      : "max-w-[85%] whitespace-pre-wrap rounded-2xl rounded-bl-md bg-white px-3 py-2 text-sm text-slate-700 shadow"
+                      ? "max-w-[85%] rounded-2xl rounded-br-md bg-[#0D3B66] px-3 py-2 text-sm whitespace-pre-wrap text-white"
+                      : "max-w-[85%] rounded-2xl rounded-bl-md bg-white px-3 py-2 text-sm whitespace-pre-wrap text-slate-700 shadow"
                   }
                 >
-                  {msg.role === "assistant" ? (
-                    (() => {
-                      const Icon = getAssistantIcon(msg.content);
-                      return (
-                        <span className="flex items-start gap-2">
-                          <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#EAF0FF] text-[#0D3B66]">
-                            <Icon size={12} />
+                  {msg.role === "assistant"
+                    ? (() => {
+                        const Icon = getAssistantIcon(msg.content);
+                        return (
+                          <span className="flex items-start gap-2">
+                            <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#EAF0FF] text-[#0D3B66]">
+                              <Icon size={12} />
+                            </span>
+                            <span
+                              dangerouslySetInnerHTML={{
+                                __html: formatAssistantMessage(msg.content),
+                              }}
+                            />
                           </span>
-                          <span dangerouslySetInnerHTML={{ __html: formatAssistantMessage(msg.content) }} />
-                        </span>
-                      );
-                    })()
-                  ) : (
-                    msg.content
-                  )}
+                        );
+                      })()
+                    : msg.content}
                 </div>
               </div>
             ))}
@@ -308,7 +366,10 @@ export function ChatbotButton() {
             </div>
           )}
 
-          <form onSubmit={onSubmit} className="flex gap-2 border-t bg-white p-3">
+          <form
+            onSubmit={onSubmit}
+            className="flex gap-2 border-t bg-white p-3"
+          >
             <input
               ref={inputRef}
               value={input}

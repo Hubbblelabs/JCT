@@ -9,7 +9,7 @@ const Accreditations = dynamic(
     import("@/components/layout/Accreditations").then(
       (mod) => mod.Accreditations,
     ),
-    
+
   { ssr: true },
 );
 const Institutions = dynamic(

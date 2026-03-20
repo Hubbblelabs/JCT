@@ -28,27 +28,87 @@ const polytechnicNavigation: PolytechnicNavItem[] = [
     name: "Institutions",
     href: "/institutions",
     children: [
-      { name: "Engineering", href: "/institutions/engineering", desc: "B.E, B.Tech, M.E programs" },
-      { name: "Arts & Science", href: "/institutions/arts-science", desc: "B.A, B.Sc, B.Com, BBA" },
-      { name: "Polytechnic", href: "/institutions/polytechnic", desc: "Diploma programs" }
-    ]
+      {
+        name: "Engineering",
+        href: "/institutions/engineering",
+        desc: "B.E, B.Tech, M.E programs",
+      },
+      {
+        name: "Arts & Science",
+        href: "/institutions/arts-science",
+        desc: "B.A, B.Sc, B.Com, BBA",
+      },
+      {
+        name: "Polytechnic",
+        href: "/institutions/polytechnic",
+        desc: "Diploma programs",
+      },
+    ],
   },
-  { name: "About Us", href: "/institutions/polytechnic#about-institution", className: "hidden xl:block" },
-  { name: "Courses", href: "/institutions/polytechnic#programs", className: "hidden xl:block" },
-  { name: "Admission", href: "/institutions/polytechnic#admissions", className: "hidden 2xl:block" },
-  { name: "Contact", href: "/institutions/polytechnic#contact", className: "hidden 2xl:block" },
+  {
+    name: "About Us",
+    href: "/institutions/polytechnic#about-institution",
+    className: "hidden xl:block",
+  },
+  {
+    name: "Courses",
+    href: "/institutions/polytechnic#programs",
+    className: "hidden xl:block",
+  },
+  {
+    name: "Admission",
+    href: "/institutions/polytechnic#admissions",
+    className: "hidden 2xl:block",
+  },
+  {
+    name: "Contact",
+    href: "/institutions/polytechnic#contact",
+    className: "hidden 2xl:block",
+  },
   {
     name: "Explore More",
     href: "#",
     children: [
-      { name: "About Us", href: "/institutions/polytechnic#about-institution", desc: "About our institution", className: "xl:hidden" },
-      { name: "Courses", href: "/institutions/polytechnic#programs", desc: "Programs offered", className: "xl:hidden" },
-      { name: "Admission", href: "/institutions/polytechnic#admissions", desc: "Admission process & criteria", className: "2xl:hidden" },
-      { name: "Contact", href: "/institutions/polytechnic#contact", desc: "Get in touch with us", className: "2xl:hidden" },
-      { name: "Placements", href: "/institutions/polytechnic#placements", desc: "Our recruitment partners & stats" },
-      { name: "Life @ JCT", href: "/institutions/polytechnic#happenings", desc: "News, events & student life" },
-      { name: "Testimonials", href: "/institutions/polytechnic#testimonials", desc: "Voices from our community" }
-    ]
+      {
+        name: "About Us",
+        href: "/institutions/polytechnic#about-institution",
+        desc: "About our institution",
+        className: "xl:hidden",
+      },
+      {
+        name: "Courses",
+        href: "/institutions/polytechnic#programs",
+        desc: "Programs offered",
+        className: "xl:hidden",
+      },
+      {
+        name: "Admission",
+        href: "/institutions/polytechnic#admissions",
+        desc: "Admission process & criteria",
+        className: "2xl:hidden",
+      },
+      {
+        name: "Contact",
+        href: "/institutions/polytechnic#contact",
+        desc: "Get in touch with us",
+        className: "2xl:hidden",
+      },
+      {
+        name: "Placements",
+        href: "/institutions/polytechnic#placements",
+        desc: "Our recruitment partners & stats",
+      },
+      {
+        name: "Life @ JCT",
+        href: "/institutions/polytechnic#happenings",
+        desc: "News, events & student life",
+      },
+      {
+        name: "Testimonials",
+        href: "/institutions/polytechnic#testimonials",
+        desc: "Voices from our community",
+      },
+    ],
   },
 ];
 
@@ -131,7 +191,10 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
       >
         <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
           {/* Logo */}
-          <Link href="/institutions/polytechnic" className="flex shrink-0 items-center gap-3">
+          <Link
+            href="/institutions/polytechnic"
+            className="flex shrink-0 items-center gap-3"
+          >
             <div className="relative h-10 w-10 md:h-11 md:w-11">
               <Image
                 src="/jct_logo_yellow.png"
@@ -142,7 +205,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-serif text-sm leading-none font-bold tracking-tight text-white whitespace-nowrap md:text-lg">
+              <span className="font-serif text-sm leading-none font-bold tracking-tight whitespace-nowrap text-white md:text-lg">
                 JCT Polytechnic College
               </span>
               <span className="mt-0.5 hidden font-sans text-[10px] font-medium tracking-[0.2em] text-white/40 uppercase sm:block">
@@ -165,7 +228,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 {link.children && link.href === "#" ? (
                   <button
                     type="button"
-                    className="flex items-center gap-1 px-3 py-2 font-sans text-base whitespace-nowrap font-medium text-white transition-colors hover:text-white/70"
+                    className="flex items-center gap-1 px-3 py-2 font-sans text-base font-medium whitespace-nowrap text-white transition-colors hover:text-white/70"
                   >
                     {link.name}
                     <ChevronDown
@@ -179,7 +242,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                   <Link
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    className="flex items-center gap-1 px-3 py-2 font-sans text-base whitespace-nowrap font-medium text-white transition-colors hover:text-white/70"
+                    className="flex items-center gap-1 px-3 py-2 font-sans text-base font-medium whitespace-nowrap text-white transition-colors hover:text-white/70"
                   >
                     {link.name}
                     {link.children && (
@@ -214,7 +277,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all hover:bg-white/6 ${child.className || ""}`}
                               >
                                 <div>
-                                  <p className="group-hover:text-gold font-sans whitespace-nowrap text-base font-medium text-white/90 transition-colors">
+                                  <p className="group-hover:text-gold font-sans text-base font-medium whitespace-nowrap text-white/90 transition-colors">
                                     {child.name}
                                   </p>
                                   {child.desc && (
@@ -243,14 +306,16 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
           <div className="hidden items-center gap-4 lg:flex">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="flex items-center gap-1.5 font-sans whitespace-nowrap text-base text-white/60 transition-colors hover:text-white"
+              className="flex items-center gap-1.5 font-sans text-base whitespace-nowrap text-white/60 transition-colors hover:text-white"
             >
               <Phone size={16} /> {siteConfig.contact.phone}
             </a>
             <Link
               href="/institutions/polytechnic#admissions"
-              onClick={(e) => handleNavClick(e, "/institutions/polytechnic#admissions")}
-              className="bg-gold text-polytechnic-dark hover:bg-gold-light shadow-gold/20 inline-flex flex-shrink-0 whitespace-nowrap h-10 items-center justify-center gap-2 rounded-full px-5 font-sans text-base font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
+              onClick={(e) =>
+                handleNavClick(e, "/institutions/polytechnic#admissions")
+              }
+              className="bg-gold text-polytechnic-dark hover:bg-gold-light shadow-gold/20 inline-flex h-10 flex-shrink-0 items-center justify-center gap-2 rounded-full px-5 font-sans text-base font-bold whitespace-nowrap shadow-lg transition-all hover:scale-105 active:scale-95"
             >
               Apply Now <ArrowRight size={16} />
             </Link>
@@ -297,8 +362,10 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                     />
                   </div>
                   <div className="flex flex-col text-white">
-                    <span className="font-serif text-lg leading-none font-bold">JCT</span>
-                    <span className="font-sans text-[10px] font-medium tracking-widest text-white/50 uppercase mt-0.5">
+                    <span className="font-serif text-lg leading-none font-bold">
+                      JCT
+                    </span>
+                    <span className="mt-0.5 font-sans text-[10px] font-medium tracking-widest text-white/50 uppercase">
                       Polytechnic
                     </span>
                   </div>
@@ -314,74 +381,97 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
               {/* Links */}
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
                 <div className="space-y-1">
-                  {(polytechnicNavigation.flatMap(item => item.name === "Explore More" ? (item.children || []) : [item]) as any[])
-                    .filter(link => !link.className?.includes("hidden") || link.className?.includes("xl:hidden") || link.className?.includes("lg:hidden") || link.className?.includes("2xl:hidden"))
+                  {(
+                    polytechnicNavigation.flatMap((item) =>
+                      item.name === "Explore More"
+                        ? item.children || []
+                        : [item],
+                    ) as any[]
+                  )
+                    .filter(
+                      (link) =>
+                        !link.className?.includes("hidden") ||
+                        link.className?.includes("xl:hidden") ||
+                        link.className?.includes("lg:hidden") ||
+                        link.className?.includes("2xl:hidden"),
+                    )
                     .map((link: any) => (
                       <div key={link.name} className="overflow-hidden">
-                      {link.children ? (
-                        <div>
-                          <button
-                            type="button"
-                            onClick={() => toggleMobileSection(link.name)}
-                            className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${mobileExpanded === link.name ? "bg-white/10 text-white shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                        {link.children ? (
+                          <div>
+                            <button
+                              type="button"
+                              onClick={() => toggleMobileSection(link.name)}
+                              className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${mobileExpanded === link.name ? "bg-white/10 text-white shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                            >
+                              {link.name}
+                              <ChevronDown
+                                size={16}
+                                className={`transition-transform duration-300 ${mobileExpanded === link.name ? "rotate-180" : ""}`}
+                              />
+                            </button>
+                            <AnimatePresence>
+                              {mobileExpanded === link.name && (
+                                <motion.div
+                                  initial={{ height: 0, opacity: 0 }}
+                                  animate={{ height: "auto", opacity: 1 }}
+                                  exit={{ height: 0, opacity: 0 }}
+                                  transition={{
+                                    duration: 0.25,
+                                    ease: "easeInOut",
+                                  }}
+                                  className="overflow-hidden"
+                                >
+                                  <div className="space-y-1 py-1 pr-2 pl-4">
+                                    {link.children.map((child: any) => (
+                                      <Link
+                                        key={child.name}
+                                        href={child.href}
+                                        onClick={(e) =>
+                                          handleNavClick(e, child.href, true)
+                                        }
+                                        className="hover:text-gold block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5"
+                                      >
+                                        {child.name}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        ) : (
+                          <Link
+                            href={link.href}
+                            onClick={(e) => handleNavClick(e, link.href, true)}
+                            className={`block rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${link.href.includes("#") && typeof window !== "undefined" && window.location.hash === (link.href.includes("#") ? link.href.slice(link.href.indexOf("#")) : "") ? "text-gold bg-white/10 shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
                           >
                             {link.name}
-                            <ChevronDown
-                              size={16}
-                              className={`transition-transform duration-300 ${mobileExpanded === link.name ? "rotate-180" : ""}`}
-                            />
-                          </button>
-                          <AnimatePresence>
-                            {mobileExpanded === link.name && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.25, ease: "easeInOut" }}
-                                className="overflow-hidden"
-                              >
-                                <div className="space-y-1 py-1 pl-4 pr-2">
-                                  {link.children.map((child: any) => (
-                                    <Link
-                                      key={child.name}
-                                      href={child.href}
-                                      onClick={(e) => handleNavClick(e, child.href, true)}
-                                      className="block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-gold"
-                                    >
-                                      {child.name}
-                                    </Link>
-                                  ))}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      ) : (
-                        <Link
-                          href={link.href}
-                          onClick={(e) => handleNavClick(e, link.href, true)}
-                          className={`block rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${link.href.includes("#") && typeof window !== 'undefined' && window.location.hash === (link.href.includes("#") ? link.href.slice(link.href.indexOf("#")) : "") ? "bg-white/10 text-gold shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
-                        >
-                          {link.name}
-                        </Link>
-                      )}
-                    </div>
-                  ))}
+                          </Link>
+                        )}
+                      </div>
+                    ))}
                 </div>
               </div>
 
               {/* Footer */}
-              <div className="space-y-3 p-5 pt-2 border-t border-white/5">
+              <div className="space-y-3 border-t border-white/5 p-5 pt-2">
                 <a
                   href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-white/5 font-sans text-sm font-medium text-white transition-all hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98]"
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-white/5 font-sans text-sm font-medium text-white transition-all hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98]"
                 >
                   <Phone size={16} /> {siteConfig.contact.phone}
                 </a>
                 <Link
                   href="/institutions/polytechnic#admissions"
-                  onClick={(e) => handleNavClick(e, "/institutions/polytechnic#admissions", true)}
-                  className="bg-gold text-[#0a1628] hover:bg-gold/80 flex h-12 w-full items-center justify-center gap-2 rounded-2xl font-sans text-sm font-bold shadow-lg shadow-gold/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                  onClick={(e) =>
+                    handleNavClick(
+                      e,
+                      "/institutions/polytechnic#admissions",
+                      true,
+                    )
+                  }
+                  className="bg-gold hover:bg-gold/80 shadow-gold/10 flex h-12 w-full items-center justify-center gap-2 rounded-2xl font-sans text-sm font-bold text-[#0a1628] shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   Apply Now <ArrowRight size={14} />
                 </Link>

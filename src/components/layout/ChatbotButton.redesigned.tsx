@@ -51,37 +51,73 @@ function formatAssistantMessage(content: string): string {
 
 function getAssistantIcon(content: string) {
   const text = content.toLowerCase();
-  if (text.includes("support scope") || text.includes("limited mode")) return ShieldAlert;
-  if (text.includes("placement") || text.includes("recruiter") || text.includes("intern")) return Briefcase;
-  if (text.includes("course") || text.includes("program") || text.includes("degree") || text.includes("diplom")) return GraduationCap;
-  if (text.includes("admission") || text.includes("eligibility") || text.includes("apply") || text.includes("process")) return BookOpen;
+  if (text.includes("support scope") || text.includes("limited mode"))
+    return ShieldAlert;
+  if (
+    text.includes("placement") ||
+    text.includes("recruiter") ||
+    text.includes("intern")
+  )
+    return Briefcase;
+  if (
+    text.includes("course") ||
+    text.includes("program") ||
+    text.includes("degree") ||
+    text.includes("diplom")
+  )
+    return GraduationCap;
+  if (
+    text.includes("admission") ||
+    text.includes("eligibility") ||
+    text.includes("apply") ||
+    text.includes("process")
+  )
+    return BookOpen;
   if (text.includes("library")) return Library;
   if (text.includes("lab") || text.includes("workshop")) return FlaskConical;
-  if (text.includes("hostel") || text.includes("facility") || text.includes("campus")) return Building2;
+  if (
+    text.includes("hostel") ||
+    text.includes("facility") ||
+    text.includes("campus")
+  )
+    return Building2;
   if (text.includes("transport") || text.includes("bus")) return Bus;
-  if (text.includes("contact") || text.includes("phone") || text.includes("email") || text.includes("website")) return Phone;
+  if (
+    text.includes("contact") ||
+    text.includes("phone") ||
+    text.includes("email") ||
+    text.includes("website")
+  )
+    return Phone;
   return Bot;
 }
 
-const COLLEGE_META: Record<CollegeId, { title: string; welcome: string; color: string }> = {
+const COLLEGE_META: Record<
+  CollegeId,
+  { title: string; welcome: string; color: string }
+> = {
   all: {
     title: "Jagannath",
-    welcome: "Jagannath: Hello! I can help with Engineering, Arts and Science, and Polytechnic programs. What would you like to know?",
+    welcome:
+      "Jagannath: Hello! I can help with Engineering, Arts and Science, and Polytechnic programs. What would you like to know?",
     color: "from-blue-600 to-blue-700",
   },
   engineering: {
     title: "Jagannath",
-    welcome: "Jagannath: Welcome! I can help with engineering programs, admissions, placements, and campus facilities. How can I assist?",
+    welcome:
+      "Jagannath: Welcome! I can help with engineering programs, admissions, placements, and campus facilities. How can I assist?",
     color: "from-indigo-600 to-indigo-700",
   },
   arts: {
     title: "Jagannath",
-    welcome: "Jagannath: Hello! I'm here to help with arts and science courses, eligibility requirements, and admissions. What's your question?",
+    welcome:
+      "Jagannath: Hello! I'm here to help with arts and science courses, eligibility requirements, and admissions. What's your question?",
     color: "from-amber-600 to-amber-700",
   },
   polytechnic: {
     title: "Jagannath",
-    welcome: "Jagannath: Hi there! I can guide you through diploma programs, admissions, and training opportunities. What would you like to know?",
+    welcome:
+      "Jagannath: Hi there! I can guide you through diploma programs, admissions, and training opportunities. What would you like to know?",
     color: "from-slate-700 to-slate-800",
   },
 };
@@ -123,9 +159,18 @@ function getCollegeIdFromPath(pathname: string): CollegeId {
 function TypingIndicator() {
   return (
     <div className="flex items-center gap-1.5">
-      <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-      <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-      <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+      <div
+        className="h-2 w-2 animate-bounce rounded-full bg-slate-400"
+        style={{ animationDelay: "0ms" }}
+      />
+      <div
+        className="h-2 w-2 animate-bounce rounded-full bg-slate-400"
+        style={{ animationDelay: "150ms" }}
+      />
+      <div
+        className="h-2 w-2 animate-bounce rounded-full bg-slate-400"
+        style={{ animationDelay: "300ms" }}
+      />
     </div>
   );
 }
@@ -139,7 +184,10 @@ export function ChatbotButton() {
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const collegeId = useMemo(() => getCollegeIdFromPath(pathname || ""), [pathname]);
+  const collegeId = useMemo(
+    () => getCollegeIdFromPath(pathname || ""),
+    [pathname],
+  );
   const meta = COLLEGE_META[collegeId];
   const frequentQuestions = FREQUENT_QUESTIONS[collegeId];
 
@@ -168,9 +216,9 @@ export function ChatbotButton() {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
 
-    const userMsg: Message = { 
-      id: String(Date.now()), 
-      role: "user", 
+    const userMsg: Message = {
+      id: String(Date.now()),
+      role: "user",
       content: trimmed,
       timestamp: new Date(),
     };
@@ -192,7 +240,9 @@ export function ChatbotButton() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           collegeId,
-          messages: nextMessages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+          messages: nextMessages
+            .slice(-10)
+            .map((m) => ({ role: m.role, content: m.content })),
         }),
       });
 
@@ -230,7 +280,11 @@ export function ChatbotButton() {
             const parsed = JSON.parse(payload) as { text?: string };
             if (parsed.text) {
               setMessages((prev) =>
-                prev.map((m) => (m.id === assistantMsg.id ? { ...m, content: m.content + parsed.text } : m))
+                prev.map((m) =>
+                  m.id === assistantMsg.id
+                    ? { ...m, content: m.content + parsed.text }
+                    : m,
+                ),
               );
             }
           } catch {
@@ -239,7 +293,10 @@ export function ChatbotButton() {
         }
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Sorry, I could not process that request. Please try again.";
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Sorry, I could not process that request. Please try again.";
       setMessages((prev) =>
         prev.map((m) =>
           m.id === assistantMsg.id
@@ -247,8 +304,8 @@ export function ChatbotButton() {
                 ...m,
                 content: `Jagannath: ${message}`,
               }
-            : m
-        )
+            : m,
+        ),
       );
     } finally {
       setIsLoading(false);
@@ -268,19 +325,29 @@ export function ChatbotButton() {
         whileTap={{ scale: 0.95 }}
         aria-label={isOpen ? "Close chatbot" : "Open chatbot"}
         onClick={() => setIsOpen((open) => !open)}
-        className={`fixed left-4 bottom-6 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-all md:left-6 md:bottom-8 md:h-16 md:w-16 ${
-          isOpen 
-            ? "bg-red-500 hover:bg-red-600" 
+        className={`fixed bottom-6 left-4 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-all md:bottom-8 md:left-6 md:h-16 md:w-16 ${
+          isOpen
+            ? "bg-red-500 hover:bg-red-600"
             : `bg-gradient-to-br ${meta.color} hover:shadow-2xl`
         }`}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
-            <motion.div key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }}>
+            <motion.div
+              key="close"
+              initial={{ rotate: -90, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              exit={{ rotate: 90, opacity: 0 }}
+            >
               <X size={24} className="text-white" />
             </motion.div>
           ) : (
-            <motion.div key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }}>
+            <motion.div
+              key="open"
+              initial={{ rotate: 90, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              exit={{ rotate: -90, opacity: 0 }}
+            >
               <MessageCircle size={24} className="text-white md:scale-110" />
             </motion.div>
           )}
@@ -295,18 +362,22 @@ export function ChatbotButton() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed left-4 bottom-24 z-50 flex h-[32rem] w-[22rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl md:left-6 md:bottom-32 md:w-[24rem]"
+            className="fixed bottom-24 left-4 z-50 flex h-[32rem] w-[22rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl md:bottom-32 md:left-6 md:w-[24rem]"
           >
             {/* Header */}
-            <div className={`bg-gradient-to-r ${meta.color} text-white px-4 py-4`}>
+            <div
+              className={`bg-gradient-to-r ${meta.color} px-4 py-4 text-white`}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20 backdrop-blur">
                     <Bot size={20} className="text-white" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm">{meta.title}</p>
-                    <p className="text-xs text-white/80">JCT Admissions Assistant</p>
+                    <p className="text-sm font-semibold">{meta.title}</p>
+                    <p className="text-xs text-white/80">
+                      JCT Admissions Assistant
+                    </p>
                   </div>
                 </div>
               </div>
@@ -321,28 +392,40 @@ export function ChatbotButton() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.05 }}
-                    className={msg.role === "user" ? "flex justify-end" : "flex justify-start"}
+                    className={
+                      msg.role === "user"
+                        ? "flex justify-end"
+                        : "flex justify-start"
+                    }
                   >
                     {msg.role === "assistant" ? (
-                      <div className="flex gap-2 max-w-[80%]">
+                      <div className="flex max-w-[80%] gap-2">
                         <div className="flex-shrink-0">
-                          <div className={`flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br ${meta.color}`}>
+                          <div
+                            className={`flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br ${meta.color}`}
+                          >
                             {(() => {
                               const Icon = getAssistantIcon(msg.content);
                               return <Icon size={14} className="text-white" />;
                             })()}
                           </div>
                         </div>
-                        <div className="rounded-2xl rounded-tl-sm bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm border border-slate-100">
+                        <div className="rounded-2xl rounded-tl-sm border border-slate-100 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm">
                           {msg.content ? (
-                            <span dangerouslySetInnerHTML={{ __html: formatAssistantMessage(msg.content) }} />
+                            <span
+                              dangerouslySetInnerHTML={{
+                                __html: formatAssistantMessage(msg.content),
+                              }}
+                            />
                           ) : (
                             <TypingIndicator />
                           )}
                         </div>
                       </div>
                     ) : (
-                      <div className={`max-w-[80%] rounded-2xl rounded-br-sm bg-gradient-to-br ${meta.color} px-4 py-2.5 text-sm text-white shadow-md`}>
+                      <div
+                        className={`max-w-[80%] rounded-2xl rounded-br-sm bg-gradient-to-br ${meta.color} px-4 py-2.5 text-sm text-white shadow-md`}
+                      >
                         {msg.content}
                       </div>
                     )}
@@ -361,7 +444,9 @@ export function ChatbotButton() {
                   exit={{ opacity: 0, height: 0 }}
                   className="border-t bg-slate-50 px-3 py-3"
                 >
-                  <p className="text-xs font-semibold text-slate-600 mb-2 px-1">Quick Questions:</p>
+                  <p className="mb-2 px-1 text-xs font-semibold text-slate-600">
+                    Quick Questions:
+                  </p>
                   <div className="flex flex-wrap gap-1.5">
                     {frequentQuestions.map((question) => (
                       <motion.button
@@ -370,7 +455,7 @@ export function ChatbotButton() {
                         whileTap={{ scale: 0.98 }}
                         type="button"
                         onClick={() => void sendMessage(question)}
-                        className={`rounded-full border-2 bg-white px-3 py-1.5 text-xs font-medium transition-all hover:shadow-md text-slate-700 border-slate-200 hover:border-slate-400 hover:bg-slate-50`}
+                        className={`rounded-full border-2 border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition-all hover:border-slate-400 hover:bg-slate-50 hover:shadow-md`}
                       >
                         {question}
                       </motion.button>
@@ -381,14 +466,17 @@ export function ChatbotButton() {
             </AnimatePresence>
 
             {/* Input Form */}
-            <form onSubmit={onSubmit} className="border-t bg-white px-3 py-3 flex gap-2">
+            <form
+              onSubmit={onSubmit}
+              className="flex gap-2 border-t bg-white px-3 py-3"
+            >
               <input
                 ref={inputRef}
                 value={input}
                 onChange={(event) => setInput(event.target.value)}
                 placeholder="Type your question..."
                 disabled={isLoading}
-                className="flex-1 rounded-full border-2 border-slate-200 focus:border-slate-400 px-4 py-2 text-sm outline-none transition-colors disabled:bg-slate-50 disabled:cursor-not-allowed"
+                className="flex-1 rounded-full border-2 border-slate-200 px-4 py-2 text-sm transition-colors outline-none focus:border-slate-400 disabled:cursor-not-allowed disabled:bg-slate-50"
               />
               <motion.button
                 whileHover={{ scale: 1.05 }}
@@ -398,7 +486,7 @@ export function ChatbotButton() {
                 className={`rounded-full p-2 transition-all ${
                   input.trim() && !isLoading
                     ? `bg-gradient-to-r ${meta.color} text-white hover:shadow-lg`
-                    : "bg-slate-200 text-slate-400 cursor-not-allowed"
+                    : "cursor-not-allowed bg-slate-200 text-slate-400"
                 }`}
               >
                 <Send size={18} />
