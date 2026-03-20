@@ -1,0 +1,129 @@
+{
+  "college": {
+    "id": "jct_engineering",
+    "name": "JCT College of Engineering and Technology",
+    "location": "Pichanur, Coimbatore – 641105, Tamil Nadu, India",
+    "phone": "+91-422-2636900",
+    "email": "info@jct.ac.in",
+    "website": "https://www.jct.ac.in/engineering/"
+  },
+  "about": {
+    "description": "JCT College of Engineering and Technology is an autonomous engineering institution in Coimbatore, established in 2009. It focuses on technical education, industry exposure, and practical training, aiming to prepare students for real-world engineering challenges.",
+    "affiliation": "Affiliated to Anna University and approved by AICTE",
+    "highlights": [
+      "Industry-oriented curriculum",
+      "Hands-on training and labs",
+      "Research and innovation focus",
+      "Strong placement support"
+    ]
+  },
+  "admissions": {
+    "mode": "TNEA counselling and management quota",
+    "eligibility": {
+      "be-btech": "10+2 with Physics, Chemistry, Mathematics with required cutoff as per norms",
+      "lateral-entry": "Diploma in relevant engineering stream with minimum qualifying marks"
+    },
+    "process": [
+      "Apply through TNEA counselling or direct admission",
+      "Submit academic documents",
+      "Verification and seat allotment",
+      "Fee payment and admission confirmation"
+    ]
+  },
+  "courses": [
+    {
+      "name": "B.E. Computer Science and Engineering",
+      "duration": "4 years"
+    },
+    {
+      "name": "B.E. Electronics and Communication Engineering",
+      "duration": "4 years"
+    },
+    {
+      "name": "B.E. Electrical and Electronics Engineering",
+      "duration": "4 years"
+    },
+    {
+      "name": "B.E. Mechanical Engineering",
+      "duration": "4 years"
+    },
+    {
+      "name": "B.E. Civil Engineering",
+      "duration": "4 years"
+    },
+    {
+      "name": "Artificial Intelligence and Data Science",
+      "duration": "4 years"
+    },
+    {
+      "name": "Computer Science and Business Systems",
+      "duration": "4 years"
+    },
+    {
+      "name": "Petroleum Engineering",
+      "duration": "4 years"
+    },
+    {
+      "name": "Petrochemical Engineering",
+      "duration": "4 years"
+    },
+    {
+      "name": "Food Technology",
+      "duration": "4 years"
+    },
+    {
+      "name": "Biotechnology and Biochemical Engineering",
+      "duration": "4 years"
+    }
+  ],
+  "facilities": [
+    "Advanced laboratories and workshops",
+    "Central library with large collection of books and journals",
+    "800+ computer systems with internet access",
+    "Hostel facilities (separate for boys and girls)",
+    "Transport services (multiple routes)",
+    "Sports and recreational facilities",
+    "Seminars, workshops, and industry visits"
+  ],
+  "placements": {
+    "description": "The college has an active placement cell that provides training and organizes campus recruitment drives.",
+    "top_recruiters": [
+      "TCS",
+      "Cognizant",
+      "Zoho",
+      "Reliance Industries",
+      "Ashok Leyland",
+      "24/7.ai",
+      "Quest Global"
+    ],
+    "highlights": [
+      "Regular campus drives",
+      "Internship opportunities",
+      "Industry collaborations",
+      "Skill development programs"
+    ]
+  },
+  "infrastructure": {
+    "campus_size": "Large campus with academic blocks, labs, and sports areas",
+    "labs": ["CNC labs", "Mechanical workshops", "Computer labs"],
+    "library": "Extensive collection of books, journals, and digital resources"
+  },
+  "faq": [
+    {
+      "q": "Is JCT Engineering autonomous?",
+      "a": "Yes, it is an autonomous institution affiliated with Anna University."
+    },
+    {
+      "q": "How many engineering courses are offered?",
+      "a": "The college offers more than 10 undergraduate engineering programs across multiple domains."
+    },
+    {
+      "q": "Are placements available?",
+      "a": "Yes, companies like TCS, Cognizant, Zoho, and Reliance visit the campus for recruitment."
+    },
+    {
+      "q": "Is hostel facility available?",
+      "a": "Yes, separate hostel facilities are available for boys and girls."
+    }
+  ]
+}

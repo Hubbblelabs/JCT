@@ -1,0 +1,103 @@
+{
+  "college": {
+    "id": "jct_cas",
+    "name": "JCT College of Arts and Science",
+    "location": "Pichanur, Coimbatore – 641105, Tamil Nadu, India",
+    "phone": ["+91-422-2636900", "+91-9361422201"],
+    "email": "info@jct.ac.in",
+    "website": "https://www.jct.ac.in/cas/"
+  },
+  "about": {
+    "description": "JCT College of Arts and Science is a newly established institution in Coimbatore offering undergraduate programs in computing, commerce, and management. The college focuses on industry-oriented learning, modern infrastructure, and skill development for real-world applications.",
+    "focus": [
+      "Industry-oriented education",
+      "Skill-based learning",
+      "Modern infrastructure",
+      "Career-focused programs"
+    ]
+  },
+  "admissions": {
+    "eligibility": {
+      "ug-programs": "10+2 from a recognized board (CBSE, ISC, Tamil Nadu or equivalent)."
+    },
+    "process": [
+      "Apply online through official website",
+      "Submit academic documents",
+      "Verification by institution",
+      "Admission confirmation after fee payment"
+    ],
+    "selection": "Merit-based admission (no national entrance exam required)"
+  },
+  "courses": [
+    {
+      "name": "B.Sc Computer Science",
+      "duration": "3 years",
+      "description": "Focuses on programming, software development, and computing fundamentals."
+    },
+    {
+      "name": "B.Sc Artificial Intelligence and Machine Learning",
+      "duration": "3 years",
+      "description": "Covers AI, data analysis, and machine learning applications."
+    },
+    {
+      "name": "BCA (Bachelor of Computer Applications)",
+      "duration": "3 years",
+      "description": "Prepares students for careers in software development and IT industries."
+    },
+    {
+      "name": "B.Com Logistics and Supply Chain Management",
+      "duration": "3 years",
+      "description": "Focuses on commerce with logistics and supply chain specialization."
+    },
+    {
+      "name": "BBA Logistics",
+      "duration": "3 years",
+      "description": "Covers business administration with logistics and shipping specialization."
+    }
+  ],
+  "facilities": [
+    "Modern classrooms",
+    "Computer labs (24/7 access)",
+    "Library and learning resources",
+    "Auditorium",
+    "Cafeteria and student spaces",
+    "Hostel facilities",
+    "Transport services",
+    "Sports and cultural activities"
+  ],
+  "placements": {
+    "description": "The institution provides career guidance, internship opportunities, and industry interaction sessions. As the college is relatively new, placement data is still developing.",
+    "highlights": [
+      "Career guidance and training",
+      "Internship support",
+      "Industry exposure sessions"
+    ]
+  },
+  "campus_life": {
+    "activities": [
+      "Cultural events",
+      "Student clubs",
+      "Sports activities",
+      "Festivals and celebrations"
+    ],
+    "environment": "Vibrant campus with focus on extracurricular and overall student development."
+  },
+  "faq": [
+    {
+      "q": "What courses are available at JCT Arts and Science?",
+      "a": "The college offers B.Sc (CS, AI & ML), BCA, B.Com Logistics, and BBA Logistics programs."
+    },
+    {
+      "q": "Is there an entrance exam required?",
+      "a": "No, admission is based on 12th marks (merit-based)."
+    },
+    {
+      "q": "Does the college provide hostel facilities?",
+      "a": "Yes, hostel facilities are available for students."
+    },
+    {
+      "q": "Are placements available?",
+      "a": "Yes, the college provides placement support, internships, and industry interaction, though it is still growing."
+    }
+  ]
+}

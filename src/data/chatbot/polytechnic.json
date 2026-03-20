@@ -1,0 +1,106 @@
+{
+  "college": {
+    "id": "jct_polytechnic",
+    "name": "JCT Polytechnic College",
+    "location": "Pichanur, Coimbatore – 641105, Tamil Nadu, India",
+    "phone": "+91-422-2636900",
+    "email": "info@jct.ac.in",
+    "website": "https://www.jct.ac.in/polytechnic/"
+  },
+  "about": {
+    "description": "JCT Polytechnic College provides diploma-level technical education with a strong focus on practical training and industry readiness. The institution emphasizes skill development, hands-on workshops, and technical expertise for early career entry.",
+    "focus": [
+      "Hands-on practical learning",
+      "Industry-oriented diploma programs",
+      "Skill development and employability",
+      "Technical training for real-world applications"
+    ]
+  },
+  "admissions": {
+    "mode": "Merit-based admission as per DOTE norms",
+    "eligibility": {
+      "diploma-programs": "10th pass from a recognized board",
+      "lateral-entry": "As per Tamil Nadu DOTE rules"
+    },
+    "process": [
+      "Apply online or through institution",
+      "Submit academic documents",
+      "Verification/counselling process",
+      "Fee payment and admission confirmation"
+    ]
+  },
+  "courses": [
+    {
+      "name": "Diploma in Mechanical Engineering",
+      "duration": "3 years"
+    },
+    {
+      "name": "Diploma in Civil Engineering",
+      "duration": "3 years"
+    },
+    {
+      "name": "Diploma in Electrical and Electronics Engineering",
+      "duration": "3 years"
+    },
+    {
+      "name": "Diploma in Petrochemical Engineering",
+      "duration": "3 years"
+    },
+    {
+      "name": "Diploma in Agricultural Engineering",
+      "duration": "3 years"
+    }
+  ],
+  "course_highlights": {
+    "mechanical": "Focus on workshops, manufacturing, and industrial machinery",
+    "civil": "Construction, structural basics, and site-level engineering",
+    "eee": "Electrical systems, circuits, and practical lab work",
+    "petrochemical": "Chemical processing and petroleum-based industries",
+    "agriculture": "Farm technology and agro-industrial applications"
+  },
+  "facilities": [
+    "Workshops and hands-on training labs",
+    "Modern technical laboratories",
+    "Library and learning resources",
+    "Industrial visits and training programs",
+    "Transport facilities",
+    "Hostel facilities",
+    "Student activities and events"
+  ],
+  "placements": {
+    "description": "The polytechnic supports students with skill-based training and industry exposure. Diploma students are prepared for both direct employment and higher studies through lateral entry.",
+    "highlights": [
+      "Industry-oriented skill training",
+      "Internship and industrial exposure",
+      "Support for lateral entry to engineering",
+      "Career guidance programs"
+    ]
+  },
+  "campus_life": {
+    "activities": [
+      "Technical workshops",
+      "Industrial visits",
+      "Cultural events",
+      "Student development programs"
+    ],
+    "environment": "Practical-focused learning environment with strong emphasis on technical skills."
+  },
+  "faq": [
+    {
+      "q": "What diploma courses are available?",
+      "a": "The college offers diploma programs in Mechanical, Civil, Electrical, Petrochemical, and Agricultural Engineering."
+    },
+    {
+      "q": "Is practical training included?",
+      "a": "Yes, the curriculum heavily focuses on workshops and hands-on training."
+    },
+    {
+      "q": "Can I join engineering after diploma?",
+      "a": "Yes, students can pursue lateral entry into B.E./B.Tech programs."
+    },
+    {
+      "q": "Is hostel facility available?",
+      "a": "Yes, hostel facilities are available for students."
+    }
+  ]
+}
