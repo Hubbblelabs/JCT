@@ -7,7 +7,8 @@ import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { CollegeTestimonials } from "@/components/layout/CollegeTestimonials";
-import { Navbar } from "@/components/layout/Navbar";
+import { EngineeringNavbar } from "@/modules/engineering/EngineeringNavbar";
+import { Placements } from "@/components/layout/Placements";
 import { Footer } from "@/components/layout/Footer";
 import {
   ArrowRight,
@@ -16,10 +17,7 @@ import {
   Zap,
   Building2,
   Wrench,
-  Trophy,
   Users,
-  Target,
-  TrendingUp,
   CheckCircle2,
   Phone,
   Mail,
@@ -108,26 +106,6 @@ const facilities = [
   },
 ];
 
-/* ─── Placement partners (names) ─── */
-const placementPartners = [
-  "TCS",
-  "Infosys",
-  "Wipro",
-  "L&T",
-  "Bosch",
-  "Ashok Leyland",
-  "Cognizant",
-  "HCL",
-  "Zoho",
-  "Freshworks",
-  "CTS",
-  "Hexaware",
-  "Sutherland",
-  "Mphasis",
-  "Capgemini",
-  "Tech Mahindra",
-];
-
 const testimonials = [
   {
     quote:
@@ -196,10 +174,11 @@ export default function EngineeringPage() {
 
   return (
     <main className="bg-background text-foreground engineering-theme min-h-screen overflow-x-hidden">
-      <Navbar />
+      <EngineeringNavbar />
 
       {/* ═══ HERO — Full-bleed, impact-driven ═══ */}
       <section
+        id="hero"
         ref={heroRef}
         className="bg-navy relative flex min-h-[90vh] items-center overflow-hidden md:min-h-screen"
       >
@@ -256,9 +235,13 @@ export default function EngineeringPage() {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="mb-8 max-w-lg text-sm leading-relaxed font-light text-white/80 md:text-base lg:text-lg"
               >
-                An autonomous institution affiliated to Anna University. Five
-                cutting-edge engineering departments, industry-grade labs, and a
-                placement record that speaks for itself.
+                An{" "}
+                <span className="text-engineering-muted font-semibold">
+                  autonomous
+                </span>{" "}
+                institution affiliated to Anna University. Five cutting-edge
+                engineering departments, industry-grade labs, and a placement
+                record that speaks for itself.
               </motion.p>
 
               <motion.div
@@ -315,8 +298,89 @@ export default function EngineeringPage() {
         </div>
       </section>
 
+      {/* ═══ ABOUT — Institution overview ═══ */}
+      <section id="about" className="bg-white py-16 md:py-24">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
+            <div>
+              <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
+                About Us
+              </h2>
+              <h3 className="text-navy mb-6 font-serif text-4xl leading-tight md:text-5xl">
+                Excellence in{" "}
+                <span className="font-light text-stone-300 italic">
+                  Engineering Education.
+                </span>
+              </h3>
+              <div className="space-y-4 text-base leading-relaxed font-light text-stone-600">
+                <p>
+                  JCT College of Engineering &amp; Technology is an{" "}
+                  <span className="text-engineering font-semibold">
+                    autonomous
+                  </span>{" "}
+                  institution affiliated to Anna University, Chennai.
+                  Established with a vision to provide world-class technical
+                  education, the college has consistently produced
+                  industry-ready graduates across five engineering disciplines.
+                </p>
+                <p>
+                  Approved by AICTE and recognized for academic excellence, our
+                  institution combines rigorous coursework with hands-on
+                  laboratory training, industry partnerships, and a robust
+                  placement ecosystem. With ISO 9001:2015 certification and a
+                  commitment to continuous improvement, JCT Engineering stands
+                  as a trusted name in technical education in Tamil Nadu.
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                {
+                  val: "AICTE",
+                  label: "Approved",
+                  desc: "All India Council for Technical Education",
+                },
+                {
+                  val: "Anna",
+                  label: "University",
+                  desc: "Affiliated to Anna University, Chennai",
+                },
+                {
+                  val: "ISO",
+                  label: "9001:2015",
+                  desc: "Certified quality management system",
+                },
+                {
+                  val: "NBA",
+                  label: "Applied",
+                  desc: "National Board of Accreditation",
+                },
+              ].map((item) => (
+                <div
+                  key={item.label}
+                  className="hover:border-engineering/20 rounded-2xl border border-stone-100 bg-stone-50 p-6 transition-colors"
+                >
+                  <span className="text-engineering mb-1 block font-sans text-2xl font-black">
+                    {item.val}
+                  </span>
+                  <span className="text-navy block text-sm font-bold">
+                    {item.label}
+                  </span>
+                  <span className="mt-1 block text-[11px] text-stone-400">
+                    {item.desc}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ ENGINEERING DOMAINS — Horizontal cards ═══ */}
-      <section className="relative bg-white py-16 md:py-24">
+      <section
+        id="engineering-domains"
+        className="relative bg-white py-16 md:py-24"
+      >
         {/* Subtle background pattern */}
         <div
           className="absolute inset-0 opacity-[0.02]"
@@ -404,7 +468,7 @@ export default function EngineeringPage() {
       </section>
 
       {/* ═══ METRICS — Numbers grid ═══ */}
-      <section className="bg-primary py-16 md:py-24">
+      <section id="courses" className="bg-primary py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mb-14 text-center">
             <h2 className="text-accent mb-4 text-xs font-bold tracking-[0.2em] uppercase">
@@ -442,7 +506,7 @@ export default function EngineeringPage() {
       </section>
 
       {/* ═══ RESEARCH & INNOVATION ═══ */}
-      <section className="bg-stone-50 py-16 md:py-24">
+      <section id="research" className="bg-stone-50 py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2">
             {/* Left: text content */}
@@ -524,102 +588,19 @@ export default function EngineeringPage() {
         </div>
       </section>
 
-      {/* ═══ PLACEMENTS — Data-driven showcase ═══ */}
-      <section className="bg-white py-16 md:py-24">
-        <div className="container mx-auto px-4 md:px-6">
-          <div className="mx-auto mb-16 max-w-2xl text-center">
-            <h2 className="mb-6 text-xs font-bold tracking-[0.2em] text-amber-600 uppercase">
-              Placements
-            </h2>
-            <h3 className="text-primary mb-6 font-serif text-4xl leading-tight md:text-5xl">
-              From Campus to{" "}
-              <span className="font-light text-stone-300 italic">Career.</span>
-            </h3>
-            <p className="leading-relaxed font-light text-stone-500">
-              The Training & Placement Cell works year-round — aptitude
-              coaching, mock interviews, resume workshops, and direct industry
-              connects. Here&apos;s who hires from us.
-            </p>
-          </div>
-
-          {/* Placement stats highlight */}
-          <div className="mb-14 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {[
-              {
-                icon: Target,
-                val: "92%",
-                label: "Placed",
-                desc: "of eligible graduates secured offers through campus placements in 2023-24.",
-              },
-              {
-                icon: TrendingUp,
-                val: "₹4.2 LPA",
-                label: "Average CTC",
-                desc: "across all departments. Top performers in CSE & ECE received significantly higher packages.",
-              },
-              {
-                icon: Trophy,
-                val: "₹8.4 LPA",
-                label: "Highest CTC",
-                desc: "offered by a leading IT products company to a CSE student with strong DSA skills.",
-              },
-            ].map((s) => (
-              <div
-                key={s.label}
-                className="rounded-2xl border border-stone-100 bg-stone-50 p-8"
-              >
-                <div className="mb-4 flex items-center gap-3">
-                  <div className="bg-accent/10 rounded-lg p-2">
-                    <s.icon size={20} className="text-accent" />
-                  </div>
-                  <span className="text-primary font-sans text-3xl font-black">
-                    {s.val}
-                  </span>
-                </div>
-                <h3 className="text-primary mb-2 text-sm font-bold tracking-wider uppercase">
-                  {s.label}
-                </h3>
-                <p className="text-sm leading-relaxed font-light text-stone-500">
-                  {s.desc}
-                </p>
-              </div>
-            ))}
-          </div>
-
-          {/* Recruiters marquee */}
-          <div className="relative overflow-hidden">
-            <div className="absolute top-0 bottom-0 left-0 z-10 w-24 bg-linear-to-r from-white to-transparent" />
-            <div className="absolute top-0 right-0 bottom-0 z-10 w-24 bg-linear-to-l from-white to-transparent" />
-            <motion.div
-              animate={{ x: ["0%", "-50%"] }}
-              transition={{ repeat: Infinity, duration: 30, ease: "linear" }}
-              className="flex gap-4 whitespace-nowrap"
-            >
-              {[...placementPartners, ...placementPartners].map((name, i) => (
-                <div
-                  key={`${name}-${i}`}
-                  className="inline-flex min-w-40 items-center justify-center rounded-xl border border-stone-100 bg-stone-50 px-8 py-4"
-                >
-                  <span className="text-sm font-bold text-stone-500">
-                    {name}
-                  </span>
-                </div>
-              ))}
-            </motion.div>
-          </div>
-        </div>
-      </section>
+      <Placements />
 
       <CollegeTestimonials
         title="Testimonials"
         subtitle="Stories from engineering students, alumni, and hiring partners who have experienced JCT's outcome-focused learning."
         accentColor="#D4A024"
         sectionBgClassName="bg-[#F8FAFC]"
+        sectionId="testimonials"
         items={testimonials}
       />
 
       {/* ═══ ADMISSIONS — Strong CTA ═══ */}
-      <section className="bg-primary py-16 md:py-24">
+      <section id="admission" className="bg-primary py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-2">
             {/* Left: CTA */}
@@ -680,6 +661,8 @@ export default function EngineeringPage() {
                 </Button>
               </div>
             </div>
+
+            <span id="contact" className="sr-only" />
 
             {/* Right: Contact card */}
             <div className="rounded-2xl border border-white/10 bg-white/5 p-10">
@@ -756,7 +739,9 @@ export default function EngineeringPage() {
         </div>
       </section>
 
-      <Footer />
+      <div id="footer">
+        <Footer />
+      </div>
     </main>
   );
 }

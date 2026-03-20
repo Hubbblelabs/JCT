@@ -36,6 +36,7 @@ import {
 import type { DepartmentData } from "@/types/department";
 import { Navbar } from "@/components/layout/Navbar";
 import { ArtsScienceNavbar } from "@/modules/arts-science/ArtsScienceNavbar";
+import { EngineeringNavbar } from "@/modules/engineering/EngineeringNavbar";
 import { PolytechnicNavbar } from "@/modules/polytechnic/PolytechnicNavbar";
 import { Footer } from "@/components/layout/Footer";
 
@@ -91,18 +92,23 @@ function SectionHeading({
 }) {
   return (
     <div className="mb-8">
-      <div className="flex items-center gap-3 mb-2">
+      <div className="mb-2 flex items-center gap-3">
         <div
           className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
           style={{ backgroundColor: `${ac}18`, border: `1.5px solid ${ac}30` }}
         >
           <Icon className="h-4 w-4" style={{ color: ac }} />
         </div>
-        <h2 className="text-xl font-bold tracking-tight text-gray-900 md:text-2xl">{title}</h2>
+        <h2 className="text-xl font-bold tracking-tight text-gray-900 md:text-2xl">
+          {title}
+        </h2>
       </div>
-      {subtitle && <p className="text-sm text-gray-500 ml-12">{subtitle}</p>}
-      <div className="mt-3 h-0.5 w-full bg-gray-100 relative">
-        <span className="absolute left-0 top-0 h-0.5 w-16 rounded-full" style={{ backgroundColor: ac }} />
+      {subtitle && <p className="ml-12 text-sm text-gray-500">{subtitle}</p>}
+      <div className="relative mt-3 h-0.5 w-full bg-gray-100">
+        <span
+          className="absolute top-0 left-0 h-0.5 w-16 rounded-full"
+          style={{ backgroundColor: ac }}
+        />
       </div>
     </div>
   );
@@ -128,7 +134,7 @@ function StatBento({
       }}
     >
       <div
-        className="pointer-events-none absolute -right-4 -top-4 h-20 w-20 rounded-full opacity-10 transition-transform duration-500 group-hover:scale-150"
+        className="pointer-events-none absolute -top-4 -right-4 h-20 w-20 rounded-full opacity-10 transition-transform duration-500 group-hover:scale-150"
         style={{ backgroundColor: ac }}
       />
       {Icon && (
@@ -136,10 +142,15 @@ function StatBento({
           <Icon className="h-4 w-4 opacity-40" style={{ color: ac }} />
         </div>
       )}
-      <p className="text-2xl font-black tracking-tight md:text-3xl" style={{ color: ac }}>
+      <p
+        className="text-2xl font-black tracking-tight md:text-3xl"
+        style={{ color: ac }}
+      >
         {value}
       </p>
-      <p className="mt-1 text-xs font-semibold tracking-wide text-gray-500 uppercase">{label}</p>
+      <p className="mt-1 text-xs font-semibold tracking-wide text-gray-500 uppercase">
+        {label}
+      </p>
     </div>
   );
 }
@@ -156,7 +167,9 @@ function Card({
   return (
     <div
       className={`rounded-2xl border border-gray-100 bg-white shadow-sm ${
-        hover ? "transition-all duration-300 hover:-translate-y-1 hover:shadow-md hover:border-gray-200" : ""
+        hover
+          ? "transition-all duration-300 hover:-translate-y-1 hover:border-gray-200 hover:shadow-md"
+          : ""
       } ${className}`}
     >
       {children}
@@ -216,7 +229,9 @@ function BoardTable({
         <tbody className="divide-y divide-gray-50">
           {members.map((m, i) => (
             <tr key={i} className="transition-colors hover:bg-gray-50/70">
-              <td className="px-5 py-3.5 font-semibold text-gray-900">{m.name}</td>
+              <td className="px-5 py-3.5 font-semibold text-gray-900">
+                {m.name}
+              </td>
               <td className="px-5 py-3.5 text-gray-600">{m.designation}</td>
               <td className="px-5 py-3.5 text-gray-500">{m.organization}</td>
               <td className="px-5 py-3.5">
@@ -232,16 +247,44 @@ function BoardTable({
 
 // ─── Tab: Overview ───────────────────────────────────────────────────────────
 
-function OverviewTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: string }) {
+function OverviewTab({
+  dept,
+  ac,
+  bg,
+}: {
+  dept: DepartmentData;
+  ac: string;
+  bg: string;
+}) {
   return (
     <div className="space-y-14">
       {/* Quick Stats Bento */}
       <FadeUp>
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-          <StatBento label="Established" value={dept.about.established} ac={ac} icon={Calendar} />
-          <StatBento label="Annual Intake" value={dept.about.intake} ac={ac} icon={Users} />
-          <StatBento label="Accreditation" value={dept.about.accreditation} ac={ac} icon={Award} />
-          <StatBento label="Affiliation" value={dept.about.affiliation} ac={ac} icon={BookMarked} />
+          <StatBento
+            label="Established"
+            value={dept.about.established}
+            ac={ac}
+            icon={Calendar}
+          />
+          <StatBento
+            label="Annual Intake"
+            value={dept.about.intake}
+            ac={ac}
+            icon={Users}
+          />
+          <StatBento
+            label="Accreditation"
+            value={dept.about.accreditation}
+            ac={ac}
+            icon={Award}
+          />
+          <StatBento
+            label="Affiliation"
+            value={dept.about.affiliation}
+            ac={ac}
+            icon={BookMarked}
+          />
         </div>
       </FadeUp>
 
@@ -272,12 +315,15 @@ function OverviewTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: s
               }}
             >
               <div
-                className="pointer-events-none absolute -right-10 -top-10 h-36 w-36 rounded-full opacity-20 blur-2xl"
+                className="pointer-events-none absolute -top-10 -right-10 h-36 w-36 rounded-full opacity-20 blur-2xl"
                 style={{ backgroundColor: ac }}
               />
               <div
                 className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-2xl font-black text-white shadow-xl sm:h-20 sm:w-20 sm:text-3xl"
-                style={{ backgroundColor: ac, boxShadow: `0 12px 32px ${ac}50` }}
+                style={{
+                  backgroundColor: ac,
+                  boxShadow: `0 12px 32px ${ac}50`,
+                }}
               >
                 {dept.hod.name
                   .split(" ")
@@ -286,8 +332,12 @@ function OverviewTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: s
                   .slice(0, 2)}
               </div>
               <div className="flex-1">
-                <p className="text-lg font-bold text-white sm:text-2xl">{dept.hod.name}</p>
-                <p className="text-sm font-medium text-white/75">{dept.hod.designation}</p>
+                <p className="text-lg font-bold text-white sm:text-2xl">
+                  {dept.hod.name}
+                </p>
+                <p className="text-sm font-medium text-white/75">
+                  {dept.hod.designation}
+                </p>
                 <div className="mt-2.5 flex flex-wrap gap-2">
                   <span className="rounded-full bg-black/25 px-3 py-1 text-xs text-white/90 backdrop-blur-sm">
                     {dept.hod.qualification}
@@ -303,7 +353,10 @@ function OverviewTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: s
             </div>
             {/* Message */}
             <div className="p-6 sm:p-8">
-              <Quote className="mb-4 h-8 w-8 opacity-10" style={{ color: ac }} />
+              <Quote
+                className="mb-4 h-8 w-8 opacity-10"
+                style={{ color: ac }}
+              />
               <div className="space-y-4 text-sm leading-relaxed text-gray-700 sm:text-[15px]">
                 {dept.hod.message.map((para, i) => (
                   <p key={i}>{para}</p>
@@ -327,14 +380,14 @@ function OverviewTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: s
               }}
             >
               <div
-                className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full opacity-25 blur-3xl"
+                className="pointer-events-none absolute -top-16 -right-16 h-48 w-48 rounded-full opacity-25 blur-3xl"
                 style={{ backgroundColor: ac }}
               />
               <div className="relative z-10">
                 <Badge ac={ac} variant="outline">
                   <Target className="h-3 w-3" /> Vision
                 </Badge>
-                <p className="mt-5 text-lg font-medium leading-relaxed sm:text-xl">
+                <p className="mt-5 text-lg leading-relaxed font-medium sm:text-xl">
                   {dept.visionMission.vision}
                 </p>
               </div>
@@ -349,7 +402,10 @@ function OverviewTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: s
               </Badge>
               <ul className="mt-5 space-y-4">
                 {dept.visionMission.mission.map((m, i) => (
-                  <li key={i} className="flex gap-3 text-sm text-gray-700 sm:text-[15px]">
+                  <li
+                    key={i}
+                    className="flex gap-3 text-sm text-gray-700 sm:text-[15px]"
+                  >
                     <div
                       className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-[10px] font-black text-white"
                       style={{ backgroundColor: ac }}
@@ -379,8 +435,12 @@ function OverviewTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: s
                   >
                     {po.code}
                   </span>
-                  <h4 className="mb-2 font-bold text-gray-900 line-clamp-2">{po.title}</h4>
-                  <p className="text-sm leading-relaxed text-gray-500">{po.description}</p>
+                  <h4 className="mb-2 line-clamp-2 font-bold text-gray-900">
+                    {po.title}
+                  </h4>
+                  <p className="text-sm leading-relaxed text-gray-500">
+                    {po.description}
+                  </p>
                 </Card>
               </FadeUp>
             ))}
@@ -395,21 +455,29 @@ function OverviewTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: s
 
 function AcademicsTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
   const [activeSemester, setActiveSemester] = useState(0);
-  
-  // Use regulations from the actual data
-  const regulations = dept.curriculum.map(c => c.regulationName);
-  const [activeRegulation, setActiveRegulation] = useState(regulations[0] || "");
 
-  const currentRegulationData = dept.curriculum.find(c => c.regulationName === activeRegulation);
+  // Use regulations from the actual data
+  const regulations = dept.curriculum.map((c) => c.regulationName);
+  const [activeRegulation, setActiveRegulation] = useState(
+    regulations[0] || "",
+  );
+
+  const currentRegulationData = dept.curriculum.find(
+    (c) => c.regulationName === activeRegulation,
+  );
   const semesters = currentRegulationData?.semesters || [];
 
   return (
     <div className="space-y-14">
       {/* Curriculum */}
       <section>
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-2">
-          <SectionHeading icon={BookOpen} title="Curriculum & Syllabus" ac={ac} />
-          
+        <div className="mb-2 flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
+          <SectionHeading
+            icon={BookOpen}
+            title="Curriculum & Syllabus"
+            ac={ac}
+          />
+
           {regulations.length > 0 && (
             <div className="flex shrink-0 items-center justify-between gap-1 overflow-x-auto rounded-xl border border-gray-200 bg-white p-1 shadow-sm sm:mt-1">
               {regulations.map((reg) => (
@@ -419,12 +487,14 @@ function AcademicsTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
                     setActiveRegulation(reg);
                     setActiveSemester(0); // Reset to Semester 1 on regulation change
                   }}
-                  className={`shrink-0 rounded-lg px-3 py-1.5 text-[11px] sm:text-xs font-bold transition-all ${
-                    activeRegulation === reg 
-                      ? "text-white shadow-sm" 
-                      : "text-gray-500 hover:text-gray-900 hover:bg-gray-50 bg-transparent"
+                  className={`shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition-all sm:text-xs ${
+                    activeRegulation === reg
+                      ? "text-white shadow-sm"
+                      : "bg-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                   }`}
-                  style={activeRegulation === reg ? { backgroundColor: ac } : {}}
+                  style={
+                    activeRegulation === reg ? { backgroundColor: ac } : {}
+                  }
                 >
                   {reg}
                 </button>
@@ -434,7 +504,7 @@ function AcademicsTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
         </div>
 
         <FadeUp>
-          <div className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="scrollbar-hide mb-5 flex gap-2 overflow-x-auto pb-1">
             {semesters.map((sem, i) => (
               <button
                 key={sem.semester}
@@ -442,7 +512,11 @@ function AcademicsTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
                 className="shrink-0 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-300"
                 style={
                   activeSemester === i
-                    ? { backgroundColor: ac, color: "#fff", boxShadow: `0 6px 16px ${ac}35` }
+                    ? {
+                        backgroundColor: ac,
+                        color: "#fff",
+                        boxShadow: `0 6px 16px ${ac}35`,
+                      }
                     : { backgroundColor: "#f3f4f6", color: "#6b7280" }
                 }
               >
@@ -477,17 +551,25 @@ function AcademicsTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {semesters[activeSemester].subjects.map((sub) => (
-                      <tr key={sub.code} className="transition-colors hover:bg-gray-50/70">
+                      <tr
+                        key={sub.code}
+                        className="transition-colors hover:bg-gray-50/70"
+                      >
                         <td className="px-5 py-3.5 font-mono text-xs font-semibold text-gray-400">
                           {sub.code}
                         </td>
-                        <td className="px-5 py-3.5 font-medium text-gray-900">{sub.name}</td>
-                        <td className="px-5 py-3.5 font-bold" style={{ color: ac }}>
+                        <td className="px-5 py-3.5 font-medium text-gray-900">
+                          {sub.name}
+                        </td>
+                        <td
+                          className="px-5 py-3.5 font-bold"
+                          style={{ color: ac }}
+                        >
                           {sub.credits}
                         </td>
                         <td className="px-5 py-3.5">
                           <span
-                            className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                            className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase ${
                               sub.type === "Lab"
                                 ? "bg-emerald-50 text-emerald-700"
                                 : sub.type === "Elective"
@@ -512,7 +594,11 @@ function AcademicsTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
 
       {/* Teaching & Learning */}
       <section>
-        <SectionHeading icon={Microscope} title="Teaching Learning Process" ac={ac} />
+        <SectionHeading
+          icon={Microscope}
+          title="Teaching Learning Process"
+          ac={ac}
+        />
         <FadeUp>
           <Card hover={false} className="mb-6 p-6 sm:p-8">
             <p className="text-sm leading-relaxed text-gray-700 sm:text-[15px]">
@@ -522,9 +608,21 @@ function AcademicsTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
         </FadeUp>
         <div className="grid gap-5 md:grid-cols-3">
           {[
-            { label: "Teaching Methods", items: dept.teachingLearning.methods, icon: BookOpen },
-            { label: "Tools & Technologies", items: dept.teachingLearning.tools, icon: Zap },
-            { label: "Best Practices", items: dept.teachingLearning.practices, icon: Star },
+            {
+              label: "Teaching Methods",
+              items: dept.teachingLearning.methods,
+              icon: BookOpen,
+            },
+            {
+              label: "Tools & Technologies",
+              items: dept.teachingLearning.tools,
+              icon: Zap,
+            },
+            {
+              label: "Best Practices",
+              items: dept.teachingLearning.practices,
+              icon: Star,
+            },
           ].map((col, ci) => (
             <FadeUp key={col.label} delay={ci * 0.08}>
               <Card className="h-full p-6">
@@ -541,7 +639,10 @@ function AcademicsTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
                 </div>
                 <ul className="space-y-2.5">
                   {col.items.map((item) => (
-                    <li key={item} className="flex items-start gap-2.5 text-sm text-gray-700">
+                    <li
+                      key={item}
+                      className="flex items-start gap-2.5 text-sm text-gray-700"
+                    >
                       <ChevronRight
                         className="mt-0.5 h-3.5 w-3.5 shrink-0 opacity-60"
                         style={{ color: ac }}
@@ -575,7 +676,9 @@ function AcademicsTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
                     <Briefcase className="h-3 w-3" />
                     {course.provider}
                   </div>
-                  <p className="text-sm leading-relaxed text-gray-600">{course.description}</p>
+                  <p className="text-sm leading-relaxed text-gray-600">
+                    {course.description}
+                  </p>
                 </Card>
               </FadeUp>
             ))}
@@ -612,7 +715,7 @@ function FacultyTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
                       .slice(0, 2)}
                   </div>
                   <div>
-                    <p className="font-bold text-gray-900 text-sm">{f.name}</p>
+                    <p className="text-sm font-bold text-gray-900">{f.name}</p>
                     <p className="text-xs text-gray-500">{f.designation}</p>
                   </div>
                 </div>
@@ -622,7 +725,10 @@ function FacultyTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
                   <Detail label="Specialization" value={f.specialization} />
                   {f.email && (
                     <div className="flex items-center gap-1.5 text-xs">
-                      <Mail className="h-3 w-3 opacity-40" style={{ color: ac }} />
+                      <Mail
+                        className="h-3 w-3 opacity-40"
+                        style={{ color: ac }}
+                      />
                       <span style={{ color: ac }}>{f.email}</span>
                     </div>
                   )}
@@ -638,21 +744,28 @@ function FacultyTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
             <table className="w-full text-sm">
               <thead>
                 <tr style={{ backgroundColor: `${ac}08` }}>
-                  {["Faculty Member", "Designation", "Qualification", "Experience", "Specialization"].map(
-                    (h) => (
-                      <th
-                        key={h}
-                        className="px-5 py-3.5 text-left text-[11px] font-black tracking-wider text-gray-500 uppercase"
-                      >
-                        {h}
-                      </th>
-                    )
-                  )}
+                  {[
+                    "Faculty Member",
+                    "Designation",
+                    "Qualification",
+                    "Experience",
+                    "Specialization",
+                  ].map((h) => (
+                    <th
+                      key={h}
+                      className="px-5 py-3.5 text-left text-[11px] font-black tracking-wider text-gray-500 uppercase"
+                    >
+                      {h}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {dept.faculty.map((f) => (
-                  <tr key={f.name} className="transition-colors hover:bg-gray-50/70">
+                  <tr
+                    key={f.name}
+                    className="transition-colors hover:bg-gray-50/70"
+                  >
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-3">
                         <div
@@ -665,13 +778,23 @@ function FacultyTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
                             .join("")
                             .slice(0, 2)}
                         </div>
-                        <span className="font-bold text-gray-900">{f.name}</span>
+                        <span className="font-bold text-gray-900">
+                          {f.name}
+                        </span>
                       </div>
                     </td>
-                    <td className="px-5 py-3.5 font-medium text-gray-700">{f.designation}</td>
-                    <td className="px-5 py-3.5 text-gray-500">{f.qualification}</td>
-                    <td className="px-5 py-3.5 text-gray-500">{f.experience}</td>
-                    <td className="px-5 py-3.5 text-gray-500">{f.specialization}</td>
+                    <td className="px-5 py-3.5 font-medium text-gray-700">
+                      {f.designation}
+                    </td>
+                    <td className="px-5 py-3.5 text-gray-500">
+                      {f.qualification}
+                    </td>
+                    <td className="px-5 py-3.5 text-gray-500">
+                      {f.experience}
+                    </td>
+                    <td className="px-5 py-3.5 text-gray-500">
+                      {f.specialization}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -683,7 +806,11 @@ function FacultyTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
       {/* Advisory Board */}
       {dept.advisoryBoard?.length > 0 && (
         <section>
-          <SectionHeading icon={Users} title="Department Advisory Board (DAB)" ac={ac} />
+          <SectionHeading
+            icon={Users}
+            title="Department Advisory Board (DAB)"
+            ac={ac}
+          />
           <FadeUp>
             <BoardTable members={dept.advisoryBoard} ac={ac} />
           </FadeUp>
@@ -693,7 +820,11 @@ function FacultyTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
       {/* PAC */}
       {dept.pac?.length > 0 && (
         <section>
-          <SectionHeading icon={Clipboard} title="Program Assessment Committee (PAC)" ac={ac} />
+          <SectionHeading
+            icon={Clipboard}
+            title="Program Assessment Committee (PAC)"
+            ac={ac}
+          />
           <FadeUp>
             <BoardTable members={dept.pac} ac={ac} />
           </FadeUp>
@@ -703,7 +834,11 @@ function FacultyTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
       {/* BOS */}
       {dept.bos?.length > 0 && (
         <section>
-          <SectionHeading icon={FileText} title="Board of Studies (BOS)" ac={ac} />
+          <SectionHeading
+            icon={FileText}
+            title="Board of Studies (BOS)"
+            ac={ac}
+          />
           <FadeUp>
             <BoardTable members={dept.bos} ac={ac} />
           </FadeUp>
@@ -720,7 +855,11 @@ function FacilitiesTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
     <div className="space-y-14">
       {/* Labs */}
       <section>
-        <SectionHeading icon={Beaker} title="Laboratories & Workspaces" ac={ac} />
+        <SectionHeading
+          icon={Beaker}
+          title="Laboratories & Workspaces"
+          ac={ac}
+        />
         <div className="grid gap-5 md:grid-cols-2">
           {dept.labs.map((lab, li) => (
             <FadeUp key={lab.name} delay={li * 0.07}>
@@ -728,7 +867,9 @@ function FacilitiesTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
                 {/* Lab header */}
                 <div
                   className="flex items-center gap-3.5 px-6 py-4"
-                  style={{ background: `linear-gradient(135deg, ${ac}12 0%, ${ac}04 100%)` }}
+                  style={{
+                    background: `linear-gradient(135deg, ${ac}12 0%, ${ac}04 100%)`,
+                  }}
                 >
                   <div
                     className="flex h-10 w-10 items-center justify-center rounded-xl bg-white shadow-sm"
@@ -739,7 +880,9 @@ function FacilitiesTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
                   <h4 className="font-bold text-gray-900">{lab.name}</h4>
                 </div>
                 <div className="p-6">
-                  <p className="mb-5 text-sm leading-relaxed text-gray-600">{lab.description}</p>
+                  <p className="mb-5 text-sm leading-relaxed text-gray-600">
+                    {lab.description}
+                  </p>
                   <p className="mb-2.5 text-[10px] font-black tracking-widest text-gray-400 uppercase">
                     Equipment & Tools
                   </p>
@@ -776,13 +919,21 @@ function FacilitiesTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
         </FadeUp>
         <div className="mb-5 grid grid-cols-3 gap-3">
           <FadeUp delay={0.04}>
-            <StatBento label="Volumes & Books" value={dept.library.books.toLocaleString()} ac={ac} />
+            <StatBento
+              label="Volumes & Books"
+              value={dept.library.books.toLocaleString()}
+              ac={ac}
+            />
           </FadeUp>
           <FadeUp delay={0.08}>
             <StatBento label="Journals" value={dept.library.journals} ac={ac} />
           </FadeUp>
           <FadeUp delay={0.12}>
-            <StatBento label="Magazines" value={dept.library.magazines} ac={ac} />
+            <StatBento
+              label="Magazines"
+              value={dept.library.magazines}
+              ac={ac}
+            />
           </FadeUp>
         </div>
         <FadeUp delay={0.16}>
@@ -795,7 +946,11 @@ function FacilitiesTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
                 <span
                   key={r}
                   className="rounded-xl px-3.5 py-1.5 text-sm font-semibold transition-colors hover:opacity-80"
-                  style={{ backgroundColor: `${ac}0d`, color: ac, border: `1px solid ${ac}20` }}
+                  style={{
+                    backgroundColor: `${ac}0d`,
+                    color: ac,
+                    border: `1px solid ${ac}20`,
+                  }}
                 >
                   {r}
                 </span>
@@ -810,14 +965,22 @@ function FacilitiesTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
 
 // ─── Tab: Life & Achievements ────────────────────────────────────────────────
 
-function LifeTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: string }) {
+function LifeTab({
+  dept,
+  ac,
+  bg,
+}: {
+  dept: DepartmentData;
+  ac: string;
+  bg: string;
+}) {
   return (
     <div className="space-y-14">
       <div className="grid gap-14 lg:grid-cols-2">
         {/* Events Timeline */}
         <section>
           <SectionHeading icon={Calendar} title="Events Organized" ac={ac} />
-          <div className="relative border-l-2 border-gray-100 pl-6 ml-3">
+          <div className="relative ml-3 border-l-2 border-gray-100 pl-6">
             {dept.events.map((ev, i) => (
               <FadeUp key={i} delay={i * 0.05}>
                 <div className="relative mb-8 last:mb-0">
@@ -827,17 +990,25 @@ function LifeTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: strin
                   />
                   <Card className="p-5">
                     <div className="mb-2.5 flex flex-wrap items-start justify-between gap-2">
-                      <h4 className="font-bold leading-snug text-gray-900">{ev.title}</h4>
+                      <h4 className="leading-snug font-bold text-gray-900">
+                        {ev.title}
+                      </h4>
                       <Badge ac={ac}>{ev.type}</Badge>
                     </div>
-                    <p className="mb-2 text-xs font-semibold text-gray-400">{ev.date}</p>
-                    <p className="text-sm leading-relaxed text-gray-600">{ev.description}</p>
+                    <p className="mb-2 text-xs font-semibold text-gray-400">
+                      {ev.date}
+                    </p>
+                    <p className="text-sm leading-relaxed text-gray-600">
+                      {ev.description}
+                    </p>
                     {ev.resourcePerson && (
                       <div
                         className="mt-3 inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs"
                         style={{ backgroundColor: `${ac}08` }}
                       >
-                        <span className="font-bold text-gray-500">Resource Person:</span>
+                        <span className="font-bold text-gray-500">
+                          Resource Person:
+                        </span>
                         <span className="font-semibold" style={{ color: ac }}>
                           {ev.resourcePerson}
                         </span>
@@ -854,7 +1025,11 @@ function LifeTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: strin
           {/* Student Achievements */}
           {dept.studentAchievements?.length > 0 && (
             <section>
-              <SectionHeading icon={Trophy} title="Student Achievements" ac={ac} />
+              <SectionHeading
+                icon={Trophy}
+                title="Student Achievements"
+                ac={ac}
+              />
               <div className="space-y-4">
                 {dept.studentAchievements.map((a, i) => (
                   <FadeUp key={i} delay={i * 0.05}>
@@ -862,17 +1037,26 @@ function LifeTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: strin
                       <div className="flex items-start gap-4">
                         <div
                           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                          style={{ backgroundColor: `${ac}12`, border: `1px solid ${ac}20` }}
+                          style={{
+                            backgroundColor: `${ac}12`,
+                            border: `1px solid ${ac}20`,
+                          }}
                         >
                           <Trophy className="h-4 w-4" style={{ color: ac }} />
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="mb-1 flex flex-wrap items-center gap-2">
                             <Badge ac={ac}>{a.year}</Badge>
                           </div>
-                          <p className="font-bold text-gray-900 text-sm">{a.name}</p>
-                          <p className="text-sm font-medium text-gray-700">{a.title}</p>
-                          <p className="mt-1 text-xs text-gray-500">{a.detail}</p>
+                          <p className="text-sm font-bold text-gray-900">
+                            {a.name}
+                          </p>
+                          <p className="text-sm font-medium text-gray-700">
+                            {a.title}
+                          </p>
+                          <p className="mt-1 text-xs text-gray-500">
+                            {a.detail}
+                          </p>
                         </div>
                       </div>
                     </Card>
@@ -885,7 +1069,11 @@ function LifeTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: strin
           {/* Faculty Achievements */}
           {dept.facultyAchievements?.length > 0 && (
             <section>
-              <SectionHeading icon={Award} title="Faculty Achievements" ac={ac} />
+              <SectionHeading
+                icon={Award}
+                title="Faculty Achievements"
+                ac={ac}
+              />
               <div className="space-y-4">
                 {dept.facultyAchievements.map((a, i) => (
                   <FadeUp key={i} delay={i * 0.05}>
@@ -893,15 +1081,24 @@ function LifeTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: strin
                       <div className="flex items-start gap-4">
                         <div
                           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                          style={{ backgroundColor: `${ac}12`, border: `1px solid ${ac}20` }}
+                          style={{
+                            backgroundColor: `${ac}12`,
+                            border: `1px solid ${ac}20`,
+                          }}
                         >
                           <Award className="h-4 w-4" style={{ color: ac }} />
                         </div>
-                        <div className="flex-1 min-w-0">
+                        <div className="min-w-0 flex-1">
                           <Badge ac={ac}>{a.year}</Badge>
-                          <p className="mt-1 font-bold text-gray-900 text-sm">{a.name}</p>
-                          <p className="text-sm font-medium text-gray-700">{a.title}</p>
-                          <p className="mt-1 text-xs text-gray-500">{a.detail}</p>
+                          <p className="mt-1 text-sm font-bold text-gray-900">
+                            {a.name}
+                          </p>
+                          <p className="text-sm font-medium text-gray-700">
+                            {a.title}
+                          </p>
+                          <p className="mt-1 text-xs text-gray-500">
+                            {a.detail}
+                          </p>
                         </div>
                       </div>
                     </Card>
@@ -914,7 +1111,11 @@ function LifeTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: strin
           {/* Magazine */}
           {dept.magazine && (
             <section>
-              <SectionHeading icon={Newspaper} title="Newsletter / Magazine" ac={ac} />
+              <SectionHeading
+                icon={Newspaper}
+                title="Newsletter / Magazine"
+                ac={ac}
+              />
               <FadeUp>
                 <Card hover={false} className="overflow-hidden">
                   <div
@@ -924,13 +1125,15 @@ function LifeTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: strin
                     }}
                   >
                     <div
-                      className="pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full opacity-25 blur-xl"
+                      className="pointer-events-none absolute -top-8 -right-8 h-28 w-28 rounded-full opacity-25 blur-xl"
                       style={{ backgroundColor: ac }}
                     />
                     <p className="mb-1 text-[10px] font-black tracking-widest text-white/60 uppercase">
                       Department Publication
                     </p>
-                    <h3 className="text-2xl font-black">{dept.magazine.name}</h3>
+                    <h3 className="text-2xl font-black">
+                      {dept.magazine.name}
+                    </h3>
                     <p className="mt-2 text-sm leading-relaxed text-white/75">
                       {dept.magazine.description}
                     </p>
@@ -941,13 +1144,17 @@ function LifeTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: strin
                         <p className="text-[10px] font-black tracking-widest text-gray-400 uppercase">
                           Frequency
                         </p>
-                        <p className="mt-1 font-bold text-gray-900">{dept.magazine.frequency}</p>
+                        <p className="mt-1 font-bold text-gray-900">
+                          {dept.magazine.frequency}
+                        </p>
                       </div>
                       <div>
                         <p className="text-[10px] font-black tracking-widest text-gray-400 uppercase">
                           Latest Issue
                         </p>
-                        <p className="mt-1 font-bold text-gray-900">{dept.magazine.latestIssue}</p>
+                        <p className="mt-1 font-bold text-gray-900">
+                          {dept.magazine.latestIssue}
+                        </p>
                       </div>
                     </div>
                     <p className="mb-3 text-[10px] font-black tracking-widest text-gray-400 uppercase">
@@ -955,7 +1162,10 @@ function LifeTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: strin
                     </p>
                     <ul className="space-y-2.5">
                       {dept.magazine.highlights.map((h, i) => (
-                        <li key={i} className="flex items-start gap-2.5 text-sm text-gray-700">
+                        <li
+                          key={i}
+                          className="flex items-start gap-2.5 text-sm text-gray-700"
+                        >
                           <ChevronRight
                             className="mt-0.5 h-3.5 w-3.5 shrink-0"
                             style={{ color: ac }}
@@ -994,7 +1204,9 @@ function LifeTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: strin
           </FadeUp>
           <FadeUp delay={0.08}>
             <Card hover={false} className="p-6 sm:p-8">
-              <h4 className="mb-4 font-bold text-gray-900">Faculty Workshops</h4>
+              <h4 className="mb-4 font-bold text-gray-900">
+                Faculty Workshops
+              </h4>
               <div className="flex flex-wrap gap-2">
                 {dept.facultyParticipation.workshops.map((w) => (
                   <span
@@ -1015,7 +1227,15 @@ function LifeTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: strin
 
 // ─── Tab: Career & Feedback ───────────────────────────────────────────────────
 
-function CareerTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: string }) {
+function CareerTab({
+  dept,
+  ac,
+  bg,
+}: {
+  dept: DepartmentData;
+  ac: string;
+  bg: string;
+}) {
   return (
     <div className="space-y-14">
       {/* Career Progression */}
@@ -1084,12 +1304,25 @@ function CareerTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: str
 
       {/* Feedback */}
       <section>
-        <SectionHeading icon={MessageSquare} title="Feedback & Improvements" ac={ac} />
+        <SectionHeading
+          icon={MessageSquare}
+          title="Feedback & Improvements"
+          ac={ac}
+        />
         <div className="grid gap-5 md:grid-cols-3">
           {[
-            { label: "Curriculum Feedback", items: dept.feedback.curriculumProcess },
-            { label: "Facility Feedback", items: dept.feedback.facilityProcess },
-            { label: "Recent Improvements", items: dept.feedback.recentImprovements },
+            {
+              label: "Curriculum Feedback",
+              items: dept.feedback.curriculumProcess,
+            },
+            {
+              label: "Facility Feedback",
+              items: dept.feedback.facilityProcess,
+            },
+            {
+              label: "Recent Improvements",
+              items: dept.feedback.recentImprovements,
+            },
           ].map((col, ci) => (
             <FadeUp key={col.label} delay={ci * 0.08}>
               <Card className="h-full p-6">
@@ -1125,7 +1358,9 @@ function CareerTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: str
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start gap-1 text-xs">
-      <span className="shrink-0 font-black text-gray-400 uppercase tracking-wide">{label}:</span>
+      <span className="shrink-0 font-black tracking-wide text-gray-400 uppercase">
+        {label}:
+      </span>
       <span className="text-gray-600">{value}</span>
     </div>
   );
@@ -1187,7 +1422,9 @@ export function DepartmentPageLayout({
 
   return (
     <>
-      {dept.college === "arts-science" ? (
+      {dept.college === "engineering" ? (
+        <EngineeringNavbar forceSolidOnTop />
+      ) : dept.college === "arts-science" ? (
         <ArtsScienceNavbar forceSolidOnTop />
       ) : dept.college === "polytechnic" ? (
         <PolytechnicNavbar forceSolidOnTop />
@@ -1196,7 +1433,10 @@ export function DepartmentPageLayout({
       )}
 
       {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <header className="relative min-h-[480px] overflow-hidden pt-28 pb-14 md:min-h-[540px]" style={{ backgroundColor: bg }}>
+      <header
+        className="relative min-h-[480px] overflow-hidden pt-28 pb-14 md:min-h-[540px]"
+        style={{ backgroundColor: bg }}
+      >
         {/* Background layers */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -1211,19 +1451,19 @@ export function DepartmentPageLayout({
           <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/65 to-black/40" />
           {/* Glow orb 1 */}
           <div
-            className="absolute -right-24 -top-24 h-80 w-80 rounded-full opacity-30 blur-[90px] animate-pulse"
+            className="absolute -top-24 -right-24 h-80 w-80 animate-pulse rounded-full opacity-30 blur-[90px]"
             style={{ backgroundColor: ac }}
           />
           {/* Glow orb 2 */}
           <div
-            className="absolute left-1/3 bottom-0 h-56 w-56 rounded-full opacity-15 blur-[70px]"
+            className="absolute bottom-0 left-1/3 h-56 w-56 rounded-full opacity-15 blur-[70px]"
             style={{ backgroundColor: ac }}
           />
           {/* Subtle dot grid */}
           <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:24px_24px]" />
         </div>
 
-        <div className="container relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="relative z-10 container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           {/* Back link */}
           <motion.div
             initial={{ opacity: 0, x: -16 }}
@@ -1247,7 +1487,7 @@ export function DepartmentPageLayout({
               transition={{ duration: 0.45, delay: 0.1 }}
             >
               <span
-                className="mb-5 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black uppercase tracking-[0.12em] backdrop-blur-sm"
+                className="mb-5 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black tracking-[0.12em] uppercase backdrop-blur-sm"
                 style={{
                   backgroundColor: `${ac}35`,
                   color: "#fff",
@@ -1263,8 +1503,12 @@ export function DepartmentPageLayout({
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-6 text-4xl font-black leading-[1.1] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl"
+              transition={{
+                duration: 0.6,
+                delay: 0.18,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+              className="mb-6 text-4xl leading-[1.1] font-black tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl"
             >
               {dept.name}
             </motion.h1>
@@ -1283,13 +1527,19 @@ export function DepartmentPageLayout({
               ].map((item, i) =>
                 item.value ? (
                   <div key={i} className="flex items-center gap-2">
-                    {i > 0 && <span className="h-1 w-1 rounded-full bg-white/30" />}
+                    {i > 0 && (
+                      <span className="h-1 w-1 rounded-full bg-white/30" />
+                    )}
                     <span>
-                      {item.label && <span className="opacity-60 mr-1">{item.label}</span>}
-                      <span className="font-semibold text-white">{item.value}</span>
+                      {item.label && (
+                        <span className="mr-1 opacity-60">{item.label}</span>
+                      )}
+                      <span className="font-semibold text-white">
+                        {item.value}
+                      </span>
                     </span>
                   </div>
-                ) : null
+                ) : null,
               )}
             </motion.div>
           </div>
@@ -1299,11 +1549,11 @@ export function DepartmentPageLayout({
       {/* ── Main Layout with Sidebar ──────────────────────────────────── */}
       <main className="min-h-screen bg-slate-50 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
+          <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
             {/* ── Floating Sidebar (Tabs) ──────────────────────────────── */}
-            <aside className="lg:w-72 shrink-0">
-              <div className="sticky top-24 z-40 lg:rounded-2xl lg:bg-white lg:p-3 lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)] lg:border lg:border-slate-200/60">
-                <nav className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-hide lg:flex-col lg:items-stretch lg:gap-1 lg:pb-0">
+            <aside className="shrink-0 lg:w-72">
+              <div className="sticky top-24 z-40 lg:rounded-2xl lg:border lg:border-slate-200/60 lg:bg-white lg:p-3 lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                <nav className="grid grid-cols-2 gap-2 pb-4 sm:grid-cols-3 lg:flex lg:flex-col lg:items-stretch lg:gap-1 lg:pb-0">
                   {TABS.map((tab) => {
                     const Icon = tab.icon;
                     const isActive = activeTab === tab.id;
@@ -1311,8 +1561,10 @@ export function DepartmentPageLayout({
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`relative flex w-full shrink-0 items-center justify-center lg:justify-start gap-2.5 rounded-full lg:rounded-xl px-5 py-2.5 lg:px-4 lg:py-3.5 text-sm font-semibold transition-all duration-300 ${
-                          isActive ? "" : "hover:bg-slate-200/50 lg:hover:bg-slate-50 text-slate-600"
+                        className={`relative flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-300 lg:justify-start lg:px-4 lg:py-3.5 ${
+                          isActive
+                            ? ""
+                            : "text-slate-600 hover:bg-slate-200/50 lg:hover:bg-slate-50"
                         }`}
                         style={isActive ? { color: ac } : {}}
                       >
@@ -1323,9 +1575,16 @@ export function DepartmentPageLayout({
                         {isActive && (
                           <motion.div
                             layoutId="activeTabIndicator"
-                            className="absolute inset-0 z-[-1] rounded-full lg:rounded-xl"
-                            style={{ backgroundColor: `${ac}12`, border: `1.5px solid ${ac}25` }}
-                            transition={{ type: "spring", bounce: 0.2, duration: 0.55 }}
+                            className="absolute inset-0 z-[-1] rounded-xl"
+                            style={{
+                              backgroundColor: `${ac}12`,
+                              border: `1.5px solid ${ac}25`,
+                            }}
+                            transition={{
+                              type: "spring",
+                              bounce: 0.2,
+                              duration: 0.55,
+                            }}
                           />
                         )}
                       </button>
@@ -1336,7 +1595,7 @@ export function DepartmentPageLayout({
             </aside>
 
             {/* ── Tab Content Container ───────────────────────────────── */}
-            <div className="flex-1 min-w-0 pb-16">
+            <div className="min-w-0 flex-1 pb-16">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeTab}

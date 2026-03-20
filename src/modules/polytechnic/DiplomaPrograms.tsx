@@ -93,7 +93,7 @@ export function DiplomaPrograms() {
       </div>
 
       <div
-        className="group/carousel relative mt-10 mb-2 flex w-full overflow-hidden py-4 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] md:[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]"
+        className="group/carousel relative mt-10 mb-2 flex w-full overflow-hidden py-4"
         onWheel={() => pauseCarouselTemporarily()}
         onTouchStart={() => pauseCarouselTemporarily()}
         onTouchMove={() => pauseCarouselTemporarily()}

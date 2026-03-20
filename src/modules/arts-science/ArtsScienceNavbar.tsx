@@ -294,11 +294,11 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               onClick={() => setIsOpen(false)}
             />
             <motion.div
-              initial={{ x: "-100%" }}
+              initial={{ x: "100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "-100%" }}
+              exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="fixed inset-y-4 left-4 z-[61] flex w-[280px] flex-col rounded-3xl border border-white/10 bg-[#111827]/90 shadow-2xl backdrop-blur-xl lg:hidden"
+              className="fixed inset-y-4 right-4 z-[61] flex w-[280px] flex-col rounded-3xl border border-white/10 bg-[#111827]/90 shadow-2xl backdrop-blur-xl lg:hidden"
             >
               {/* Header */}
               <div className="flex items-center justify-between border-b border-white/5 p-5">
