@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { motion, useInView, useSpring, useTransform } from "framer-motion";
 import { useEffect, useRef } from "react";
@@ -83,7 +83,7 @@ export function Hero() {
       </div> */}
 
       {/* Hero Content */}
-      <div className="container relative z-10 mx-auto flex flex-1 flex-col items-center justify-center gap-6 px-4 py-12 sm:gap-8 sm:py-16 md:gap-10 md:py-20 lg:py-24 text-center">
+      <div className="container relative z-10 mx-auto flex flex-1 flex-col items-center justify-center gap-6 px-4 pt-28 pb-12 sm:gap-8 sm:pt-32 sm:pb-16 md:gap-10 md:pt-36 md:pb-20 lg:pt-40 lg:pb-24 text-center">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -111,18 +111,14 @@ export function Hero() {
                 buttonVariants({ size: "lg" }),
                 "flex-1 sm:flex-none bg-arts-science-accent hover:bg-arts-science h-12 sm:h-14 gap-2 px-6 sm:px-8 font-medium text-white rounded-full text-sm sm:text-base transition-colors",
               )}
-            >
-              Apply Now <ArrowRight size={16} className="hidden sm:inline" />
-            </Link>
+            ><span>Apply Now</span><ArrowRight size={16} className="hidden sm:inline" /></Link>
             <Link
               href="#programs"
               className={cn(
                 buttonVariants({ variant: "outline", size: "lg" }),
-                "flex-1 sm:flex-none h-12 sm:h-14 border-gray-300 px-6 sm:px-8 font-medium text-gray-700 hover:bg-gray-100 rounded-full text-sm sm:text-base",
+                "flex-1 sm:flex-none h-12 sm:h-14 border-gray-300 px-6 sm:px-8 font-medium text-gray-700 hover:bg-gray-100 rounded-full text-sm sm:text-base transition-all",
               )}
-            >
-              Explore Programs
-            </Link>
+            ><span>Explore Programs</span></Link>
           </div>
 
           {/* Stats Row */}

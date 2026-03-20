@@ -18,7 +18,7 @@ export function Hero() {
       className="bg-polytechnic relative flex h-dvh flex-col justify-center overflow-hidden pb-50"
     >
       <CourseMuralBackground />
-      <div className="container relative z-10 mx-auto flex flex-col items-center justify-center px-4 md:px-6 lg:px-8 mt-16">
+      <div className="container relative z-10 mx-auto flex flex-col items-center justify-center px-4 md:px-6 lg:px-8 mt-28">
         {/* ─── Hero Header ─── */}
         <motion.div {...fadeUp(0)} className="text-center max-w-4xl">
           <h1 className="mb-6 font-serif text-5xl leading-tight font-bold text-white md:text-6xl lg:text-7xl">

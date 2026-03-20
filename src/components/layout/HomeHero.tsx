@@ -142,7 +142,7 @@ export function HomeHero() {
       </motion.div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto flex min-h-svh flex-1 flex-col justify-between px-4 pt-[88px] pb-3 sm:pt-[96px] md:px-6 md:pt-[104px] md:pb-5">
+      <div className="relative z-10 container mx-auto flex min-h-svh flex-1 flex-col justify-between px-4 pt-28 pb-3 md:px-6 md:pt-32 md:pb-5">
         {/* Main content area */}
         <div className="flex max-w-4xl flex-1 flex-col justify-center py-2 md:py-4">
           {/* Top badge */}

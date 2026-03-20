@@ -35,7 +35,7 @@ const newsItems = [
     excerpt:
       "JCT Institutions undergoes peer review for NAAC re-accreditation, with preliminary reports indicating strong outcomes.",
     category: "Accreditation",
-    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=crop",
+    image: "https://images.unsplash.com/photo-1525921429624-479b6c294a48?q=80&w=800&auto=format&fit=crop",
   },
 ];
 

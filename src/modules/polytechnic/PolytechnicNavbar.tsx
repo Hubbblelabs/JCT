@@ -279,14 +279,14 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
               onClick={() => setIsOpen(false)}
             />
             <motion.div
-              initial={{ x: "100%" }}
+              initial={{ x: "-100%" }}
               animate={{ x: 0 }}
-              exit={{ x: "100%" }}
+              exit={{ x: "-100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="bg-polytechnic-dark fixed inset-y-0 right-0 z-61 flex w-full flex-col sm:w-96 lg:hidden"
+              className="fixed inset-y-4 left-4 z-[61] flex w-[280px] flex-col rounded-3xl border border-white/10 bg-[#0a1628]/90 shadow-2xl backdrop-blur-xl lg:hidden"
             >
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-white/5 p-4 pt-6">
+              <div className="flex items-center justify-between border-b border-white/5 p-5">
                 <div className="flex items-center gap-3">
                   <div className="relative h-9 w-9">
                     <Image
@@ -296,89 +296,94 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                       className="object-contain"
                     />
                   </div>
-                  <span className="font-serif text-lg font-bold text-white">
-                    JCT Polytechnic
-                  </span>
+                  <div className="flex flex-col text-white">
+                    <span className="font-serif text-lg leading-none font-bold">JCT</span>
+                    <span className="font-sans text-[10px] font-medium tracking-widest text-white/50 uppercase mt-0.5">
+                      Polytechnic
+                    </span>
+                  </div>
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="rounded-full p-2 text-white/60 transition-colors hover:bg-white/5"
+                  className="rounded-full p-2 text-white/40 transition-colors hover:bg-white/5 hover:text-white"
                 >
-                  <X size={22} />
+                  <X size={20} />
                 </button>
               </div>
 
               {/* Links */}
-              <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-3">
-                {polytechnicNavigation.map((link) => (
-                  <div key={link.name} className={`border-b border-white/5 ${link.className || ""}`}>
-                    {link.children ? (
-                      <div>
-                        <button
-                          onClick={() => toggleMobileSection(link.name)}
-                          className="flex w-full items-center justify-between py-3 font-sans text-lg font-medium text-white/80 transition-colors hover:text-white"
+              <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
+                <div className="space-y-1">
+                  {(polytechnicNavigation.flatMap(item => item.name === "Explore More" ? (item.children || []) : [item]) as any[])
+                    .filter(link => !link.className?.includes("hidden") || link.className?.includes("xl:hidden") || link.className?.includes("lg:hidden") || link.className?.includes("2xl:hidden"))
+                    .map((link: any) => (
+                      <div key={link.name} className="overflow-hidden">
+                      {link.children ? (
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => toggleMobileSection(link.name)}
+                            className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${mobileExpanded === link.name ? "bg-white/10 text-white shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                          >
+                            {link.name}
+                            <ChevronDown
+                              size={16}
+                              className={`transition-transform duration-300 ${mobileExpanded === link.name ? "rotate-180" : ""}`}
+                            />
+                          </button>
+                          <AnimatePresence>
+                            {mobileExpanded === link.name && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.25, ease: "easeInOut" }}
+                                className="overflow-hidden"
+                              >
+                                <div className="space-y-1 py-1 pl-4 pr-2">
+                                  {link.children.map((child: any) => (
+                                    <Link
+                                      key={child.name}
+                                      href={child.href}
+                                      onClick={(e) => handleNavClick(e, child.href, true)}
+                                      className="block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-gold"
+                                    >
+                                      {child.name}
+                                    </Link>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      ) : (
+                        <Link
+                          href={link.href}
+                          onClick={(e) => handleNavClick(e, link.href, true)}
+                          className={`block rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${link.href.includes("#") && typeof window !== 'undefined' && window.location.hash === (link.href.includes("#") ? link.href.slice(link.href.indexOf("#")) : "") ? "bg-white/10 text-gold shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
                         >
                           {link.name}
-                          <ChevronDown
-                            size={16}
-                            className={`text-white/40 transition-transform duration-200 ${
-                              mobileExpanded === link.name ? "rotate-180" : ""
-                            }`}
-                          />
-                        </button>
-                        <AnimatePresence>
-                          {mobileExpanded === link.name && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              transition={{ duration: 0.2 }}
-                              className="overflow-hidden"
-                            >
-                              <div className="space-y-0.5 pb-3 pl-3">
-                                {link.children.map((child) => (
-                                  <Link
-                                    key={child.name}
-                                    href={child.href}
-                                    onClick={(e) => handleNavClick(e, child.href, true)}
-                                    className={`hover:text-gold block rounded-lg px-2 py-2 font-sans text-base text-white/60 transition-colors ${child.className || ""}`}
-                                  >
-                                    {child.name}
-                                  </Link>
-                                ))}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    ) : (
-                      <Link
-                        href={link.href}
-                        onClick={(e) => handleNavClick(e, link.href, true)}
-                        className="block py-3 font-sans text-lg font-medium text-white/80 transition-colors hover:text-white"
-                      >
-                        {link.name}
-                      </Link>
-                    )}
-                  </div>
-                ))}
+                        </Link>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Footer */}
-              <div className="border-t border-white/5 bg-white/5 p-4">
+              <div className="space-y-3 p-5 pt-2 border-t border-white/5">
                 <a
                   href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-                  className="mb-4 flex items-center justify-center gap-2 font-sans text-base font-medium text-white"
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-white/5 font-sans text-sm font-medium text-white transition-all hover:bg-white/10 hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  <Phone size={18} className="text-gold" />{" "}
-                  {siteConfig.contact.phone}
+                  <Phone size={16} /> {siteConfig.contact.phone}
                 </a>
                 <Link
                   href="/institutions/polytechnic#admissions"
                   onClick={(e) => handleNavClick(e, "/institutions/polytechnic#admissions", true)}
-                  className="bg-gold text-polytechnic-dark font-sans flex w-full items-center justify-center gap-2 rounded-xl py-3 text-lg font-bold transition-transform active:scale-[0.98]"
+                  className="bg-gold text-[#0a1628] hover:bg-gold/80 flex h-12 w-full items-center justify-center gap-2 rounded-2xl font-sans text-sm font-bold shadow-lg shadow-gold/10 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  Apply Now <ArrowRight size={16} />
+                  Apply Now <ArrowRight size={14} />
                 </Link>
               </div>
             </motion.div>
