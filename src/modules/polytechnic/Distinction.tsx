@@ -29,7 +29,7 @@ const advantages = [
 
 export function Distinction() {
   return (
-    <PolySection tone="subtle">
+    <PolySection id="distinction" tone="subtle">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}

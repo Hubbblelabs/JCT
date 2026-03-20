@@ -7,18 +7,25 @@ import { Menu, X, ChevronDown, ArrowRight, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { siteConfig } from "@/data/site";
 
+type PolytechnicNavChild = {
+  name: string;
+  href: string;
+  desc?: string;
+};
+
+type PolytechnicNavItem = {
+  name: string;
+  href: string;
+  children?: PolytechnicNavChild[];
+};
+
 // Custom Polytechnic Navigation Data
-const polytechnicNavigation = [
-  { name: "Home", href: "/institutions/polytechnic" },
-  { name: "About Us", href: "/institutions/polytechnic#distinction" }, // Link to a section or update to actual page later
+const polytechnicNavigation: PolytechnicNavItem[] = [
+  { name: "Home", href: "/institutions/polytechnic#top" },
+  { name: "About Us", href: "/institutions/polytechnic#distinction" },
   { name: "Courses", href: "/institutions/polytechnic#programs" },
   { name: "Admission", href: "/institutions/polytechnic#admissions" },
-  { name: "Training & Placements", href: "/placements" },
-  { name: "Life @ JCT", href: "/campus-life" },
-  { name: "Quick Links", href: "/institutions/polytechnic#quick-links", children: [
-    { name: "Main Website", href: "/", desc: "JCT Institutions Portal" },
-    { name: "Contact Us", href: "/contact", desc: "Get in touch with us" },
-  ] },
+  { name: "Contact", href: "/institutions/polytechnic#contact" },
 ];
 
 type NavbarProps = {
@@ -161,7 +168,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
               <Phone size={16} /> {siteConfig.contact.phone}
             </a>
             <Link
-              href="/admissions/apply"
+              href="/institutions/polytechnic#admissions"
               className="bg-gold text-polytechnic-dark hover:bg-gold-light shadow-gold/20 inline-flex h-10 items-center gap-2 rounded-full px-5 font-sans text-base font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
             >
               Apply Now <ArrowRight size={16} />
@@ -286,7 +293,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                   {siteConfig.contact.phone}
                 </a>
                 <Link
-                  href="/admissions/apply"
+                  href="/institutions/polytechnic#admissions"
                   onClick={() => setIsOpen(false)}
                   className="bg-gold text-polytechnic-dark font-sans flex w-full items-center justify-center gap-2 rounded-xl py-3 text-lg font-bold transition-transform active:scale-[0.98]"
                 >

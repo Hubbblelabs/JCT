@@ -51,7 +51,10 @@ export function Admissions() {
           ))}
         </div>
 
-        <div className="mt-8 grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-4 text-sm md:grid-cols-3 md:gap-4">
+        <div
+          id="contact"
+          className="mt-8 grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-4 text-sm md:grid-cols-3 md:gap-4"
+        >
           <a
             href="tel:+919361422201"
             className="text-polytechnic-dark hover:text-polytechnic flex items-center gap-2"

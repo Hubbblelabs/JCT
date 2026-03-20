@@ -13,7 +13,10 @@ const fadeUp = (delay = 0) => ({
 
 export function Hero() {
   return (
-    <section className="bg-polytechnic relative overflow-hidden h-[100dvh] flex flex-col justify-center pb-[200px]">
+    <section
+      id="top"
+      className="bg-polytechnic relative flex h-dvh flex-col justify-center overflow-hidden pb-50"
+    >
       <CourseMuralBackground />
       <div className="container relative z-10 mx-auto flex flex-col items-center justify-center px-4 md:px-6 lg:px-8 mt-16">
         {/* ─── Hero Header ─── */}
