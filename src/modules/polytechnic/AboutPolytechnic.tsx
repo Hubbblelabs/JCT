@@ -62,7 +62,7 @@ export function AboutPolytechnic() {
             className="relative h-[400px] lg:h-[500px] w-full rounded-3xl overflow-hidden shadow-2xl"
           >
             <Image
-              src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1200&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1200&auto=format&fit=crop"
               alt="JCT Polytechnic Campus"
               fill
               className="object-cover"
