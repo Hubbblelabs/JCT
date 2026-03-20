@@ -2,9 +2,13 @@ import type { Metadata } from "next";
 import { PolytechnicNavbar } from "@/modules/polytechnic/PolytechnicNavbar";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/modules/polytechnic/Hero";
+import { AboutPolytechnic } from "@/modules/polytechnic/AboutPolytechnic";
 import { DiplomaPrograms } from "@/modules/polytechnic/DiplomaPrograms";
 import { Distinction } from "@/modules/polytechnic/Distinction";
 import { Admissions } from "@/modules/polytechnic/Admissions";
+import { Placements } from "@/components/layout/Placements";
+import { NewsEvents } from "@/components/layout/NewsEvents";
+import { Testimonials } from "@/modules/polytechnic/Testimonials";
 
 export const metadata: Metadata = {
   title: "Polytechnic | JCT Polytechnic College, Coimbatore",
@@ -24,7 +28,11 @@ export default function PolytechnicPage() {
       <PolytechnicNavbar forceSolidOnTop />
       <Hero />
       <DiplomaPrograms />
-      <Distinction />
+      <AboutPolytechnic />
+      {/* <Distinction /> */}
+      <Placements />
+      <NewsEvents />
+      <Testimonials />
       <Admissions />
       <Footer />
     </main>

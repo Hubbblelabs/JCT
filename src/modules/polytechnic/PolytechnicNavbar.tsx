@@ -22,10 +22,28 @@ type PolytechnicNavItem = {
 // Custom Polytechnic Navigation Data
 const polytechnicNavigation: PolytechnicNavItem[] = [
   { name: "Home", href: "/institutions/polytechnic#top" },
-  { name: "About Us", href: "/institutions/polytechnic#distinction" },
+  {
+    name: "Institutions",
+    href: "/institutions",
+    children: [
+      { name: "Engineering", href: "/institutions/engineering", desc: "B.E, B.Tech, M.E programs" },
+      { name: "Arts & Science", href: "/institutions/arts-science", desc: "B.A, B.Sc, B.Com, BBA" },
+      { name: "Polytechnic", href: "/institutions/polytechnic", desc: "Diploma programs" }
+    ]
+  },
+  { name: "About Us", href: "/institutions/polytechnic#about-institution" },
   { name: "Courses", href: "/institutions/polytechnic#programs" },
   { name: "Admission", href: "/institutions/polytechnic#admissions" },
   { name: "Contact", href: "/institutions/polytechnic#contact" },
+  {
+    name: "Explore More",
+    href: "#",
+    children: [
+      { name: "Placements", href: "/institutions/polytechnic#placements", desc: "Our recruitment partners & stats" },
+      { name: "Life @ JCT", href: "/institutions/polytechnic#happenings", desc: "News, events & student life" },
+      { name: "Testimonials", href: "/institutions/polytechnic#testimonials", desc: "Voices from our community" }
+    ]
+  },
 ];
 
 type NavbarProps = {

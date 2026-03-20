@@ -3,12 +3,39 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X, ArrowRight, Phone } from "lucide-react";
+import { ChevronDown, ArrowRight, Menu, Phone, X } from "lucide-react";
 import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { siteConfig } from "@/data/site";
 
-const artsNav = [
+type ArtsNavItem = {
+  name: string;
+  href: string;
+  children?: { name: string; href: string; description?: string }[];
+};
+
+const artsNav: ArtsNavItem[] = [
   { name: "Home", href: "#hero" },
+  {
+    name: "Institutions",
+    href: "/institutions",
+    children: [
+      {
+        name: "Engineering",
+        href: "/institutions/engineering",
+        description: "B.E, B.Tech, M.E programs",
+      },
+      {
+        name: "Arts & Science",
+        href: "/institutions/arts-science",
+        description: "B.A, B.Sc, B.Com, BBA programs",
+      },
+      {
+        name: "Polytechnic",
+        href: "/institutions/polytechnic",
+        description: "Diploma programs",
+      },
+    ],
+  },
   { name: "About JCT", href: "#about" },
   { name: "Courses", href: "#courses" },
   { name: "Admission", href: "#admission" },
@@ -24,6 +51,12 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(true);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+
+  const toggleMobileSection = (name: string) => {
+    setMobileExpanded(mobileExpanded === name ? null : name);
+  };
 
   const { scrollY } = useScroll();
   const navBackground = useTransform(
@@ -96,13 +129,71 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
           {/* Desktop Links */}
           <div className="hidden items-center gap-2 lg:flex">
             {artsNav.map((link) => (
-              <Link
+              <div
                 key={link.name}
-                href={link.href}
-                className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium text-white/70 transition-colors hover:text-white"
+                className="relative"
+                onMouseEnter={() =>
+                  link.children && setActiveDropdown(link.name)
+                }
+                onMouseLeave={() => setActiveDropdown(null)}
               >
-                {link.name}
-              </Link>
+                <Link
+                  href={link.href}
+                  className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium text-white/70 transition-colors hover:text-white"
+                >
+                  {link.name}
+                  {link.children && (
+                    <ChevronDown
+                      size={12}
+                      className={`transition-transform duration-200 ${
+                        activeDropdown === link.name ? "rotate-180" : ""
+                      }`}
+                    />
+                  )}
+                </Link>
+
+                {/* Dropdown */}
+                {link.children && (
+                  <AnimatePresence>
+                    {activeDropdown === link.name && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 4 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        className="absolute top-full left-0 w-64 pt-3"
+                      >
+                        <div className="bg-[#111827]/95 overflow-hidden rounded-xl border border-white/10 p-2 shadow-2xl shadow-black/30 backdrop-blur-2xl">
+                          <div className="space-y-0.5">
+                            {link.children.map((child) => (
+                              <Link
+                                key={child.name}
+                                href={child.href}
+                                className="group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all hover:bg-white/5"
+                              >
+                                <div>
+                                  <p className="font-sans text-[15px] font-medium text-white/90 transition-colors group-hover:text-arts-science-primary group-hover:text-amber-500">
+                                    {child.name}
+                                  </p>
+                                  {child.description && (
+                                    <p className="mt-0.5 font-sans text-xs text-white/40">
+                                      {child.description}
+                                    </p>
+                                  )}
+                                </div>
+                                <ArrowRight
+                                  size={12}
+                                  className="shrink-0 text-amber-500 opacity-0 transition-opacity group-hover:opacity-100"
+                                />
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                )}
+              </div>
             ))}
           </div>
 
