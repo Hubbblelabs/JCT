@@ -96,10 +96,10 @@ export function CollegeTestimonials({
   }, [groupedItems, paused]);
 
   return (
-    <section className="py-20 md:py-32 bg-white">
+    <section className="py-10 md:py-16 bg-white">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="bg-[#f2f4f7] rounded-[3rem] md:rounded-[4rem] p-8 md:p-16 lg:p-20 shadow-inner">
-          <div className="mb-14 text-center">
+        <div className="bg-[#f2f4f7] rounded-[3rem] md:rounded-[4rem] p-6 md:p-10 lg:p-14 shadow-inner">
+          <div className="mb-8 text-center">
             {subtitle && (
               <motion.span 
                 initial={{ opacity: 0, y: 10 }}
@@ -167,7 +167,7 @@ export function CollegeTestimonials({
                       </p>
                     </div>
 
-                    <div className="mt-6 pt-6 border-t border-gray-100/80 flex items-center gap-4">
+                    <div className="mt-4 pt-4 border-t border-gray-100/80 flex items-center gap-4">
                       <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
                         <Image
                           src={activeItem.image}

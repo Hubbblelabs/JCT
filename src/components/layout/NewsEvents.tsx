@@ -41,10 +41,10 @@ const newsItems = [
 
 export function NewsEvents() {
   return (
-    <section id="happenings" className="bg-white py-16 md:py-24">
+    <section id="happenings" className="bg-white py-10 md:py-14">
       <div className="container mx-auto px-4 md:px-8 max-w-[1400px]">
         {/* Header */}
-        <div className="mb-10 md:mb-14 flex items-end justify-between border-b border-gray-100 pb-6">
+        <div className="mb-6 md:mb-8 flex items-end justify-between border-b border-gray-100 pb-4">
           <div>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}

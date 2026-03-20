@@ -43,10 +43,10 @@ const pathways = [
 
 export function AdmissionsCTA() {
   return (
-    <section id="admissions" className="section-padding bg-surface">
+    <section id="admissions" className="py-10 md:py-16 bg-surface">
       <div className="container mx-auto px-4 md:px-6">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-8 text-center md:mb-16">
+          <div className="mb-6 text-center md:mb-10">
             <motion.span
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -79,7 +79,7 @@ export function AdmissionsCTA() {
             </motion.p>
           </div>
 
-          <div className="snap-container scrollbar-hide -mx-4 mb-8 flex gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:mb-16 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0">
+          <div className="snap-container scrollbar-hide -mx-4 mb-8 flex gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:mb-10 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0">
             {pathways.map((item, i) => (
               <motion.div
                 key={item.title}
@@ -120,7 +120,7 @@ export function AdmissionsCTA() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="mb-8 flex flex-col justify-center gap-3 sm:flex-row md:mb-12"
+            className="flex flex-col justify-center gap-3 sm:flex-row"
           >
             <Link
               href="#contact"
