@@ -24,9 +24,8 @@ const slides = [
     id: 1,
     label: "Arts & Science",
     subtitle: "// Liberal Arts Campus",
-    thumb: "/jct_arts.png",
-    bgImage:
-      "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=2670&auto=format&fit=crop",
+    thumb: "/assets/home-herosection.jpg",
+    bgImage: "/assets/home-herosection.jpg",
   },
   {
     id: 2,

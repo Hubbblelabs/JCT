@@ -12,7 +12,7 @@ const institutions = [
     href: "/institutions/engineering",
     // logo: "/jct_engineering1.png",
     image:
-      "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1200&auto=format&fit=crop",
+      "/assets/robot.png",
     tagline: "Pioneering Technical Education",
     // stat: "6 B.E./B.Tech Programs",
     degreePrograms: [
@@ -42,7 +42,7 @@ const institutions = [
     href: "/institutions/arts-science",
     // logo: "/jct_arts1.png",
     image:
-      "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=1200&auto=format&fit=crop",
+      "/assets/arts-and-science-home.png",
     tagline: "Fostering Creativity & Inquiry",
     // stat: "6 UG Programs",
     degreePrograms: [
@@ -60,7 +60,7 @@ const institutions = [
     href: "/institutions/polytechnic",
     // logo: "/jct_polytechnic1.png",
     image:
-      "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1200&auto=format&fit=crop",
+      "/assets/polytechnic-home.png",
     tagline: "Hands-On Technical Training",
     // stat: "5 Diploma Programs",
     degreePrograms: [
