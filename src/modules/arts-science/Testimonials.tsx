@@ -7,15 +7,17 @@ export function Testimonials() {
   const categories = ["Alumini", "Student", "VIP"] as const;
 
   return (
-    <CollegeTestimonials
-      title="Testimonials"
-      subtitle="Hear directly from our graduates about how their experiences on campus prepared them for the challenges of tomorrow."
-      accentColor="var(--color-arts-science-accent)"
-      sectionBgClassName="bg-[#F8F8F8]"
-      items={testimonials.map((item, index) => ({
-        ...item,
-        tag: categories[index % categories.length],
-      }))}
-    />
+    <div id="testimonials">
+      <CollegeTestimonials
+        title="Testimonials"
+        subtitle="Hear directly from our graduates about how their experiences on campus prepared them for the challenges of tomorrow."
+        accentColor="var(--color-arts-science-accent)"
+        sectionBgClassName="bg-[#F8F8F8]"
+        items={testimonials.map((item, index) => ({
+          ...item,
+          tag: categories[index % categories.length],
+        }))}
+      />
+    </div>
   );
 }

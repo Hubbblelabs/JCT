@@ -36,11 +36,19 @@ const artsNav: ArtsNavItem[] = [
       },
     ],
   },
-  { name: "About JCT", href: "#about" },
+  { name: "About Us", href: "#about" },
   { name: "Courses", href: "#courses" },
   { name: "Admission", href: "#admission" },
-  { name: "Life @ JCT", href: "#life" },
-  { name: "Contact Us", href: "#contact" },
+  { name: "Contact", href: "#contact" },
+  {
+    name: "Explore More",
+    href: "#",
+    children: [
+      { name: "Placements", href: "#placements", description: "Our recruitment partners & stats" },
+      { name: "Life @ JCT", href: "#life", description: "News, events & student life" },
+      { name: "Testimonials", href: "#testimonials", description: "Voices from our community" }
+    ]
+  },
 ];
 
 type NavbarProps = {
@@ -49,8 +57,6 @@ type NavbarProps = {
 
 export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-  const [bannerVisible, setBannerVisible] = useState(true);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
 
@@ -71,15 +77,6 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
     ["rgba(55, 65, 81, 0)", "rgba(55, 65, 81, 0.4)"]
   );
   
-  const navY = useTransform(scrollY, [0, 50], [0, 0]);
-
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "unset";
     return () => {
@@ -102,7 +99,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
           borderColor: forceSolidOnTop ? "rgba(55, 65, 81, 0.4)" : navBorder,
           borderBottomWidth: "1px",
         }}
-        className={`fixed ${bannerVisible ? "top-0" : "top-0"} right-0 left-0 z-50 transition-all duration-300 shadow-lg backdrop-blur-xl py-3`}
+        className="fixed top-0 right-0 left-0 z-50 py-3 shadow-lg backdrop-blur-xl transition-all duration-300"
       >
         <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
           {/* Logo */}
@@ -137,20 +134,35 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 }
                 onMouseLeave={() => setActiveDropdown(null)}
               >
-                <Link
-                  href={link.href}
-                  className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium text-white/70 transition-colors hover:text-white"
-                >
-                  {link.name}
-                  {link.children && (
+                {link.children && link.href === "#" ? (
+                  <button
+                    type="button"
+                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium text-white/70 transition-colors hover:text-white"
+                  >
+                    {link.name}
                     <ChevronDown
                       size={12}
                       className={`transition-transform duration-200 ${
                         activeDropdown === link.name ? "rotate-180" : ""
                       }`}
                     />
-                  )}
-                </Link>
+                  </button>
+                ) : (
+                  <Link
+                    href={link.href}
+                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium text-white/70 transition-colors hover:text-white"
+                  >
+                    {link.name}
+                    {link.children && (
+                      <ChevronDown
+                        size={12}
+                        className={`transition-transform duration-200 ${
+                          activeDropdown === link.name ? "rotate-180" : ""
+                        }`}
+                      />
+                    )}
+                  </Link>
+                )}
 
                 {/* Dropdown */}
                 {link.children && (
@@ -201,7 +213,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
           <div className="hidden items-center gap-3 lg:flex">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="flex items-center gap-1.5 font-sans text-sm text-white/60 transition-colors hover:text-white xl:flex hidden"
+              className="hidden items-center gap-1.5 font-sans text-sm text-white/60 transition-colors hover:text-white xl:flex"
             >
               <Phone size={14} /> {siteConfig.contact.phone}
             </a>
@@ -272,13 +284,58 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-3">
                 {artsNav.map((link) => (
                   <div key={link.name} className="border-b border-white/5">
-                    <Link
-                      href={link.href}
-                      onClick={() => setIsOpen(false)}
-                      className="block py-3 font-sans text-[15px] font-medium text-white/80 transition-colors hover:text-white"
-                    >
-                      {link.name}
-                    </Link>
+                    {link.children ? (
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() => toggleMobileSection(link.name)}
+                          className="flex w-full items-center justify-between py-3 font-sans text-[15px] font-medium text-white/80 transition-colors hover:text-white"
+                        >
+                          {link.name}
+                          <ChevronDown
+                            size={16}
+                            className={`transition-transform duration-300 ${
+                              mobileExpanded === link.name ? "rotate-180" : ""
+                            }`}
+                          />
+                        </button>
+                        <AnimatePresence>
+                          {mobileExpanded === link.name && (
+                            <motion.div
+                              initial={{ height: 0, opacity: 0 }}
+                              animate={{ height: "auto", opacity: 1 }}
+                              exit={{ height: 0, opacity: 0 }}
+                              transition={{ duration: 0.2 }}
+                              className="overflow-hidden pb-2"
+                            >
+                              <div className="space-y-1 pl-4">
+                                {link.children.map((child) => (
+                                  <Link
+                                    key={child.name}
+                                    href={child.href}
+                                    onClick={() => {
+                                      setIsOpen(false);
+                                      setMobileExpanded(null);
+                                    }}
+                                    className="block rounded-lg px-3 py-2 text-sm text-white/65 transition-colors hover:bg-white/5 hover:text-white"
+                                  >
+                                    {child.name}
+                                  </Link>
+                                ))}
+                              </div>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </div>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        onClick={() => setIsOpen(false)}
+                        className="block py-3 font-sans text-[15px] font-medium text-white/80 transition-colors hover:text-white"
+                      >
+                        {link.name}
+                      </Link>
+                    )}
                   </div>
                 ))}
               </div>
