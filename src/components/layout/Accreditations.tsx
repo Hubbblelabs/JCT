@@ -25,7 +25,7 @@ export function Accreditations() {
         {doubled.map((logo, i) => (
           <div
             key={`${logo.name}-${i}`}
-            className="flex shrink-0 items-center gap-3 opacity-70 transition-opacity duration-300 hover:opacity-100"
+            className="flex shrink-0 items-center gap-1.5 md:gap-2 opacity-70 transition-opacity duration-300 hover:opacity-100"
             title={logo.name}
           >
             <div className="relative h-10 w-24 shrink-0 md:h-12 md:w-28">
@@ -37,7 +37,7 @@ export function Accreditations() {
                 sizes="(max-width: 768px) 96px, 112px"
               />
             </div>
-            <span className="text-[#64748b] font-sans text-[10px] md:text-[11px] font-bold tracking-[0.1em] uppercase whitespace-nowrap pr-2">
+            <span className="text-[#64748b] font-sans text-[10px] md:text-[11px] font-bold tracking-widest uppercase whitespace-nowrap pr-2">
               {logo.name}
             </span>
           </div>

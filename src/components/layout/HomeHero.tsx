@@ -9,7 +9,7 @@ import {
 } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Phone } from "lucide-react";
+import { ArrowRight, Phone, Settings, Palette, PencilRuler } from "lucide-react";
 
 const slides = [
   {
@@ -98,9 +98,10 @@ export function HomeHero() {
   // Auto-advance carousel
   useEffect(() => {
     if (isPaused) return;
+    const intervalTime = window.innerWidth < 768 ? 3000 : 5000;
     const timer = setInterval(() => {
       setActiveSlide((prev) => (prev + 1) % slides.length);
-    }, 5000);
+    }, intervalTime);
     return () => clearInterval(timer);
   }, [isPaused]);
 
@@ -136,8 +137,8 @@ export function HomeHero() {
           style={{ opacity: overlayOpacity }}
           className="bg-navy/40 absolute inset-0 mix-blend-multiply"
         />
-        <div className="from-navy/70 via-navy/20 absolute inset-0 bg-gradient-to-r to-transparent" />
-        <div className="from-navy/60 absolute inset-0 bg-gradient-to-t via-transparent to-transparent" />
+        <div className="from-navy/70 via-navy/20 absolute inset-0 bg-linear-to-r to-transparent" />
+        <div className="from-navy/60 absolute inset-0 bg-linear-to-t via-transparent to-transparent" />
       </motion.div>
 
       {/* Content */}
@@ -149,7 +150,7 @@ export function HomeHero() {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="mb-5 md:mb-7"
+            className="hidden md:block mb-5 md:mb-7"
           >
             <span className="inline-flex items-center rounded-md border border-white/20 bg-black/20 px-3 py-1.5 font-sans text-xs font-medium text-white/85 backdrop-blur-sm md:px-4 md:py-2">
               Established 2009 • Coimbatore, Tamil Nadu
@@ -164,11 +165,12 @@ export function HomeHero() {
               delay: 0.15,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="mb-3 font-serif text-[2.15rem] leading-[1.05] tracking-tight text-white sm:text-[2.7rem] md:mb-4 md:text-5xl lg:text-6xl"
+            className="mb-10 md:mb-4 text-center md:text-left font-sans text-[42px] leading-[1.1] font-bold tracking-tight text-white md:font-serif md:text-5xl lg:text-6xl drop-shadow-lg"
           >
-            Three Colleges.
-            <br className="hidden md:block" />
-            <span className="gradient-text ml-1 font-light italic md:ml-0">
+            <span className="block md:inline">Three Colleges.</span>
+            <span className="block md:hidden">One Commitment</span>
+            <span className="block md:hidden mt-0">to Your Success.</span>
+            <span className="hidden md:inline gradient-text ml-1 font-light italic md:ml-0">
               One Commitment to Your Success.
             </span>
           </motion.h1>
@@ -195,7 +197,7 @@ export function HomeHero() {
           >
             <Link
               href="#admissions"
-              className="bg-gold text-navy hover:bg-gold-light shadow-gold/20 inline-flex h-11 items-center gap-2 rounded-full px-6 font-sans text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95 md:h-13 md:px-7"
+              className="bg-gold text-navy hover:bg-gold-light shadow-gold/20 hidden md:inline-flex h-11 items-center gap-2 rounded-full px-6 font-sans text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95 md:h-13 md:px-7"
             >
               Apply Now <ArrowRight size={16} />
             </Link>

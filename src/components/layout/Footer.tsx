@@ -173,12 +173,12 @@ export function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="bg-[#ebe4d8] pl-12 pt-6 pb-32 md:pl-24 md:pt-8 md:pb-30 lg:pb-10 border-t border-[#e2d8c9]">
-        <div className="container mx-auto flex flex-col items-center justify-between gap-6 text-[13px] text-gray-600 sm:flex-row lg:pr-[320px]">
-          <p className="font-medium">
+      <div className="bg-[#ebe4d8] px-4 pt-6 pb-32 md:px-8 md:pt-8 md:pb-30 lg:pb-10 border-t border-[#e2d8c9]">
+        <div className="container mx-auto flex flex-col items-center text-center justify-between gap-6 text-[13px] text-gray-600 sm:flex-row lg:pr-[320px]">
+          <p className="font-medium w-full sm:w-auto">
             © {new Date().getFullYear()} JCT Institutions. All rights reserved.
           </p>
-          <div className="flex flex-wrap justify-center gap-6 font-medium">
+          <div className="flex flex-col sm:flex-row flex-wrap justify-center items-center gap-3 sm:gap-6 font-medium w-full sm:w-auto">
             <Link href="/mandatory-disclosure/privacy" className="hover:text-[#D4A024] transition-colors">
               Privacy Policy
             </Link>

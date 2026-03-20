@@ -242,6 +242,7 @@ export function Institutions() {
 
         {/* Mobile: Horizontal Scroll Cards */}
         <div className="snap-container scrollbar-hide -mx-4 flex gap-4 overflow-x-auto px-4 pb-4 lg:hidden">
+          <div className="w-1 shrink-0"></div>
           {institutions.map((inst, i) => (
             <motion.div
               key={inst.slug}
@@ -298,6 +299,7 @@ export function Institutions() {
               </Link>
             </motion.div>
           ))}
+          <div className="w-1 shrink-0"></div>
         </div>
       </div>
     </section>
