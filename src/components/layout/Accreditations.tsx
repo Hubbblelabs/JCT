@@ -14,29 +14,30 @@ const logos = [
 ];
 
 export function Accreditations() {
-  const doubled = [...logos, ...logos];
+  const doubled = [...logos, ...logos, ...logos];
   return (
-    <section className="border-border relative overflow-hidden border-b bg-white py-5 md:py-6">
+    <section className="relative overflow-hidden bg-white py-5 md:py-6 shadow-inner border-b border-gray-100">
       {/* Fade Edges */}
-      <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-16 bg-gradient-to-r from-white to-transparent md:w-24" />
-      <div className="pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-16 bg-gradient-to-l from-white to-transparent md:w-24" />
+      <div className="pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-12 bg-linear-to-r from-white to-transparent md:w-24" />
+      <div className="pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-12 bg-linear-to-l from-white to-transparent md:w-24" />
 
-      <div className="flex animate-[marquee_20s_linear_infinite] items-center gap-10 md:animate-[marquee_35s_linear_infinite] md:gap-16">
+      <div className="flex animate-[marquee_12s_linear_infinite] items-center gap-12 md:animate-[marquee_20s_linear_infinite] md:gap-16">
         {doubled.map((logo, i) => (
           <div
             key={`${logo.name}-${i}`}
-            className="flex shrink-0 items-center gap-2.5 opacity-40 transition-opacity duration-300 hover:opacity-100"
+            className="flex shrink-0 items-center gap-3 opacity-70 transition-opacity duration-300 hover:opacity-100"
+            title={logo.name}
           >
-            <div className="relative h-8 w-8 shrink-0 md:h-10 md:w-10">
+            <div className="relative h-10 w-24 shrink-0 md:h-12 md:w-28">
               <Image
                 src={logo.src}
                 alt={logo.name}
                 fill
                 className="object-contain"
-                sizes="40px"
+                sizes="(max-width: 768px) 96px, 112px"
               />
             </div>
-            <span className="text-muted-foreground hidden font-sans text-xs font-semibold tracking-wide whitespace-nowrap uppercase md:inline-block">
+            <span className="text-[#64748b] font-sans text-[10px] md:text-[11px] font-bold tracking-[0.1em] uppercase whitespace-nowrap pr-2">
               {logo.name}
             </span>
           </div>

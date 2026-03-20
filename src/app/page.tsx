@@ -57,8 +57,8 @@ export default function HomePage() {
       <Accreditations />
       <Institutions />
       {/* <WhyJCT /> */}
-      <NewsEvents />
       <Placements />
+      <NewsEvents />
       <Testimonials />
       {/* <CampusLife /> */}
       <AdmissionsCTA />

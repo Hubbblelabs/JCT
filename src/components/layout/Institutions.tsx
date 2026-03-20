@@ -76,234 +76,131 @@ const institutions = [
 
 export function Institutions() {
   return (
-    <section id="institutions" className="section-padding bg-white">
-      <div className="container mx-auto px-4 md:px-6">
-        {/* Header */}
-        <div className="mx-auto mb-8 max-w-3xl text-center md:mb-16">
+    <section id="institutions" className="bg-white py-12 md:py-16 relative overflow-hidden">
+      <div className="container mx-auto px-4 md:px-6 relative z-10">
+        
+        {/* Header content matching Image 2 */}
+        <div className="mx-auto mb-12 md:mb-16 max-w-3xl text-center">
           <motion.span
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-gold mb-4 inline-block font-sans text-xs font-bold tracking-[0.2em] uppercase"
+            className="text-[#a0842c] mb-6 inline-block font-sans text-[10px] font-bold tracking-[0.25em] uppercase"
           >
-            Our Institutions
+            The Academic Ecosystem
           </motion.span>
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-navy mb-3 font-serif text-3xl leading-tight sm:text-4xl md:mb-5 md:text-5xl lg:text-6xl"
+            className="text-[#1a2332] mb-6 font-serif text-[42px] leading-tight sm:text-5xl md:text-6xl tracking-tight"
           >
-            Three Pathways to{" "}
-            <span className="text-muted-foreground font-light italic">
-              Excellence
-            </span>
+            Three Pathways to <br className="hidden md:block" />
+            <span className="text-[#c1a044] italic pr-2">Prestige</span>
           </motion.h2>
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-muted-foreground mx-auto max-w-2xl font-sans text-base leading-relaxed md:text-lg"
+            className="text-[#5b6574] mx-auto max-w-2xl font-sans text-[15px] leading-relaxed"
           >
-            Each institution is dedicated to shaping future leaders through
-            specialized education, modern infrastructure, and strong industry
-            connections.
+            Select your trajectory within our specialized environments. Each
+            college is a distinct pillar of our commitment to your future.
           </motion.p>
         </div>
 
-        {/* Bento Grid — Desktop | Horizontal Scroll — Mobile */}
-        <div className="hidden lg:grid lg:grid-cols-2 lg:gap-6">
-          {/* Smaller Cards Column (Column 1) */}
-          <div className="flex flex-col gap-6">
-            {institutions.slice(1).map((inst, index) => (
-              <motion.div
-                key={inst.slug}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: 0.15 * index }}
-              >
-                <Link href={inst.href} className="group block">
-                  <div className="relative h-50 overflow-hidden rounded-3xl md:h-70">
-                    <Image
-                      src={inst.image}
-                      alt={inst.name}
-                      fill
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
-                      sizes="(max-width: 1024px) 100vw, 50vw"
-                    />
-                    <div
-                      className={`absolute inset-0 bg-linear-to-t ${inst.color}`}
-                    />
-                    <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
-
-                    <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-8">
-                      <h3 className="mb-2 font-serif text-xl leading-tight font-bold text-white md:text-2xl">
-                        {inst.name}
-                      </h3>
-                      <p className="mb-5 font-sans text-sm text-white/70">
-                        {inst.tagline}
-                      </p>
-                      <div className="flex flex-1 items-end gap-3">
-                        <div className="flex flex-1 flex-col gap-3">
-                          {inst.degreePrograms.map((degProg) => (
-                            <div key={degProg.degree} className="flex flex-col gap-1.5">
-                              <span className="font-sans text-[10px] font-bold tracking-wider text-white/60 uppercase">
-                                {degProg.degree}
-                              </span>
-                              {degProg.courses.length > 0 && (
-                                <div className="flex flex-wrap gap-1.5">
-                                  {degProg.courses.map((course) => (
-                                    <span
-                                      key={course}
-                                      className="rounded-md bg-white/10 px-2 py-1 font-sans text-[11px] font-medium text-white/90 backdrop-blur-sm"
-                                    >
-                                      {course}
-                                    </span>
-                                  ))}
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
-                        <span className="group-hover:bg-gold group-hover:border-gold group-hover:text-navy mb-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 bg-white/10 text-white transition-all">
-                          <ArrowUpRight size={16} />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Large Feature Card (Column 2) */}
+        {/* 3 Circular overlapping images */}
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-12 lg:gap-0 lg:-space-x-12 mt-8 md:mt-16">
+          {/* Engineering (Left) */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="h-full"
+             initial={{ opacity: 0, x: -30 }}
+             whileInView={{ opacity: 1, x: 0 }}
+             viewport={{ once: true }}
+             transition={{ duration: 0.7 }}
+             className="z-10 lg:translate-y-8"
           >
-            <Link href={institutions[0].href} className="group block h-full">
-              <div className="relative h-full min-h-70 overflow-hidden rounded-3xl lg:min-h-145">
-                <Image
-                  src={institutions[0].image}
-                  alt={institutions[0].name}
-                  fill
-                  className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-                <div
-                  className={`absolute inset-0 bg-linear-to-t ${institutions[0].color}`}
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
+            <Link href={institutions[0].href} className="group block relative w-[300px] h-[300px] md:w-[360px] md:h-[360px] rounded-full overflow-hidden transition-transform duration-500 hover:scale-105 hover:z-30">
+              <Image
+                src={institutions[0].image}
+                alt={institutions[0].name}
+                fill
+                className="object-cover transition-all duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
+                sizes="(max-width: 768px) 300px, 360px"
+              />
+              <div className="absolute inset-0 bg-[#0e111a]/60 group-hover:bg-[#0e111a]/40 transition-colors duration-500" />
+              
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-10">
+                <p className="text-[#c1a044] font-sans text-[9px] font-bold tracking-[0.2em] uppercase mb-4">
+                  College of Engineering
+                </p>
+                <h3 className="text-white font-serif text-[26px] md:text-[28px] italic leading-snug">
+                  Engineering the New<br/>Frontier.
+                </h3>
+              </div>
+            </Link>
+          </motion.div>
 
-                {/* Content overlay */}
-                <div className="absolute inset-0 z-10 flex flex-col justify-end p-6 md:p-8 lg:p-10">
-                  <h3 className="mb-2 font-serif text-2xl leading-tight font-bold text-white md:text-3xl">
-                    {institutions[0].name}
-                  </h3>
-                  <p className="mb-5 max-w-md font-sans text-sm text-white/70">
-                    {institutions[0].tagline} — state-of-the-art laboratories
-                    and industry-aligned curriculum preparing engineers for
-                    tomorrow.
-                  </p>
-                  <div className="flex flex-1 items-end gap-3">
-                    <div className="flex flex-1 flex-col gap-4">
-                      {institutions[0].degreePrograms.map((degProg) => (
-                        <div key={degProg.degree} className="flex flex-col gap-2">
-                          <span className="font-sans text-[11px] font-bold tracking-[0.15em] text-white/60 uppercase">
-                            {degProg.degree}
-                          </span>
-                          {degProg.courses.length > 0 && (
-                            <div className="flex flex-wrap gap-2">
-                              {degProg.courses.map((course) => (
-                                <span
-                                  key={course}
-                                  className="rounded-md bg-white/10 px-2.5 py-1 font-sans text-[12px] font-medium text-white/90 backdrop-blur-sm"
-                                >
-                                  {course}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                    <span className="bg-gold text-navy mb-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full shadow-lg transition-transform group-hover:scale-110">
-                      <ArrowUpRight size={18} />
-                    </span>
-                  </div>
-                </div>
+          {/* Arts & Science (Center) */}
+          <motion.div
+             initial={{ opacity: 0, y: 30 }}
+             whileInView={{ opacity: 1, y: 0 }}
+             viewport={{ once: true }}
+             transition={{ duration: 0.7, delay: 0.1 }}
+             className="z-20 relative"
+          >
+            <Link href={institutions[1].href} className="group block relative w-[340px] h-[340px] md:w-[420px] md:h-[420px] rounded-full overflow-hidden border border-[#c1a044]/80 shadow-[0_0_80px_rgba(193,160,68,0.1)] transition-all duration-500 hover:scale-105 hover:shadow-[0_0_100px_rgba(193,160,68,0.2)]">
+              <Image
+                src={institutions[1].image}
+                alt={institutions[1].name}
+                fill
+                className="object-cover transition-all duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
+                sizes="(max-width: 768px) 340px, 420px"
+              />
+              <div className="absolute inset-0 bg-[#0e111a]/50 group-hover:bg-[#0e111a]/30 transition-colors duration-500" />
+              
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-10 text-center z-10">
+                <p className="text-[#c1a044] font-sans text-[10px] font-bold tracking-[0.2em] uppercase mb-4">
+                  College of Arts & Science
+                </p>
+                <h3 className="text-white font-serif text-[32px] md:text-[36px] italic leading-snug">
+                  The Art of Critical<br/>Thought.
+                </h3>
+              </div>
+            </Link>
+          </motion.div>
+
+          {/* Polytechnic (Right) */}
+          <motion.div
+             initial={{ opacity: 0, x: 30 }}
+             whileInView={{ opacity: 1, x: 0 }}
+             viewport={{ once: true }}
+             transition={{ duration: 0.7, delay: 0.2 }}
+             className="z-10 lg:translate-y-8"
+          >
+             <Link href={institutions[2].href} className="group block relative w-[300px] h-[300px] md:w-[360px] md:h-[360px] rounded-full overflow-hidden transition-transform duration-500 hover:scale-105 hover:z-30">
+              <Image
+                src={institutions[2].image}
+                alt={institutions[2].name}
+                fill
+                className="object-cover transition-all duration-700 group-hover:scale-110 grayscale group-hover:grayscale-0"
+                sizes="(max-width: 768px) 300px, 360px"
+              />
+              <div className="absolute inset-0 bg-[#0e111a]/60 group-hover:bg-[#0e111a]/40 transition-colors duration-500" />
+              
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-center z-10">
+                <p className="text-[#c1a044] font-sans text-[9px] font-bold tracking-[0.2em] uppercase mb-4">
+                  Polytechnic College
+                </p>
+                <h3 className="text-white font-serif text-[26px] md:text-[28px] italic leading-snug">
+                  Hands-On Mastery,<br/>Redefined.
+                </h3>
               </div>
             </Link>
           </motion.div>
         </div>
 
-        {/* Mobile: Horizontal Scroll Cards */}
-        <div className="snap-container scrollbar-hide -mx-4 flex gap-4 overflow-x-auto px-4 pb-4 lg:hidden">
-          {institutions.map((inst, i) => (
-            <motion.div
-              key={inst.slug}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="snap-item w-70 shrink-0 sm:w-85"
-            >
-              <Link href={inst.href} className="group block">
-                <div className="relative h-80 overflow-hidden rounded-2xl sm:h-90">
-                  <Image
-                    src={inst.image}
-                    alt={inst.name}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="340px"
-                  />
-                  <div
-                    className={`absolute inset-0 bg-linear-to-t ${inst.color}`}
-                  />
-                  <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
-
-                  <div className="absolute inset-0 z-10 flex flex-col justify-end p-5">
-                    <h3 className="mb-1.5 font-serif text-lg leading-tight font-bold text-white">
-                      {inst.name}
-                    </h3>
-                    <p className="mb-3 font-sans text-xs text-white/60">
-                      {inst.tagline}
-                    </p>
-                    <div className="flex flex-col gap-2.5">
-                      {inst.degreePrograms.map((degProg) => (
-                        <div key={degProg.degree} className="flex flex-col gap-1">
-                          <span className="font-sans text-[9px] font-bold tracking-[0.1em] text-white/50 uppercase">
-                            {degProg.degree}
-                          </span>
-                          {degProg.courses.length > 0 && (
-                            <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
-                              {degProg.courses.map((course, idx) => (
-                                <div key={course} className="flex items-center gap-1.5">
-                                  <span className="font-sans text-[10px] font-medium text-white/90">
-                                    {course}
-                                  </span>
-                                  {idx < degProg.courses.length - 1 && (
-                                    <span className="h-1 w-1 rounded-full bg-white/20" />
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
-        </div>
       </div>
     </section>
   );

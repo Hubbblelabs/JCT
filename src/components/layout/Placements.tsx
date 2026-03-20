@@ -103,39 +103,10 @@ export function Placements() {
             regularly recruit from JCT campuses.
           </motion.p>
         </div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mb-14 grid grid-cols-2 gap-4 md:mb-16 md:grid-cols-4 md:gap-6"
-        >
-          {placementStats.map((stat, i) => (
-            <motion.div
-              key={stat.label}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="border-border rounded-2xl border bg-white p-4 text-center md:p-6"
-            >
-              <stat.icon
-                size={20}
-                className="text-gold mx-auto mb-2"
-                strokeWidth={1.5}
-              />
-              <span className="text-navy mb-1 block font-sans text-xl font-black tracking-tight md:text-3xl">
-                {stat.value}
-              </span>
-              <span className="text-muted-foreground font-sans text-[10px] font-semibold tracking-wider uppercase md:text-xs">
-                {stat.label}
-              </span>
-            </motion.div>
-          ))}
-        </motion.div>
       </div>
 
-      <div className="relative">
+      {/* Carousel full bleed */}
+      <div className="relative mb-14 md:mb-20">
         <div className="from-surface pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-16 bg-gradient-to-r to-transparent md:w-32" />
         <div className="from-surface pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-16 bg-gradient-to-l to-transparent md:w-32" />
         <div className="mb-4">
@@ -159,6 +130,39 @@ export function Placements() {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Stats contained */}
+      <div className="container mx-auto px-4 md:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6"
+        >
+          {placementStats.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="border-border rounded-2xl border bg-white p-4 text-center shadow-sm md:p-6"
+            >
+              <stat.icon
+                size={20}
+                className="text-gold mx-auto mb-2"
+                strokeWidth={1.5}
+              />
+              <span className="text-navy mb-1 block font-sans text-xl font-black tracking-tight md:text-3xl">
+                {stat.value}
+              </span>
+              <span className="text-muted-foreground font-sans text-[10px] font-semibold tracking-wider uppercase md:text-xs">
+                {stat.label}
+              </span>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

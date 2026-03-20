@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { MapPin, ArrowRight, Clock } from "lucide-react";
+import { motion } from "framer-motion";
+import Link from "next/link";
+import Image from "next/image";
 
 const newsItems = [
   {
@@ -11,6 +11,7 @@ const newsItems = [
     excerpt:
       "A team of 4 CSE students bagged first prize at CodeSprint 2026, competing against 200+ teams from across India.",
     category: "Achievement",
+    image: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=1200&auto=format&fit=crop",
   },
   {
     date: "28 Feb 2026",
@@ -18,13 +19,7 @@ const newsItems = [
     excerpt:
       "JCT College of Engineering partners with TCS to offer hands-on training modules and guaranteed internship placements.",
     category: "Partnership",
-  },
-  {
-    date: "22 Feb 2026",
-    title: "NAAC Re-Accreditation Process Successfully Completed",
-    excerpt:
-      "JCT Institutions undergoes peer review for NAAC re-accreditation, with preliminary reports indicating strong outcomes.",
-    category: "Accreditation",
+    image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop",
   },
   {
     date: "15 Feb 2026",
@@ -32,209 +27,156 @@ const newsItems = [
     excerpt:
       "Over 1,500 students participated in inter-department sports events spanning athletics, cricket, basketball, and chess.",
     category: "Campus Life",
+    image: "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=800&auto=format&fit=crop",
   },
   {
-    date: "10 Feb 2026",
-    title: "Guest Lecture by Dr. A.P.J. Abdul Kalam Foundation",
+    date: "22 Feb 2026",
+    title: "NAAC Re-Accreditation Process Successfully Completed",
     excerpt:
-      "Students attended an inspiring lecture on innovation and scientific temper by the A.P.J. Abdul Kalam Foundation delegation.",
-    category: "Events",
-  },
-  {
-    date: "05 Feb 2026",
-    title: "Placement Drive: 150+ Offers from Top Recruiters",
-    excerpt:
-      "The 2025-26 placement season sees record offers from Infosys, Wipro, CTS, and 40+ other companies visiting campus.",
-    category: "Placements",
+      "JCT Institutions undergoes peer review for NAAC re-accreditation, with preliminary reports indicating strong outcomes.",
+    category: "Accreditation",
+    image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=800&auto=format&fit=crop",
   },
 ];
-
-const events = [
-  {
-    date: { day: "15", month: "Mar" },
-    title: "TechVista 2026 — National Technical Symposium",
-    venue: "JCT Engineering Campus, Main Auditorium",
-    time: "9:00 AM – 5:00 PM",
-  },
-  {
-    date: { day: "22", month: "Mar" },
-    title: "Campus Placement Drive — Cognizant & Infosys",
-    venue: "Placement Cell, Admin Block",
-    time: "10:00 AM – 4:00 PM",
-  },
-  {
-    date: { day: "05", month: "Apr" },
-    title: "Annual Cultural Fest — Kaleidoscope 2026",
-    venue: "College Ground & Open Air Theatre",
-    time: "All Day Event",
-  },
-  {
-    date: { day: "12", month: "Apr" },
-    title: "Workshop: AI & Machine Learning Fundamentals",
-    venue: "CSE Lab, Block A",
-    time: "2:00 PM – 5:00 PM",
-  },
-];
-
-const categoryColors: Record<string, string> = {
-  Achievement: "bg-emerald-50 text-emerald-700",
-  Partnership: "bg-blue-50 text-blue-700",
-  Accreditation: "bg-amber-50 text-amber-700",
-  "Campus Life": "bg-rose-50 text-rose-700",
-  Events: "bg-violet-50 text-violet-700",
-  Placements: "bg-indigo-50 text-indigo-700",
-};
 
 export function NewsEvents() {
-  const [activeTab, setActiveTab] = useState<"news" | "events">("news");
-  const [showAllNews] = useState(false);
-
   return (
-    <section className="section-padding bg-white">
-      <div className="container mx-auto px-4 md:px-6">
+    <section id="happenings" className="bg-white py-16 md:py-24">
+      <div className="container mx-auto px-4 md:px-8 max-w-[1400px]">
         {/* Header */}
-        <div className="mb-6 flex flex-col gap-4 md:mb-14 md:flex-row md:items-end md:justify-between md:gap-6">
+        <div className="mb-10 md:mb-14 flex items-end justify-between border-b border-gray-100 pb-6">
           <div>
-            <motion.span
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="text-gold mb-4 inline-block font-sans text-xs font-bold tracking-[0.2em] uppercase"
-            >
-              Stay Updated
-            </motion.span>
             <motion.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-navy font-serif text-3xl leading-tight sm:text-4xl md:text-5xl"
+              className="text-[#1a2332] font-serif text-3xl leading-tight sm:text-4xl md:text-[44px] italic mb-3"
             >
-              Happenings at{" "}
-              <span className="text-muted-foreground font-light italic">
-                JCT
-              </span>
+              Happenings at JCT
             </motion.h2>
+            <motion.p
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-[#5b6574] font-sans text-base"
+            >
+              Latest news, events, and academic breakthroughs.
+            </motion.p>
           </div>
 
-          {/* Tab Toggles */}
           <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="bg-muted flex gap-1 rounded-xl p-1"
+            className="hidden sm:block"
           >
-            {[
-              { id: "news" as const, label: "Latest News" },
-              { id: "events" as const, label: "Upcoming Events" },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`rounded-lg px-5 py-2.5 font-sans text-sm font-semibold transition-all duration-300 ${
-                  activeTab === tab.id
-                    ? "text-navy bg-white shadow-sm"
-                    : "text-muted-foreground hover:text-navy"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
+            <Link href="/campus-life" className="text-[#e68b20] font-sans text-[15px] font-bold tracking-wide hover:underline underline-offset-4">
+              View All News
+            </Link>
           </motion.div>
         </div>
 
-        {/* Content */}
-        <AnimatePresence mode="wait">
-          {activeTab === "news" ? (
-            <motion.div
-              key="news"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="snap-container scrollbar-hide -mx-4 flex gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-3"
+        {/* Bento Grid layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Column - Large Image Card (index 0) */}
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.1 }}
+            className="lg:col-span-5 h-[400px] lg:h-[600px] relative rounded-4xl overflow-hidden group cursor-pointer"
+          >
+            <Image
+              src={newsItems[0].image}
+              alt={newsItems[0].title}
+              fill
+              className="object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-linear-to-t from-[#1a2332]/90 via-[#1a2332]/20 to-transparent" />
+            <div className="absolute bottom-10 left-8 right-8 text-white z-10">
+              <span className="bg-[#a0842c] text-white text-[10px] font-bold tracking-widest uppercase px-2.5 py-1 rounded inline-block mb-5">
+                {newsItems[0].category}
+              </span>
+              <h3 className="font-serif text-[28px] md:text-[34px] italic leading-[1.2] text-white/95">
+                {newsItems[0].title}
+              </h3>
+            </div>
+          </motion.div>
+
+          {/* Right Column Grid */}
+          <div className="lg:col-span-7 flex flex-col gap-6 h-auto lg:h-[600px]">
+            {/* Top Horizontal Card (index 1) */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="flex-1 min-h-[250px] relative rounded-4xl overflow-hidden group cursor-pointer"
             >
-              {(showAllNews ? newsItems : newsItems.slice(0, 6)).map(
-                (item, i) => (
-                  <motion.article
-                    key={item.title}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
-                    className="group bg-surface border-border hover:border-gold/30 card-hover-lift snap-item w-[280px] shrink-0 cursor-pointer rounded-2xl border p-5 sm:w-[320px] md:w-auto md:p-6"
-                  >
-                    <div className="mb-4 flex items-center gap-3">
-                      <span
-                        className={`rounded-full px-2.5 py-1 font-sans text-[10px] font-bold tracking-wider uppercase ${categoryColors[item.category] || "bg-gray-50 text-gray-600"}`}
-                      >
-                        {item.category}
-                      </span>
-                      <span className="text-muted-foreground font-sans text-xs">
-                        {item.date}
-                      </span>
-                    </div>
-                    <h3 className="text-navy group-hover:text-gold mb-2 line-clamp-2 font-sans text-base leading-snug font-semibold transition-colors">
-                      {item.title}
-                    </h3>
-                    <p className="text-muted-foreground mb-4 line-clamp-2 font-sans text-sm leading-relaxed">
-                      {item.excerpt}
-                    </p>
-                    <span className="text-gold flex items-center gap-1 font-sans text-xs font-semibold transition-all group-hover:gap-2">
-                      Read More <ArrowRight size={12} />
-                    </span>
-                  </motion.article>
-                ),
-              )}
+              <Image
+                src={newsItems[1].image}
+                alt={newsItems[1].title}
+                fill
+                className="object-cover transition-transform duration-700 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-[#1a2332]/90 via-[#1a2332]/10 to-transparent" />
+              <div className="absolute bottom-8 left-8 right-8 text-white z-10">
+                <h3 className="font-serif text-[24px] md:text-[28px] italic leading-tight text-white/95 max-w-[80%]">
+                  {newsItems[1].title}
+                </h3>
+              </div>
             </motion.div>
-          ) : (
-            <motion.div
-              key="events"
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="snap-container scrollbar-hide -mx-4 flex gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:px-0 md:pb-0"
-            >
-              {events.map((event, i) => (
-                <motion.div
-                  key={event.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.08 }}
-                  className="group bg-surface border-border hover:border-gold/30 card-hover-lift snap-item flex w-[300px] shrink-0 cursor-pointer gap-4 rounded-2xl border p-5 sm:w-[360px] md:w-auto md:gap-5 md:p-6"
-                >
-                  {/* Date Badge */}
-                  <div className="bg-navy flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-xl">
-                    <span className="font-sans text-xl leading-none font-black text-white">
-                      {event.date.day}
-                    </span>
-                    <span className="text-gold mt-0.5 font-sans text-[10px] font-bold tracking-wider uppercase">
-                      {event.date.month}
-                    </span>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="text-navy group-hover:text-gold mb-2 font-sans text-base leading-snug font-semibold transition-colors">
-                      {event.title}
-                    </h3>
-                    <div className="text-muted-foreground flex flex-wrap gap-3 font-sans text-xs">
-                      <span className="flex items-center gap-1">
-                        <MapPin size={11} /> {event.venue}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock size={11} /> {event.time}
-                      </span>
-                    </div>
-                  </div>
-                  <ArrowRight
-                    size={16}
-                    className="text-muted-foreground group-hover:text-gold mt-1 shrink-0 transition-colors"
+            
+            {/* Two Bottom Vertical Cards */}
+            <div className="flex-[1.2] grid grid-cols-1 sm:grid-cols-2 gap-6 min-h-[250px]">
+               {/* Card (index 2) */}
+               <motion.div 
+                 initial={{ opacity: 0, y: 30 }}
+                 whileInView={{ opacity: 1, y: 0 }}
+                 viewport={{ once: true }}
+                 transition={{ delay: 0.3 }}
+                 className="relative rounded-4xl overflow-hidden group cursor-pointer min-h-[250px]"
+               >
+                  <Image
+                    src={newsItems[2].image}
+                    alt={newsItems[2].title}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
                   />
-                </motion.div>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+                  <div className="absolute inset-0 bg-linear-to-t from-[#1a2332]/90 via-[#1a2332]/20 to-transparent" />
+                  <div className="absolute bottom-6 left-6 right-6 text-white z-10">
+                     <h3 className="font-serif text-[20px] md:text-[22px] italic leading-tight text-white/95">
+                        {newsItems[2].title}
+                     </h3>
+                  </div>
+               </motion.div>
+
+               {/* Card (index 3) */}
+               <motion.div 
+                 initial={{ opacity: 0, y: 30 }}
+                 whileInView={{ opacity: 1, y: 0 }}
+                 viewport={{ once: true }}
+                 transition={{ delay: 0.4 }}
+                 className="relative rounded-4xl overflow-hidden group cursor-pointer min-h-[250px]"
+               >
+                  <Image
+                    src={newsItems[3].image}
+                    alt={newsItems[3].title}
+                    fill
+                    className="object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-linear-to-t from-[#1a2332]/90 via-[#1a2332]/20 to-transparent" />
+                  <div className="absolute bottom-6 left-6 right-6 text-white z-10">
+                     <h3 className="font-serif text-[20px] md:text-[22px] italic leading-tight text-white/95">
+                        {newsItems[3].title}
+                     </h3>
+                  </div>
+               </motion.div>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

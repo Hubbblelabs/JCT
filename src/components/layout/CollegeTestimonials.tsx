@@ -96,110 +96,116 @@ export function CollegeTestimonials({
   }, [groupedItems, paused]);
 
   return (
-    <section className={`py-20 md:py-28 ${sectionBgClassName}`}>
+    <section className="py-20 md:py-32 bg-white">
       <div className="container mx-auto px-4 md:px-6">
-        <div className="mb-14 text-center">
-          <h2 className="text-3xl font-bold text-[#111827] md:text-5xl">
-            {title}
-          </h2>
-          {subtitle ? (
-            <p className="mx-auto mt-4 max-w-3xl text-sm leading-relaxed text-[#4B5563] md:text-base">
-              {subtitle}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-          {TESTIMONIAL_CATEGORIES.map((category, laneIndex) => {
-            const laneItems = groupedItems[category];
-            const activeIndex = activeIndices[category] % laneItems.length;
-            const activeItem = laneItems[activeIndex];
-
-            return (
-              <motion.article
-                key={category}
-                initial={{ opacity: 0, y: 24 }}
+        <div className="bg-[#f2f4f7] rounded-[3rem] md:rounded-[4rem] p-8 md:p-16 lg:p-20 shadow-inner">
+          <div className="mb-14 text-center">
+            {subtitle && (
+              <motion.span 
+                initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, amount: 0.25 }}
-                transition={{ duration: 0.5, delay: laneIndex * 0.08 }}
-                className="flex flex-col items-center"
-                onMouseEnter={() =>
-                  setPaused((prev) => ({
-                    ...prev,
-                    [category]: true,
-                  }))
-                }
-                onMouseLeave={() =>
-                  setPaused((prev) => ({
-                    ...prev,
-                    [category]: false,
-                  }))
-                }
+                viewport={{ once: true }}
+                className="text-[#a0842c] font-sans text-[10px] font-bold tracking-[0.2em] uppercase mb-4 inline-block"
               >
-                <span
-                  className="z-20 inline-flex rounded-full px-6 py-2 text-sm font-semibold"
-                  style={{
-                    backgroundColor: `${accentColor}20`,
-                    color: accentColor,
-                  }}
-                >
-                  {category}
-                </span>
+                Voices
+              </motion.span>
+            )}
+            <motion.h2 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1 }}
+              className="text-4xl md:text-5xl lg:text-5xl font-serif italic text-[#1a2332] leading-tight"
+            >
+              {title === "Testimonials" ? "Stories of Transformation" : title}
+            </motion.h2>
+          </div>
 
-                <motion.div
-                  key={`${category}-${activeItem.name}-${activeIndex}`}
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.35, ease: "easeOut" }}
-                  className="w-full"
+          <div className="grid grid-cols-1 gap-6 lg:gap-8 md:grid-cols-3">
+            {TESTIMONIAL_CATEGORIES.map((category, laneIndex) => {
+              const laneItems = groupedItems[category];
+              const activeIndex = activeIndices[category] % laneItems.length;
+              const activeItem = laneItems[activeIndex];
+
+              if (!activeItem) return null;
+
+              return (
+                <motion.article
+                  key={category}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, amount: 0.25 }}
+                  transition={{ duration: 0.5, delay: laneIndex * 0.1 }}
+                  className="flex flex-col h-full"
+                  onMouseEnter={() =>
+                    setPaused((prev) => ({
+                      ...prev,
+                      [category]: true,
+                    }))
+                  }
+                  onMouseLeave={() =>
+                    setPaused((prev) => ({
+                      ...prev,
+                      [category]: false,
+                    }))
+                  }
                 >
-                  <div
-                    className="relative z-10 mx-auto -mt-2 h-32 w-32 overflow-hidden rounded-full border-4 bg-white"
-                    style={{ borderColor: accentColor }}
+                  <motion.div
+                    key={`${category}-${activeItem.name}-${activeIndex}`}
+                    initial={{ opacity: 0, scale: 0.98 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4, ease: "easeOut" }}
+                    className="flex flex-col flex-1 bg-white rounded-3xl p-8 md:p-10 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] border border-transparent hover:border-gray-100 transition-colors"
                   >
-                    <Image
-                      src={activeItem.image}
-                      alt={activeItem.name}
-                      fill
-                      sizes="136px"
-                      className="object-cover"
-                    />
+                    <div className="flex-1 relative">
+                      <span className="absolute -top-2 right-0 bg-[#f4f5f7] text-[#a0842c] px-3 py-1 rounded-full text-[9px] font-bold tracking-widest uppercase">
+                        {category}
+                      </span>
+                      <span className="text-[#fcebba] font-serif text-7xl leading-0 block mb-6 mt-4 opacity-80">&ldquo;</span>
+                      <p className="text-[#5b6574] italic leading-relaxed text-[15px] min-h-[140px]">
+                        "{activeItem.quote}"
+                      </p>
+                    </div>
+
+                    <div className="mt-6 pt-6 border-t border-gray-100/80 flex items-center gap-4">
+                      <div className="relative w-12 h-12 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+                        <Image
+                          src={activeItem.image}
+                          alt={activeItem.name}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-[#1a2332] text-[15px]">
+                          {activeItem.name}
+                        </h3>
+                        <p className="text-[#7c869a] text-[10px] font-bold tracking-widest uppercase mt-0.5">
+                          {activeItem.role}
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+
+                  <div className="mt-8 flex items-center justify-center gap-2">
+                    {laneItems.length > 1 && laneItems.map((_, dotIndex) => (
+                      <button
+                        key={dotIndex}
+                        onClick={() => setActiveIndices(prev => ({ ...prev, [category]: dotIndex }))}
+                        className={`h-2 rounded-full transition-all duration-300 ${
+                          dotIndex === activeIndex 
+                            ? "w-6 bg-[#3b475c]" 
+                            : "w-2 bg-[#d1d5db] hover:bg-[#9ca3af]"
+                        }`}
+                        aria-label={`Go to slide ${dotIndex + 1}`}
+                      />
+                    ))}
                   </div>
-
-                  <div className="-mt-10 w-full rounded-4xl border border-[#D1D5DB] bg-white px-8 pt-20 pb-10 text-center shadow-[0_12px_35px_rgba(17,24,39,0.06)]">
-                    <p className="min-h-36 text-lg leading-relaxed text-[#374151]">
-                      {activeItem.quote}
-                    </p>
-
-                    <h3
-                      className="mt-8 text-4xl font-bold"
-                      style={{ color: accentColor }}
-                    >
-                      {activeItem.name}
-                    </h3>
-                    <p className="mt-2 text-lg text-[#6B7280]">
-                      {activeItem.role}
-                    </p>
-                  </div>
-                </motion.div>
-
-                <div className="mt-7 flex items-center gap-2">
-                  {laneItems.map((_, dotIndex) => (
-                    <span
-                      key={dotIndex}
-                      className={`h-3 w-3 rounded-full ${
-                        dotIndex === activeIndex ? "opacity-100" : "opacity-40"
-                      }`}
-                      style={{
-                        backgroundColor:
-                          dotIndex === activeIndex ? accentColor : "#D1D5DB",
-                      }}
-                    />
-                  ))}
-                </div>
-              </motion.article>
-            );
-          })}
+                </motion.article>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
