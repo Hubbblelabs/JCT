@@ -123,27 +123,11 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
       <nav
         className={`fixed ${bannerVisible && !isHomePage ? "top-10" : "top-4"} right-0 left-0 z-50 transition-all duration-300 px-4 md:px-8`}
       >
-        <div className={`mx-auto flex w-full max-w-360 items-center lg:justify-between justify-end rounded-full border px-4 lg:px-7 py-2.5 transition-all duration-300 ${isSolid ? 'shadow-[0_8px_30px_rgba(0,0,0,0.4)] border-white/10 bg-[#0a1628]/95 backdrop-blur-md' : 'border-white/0 bg-transparent'}`}>
-          {/* Mobile Centered Logo */}
-          <div className="absolute left-1/2 -translate-x-1/2 lg:hidden flex flex-col items-center pointer-events-auto z-50 mt-1">
-            <Link href="/" className="flex flex-col items-center text-center">
-              <div className="relative h-[26px] w-[26px] mb-1">
-                <Image src="/jct_logo_yellow.png" alt="JCT Logo" fill className="object-contain" />
-              </div>
-              <span className="font-serif text-[20px] leading-none font-bold text-white tracking-[0.15em] drop-shadow-md">JCT</span>
-              <span className="font-sans text-[8px] leading-tight font-bold text-white tracking-[0.18em] uppercase mt-0.5 drop-shadow-md">Institutions</span>
-              <div className="flex items-center gap-1 opacity-90 mt-0.5">
-                <div className="h-px w-3 bg-white/70"></div>
-                <span className="font-sans text-[5px] font-bold text-white tracking-widest uppercase drop-shadow-sm">Est. 2009</span>
-                <div className="h-px w-3 bg-white/70"></div>
-              </div>
-            </Link>
-          </div>
-
-          {/* Desktop Logo Container */}
-          <div className="hidden lg:flex items-center lg:flex-1 justify-start shrink-0 z-50">
-            <Link href="/" className="flex shrink-0 items-center gap-3">
-              <div className="relative h-10 w-10">
+        <div className={`mx-auto flex w-full max-w-360 items-center justify-between rounded-full border px-4 lg:px-7 py-2.5 transition-all duration-300 ${isSolid ? 'shadow-[0_8px_30px_rgba(0,0,0,0.4)] border-white/10 bg-[#0a1628]/95 backdrop-blur-md' : 'border-white/0 bg-transparent'}`}>
+          {/* Logo Container */}
+          <div className="flex items-center lg:flex-1 justify-start shrink-0 z-50">
+            <Link href="/" className="flex shrink-0 items-center gap-2 lg:gap-3">
+              <div className="relative h-7 w-7 lg:h-10 lg:w-10">
                 <Image 
                   src="/jct_logo_yellow.png" 
                   alt="JCT Logo" 
@@ -151,7 +135,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                   className="object-contain" 
                 />
               </div>
-              <span className="font-sans text-xl xl:text-[24px] font-bold tracking-tight transition-colors drop-shadow-sm whitespace-nowrap text-white">
+              <span className="font-sans text-lg lg:text-xl xl:text-[24px] font-bold tracking-tight transition-colors drop-shadow-sm whitespace-nowrap text-white">
                 JCT Institutions
               </span>
             </Link>
@@ -170,17 +154,27 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                   { name: "Polytechnic College", href: "/institutions/polytechnic" },
                 ]
               },
-              { name: "Admissions", href: "/admissions" },
-              { name: "Placements", href: "/#placements" },
-              { name: "Testimonials", href: "/#testimonials" },
-              { name: "Life@JCT", href: "/#happenings" },
+              { name: "Admissions", href: "/admissions", className: "hidden lg:block" },
+              { name: "Placements", href: "/#placements", className: "hidden xl:block" },
+              { name: "Testimonials", href: "/#testimonials", className: "hidden xl:block" },
+              { name: "Life@JCT", href: "/#happenings", className: "hidden 2xl:block" },
+              {
+                name: "Explore More",
+                href: "#",
+                className: "lg:block 2xl:hidden",
+                children: [
+                  { name: "Placements", href: "/#placements", className: "xl:hidden" },
+                  { name: "Testimonials", href: "/#testimonials", className: "xl:hidden" },
+                  { name: "Life@JCT", href: "/#happenings", className: "2xl:hidden" },
+                ]
+              }
             ].map((link) => {
               const isActive = link.href === "/" ? pathname === "/" : (pathname.startsWith(link.href) && !link.href.includes("#"));
               const hasDropdown = !!link.children;
               const isExpanded = desktopExpanded === link.name;
 
               return (
-                <div key={link.name} className="relative">
+                <div key={link.name} className={`relative ${(link as any).className || ""}`}>
                   {hasDropdown ? (
                     <button
                       onClick={(e) => {
@@ -227,7 +221,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                               key={child.name}
                               href={child.href}
                               onClick={() => setDesktopExpanded(null)}
-                              className="block rounded-lg px-4 py-2.5 font-sans text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white"
+                              className={`block rounded-lg px-4 py-2.5 font-sans whitespace-nowrap text-sm font-medium text-white/90 transition-colors hover:bg-white/10 hover:text-white ${(child as any).className || ""}`}
                             >
                               {child.name}
                             </Link>

@@ -78,7 +78,7 @@ const ENGINEERING_PO = [
 function buildEngineeringCurriculum(
   prefix: string,
 ): DepartmentData["curriculum"] {
-  return Array.from({ length: 8 }, (_, index) => {
+  const buildSemesters = (regYear: string) => Array.from({ length: 8 }, (_, index) => {
     const semester = index + 1;
     return {
       semester,
@@ -88,32 +88,43 @@ function buildEngineeringCurriculum(
           name:
             semester < 3
               ? "Engineering Mathematics"
-              : "Core Engineering Subject",
+              : `Core Engineering Subject`,
           credits: 4,
-          type: "Core",
+          type: "Core" as const,
         },
         {
           code: `${prefix}${semester}02`,
-          name: semester < 3 ? "Engineering Science" : "Department Elective",
+          name: semester < 3 ? "Engineering Science" : `Department Elective (${regYear})`,
           credits: 3,
-          type: semester < 3 ? "Theory" : "Elective",
+          type: semester < 3 ? "Theory" as const : "Elective" as const,
         },
         {
           code: `${prefix}${semester}03`,
           name: "Laboratory / Practical",
           credits: 2,
-          type: "Lab",
+          type: "Lab" as const,
         },
         {
           code: `${prefix}${semester}04`,
           name:
             semester === 8 ? "Project Work" : "Professional Skill Development",
-          credits: 3,
-          type: semester === 8 ? "Project" : "Core",
+          credits: regYear === "R2021" ? 3 : 2,
+          type: semester === 8 ? "Project" as const : "Core" as const,
         },
       ],
     };
   });
+
+  return [
+    {
+      regulationName: "Regulation 2021",
+      semesters: buildSemesters("R2021"),
+    },
+    {
+      regulationName: "Regulation 2017",
+      semesters: buildSemesters("R2017"),
+    }
+  ];
 }
 
 function createEngineeringDepartment(config: {

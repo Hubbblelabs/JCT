@@ -82,8 +82,11 @@ export type DepartmentData = {
   bos: BoardMember[];
 
   curriculum: {
-    semester: number;
-    subjects: CurriculumSubject[];
+    regulationName: string;
+    semesters: {
+      semester: number;
+      subjects: CurriculumSubject[];
+    }[];
   }[];
 
   teachingLearning: {

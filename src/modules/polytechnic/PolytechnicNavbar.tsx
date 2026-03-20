@@ -11,11 +11,13 @@ type PolytechnicNavChild = {
   name: string;
   href: string;
   desc?: string;
+  className?: string;
 };
 
 type PolytechnicNavItem = {
   name: string;
   href: string;
+  className?: string;
   children?: PolytechnicNavChild[];
 };
 
@@ -31,14 +33,18 @@ const polytechnicNavigation: PolytechnicNavItem[] = [
       { name: "Polytechnic", href: "/institutions/polytechnic", desc: "Diploma programs" }
     ]
   },
-  { name: "About Us", href: "/institutions/polytechnic#about-institution" },
-  { name: "Courses", href: "/institutions/polytechnic#programs" },
-  { name: "Admission", href: "/institutions/polytechnic#admissions" },
-  { name: "Contact", href: "/institutions/polytechnic#contact" },
+  { name: "About Us", href: "/institutions/polytechnic#about-institution", className: "hidden xl:block" },
+  { name: "Courses", href: "/institutions/polytechnic#programs", className: "hidden xl:block" },
+  { name: "Admission", href: "/institutions/polytechnic#admissions", className: "hidden 2xl:block" },
+  { name: "Contact", href: "/institutions/polytechnic#contact", className: "hidden 2xl:block" },
   {
     name: "Explore More",
     href: "#",
     children: [
+      { name: "About Us", href: "/institutions/polytechnic#about-institution", desc: "About our institution", className: "xl:hidden" },
+      { name: "Courses", href: "/institutions/polytechnic#programs", desc: "Programs offered", className: "xl:hidden" },
+      { name: "Admission", href: "/institutions/polytechnic#admissions", desc: "Admission process & criteria", className: "2xl:hidden" },
+      { name: "Contact", href: "/institutions/polytechnic#contact", desc: "Get in touch with us", className: "2xl:hidden" },
       { name: "Placements", href: "/institutions/polytechnic#placements", desc: "Our recruitment partners & stats" },
       { name: "Life @ JCT", href: "/institutions/polytechnic#happenings", desc: "News, events & student life" },
       { name: "Testimonials", href: "/institutions/polytechnic#testimonials", desc: "Voices from our community" }
@@ -136,7 +142,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
               />
             </div>
             <div className="flex flex-col">
-              <span className="font-serif text-sm leading-none font-bold tracking-tight text-white md:text-lg">
+              <span className="font-serif text-sm leading-none font-bold tracking-tight text-white whitespace-nowrap md:text-lg">
                 JCT Polytechnic College
               </span>
               <span className="mt-0.5 hidden font-sans text-[10px] font-medium tracking-[0.2em] text-white/40 uppercase sm:block">
@@ -146,11 +152,11 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
           </Link>
 
           {/* Desktop Links */}
-          <div className="hidden items-center gap-2 xl:flex">
+          <div className="hidden items-center gap-2 lg:flex">
             {polytechnicNavigation.map((link) => (
               <div
                 key={link.name}
-                className="relative"
+                className={`relative ${link.className || ""}`}
                 onMouseEnter={() =>
                   link.children && setActiveDropdown(link.name)
                 }
@@ -159,7 +165,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 {link.children && link.href === "#" ? (
                   <button
                     type="button"
-                    className="flex items-center gap-1 px-3 py-2 font-sans text-base font-medium text-white transition-colors hover:text-white/70"
+                    className="flex items-center gap-1 px-3 py-2 font-sans text-base whitespace-nowrap font-medium text-white transition-colors hover:text-white/70"
                   >
                     {link.name}
                     <ChevronDown
@@ -173,7 +179,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                   <Link
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    className="flex items-center gap-1 px-3 py-2 font-sans text-base font-medium text-white transition-colors hover:text-white/70"
+                    className="flex items-center gap-1 px-3 py-2 font-sans text-base whitespace-nowrap font-medium text-white transition-colors hover:text-white/70"
                   >
                     {link.name}
                     {link.children && (
@@ -205,10 +211,10 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 key={child.name}
                                 href={child.href}
                                 onClick={(e) => handleNavClick(e, child.href)}
-                                className="group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all hover:bg-white/6"
+                                className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all hover:bg-white/6 ${child.className || ""}`}
                               >
                                 <div>
-                                  <p className="group-hover:text-gold font-sans text-base font-medium text-white/90 transition-colors">
+                                  <p className="group-hover:text-gold font-sans whitespace-nowrap text-base font-medium text-white/90 transition-colors">
                                     {child.name}
                                   </p>
                                   {child.desc && (
@@ -234,17 +240,17 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
           </div>
 
           {/* Desktop Right */}
-          <div className="hidden items-center gap-4 xl:flex">
+          <div className="hidden items-center gap-4 lg:flex">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="flex items-center gap-1.5 font-sans text-base text-white/60 transition-colors hover:text-white"
+              className="flex items-center gap-1.5 font-sans whitespace-nowrap text-base text-white/60 transition-colors hover:text-white"
             >
               <Phone size={16} /> {siteConfig.contact.phone}
             </a>
             <Link
               href="/institutions/polytechnic#admissions"
               onClick={(e) => handleNavClick(e, "/institutions/polytechnic#admissions")}
-              className="bg-gold text-polytechnic-dark hover:bg-gold-light shadow-gold/20 inline-flex h-10 items-center gap-2 rounded-full px-5 font-sans text-base font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
+              className="bg-gold text-polytechnic-dark hover:bg-gold-light shadow-gold/20 inline-flex flex-shrink-0 whitespace-nowrap h-10 items-center justify-center gap-2 rounded-full px-5 font-sans text-base font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
             >
               Apply Now <ArrowRight size={16} />
             </Link>
@@ -252,7 +258,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
 
           {/* Mobile Toggle */}
           <button
-            className="p-2 text-white/70 transition-colors hover:text-white xl:hidden"
+            className="p-2 text-white/70 transition-colors hover:text-white lg:hidden"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
@@ -269,7 +275,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-60 bg-black/40 backdrop-blur-sm xl:hidden"
+              className="fixed inset-0 z-60 bg-black/40 backdrop-blur-sm lg:hidden"
               onClick={() => setIsOpen(false)}
             />
             <motion.div
@@ -277,7 +283,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="bg-polytechnic-dark fixed inset-y-0 right-0 z-61 flex w-full flex-col sm:w-96 xl:hidden"
+              className="bg-polytechnic-dark fixed inset-y-0 right-0 z-61 flex w-full flex-col sm:w-96 lg:hidden"
             >
               {/* Header */}
               <div className="flex items-center justify-between border-b border-white/5 p-4 pt-6">
@@ -305,7 +311,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
               {/* Links */}
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-3">
                 {polytechnicNavigation.map((link) => (
-                  <div key={link.name} className="border-b border-white/5">
+                  <div key={link.name} className={`border-b border-white/5 ${link.className || ""}`}>
                     {link.children ? (
                       <div>
                         <button
@@ -335,7 +341,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                     key={child.name}
                                     href={child.href}
                                     onClick={(e) => handleNavClick(e, child.href, true)}
-                                    className="hover:text-gold block rounded-lg px-2 py-2 font-sans text-base text-white/60 transition-colors"
+                                    className={`hover:text-gold block rounded-lg px-2 py-2 font-sans text-base text-white/60 transition-colors ${child.className || ""}`}
                                   >
                                     {child.name}
                                   </Link>

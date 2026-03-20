@@ -1,28 +1,28 @@
 import type { DepartmentData } from "@/types/department";
 
 function buildPolyCurriculum(prefix: string): DepartmentData["curriculum"] {
-  return Array.from({ length: 6 }, (_, index) => {
+  const buildSemesters = (regYear: string) => Array.from({ length: 6 }, (_, index) => {
     const semester = index + 1;
     return {
       semester,
       subjects: [
         {
           code: `${prefix}${semester}01`,
-          name: semester <= 2 ? "Applied Science" : "Core Diploma Subject",
+          name: semester <= 2 ? "Applied Science" : `Core Diploma Subject (${regYear})`,
           credits: 4,
-          type: "Core",
+          type: "Core" as const,
         },
         {
           code: `${prefix}${semester}02`,
           name: "Technical Drawing / Design",
           credits: 3,
-          type: "Theory",
+          type: "Theory" as const,
         },
         {
           code: `${prefix}${semester}03`,
           name: "Workshop / Lab",
           credits: 2,
-          type: "Lab",
+          type: "Lab" as const,
         },
         {
           code: `${prefix}${semester}04`,
@@ -30,12 +30,23 @@ function buildPolyCurriculum(prefix: string): DepartmentData["curriculum"] {
             semester === 6
               ? "Industrial Training Project"
               : "Skill Enhancement",
-          credits: 3,
-          type: semester === 6 ? "Project" : "Elective",
+          credits: regYear === "M Scheme" ? 3 : 2,
+          type: semester === 6 ? "Project" as const : "Elective" as const,
         },
       ],
     };
   });
+
+  return [
+    {
+      regulationName: "M Scheme",
+      semesters: buildSemesters("M Scheme"),
+    },
+    {
+      regulationName: "L Scheme",
+      semesters: buildSemesters("L Scheme"),
+    }
+  ];
 }
 
 function createPolyDepartment(config: {

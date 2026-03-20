@@ -35,6 +35,8 @@ import {
 } from "lucide-react";
 import type { DepartmentData } from "@/types/department";
 import { Navbar } from "@/components/layout/Navbar";
+import { ArtsScienceNavbar } from "@/modules/arts-science/ArtsScienceNavbar";
+import { PolytechnicNavbar } from "@/modules/polytechnic/PolytechnicNavbar";
 import { Footer } from "@/components/layout/Footer";
 
 // ─── Tab Definition ──────────────────────────────────────────────────────────
@@ -393,15 +395,47 @@ function OverviewTab({ dept, ac, bg }: { dept: DepartmentData; ac: string; bg: s
 
 function AcademicsTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
   const [activeSemester, setActiveSemester] = useState(0);
+  
+  // Use regulations from the actual data
+  const regulations = dept.curriculum.map(c => c.regulationName);
+  const [activeRegulation, setActiveRegulation] = useState(regulations[0] || "");
+
+  const currentRegulationData = dept.curriculum.find(c => c.regulationName === activeRegulation);
+  const semesters = currentRegulationData?.semesters || [];
 
   return (
     <div className="space-y-14">
       {/* Curriculum */}
       <section>
-        <SectionHeading icon={BookOpen} title="Curriculum & Syllabus" ac={ac} />
+        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-2">
+          <SectionHeading icon={BookOpen} title="Curriculum & Syllabus" ac={ac} />
+          
+          {regulations.length > 0 && (
+            <div className="flex shrink-0 items-center justify-between gap-1 overflow-x-auto rounded-xl border border-gray-200 bg-white p-1 shadow-sm sm:mt-1">
+              {regulations.map((reg) => (
+                <button
+                  key={reg}
+                  onClick={() => {
+                    setActiveRegulation(reg);
+                    setActiveSemester(0); // Reset to Semester 1 on regulation change
+                  }}
+                  className={`shrink-0 rounded-lg px-3 py-1.5 text-[11px] sm:text-xs font-bold transition-all ${
+                    activeRegulation === reg 
+                      ? "text-white shadow-sm" 
+                      : "text-gray-500 hover:text-gray-900 hover:bg-gray-50 bg-transparent"
+                  }`}
+                  style={activeRegulation === reg ? { backgroundColor: ac } : {}}
+                >
+                  {reg}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         <FadeUp>
           <div className="mb-5 flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-            {dept.curriculum.map((sem, i) => (
+            {semesters.map((sem, i) => (
               <button
                 key={sem.semester}
                 onClick={() => setActiveSemester(i)}
@@ -419,9 +453,9 @@ function AcademicsTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
         </FadeUp>
 
         <AnimatePresence mode="wait">
-          {dept.curriculum[activeSemester] && (
+          {semesters[activeSemester] && (
             <motion.div
-              key={activeSemester}
+              key={`${activeRegulation}-${activeSemester}`}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
@@ -442,7 +476,7 @@ function AcademicsTab({ dept, ac }: { dept: DepartmentData; ac: string }) {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
-                    {dept.curriculum[activeSemester].subjects.map((sub) => (
+                    {semesters[activeSemester].subjects.map((sub) => (
                       <tr key={sub.code} className="transition-colors hover:bg-gray-50/70">
                         <td className="px-5 py-3.5 font-mono text-xs font-semibold text-gray-400">
                           {sub.code}
@@ -1153,7 +1187,13 @@ export function DepartmentPageLayout({
 
   return (
     <>
-      <Navbar />
+      {dept.college === "arts-science" ? (
+        <ArtsScienceNavbar forceSolidOnTop />
+      ) : dept.college === "polytechnic" ? (
+        <PolytechnicNavbar forceSolidOnTop />
+      ) : (
+        <Navbar />
+      )}
 
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <header className="relative min-h-[480px] overflow-hidden pt-28 pb-14 md:min-h-[540px]" style={{ backgroundColor: bg }}>
@@ -1190,13 +1230,13 @@ export function DepartmentPageLayout({
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.45 }}
           >
-            <Link
+            {/* <Link
               href={backHref}
               className="mb-8 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white/85 backdrop-blur-sm transition-all hover:bg-white/20 hover:text-white"
             >
               <ArrowLeft className="h-3.5 w-3.5" />
               {backLabel}
-            </Link>
+            </Link> */}
           </motion.div>
 
           <div className="max-w-4xl">
@@ -1256,57 +1296,60 @@ export function DepartmentPageLayout({
         </div>
       </header>
 
-      {/* ── Sticky Tab Bar ────────────────────────────────────────────── */}
-      <div className="sticky top-16 z-40 border-b border-gray-200 bg-white/90 backdrop-blur-xl">
+      {/* ── Main Layout with Sidebar ──────────────────────────────────── */}
+      <main className="min-h-screen bg-slate-50 py-8 md:py-12">
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <nav className="flex items-center gap-1 overflow-x-auto py-3 scrollbar-hide sm:gap-2">
-            {TABS.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className="relative flex shrink-0 items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 sm:px-5"
-                  style={
-                    isActive
-                      ? { color: ac }
-                      : { color: "#6b7280" }
-                  }
-                >
-                  <Icon
-                    className={`h-3.5 w-3.5 shrink-0 transition-transform duration-300 ${isActive ? "scale-110" : ""}`}
-                  />
-                  <span className="hidden xs:inline sm:inline">{tab.label}</span>
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeTabIndicator"
-                      className="absolute inset-0 z-[-1] rounded-full"
-                      style={{ backgroundColor: `${ac}12`, border: `1.5px solid ${ac}25` }}
-                      transition={{ type: "spring", bounce: 0.2, duration: 0.55 }}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-      </div>
+          <div className="flex flex-col lg:flex-row gap-6 lg:gap-10">
+            {/* ── Floating Sidebar (Tabs) ──────────────────────────────── */}
+            <aside className="lg:w-72 shrink-0">
+              <div className="sticky top-24 z-40 lg:rounded-2xl lg:bg-white lg:p-3 lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)] lg:border lg:border-slate-200/60">
+                <nav className="flex items-center gap-2 overflow-x-auto pb-4 scrollbar-hide lg:flex-col lg:items-stretch lg:gap-1 lg:pb-0">
+                  {TABS.map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = activeTab === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`relative flex w-full shrink-0 items-center justify-center lg:justify-start gap-2.5 rounded-full lg:rounded-xl px-5 py-2.5 lg:px-4 lg:py-3.5 text-sm font-semibold transition-all duration-300 ${
+                          isActive ? "" : "hover:bg-slate-200/50 lg:hover:bg-slate-50 text-slate-600"
+                        }`}
+                        style={isActive ? { color: ac } : {}}
+                      >
+                        <Icon
+                          className={`h-4 w-4 shrink-0 transition-transform duration-300 ${isActive ? "scale-110" : "opacity-60"}`}
+                        />
+                        <span className="whitespace-nowrap">{tab.label}</span>
+                        {isActive && (
+                          <motion.div
+                            layoutId="activeTabIndicator"
+                            className="absolute inset-0 z-[-1] rounded-full lg:rounded-xl"
+                            style={{ backgroundColor: `${ac}12`, border: `1.5px solid ${ac}25` }}
+                            transition={{ type: "spring", bounce: 0.2, duration: 0.55 }}
+                          />
+                        )}
+                      </button>
+                    );
+                  })}
+                </nav>
+              </div>
+            </aside>
 
-      {/* ── Main Content ──────────────────────────────────────────────── */}
-      <main className="min-h-screen bg-slate-50 py-10 md:py-16">
-        <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeTab}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -12 }}
-              transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            >
-              {renderTabContent()}
-            </motion.div>
-          </AnimatePresence>
+            {/* ── Tab Content Container ───────────────────────────────── */}
+            <div className="flex-1 min-w-0 pb-16">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeTab}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {renderTabContent()}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
       </main>
 

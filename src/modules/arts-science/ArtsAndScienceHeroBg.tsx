@@ -4,27 +4,27 @@ export function ArtsAndScienceHeroBg() {
   return (
     <div className="absolute inset-0 z-0 overflow-hidden bg-[#faf8fc] pointer-events-none">
       {/* Light radial glow for maximum text readability on the center-left */}
-      <div className="absolute -top-[20%] -left-[10%] w-[60%] h-[70%] rounded-full bg-white opacity-100 blur-[100px]" />
-      <div className="absolute top-[20%] left-[10%] w-[40%] h-[40%] rounded-full bg-[#fdfcff] opacity-90 blur-[80px]" />
+      <div className="absolute -top-[20%] -left-[10%] w-[60%] sm:w-[50%] md:w-[45%] h-[70%] sm:h-[60%] md:h-[50%] rounded-full bg-white opacity-100 blur-[80px] sm:blur-[100px]" />
+      <div className="absolute top-[20%] left-[10%] w-[40%] sm:w-[35%] md:w-[30%] h-[40%] sm:h-[35%] md:h-[30%] rounded-full bg-[#fdfcff] opacity-90 blur-[60px] sm:blur-[80px]" />
       
       {/* Deep, rich soft glow behind the image card area on the right */}
-      <div className="absolute bottom-[0%] right-[0%] w-[50%] h-[60%] rounded-full bg-orange-500/15 blur-[130px]" />
-      <div className="absolute top-[30%] right-[5%] w-[40%] h-[40%] rounded-full bg-orange-400/15 blur-[120px]" />
+      <div className="absolute bottom-[0%] right-[0%] w-[50%] sm:w-[45%] md:w-[40%] h-[60%] sm:h-[55%] md:h-[50%] rounded-full bg-orange-500/15 blur-[100px] sm:blur-[130px]" />
+      <div className="absolute top-[30%] right-[5%] sm:right-[8%] md:right-[10%] w-[40%] sm:w-[35%] md:w-[30%] h-[40%] sm:h-[35%] md:h-[30%] rounded-full bg-orange-400/15 blur-[80px] sm:blur-[120px]" />
 
       {/* Left side contrast texture: Dot grid representing "Science & Structure" */}
       <div 
         className="absolute inset-0 opacity-[0.25]"
         style={{
           backgroundImage: "radial-gradient(#f97316 1.5px, transparent 1.5px)",
-          backgroundSize: "32px 32px",
-          maskImage: "radial-gradient(ellipse at 10% 60%, black 0%, transparent 45%)",
-          WebkitMaskImage: "radial-gradient(ellipse at 10% 60%, black 0%, transparent 45%)"
+          backgroundSize: "24px 24px",
+          maskImage: "radial-gradient(ellipse at 10% 60%, black 0%, transparent 50%)",
+          WebkitMaskImage: "radial-gradient(ellipse at 10% 60%, black 0%, transparent 50%)"
         }}
       />
 
       {/* Primary Abstract Contour Waves gathering at the bottom right */}
       <svg
-        className="absolute top-0 left-0 w-full h-full object-cover min-w-[100vw] min-h-[100vh] opacity-95"
+        className="absolute top-0 left-0 w-full h-full opacity-95"
         preserveAspectRatio="xMidYMid slice"
         viewBox="0 0 1440 800"
         xmlns="http://www.w3.org/2000/svg"
@@ -74,7 +74,7 @@ export function ArtsAndScienceHeroBg() {
         }}
       >
         <svg
-          className="absolute top-0 left-0 w-full h-full min-w-[100vw] min-h-[100vh] object-cover -scale-x-100"
+          className="absolute top-0 left-0 w-full h-full -scale-x-100"
           preserveAspectRatio="xMidYMid slice"
           viewBox="0 0 1440 800"
           xmlns="http://www.w3.org/2000/svg"

@@ -10,11 +10,12 @@ import { siteConfig } from "@/data/site";
 type ArtsNavItem = {
   name: string;
   href: string;
-  children?: { name: string; href: string; description?: string }[];
+  className?: string;
+  children?: { name: string; href: string; description?: string; className?: string }[];
 };
 
 const artsNav: ArtsNavItem[] = [
-  { name: "Home", href: "#hero" },
+  { name: "Home", href: "/institutions/arts-science/#hero" },
   {
     name: "Institutions",
     href: "/institutions",
@@ -36,14 +37,18 @@ const artsNav: ArtsNavItem[] = [
       },
     ],
   },
-  { name: "About Us", href: "#about" },
-  { name: "Courses", href: "#courses" },
-  { name: "Admission", href: "#admission" },
-  { name: "Contact", href: "#contact" },
+  { name: "About Us", href: "#about", className: "hidden xl:block" },
+  { name: "Courses", href: "#courses", className: "hidden xl:block" },
+  { name: "Admission", href: "#admission", className: "hidden 2xl:block" },
+  { name: "Contact", href: "#contact", className: "hidden 2xl:block" },
   {
     name: "Explore More",
     href: "#",
     children: [
+      { name: "About Us", href: "#about", description: "About our institution", className: "xl:hidden" },
+      { name: "Courses", href: "#courses", description: "Programs offered", className: "xl:hidden" },
+      { name: "Admission", href: "#admission", description: "Admission process & criteria", className: "2xl:hidden" },
+      { name: "Contact", href: "#contact", description: "Get in touch with us", className: "2xl:hidden" },
       { name: "Placements", href: "#placements", description: "Our recruitment partners & stats" },
       { name: "Life @ JCT", href: "#life", description: "News, events & student life" },
       { name: "Testimonials", href: "#testimonials", description: "Voices from our community" }
@@ -156,7 +161,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               <span className="font-serif text-sm leading-none font-bold tracking-tight md:text-lg">
                 JCT
               </span>
-              <span className="font-sans text-[10px] font-medium tracking-[0.1em] text-white/70 uppercase pt-0.5">
+              <span className="font-sans text-[10px] font-medium tracking-[0.1em] text-white/70 uppercase pt-0.5 whitespace-nowrap">
                 Arts & Science
               </span>
             </div>
@@ -167,7 +172,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
             {artsNav.map((link) => (
               <div
                 key={link.name}
-                className="relative"
+                className={`relative ${link.className || ""}`}
                 onMouseEnter={() =>
                   link.children && setActiveDropdown(link.name)
                 }
@@ -176,7 +181,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 {link.children && link.href === "#" ? (
                   <button
                     type="button"
-                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium text-white transition-colors hover:text-white/70"
+                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] whitespace-nowrap font-medium text-white transition-colors hover:text-white/70"
                   >
                     {link.name}
                     <ChevronDown
@@ -222,10 +227,10 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 key={child.name}
                                 href={child.href}
                                 onClick={(e) => handleNavClick(e, child.href)}
-                                className="group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all hover:bg-white/5"
+                                className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all hover:bg-white/5 ${child.className || ""}`}
                               >
                                 <div>
-                                  <p className="font-sans text-[15px] font-medium text-white/90 transition-colors group-hover:text-arts-science-primary group-hover:text-amber-500">
+                                  <p className="font-sans text-[15px] whitespace-nowrap font-medium text-white/90 transition-colors group-hover:text-arts-science-primary group-hover:text-amber-500">
                                     {child.name}
                                   </p>
                                   {child.description && (
@@ -254,13 +259,13 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
           <div className="hidden items-center gap-3 lg:flex">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="hidden items-center gap-1.5 font-sans text-sm text-white transition-colors hover:text-white/60 xl:flex"
+              className="hidden items-center gap-1.5 font-sans whitespace-nowrap text-sm text-white transition-colors hover:text-white/60 xl:flex"
             >
               <Phone size={14} /> {siteConfig.contact.phone}
             </a>
             <Link
               href="/admissions/apply"
-              className="bg-arts-science-accent text-white hover:bg-orange-500 shadow-arts-science-accent/20 inline-flex h-9 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
+              className="bg-arts-science-accent text-white hover:bg-orange-500 shadow-arts-science-accent/20 inline-flex whitespace-nowrap flex-shrink-0 h-9 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95"
             >
               Apply Now <ArrowRight size={14} />
             </Link>
@@ -324,7 +329,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               {/* Links */}
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-3">
                 {artsNav.map((link) => (
-                  <div key={link.name} className="border-b border-white/5">
+                  <div key={link.name} className={`border-b border-white/5 ${link.className || ""}`}>
                     {link.children ? (
                       <div>
                         <button
@@ -355,7 +360,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                     key={child.name}
                                     href={child.href}
                                     onClick={(e) => handleNavClick(e, child.href, true)}
-                                    className="block rounded-lg px-3 py-2 text-sm text-white/65 transition-colors hover:bg-white/5 hover:text-white"
+                                    className={`block rounded-lg px-3 py-2 text-sm text-white/65 transition-colors hover:bg-white/5 hover:text-white ${child.className || ""}`}
                                   >
                                     {child.name}
                                   </Link>

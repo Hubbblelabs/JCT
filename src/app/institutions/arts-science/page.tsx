@@ -38,7 +38,7 @@ export default function ArtsSciencePage() {
       <PartnerLogos />
       <Testimonials />
       <NewsEvents />
-      <CTA />
+      {/* <CTA /> */}
 
       <Footer />
     </main>
