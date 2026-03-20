@@ -119,7 +119,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
               >
                 <Link
                   href={link.href}
-                  className="flex items-center gap-1 px-3 py-2 font-sans text-base font-medium text-white/70 transition-colors hover:text-white"
+                  className="flex items-center gap-1 px-3 py-2 font-sans text-base font-medium text-white transition-colors hover:text-white/70"
                 >
                   {link.name}
                   {link.children && (

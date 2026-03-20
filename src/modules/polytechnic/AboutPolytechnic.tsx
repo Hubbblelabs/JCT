@@ -7,9 +7,33 @@ import { Quote } from "lucide-react";
 
 export function AboutPolytechnic() {
   return (
-    <>
-      <PolySection id="about-institution" tone="surface">
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16 items-center">
+    <div className="relative overflow-hidden bg-[#f6f8f7]">
+      {/* Global Engineering Drafting Paper Texture */}
+      <div 
+        className="absolute inset-0 z-0 pointer-events-none" 
+        style={{
+          backgroundImage: `linear-gradient(rgba(15, 23, 42, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(15, 23, 42, 0.03) 1px, transparent 1px)`,
+          backgroundSize: '40px 40px'
+        }}
+      />
+
+      <PolySection 
+        id="about-institution" 
+        tone="transparent"
+        className="relative"
+      >
+        {/* Abstract Texture & Blobs */}
+        <div 
+          className="absolute inset-0 z-0 pointer-events-none opacity-[0.6]" 
+          style={{
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(212, 160, 36, 0.15) 1px, transparent 0)`,
+            backgroundSize: '28px 28px'
+          }}
+        />
+        <div className="absolute top-0 right-0 -mr-32 -mt-32 w-[500px] h-[500px] bg-polytechnic-accent/5 rounded-full blur-3xl z-0 pointer-events-none"></div>
+        <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-[400px] h-[400px] bg-polytechnic-dark/5 rounded-full blur-3xl z-0 pointer-events-none"></div>
+
+        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:gap-16 items-center relative z-10">
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -47,13 +71,18 @@ export function AboutPolytechnic() {
         </div>
       </PolySection>
 
-      <PolySection id="vision-mission" tone="subtle">
-        <PolySectionHeader
-          title="Vision & Mission"
-          description="Our guiding principles and core objectives."
-          centered={true}
-        />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
+      <PolySection 
+        id="vision-mission" 
+        tone="transparent"
+        className="relative"
+      >
+        <div className="relative z-10">
+          <PolySectionHeader
+            title="Vision & Mission"
+            description="Our guiding principles and core objectives."
+            centered={true}
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -95,10 +124,18 @@ export function AboutPolytechnic() {
             </ul>
           </motion.div>
         </div>
+        </div>
       </PolySection>
 
-      <PolySection id="principals-message" tone="surface">
+      <PolySection id="principals-message" tone="transparent">
         <div className="bg-[#fcfaf7] rounded-[2rem] p-6 md:p-12 border border-[#f0e6d5] shadow-lg relative overflow-hidden">
+          {/* Diagonal abstract texture */}
+          <div 
+            className="absolute inset-0 z-0 pointer-events-none opacity-20"
+            style={{
+              backgroundImage: `repeating-linear-gradient(45deg, rgba(212, 160, 36, 0.1) 0px, rgba(212, 160, 36, 0.1) 2px, transparent 2px, transparent 10px)`
+            }}
+          />
           {/* Decorative Quote Mark */}
           <Quote className="absolute top-6 left-6 w-24 h-24 text-polytechnic-accent/10 -rotate-12" />
           
@@ -147,6 +184,6 @@ export function AboutPolytechnic() {
           </div>
         </div>
       </PolySection>
-    </>
+    </div>
   );
 }

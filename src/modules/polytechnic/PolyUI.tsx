@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 type PolySectionProps = {
   children: React.ReactNode;
   className?: string;
-  tone?: "surface" | "subtle" | "brand";
+  tone?: "surface" | "subtle" | "brand" | "transparent";
 } & React.ComponentPropsWithoutRef<"section">;
 
 export function PolySection({
@@ -18,7 +18,9 @@ export function PolySection({
       ? "bg-polytechnic-dark text-white"
       : tone === "subtle"
         ? "bg-[#f6f8f7]"
-        : "bg-white";
+        : tone === "transparent"
+          ? "bg-transparent"
+          : "bg-white";
 
   return (
     <section className={cn("py-16 md:py-20", toneClass, className)} {...props}>

@@ -15,15 +15,15 @@ export const metadata: Metadata = {
 };
 
 import { Hero } from "@/modules/arts-science/Hero";
-import { Philosophy } from "@/modules/arts-science/Philosophy";
+import { AboutArtsScience } from "@/modules/arts-science/AboutArtsScience";
 import { UgPrograms } from "@/modules/arts-science/UgPrograms";
-import { Distinction } from "@/modules/arts-science/Distinction";
 import { Accreditation } from "@/modules/arts-science/Accreditation";
 import { CampusLife } from "@/modules/arts-science/CampusLife";
 import { PartnerLogos } from "@/modules/arts-science/PartnerLogos";
 import { Testimonials } from "@/modules/arts-science/Testimonials";
 import { NewsEvents } from "@/modules/arts-science/NewsEvents";
 import { CTA } from "@/modules/arts-science/CTA";
+import { Placements } from "@/components/layout/Placements";
 
 export default function ArtsSciencePage() {
   return (
@@ -31,11 +31,10 @@ export default function ArtsSciencePage() {
       <ArtsScienceNavbar forceSolidOnTop />
 
       <Hero />
-      <Philosophy />
+      <AboutArtsScience />
       <UgPrograms />
-      <Distinction />
-      <Accreditation />
-      <CampusLife />
+      {/* <Distinction /> */}
+      <Accreditation />      <Placements />      <CampusLife />
       <PartnerLogos />
       <Testimonials />
       <NewsEvents />
