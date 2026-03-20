@@ -105,35 +105,8 @@ export function Placements() {
         </div>
       </div>
 
-      {/* Carousel full bleed */}
-      <div className="relative mb-14 md:mb-20">
-        <div className="from-surface pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-16 bg-gradient-to-r to-transparent md:w-32" />
-        <div className="from-surface pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-16 bg-gradient-to-l to-transparent md:w-32" />
-        <div className="mb-4">
-          <div className="animate-scroll-left flex gap-4">
-            {[...companies, ...companies].map((company, i) => (
-              <div key={`r1-${i}`} className="shrink-0">
-                <CompanyCard company={company} />
-              </div>
-            ))}
-          </div>
-        </div>
-        <div>
-          <div className="animate-scroll-right flex gap-4">
-            {[
-              ...companies.slice().reverse(),
-              ...companies.slice().reverse(),
-            ].map((company, i) => (
-              <div key={`r2-${i}`} className="shrink-0">
-                <CompanyCard company={company} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Stats contained */}
-      <div className="container mx-auto px-4 md:px-6">
+      <div className="container mx-auto mb-14 px-4 md:mb-20 md:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -163,6 +136,33 @@ export function Placements() {
             </motion.div>
           ))}
         </motion.div>
+      </div>
+
+      {/* Carousel full bleed */}
+      <div className="relative">
+        <div className="from-surface pointer-events-none absolute top-0 bottom-0 left-0 z-10 w-16 bg-linear-to-r to-transparent md:w-32" />
+        <div className="from-surface pointer-events-none absolute top-0 right-0 bottom-0 z-10 w-16 bg-linear-to-l to-transparent md:w-32" />
+        <div className="mb-4">
+          <div className="animate-scroll-left flex gap-4">
+            {[...companies, ...companies].map((company, i) => (
+              <div key={`r1-${i}`} className="shrink-0">
+                <CompanyCard company={company} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <div className="animate-scroll-right flex gap-4">
+            {[
+              ...companies.slice().reverse(),
+              ...companies.slice().reverse(),
+            ].map((company, i) => (
+              <div key={`r2-${i}`} className="shrink-0">
+                <CompanyCard company={company} />
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </section>
   );

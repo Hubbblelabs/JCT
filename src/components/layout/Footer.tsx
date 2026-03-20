@@ -52,7 +52,7 @@ export function Footer() {
               <div className="absolute inset-0 bg-[#D4A024]/20 blur-[80px] rounded-full scale-105 pointer-events-none" />
               
               {/* Helpline Card */}
-              <div className="relative z-10 flex-1 flex flex-col justify-center overflow-hidden rounded-[1.5rem] bg-[#0F172A] p-6 text-center text-white shadow-2xl w-full h-full">
+              <div className="relative z-10 flex-1 flex flex-col justify-center overflow-hidden rounded-3xl bg-[#0F172A] p-6 text-center text-white shadow-2xl w-full h-full">
                 <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 rounded-full bg-[#D4A024]/10 blur-3xl"></div>
               <div className="absolute bottom-0 left-0 -mb-10 -ml-10 h-32 w-32 rounded-full bg-[#D4A024]/10 blur-3xl"></div>
               
@@ -69,7 +69,7 @@ export function Footer() {
                   +91 93614 88801
                 </a>
                 
-                <div className="my-1.5 h-[1px] w-full max-w-[200px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+                <div className="my-1.5 h-px w-full max-w-[200px] bg-linear-to-r from-transparent via-white/20 to-transparent"></div>
                 
                 <a href="mailto:admissions@jct.edu" className="mt-3 flex items-center justify-center gap-2 font-sans text-xs font-medium text-white/80 transition-colors hover:text-white">
                   <Mail className="h-4 w-4 text-[#D4A024]" strokeWidth={2} />
@@ -154,7 +154,7 @@ export function Footer() {
                 Location Map
               </h3>
             </div>
-            <div className="overflow-hidden rounded-[1.5rem] shadow-[0_8px_30px_rgba(0,0,0,0.08)] w-full relative h-[250px] lg:h-auto lg:flex-1 min-h-[220px]">
+            <div className="overflow-hidden rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] w-full relative h-[250px] lg:h-auto lg:flex-1 min-h-[220px]">
               {/* Subtle map glow */}
               <div className="absolute inset-0 bg-white/10 mix-blend-overlay pointer-events-none z-10"></div>
               <iframe
@@ -173,8 +173,8 @@ export function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="bg-[#ebe4d8] px-4 py-6 md:px-8 border-t border-[#e2d8c9]">
-        <div className="container mx-auto flex flex-col items-center justify-between gap-4 text-[13px] text-gray-600 sm:flex-row">
+      <div className="bg-[#ebe4d8] pl-12 pt-6 pb-32 md:pl-24 md:pt-8 md:pb-30 lg:pb-10 border-t border-[#e2d8c9]">
+        <div className="container mx-auto flex flex-col items-center justify-between gap-6 text-[13px] text-gray-600 sm:flex-row lg:pr-[320px]">
           <p className="font-medium">
             © {new Date().getFullYear()} JCT Institutions. All rights reserved.
           </p>

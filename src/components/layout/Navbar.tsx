@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -21,16 +21,34 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const [bannerVisible, setBannerVisible] = useState(true);
 
+  const [desktopExpanded, setDesktopExpanded] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDesktopExpanded(null);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   const navItems = isHomePage
-    ? ["Home", "Institutions", "Placements", "Campus Life"]
-        .map((name) => navigationData.find((item) => item.name === name))
+    ? ["Home", "Institutions", "Placements", "Testimonials", "Campus Life"]
+
+        .map((name) => {
+          if (name === "Testimonials") {
+            return { name: "Testimonials", href: "/#testimonials" } as typeof navigationData[0];
+          }
+          return navigationData.find((item) => item.name === name);
+        })
         .filter((item): item is NonNullable<typeof item> => Boolean(item))
         .map((item) => {
           if (item.name === "Institutions") {
             return {
               ...item,
-              href: "/#institutions",
-              children: undefined,
+              href: "#",
             };
           }
 
@@ -81,7 +99,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   return (
     <>
       {/* Announcement Bar — Counselling Code */}
-      {bannerVisible && (
+      {bannerVisible && !isHomePage && (
         <div className="bg-gold text-navy fixed top-0 right-0 left-0 z-60 px-4 py-2 text-center font-sans text-xs font-bold tracking-wide">
           🎓 Admissions Open 2026-27 | Counselling Code:{" "}
           <span className="underline">{siteConfig.counsellingCode}</span> —{" "}
@@ -103,58 +121,124 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
 
       {/* Main Nav */}
       <nav
-        className={`fixed ${bannerVisible ? "top-10" : "top-4"} right-0 left-0 z-50 transition-all duration-300 px-4 md:px-8`}
+        className={`fixed ${bannerVisible && !isHomePage ? "top-10" : "top-4"} right-0 left-0 z-50 transition-all duration-300 px-4 md:px-8`}
       >
-        <div className={`mx-auto flex w-full max-w-7xl items-center justify-between rounded-full border px-7 py-2.5 transition-all duration-300 ${isSolid ? 'shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] border-gray-200 bg-white' : 'border-white/0 bg-transparent'}`}>
-          {/* Logo */}
-          <Link href="/" className="flex shrink-0 items-center gap-3">
-            <div className="relative h-10 w-10">
-              <Image 
-                src={isSolid ? "/jct_logo_blue.png" : "/jct_logo_yellow.png"} 
-                alt="JCT Logo" 
-                fill 
-                className="object-contain" 
-              />
-            </div>
-            <span className={`hidden sm:block font-serif text-[24px] font-bold italic tracking-tight transition-colors drop-shadow-sm ${isSolid ? 'text-[#1a2332]' : 'text-white'}`}>
-              JCT Institutions
-            </span>
-          </Link>
+        <div className={`mx-auto flex w-full max-w-360 items-center justify-between rounded-full border px-4 lg:px-7 py-2.5 transition-all duration-300 ${isSolid ? 'shadow-[0_8px_30px_-4px_rgba(0,0,0,0.12)] border-gray-200 bg-white' : 'border-white/0 bg-transparent'}`}>
+          {/* Logo Container - Flex 1 for perfect centering */}
+          <div className="flex items-center lg:flex-1 justify-start shrink-0 z-50">
+            <Link href="/" className="flex shrink-0 items-center gap-3">
+              <div className="relative h-10 w-10">
+                <Image 
+                  src={isSolid ? "/jct_logo_blue.png" : "/jct_logo_yellow.png"} 
+                  alt="JCT Logo" 
+                  fill 
+                  className="object-contain" 
+                />
+              </div>
+              <span className={`hidden sm:block font-sans text-xl xl:text-[24px] font-bold tracking-tight transition-colors drop-shadow-sm whitespace-nowrap ${isSolid ? 'text-[#1a2332]' : 'text-white'}`}>
+                JCT Institutions
+              </span>
+            </Link>
+          </div>
 
           {/* Desktop Links */}
-          <div className="hidden items-center gap-9 lg:flex">
+          <div className="hidden items-center justify-center gap-4 xl:gap-8 lg:flex whitespace-nowrap" ref={dropdownRef}>
             {[
               { name: "Home", href: "/" },
-              { name: "Colleges", href: "/#institutions" },
+              { 
+                name: "Institutions", 
+                href: "#", 
+                children: [
+                  { name: "Engineering College", href: "/institutions/engineering" },
+                  { name: "Arts & Science College", href: "/institutions/arts-science" },
+                  { name: "Polytechnic College", href: "/institutions/polytechnic" },
+                ]
+              },
               { name: "Admissions", href: "/admissions" },
               { name: "Placements", href: "/#placements" },
+              { name: "Testimonials", href: "/#testimonials" },
               { name: "Life@JCT", href: "/#happenings" },
             ].map((link) => {
               const isActive = link.href === "/" ? pathname === "/" : (pathname.startsWith(link.href) && !link.href.includes("#"));
+              const hasDropdown = !!link.children;
+              const isExpanded = desktopExpanded === link.name;
+
               return (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className={`relative font-sans text-[15px] font-medium transition-colors ${
-                    isActive 
-                      ? (isSolid ? "text-[#e68b20]" : "text-white") 
-                      : (isSolid ? "text-[#5b6574] hover:text-[#1a2332]" : "text-white/80 hover:text-white")
-                  }`}
-                >
-                  {link.name}
-                  {isActive && (
-                    <span className={`absolute -bottom-1.5 left-0 right-0 h-[2px] ${isSolid ? 'bg-[#e68b20]' : 'bg-white'}`} />
+                <div key={link.name} className="relative">
+                  {hasDropdown ? (
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setDesktopExpanded(isExpanded ? null : link.name);
+                      }}
+                      className={`relative flex items-center gap-1 font-sans text-sm xl:text-[15px] font-medium transition-colors ${
+                        isExpanded
+                          ? (isSolid ? "text-[#e68b20]" : "text-white")
+                          : (isSolid ? "text-[#5b6574] hover:text-[#1a2332]" : "text-white/80 hover:text-white")
+                      }`}
+                    >
+                      {link.name}
+                      <ChevronDown size={14} className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`} />
+                    </button>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      className={`relative font-sans text-sm xl:text-[15px] font-medium transition-colors ${
+                        isActive 
+                          ? (isSolid ? "text-[#e68b20]" : "text-white") 
+                          : (isSolid ? "text-[#5b6574] hover:text-[#1a2332]" : "text-white/80 hover:text-white")
+                      }`}
+                    >
+                      {link.name}
+                      {isActive && (
+                        <span className={`absolute -bottom-1.5 left-0 right-0 h-[2px] ${isSolid ? 'bg-[#e68b20]' : 'bg-white'}`} />
+                      )}
+                    </Link>
                   )}
-                </Link>
+                  
+                  {hasDropdown && (
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 10 }}
+                          transition={{ duration: 0.2 }}
+                          className="absolute left-0 top-full mt-4 w-56 rounded-xl border border-gray-100 bg-white p-2 shadow-lg"
+                        >
+                          {link.children?.map((child) => (
+                            <Link
+                              key={child.name}
+                              href={child.href}
+                              onClick={() => setDesktopExpanded(null)}
+                              className="block rounded-lg px-4 py-2.5 font-sans text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 hover:text-navy"
+                            >
+                              {child.name}
+                            </Link>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  )}
+                </div>
               );
             })}
           </div>
 
           {/* Desktop Right */}
-          <div className="hidden items-center lg:flex">
+          <div className="hidden items-center justify-end gap-3 xl:gap-6 lg:flex lg:flex-1 shrink-0 z-50 whitespace-nowrap">
+            <a 
+              href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`} 
+              className={`flex items-center gap-1.5 xl:gap-2 font-sans text-sm xl:text-[15px] font-medium transition-colors ${
+                isSolid ? 'text-[#5b6574] hover:text-[#1a2332]' : 'text-white/80 hover:text-white'
+              }`}
+            >
+              <Phone size={16} className="xl:w-4 xl:h-4 w-3.5 h-3.5" />
+              {siteConfig.contact.phone}
+            </a>
             <Link
               href="/admissions/apply"
-              className={`inline-flex h-[42px] items-center justify-center rounded-full px-8 font-sans text-[15px] font-medium transition-all hover:scale-105 active:scale-95 ${
+              className={`inline-flex h-[38px] xl:h-[42px] items-center justify-center rounded-full px-5 xl:px-8 font-sans text-sm xl:text-[15px] font-medium transition-all hover:scale-105 active:scale-95 ${
                 isSolid 
                   ? 'bg-[#735b0d] text-white hover:bg-[#5e4b0c]' 
                   : 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
