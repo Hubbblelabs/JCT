@@ -187,22 +187,14 @@ export default function EngineeringPage() {
           className="absolute inset-0 z-0"
         >
           <Image
-            src="https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=800&auto=format&fit=crop"
+            src="/assets/engineering-landing4.png"
             alt="Engineering campus"
             fill
             sizes="100vw"
-            className="object-cover opacity-40"
+            className="object-cover opacity-65"
             priority
           />
-          <div className="from-navy/95 via-navy/80 to-navy/40 absolute inset-0 bg-linear-to-r" />
-          {/* Subtle grid pattern overlay */}
-          <div
-            className="absolute inset-0 opacity-10"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(0deg, transparent, transparent 50px, var(--color-engineering) 50px, var(--color-engineering) 51px), repeating-linear-gradient(90deg, transparent, transparent 50px, var(--color-engineering) 50px, var(--color-engineering) 51px)",
-            }}
-          />
+          <div className="from-navy/65 via-navy/45 to-navy/20 absolute inset-0 bg-linear-to-r" />
         </motion.div>
 
         <div className="relative z-10 container mx-auto px-4 pt-32 pb-16 md:px-6 md:pt-40 lg:pt-44">
