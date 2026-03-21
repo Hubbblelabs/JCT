@@ -35,7 +35,7 @@ export const navigationData: NavItem[] = [
   },
   {
     name: "Institutions",
-    href: "/institutions",
+    href: "#",
     children: [
       {
         name: "Engineering",

@@ -25,7 +25,7 @@ const engineeringNavigation: EngineeringNavItem[] = [
   { name: "Home", href: "/institutions/engineering" },
   {
     name: "Institutions",
-    href: "/institutions",
+    href: "#",
     children: [
       {
         name: "Engineering",
@@ -219,7 +219,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 JCT
               </span>
               <span className="pt-0.5 font-sans text-[10px] font-medium tracking-widest whitespace-nowrap text-white/70 uppercase">
-                Engineering
+                Engineering & Technology
               </span>
             </div>
           </Link>

@@ -3,6 +3,7 @@
 import { DragScroll } from "@/components/ui/DragScroll";
 import Image from "next/image";
 import Link from "next/link";
+import { siteConfig } from "@/data/site";
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -25,11 +26,20 @@ import {
   Globe,
   Beaker,
   ShieldCheck,
+  GraduationCap,
+  BookOpen,
+  Award,
+  Sparkles,
+  FlaskConical,
+  Droplets,
+  Utensils,
+  BrainCircuit,
 } from "lucide-react";
 import { useRef } from "react";
 
 /* ─── Departments ─── */
-const departments = [
+/* ─── UG Courses (11) ─── */
+const ugCourses = [
   {
     name: "Computer Science & Engineering",
     abbr: "CSE",
@@ -39,20 +49,20 @@ const departments = [
     highlight: "AI/ML, Software Engineering, Cloud Computing",
   },
   {
-    name: "Mechanical Engineering",
-    abbr: "MECH",
-    slug: "mech",
-    icon: Cog,
+    name: "Artificial Intelligence & Data Science",
+    abbr: "AI&DS",
+    slug: "aids",
+    icon: BrainCircuit,
     seats: 60,
-    highlight: "CAD/CAM, Thermal Engineering, Robotics",
+    highlight: "Machine Learning, Deep Learning, Big Data Analytics",
   },
   {
-    name: "Electrical & Electronics Engineering",
-    abbr: "EEE",
-    slug: "eee",
-    icon: Zap,
+    name: "Computer Science & Business Systems",
+    abbr: "CSBS",
+    slug: "csbs",
+    icon: Cpu,
     seats: 60,
-    highlight: "Power Systems, Control Systems, Embedded Design",
+    highlight: "Business Analytics, ERP Systems, Data-Driven Decisions",
   },
   {
     name: "Electronics & Communication Engineering",
@@ -63,12 +73,93 @@ const departments = [
     highlight: "VLSI Design, Signal Processing, IoT",
   },
   {
+    name: "Electrical & Electronics Engineering",
+    abbr: "EEE",
+    slug: "eee",
+    icon: Zap,
+    seats: 60,
+    highlight: "Power Systems, Control Systems, Embedded Design",
+  },
+  {
+    name: "Mechanical Engineering",
+    abbr: "MECH",
+    slug: "mech",
+    icon: Cog,
+    seats: 60,
+    highlight: "CAD/CAM, Thermal Engineering, Robotics",
+  },
+  {
     name: "Civil Engineering",
     abbr: "CE",
     slug: "ce",
     icon: Building2,
     seats: 60,
-    highlight: "Structural Analysis, Environmental Engineering",
+    highlight: "Structural Engineering, Environmental Engineering",
+  },
+  {
+    name: "Bio-Technology & Bio-Chemical Engineering",
+    abbr: "BT",
+    slug: "bt",
+    icon: Beaker,
+    seats: 60,
+    highlight: "Genetic Engineering, Bioprocessing, Pharma",
+  },
+  {
+    name: "Food Technology",
+    abbr: "FT",
+    slug: "ft",
+    icon: Utensils,
+    seats: 60,
+    highlight: "Food Processing, Quality Control, Nutrition Science",
+  },
+  {
+    name: "Petroleum Engineering",
+    abbr: "PE",
+    slug: "pe",
+    icon: Droplets,
+    seats: 60,
+    highlight:
+      "Reservoir Engineering, Drilling Technology, Refinery Operations",
+  },
+  {
+    name: "Petrochemical Technology",
+    abbr: "PCT",
+    slug: "pct",
+    icon: FlaskConical,
+    seats: 60,
+    highlight: "Polymer Technology, Chemical Processes, Industrial Chemistry",
+  },
+];
+
+/* ─── PG Courses (4) ─── */
+const pgCourses = [
+  {
+    name: "Structural Engineering",
+    abbr: "M.E.",
+    slug: "structural-engineering",
+    icon: Building2,
+    highlight: "Advanced Structural Analysis, Earthquake Engineering",
+  },
+  {
+    name: "Power Electronics & Drives",
+    abbr: "M.E.",
+    slug: "power-electronics",
+    icon: Zap,
+    highlight: "Power Converters, Motor Drives, Renewable Energy Systems",
+  },
+  {
+    name: "CSE (Artificial Intelligence & Machine Learning)",
+    abbr: "M.E.",
+    slug: "cse-aiml",
+    icon: BrainCircuit,
+    highlight: "Neural Networks, NLP, Computer Vision",
+  },
+  {
+    name: "EEE (Doctoral Programme)",
+    abbr: "Ph.D.",
+    slug: "eee-doctoral",
+    icon: GraduationCap,
+    highlight: "Advanced Research in Electrical & Electronics",
   },
 ];
 
@@ -231,15 +322,39 @@ export default function EngineeringPage() {
                 <span className="text-engineering-muted font-semibold">
                   autonomous
                 </span>{" "}
-                institution affiliated to Anna University. Five cutting-edge
-                engineering departments, industry-grade labs, and a placement
-                record that speaks for itself.
+                institution affiliated to Anna University. 11 UG and 4 PG
+                programs, industry-grade labs, and a placement record that
+                speaks for itself.
               </motion.p>
+
+              {/* ── Autonomous + Counselling Code Badges ── */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.15 }}
+                className="mb-6 flex flex-wrap items-center gap-3"
+              >
+                <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/15 px-4 py-1.5 backdrop-blur-md">
+                  <Award size={16} className="text-amber-400" />
+                  <span className="text-xs font-extrabold tracking-wider text-amber-300 uppercase">
+                    Autonomous
+                  </span>
+                </span>
+                <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-md">
+                  <Sparkles size={14} className="text-engineering-muted" />
+                  <span className="text-xs font-bold tracking-wider text-white/90">
+                    Counselling Code:{" "}
+                    <span className="text-engineering-muted font-extrabold">
+                      {siteConfig.counsellingCode}
+                    </span>
+                  </span>
+                </span>
+              </motion.div>
 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.35 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
                 className="flex flex-col gap-4 sm:flex-row"
               >
                 <Button
@@ -251,7 +366,7 @@ export default function EngineeringPage() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="h-12 w-full rounded-xl border-white/20 bg-white/5 px-8 font-bold text-white backdrop-blur-sm hover:bg-white/10 sm:w-auto md:h-14"
+                  className="h-12 w-full rounded-xl border-white/20 bg-white/5 px-8 font-bold text-white backdrop-blur-sm hover:bg-white/10 hover:text-white sm:w-auto md:h-14"
                 >
                   View Placements
                 </Button>
@@ -266,8 +381,8 @@ export default function EngineeringPage() {
               className="mt-8 grid grid-cols-2 gap-3 md:gap-4 lg:mt-0"
             >
               {[
-                { val: "5", label: "Departments", accent: true },
-                { val: "360+", label: "Seats / Year", accent: false },
+                { val: "11", label: "UG Programs", accent: true },
+                { val: "4", label: "PG Programs", accent: false },
                 { val: "Anna", label: "University", accent: false },
                 { val: "92%", label: "Placement Rate", accent: true },
               ].map((s) => (
@@ -307,13 +422,18 @@ export default function EngineeringPage() {
               <div className="space-y-4 text-base leading-relaxed font-light text-stone-600">
                 <p>
                   JCT College of Engineering &amp; Technology is an{" "}
-                  <span className="text-engineering font-semibold">
-                    autonomous
+                  <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-0.5 align-baseline font-semibold text-amber-700">
+                    <Award size={14} className="inline-block" />
+                    Autonomous
                   </span>{" "}
                   institution affiliated to Anna University, Chennai.
                   Established with a vision to provide world-class technical
-                  education, the college has consistently produced
-                  industry-ready graduates across five engineering disciplines.
+                  education, the college offers{" "}
+                  <strong className="text-stone-800">
+                    11 undergraduate
+                  </strong>{" "}
+                  and <strong className="text-stone-800">4 postgraduate</strong>{" "}
+                  programs, producing industry-ready graduates year after year.
                 </p>
                 <p>
                   Approved by AICTE and recognized for academic excellence, our
@@ -323,6 +443,15 @@ export default function EngineeringPage() {
                   commitment to continuous improvement, JCT Engineering stands
                   as a trusted name in technical education in Tamil Nadu.
                 </p>
+                <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-stone-200 bg-stone-50 px-4 py-2.5">
+                  <BookOpen size={16} className="text-engineering" />
+                  <span className="text-sm font-bold text-stone-700">
+                    Counselling Code:{" "}
+                    <span className="text-engineering text-base font-extrabold">
+                      {siteConfig.counsellingCode}
+                    </span>
+                  </span>
+                </div>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4">
@@ -385,24 +514,24 @@ export default function EngineeringPage() {
           <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
               <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
-                Engineering Domains
+                Undergraduate Programs
               </h2>
               <h3 className="text-navy font-serif text-4xl leading-tight md:text-5xl">
-                Five Disciplines,{" "}
+                11 UG Courses,{" "}
                 <span className="font-light text-stone-300 italic">
                   One Standard.
                 </span>
               </h3>
             </div>
             <p className="text-muted-foreground max-w-sm text-sm font-light">
-              4-year B.E. programs approved by AICTE and affiliated to Anna
-              University, Chennai. Each department has dedicated labs,
+              4-year B.E. / B.Tech programs approved by AICTE and affiliated to
+              Anna University, Chennai. Each department has dedicated labs,
               workshops, and faculty with industry experience.
             </p>
           </div>
 
           <DragScroll className="-mx-4 flex snap-x snap-mandatory gap-4 scroll-smooth px-4 pb-8 md:mx-0 md:gap-6 md:px-0">
-            {departments.map((dept, index) => (
+            {ugCourses.map((dept, index) => (
               <motion.div
                 key={dept.abbr}
                 initial={{ opacity: 0, x: 20 }}
@@ -456,6 +585,59 @@ export default function EngineeringPage() {
               </motion.div>
             ))}
           </DragScroll>
+
+          {/* ── PG Programs ── */}
+          <div className="mt-16">
+            <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+              <div>
+                <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
+                  Postgraduate Programs
+                </h2>
+                <h3 className="text-navy font-serif text-4xl leading-tight md:text-5xl">
+                  4 PG Courses,{" "}
+                  <span className="font-light text-stone-300 italic">
+                    Advanced Learning.
+                  </span>
+                </h3>
+              </div>
+              <p className="text-muted-foreground max-w-sm text-sm font-light">
+                M.E. / M.Tech and Doctoral programs for advanced research and
+                specialized expertise.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {pgCourses.map((course, index) => (
+                <motion.div
+                  key={course.slug}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: index * 0.08 }}
+                  className="group hover:border-engineering/30 rounded-2xl border border-stone-100 bg-white p-6 transition-all hover:shadow-md"
+                >
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="text-engineering group-hover:bg-engineering bg-engineering-muted shrink-0 rounded-xl p-3 transition-colors group-hover:text-white">
+                        <course.icon size={22} strokeWidth={1.5} />
+                      </div>
+                      <span className="rounded-full border border-stone-200 bg-stone-50 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-stone-500 uppercase">
+                        {course.abbr}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="text-navy mb-2 font-serif text-base font-bold">
+                        {course.name}
+                      </h3>
+                      <p className="text-muted-foreground text-sm font-light">
+                        {course.highlight}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -647,7 +829,7 @@ export default function EngineeringPage() {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="h-14 rounded-2xl border-white/20 bg-transparent px-8 font-bold text-white hover:bg-white/10"
+                  className="h-14 rounded-2xl border-white/20 bg-transparent px-8 font-bold text-white hover:bg-white/10 hover:text-white"
                 >
                   Management Quota
                 </Button>

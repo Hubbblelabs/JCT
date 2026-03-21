@@ -6,6 +6,42 @@ This repository is a marketing and admissions website for JCT Institutions built
 
 The codebase is content-heavy and design-led.
 
+This project is a **modern redesign of the existing PHP website**:
+
+- https://jct.ac.in
+- https://jct.ac.in/engineering
+- https://jct.ac.in/cas
+- https://jct.ac.in/polytechnic
+
+Copilot should use these sites as the **primary source of truth for content**, structure, and institutional information.
+
+## Content sourcing guidelines
+
+- Always refer to the original website for content:
+  - https://jct.ac.in
+  - https://jct.ac.in/engineering
+  - https://jct.ac.in/cas
+  - https://jct.ac.in/polytechnic
+
+- This project is a **redesign, not a rewrite of content**.
+- Extract and reuse:
+  - Program details
+  - Department information
+  - Admission content
+  - Facilities and infrastructure
+  - Placement and accreditation details
+  - Contact and institutional data
+
+- Do NOT invent random content unless explicitly required.
+- If content is unclear or missing:
+  - Keep it minimal and structured
+  - Prefer placeholders or reusable data structures
+
+- Normalize and improve:
+  - Grammar and clarity
+  - Formatting and hierarchy
+  - SEO structure (headings, sections, metadata)
+
 ## Architecture
 
 - Keep route files in `src/app` thin. They should usually export metadata and render a page module or shared layout.
@@ -22,7 +58,10 @@ The codebase is content-heavy and design-led.
 - Prefer server components by default. Add `"use client"` only when a component needs hooks, browser APIs, or Framer Motion interactivity.
 - Follow the existing functional component style and named exports for shared components.
 - Reuse helpers already in the repo, especially `cn` from `src/lib/utils.ts` and existing UI components like `Button` and `DragScroll`.
-- When adding new department or program content, update the appropriate `src/data/*` file first and let pages render from data whenever possible.
+- When adding new department or program content:
+  - First extract content from the original website
+  - Then structure it inside `src/data/*`
+  - Avoid hardcoding content directly in components
 - Keep metadata accurate for new top-level or detail pages. Use `generateMetadata` and `generateStaticParams` for slug-driven routes when appropriate.
 
 ## Styling and UX
@@ -36,8 +75,14 @@ The codebase is content-heavy and design-led.
 ## Content expectations
 
 - This is an institution website, so content should sound credible, clear, and admissions-focused.
-- Keep accreditation, placement, intake, and contact information consistent with nearby content. If values are uncertain, prefer centralizing them in data rather than scattering literals.
-- Favor SEO-friendly structure with descriptive headings, meaningful page titles, and useful metadata.
+- Content should closely reflect the original JCT website but with improved readability and structure.
+- Keep accreditation, placement, intake, and contact information consistent with the source website.
+- Avoid duplication and inconsistencies across pages.
+- Favor SEO-friendly structure with:
+  - Descriptive headings
+  - Meaningful page titles
+  - Structured sections
+  - Clean metadata
 
 ## Workflow
 

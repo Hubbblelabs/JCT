@@ -28,7 +28,7 @@ const artsNav: ArtsNavItem[] = [
   { name: "Home", href: "/institutions/arts-science/#hero" },
   {
     name: "Institutions",
-    href: "/institutions",
+    href: "#",
     children: [
       {
         name: "Engineering",
@@ -207,7 +207,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               <span className="font-serif text-sm leading-none font-bold tracking-tight md:text-lg">
                 JCT
               </span>
-              <span className="pt-0.5 font-sans text-[10px] font-medium tracking-[0.1em] whitespace-nowrap text-white/70 uppercase">
+              <span className="pt-0.5 font-sans text-[10px] font-medium tracking-widest whitespace-nowrap text-white/70 uppercase">
                 Arts & Science
               </span>
             </div>
@@ -311,7 +311,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
             </a>
             <Link
               href="/admissions/apply"
-              className="bg-arts-science-accent shadow-arts-science-accent/20 inline-flex h-9 flex-shrink-0 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold whitespace-nowrap text-white shadow-lg transition-all hover:scale-105 hover:bg-orange-500 active:scale-95"
+              className="bg-arts-science-accent shadow-arts-science-accent/20 inline-flex h-9 shrink-0 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold whitespace-nowrap text-white shadow-lg transition-all hover:scale-105 hover:bg-orange-500 active:scale-95"
             >
               Apply Now <ArrowRight size={14} />
             </Link>
@@ -344,7 +344,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="fixed inset-y-4 right-4 z-[61] flex w-[280px] flex-col rounded-3xl border border-white/10 bg-[#111827]/90 shadow-2xl backdrop-blur-xl lg:hidden"
+              className="fixed inset-y-4 right-4 z-61 flex w-[280px] flex-col rounded-3xl border border-white/10 bg-[#111827]/90 shadow-2xl backdrop-blur-xl lg:hidden"
             >
               {/* Header */}
               <div className="flex items-center justify-between border-b border-white/5 p-5">
@@ -361,7 +361,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                     <span className="font-serif text-lg leading-none font-bold">
                       JCT
                     </span>
-                    <span className="mt-0.5 font-sans text-[9px] font-medium tracking-[0.1em] text-white/70 uppercase">
+                    <span className="mt-0.5 font-sans text-[9px] font-medium tracking-widest text-white/70 uppercase">
                       Arts & Science
                     </span>
                   </div>
