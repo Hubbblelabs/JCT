@@ -113,24 +113,24 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
         { name: "Polytechnic College", href: "/institutions/polytechnic" },
       ],
     },
-    { name: "Admissions", href: "/admissions", className: "hidden lg:block" },
-    { name: "Placements", href: "/#placements", className: "hidden xl:block" },
+    { name: "Admissions", href: "/admissions" },
+    { name: "Placements", href: "/#placements", className: "hidden 2xl:block" },
     {
       name: "Testimonials",
       href: "/#testimonials",
-      className: "hidden xl:block",
+      className: "hidden 2xl:block",
     },
     { name: "Life@JCT", href: "/#happenings", className: "hidden 2xl:block" },
     {
       name: "Explore More",
       href: "#",
-      className: "lg:block 2xl:hidden",
+      className: "xl:block 2xl:hidden",
       children: [
-        { name: "Placements", href: "/#placements", className: "xl:hidden" },
+        { name: "Placements", href: "/#placements", className: "2xl:hidden" },
         {
           name: "Testimonials",
           href: "/#testimonials",
-          className: "xl:hidden",
+          className: "2xl:hidden",
         },
         { name: "Life@JCT", href: "/#happenings", className: "2xl:hidden" },
       ],
@@ -168,7 +168,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
           className={`mx-auto flex w-full max-w-360 items-center justify-between rounded-full border px-4 py-2.5 transition-all duration-300 lg:px-7 ${isSolid ? "border-white/10 bg-[#0a1628]/95 shadow-[0_8px_30px_rgba(0,0,0,0.4)] backdrop-blur-md" : "border-white/0 bg-transparent"}`}
         >
           {/* Logo Container */}
-          <div className="z-50 flex shrink-0 items-center justify-start lg:flex-1">
+          <div className="z-50 flex shrink-0 items-center justify-start xl:flex-1">
             <Link
               href="/"
               className="flex shrink-0 items-center gap-2 lg:gap-3"
@@ -189,7 +189,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
 
           {/* Desktop Links */}
           <div
-            className="hidden items-center justify-center whitespace-nowrap lg:flex"
+            className="hidden items-center justify-center whitespace-nowrap xl:flex"
             ref={dropdownRef}
           >
             {navigationLinks.map((link) => {
@@ -269,7 +269,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
           </div>
 
           {/* Desktop Right */}
-          <div className="z-50 hidden shrink-0 items-center justify-end gap-3 whitespace-nowrap lg:flex lg:flex-1 xl:gap-6">
+          <div className="z-50 hidden shrink-0 items-center justify-end gap-3 whitespace-nowrap xl:flex xl:flex-1 xl:gap-6">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
               className="flex items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white xl:gap-2 xl:text-[15px]"
@@ -291,7 +291,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
 
           {/* Mobile Toggle */}
           <button
-            className="z-50 ml-auto p-2 text-white transition-colors hover:text-white/80 lg:hidden"
+            className="z-50 ml-auto p-2 text-white transition-colors hover:text-white/80 xl:hidden"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
