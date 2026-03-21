@@ -260,7 +260,7 @@ export function AboutArtsScience() {
         <div className="relative overflow-hidden rounded-[2.5rem] border border-orange-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:p-14">
           <Quote className="absolute top-8 left-8 h-32 w-32 -rotate-6 text-orange-500/5" />
 
-          <div className="relative z-10 grid grid-cols-1 items-center gap-10 md:grid-cols-12 md:gap-16">
+          {/* <div className="relative z-10 grid grid-cols-1 items-center gap-10 md:grid-cols-12 md:gap-16">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               whileInView={{ opacity: 1, scale: 1 }}
@@ -316,7 +316,7 @@ export function AboutArtsScience() {
                 </p>
               </div>
             </motion.div>
-          </div>
+          </div> */}
         </div>
       </ArtsSection>
     </section>
