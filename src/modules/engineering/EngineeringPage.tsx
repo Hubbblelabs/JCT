@@ -500,20 +500,35 @@ export default function EngineeringPage() {
       {/* ═══ ENGINEERING DOMAINS — Horizontal cards ═══ */}
       <section
         id="engineering-domains"
-        className="relative bg-white py-16 md:py-24"
+        className="group/section relative overflow-hidden bg-white py-16 md:py-24"
       >
+        <style>{`
+          @keyframes slide-bg {
+            0% { background-position: 0 0; }
+            100% { background-position: -28.28px 0; }
+          }
+          @keyframes marquee-courses {
+            to { transform: translateX(calc(-50% - 12px)); }
+          }
+          @media (min-width: 768px) {
+            @keyframes marquee-courses {
+              to { transform: translateX(calc(-50% - 16px)); }
+            }
+          }
+        `}</style>
         {/* Subtle background pattern */}
         <div
-          className="absolute inset-0 opacity-[0.02]"
+          className="absolute inset-0 opacity-[0.02] group-hover/section:[animation:slide-bg_2s_linear_infinite]"
           style={{
             backgroundImage:
               "repeating-linear-gradient(45deg, var(--color-engineering-dark) 0px, var(--color-engineering-dark) 2px, transparent 2px, transparent 10px)",
+            backgroundSize: "28.28px 28.28px",
           }}
         />
-        <div className="relative z-10 container mx-auto px-4 md:px-6">
-          <div className="mb-12 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+        <div className="relative z-10 w-full mb-8 container mx-auto px-4 md:px-6">
+          <div className="mb-0 flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
+              <h2 className="text-engineering-light mb-4 text-xs font-bold uppercase tracking-[0.2em]">
                 Undergraduate Programs
               </h2>
               <h3 className="text-navy font-serif text-4xl leading-tight md:text-5xl">
@@ -529,16 +544,21 @@ export default function EngineeringPage() {
               workshops, and faculty with industry experience.
             </p>
           </div>
+        </div>
 
-          <DragScroll className="-mx-4 flex snap-x snap-mandatory gap-4 scroll-smooth px-4 pb-8 md:mx-0 md:gap-6 md:px-0">
-            {ugCourses.map((dept, index) => (
+        <div className="group/carousel relative flex w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] pb-8 pt-4 md:[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+          <div
+            className="flex w-max items-stretch gap-6 pl-6 group-hover/carousel:![animation-play-state:paused] md:gap-8 md:pl-8"
+            style={{ animation: "marquee-courses 30s linear infinite" }}
+          >
+            {[...ugCourses, ...ugCourses].map((dept, index) => (
               <motion.div
-                key={dept.abbr}
+                key={`${dept.abbr}-${index}`}
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.35, delay: index * 0.05 }}
-                className="group border-border hover:border-engineering/30 card-hover-lift relative flex min-w-62.5 shrink-0 snap-center flex-col justify-between rounded-2xl border bg-white p-6 md:min-w-72.5 md:p-8"
+                transition={{ duration: 0.35, delay: (index % ugCourses.length) * 0.05 }}
+                className="group border-border hover:border-engineering/30 card-hover-lift relative flex min-h-[300px] w-[290px] shrink-0 flex-col justify-between rounded-2xl border bg-white p-6 shadow-sm shadow-slate-200/50 transition-all hover:shadow-xl md:w-[320px] md:p-8"
                 draggable={false}
               >
                 <Link
@@ -558,7 +578,7 @@ export default function EngineeringPage() {
                       <h3 className="text-navy font-serif text-lg font-bold">
                         {dept.name}
                       </h3>
-                      <span className="text-engineering text-xs font-bold tracking-wider uppercase">
+                      <span className="text-engineering text-xs font-bold uppercase tracking-wider">
                         {dept.abbr}
                       </span>
                     </div>
@@ -579,16 +599,17 @@ export default function EngineeringPage() {
                   </div>
                   <ArrowRight
                     size={18}
-                    className="text-engineering/40 group-hover:text-engineering transition-all group-hover:translate-x-1"
+                    className="text-engineering/40 transition-all group-hover:translate-x-1 group-hover:text-engineering"
                   />
                 </div>
               </motion.div>
             ))}
-          </DragScroll>
+          </div>
+        </div>
 
-          {/* ── PG Programs ── */}
-          <div className="mt-16">
-            <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+        {/* ── PG Programs ── */}
+        <div className="relative z-10 container mx-auto px-4 md:px-6 mt-16">
+          <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
               <div>
                 <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
                   Postgraduate Programs
@@ -637,7 +658,6 @@ export default function EngineeringPage() {
                 </motion.div>
               ))}
             </div>
-          </div>
         </div>
       </section>
 
