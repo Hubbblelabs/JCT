@@ -8,7 +8,7 @@ import { Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { MouseEvent } from "react";
 
-type TabKey = "about" | "vision" | "mission";
+type TabKey = "about" | "vision-mission" | "principal";
 
 export function AboutPolytechnic() {
   const [activeTab, setActiveTab] = useState<TabKey>("about");
@@ -23,8 +23,8 @@ export function AboutPolytechnic() {
 
   const tabs: { key: TabKey; label: string }[] = [
     { key: "about", label: "About Us" },
-    { key: "vision", label: "Vision" },
-    { key: "mission", label: "Mission" },
+    { key: "vision-mission", label: "Vision & Mission" },
+    { key: "principal", label: "Principal's Message" },
   ];
 
   return (
@@ -68,14 +68,14 @@ export function AboutPolytechnic() {
         <div className="bg-polytechnic-dark/5 pointer-events-none absolute bottom-0 left-0 z-0 -mb-32 -ml-32 h-[400px] w-[400px] rounded-full blur-3xl"></div>
 
         {/* Tab Navigation */}
-        <div className="relative z-10 mb-10 flex justify-center">
-          <div className="inline-flex rounded-full border border-slate-200 bg-white/80 p-1 shadow-sm backdrop-blur-sm">
+        <div className="relative z-10 mb-10 flex justify-center px-4">
+          <div className="no-scrollbar flex max-w-full overflow-x-auto rounded-full border border-slate-200 bg-white/80 p-1 shadow-sm backdrop-blur-sm">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={cn(
-                  "relative rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300",
+                  "relative shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300",
                   activeTab === tab.key
                     ? "bg-polytechnic text-white shadow-md"
                     : "text-polytechnic-dark/60 hover:text-polytechnic-dark",
@@ -143,19 +143,19 @@ export function AboutPolytechnic() {
           </motion.div>
         )}
 
-        {/* Vision Tab */}
-        {activeTab === "vision" && (
+        {/* Vision & Mission Tab */}
+        {activeTab === "vision-mission" && (
           <motion.div
-            key="vision"
+            key="vision-mission"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
             className="relative z-10"
           >
-            <div className="mx-auto max-w-3xl">
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm"
               >
@@ -185,23 +185,10 @@ export function AboutPolytechnic() {
                   contribute to the nation&apos;s technological growth.
                 </p>
               </motion.div>
-            </div>
-          </motion.div>
-        )}
 
-        {/* Mission Tab */}
-        {activeTab === "mission" && (
-          <motion.div
-            key="mission"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="relative z-10"
-          >
-            <div className="mx-auto max-w-3xl">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.1 }}
                 className="bg-polytechnic-dark rounded-2xl p-8 text-white shadow-sm"
@@ -246,102 +233,89 @@ export function AboutPolytechnic() {
             </div>
           </motion.div>
         )}
-      </PolySection>
 
-      <PolySection
-        id="principals-message"
-        tone="transparent"
-        className="group/section relative"
-        onMouseMove={handleMouseMove}
-      >
-        <div
-          className="pointer-events-none absolute inset-0 z-0 opacity-0 transition-opacity duration-500 group-hover/section:opacity-100"
-          style={{
-            WebkitMaskImage:
-              "radial-gradient(circle 500px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%)",
-            maskImage:
-              "radial-gradient(circle 500px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%)",
-          }}
-        >
-          <div
-            className="absolute inset-0"
-            style={{
-              backgroundImage:
-                "linear-gradient(rgba(0, 92, 185, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 92, 185, 0.15) 1px, transparent 1px)",
-              backgroundSize: "40px 40px",
-            }}
-          />
-        </div>
-        <div className="relative z-10 overflow-hidden rounded-[2rem] border border-[#f0e6d5] bg-[#fcfaf7] p-6 shadow-lg md:p-12">
-          {/* Diagonal abstract texture */}
-          <div
-            className="pointer-events-none absolute inset-0 z-0 opacity-20"
-            style={{
-              backgroundImage: `repeating-linear-gradient(45deg, rgba(212, 160, 36, 0.1) 0px, rgba(212, 160, 36, 0.1) 2px, transparent 2px, transparent 10px)`,
-            }}
-          />
-          {/* Decorative Quote Mark */}
-          <Quote className="text-polytechnic-accent/10 absolute top-6 left-6 h-24 w-24 -rotate-12" />
+        {/* Principal's Message Tab */}
+        {activeTab === "principal" && (
+          <motion.div
+            key="principal"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="relative z-10"
+          >
+            <div className="relative z-10 overflow-hidden rounded-[2rem] border border-[#f0e6d5] bg-[#fcfaf7] p-6 shadow-lg md:p-12">
+              {/* Diagonal abstract texture */}
+              <div
+                className="pointer-events-none absolute inset-0 z-0 opacity-20"
+                style={{
+                  backgroundImage: `repeating-linear-gradient(45deg, rgba(212, 160, 36, 0.1) 0px, rgba(212, 160, 36, 0.1) 2px, transparent 2px, transparent 10px)`,
+                }}
+              />
+              {/* Decorative Quote Mark */}
+              <Quote className="text-polytechnic-accent/10 absolute top-6 left-6 h-24 w-24 -rotate-12" />
 
-          <div className="relative z-10 grid grid-cols-1 items-center gap-8 md:grid-cols-12 md:gap-12">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="md:col-span-4"
-            >
-              <div className="relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-full border-4 border-white shadow-xl">
-                <Image
-                  src="/jct_logo.png"
-                  alt="Principal"
-                  fill
-                  className="bg-white object-contain"
-                />
-              </div>
-              <div className="mt-6 text-center">
-                <h3 className="text-polytechnic-dark font-serif text-xl font-bold">
-                  Dr. A. Jothi
-                </h3>
-                <p className="text-polytechnic-accent mt-1 font-sans text-sm font-semibold">
-                  Principal, JCT Polytechnic College
-                </p>
-              </div>
-            </motion.div>
+              <div className="relative z-10 grid grid-cols-1 items-center gap-8 md:grid-cols-12 md:gap-12">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  className="md:col-span-4"
+                >
+                  <div className="relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-full border-4 border-white shadow-xl">
+                    <Image
+                      src="/jct_logo.png"
+                      alt="Principal"
+                      fill
+                      className="bg-white object-contain"
+                    />
+                  </div>
+                  <div className="mt-6 text-center">
+                    <h3 className="text-polytechnic-dark font-serif text-xl font-bold">
+                      Dr. A. Jothi
+                    </h3>
+                    <p className="text-polytechnic-accent mt-1 font-sans text-sm font-semibold">
+                      Principal, JCT Polytechnic College
+                    </p>
+                  </div>
+                </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="flex flex-col justify-center md:col-span-8"
-            >
-              <h2 className="text-polytechnic-dark mb-6 font-serif text-2xl font-bold md:text-3xl">
-                Principal&apos;s Message
-              </h2>
-              <div className="text-polytechnic-dark/80 space-y-4 font-sans text-base leading-relaxed italic md:text-[17px]">
-                <p>
-                  &ldquo;Welcome to JCT Polytechnic College. As we stand at the
-                  threshold of a rapidly advancing technological era, our
-                  objective is to equip our youth with the exact skills the
-                  modern industry demands. At our institution, we emphasize
-                  hands-on, practical learning above all else.&rdquo;
-                </p>
-                <p>
-                  &ldquo;Our dedicated faculty ensures that our students are not
-                  only technically proficient but also imbibe strong ethical
-                  values. We have consistently produced a high placement record
-                  because we bridge the gap between the classroom and the
-                  factory floor from day one.&rdquo;
-                </p>
-                <p>
-                  &ldquo;I invite you to explore our campus and witness the
-                  dedication to experiential learning that defines JCT
-                  Polytechnic. Let us work together to build a strong foundation
-                  for your future.&rdquo;
-                </p>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="flex flex-col justify-center md:col-span-8"
+                >
+                  <h2 className="text-polytechnic-dark mb-6 font-serif text-2xl font-bold md:text-3xl">
+                    Principal&apos;s Message
+                  </h2>
+                  <div className="text-polytechnic-dark/80 space-y-4 font-sans text-base leading-relaxed italic md:text-[17px]">
+                    <p>
+                      &ldquo;Welcome to JCT Polytechnic College. As we stand at
+                      the threshold of a rapidly advancing technological era,
+                      our objective is to equip our youth with the exact skills
+                      the modern industry demands. At our institution, we
+                      emphasize hands-on, practical learning above all
+                      else.&rdquo;
+                    </p>
+                    <p>
+                      &ldquo;Our dedicated faculty ensures that our students are
+                      not only technically proficient but also imbibe strong
+                      ethical values. We have consistently produced a high
+                      placement record because we bridge the gap between the
+                      classroom and the factory floor from day one.&rdquo;
+                    </p>
+                    <p>
+                      &ldquo;I invite you to explore our campus and witness the
+                      dedication to experiential learning that defines JCT
+                      Polytechnic. Let us work together to build a strong
+                      foundation for your future.&rdquo;
+                    </p>
+                  </div>
+                </motion.div>
               </div>
-            </motion.div>
-          </div>
-        </div>
+            </div>
+          </motion.div>
+        )}
       </PolySection>
     </div>
   );

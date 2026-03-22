@@ -35,7 +35,7 @@ function ArtsSection({
   );
 }
 
-type TabKey = "about" | "vision" | "mission";
+type TabKey = "about" | "vision-mission" | "principal";
 
 export function AboutArtsScience() {
   const [activeTab, setActiveTab] = useState<TabKey>("about");
@@ -50,8 +50,8 @@ export function AboutArtsScience() {
 
   const tabs: { key: TabKey; label: string }[] = [
     { key: "about", label: "About Us" },
-    { key: "vision", label: "Vision" },
-    { key: "mission", label: "Mission" },
+    { key: "vision-mission", label: "Vision & Mission" },
+    { key: "principal", label: "Principal's Message" },
   ];
 
   return (
@@ -80,14 +80,14 @@ export function AboutArtsScience() {
 
       <ArtsSection tone="transparent" className="relative">
         {/* Tab Navigation */}
-        <div className="relative z-10 mb-10 flex justify-center">
-          <div className="inline-flex rounded-full border border-orange-100 bg-white/80 p-1 shadow-sm backdrop-blur-sm">
+        <div className="relative z-10 mb-10 flex justify-center px-4">
+          <div className="no-scrollbar flex max-w-full overflow-x-auto rounded-full border border-orange-100 bg-white/80 p-1 shadow-sm backdrop-blur-sm">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
                 className={cn(
-                  "relative rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300",
+                  "relative shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-300",
                   activeTab === tab.key
                     ? "bg-arts-science-accent text-white shadow-md"
                     : "text-arts-science-dark/60 hover:text-arts-science-dark",
@@ -153,19 +153,19 @@ export function AboutArtsScience() {
           </motion.div>
         )}
 
-        {/* Vision Tab */}
-        {activeTab === "vision" && (
+        {/* Vision & Mission Tab */}
+        {activeTab === "vision-mission" && (
           <motion.div
-            key="vision"
+            key="vision-mission"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
             className="relative z-10"
           >
-            <div className="mx-auto max-w-3xl">
+            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 md:grid-cols-2">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 className="rounded-[2rem] border border-orange-100 bg-white p-10 shadow-sm"
               >
@@ -196,23 +196,10 @@ export function AboutArtsScience() {
                   harmonious society.
                 </p>
               </motion.div>
-            </div>
-          </motion.div>
-        )}
 
-        {/* Mission Tab */}
-        {activeTab === "mission" && (
-          <motion.div
-            key="mission"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="relative z-10"
-          >
-            <div className="mx-auto max-w-3xl">
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, x: 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 className="bg-arts-science-dark relative overflow-hidden rounded-[2rem] p-10 text-white shadow-lg"
               >
@@ -254,70 +241,79 @@ export function AboutArtsScience() {
             </div>
           </motion.div>
         )}
-      </ArtsSection>
 
-      <ArtsSection tone="transparent" className="relative pb-24">
-        <div className="relative overflow-hidden rounded-[2.5rem] border border-orange-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:p-14">
-          <Quote className="absolute top-8 left-8 h-32 w-32 -rotate-6 text-orange-500/5" />
+        {/* Principal's Message Tab */}
+        {activeTab === "principal" && (
+          <motion.div
+            key="principal"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="relative z-10"
+          >
+            <div className="relative overflow-hidden rounded-[2.5rem] border border-orange-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:p-14">
+              <Quote className="absolute top-8 left-8 h-32 w-32 -rotate-6 text-orange-500/5" />
 
-          <div className="relative z-10 grid grid-cols-1 items-center gap-10 md:grid-cols-12 md:gap-16">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              viewport={{ once: true }}
-              className="md:col-span-4"
-            >
-              <div className="relative mx-auto flex aspect-[4/5] w-full max-w-[320px] items-center justify-center overflow-hidden rounded-3xl border-8 border-orange-50 bg-white shadow-lg">
-                <Image
-                  src="/jct_logo.png"
-                  alt="Principal"
-                  width={200}
-                  height={200}
-                  className="object-contain"
-                />
-              </div>
-              <div className="mt-6 text-center">
-                <h3 className="text-arts-science-dark font-serif text-2xl font-bold">
-                  Dr. K. Senthil
-                </h3>
-                <p className="text-arts-science-accent mt-1 font-sans text-[15px] font-semibold">
-                  Principal, JCT College of Arts &amp; Science
-                </p>
-              </div>
-            </motion.div>
+              <div className="relative z-10 grid grid-cols-1 items-center gap-10 md:grid-cols-12 md:gap-16">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  className="md:col-span-4"
+                >
+                  <div className="relative mx-auto flex aspect-[4/5] w-full max-w-[320px] items-center justify-center overflow-hidden rounded-3xl border-8 border-orange-50 bg-white shadow-lg">
+                    <Image
+                      src="/jct_logo.png"
+                      alt="Principal"
+                      width={200}
+                      height={200}
+                      className="object-contain"
+                    />
+                  </div>
+                  <div className="mt-6 text-center">
+                    <h3 className="text-arts-science-dark font-serif text-2xl font-bold">
+                      Dr. K. Senthil
+                    </h3>
+                    <p className="text-arts-science-accent mt-1 font-sans text-[15px] font-semibold">
+                      Principal, JCT College of Arts &amp; Science
+                    </p>
+                  </div>
+                </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              className="flex flex-col justify-center md:col-span-8"
-            >
-              <h2 className="text-arts-science-dark mb-8 font-serif text-3xl font-bold md:text-4xl">
-                Principal&apos;s Message
-              </h2>
-              <div className="text-arts-science-dark/80 space-y-5 font-sans text-lg leading-relaxed italic md:text-[19px]">
-                <p>
-                  &ldquo;It gives me immense pleasure to welcome you to JCT
-                  College of Arts &amp; Science. Higher education today requires
-                  a delicate balance of academic rigor, practical knowledge, and
-                  value-based development. At JCT, we ensure our students find
-                  this balance.&rdquo;
-                </p>
-                <p>
-                  &ldquo;Our dedicated faculty, modern infrastructure, and
-                  industry-oriented programs ensure that every student who
-                  leaves our doors is confident, capable, and ready to make a
-                  significant impact in the world.&rdquo;
-                </p>
-                <p>
-                  &ldquo;I invite you to be a part of our dynamic learning
-                  community and embark on a fulfilling educational journey that
-                  will shape your career and your life.&rdquo;
-                </p>
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  className="flex flex-col justify-center md:col-span-8"
+                >
+                  <h2 className="text-arts-science-dark mb-8 font-serif text-3xl font-bold md:text-4xl">
+                    Principal&apos;s Message
+                  </h2>
+                  <div className="text-arts-science-dark/80 space-y-5 font-sans text-lg leading-relaxed italic md:text-[19px]">
+                    <p>
+                      &ldquo;It gives me immense pleasure to welcome you to JCT
+                      College of Arts &amp; Science. Higher education today
+                      requires a delicate balance of academic rigor, practical
+                      knowledge, and value-based development. At JCT, we ensure
+                      our students find this balance.&rdquo;
+                    </p>
+                    <p>
+                      &ldquo;Our dedicated faculty, modern infrastructure, and
+                      industry-oriented programs ensure that every student who
+                      leaves our doors is confident, capable, and ready to make
+                      a significant impact in the world.&rdquo;
+                    </p>
+                    <p>
+                      &ldquo;I invite you to be a part of our dynamic learning
+                      community and embark on a fulfilling educational journey
+                      that will shape your career and your life.&rdquo;
+                    </p>
+                  </div>
+                </motion.div>
               </div>
-            </motion.div>
-          </div>
-        </div>
+            </div>
+          </motion.div>
+        )}
       </ArtsSection>
     </section>
   );
