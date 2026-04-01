@@ -13,6 +13,7 @@ import {
   MessageCircle,
   Phone,
   ShieldAlert,
+  X,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
 
@@ -306,9 +307,18 @@ export function ChatbotButton() {
 
       {isOpen && (
         <div className="fixed bottom-24 left-4 z-50 flex h-[32rem] w-[22rem] flex-col overflow-hidden rounded-2xl border border-white/20 bg-white shadow-2xl md:bottom-32 md:left-6 md:w-[24rem]">
-          <div className="bg-navy px-4 py-3 text-white">
-            <p className="text-sm font-semibold">{meta.title}</p>
-            <p className="text-xs text-white/80">JCT Admissions Assistant</p>
+          <div className="bg-navy flex items-center justify-between px-4 py-3 text-white">
+            <div>
+              <p className="text-sm font-semibold">{meta.title}</p>
+              <p className="text-xs text-white/80">JCT Admissions Assistant</p>
+            </div>
+            <button
+              onClick={() => setIsOpen(false)}
+              className="rounded-full p-1 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+              aria-label="Close chatbot"
+            >
+              <X size={18} />
+            </button>
           </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto bg-slate-50 p-3">

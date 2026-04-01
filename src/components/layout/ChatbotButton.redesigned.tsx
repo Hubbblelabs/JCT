@@ -380,6 +380,13 @@ export function ChatbotButton() {
                     </p>
                   </div>
                 </div>
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="rounded-full p-2 text-white/80 transition-colors hover:bg-white/20 hover:text-white"
+                  aria-label="Close chatbot"
+                >
+                  <X size={20} />
+                </button>
               </div>
             </div>
 
