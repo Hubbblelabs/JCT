@@ -371,7 +371,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
                 <div className="space-y-1">
                   {(
-                    navigationLinks.flatMap((item) =>
+                    navigationLinks.flatMap((item: any) =>
                       item.name === "Explore More"
                         ? item.children || []
                         : [item],
