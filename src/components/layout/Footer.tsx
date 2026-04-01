@@ -77,11 +77,11 @@ export function Footer() {
                   <div className="my-1.5 h-px w-full max-w-[200px] bg-linear-to-r from-transparent via-white/20 to-transparent"></div>
 
                   <a
-                    href="mailto:admissions@jct.edu"
+                    href="mailto:admissions@jct.ac.in"
                     className="mt-3 flex items-center justify-center gap-2 font-sans text-xs font-medium text-white/80 transition-colors hover:text-white"
                   >
                     <Mail className="h-4 w-4 text-[#D4A024]" strokeWidth={2} />
-                    admissions@jct.edu
+                    admissions@jct.ac.in
                   </a>
                 </div>
               </div>

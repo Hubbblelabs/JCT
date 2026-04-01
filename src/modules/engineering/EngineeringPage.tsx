@@ -383,7 +383,7 @@ export default function EngineeringPage() {
               {[
                 { val: "11", label: "UG Programs", accent: true },
                 { val: "4", label: "PG Programs", accent: false },
-                { val: "Anna", label: "University", accent: false },
+                { val: "2769", label: "Counselling Code", accent: false },
                 { val: "92%", label: "Placement Rate", accent: true },
               ].map((s) => (
                 <div
@@ -886,7 +886,7 @@ export default function EngineeringPage() {
                   </div>
                 </a>
                 <a
-                  href="mailto:engineering@jct.edu"
+                  href="mailto:engineering@jct.ac.in"
                   className="flex items-center gap-4 text-white/70 transition-colors hover:text-white"
                 >
                   <div className="rounded-xl bg-white/5 p-3">
@@ -894,7 +894,7 @@ export default function EngineeringPage() {
                   </div>
                   <div>
                     <span className="block text-sm font-bold text-white">
-                      engineering@jct.edu
+                      engineering@jct.ac.in
                     </span>
                     <span className="text-xs text-white/40">
                       Typical response within 24 hours

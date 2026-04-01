@@ -108,9 +108,21 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
       name: "Institutions",
       href: "#",
       children: [
-        { name: "Engineering College", href: "/institutions/engineering" },
-        { name: "Arts & Science College", href: "/institutions/arts-science" },
-        { name: "Polytechnic College", href: "/institutions/polytechnic" },
+        { 
+          name: "Engineering", 
+          href: "/institutions/engineering",
+          desc: "B.E, B.Tech, M.E programs"
+        },
+        { 
+          name: "Arts & Science", 
+          href: "/institutions/arts-science",
+          desc: "B.A, B.Sc, B.Com, BBA programs"
+        },
+        { 
+          name: "Polytechnic", 
+          href: "/institutions/polytechnic",
+          desc: "Diploma programs"
+        },
       ],
     },
     { name: "Admissions", href: "/admissions" },
@@ -204,6 +216,8 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                 <div
                   key={link.name}
                   className={`relative ${(link as any).className || ""}`}
+                  onMouseEnter={() => hasDropdown && setDesktopExpanded(link.name)}
+                  onMouseLeave={() => hasDropdown && setDesktopExpanded(null)}
                 >
                   {hasDropdown ? (
                     <button
@@ -247,16 +261,19 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: 10 }}
                           transition={{ duration: 0.2 }}
-                          className="absolute top-full left-0 mt-2 w-60 rounded-xl border border-white/10 bg-[#0a1628]/95 p-2 shadow-xl backdrop-blur-md"
+                          className="absolute top-full left-0 mt-2 w-64 rounded-xl border border-white/10 bg-[#0a1628]/95 p-2 shadow-xl backdrop-blur-md"
                         >
                           {link.children?.map((child: any) => (
                             <Link
                               key={child.name}
                               href={child.href}
                               onClick={() => setDesktopExpanded(null)}
-                              className={`block rounded-lg px-4 py-2.5 font-sans text-sm font-medium whitespace-nowrap text-white/90 transition-colors hover:bg-white/10 hover:text-white ${child.className || ""}`}
+                              className={`block rounded-lg px-4 py-3 font-sans transition-colors hover:bg-white/10 ${child.className || ""}`}
                             >
-                              {child.name}
+                              <div className="text-[15px] font-medium text-white/90 whitespace-nowrap">{child.name}</div>
+                              {child.desc && (
+                                <div className="mt-0.5 text-[13px] text-white/50 whitespace-nowrap">{child.desc}</div>
+                              )}
                             </Link>
                           ))}
                         </motion.div>
@@ -399,9 +416,12 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                         key={child.name}
                                         href={child.href}
                                         onClick={() => setIsOpen(false)}
-                                        className="block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-[#d4a024]"
+                                        className="block rounded-lg px-4 py-3 font-sans transition-colors hover:bg-white/5 hover:text-[#d4a024]"
                                       >
-                                        {child.name}
+                                        <div className="text-sm text-white/70">{child.name}</div>
+                                        {child.desc && (
+                                          <div className="text-xs text-white/40 mt-0.5">{child.desc}</div>
+                                        )}
                                       </Link>
                                     ))}
                                   </div>

@@ -44,9 +44,9 @@ const slides = [
 ];
 
 const stats = [
-  { value: 15, suffix: "+", label: "Years" },
+  { value: 16, suffix: "+", label: "Years" },
   { value: 12000, suffix: "+", label: "Alumni" },
-  { value: 96, suffix: "%", label: "Placements" },
+  { value: 92, suffix: "%", label: "Placements" },
   { value: 500, suffix: "+", label: "Recruiters" },
 ];
 
