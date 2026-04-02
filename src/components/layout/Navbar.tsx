@@ -108,20 +108,20 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
       name: "Institutions",
       href: "#",
       children: [
-        { 
-          name: "Engineering", 
+        {
+          name: "Engineering",
           href: "/institutions/engineering",
-          desc: "B.E, B.Tech, M.E programs"
+          desc: "B.E, B.Tech, M.E programs",
         },
-        { 
-          name: "Arts & Science", 
+        {
+          name: "Arts & Science",
           href: "/institutions/arts-science",
-          desc: "B.A, B.Sc, B.Com, BBA programs"
+          desc: "B.A, B.Sc, B.Com, BBA programs",
         },
-        { 
-          name: "Polytechnic", 
+        {
+          name: "Polytechnic",
           href: "/institutions/polytechnic",
-          desc: "Diploma programs"
+          desc: "Diploma programs",
         },
       ],
     },
@@ -216,7 +216,9 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                 <div
                   key={link.name}
                   className={`relative ${(link as any).className || ""}`}
-                  onMouseEnter={() => hasDropdown && setDesktopExpanded(link.name)}
+                  onMouseEnter={() =>
+                    hasDropdown && setDesktopExpanded(link.name)
+                  }
                   onMouseLeave={() => hasDropdown && setDesktopExpanded(null)}
                 >
                   {hasDropdown ? (
@@ -270,9 +272,13 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                               onClick={() => setDesktopExpanded(null)}
                               className={`block rounded-lg px-4 py-3 font-sans transition-colors hover:bg-white/10 ${child.className || ""}`}
                             >
-                              <div className="text-[15px] font-medium text-white/90 whitespace-nowrap">{child.name}</div>
+                              <div className="text-[15px] font-medium whitespace-nowrap text-white/90">
+                                {child.name}
+                              </div>
                               {child.desc && (
-                                <div className="mt-0.5 text-[13px] text-white/50 whitespace-nowrap">{child.desc}</div>
+                                <div className="mt-0.5 text-[13px] whitespace-nowrap text-white/50">
+                                  {child.desc}
+                                </div>
                               )}
                             </Link>
                           ))}
@@ -418,9 +424,13 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                         onClick={() => setIsOpen(false)}
                                         className="block rounded-lg px-4 py-3 font-sans transition-colors hover:bg-white/5 hover:text-[#d4a024]"
                                       >
-                                        <div className="text-sm text-white/70">{child.name}</div>
+                                        <div className="text-sm text-white/70">
+                                          {child.name}
+                                        </div>
                                         {child.desc && (
-                                          <div className="text-xs text-white/40 mt-0.5">{child.desc}</div>
+                                          <div className="mt-0.5 text-xs text-white/40">
+                                            {child.desc}
+                                          </div>
                                         )}
                                       </Link>
                                     ))}

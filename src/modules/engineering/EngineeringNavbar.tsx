@@ -168,8 +168,9 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const isSolid = scrolled || forceSolidOnTop;
 
   // Flatten nav items for mobile that mimics the arts-science style
-  const mobileNavItems = (engineeringNavigation as any[]).flatMap((item: any) =>
-    item.name === "Explore More" ? item.children || [] : [item],
+  const mobileNavItems = (engineeringNavigation as any[]).flatMap(
+    (item: any) =>
+      item.name === "Explore More" ? item.children || [] : [item],
   );
 
   return (

@@ -525,10 +525,10 @@ export default function EngineeringPage() {
             backgroundSize: "28.28px 28.28px",
           }}
         />
-        <div className="relative z-10 w-full mb-8 container mx-auto px-4 md:px-6">
+        <div className="relative z-10 container mx-auto mb-8 w-full px-4 md:px-6">
           <div className="mb-0 flex flex-col justify-between gap-6 md:flex-row md:items-end">
             <div>
-              <h2 className="text-engineering-light mb-4 text-xs font-bold uppercase tracking-[0.2em]">
+              <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
                 Undergraduate Programs
               </h2>
               <h3 className="text-navy font-serif text-4xl leading-tight md:text-5xl">
@@ -546,7 +546,7 @@ export default function EngineeringPage() {
           </div>
         </div>
 
-        <div className="group/carousel relative flex w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] pb-8 pt-4 md:[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+        <div className="group/carousel relative flex w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] pt-4 pb-8 md:[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
           <div
             className="flex w-max items-stretch gap-6 pl-6 group-hover/carousel:![animation-play-state:paused] md:gap-8 md:pl-8"
             style={{ animation: "marquee-courses 30s linear infinite" }}
@@ -557,7 +557,10 @@ export default function EngineeringPage() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.35, delay: (index % ugCourses.length) * 0.05 }}
+                transition={{
+                  duration: 0.35,
+                  delay: (index % ugCourses.length) * 0.05,
+                }}
                 className="group border-border hover:border-engineering/30 card-hover-lift relative flex min-h-[300px] w-[290px] shrink-0 flex-col justify-between rounded-2xl border bg-white p-6 shadow-sm shadow-slate-200/50 transition-all hover:shadow-xl md:w-[320px] md:p-8"
                 draggable={false}
               >
@@ -578,7 +581,7 @@ export default function EngineeringPage() {
                       <h3 className="text-navy font-serif text-lg font-bold">
                         {dept.name}
                       </h3>
-                      <span className="text-engineering text-xs font-bold uppercase tracking-wider">
+                      <span className="text-engineering text-xs font-bold tracking-wider uppercase">
                         {dept.abbr}
                       </span>
                     </div>
@@ -599,7 +602,7 @@ export default function EngineeringPage() {
                   </div>
                   <ArrowRight
                     size={18}
-                    className="text-engineering/40 transition-all group-hover:translate-x-1 group-hover:text-engineering"
+                    className="text-engineering/40 group-hover:text-engineering transition-all group-hover:translate-x-1"
                   />
                 </div>
               </motion.div>
@@ -608,56 +611,56 @@ export default function EngineeringPage() {
         </div>
 
         {/* ── PG Programs ── */}
-        <div className="relative z-10 container mx-auto px-4 md:px-6 mt-16">
+        <div className="relative z-10 container mx-auto mt-16 px-4 md:px-6">
           <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-              <div>
-                <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
-                  Postgraduate Programs
-                </h2>
-                <h3 className="text-navy font-serif text-4xl leading-tight md:text-5xl">
-                  4 PG Courses,{" "}
-                  <span className="font-light text-stone-300 italic">
-                    Advanced Learning.
-                  </span>
-                </h3>
-              </div>
-              <p className="text-muted-foreground max-w-sm text-sm font-light">
-                M.E. / M.Tech and Doctoral programs for advanced research and
-                specialized expertise.
-              </p>
+            <div>
+              <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
+                Postgraduate Programs
+              </h2>
+              <h3 className="text-navy font-serif text-4xl leading-tight md:text-5xl">
+                4 PG Courses,{" "}
+                <span className="font-light text-stone-300 italic">
+                  Advanced Learning.
+                </span>
+              </h3>
             </div>
+            <p className="text-muted-foreground max-w-sm text-sm font-light">
+              M.E. / M.Tech and Doctoral programs for advanced research and
+              specialized expertise.
+            </p>
+          </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {pgCourses.map((course, index) => (
-                <motion.div
-                  key={course.slug}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.35, delay: index * 0.08 }}
-                  className="group hover:border-engineering/30 rounded-2xl border border-stone-100 bg-white p-6 transition-all hover:shadow-md"
-                >
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-center gap-3">
-                      <div className="text-engineering group-hover:bg-engineering bg-engineering-muted shrink-0 rounded-xl p-3 transition-colors group-hover:text-white">
-                        <course.icon size={22} strokeWidth={1.5} />
-                      </div>
-                      <span className="rounded-full border border-stone-200 bg-stone-50 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-stone-500 uppercase">
-                        {course.abbr}
-                      </span>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {pgCourses.map((course, index) => (
+              <motion.div
+                key={course.slug}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.35, delay: index * 0.08 }}
+                className="group hover:border-engineering/30 rounded-2xl border border-stone-100 bg-white p-6 transition-all hover:shadow-md"
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="text-engineering group-hover:bg-engineering bg-engineering-muted shrink-0 rounded-xl p-3 transition-colors group-hover:text-white">
+                      <course.icon size={22} strokeWidth={1.5} />
                     </div>
-                    <div>
-                      <h3 className="text-navy mb-2 font-serif text-base font-bold">
-                        {course.name}
-                      </h3>
-                      <p className="text-muted-foreground text-sm font-light">
-                        {course.highlight}
-                      </p>
-                    </div>
+                    <span className="rounded-full border border-stone-200 bg-stone-50 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-stone-500 uppercase">
+                      {course.abbr}
+                    </span>
                   </div>
-                </motion.div>
-              ))}
-            </div>
+                  <div>
+                    <h3 className="text-navy mb-2 font-serif text-base font-bold">
+                      {course.name}
+                    </h3>
+                    <p className="text-muted-foreground text-sm font-light">
+                      {course.highlight}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
