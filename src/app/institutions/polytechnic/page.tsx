@@ -4,7 +4,6 @@ import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/modules/polytechnic/Hero";
 import { AboutPolytechnic } from "@/modules/polytechnic/AboutPolytechnic";
 import { DiplomaPrograms } from "@/modules/polytechnic/DiplomaPrograms";
-import { Distinction } from "@/modules/polytechnic/Distinction";
 import { Admissions } from "@/modules/polytechnic/Admissions";
 import { Placements } from "@/components/layout/Placements";
 import { NewsEvents } from "@/components/layout/NewsEvents";

@@ -155,7 +155,7 @@ export function WhyJCT() {
               className={`group border-border hover:border-gold/30 card-hover-lift rounded-2xl border bg-white p-4 md:p-8 ${!showAllFeatures && i >= 4 ? "hidden sm:block" : ""}`}
             >
               <div
-                className={`h-10 w-10 rounded-xl bg-gradient-to-br md:h-12 md:w-12 ${feature.gradient} mb-3 flex items-center justify-center transition-transform group-hover:scale-110 md:mb-5`}
+                className={`h-10 w-10 rounded-xl bg-linear-to-br md:h-12 md:w-12 ${feature.gradient} mb-3 flex items-center justify-center transition-transform group-hover:scale-110 md:mb-5`}
               >
                 <feature.icon
                   size={20}
@@ -193,7 +193,7 @@ export function WhyJCT() {
           viewport={{ once: true }}
           className="bg-navy noise-overlay relative overflow-hidden rounded-3xl p-8 md:p-12"
         >
-          <div className="bg-gold/5 pointer-events-none absolute top-0 right-0 h-[500px] w-[500px] rounded-full blur-[150px]" />
+          <div className="bg-gold/5 pointer-events-none absolute top-0 right-0 h-125 w-125 rounded-full blur-[150px]" />
           <div className="relative z-10 grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
             {counters.map((item, i) => (
               <motion.div

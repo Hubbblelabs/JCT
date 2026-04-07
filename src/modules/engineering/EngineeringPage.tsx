@@ -1,6 +1,5 @@
 "use client";
 
-import { DragScroll } from "@/components/ui/DragScroll";
 import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/data/site";
@@ -256,10 +255,7 @@ const testimonials = [
 
 export default function EngineeringPage() {
   const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
+  const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.6], [1, 1.08]);
 
@@ -518,7 +514,7 @@ export default function EngineeringPage() {
         `}</style>
         {/* Subtle background pattern */}
         <div
-          className="absolute inset-0 opacity-[0.02] group-hover/section:[animation:slide-bg_2s_linear_infinite]"
+          className="absolute inset-0 opacity-[0.02] group-hover/section:animate-[slide-bg_2s_linear_infinite]"
           style={{
             backgroundImage:
               "repeating-linear-gradient(45deg, var(--color-engineering-dark) 0px, var(--color-engineering-dark) 2px, transparent 2px, transparent 10px)",
@@ -546,9 +542,9 @@ export default function EngineeringPage() {
           </div>
         </div>
 
-        <div className="group/carousel relative flex w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] pt-4 pb-8 md:[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+        <div className="group/carousel relative flex w-full overflow-hidden mask-[linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] pt-4 pb-8 md:mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
           <div
-            className="flex w-max items-stretch gap-6 pl-6 group-hover/carousel:![animation-play-state:paused] md:gap-8 md:pl-8"
+            className="flex w-max items-stretch gap-6 pl-6 group-hover/carousel:[animation-play-state:paused]! md:gap-8 md:pl-8"
             style={{ animation: "marquee-courses 30s linear infinite" }}
           >
             {[...ugCourses, ...ugCourses].map((dept, index) => (
@@ -561,7 +557,7 @@ export default function EngineeringPage() {
                   duration: 0.35,
                   delay: (index % ugCourses.length) * 0.05,
                 }}
-                className="group border-border hover:border-engineering/30 card-hover-lift relative flex min-h-[300px] w-[290px] shrink-0 flex-col justify-between rounded-2xl border bg-white p-6 shadow-sm shadow-slate-200/50 transition-all hover:shadow-xl md:w-[320px] md:p-8"
+                className="group border-border hover:border-engineering/30 card-hover-lift relative flex min-h-75 w-72.5 shrink-0 flex-col justify-between rounded-2xl border bg-white p-6 shadow-sm shadow-slate-200/50 transition-all hover:shadow-xl md:w-[320px] md:p-8"
                 draggable={false}
               >
                 <Link

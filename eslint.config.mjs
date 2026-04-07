@@ -7,6 +7,16 @@ const eslintConfig = [
   ...coreWebVitalsConfig,
   ...typescriptConfig,
   prettierConfig,
+
+  // Tailwind plugin config
+  {
+    plugins: {
+      
+    },
+    
+  },
+
+  // Existing rules
   {
     rules: {
       "@typescript-eslint/no-unused-vars": [

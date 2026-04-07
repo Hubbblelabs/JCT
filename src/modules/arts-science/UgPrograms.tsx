@@ -22,8 +22,8 @@ export function UgPrograms() {
       onMouseMove={handleMouseMove}
     >
       {/* Background Textures & Gradients */}
-      <div className="pointer-events-none absolute inset-0 z-0 [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_100%)]">
-        <div className="absolute inset-0 bg-orange-200 [mask-image:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] [mask-size:24px_24px]" />
+      <div className="pointer-events-none absolute inset-0 z-0 mask-[radial-gradient(ellipse_at_center,black_60%,transparent_100%)]">
+        <div className="absolute inset-0 bg-orange-200 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px]" />
 
         {/* Spotlight dots layer tracking the mouse */}
         <div
@@ -33,11 +33,11 @@ export function UgPrograms() {
             maskImage: `radial-gradient(circle 400px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%)`,
           }}
         >
-          <div className="bg-arts-science-accent absolute inset-0 [mask-image:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] [mask-size:24px_24px]" />
+          <div className="bg-arts-science-accent absolute inset-0 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px]" />
         </div>
       </div>
-      <div className="bg-arts-science/5 absolute -top-40 -right-40 h-[30rem] w-[30rem] rounded-full blur-[100px]" />
-      <div className="bg-arts-science/5 absolute -bottom-40 -left-40 h-[30rem] w-[30rem] rounded-full blur-[100px]" />
+      <div className="bg-arts-science/5 absolute -top-40 -right-40 h-120 w-120 rounded-full blur-[100px]" />
+      <div className="bg-arts-science/5 absolute -bottom-40 -left-40 h-120 w-120 rounded-full blur-[100px]" />
 
       <div className="relative container mx-auto px-4 md:px-8">
         <div className="mb-20 flex flex-col items-center text-center">
@@ -74,7 +74,7 @@ export function UgPrograms() {
           </motion.p>
         </div>
 
-        <div className="group/carousel relative mb-20 flex w-full overflow-hidden [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] py-10 md:[mask-image:linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
+        <div className="group/carousel relative mb-20 flex w-full overflow-hidden mask-[linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] py-10 md:mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
           <style>{`
             @keyframes marquee {
               to { transform: translateX(-50%); }
@@ -95,10 +95,10 @@ export function UgPrograms() {
                     duration: 0.5,
                     delay: (index % ugPrograms.length) * 0.1,
                   }}
-                  className="group/card hover:border-arts-science-accent/30 hover:shadow-arts-science-accent/10 relative flex min-h-[420px] w-[320px] shrink-0 flex-col overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-8 shadow-xl shadow-slate-200/50 backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:bg-white hover:shadow-2xl md:w-[380px]"
+                  className="group/card hover:border-arts-science-accent/30 hover:shadow-arts-science-accent/10 relative flex min-h-105 w-80 shrink-0 flex-col overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-8 shadow-xl shadow-slate-200/50 backdrop-blur-xl transition-all duration-300 hover:-translate-y-2 hover:bg-white hover:shadow-2xl md:w-95"
                 >
-                  <div className="absolute inset-0 z-0 bg-gradient-to-br from-white/90 via-white/80 to-slate-50/70 opacity-100 transition-opacity duration-300 group-hover/card:opacity-0" />
-                  <div className="from-arts-science-accent/5 absolute inset-0 z-0 bg-gradient-to-br via-white/95 to-white/90 opacity-0 transition-opacity duration-300 group-hover/card:opacity-100" />
+                  <div className="absolute inset-0 z-0 bg-linear-to-br from-white/90 via-white/80 to-slate-50/70 opacity-100 transition-opacity duration-300 group-hover/card:opacity-0" />
+                  <div className="from-arts-science-accent/5 absolute inset-0 z-0 bg-linear-to-br via-white/95 to-white/90 opacity-0 transition-opacity duration-300 group-hover/card:opacity-100" />
 
                   <Link
                     href={`/institutions/arts-science/departments/${prog.slug}`}
@@ -151,7 +151,7 @@ export function UgPrograms() {
               Browse all programs
               <ArrowRight className="h-5 w-5 transition-transform duration-300 group-hover:translate-x-1" />
             </span>
-            <div className="from-arts-science-accent/80 to-arts-science absolute inset-0 bg-gradient-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+            <div className="from-arts-science-accent/80 to-arts-science absolute inset-0 bg-linear-to-r opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
           </Link>
         </motion.div>
       </div>

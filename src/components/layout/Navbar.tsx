@@ -4,9 +4,9 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X, ChevronDown, ArrowRight, Phone } from "lucide-react";
+import { Menu, X, ChevronDown, Phone, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { navigationData } from "@/data/navigation";
+import { navigationData, type NavItem, type NavChild } from "@/data/navigation";
 import { siteConfig } from "@/data/site";
 
 type NavbarProps = {
@@ -36,51 +36,6 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const navItems = isHomePage
-    ? ["Home", "Institutions", "Placements", "Testimonials", "Campus Life"]
-
-        .map((name) => {
-          if (name === "Testimonials") {
-            return {
-              name: "Testimonials",
-              href: "/#testimonials",
-            } as (typeof navigationData)[0];
-          }
-          return navigationData.find((item) => item.name === name);
-        })
-        .filter((item): item is NonNullable<typeof item> => Boolean(item))
-        .map((item) => {
-          if (item.name === "Institutions") {
-            return {
-              ...item,
-              href: "#",
-            };
-          }
-
-          if (item.name === "Placements") {
-            return {
-              ...item,
-              href: "/#placements",
-              children: undefined,
-            };
-          }
-
-          if (item.name === "Campus Life") {
-            return {
-              ...item,
-              name: "Life@JCT",
-              href: "/campus-life",
-              children: undefined,
-            };
-          }
-
-          return {
-            ...item,
-            children: undefined,
-          };
-        })
-    : navigationData;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -171,7 +126,6 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
           </button>
         </div>
       )}
-
       {/* Main Nav */}
       <nav
         className={`fixed ${bannerVisible && !isHomePage ? "top-10" : "top-4"} right-0 left-0 z-50 px-4 transition-all duration-300 md:px-8`}
@@ -190,6 +144,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                   src="/jct_logo_yellow.png"
                   alt="JCT Logo"
                   fill
+                  sizes="(min-width: 1024px) 40px, 28px"
                   className="object-contain"
                 />
               </div>
@@ -215,7 +170,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               return (
                 <div
                   key={link.name}
-                  className={`relative ${(link as any).className || ""}`}
+                  className="relative"
                   onMouseEnter={() =>
                     hasDropdown && setDesktopExpanded(link.name)
                   }
@@ -250,7 +205,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                     >
                       {link.name}
                       {isActive && (
-                        <span className="absolute right-3 bottom-1 left-3 h-[2px] bg-[#d4a024] xl:right-5 xl:left-5" />
+                        <span className="absolute right-3 bottom-1 left-3 h-0.5 bg-[#d4a024] xl:right-5 xl:left-5" />
                       )}
                     </Link>
                   )}
@@ -265,7 +220,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                           transition={{ duration: 0.2 }}
                           className="absolute top-full left-0 mt-2 w-64 rounded-xl border border-white/10 bg-[#0a1628]/95 p-2 shadow-xl backdrop-blur-md"
                         >
-                          {link.children?.map((child: any) => (
+                          {link.children?.map((child: NavChild) => (
                             <Link
                               key={child.name}
                               href={child.href}
@@ -302,7 +257,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             </a>
             <Link
               href="/admissions/apply"
-              className={`inline-flex h-[38px] items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-[42px] xl:px-8 xl:text-[15px] ${
+              className={`inline-flex h-9.5 items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10.5 xl:px-8 xl:text-[15px] ${
                 isSolid
                   ? "bg-[#d4a024] font-semibold text-[#0a1628] shadow-lg shadow-black/20 hover:bg-[#e8b84a]"
                   : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
@@ -326,7 +281,6 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
           </button>
         </div>
       </nav>
-
       {/* Mobile Drawer */}
       <AnimatePresence>
         {isOpen && (
@@ -343,7 +297,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="fixed inset-y-4 right-4 z-[61] flex w-[280px] flex-col rounded-3xl border border-white/10 bg-[#0a1628]/90 shadow-2xl backdrop-blur-xl xl:hidden"
+              className="fixed inset-y-4 right-4 z-61 flex w-70 flex-col rounded-3xl border border-white/10 bg-[#0a1628]/90 shadow-2xl backdrop-blur-xl xl:hidden"
             >
               {/* Header */}
               <div className="flex items-center justify-between border-b border-white/5 p-5">
@@ -353,6 +307,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                       src="/jct_logo_yellow.png"
                       alt="JCT"
                       fill
+                      sizes="36px"
                       className="object-contain"
                     />
                   </div>
@@ -376,23 +331,15 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               {/* Links */}
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
                 <div className="space-y-1">
-                  {(
-                    navigationLinks.flatMap((item: any) =>
+                  {navigationData
+                    .flatMap((item: NavItem) =>
                       item.name === "Explore More"
                         ? item.children || []
                         : [item],
-                    ) as any[]
-                  )
-                    .filter(
-                      (link) =>
-                        !link.className?.includes("hidden") ||
-                        link.className?.includes("xl:hidden") ||
-                        link.className?.includes("lg:hidden") ||
-                        link.className?.includes("2xl:hidden"),
                     )
-                    .map((link) => (
+                    .map((link: NavItem | NavChild) => (
                       <div key={link.name} className="overflow-hidden">
-                        {link.children ? (
+                        {"children" in link && link.children ? (
                           <div>
                             <button
                               onClick={() => toggleMobileSection(link.name)}
@@ -417,7 +364,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                   className="overflow-hidden"
                                 >
                                   <div className="space-y-1 py-1 pr-2 pl-4">
-                                    {link.children.map((child: any) => (
+                                    {link.children?.map((child: NavChild) => (
                                       <Link
                                         key={child.name}
                                         href={child.href}

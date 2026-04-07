@@ -168,8 +168,8 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const isSolid = scrolled || forceSolidOnTop;
 
   // Flatten nav items for mobile that mimics the arts-science style
-  const mobileNavItems = (engineeringNavigation as any[]).flatMap(
-    (item: any) =>
+  const mobileNavItems = engineeringNavigation.flatMap(
+    (item: EngineeringNavItem) =>
       item.name === "Explore More" ? item.children || [] : [item],
   );
 
@@ -192,7 +192,6 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
           </button>
         </div>
       )}
-
       <nav
         style={{ top: bannerVisible ? bannerHeight : 0 }}
         className={`fixed right-0 left-0 z-50 transition-all duration-300 ${
@@ -211,6 +210,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 src="/jct_logo_yellow.png"
                 alt="JCT"
                 fill
+                sizes="(min-width: 768px) 44px, 40px"
                 className="object-contain"
                 priority
               />
@@ -339,7 +339,6 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
           </button>
         </div>
       </nav>
-
       {/* Mobile Drawer — matches arts-science / polytechnic style */}
       <AnimatePresence>
         {isOpen && (
@@ -369,6 +368,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                       src="/jct_logo_yellow.png"
                       alt="JCT"
                       fill
+                      sizes="36px"
                       className="object-contain"
                     />
                   </div>

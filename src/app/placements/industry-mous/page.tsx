@@ -28,7 +28,7 @@ export default function IndustryMousPage() {
       ]}
     >
       <div className="overflow-x-auto">
-        <table className="w-full min-w-[500px] text-left text-sm">
+        <table className="w-full min-w-125 text-left text-sm">
           <thead>
             <tr className="border-border border-b">
               <th className="text-foreground py-3 pr-4 font-semibold">

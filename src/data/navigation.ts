@@ -8,6 +8,7 @@ export type NavChild = {
   name: string;
   href: string;
   desc?: string;
+  className?: string;
 };
 
 export const navigationData: NavItem[] = [

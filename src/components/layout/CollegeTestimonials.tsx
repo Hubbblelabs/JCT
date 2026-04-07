@@ -37,7 +37,7 @@ export function CollegeTestimonials({
   title,
   subtitle,
   items,
-  accentColor,
+  accentColor: _accentColor,
   sectionBgClassName = "bg-[#F5F5F5]",
   sectionId,
 }: CollegeTestimonialsProps) {
@@ -166,13 +166,13 @@ export function CollegeTestimonials({
                       <span className="mt-4 mb-6 block font-serif text-7xl leading-0 text-[#fcebba] opacity-80">
                         &ldquo;
                       </span>
-                      <p className="min-h-[140px] text-[15px] leading-relaxed text-[#5b6574] italic">
-                        "{activeItem.quote}"
+                      <p className="min-h-35 text-[15px] leading-relaxed text-[#5b6574] italic">
+                        &quot;{activeItem.quote}&quot;
                       </p>
                     </div>
 
                     <div className="mt-4 flex items-center gap-4 border-t border-gray-100/80 pt-4">
-                      <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-xl bg-gray-100">
+                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-gray-100">
                         <Image
                           src={activeItem.image}
                           alt={activeItem.name}

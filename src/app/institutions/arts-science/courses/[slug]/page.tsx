@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 import * as motion from "framer-motion/client";
 import { Variants } from "framer-motion";
+import { siteConfig } from "@/data/site";
 
 export const dynamicParams = false;
 
@@ -35,6 +36,9 @@ export async function generateMetadata({
   return {
     title: `${course.name} | JCT College of Arts & Science`,
     description: course.desc,
+    alternates: {
+      canonical: `${siteConfig.url}/institutions/arts-science/courses/${course.slug}`,
+    },
     openGraph: {
       title: `${course.name} | JCT College of Arts & Science`,
       description: course.desc,

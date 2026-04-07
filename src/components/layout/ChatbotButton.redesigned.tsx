@@ -37,16 +37,76 @@ function escapeHtml(input: string): string {
     .replaceAll("'", "&#39;");
 }
 
-function formatAssistantMessage(content: string): string {
-  let html = escapeHtml(content);
-  html = html.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{26FF}]/gu, "");
-  html = html.replace(/^\s*Jagannath\s*:/i, "<strong>Jagannath:</strong>");
-  html = html.replace(/^[\t ]*[-*][\t ]+/gm, "• ");
-  html = html.replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>");
-  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-  html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
-  html = html.replace(/\n/g, "<br />");
-  return html;
+/**
+ * Safe formatter that converts markdown-style text to React elements (no dangerouslySetInnerHTML)
+ */
+function FormattedMessage({ content }: { content: string }): React.ReactNode {
+  let text = escapeHtml(content);
+  text = text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{26FF}]/gu, "");
+
+  // Split by newlines and process each line
+  const lines = text.split("\n");
+
+  return (
+    <>
+      {lines
+        .map((line, lineIdx) => {
+          // Handle bullet points
+          const bulletMatch = line.match(/^• (.+)$/);
+          if (bulletMatch) {
+            line = bulletMatch[1];
+          }
+
+          // Process ***bold-italic*** -> <strong><em>
+          line = line.replace(/\*\*\*(.+?)\*\*\*/g, (_match, group) => {
+            return `\x01BOLDITALIC\x02${group}\x03`;
+          });
+          line = line.replace(/\*\*(.+?)\*\*/g, (_match, group) => {
+            return `\x01BOLD\x02${group}\x03`;
+          });
+
+          // Process *italic* -> <em>
+          line = line.replace(/\*(.+?)\*/g, (_match, group) => {
+            return `\x01ITALIC\x02${group}\x03`;
+          });
+
+          // Handle Jagannath label
+          const jagannathMatch = line.match(/^\s*Jagannath\s*:/i);
+          if (jagannathMatch) {
+            line = line.replace(/^\s*Jagannath\s*:/i, `\x01JAGANNATH\x02\x03`);
+          }
+
+          // Parse the formatted line
+          const tokens = line.split(/(\x01[A-Z]+\x02.*?\x03)/);
+
+          return tokens.map((token, idx) => {
+            if (token.startsWith("\x01JAGANNATH\x02")) {
+              return <strong key={`${lineIdx}-${idx}`}>Jagannath:</strong>;
+            } else if (token.startsWith("\x01BOLDITALIC\x02")) {
+              const content = token.slice(13, -1);
+              return (
+                <strong key={`${lineIdx}-${idx}`}>
+                  <em>{content}</em>
+                </strong>
+              );
+            } else if (token.startsWith("\x01BOLD\x02")) {
+              const content = token.slice(8, -1);
+              return <strong key={`${lineIdx}-${idx}`}>{content}</strong>;
+            } else if (token.startsWith("\x01ITALIC\x02")) {
+              const content = token.slice(8, -1);
+              return <em key={`${lineIdx}-${idx}`}>{content}</em>;
+            } else if (token.trim() === "") {
+              return null;
+            }
+            return token;
+          });
+        })
+        .flat()
+        .filter(Boolean)}
+      {lines.length > 1 &&
+        lines.slice(0, -1).map((_, idx) => <br key={`br-${idx}`} />)}
+    </>
+  );
 }
 
 function getAssistantIcon(content: string) {
@@ -323,12 +383,13 @@ export function ChatbotButton() {
       <motion.button
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
+        aria-expanded={isOpen}
         aria-label={isOpen ? "Close chatbot" : "Open chatbot"}
         onClick={() => setIsOpen((open) => !open)}
         className={`fixed bottom-6 left-4 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-all md:bottom-8 md:left-6 md:h-16 md:w-16 ${
           isOpen
             ? "bg-red-500 hover:bg-red-600"
-            : `bg-gradient-to-br ${meta.color} hover:shadow-2xl`
+            : `bg-linear-to-br ${meta.color} hover:shadow-2xl`
         }`}
       >
         <AnimatePresence mode="wait">
@@ -362,11 +423,14 @@ export function ChatbotButton() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="fixed bottom-24 left-4 z-50 flex h-[32rem] w-[22rem] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl md:bottom-32 md:left-6 md:w-[24rem]"
+            role="dialog"
+            aria-modal="true"
+            aria-label={`${meta.title} chat`}
+            className="fixed bottom-24 left-4 z-50 flex h-128 w-88 flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl md:bottom-32 md:left-6 md:w-[24rem]"
           >
             {/* Header */}
             <div
-              className={`bg-gradient-to-r ${meta.color} px-4 py-4 text-white`}
+              className={`bg-linear-to-r ${meta.color} px-4 py-4 text-white`}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -391,7 +455,10 @@ export function ChatbotButton() {
             </div>
 
             {/* Messages */}
-            <div className="flex-1 space-y-3 overflow-y-auto bg-gradient-to-b from-slate-50 to-white p-4">
+            <div
+              aria-live="polite"
+              className="flex-1 space-y-3 overflow-y-auto bg-linear-to-b from-slate-50 to-white p-4"
+            >
               <AnimatePresence>
                 {messages.map((msg, idx) => (
                   <motion.div
@@ -407,9 +474,9 @@ export function ChatbotButton() {
                   >
                     {msg.role === "assistant" ? (
                       <div className="flex max-w-[80%] gap-2">
-                        <div className="flex-shrink-0">
+                        <div className="shrink-0">
                           <div
-                            className={`flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br ${meta.color}`}
+                            className={`flex h-7 w-7 items-center justify-center rounded-full bg-linear-to-br ${meta.color}`}
                           >
                             {(() => {
                               const Icon = getAssistantIcon(msg.content);
@@ -419,11 +486,7 @@ export function ChatbotButton() {
                         </div>
                         <div className="rounded-2xl rounded-tl-sm border border-slate-100 bg-white px-4 py-2.5 text-sm text-slate-700 shadow-sm">
                           {msg.content ? (
-                            <span
-                              dangerouslySetInnerHTML={{
-                                __html: formatAssistantMessage(msg.content),
-                              }}
-                            />
+                            <FormattedMessage content={msg.content} />
                           ) : (
                             <TypingIndicator />
                           )}
@@ -431,7 +494,7 @@ export function ChatbotButton() {
                       </div>
                     ) : (
                       <div
-                        className={`max-w-[80%] rounded-2xl rounded-br-sm bg-gradient-to-br ${meta.color} px-4 py-2.5 text-sm text-white shadow-md`}
+                        className={`max-w-[80%] rounded-2xl rounded-br-sm bg-linear-to-br ${meta.color} px-4 py-2.5 text-sm text-white shadow-md`}
                       >
                         {msg.content}
                       </div>
@@ -492,7 +555,7 @@ export function ChatbotButton() {
                 disabled={!input.trim() || isLoading}
                 className={`rounded-full p-2 transition-all ${
                   input.trim() && !isLoading
-                    ? `bg-gradient-to-r ${meta.color} text-white hover:shadow-lg`
+                    ? `bg-linear-to-r ${meta.color} text-white hover:shadow-lg`
                     : "cursor-not-allowed bg-slate-200 text-slate-400"
                 }`}
               >

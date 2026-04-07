@@ -60,8 +60,8 @@ export function AboutArtsScience() {
       className="group/section relative overflow-hidden bg-slate-50"
       onMouseMove={handleMouseMove}
     >
-      <div className="pointer-events-none absolute inset-0 z-0 [mask-image:radial-gradient(ellipse_at_center,black_60%,transparent_100%)]">
-        <div className="absolute inset-0 bg-orange-200 [mask-image:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] [mask-size:24px_24px]" />
+      <div className="pointer-events-none absolute inset-0 z-0 mask-[radial-gradient(ellipse_at_center,black_60%,transparent_100%)]">
+        <div className="absolute inset-0 bg-orange-200 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px]" />
 
         <div
           className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover/section:opacity-100"
@@ -72,11 +72,11 @@ export function AboutArtsScience() {
               "radial-gradient(circle 400px at var(--mouse-x, 50%) var(--mouse-y, 50%), black 0%, transparent 100%)",
           }}
         >
-          <div className="bg-arts-science-accent absolute inset-0 [mask-image:url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] [mask-size:24px_24px]" />
+          <div className="bg-arts-science-accent absolute inset-0 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px]" />
         </div>
       </div>
-      <div className="bg-arts-science/5 absolute -top-40 -right-40 h-[30rem] w-[30rem] rounded-full blur-[100px]" />
-      <div className="bg-arts-science/5 absolute -bottom-40 -left-40 h-[30rem] w-[30rem] rounded-full blur-[100px]" />
+      <div className="bg-arts-science/5 absolute -top-40 -right-40 h-120 w-120 rounded-full blur-[100px]" />
+      <div className="bg-arts-science/5 absolute -bottom-40 -left-40 h-120 w-120 rounded-full blur-[100px]" />
 
       <ArtsSection tone="transparent" className="relative">
         {/* Tab Navigation */}
@@ -140,7 +140,7 @@ export function AboutArtsScience() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                className="relative h-[450px] w-full overflow-hidden rounded-[2rem] border-4 border-white shadow-2xl lg:h-[550px]"
+                className="relative h-112.5 w-full overflow-hidden rounded-4xl border-4 border-white shadow-2xl lg:h-137.5"
               >
                 <Image
                   src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop"
@@ -167,7 +167,7 @@ export function AboutArtsScience() {
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="rounded-[2rem] border border-orange-100 bg-white p-10 shadow-sm"
+                className="rounded-4xl border border-orange-100 bg-white p-10 shadow-sm"
               >
                 <div className="mb-6 flex items-center gap-4">
                   <div className="rounded-2xl bg-orange-50 p-4">
@@ -201,7 +201,7 @@ export function AboutArtsScience() {
                 initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="bg-arts-science-dark relative overflow-hidden rounded-[2rem] p-10 text-white shadow-lg"
+                className="bg-arts-science-dark relative overflow-hidden rounded-4xl p-10 text-white shadow-lg"
               >
                 <div className="pointer-events-none absolute top-0 right-0 h-32 w-32 rounded-full bg-orange-500/10 blur-2xl" />
                 <div className="relative z-10 mb-6 flex items-center gap-4">
@@ -261,7 +261,7 @@ export function AboutArtsScience() {
                   viewport={{ once: true }}
                   className="md:col-span-4"
                 >
-                  <div className="relative mx-auto flex aspect-[4/5] w-full max-w-[320px] items-center justify-center overflow-hidden rounded-3xl border-8 border-orange-50 bg-white shadow-lg">
+                  <div className="relative mx-auto flex aspect-4/5 w-full max-w-[320px] items-center justify-center overflow-hidden rounded-3xl border-8 border-orange-50 bg-white shadow-lg">
                     <Image
                       src="/jct_logo.png"
                       alt="Principal"

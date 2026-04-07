@@ -39,14 +39,14 @@ const newsItems = [
       "JCT Institutions undergoes peer review for NAAC re-accreditation, with preliminary reports indicating strong outcomes.",
     category: "Accreditation",
     image:
-      "https://images.unsplash.com/photo-1525921429624-479b6c294a48?q=80&w=800&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1200&auto=format&fit=crop",
   },
 ];
 
 export function NewsEvents() {
   return (
     <section id="happenings" className="bg-white py-10 md:py-14">
-      <div className="container mx-auto max-w-[1400px] px-4 md:px-8">
+      <div className="container mx-auto max-w-350 px-4 md:px-8">
         {/* Header */}
         <div className="mb-6 flex items-end justify-between border-b border-gray-100 pb-4 md:mb-8">
           <div>
@@ -93,12 +93,13 @@ export function NewsEvents() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="group relative h-[400px] cursor-pointer overflow-hidden rounded-4xl lg:col-span-5 lg:h-[600px]"
+            className="group relative h-100 cursor-pointer overflow-hidden rounded-4xl lg:col-span-5 lg:h-150"
           >
             <Image
               src={newsItems[0].image}
               alt={newsItems[0].title}
               fill
+              sizes="(min-width: 1024px) 42vw, 100vw"
               className="object-cover transition-transform duration-700 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-linear-to-t from-[#1a2332]/90 via-[#1a2332]/20 to-transparent" />
@@ -113,19 +114,20 @@ export function NewsEvents() {
           </motion.div>
 
           {/* Right Column Grid */}
-          <div className="flex h-auto flex-col gap-6 lg:col-span-7 lg:h-[600px]">
+          <div className="flex h-auto flex-col gap-6 lg:col-span-7 lg:h-150">
             {/* Top Horizontal Card (index 1) */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="group relative min-h-[250px] flex-1 cursor-pointer overflow-hidden rounded-4xl"
+              className="group relative min-h-62.5 flex-1 cursor-pointer overflow-hidden rounded-4xl"
             >
               <Image
                 src={newsItems[1].image}
                 alt={newsItems[1].title}
                 fill
+                sizes="(min-width: 1024px) 58vw, 100vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-linear-to-t from-[#1a2332]/90 via-[#1a2332]/10 to-transparent" />
@@ -137,19 +139,20 @@ export function NewsEvents() {
             </motion.div>
 
             {/* Two Bottom Vertical Cards */}
-            <div className="grid min-h-[250px] flex-[1.2] grid-cols-1 gap-6 sm:grid-cols-2">
+            <div className="grid min-h-62.5 flex-[1.2] grid-cols-1 gap-6 sm:grid-cols-2">
               {/* Card (index 2) */}
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.3 }}
-                className="group relative min-h-[250px] cursor-pointer overflow-hidden rounded-4xl"
+                className="group relative min-h-62.5 cursor-pointer overflow-hidden rounded-4xl"
               >
                 <Image
                   src={newsItems[2].image}
                   alt={newsItems[2].title}
                   fill
+                  sizes="(min-width: 1024px) 29vw, (min-width: 640px) 50vw, 100vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-[#1a2332]/90 via-[#1a2332]/20 to-transparent" />
@@ -166,12 +169,13 @@ export function NewsEvents() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: 0.4 }}
-                className="group relative min-h-[250px] cursor-pointer overflow-hidden rounded-4xl"
+                className="group relative min-h-62.5 cursor-pointer overflow-hidden rounded-4xl"
               >
                 <Image
                   src={newsItems[3].image}
                   alt={newsItems[3].title}
                   fill
+                  sizes="(min-width: 1024px) 29vw, (min-width: 640px) 50vw, 100vw"
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-linear-to-t from-[#1a2332]/90 via-[#1a2332]/20 to-transparent" />

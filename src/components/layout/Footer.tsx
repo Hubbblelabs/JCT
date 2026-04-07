@@ -37,6 +37,7 @@ export function Footer() {
                   src="/jct_logo_yellow.png"
                   alt="JCT"
                   fill
+                  sizes="(min-width: 640px) 48px, 40px"
                   className="object-contain"
                 />
               </div>
@@ -46,7 +47,7 @@ export function Footer() {
             </div>
 
             {/* Helpline Card Wrapper for Glow */}
-            <div className="relative flex min-h-[220px] w-full flex-1 flex-col">
+            <div className="relative flex min-h-55 w-full flex-1 flex-col">
               {/* Soft external radial glow behind the card */}
               <div className="pointer-events-none absolute inset-0 scale-105 rounded-full bg-[#D4A024]/20 blur-[80px]" />
 
@@ -74,7 +75,7 @@ export function Footer() {
                     +91 93614 88801
                   </a>
 
-                  <div className="my-1.5 h-px w-full max-w-[200px] bg-linear-to-r from-transparent via-white/20 to-transparent"></div>
+                  <div className="my-1.5 h-px w-full max-w-50 bg-linear-to-r from-transparent via-white/20 to-transparent"></div>
 
                   <a
                     href="mailto:admissions@jct.ac.in"
@@ -163,7 +164,7 @@ export function Footer() {
                 Location Map
               </h3>
             </div>
-            <div className="relative h-[250px] min-h-[220px] w-full overflow-hidden rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] lg:h-auto lg:flex-1">
+            <div className="relative h-62.5 min-h-55 w-full overflow-hidden rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] lg:h-auto lg:flex-1">
               {/* Subtle map glow */}
               <div className="pointer-events-none absolute inset-0 z-10 bg-white/10 mix-blend-overlay"></div>
               <iframe
@@ -179,10 +180,9 @@ export function Footer() {
           </div>
         </div>
       </div>
-
       {/* Bottom bar */}
       <div className="border-t border-[#e2d8c9] bg-[#ebe4d8] px-4 pt-6 pb-32 md:px-8 md:pt-8 md:pb-30 lg:pb-10">
-        <div className="container mx-auto flex flex-col items-center justify-between gap-6 text-center text-[13px] text-gray-600 sm:flex-row lg:pr-[320px]">
+        <div className="container mx-auto flex flex-col items-center justify-between gap-6 text-center text-[13px] text-gray-600 sm:flex-row lg:pr-80">
           <p className="w-full font-medium sm:w-auto">
             © {new Date().getFullYear()} JCT Institutions. All rights reserved.
           </p>

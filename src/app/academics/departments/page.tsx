@@ -7,7 +7,6 @@ import {
   Building2,
   ChevronRight,
   Home,
-  ChevronDown,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -76,7 +75,7 @@ const colleges = [
 ];
 
 export default function DepartmentsPage() {
-  const { title, subtitle } = academicsData.departments;
+  const { subtitle } = academicsData.departments;
 
   return (
     <main className="bg-surface text-foreground min-h-screen">
@@ -86,8 +85,8 @@ export default function DepartmentsPage() {
       <section className="relative z-0 overflow-hidden pt-36 pb-24 md:pt-48 md:pb-32">
         <div className="from-arts-science-dark absolute inset-0 z-0 bg-linear-to-br via-[#5c1022] to-[#2a060e]">
           {/* Abstract graphics to give the background depth */}
-          <div className="bg-gold/10 pointer-events-none absolute top-0 right-0 h-[800px] w-[800px] translate-x-1/3 -translate-y-1/3 rounded-full mix-blend-screen blur-[120px]"></div>
-          <div className="bg-engineering/20 pointer-events-none absolute bottom-0 left-0 h-[600px] w-[600px] -translate-x-1/3 translate-y-1/3 rounded-full mix-blend-screen blur-[100px]"></div>
+          <div className="bg-gold/10 pointer-events-none absolute top-0 right-0 h-200 w-200 translate-x-1/3 -translate-y-1/3 rounded-full mix-blend-screen blur-[120px]"></div>
+          <div className="bg-engineering/20 pointer-events-none absolute bottom-0 left-0 h-150 w-150 -translate-x-1/3 translate-y-1/3 rounded-full mix-blend-screen blur-[100px]"></div>
         </div>
 
         <div className="relative z-10 container mx-auto px-4 md:px-6">

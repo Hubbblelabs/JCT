@@ -24,6 +24,8 @@ type ArtsNavItem = {
   }[];
 };
 
+type ArtsNavChild = NonNullable<ArtsNavItem["children"]>[number];
+
 const artsNav: ArtsNavItem[] = [
   { name: "Home", href: "/institutions/arts-science/#hero" },
   {
@@ -173,7 +175,6 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
   return (
     <>
       {/* Announcement Bar */}
-
       {/* Main Nav */}
       <motion.nav
         initial={{ y: -100 }}
@@ -199,6 +200,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 src="/jct_logo_yellow.png"
                 alt="JCT"
                 fill
+                sizes="(min-width: 768px) 44px, 40px"
                 className="object-contain"
                 priority
               />
@@ -327,7 +329,6 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
           </button>
         </div>
       </motion.nav>
-
       {/* Mobile Drawer */}
       <AnimatePresence>
         {isOpen && (
@@ -344,7 +345,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="fixed inset-y-4 right-4 z-61 flex w-[280px] flex-col rounded-3xl border border-white/10 bg-[#111827]/90 shadow-2xl backdrop-blur-xl lg:hidden"
+              className="fixed inset-y-4 right-4 z-61 flex w-70 flex-col rounded-3xl border border-white/10 bg-[#111827]/90 shadow-2xl backdrop-blur-xl lg:hidden"
             >
               {/* Header */}
               <div className="flex items-center justify-between border-b border-white/5 p-5">
@@ -354,6 +355,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                       src="/jct_logo_yellow.png"
                       alt="JCT"
                       fill
+                      sizes="36px"
                       className="object-contain"
                     />
                   </div>
@@ -377,13 +379,12 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               {/* Links */}
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
                 <div className="space-y-1">
-                  {(
-                    artsNav.flatMap((item: any) =>
+                  {artsNav
+                    .flatMap((item: ArtsNavItem) =>
                       item.name === "Explore More"
                         ? item.children || []
                         : [item],
-                    ) as any[]
-                  )
+                    )
                     .filter(
                       (link) =>
                         !link.className?.includes("hidden") ||
@@ -391,9 +392,9 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                         link.className?.includes("lg:hidden") ||
                         link.className?.includes("2xl:hidden"),
                     )
-                    .map((link: any) => (
+                    .map((link: ArtsNavItem | ArtsNavChild) => (
                       <div key={link.name} className="overflow-hidden">
-                        {link.children ? (
+                        {"children" in link && link.children ? (
                           <div>
                             <button
                               type="button"
@@ -419,18 +420,20 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                   className="overflow-hidden"
                                 >
                                   <div className="space-y-1 py-1 pr-2 pl-4">
-                                    {link.children.map((child: any) => (
-                                      <Link
-                                        key={child.name}
-                                        href={child.href}
-                                        onClick={(e) =>
-                                          handleNavClick(e, child.href, true)
-                                        }
-                                        className="hover:text-arts-science-accent block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5"
-                                      >
-                                        {child.name}
-                                      </Link>
-                                    ))}
+                                    {link.children.map(
+                                      (child: ArtsNavChild) => (
+                                        <Link
+                                          key={child.name}
+                                          href={child.href}
+                                          onClick={(e) =>
+                                            handleNavClick(e, child.href, true)
+                                          }
+                                          className="hover:text-arts-science-accent block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5"
+                                        >
+                                          {child.name}
+                                        </Link>
+                                      ),
+                                    )}
                                   </div>
                                 </motion.div>
                               )}

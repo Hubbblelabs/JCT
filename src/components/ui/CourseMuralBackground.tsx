@@ -10,7 +10,6 @@ export function CourseMuralBackground() {
     Array.from({ length: n }, (_, i) => {
       const a = (i * 360) / n;
       const ar = (a * Math.PI) / 180;
-      const a2 = ((a + 360 / n) * 0.72 * Math.PI) / 180;
       const a3 = ((a + (360 / n) * 0.72) * Math.PI) / 180;
       const a4 = ((a + 360 / n) * Math.PI) / 180;
       return (

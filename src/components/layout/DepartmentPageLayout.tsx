@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, type ElementType } from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
 import {
   BookOpen,
   GraduationCap,
@@ -23,7 +22,6 @@ import {
   Star,
   Microscope,
   Quote,
-  ArrowLeft,
   Trophy,
   Mail,
   Beaker,
@@ -1230,7 +1228,7 @@ function LifeTab({
 function CareerTab({
   dept,
   ac,
-  bg,
+  bg: _bg,
 }: {
   dept: DepartmentData;
   ac: string;
@@ -1370,8 +1368,8 @@ function Detail({ label, value }: { label: string; value: string }) {
 
 export function DepartmentPageLayout({
   dept,
-  backHref,
-  backLabel,
+  backHref: _backHref,
+  backLabel: _backLabel,
 }: {
   dept: DepartmentData;
   backHref: string;
@@ -1434,7 +1432,7 @@ export function DepartmentPageLayout({
 
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <header
-        className="relative min-h-[480px] overflow-hidden pt-28 pb-14 md:min-h-[540px]"
+        className="relative min-h-120 overflow-hidden pt-28 pb-14 md:min-h-135"
         style={{ backgroundColor: bg }}
       >
         {/* Background layers */}
@@ -1448,7 +1446,7 @@ export function DepartmentPageLayout({
             priority
           />
           {/* Deep gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/85 via-black/65 to-black/40" />
+          <div className="absolute inset-0 bg-linear-to-b from-black/85 via-black/65 to-black/40" />
           {/* Glow orb 1 */}
           <div
             className="absolute -top-24 -right-24 h-80 w-80 animate-pulse rounded-full opacity-30 blur-[90px]"
@@ -1460,7 +1458,7 @@ export function DepartmentPageLayout({
             style={{ backgroundColor: ac }}
           />
           {/* Subtle dot grid */}
-          <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] [background-size:24px_24px]" />
+          <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.04)_1px,transparent_1px)] bg-size-[24px_24px]" />
         </div>
 
         <div className="relative z-10 container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

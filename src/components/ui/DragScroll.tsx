@@ -39,7 +39,7 @@ export function DragScroll({
   return (
     <div
       ref={scrollRef}
-      className={`cursor-grab overflow-x-auto select-none [-ms-overflow-style:'none'] [scrollbar-width:'none'] active:cursor-grabbing [&::-webkit-scrollbar]:hidden ${className}`}
+      className={`relative cursor-grab overflow-x-auto select-none [-ms-overflow-style:'none'] [scrollbar-width:'none'] active:cursor-grabbing [&::-webkit-scrollbar]:hidden ${className}`}
       style={style}
       onMouseDown={onMouseDown}
       onMouseLeave={onMouseLeave}

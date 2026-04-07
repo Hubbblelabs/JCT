@@ -34,28 +34,64 @@ function escapeHtml(input: string): string {
     .replaceAll("'", "&#39;");
 }
 
-function formatAssistantMessage(content: string): string {
-  let html = escapeHtml(content);
+/**
+ * Safe formatter that converts markdown-style text to React elements (no dangerouslySetInnerHTML)
+ */
+function FormattedMessage({ content }: { content: string }): React.ReactNode {
+  let text = escapeHtml(content);
+  text = text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{26FF}]/gu, "");
 
-  // Strip emojis and rely on consistent UI icons instead.
-  html = html.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{26FF}]/gu, "");
+  // Split by newlines and process each line
+  const lines = text.split("\n");
 
-  // Always emphasize assistant name prefix.
-  html = html.replace(/^\s*Jagannath\s*:/i, "<strong>Jagannath:</strong>");
+  const result: React.ReactNode[] = [];
 
-  // Convert markdown-style bullets into readable bullets.
-  html = html.replace(/^[\t ]*[-*][\t ]+/gm, "• ");
+  lines.forEach((line, lineIdx) => {
+    // Handle bullet points
+    const bulletMatch = line.match(/^• (.+)$/);
+    if (bulletMatch) {
+      line = bulletMatch[1];
+    }
 
-  // Support emphasis markers from model output.
-  html = html.replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>");
-  html = html.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-  html = html.replace(/\*(.+?)\*/g, "<em>$1</em>");
+    // Process formatting markers
+    line = line.replace(/\*\*\*(.+?)\*\*\*/g, "\x01BOLDITALIC\x02$1\x03");
+    line = line.replace(/\*\*(.+?)\*\*/g, "\x01BOLD\x02$1\x03");
+    line = line.replace(/\*(.+?)\*/g, "\x01ITALIC\x02$1\x03");
+    const jagannathMatch = line.match(/^\s*Jagannath\s*:/i);
+    if (jagannathMatch) {
+      line = line.replace(/^\s*Jagannath\s*:/i, "\x01JAGANNATH\x02\x03");
+    }
 
-  // Preserve line breaks for point-wise formatting.
-  html = html.replace(/\n/g, "<br />");
-  return html;
+    const tokens = line.split(/(\x01[A-Z]+\x02.*?\x03)/);
+
+    tokens.forEach((token, idx) => {
+      if (token.startsWith("\x01JAGANNATH\x02")) {
+        result.push(<strong key={`${lineIdx}-${idx}`}>Jagannath:</strong>);
+      } else if (token.startsWith("\x01BOLDITALIC\x02")) {
+        const content = token.slice(13, -1);
+        result.push(
+          <strong key={`${lineIdx}-${idx}`}>
+            <em>{content}</em>
+          </strong>,
+        );
+      } else if (token.startsWith("\x01BOLD\x02")) {
+        const content = token.slice(8, -1);
+        result.push(<strong key={`${lineIdx}-${idx}`}>{content}</strong>);
+      } else if (token.startsWith("\x01ITALIC\x02")) {
+        const content = token.slice(8, -1);
+        result.push(<em key={`${lineIdx}-${idx}`}>{content}</em>);
+      } else if (token.trim() !== "") {
+        result.push(token);
+      }
+    });
+
+    if (lineIdx < lines.length - 1) {
+      result.push(<br key={`br-${lineIdx}`} />);
+    }
+  });
+
+  return <>{result}</>;
 }
-
 function getAssistantIcon(content: string) {
   const text = content.toLowerCase();
 
@@ -299,6 +335,7 @@ export function ChatbotButton() {
     <>
       <button
         aria-label={isOpen ? "Close chatbot" : "Open chatbot"}
+        aria-expanded={isOpen}
         onClick={() => setIsOpen((open) => !open)}
         className="bg-navy hover:bg-navy-mid fixed bottom-6 left-4 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all hover:scale-105 active:scale-95 md:bottom-8 md:left-6 md:h-16 md:w-16"
       >
@@ -306,7 +343,12 @@ export function ChatbotButton() {
       </button>
 
       {isOpen && (
-        <div className="fixed bottom-24 left-4 z-50 flex h-[32rem] w-[22rem] flex-col overflow-hidden rounded-2xl border border-white/20 bg-white shadow-2xl md:bottom-32 md:left-6 md:w-[24rem]">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={`${meta.title} chat`}
+          className="fixed bottom-24 left-4 z-50 flex h-128 w-88 flex-col overflow-hidden rounded-2xl border border-white/20 bg-white shadow-2xl md:bottom-32 md:left-6 md:w-[24rem]"
+        >
           <div className="bg-navy flex items-center justify-between px-4 py-3 text-white">
             <div>
               <p className="text-sm font-semibold">{meta.title}</p>
@@ -321,7 +363,10 @@ export function ChatbotButton() {
             </button>
           </div>
 
-          <div className="flex-1 space-y-3 overflow-y-auto bg-slate-50 p-3">
+          <div
+            aria-live="polite"
+            className="flex-1 space-y-3 overflow-y-auto bg-slate-50 p-3"
+          >
             {messages.map((msg) => (
               <div
                 key={msg.id}
@@ -346,11 +391,9 @@ export function ChatbotButton() {
                             <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#EAF0FF] text-[#0D3B66]">
                               <Icon size={12} />
                             </span>
-                            <span
-                              dangerouslySetInnerHTML={{
-                                __html: formatAssistantMessage(msg.content),
-                              }}
-                            />
+                            <span>
+                              <FormattedMessage content={msg.content} />
+                            </span>
                           </span>
                         );
                       })()

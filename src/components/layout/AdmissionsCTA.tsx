@@ -7,8 +7,6 @@ import {
   CalendarCheck,
   GraduationCap,
   ArrowRight,
-  Phone,
-  Mail,
 } from "lucide-react";
 
 const pathways = [

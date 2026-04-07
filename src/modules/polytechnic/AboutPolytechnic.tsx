@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { PolySection, PolySectionHeader } from "@/modules/polytechnic/PolyUI";
+import { PolySection } from "@/modules/polytechnic/PolyUI";
 import Image from "next/image";
 import { Quote } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -64,8 +64,8 @@ export function AboutPolytechnic() {
         tone="transparent"
         className="relative"
       >
-        <div className="bg-polytechnic-accent/5 pointer-events-none absolute top-0 right-0 z-0 -mt-32 -mr-32 h-[500px] w-[500px] rounded-full blur-3xl"></div>
-        <div className="bg-polytechnic-dark/5 pointer-events-none absolute bottom-0 left-0 z-0 -mb-32 -ml-32 h-[400px] w-[400px] rounded-full blur-3xl"></div>
+        <div className="bg-polytechnic-accent/5 pointer-events-none absolute top-0 right-0 z-0 -mt-32 -mr-32 h-125 w-125 rounded-full blur-3xl"></div>
+        <div className="bg-polytechnic-dark/5 pointer-events-none absolute bottom-0 left-0 z-0 -mb-32 -ml-32 h-100 w-100 rounded-full blur-3xl"></div>
 
         {/* Tab Navigation */}
         <div className="relative z-10 mb-10 flex justify-center px-4">
@@ -130,7 +130,7 @@ export function AboutPolytechnic() {
                 initial={{ opacity: 0, scale: 0.95 }}
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
-                className="relative h-[400px] w-full overflow-hidden rounded-3xl shadow-2xl lg:h-[500px]"
+                className="relative h-100 w-full overflow-hidden rounded-3xl shadow-2xl lg:h-125"
               >
                 <Image
                   src="https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1200&auto=format&fit=crop"
@@ -243,7 +243,7 @@ export function AboutPolytechnic() {
             transition={{ duration: 0.3 }}
             className="relative z-10"
           >
-            <div className="relative z-10 overflow-hidden rounded-[2rem] border border-[#f0e6d5] bg-[#fcfaf7] p-6 shadow-lg md:p-12">
+            <div className="relative z-10 overflow-hidden rounded-4xl border border-[#f0e6d5] bg-[#fcfaf7] p-6 shadow-lg md:p-12">
               {/* Diagonal abstract texture */}
               <div
                 className="pointer-events-none absolute inset-0 z-0 opacity-20"
@@ -261,7 +261,7 @@ export function AboutPolytechnic() {
                   viewport={{ once: true }}
                   className="md:col-span-4"
                 >
-                  <div className="relative mx-auto aspect-square w-full max-w-[280px] overflow-hidden rounded-full border-4 border-white shadow-xl">
+                  <div className="relative mx-auto aspect-square w-full max-w-70 overflow-hidden rounded-full border-4 border-white shadow-xl">
                     <Image
                       src="/jct_logo.png"
                       alt="Principal"

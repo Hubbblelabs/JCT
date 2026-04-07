@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { DepartmentPageLayout } from "@/components/layout/DepartmentPageLayout";
 import { engineeringDepartments } from "@/data/engineering-departments";
+import { siteConfig } from "@/data/site";
 
 export const dynamicParams = false;
 
@@ -24,6 +25,9 @@ export async function generateMetadata({
   return {
     title: `${dept.name} | JCT College of Engineering & Technology`,
     description: dept.about.paragraphs[0],
+    alternates: {
+      canonical: `${siteConfig.url}/institutions/engineering/departments/${dept.slug}`,
+    },
     openGraph: {
       title: `${dept.name} | JCT College of Engineering & Technology`,
       description: dept.about.paragraphs[0],

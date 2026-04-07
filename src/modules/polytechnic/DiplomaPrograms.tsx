@@ -81,8 +81,8 @@ export function DiplomaPrograms() {
           }}
         />
       </div>
-      <div className="bg-polytechnic-accent/5 pointer-events-none absolute top-0 right-0 z-0 h-[500px] w-[500px] translate-x-1/3 -translate-y-1/3 rounded-full blur-3xl" />
-      <div className="bg-polytechnic-dark/5 pointer-events-none absolute bottom-0 left-0 z-0 h-[400px] w-[400px] -translate-x-1/3 translate-y-1/3 rounded-full blur-3xl" />
+      <div className="bg-polytechnic-accent/5 pointer-events-none absolute top-0 right-0 z-0 h-125 w-125 translate-x-1/3 -translate-y-1/3 rounded-full blur-3xl" />
+      <div className="bg-polytechnic-dark/5 pointer-events-none absolute bottom-0 left-0 z-0 h-100 w-100 -translate-x-1/3 translate-y-1/3 rounded-full blur-3xl" />
 
       <div className="relative z-10">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
@@ -135,7 +135,7 @@ export function DiplomaPrograms() {
                   duration: 0.45,
                   delay: (index % diplomaPrograms.length) * 0.06,
                 }}
-                className="border-polytechnic/12 group flex h-full w-[84vw] shrink-0 flex-col overflow-hidden rounded-xl border bg-white shadow-[0_8px_24px_rgba(2,42,50,0.06)] sm:w-[70vw] md:w-[50vw] lg:w-[380px]"
+                className="border-polytechnic/12 group flex h-full w-[84vw] shrink-0 flex-col overflow-hidden rounded-xl border bg-white shadow-[0_8px_24px_rgba(2,42,50,0.06)] sm:w-[70vw] md:w-[50vw] lg:w-95"
               >
                 <div className="relative aspect-16/10 overflow-hidden">
                   {prog.image ? (

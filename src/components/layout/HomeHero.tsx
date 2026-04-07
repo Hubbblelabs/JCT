@@ -9,13 +9,7 @@ import {
 } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  ArrowRight,
-  Phone,
-  Settings,
-  Palette,
-  PencilRuler,
-} from "lucide-react";
+import { ArrowRight, Phone } from "lucide-react";
 
 const slides = [
   {
@@ -94,10 +88,7 @@ export function HomeHero() {
   const [activeSlide, setActiveSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"],
-  });
+  const { scrollYProgress } = useScroll();
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const overlayOpacity = useTransform(scrollYProgress, [0, 1], [0.55, 0.85]);
 
