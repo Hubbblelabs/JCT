@@ -32,15 +32,15 @@
   },
   "courses": [
     {
-      "name": "B.E. Computer Science and Engineering",
+      "name": "B.E. Computer Science & Engineering",
       "duration": "4 years"
     },
     {
-      "name": "B.E. Electronics and Communication Engineering",
+      "name": "B.E. Electronics & Communication Engineering",
       "duration": "4 years"
     },
     {
-      "name": "B.E. Electrical and Electronics Engineering",
+      "name": "B.E. Electrical & Electronics Engineering",
       "duration": "4 years"
     },
     {
@@ -52,28 +52,44 @@
       "duration": "4 years"
     },
     {
-      "name": "Artificial Intelligence and Data Science",
+      "name": "B.Tech. Artificial Intelligence and Data Science",
       "duration": "4 years"
     },
     {
-      "name": "Computer Science and Business Systems",
+      "name": "B.E. Computer Science and Business Systems",
       "duration": "4 years"
     },
     {
-      "name": "Petroleum Engineering",
+      "name": "B.E. Petroleum Engineering",
       "duration": "4 years"
     },
     {
-      "name": "Petrochemical Engineering",
+      "name": "B.Tech. Petrochemical Technology",
       "duration": "4 years"
     },
     {
-      "name": "Food Technology",
+      "name": "B.Tech. Food Technology",
       "duration": "4 years"
     },
     {
-      "name": "Biotechnology and Biochemical Engineering",
+      "name": "B.Tech. Bio-Technology and Bio-Chemical Engineering",
       "duration": "4 years"
+    },
+    {
+      "name": "M.E. Structural Engineering",
+      "duration": "2 years"
+    },
+    {
+      "name": "M.E. Power Electronics and Drives",
+      "duration": "2 years"
+    },
+    {
+      "name": "M.E. CSE (Artificial Intelligence & Machine Learning)",
+      "duration": "2 years"
+    },
+    {
+      "name": "Ph.D. Electrical and Electronics Engineering (Doctoral Programme)",
+      "duration": "As per university norms"
     }
   ],
   "facilities": [
@@ -115,7 +131,7 @@
     },
     {
       "q": "How many engineering courses are offered?",
-      "a": "The college offers more than 10 undergraduate engineering programs across multiple domains."
+      "a": "The college offers 11 undergraduate programs, 3 postgraduate programs, and a doctoral program in Electrical and Electronics Engineering."
     },
     {
       "q": "Are placements available?",

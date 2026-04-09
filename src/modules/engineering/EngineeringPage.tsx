@@ -54,7 +54,7 @@ const ugCourses = [
     slug: "aids",
     icon: BrainCircuit,
     seats: 60,
-    highlight: "Machine Learning, Deep Learning, Big Data Analytics",
+    highlight: "B.Tech. program in AI, Data Science, and Intelligent Systems",
   },
   {
     name: "Computer Science & Business Systems",
@@ -62,7 +62,7 @@ const ugCourses = [
     slug: "csbs",
     icon: Cpu,
     seats: 60,
-    highlight: "Business Analytics, ERP Systems, Data-Driven Decisions",
+    highlight: "B.E. program blending computing with business systems",
   },
   {
     name: "Electronics & Communication Engineering",
@@ -70,7 +70,7 @@ const ugCourses = [
     slug: "ece",
     icon: Globe,
     seats: 60,
-    highlight: "VLSI Design, Signal Processing, IoT",
+    highlight: "Communication Systems, VLSI, Signal Processing, and IoT",
     nbaAccredited: true,
   },
   {
@@ -79,7 +79,7 @@ const ugCourses = [
     slug: "eee",
     icon: Zap,
     seats: 60,
-    highlight: "Power Systems, Control Systems, Embedded Design",
+    highlight: "Power Systems, Drives, Control Systems, and Energy Applications",
     nbaAccredited: true,
   },
   {
@@ -88,7 +88,7 @@ const ugCourses = [
     slug: "mech",
     icon: Cog,
     seats: 60,
-    highlight: "CAD/CAM, Thermal Engineering, Robotics",
+    highlight: "Design, Manufacturing, Thermal Systems, and Automation",
     nbaAccredited: true,
   },
   {
@@ -97,15 +97,15 @@ const ugCourses = [
     slug: "ce",
     icon: Building2,
     seats: 60,
-    highlight: "Structural Engineering, Environmental Engineering",
+    highlight: "Structural, Construction, and Environmental Engineering",
   },
   {
-    name: "Bio-Technology & Bio-Chemical Engineering",
+    name: "Bio-Technology and Bio-Chemical Engineering",
     abbr: "BT",
     slug: "bt",
     icon: Beaker,
     seats: 60,
-    highlight: "Genetic Engineering, Bioprocessing, Pharma",
+    highlight: "Bioprocess Engineering, Biotechnology, and Biochemical Systems",
   },
   {
     name: "Food Technology",
@@ -113,7 +113,7 @@ const ugCourses = [
     slug: "ft",
     icon: Utensils,
     seats: 60,
-    highlight: "Food Processing, Quality Control, Nutrition Science",
+    highlight: "Food Processing, Safety, Quality Assurance, and Product Development",
   },
   {
     name: "Petroleum Engineering",
@@ -122,7 +122,7 @@ const ugCourses = [
     icon: Droplets,
     seats: 60,
     highlight:
-      "Reservoir Engineering, Drilling Technology, Refinery Operations",
+      "Reservoir Studies, Drilling Technology, and Hydrocarbon Production",
   },
   {
     name: "Petrochemical Technology",
@@ -130,43 +130,43 @@ const ugCourses = [
     slug: "pct",
     icon: FlaskConical,
     seats: 60,
-    highlight: "Polymer Technology, Chemical Processes, Industrial Chemistry",
+    highlight: "Petrochemical Processing, Industrial Chemistry, and Process Safety",
   },
 ];
 
-/* ─── PG Courses (4) ─── */
+/* ─── PG Courses (3) ─── */
 const pgCourses = [
   {
     name: "Structural Engineering",
     abbr: "M.E.",
     slug: "structural-engineering",
     icon: Building2,
-    highlight: "Advanced Structural Analysis, Earthquake Engineering",
+    highlight: "Advanced Structural Design, Analysis, and Earthquake Engineering",
   },
   {
     name: "Power Electronics & Drives",
     abbr: "M.E.",
     slug: "power-electronics",
     icon: Zap,
-    highlight: "Power Converters, Motor Drives, Renewable Energy Systems",
+    highlight: "Power Converters, Drives, and Advanced Electrical Applications",
   },
   {
     name: "CSE (Artificial Intelligence & Machine Learning)",
     abbr: "M.E.",
     slug: "cse-aiml",
     icon: BrainCircuit,
-    highlight: "Neural Networks, NLP, Computer Vision",
+    highlight: "Advanced AI, Machine Learning, and Intelligent Computing",
   },
 ];
 
 /* ─── Research Programs ─── */
 const researchCourses = [
   {
-    name: "EEE (Doctoral Programme)",
+    name: "Electrical and Electronics Engineering (Doctoral Programme)",
     abbr: "Ph.D.",
     slug: "eee-doctoral",
     icon: GraduationCap,
-    highlight: "Advanced Research in Electrical & Electronics",
+    highlight: "Doctoral research in advanced Electrical and Electronics domains",
   },
 ];
 
@@ -386,7 +386,7 @@ export default function EngineeringPage() {
             >
               {[
                 { val: "11", label: "UG Programs", accent: true },
-                { val: "4", label: "PG Programs", accent: false },
+                { val: "3", label: "PG Programs", accent: false },
                 { val: "2769", label: "Counselling Code", accent: false },
                 { val: "92%", label: "Placement Rate", accent: true },
               ].map((s) => (
