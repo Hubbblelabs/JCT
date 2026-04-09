@@ -46,6 +46,7 @@ const ugCourses = [
     icon: Cpu,
     seats: 120,
     highlight: "AI/ML, Software Engineering, Cloud Computing",
+    nbaAccredited: true,
   },
   {
     name: "Artificial Intelligence & Data Science",
@@ -70,6 +71,7 @@ const ugCourses = [
     icon: Globe,
     seats: 60,
     highlight: "VLSI Design, Signal Processing, IoT",
+    nbaAccredited: true,
   },
   {
     name: "Electrical & Electronics Engineering",
@@ -78,6 +80,7 @@ const ugCourses = [
     icon: Zap,
     seats: 60,
     highlight: "Power Systems, Control Systems, Embedded Design",
+    nbaAccredited: true,
   },
   {
     name: "Mechanical Engineering",
@@ -86,6 +89,7 @@ const ugCourses = [
     icon: Cog,
     seats: 60,
     highlight: "CAD/CAM, Thermal Engineering, Robotics",
+    nbaAccredited: true,
   },
   {
     name: "Civil Engineering",
@@ -153,6 +157,10 @@ const pgCourses = [
     icon: BrainCircuit,
     highlight: "Neural Networks, NLP, Computer Vision",
   },
+];
+
+/* ─── Research Programs ─── */
+const researchCourses = [
   {
     name: "EEE (Doctoral Programme)",
     abbr: "Ph.D.",
@@ -469,7 +477,7 @@ export default function EngineeringPage() {
                 },
                 {
                   val: "NBA",
-                  label: "Applied",
+                  label: "Accredited",
                   desc: "National Board of Accreditation",
                 },
               ].map((item) => (
@@ -595,6 +603,18 @@ export default function EngineeringPage() {
                     <span className="text-muted-foreground text-sm font-bold">
                       {dept.seats} Seats
                     </span>
+                    {dept.nbaAccredited && (
+                      <div className="ml-1 rounded bg-white px-1.5 py-0.5 shadow-xs border border-stone-100 flex items-center">
+                        <Image
+                          src="/nba.png"
+                          alt="NBA Accredited"
+                          width={60}
+                          height={24}
+                          style={{ width: "auto" }}
+                          className="h-5 object-contain"
+                        />
+                      </div>
+                    )}
                   </div>
                   <ArrowRight
                     size={18}
@@ -614,20 +634,71 @@ export default function EngineeringPage() {
                 Postgraduate Programs
               </h2>
               <h3 className="text-navy font-serif text-4xl leading-tight md:text-5xl">
-                4 PG Courses,{" "}
+                3 M.E. Courses,{" "}
                 <span className="font-light text-stone-300 italic">
                   Advanced Learning.
                 </span>
               </h3>
             </div>
             <p className="text-muted-foreground max-w-sm text-sm font-light">
-              M.E. / M.Tech and Doctoral programs for advanced research and
-              specialized expertise.
+              M.E. programs for advanced learning and specialized expertise in engineering.
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {pgCourses.map((course, index) => (
+              <motion.div
+                key={course.slug}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.35, delay: index * 0.08 }}
+                className="group hover:border-engineering/30 rounded-2xl border border-stone-100 bg-white p-6 transition-all hover:shadow-md"
+              >
+                <div className="flex flex-col gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="text-engineering group-hover:bg-engineering bg-engineering-muted shrink-0 rounded-xl p-3 transition-colors group-hover:text-white">
+                      <course.icon size={22} strokeWidth={1.5} />
+                    </div>
+                    <span className="rounded-full border border-stone-200 bg-stone-50 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-stone-500 uppercase">
+                      {course.abbr}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-navy mb-2 font-serif text-base font-bold">
+                      {course.name}
+                    </h3>
+                    <p className="text-muted-foreground text-sm font-light">
+                      {course.highlight}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── Research Programs ── */}
+        <div className="relative z-10 container mx-auto mt-16 px-4 md:px-6">
+          <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div>
+              <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
+                Research Programs
+              </h2>
+              <h3 className="text-navy font-serif text-4xl leading-tight md:text-5xl">
+                Ph.D. Programs,{" "}
+                <span className="font-light text-stone-300 italic">
+                  Leading Innovation.
+                </span>
+              </h3>
+            </div>
+            <p className="text-muted-foreground max-w-sm text-sm font-light">
+              Doctoral programs for deep research, innovation, and specialized expertise.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {researchCourses.map((course, index) => (
               <motion.div
                 key={course.slug}
                 initial={{ opacity: 0, y: 20 }}
