@@ -604,7 +604,7 @@ export default function EngineeringPage() {
                       {dept.seats} Seats
                     </span>
                     {dept.nbaAccredited && (
-                      <div className="ml-1 rounded bg-white px-1.5 py-0.5 shadow-xs border border-stone-100 flex items-center">
+                      <div className="ml-1 flex items-center rounded border border-stone-100 bg-white px-1.5 py-0.5 shadow-xs">
                         <Image
                           src="/nba.png"
                           alt="NBA Accredited"
@@ -641,7 +641,8 @@ export default function EngineeringPage() {
               </h3>
             </div>
             <p className="text-muted-foreground max-w-sm text-sm font-light">
-              M.E. programs for advanced learning and specialized expertise in engineering.
+              M.E. programs for advanced learning and specialized expertise in
+              engineering.
             </p>
           </div>
 
@@ -693,7 +694,8 @@ export default function EngineeringPage() {
               </h3>
             </div>
             <p className="text-muted-foreground max-w-sm text-sm font-light">
-              Doctoral programs for deep research, innovation, and specialized expertise.
+              Doctoral programs for deep research, innovation, and specialized
+              expertise.
             </p>
           </div>
 

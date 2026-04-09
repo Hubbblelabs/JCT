@@ -139,9 +139,11 @@ function getUserMessages(messages: Message[]): string[] {
 
 function isFollowUpPrompt(text: string): boolean {
   const t = text.toLowerCase();
-  return (/^(explain|elaborate|details|detail|more|continue|what about|and what about)/.test(
-    t,
-  ) || /\b(those|that|them|it|this)\b/.test(t));
+  return (
+    /^(explain|elaborate|details|detail|more|continue|what about|and what about)/.test(
+      t,
+    ) || /\b(those|that|them|it|this)\b/.test(t)
+  );
 }
 
 function deriveEffectiveQuestion(messages: Message[]): string {

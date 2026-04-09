@@ -10,10 +10,7 @@ const eslintConfig = [
 
   // Tailwind plugin config
   {
-    plugins: {
-      
-    },
-    
+    plugins: {},
   },
 
   // Existing rules
