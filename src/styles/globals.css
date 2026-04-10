@@ -25,10 +25,10 @@
   --color-arts-science-accent: #f97316;
 
   /* ─── Institution: Polytechnic ─── */
-  --color-polytechnic: #005cb9;
-  --color-polytechnic-light: #3b8de0;
-  --color-polytechnic-muted: #e6f3ff;
-  --color-polytechnic-dark: #002e5c;
+  --color-polytechnic: #166534;
+  --color-polytechnic-light: #22c55e;
+  --color-polytechnic-muted: #dcfce7;
+  --color-polytechnic-dark: #052e16;
 
   /* ─── Semantic ─── */
   --color-primary: var(--color-navy);

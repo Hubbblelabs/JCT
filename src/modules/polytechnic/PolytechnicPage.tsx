@@ -164,7 +164,7 @@ export default function PolytechnicPage() {
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=800&auto=format&fit=crop"
+            src="https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?q=80&w=1200&auto=format&fit=crop"
             alt="Polytechnic workshop"
             fill
             sizes="100vw"
@@ -191,7 +191,7 @@ export default function PolytechnicPage() {
                 transition={{ duration: 0.6 }}
                 className="mb-4 md:mb-6"
               >
-                <span className="border-polytechnic-light/40 bg-polytechnic-light/20 text-polytechnic-muted inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[10px] font-bold tracking-widest uppercase backdrop-blur-md md:text-sm">
+                <span className="border-polytechnic-light/40 bg-polytechnic-light/20 text-polytechnic-muted inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs md:text-sm font-bold tracking-widest uppercase backdrop-blur-md">
                   <Wrench size={14} />
                   Diploma Programs — AICTE Approved
                 </span>
@@ -201,10 +201,10 @@ export default function PolytechnicPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.1 }}
-                className="mb-6 font-serif text-4xl leading-[1.1] tracking-tight text-white sm:text-5xl md:text-6xl md:leading-none lg:text-7xl"
+                className="mb-6 font-serif text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight text-white"
               >
                 Learn a Trade. <br />
-                <span className="font-light text-white/70 italic">
+                <span className="font-normal text-white/70 italic">
                   Build a Career.
                 </span>
               </motion.h1>
@@ -213,7 +213,7 @@ export default function PolytechnicPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.25 }}
-                className="mb-8 max-w-lg text-sm leading-relaxed font-light text-white/80 md:text-base lg:text-lg"
+                className="mb-8 max-w-lg text-base md:text-lg leading-relaxed text-white/80"
               >
                 JCT Polytechnic College offers three-year diploma programs where
                 students spend as much time in workshops as they do in
@@ -276,13 +276,13 @@ export default function PolytechnicPage() {
                   key={i}
                   className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md transition-colors hover:bg-white/10"
                 >
-                  <span className="text-polytechnic-light mb-1 block font-sans text-2xl font-black tracking-tight md:mb-2 md:text-4xl">
+                  <span className="text-polytechnic-light mb-1 block font-sans text-3xl md:text-4xl font-bold">
                     {stat.value}
                   </span>
-                  <h3 className="mb-1 text-[10px] font-bold tracking-wider text-white/90 uppercase md:text-xs">
+                  <h3 className="mb-1 text-xs font-bold tracking-wider text-white/90 uppercase">
                     {stat.label}
                   </h3>
-                  <p className="text-[10px] font-light text-white/50">
+                  <p className="text-xs font-bold text-white/60">
                     {stat.sub}
                   </p>
                 </div>
@@ -296,16 +296,16 @@ export default function PolytechnicPage() {
       <section className="bg-white py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mb-16 max-w-3xl">
-            <h2 className="text-polytechnic mb-6 text-xs font-bold tracking-[0.2em] uppercase">
+            <h2 className="text-polytechnic mb-4 text-sm font-bold tracking-[0.2em] uppercase">
               Programs Offered
             </h2>
-            <h3 className="text-navy mb-6 font-serif text-4xl leading-tight md:text-5xl">
+            <h3 className="text-navy mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight">
               Six Streams.{" "}
-              <span className="font-light text-stone-300 italic">
+              <span className="font-normal text-stone-300 italic">
                 Clear Outcomes.
               </span>
             </h3>
-            <p className="text-lg leading-relaxed font-light text-stone-500">
+            <p className="text-base md:text-lg leading-relaxed text-stone-600">
               Each diploma program is structured around what you&apos;ll
               actually be able to do when you finish — not just what you&apos;ll
               know in theory.
@@ -330,10 +330,10 @@ export default function PolytechnicPage() {
                         <prog.icon size={22} strokeWidth={1.5} />
                       </div>
                       <div>
-                        <h3 className="text-navy font-serif text-lg leading-tight font-bold">
+                        <h3 className="text-navy font-serif text-xl font-bold">
                           {prog.name}
                         </h3>
-                        <span className="text-muted-foreground text-xs">
+                        <span className="text-stone-500 text-sm">
                           {prog.duration} — Full Time
                         </span>
                       </div>
@@ -348,7 +348,7 @@ export default function PolytechnicPage() {
                       {prog.outcomes.slice(0, 3).map((outcome) => (
                         <div
                           key={outcome}
-                          className="text-muted-foreground flex items-center gap-2 text-sm font-light"
+                          className="text-stone-600 flex items-center gap-2 text-sm md:text-base leading-relaxed"
                         >
                           <CheckCircle2
                             size={13}
@@ -386,16 +386,16 @@ export default function PolytechnicPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
               >
-                <h2 className="mb-6 text-xs font-bold tracking-[0.2em] text-amber-600 uppercase">
+                <h2 className="text-polytechnic mb-4 text-sm font-bold tracking-[0.2em] uppercase">
                   Why JCT Polytechnic
                 </h2>
-                <h3 className="text-primary mb-8 font-serif text-4xl leading-tight md:text-5xl">
+                <h3 className="text-navy mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight">
                   A Practical Start <br />
-                  <span className="font-light text-stone-500 italic">
+                  <span className="font-normal text-stone-500 italic">
                     to Working Life.
                   </span>
                 </h3>
-                <p className="mb-8 text-lg leading-relaxed font-light text-stone-500">
+                <p className="mb-8 text-base md:text-lg leading-relaxed text-stone-600">
                   Not every good career begins with a four-year degree. Our
                   diploma programs offer focused, affordable, workshop-driven
                   training — and a clear path forward, whether you join the
@@ -429,10 +429,10 @@ export default function PolytechnicPage() {
                     <item.icon size={22} strokeWidth={1.5} />
                   </div>
                   <div>
-                    <h3 className="text-primary mb-2 font-serif text-lg font-bold">
+                    <h3 className="text-navy mb-2 font-serif text-xl font-bold">
                       {item.title}
                     </h3>
-                    <p className="text-sm leading-relaxed font-light text-stone-500">
+                    <p className="text-base md:text-lg leading-relaxed text-stone-600">
                       {item.desc}
                     </p>
                   </div>
@@ -447,12 +447,12 @@ export default function PolytechnicPage() {
       <section className="bg-white py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mx-auto mb-16 max-w-2xl text-center">
-            <h2 className="mb-6 text-xs font-bold tracking-[0.2em] text-amber-600 uppercase">
+            <h2 className="text-polytechnic mb-4 text-sm font-bold tracking-[0.2em] uppercase">
               Facilities
             </h2>
-            <h3 className="text-primary font-serif text-4xl leading-tight md:text-5xl">
+            <h3 className="text-navy font-serif text-4xl md:text-5xl font-bold leading-tight mb-8">
               Where Training{" "}
-              <span className="font-light text-stone-300 italic">Happens</span>
+              <span className="font-normal text-stone-300 italic">Happens</span>
             </h3>
           </div>
 
@@ -478,10 +478,10 @@ export default function PolytechnicPage() {
                   />
                   <div className="from-primary/90 via-primary/30 absolute inset-0 bg-linear-to-t to-transparent" />
                   <div className="absolute right-0 bottom-0 left-0 p-8">
-                    <h3 className="mb-2 font-serif text-2xl text-white">
+                    <h3 className="mb-2 font-serif text-2xl font-bold text-white">
                       {item.title}
                     </h3>
-                    <p className="max-w-md text-sm leading-relaxed font-light text-white/70">
+                    <p className="max-w-md text-base leading-relaxed text-white/90">
                       {item.desc}
                     </p>
                   </div>
@@ -510,12 +510,12 @@ export default function PolytechnicPage() {
               viewport={{ once: true }}
               transition={{ duration: 0.6 }}
             >
-              <h2 className="text-accent mb-6 text-xs font-bold tracking-[0.2em] uppercase">
+              <h2 className="text-gold mb-4 text-sm font-bold tracking-[0.2em] uppercase">
                 After Your Diploma
               </h2>
-              <h3 className="mb-10 font-serif text-4xl leading-tight md:text-5xl">
+              <h3 className="text-white mb-8 font-serif text-4xl md:text-5xl font-bold leading-tight">
                 Two Clear Roads{" "}
-                <span className="font-light text-white/60 italic">Forward</span>
+                <span className="font-normal text-white/60 italic">Forward</span>
               </h3>
             </motion.div>
 
@@ -528,10 +528,10 @@ export default function PolytechnicPage() {
                 className="rounded-3xl border border-white/10 bg-white/5 p-10 text-left"
               >
                 <Briefcase size={28} className="text-accent mb-6" />
-                <h3 className="mb-4 font-serif text-2xl text-white">
+                <h3 className="mb-4 font-serif text-2xl font-bold text-white">
                   Start Working
                 </h3>
-                <p className="mb-6 text-sm leading-relaxed font-light text-blue-200/70">
+                <p className="mb-6 text-base md:text-lg leading-relaxed text-white/80">
                   Diploma holders are eligible for technical positions in
                   manufacturing, construction, IT support, government
                   departments, and more. Many of our graduates are placed
@@ -550,10 +550,10 @@ export default function PolytechnicPage() {
                 className="rounded-3xl border border-white/10 bg-white/5 p-10 text-left"
               >
                 <GraduationCap size={28} className="text-accent mb-6" />
-                <h3 className="mb-4 font-serif text-2xl text-white">
+                <h3 className="mb-4 font-serif text-2xl font-bold text-white">
                   Continue to B.E.
                 </h3>
-                <p className="mb-6 text-sm leading-relaxed font-light text-blue-200/70">
+                <p className="mb-6 text-base md:text-lg leading-relaxed text-white/80">
                   Through lateral entry, you can join the second year of
                   B.E./B.Tech programs at JCT College of Engineering and
                   Technology or any Anna University-affiliated college. Skip a
@@ -582,12 +582,12 @@ export default function PolytechnicPage() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.6 }}
               >
-                <h2 className="mb-6 text-xs font-bold tracking-[0.2em] text-amber-600 uppercase">
+                <h2 className="text-polytechnic mb-4 text-sm font-bold tracking-[0.2em] uppercase">
                   Admissions
                 </h2>
                 <h3 className="text-primary mb-8 font-serif text-4xl leading-tight md:text-5xl">
                   Simple Entry. <br />
-                  <span className="font-light text-stone-500 italic">
+                  <span className="font-normal text-stone-500 italic">
                     Clear Requirements.
                   </span>
                 </h3>
@@ -611,14 +611,14 @@ export default function PolytechnicPage() {
                     },
                   ].map((item) => (
                     <div key={item.step} className="flex gap-5">
-                      <span className="text-accent/30 font-sans text-3xl font-black">
+                      <span className="text-polytechnic font-sans text-4xl font-bold">
                         {item.step}
                       </span>
                       <div>
-                        <h3 className="text-primary mb-1 font-serif text-lg font-bold">
+                        <h3 className="text-navy mb-1 font-serif text-xl font-bold">
                           {item.title}
                         </h3>
-                        <p className="text-sm leading-relaxed font-light text-stone-500">
+                        <p className="text-base md:text-lg leading-relaxed text-stone-600">
                           {item.desc}
                         </p>
                       </div>
@@ -644,7 +644,7 @@ export default function PolytechnicPage() {
               <h3 className="text-primary mb-2 font-serif text-xl">
                 Have Questions?
               </h3>
-              <p className="mb-6 text-sm font-light text-stone-500">
+              <p className="mb-6 text-base leading-relaxed text-stone-600">
                 Our admissions office responds within one working day.
               </p>
               <form className="space-y-4">

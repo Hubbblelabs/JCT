@@ -57,7 +57,7 @@ function CompanyCard({ company }: { company: { name: string; logo: string } }) {
           loading="lazy"
         />
       </div>
-      <span className="text-muted-foreground mt-1 font-sans text-[9px] leading-none font-bold tracking-wider uppercase">
+      <span className="text-stone-500 mt-1 text-[10px] font-bold tracking-wider uppercase">
         {company.name}
       </span>
     </div>
@@ -76,7 +76,7 @@ export function Placements() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-gold mb-4 inline-block font-sans text-xs font-bold tracking-[0.2em] uppercase"
+            className="text-gold mb-4 inline-block text-sm font-bold tracking-[0.2em] uppercase"
           >
             Placement Highlights
           </motion.span>
@@ -85,10 +85,10 @@ export function Placements() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-navy mb-5 font-serif text-3xl leading-tight sm:text-4xl md:text-5xl"
+            className="text-navy mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight"
           >
             Our Recruiters{" "}
-            <span className="text-muted-foreground font-light italic">
+            <span className="text-stone-500 font-normal italic">
               Trust Our Graduates
             </span>
           </motion.h2>
@@ -97,7 +97,7 @@ export function Placements() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-muted-foreground mx-auto max-w-xl font-sans text-base"
+            className="text-stone-600 mx-auto max-w-xl text-base md:text-lg leading-relaxed"
           >
             Leading organizations across IT, engineering, and consulting
             regularly recruit from JCT campuses.
@@ -127,10 +127,10 @@ export function Placements() {
                 className="text-gold mx-auto mb-2"
                 strokeWidth={1.5}
               />
-              <span className="text-navy mb-1 block font-sans text-xl font-black tracking-tight md:text-3xl">
+              <span className="text-navy mb-1 block font-sans text-3xl md:text-4xl font-bold">
                 {stat.value}
               </span>
-              <span className="text-muted-foreground font-sans text-[10px] font-semibold tracking-wider uppercase md:text-xs">
+              <span className="text-muted-foreground font-sans text-xs font-bold tracking-wider uppercase">
                 {stat.label}
               </span>
             </motion.div>

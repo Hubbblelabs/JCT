@@ -102,13 +102,13 @@ export function AboutPolytechnic() {
                 viewport={{ once: true }}
                 className="flex flex-col justify-center"
               >
-                <span className="text-polytechnic-accent mb-3 block font-sans text-sm font-bold tracking-widest uppercase">
+                <span className="text-polytechnic block mb-4 text-sm font-bold tracking-[0.2em] uppercase">
                   About Us
                 </span>
-                <h2 className="text-polytechnic-dark mb-6 font-serif text-3xl font-bold tracking-tight md:text-4xl">
+                <h2 className="text-polytechnic-dark mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight">
                   Empowering Minds with Technical Excellence
                 </h2>
-                <div className="text-polytechnic-dark/70 space-y-4 font-sans text-base leading-relaxed">
+                <div className="text-stone-600 space-y-4 text-base md:text-lg leading-relaxed">
                   <p>
                     Established with a strong commitment to quality technical
                     education, JCT Polytechnic College has been a beacon of
@@ -178,7 +178,7 @@ export function AboutPolytechnic() {
                     Our Vision
                   </h3>
                 </div>
-                <p className="text-polytechnic-dark/70 font-sans text-[15px] leading-relaxed">
+                <p className="text-stone-600 text-base md:text-lg leading-relaxed">
                   To emerge as a premier institute of technical education by
                   imparting practical, industry-driven training and nurturing
                   ethically strong, socially responsible technicians who
@@ -212,7 +212,7 @@ export function AboutPolytechnic() {
                     Our Mission
                   </h3>
                 </div>
-                <ul className="list-outside list-disc space-y-3 pl-4 font-sans text-[15px] leading-relaxed text-white/80">
+                <ul className="list-outside list-disc space-y-3 pl-4 text-base md:text-lg leading-relaxed text-white/80">
                   <li>
                     To provide state-of-the-art infrastructure and skilled
                     faculty to facilitate effective teaching and practical
@@ -285,10 +285,10 @@ export function AboutPolytechnic() {
                   viewport={{ once: true }}
                   className="flex flex-col justify-center md:col-span-8"
                 >
-                  <h2 className="text-polytechnic-dark mb-6 font-serif text-2xl font-bold md:text-3xl">
+                  <h2 className="text-polytechnic-dark mb-6 font-serif text-3xl md:text-4xl font-bold leading-tight">
                     Principal&apos;s Message
                   </h2>
-                  <div className="text-polytechnic-dark/80 space-y-4 font-sans text-base leading-relaxed italic md:text-[17px]">
+                  <div className="text-stone-600 space-y-4 text-base md:text-lg leading-relaxed italic">
                     <p>
                       &ldquo;Welcome to JCT Polytechnic College. As we stand at
                       the threshold of a rapidly advancing technological era,

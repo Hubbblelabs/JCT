@@ -301,7 +301,7 @@ export default function EngineeringPage() {
                 transition={{ duration: 0.5 }}
                 className="mb-4 md:mb-6"
               >
-                <span className="border-engineering-light/30 bg-engineering/20 text-engineering-muted inline-block rounded-full border px-3 py-1 text-[10px] font-bold tracking-[0.2em] uppercase backdrop-blur-md md:text-xs">
+                <span className="border-engineering-light/30 bg-engineering/20 text-engineering-light inline-block rounded-full border px-4 py-1 text-xs md:text-sm font-bold tracking-[0.2em] uppercase backdrop-blur-md">
                   JCT College of Engineering & Technology
                 </span>
               </motion.div>
@@ -310,7 +310,7 @@ export default function EngineeringPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-                className="mb-6 font-serif text-4xl leading-[1.1] tracking-tight text-white sm:text-5xl md:text-6xl md:leading-none lg:text-7xl"
+                className="mb-6 font-serif text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight text-white"
               >
                 Engineer the <br />
                 Future <span className="text-engineering-light">.</span>
@@ -320,7 +320,7 @@ export default function EngineeringPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className="mb-8 max-w-lg text-sm leading-relaxed font-light text-white/80 md:text-base lg:text-lg"
+                className="mb-8 max-w-lg text-base md:text-lg leading-relaxed text-white/80"
               >
                 An{" "}
                 <span className="text-engineering-muted font-semibold">
@@ -399,7 +399,7 @@ export default function EngineeringPage() {
                   >
                     {s.val}
                   </span>
-                  <span className="text-[10px] font-bold tracking-wider text-white/60 uppercase md:text-xs">
+                  <span className="text-xs font-bold tracking-wider text-white/70 uppercase">
                     {s.label}
                   </span>
                 </div>
@@ -414,16 +414,16 @@ export default function EngineeringPage() {
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
             <div>
-              <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
+              <h2 className="text-engineering mb-4 text-sm font-bold tracking-[0.2em] uppercase">
                 About Us
               </h2>
-              <h3 className="text-navy mb-6 font-serif text-4xl leading-tight md:text-5xl">
+              <h3 className="text-navy mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight">
                 Excellence in{" "}
-                <span className="font-light text-stone-300 italic">
+                <span className="font-normal text-stone-300 italic">
                   Engineering Education.
                 </span>
               </h3>
-              <div className="space-y-4 text-base leading-relaxed font-light text-stone-600">
+              <div className="space-y-4 text-base md:text-lg leading-relaxed text-stone-600">
                 <p>
                   JCT College of Engineering &amp; Technology is an{" "}
                   <span className="inline-flex items-center gap-1.5 rounded-md border border-amber-200 bg-amber-50 px-2.5 py-0.5 align-baseline font-semibold text-amber-700">
@@ -485,7 +485,7 @@ export default function EngineeringPage() {
                   key={item.label}
                   className="hover:border-engineering/20 rounded-2xl border border-stone-100 bg-stone-50 p-6 transition-colors"
                 >
-                  <span className="text-engineering mb-1 block font-sans text-2xl font-black">
+                  <span className="text-engineering mb-1 block font-sans text-2xl md:text-3xl font-bold">
                     {item.val}
                   </span>
                   <span className="text-navy block text-sm font-bold">
@@ -535,14 +535,14 @@ export default function EngineeringPage() {
               <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
                 Undergraduate Programs
               </h2>
-              <h3 className="text-navy font-serif text-4xl leading-tight md:text-5xl">
+              <h3 className="text-navy font-serif text-4xl md:text-5xl font-bold leading-tight mb-6">
                 11 UG Courses,{" "}
-                <span className="font-light text-stone-300 italic">
+                <span className="font-normal text-stone-300 italic">
                   One Standard.
                 </span>
               </h3>
             </div>
-            <p className="text-muted-foreground max-w-sm text-sm font-light">
+            <p className="text-stone-600 text-base md:text-lg leading-relaxed max-w-sm">
               4-year B.E. / B.Tech programs approved by AICTE and affiliated to
               Anna University, Chennai. Each department has dedicated labs,
               workshops, and faculty with industry experience.
@@ -582,16 +582,16 @@ export default function EngineeringPage() {
                       <dept.icon size={24} strokeWidth={1.5} />
                     </div>
                     <div>
-                      <h3 className="text-navy font-serif text-lg font-bold">
+                      <h3 className="text-navy font-serif text-xl font-bold">
                         {dept.name}
                       </h3>
-                      <span className="text-engineering text-xs font-bold tracking-wider uppercase">
+                      <span className="text-engineering mt-1 text-sm font-bold tracking-wider uppercase">
                         {dept.abbr}
                       </span>
                     </div>
                   </div>
                   <div>
-                    <p className="text-muted-foreground text-sm font-light">
+                    <p className="text-stone-600 text-base leading-relaxed">
                       {dept.highlight}
                     </p>
                   </div>
@@ -599,8 +599,8 @@ export default function EngineeringPage() {
 
                 <div className="border-border mt-6 flex items-center justify-between border-t pt-6">
                   <div className="flex items-center gap-2">
-                    <Users size={14} className="text-muted-foreground/60" />
-                    <span className="text-muted-foreground text-sm font-bold">
+                    <Users size={14} className="text-stone-400" />
+                    <span className="text-stone-600 text-sm font-bold">
                       {dept.seats} Seats
                     </span>
                     {dept.nbaAccredited && (
@@ -633,14 +633,14 @@ export default function EngineeringPage() {
               <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
                 Postgraduate Programs
               </h2>
-              <h3 className="text-navy font-serif text-4xl leading-tight md:text-5xl">
+              <h3 className="text-navy font-serif text-4xl md:text-5xl font-bold leading-tight mb-6">
                 3 M.E. Courses,{" "}
-                <span className="font-light text-stone-300 italic">
+                <span className="font-normal text-stone-300 italic">
                   Advanced Learning.
                 </span>
               </h3>
             </div>
-            <p className="text-muted-foreground max-w-sm text-sm font-light">
+            <p className="text-stone-600 text-base md:text-lg leading-relaxed max-w-sm">
               M.E. programs for advanced learning and specialized expertise in
               engineering.
             </p>
@@ -666,10 +666,10 @@ export default function EngineeringPage() {
                     </span>
                   </div>
                   <div>
-                    <h3 className="text-navy mb-2 font-serif text-base font-bold">
+                    <h3 className="text-navy mb-2 font-serif text-xl font-bold">
                       {course.name}
                     </h3>
-                    <p className="text-muted-foreground text-sm font-light">
+                    <p className="text-stone-600 text-base leading-relaxed">
                       {course.highlight}
                     </p>
                   </div>
@@ -686,14 +686,14 @@ export default function EngineeringPage() {
               <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
                 Research Programs
               </h2>
-              <h3 className="text-navy font-serif text-4xl leading-tight md:text-5xl">
+              <h3 className="text-navy font-serif text-4xl md:text-5xl font-bold leading-tight mb-6">
                 Ph.D. Programs,{" "}
-                <span className="font-light text-stone-300 italic">
+                <span className="font-normal text-stone-300 italic">
                   Leading Innovation.
                 </span>
               </h3>
             </div>
-            <p className="text-muted-foreground max-w-sm text-sm font-light">
+            <p className="text-stone-600 text-base md:text-lg leading-relaxed max-w-sm">
               Doctoral programs for deep research, innovation, and specialized
               expertise.
             </p>
@@ -719,10 +719,10 @@ export default function EngineeringPage() {
                     </span>
                   </div>
                   <div>
-                    <h3 className="text-navy mb-2 font-serif text-base font-bold">
+                    <h3 className="text-navy mb-2 font-serif text-xl font-bold">
                       {course.name}
                     </h3>
-                    <p className="text-muted-foreground text-sm font-light">
+                    <p className="text-stone-600 text-base leading-relaxed">
                       {course.highlight}
                     </p>
                   </div>
@@ -737,12 +737,12 @@ export default function EngineeringPage() {
       <section id="courses" className="bg-primary py-16 md:py-24">
         <div className="container mx-auto px-4 md:px-6">
           <div className="mb-14 text-center">
-            <h2 className="text-accent mb-4 text-xs font-bold tracking-[0.2em] uppercase">
+            <h2 className="text-engineering-light mb-4 text-sm font-bold tracking-[0.2em] uppercase">
               By the Numbers
             </h2>
-            <h3 className="font-serif text-3xl leading-tight text-white md:text-4xl">
+            <h3 className="text-white mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight">
               Performance That{" "}
-              <span className="font-light text-white/40 italic">Speaks.</span>
+              <span className="font-normal text-white/40 italic">Speaks.</span>
             </h3>
           </div>
 
@@ -756,13 +756,13 @@ export default function EngineeringPage() {
                 transition={{ duration: 0.3, delay: index * 0.06 }}
                 className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center transition-colors hover:bg-white/10"
               >
-                <span className="text-accent mb-1 block font-sans text-3xl font-black">
+                <span className="text-engineering-light mb-1 block font-sans text-4xl md:text-5xl font-bold">
                   {m.value}
                 </span>
-                <span className="mb-1 block text-sm font-bold text-white">
+                <span className="mb-1 block text-base md:text-lg font-bold text-white">
                   {m.label}
                 </span>
-                <span className="text-[10px] font-bold tracking-wider text-white/30 uppercase">
+                <span className="text-xs font-bold tracking-wider text-white/80 uppercase">
                   {m.sub}
                 </span>
               </motion.div>
@@ -777,16 +777,16 @@ export default function EngineeringPage() {
           <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-2">
             {/* Left: text content */}
             <div>
-              <h2 className="mb-6 text-xs font-bold tracking-[0.2em] text-amber-600 uppercase">
+              <h2 className="text-engineering mb-4 text-sm font-bold tracking-[0.2em] uppercase">
                 Research & Innovation
               </h2>
-              <h3 className="text-primary mb-8 font-serif text-4xl leading-tight md:text-5xl">
+              <h3 className="text-navy mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight">
                 Where Theory <br />
-                <span className="font-light text-stone-300 italic">
+                <span className="font-normal text-stone-300 italic">
                   Meets Application
                 </span>
               </h3>
-              <p className="mb-8 text-lg leading-relaxed font-light text-stone-600">
+              <p className="mb-8 text-base md:text-lg leading-relaxed text-stone-600">
                 Our faculty actively publish in peer-reviewed journals and guide
                 student projects that go beyond coursework. The Research &
                 Innovation Cell connects departments and facilitates
@@ -805,7 +805,7 @@ export default function EngineeringPage() {
                       size={16}
                       className="text-accent mt-1 shrink-0"
                     />
-                    <p className="text-sm leading-relaxed font-light text-stone-600">
+                    <p className="text-base md:text-lg leading-relaxed text-stone-600">
                       {item}
                     </p>
                   </div>
@@ -813,7 +813,7 @@ export default function EngineeringPage() {
               </div>
 
               <div className="bg-primary rounded-2xl p-6">
-                <p className="mb-2 text-sm font-light text-white/60">
+                <p className="mb-2 text-base font-bold text-white/80">
                   Student Innovation Challenge
                 </p>
                 <p className="font-serif text-lg font-bold text-white">
@@ -839,10 +839,10 @@ export default function EngineeringPage() {
                       <fac.icon size={24} strokeWidth={1.5} />
                     </div>
                     <div>
-                      <h3 className="text-primary mb-2 font-serif text-lg font-bold">
+                      <h3 className="text-navy mb-2 font-serif text-xl font-bold">
                         {fac.title}
                       </h3>
-                      <p className="text-sm leading-relaxed font-light text-stone-500">
+                      <p className="text-base leading-relaxed text-stone-600">
                         {fac.desc}
                       </p>
                     </div>
@@ -871,14 +871,14 @@ export default function EngineeringPage() {
           <div className="grid grid-cols-1 items-start gap-16 lg:grid-cols-2">
             {/* Left: CTA */}
             <div>
-              <h2 className="text-accent mb-6 text-xs font-bold tracking-[0.2em] uppercase">
+              <h2 className="text-engineering-light mb-4 text-sm font-bold tracking-[0.2em] uppercase">
                 Admissions 2025-26
               </h2>
-              <h3 className="mb-8 font-serif text-4xl leading-tight text-white md:text-5xl">
+              <h3 className="text-white mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight">
                 Your Engineering <br />
                 Journey Starts <span className="text-accent">Here.</span>
               </h3>
-              <p className="mb-10 text-lg leading-relaxed font-light text-white/50">
+              <p className="mb-10 text-base md:text-lg leading-relaxed text-white/80">
                 Admissions for B.E. programs are through TNEA counseling (Tamil
                 Nadu Engineering Admissions). Management quota seats are
                 available for eligible candidates.
@@ -901,10 +901,10 @@ export default function EngineeringPage() {
                   { step: "04", text: "Confirm enrollment with fee payment" },
                 ].map((s) => (
                   <div key={s.step} className="flex items-start gap-4">
-                    <span className="text-accent font-sans text-lg font-black">
+                    <span className="text-engineering-light font-sans text-xl font-bold">
                       {s.step}
                     </span>
-                    <p className="pt-1 text-sm font-light text-white/70">
+                    <p className="pt-1 text-base leading-relaxed text-white/80">
                       {s.text}
                     </p>
                   </div>
@@ -995,7 +995,7 @@ export default function EngineeringPage() {
                     Approved & Recognized
                   </span>
                 </div>
-                <p className="text-xs leading-relaxed font-light text-white/40">
+                <p className="text-xs leading-relaxed font-normal text-white/40">
                   AICTE Approved • Anna University Affiliated • ISO 9001:2015
                   Certified • NBA Accreditation Applied
                 </p>

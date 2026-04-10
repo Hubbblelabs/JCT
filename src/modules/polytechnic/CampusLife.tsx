@@ -33,13 +33,13 @@ export function CampusLife() {
             <h3 className="text-polytechnic-dark mb-6 font-sans text-4xl leading-tight font-bold md:text-5xl">
               More than a classroom
             </h3>
-            <p className="mb-6 text-lg leading-relaxed font-light text-[#212121]/75">
+            <p className="mb-6 text-lg leading-relaxed font-normal text-[#212121]/75">
               We want you to make the most of your time studying with us.
               Studying here is about the atmosphere and feeling like part of the
               JCT Polytechnic community — whether you&apos;re in the workshop,
               the library, or on the sports field.
             </p>
-            <p className="mb-10 leading-relaxed font-light text-[#212121]/75">
+            <p className="mb-10 leading-relaxed font-normal text-[#212121]/75">
               Our campus offers dedicated labs, sports facilities, a library
               with technical references, and an active NSS and cultural
               programme that keeps student life vibrant throughout the year.

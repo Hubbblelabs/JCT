@@ -107,7 +107,7 @@ export function CollegeTestimonials({
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="mb-4 inline-block font-sans text-[10px] font-bold tracking-[0.2em] text-[#a0842c] uppercase"
+                className="mb-4 inline-block font-sans text-sm font-bold tracking-[0.2em] text-[#a0842c] uppercase"
               >
                 Voices
               </motion.span>
@@ -117,7 +117,7 @@ export function CollegeTestimonials({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="font-serif text-4xl leading-tight text-[#1a2332] italic md:text-5xl lg:text-5xl"
+              className="font-serif text-4xl md:text-5xl font-bold leading-tight text-navy mb-6"
             >
               {title === "Testimonials" ? "Stories of Transformation" : title}
             </motion.h2>
@@ -160,13 +160,13 @@ export function CollegeTestimonials({
                     className="flex flex-1 flex-col rounded-3xl border border-transparent bg-white p-8 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] transition-colors hover:border-gray-100 md:p-10"
                   >
                     <div className="relative flex-1">
-                      <span className="absolute -top-2 right-0 rounded-full bg-[#f4f5f7] px-3 py-1 text-[9px] font-bold tracking-widest text-[#a0842c] uppercase">
+                      <span className="absolute -top-2 right-0 rounded-full bg-[#f4f5f7] px-3 py-1 text-[10px] font-bold tracking-widest text-[#a0842c] uppercase">
                         {category}
                       </span>
                       <span className="mt-4 mb-6 block font-serif text-7xl leading-0 text-[#fcebba] opacity-80">
                         &ldquo;
                       </span>
-                      <p className="min-h-35 text-[15px] leading-relaxed text-[#5b6574] italic">
+                      <p className="min-h-35 text-base md:text-lg leading-relaxed text-stone-600 italic">
                         &quot;{activeItem.quote}&quot;
                       </p>
                     </div>
@@ -182,10 +182,10 @@ export function CollegeTestimonials({
                         />
                       </div>
                       <div>
-                        <h3 className="text-[15px] font-bold text-[#1a2332]">
+                        <h3 className="text-lg font-bold font-serif text-navy">
                           {activeItem.name}
                         </h3>
-                        <p className="mt-0.5 text-[10px] font-bold tracking-widest text-[#7c869a] uppercase">
+                        <p className="mt-0.5 text-xs font-bold tracking-widest text-stone-500 uppercase">
                           {activeItem.role}
                         </p>
                       </div>

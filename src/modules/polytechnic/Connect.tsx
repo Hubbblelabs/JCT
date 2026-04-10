@@ -22,7 +22,7 @@ export function Connect() {
             <h3 className="text-polytechnic-dark mb-6 font-sans text-4xl leading-tight font-bold md:text-5xl">
               Connect. Learn. Explore.
             </h3>
-            <p className="mb-10 text-xl leading-relaxed font-light text-[#212121]/80 md:text-2xl">
+            <p className="mb-10 text-xl leading-relaxed font-normal text-[#212121]/80 md:text-2xl">
               Shri Jagannath Educational Health and Charitable Trust was
               established by renowned and philanthropic people with an objective
               of providing education to all — especially the downtrodden and
