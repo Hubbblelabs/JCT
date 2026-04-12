@@ -350,6 +350,10 @@ export default function EngineeringPage() {
                     Counselling Code:{" "}
                     <span className="text-engineering-muted font-extrabold">
                       {siteConfig.counsellingCode}
+                    </span>{" "}
+                    | Mobile:{" "}
+                    <span className="text-engineering-muted font-extrabold">
+                      {siteConfig.contact.phone}
                     </span>
                   </span>
                 </span>
@@ -856,14 +860,16 @@ export default function EngineeringPage() {
 
       <Placements />
 
-      <CollegeTestimonials
-        title="Testimonials"
-        subtitle="Stories from engineering students, alumni, and hiring partners who have experienced JCT's outcome-focused learning."
-        accentColor="#D4A024"
-        sectionBgClassName="bg-[#F8FAFC]"
-        sectionId="testimonials"
-        items={testimonials}
-      />
+      <div id="life-jct">
+        <CollegeTestimonials
+          title="Testimonials"
+          subtitle="Stories from engineering students, alumni, and hiring partners who have experienced JCT's outcome-focused learning."
+          accentColor="#D4A024"
+          sectionBgClassName="bg-[#F8FAFC]"
+          sectionId="testimonials"
+          items={testimonials}
+        />
+      </div>
 
       {/* ═══ ADMISSIONS — Strong CTA ═══ */}
       <section id="admission" className="bg-primary py-16 md:py-24">

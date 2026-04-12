@@ -90,7 +90,7 @@ export function HomeHero() {
 
   const { scrollYProgress } = useScroll();
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
-  const overlayOpacity = useTransform(scrollYProgress, [0, 1], [0.55, 0.85]);
+  const overlayOpacity = useTransform(scrollYProgress, [0, 1], [0.38, 0.65]);
 
   // Auto-advance carousel
   useEffect(() => {
@@ -132,16 +132,16 @@ export function HomeHero() {
         </AnimatePresence>
         <motion.div
           style={{ opacity: overlayOpacity }}
-          className="bg-navy/40 absolute inset-0 mix-blend-multiply"
+          className="absolute inset-0 bg-[#3f485a] mix-blend-multiply"
         />
-        <div className="from-navy/70 via-navy/20 absolute inset-0 bg-linear-to-r to-transparent" />
-        <div className="from-navy/60 absolute inset-0 bg-linear-to-t via-transparent to-transparent" />
+        <div className="from-[#2d3442]/75 via-[#3b4559]/30 absolute inset-0 bg-linear-to-r to-transparent" />
+        <div className="from-[#2e3545]/65 absolute inset-0 bg-linear-to-t via-transparent to-transparent" />
       </motion.div>
 
       {/* Content */}
-      <div className="relative z-10 container mx-auto flex min-h-svh flex-1 flex-col justify-between px-4 pt-28 pb-3 md:px-6 md:pt-32 md:pb-5">
+      <div className="relative z-10 container mx-auto flex min-h-svh flex-1 flex-col justify-between px-4 pt-24 pb-4 sm:pt-28 md:px-6 md:pt-32 md:pb-5">
         {/* Main content area */}
-        <div className="flex max-w-4xl flex-1 flex-col justify-center py-2 md:py-4">
+        <div className="flex max-w-4xl flex-1 flex-col justify-center py-1 sm:py-2 md:py-4">
           {/* Top badge */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -162,7 +162,7 @@ export function HomeHero() {
               delay: 0.15,
               ease: [0.22, 1, 0.36, 1],
             }}
-            className="mb-10 text-center font-sans text-[42px] leading-[1.1] font-bold tracking-tight text-white drop-shadow-lg md:mb-4 md:text-left md:font-serif md:text-5xl lg:text-6xl"
+            className="mb-7 text-center font-sans text-[34px] leading-[1.1] font-bold tracking-tight text-white drop-shadow-lg sm:text-[40px] md:mb-4 md:text-left md:font-serif md:text-5xl lg:text-6xl"
           >
             <span className="block md:inline">Three Colleges.</span>
             <span className="block md:hidden">One Commitment</span>
@@ -176,7 +176,7 @@ export function HomeHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.35 }}
-            className="mb-4 max-w-2xl font-sans text-sm leading-relaxed text-white/50 md:mb-5 md:text-base lg:text-lg"
+            className="mb-5 max-w-2xl font-sans text-sm leading-relaxed text-white/78 md:mb-5 md:text-base lg:text-lg"
           >
             JCT Institutions is a group of three colleges in Coimbatore—{" "}
             <span className="font-medium text-white">Engineering</span>,{" "}
@@ -194,7 +194,7 @@ export function HomeHero() {
           >
             <Link
               href="#admissions"
-              className="bg-gold text-navy hover:bg-gold-light shadow-gold/20 hidden h-11 items-center gap-2 rounded-full px-6 font-sans text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95 md:inline-flex md:h-13 md:px-7"
+              className="bg-gold text-navy hover:bg-gold-light shadow-gold/20 inline-flex h-11 items-center gap-2 rounded-full px-6 font-sans text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-95 md:h-13 md:px-7"
             >
               Apply Now <ArrowRight size={16} />
             </Link>
@@ -215,10 +215,10 @@ export function HomeHero() {
           className="flex w-full justify-center border-t border-white/10 pt-5 md:pt-6"
         >
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-x-12 gap-y-6 sm:grid-cols-4 md:gap-x-20">
+          <div className="grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-4 md:gap-x-20 md:gap-y-6">
             {stats.map((stat) => (
               <div key={stat.label} className="flex flex-col">
-                <span className="font-sans text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">
+                <span className="font-sans text-2xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">
                   <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                 </span>
                 <span className="mt-1 block font-sans text-[11px] font-bold tracking-[0.18em] text-white/50 uppercase md:mt-2 md:text-xs">

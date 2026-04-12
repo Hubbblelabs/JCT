@@ -44,52 +44,12 @@ const engineeringNavigation: EngineeringNavItem[] = [
       },
     ],
   },
-  {
-    name: "Courses",
-    href: "#engineering-domains",
-    className: "hidden xl:block",
-  },
-  { name: "Placements", href: "#placements", className: "hidden xl:block" },
-  { name: "Admission", href: "#admission", className: "hidden 2xl:block" },
-  { name: "Contact", href: "#footer", className: "hidden 2xl:block" },
-  {
-    name: "Explore More",
-    href: "#",
-    children: [
-      { name: "About Us", href: "#about", desc: "Institution overview" },
-      {
-        name: "Departments",
-        href: "#engineering-domains",
-        desc: "Engineering disciplines",
-      },
-      { name: "Research", href: "#research", desc: "Labs & innovations" },
-      {
-        name: "Courses",
-        href: "#engineering-domains",
-        desc: "Engineering disciplines",
-        className: "xl:hidden",
-      },
-      {
-        name: "Placements",
-        href: "#placements",
-        desc: "Our placement record",
-        className: "xl:hidden",
-      },
-      {
-        name: "Admission",
-        href: "#admission",
-        desc: "Apply for 2026-27",
-        className: "2xl:hidden",
-      },
-      {
-        name: "Contact",
-        href: "#footer",
-        desc: "Get in touch with us",
-        className: "2xl:hidden",
-      },
-      { name: "Testimonials", href: "#testimonials", desc: "Student stories" },
-    ],
-  },
+  { name: "About Us", href: "#about" },
+  { name: "Courses", href: "#courses" },
+  { name: "Placements", href: "#placements" },
+  { name: "CoE", href: "#research" },
+  { name: "Research", href: "#research" },
+  { name: "Life@JCT", href: "#life-jct" },
 ];
 
 type NavbarProps = {
@@ -167,11 +127,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
 
   const isSolid = scrolled || forceSolidOnTop;
 
-  // Flatten nav items for mobile that mimics the arts-science style
-  const mobileNavItems = engineeringNavigation.flatMap(
-    (item: EngineeringNavItem) =>
-      item.name === "Explore More" ? item.children || [] : [item],
-  );
+  const mobileNavItems = engineeringNavigation;
 
   return (
     <>
@@ -182,7 +138,13 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
           className="bg-engineering fixed top-0 right-0 left-0 z-60 px-4 py-2 text-center font-sans text-xs font-bold tracking-wide text-white"
         >
           🎓 Admissions Open 2026-27 | Counselling Code:{" "}
-          <span className="underline">{siteConfig.counsellingCode}</span>
+          <span className="underline">{siteConfig.counsellingCode}</span> | Mobile:{" "}
+          <a
+            href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
+            className="underline"
+          >
+            {siteConfig.contact.phone}
+          </a>
           <button
             onClick={() => setBannerVisible(false)}
             className="absolute top-1/2 right-3 -translate-y-1/2 rounded p-0.5 opacity-70 transition-opacity hover:opacity-100"
@@ -320,13 +282,6 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
             >
               <Phone size={16} /> {siteConfig.contact.phone}
             </a>
-            <Link
-              href="#admission"
-              onClick={(e) => handleNavClick(e, "#admission")}
-              className="bg-engineering shadow-engineering/30 hover:bg-engineering-light inline-flex h-9 shrink-0 items-center justify-center gap-2 rounded-full px-5 font-sans text-sm font-bold whitespace-nowrap text-white shadow-lg transition-all hover:scale-105 active:scale-95"
-            >
-              Apply Now <ArrowRight size={14} />
-            </Link>
           </div>
 
           {/* Mobile Toggle */}
@@ -472,13 +427,6 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 >
                   <Phone size={16} /> {siteConfig.contact.phone}
                 </a>
-                <Link
-                  href="#admission"
-                  onClick={(e) => handleNavClick(e, "#admission", true)}
-                  className="bg-engineering hover:bg-engineering-light flex h-12 w-full items-center justify-center gap-2 rounded-2xl font-sans text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98]"
-                >
-                  Apply Now <ArrowRight size={14} />
-                </Link>
               </div>
             </motion.div>
           </>
