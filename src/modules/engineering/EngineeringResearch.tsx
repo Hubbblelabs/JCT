@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { CheckCircle2 } from "lucide-react";
-import { facilities } from "./data";
+import { facilities } from "@/data/engineering";
 
 export function EngineeringResearch() {
   return (

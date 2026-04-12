@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ArrowRight, Users } from "lucide-react";
-import { ugCourses, pgCourses, researchCourses } from "./data";
+import { ugCourses, pgCourses, researchCourses } from "@/data/engineering";
 
 export function EngineeringDomains() {
   return (

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { metrics } from "./data";
+import { metrics } from "@/data/engineering";
 
 export function EngineeringMetrics() {
   return (
