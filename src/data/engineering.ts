@@ -4,7 +4,6 @@ import {
   Zap,
   Building2,
   Wrench,
-  Users,
   Beaker,
   GraduationCap,
   BrainCircuit,
@@ -14,7 +13,6 @@ import {
   FlaskConical,
 } from "lucide-react";
 
-/* ─── UG Courses (11) ─── */
 export const ugCourses = [
   {
     name: "Computer Science & Engineering",
@@ -98,8 +96,7 @@ export const ugCourses = [
     slug: "pe",
     icon: Droplets,
     seats: 60,
-    highlight:
-      "Reservoir Studies, Drilling Technology, and Hydrocarbon Production",
+    highlight: "Reservoir Studies, Drilling Technology, and Hydrocarbon Production",
   },
   {
     name: "Petrochemical Technology",
@@ -111,7 +108,6 @@ export const ugCourses = [
   },
 ];
 
-/* ─── PG Courses (3) ─── */
 export const pgCourses = [
   {
     name: "Structural Engineering",
@@ -136,7 +132,6 @@ export const pgCourses = [
   },
 ];
 
-/* ─── Research Programs ─── */
 export const researchCourses = [
   {
     name: "Electrical and Electronics Engineering (Doctoral Programme)",
@@ -147,7 +142,6 @@ export const researchCourses = [
   },
 ];
 
-/* ─── Key metrics  ─── */
 export const metrics = [
   { value: "92%", label: "Placement Rate", sub: "2023-24 Batch" },
   { value: "₹8.4L", label: "Highest Package", sub: "On-campus" },
@@ -157,7 +151,6 @@ export const metrics = [
   { value: "25+", label: "Patents Filed", sub: "Faculty & Students" },
 ];
 
-/* ─── Facilities ─── */
 export const facilities = [
   {
     title: "High-Performance Computing Lab",
@@ -187,8 +180,7 @@ export const testimonials = [
       "Our final-year project was reviewed by industry mentors, and that experience changed how I approached problem-solving in real engineering teams.",
     name: "Harish V.",
     role: "Software Engineer at Infosys",
-    image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
+    image: "/site_assests/2.jpeg",
     tag: "Alumini",
   },
   {
@@ -196,8 +188,7 @@ export const testimonials = [
       "The placement training and mock interviews made a huge difference. I stepped into campus recruitment with confidence and secured my offer early.",
     name: "Keerthana M.",
     role: "Graduate Engineer Trainee at Caterpillar",
-    image:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop",
+    image: "/site_assests/3.jpeg",
     tag: "Student",
   },
   {
@@ -205,8 +196,7 @@ export const testimonials = [
       "JCT students stand out for practical clarity. They arrive ready for production environments, not just textbook discussions.",
     name: "R. Suresh",
     role: "Senior Manager, Industry Partner",
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
+    image: "/site_assests/8.jpg.jpeg",
     tag: "VIP",
   },
   {
@@ -214,8 +204,7 @@ export const testimonials = [
       "Faculty encouraged us to build beyond syllabus requirements. That project depth helped me during technical interviews and onboarding.",
     name: "Vikram N.",
     role: "Design Engineer at L&T",
-    image:
-      "https://images.unsplash.com/photo-1566492031773-4f4e44671857?q=80&w=200&auto=format&fit=crop",
+    image: "/site_assests/19.jpeg",
     tag: "Alumini",
   },
   {
@@ -223,8 +212,7 @@ export const testimonials = [
       "The coding and aptitude sessions were consistent and practical. I improved every month and was ready by placement season.",
     name: "Janani P.",
     role: "Final Year ECE Student",
-    image:
-      "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=200&auto=format&fit=crop",
+    image: "/site_assests/4564cb56ad6a43f1af8faa4f29ad9e51.jpg.jpeg",
     tag: "Student",
   },
   {
@@ -232,8 +220,7 @@ export const testimonials = [
       "The graduates we recruit from JCT show strong fundamentals and discipline in execution, especially in quality and documentation workflows.",
     name: "Mohan Raj",
     role: "Plant Operations Lead, Caterpillar",
-    image:
-      "https://images.unsplash.com/photo-1463453091185-61582044d556?q=80&w=200&auto=format&fit=crop",
+    image: "/site_assests/WhatsApp-Image-2024-11-29-at-2.36.24-PM.jpeg",
     tag: "VIP",
   },
 ];

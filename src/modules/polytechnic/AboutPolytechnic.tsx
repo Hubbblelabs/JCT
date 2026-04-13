@@ -133,7 +133,7 @@ export function AboutPolytechnic() {
                 className="relative h-100 w-full overflow-hidden rounded-3xl shadow-2xl lg:h-125"
               >
                 <Image
-                  src="https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1200&auto=format&fit=crop"
+                  src="/site_assests/polytechnic.jpeg"
                   alt="JCT Polytechnic Campus"
                   fill
                   className="object-cover"
@@ -263,7 +263,7 @@ export function AboutPolytechnic() {
                 >
                   <div className="relative mx-auto aspect-square w-full max-w-70 overflow-hidden rounded-full border-4 border-white shadow-xl">
                     <Image
-                      src="/jct_logo.png"
+                      src="/site_assests/logo.webp"
                       alt="Principal"
                       fill
                       className="bg-white object-contain"

@@ -6,12 +6,12 @@ import { ArrowRight } from "lucide-react";
 import { DragScroll } from "@/components/ui/DragScroll";
 
 const campusImages = [
-  "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?q=80&w=800&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=800&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1606761568499-6d2451b23c66?q=80&w=800&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1200&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=800&auto=format&fit=crop",
+  "/site_assests/mech-img.jpg.jpeg",
+  "/site_assests/eee-img.jpg.jpeg",
+  "/site_assests/computer-img1.jpg.jpeg",
+  "/site_assests/engineering.jpeg",
+  "/site_assests/banner6.jpeg",
+  "/site_assests/polytechnic.jpeg",
 ];
 
 export function CampusLife() {

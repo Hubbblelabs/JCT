@@ -188,48 +188,48 @@ export const testimonials = [
       "The education here prepared me for real challenges. I walked into my first job feeling confident and capable, all thanks to the rigorous curriculum and supportive faculty.",
     name: "Rajesh Kumar",
     role: "Engineering at TCS",
-    image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=200&auto=format&fit=crop",
+      image:
+        "/site_assests/2.jpeg",
   },
   {
     quote:
       "I came here uncertain about my direction. The diverse environment and the mentorship I received helped me discover my true passion and shape my career path.",
     name: "Priya Sharma",
     role: "Management at Accenture",
-    image:
-      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&auto=format&fit=crop",
+      image:
+        "/site_assests/3.jpeg",
   },
   {
     quote:
       "The faculty understood that we needed more than theory. The hands-on projects and industry connections gave me the exact experience I needed to stand out.",
     name: "Arjun Patel",
     role: "Computer Science at Google",
-    image:
-      "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
+      image:
+        "/site_assests/8.jpg.jpeg",
   },
   {
     quote:
       "The placement cell gave us structured preparation from the second year itself. That consistency helped me clear rounds at a product company.",
     name: "Kirthika M.",
     role: "Associate Analyst at Zoho",
-    image:
-      "https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=200&auto=format&fit=crop",
+      image:
+        "/site_assests/19.jpeg",
   },
   {
     quote:
       "I joined with stage fear and left with confidence. Presentations, seminars, and project reviews made communication one of my strengths.",
     name: "Vignesh R.",
     role: "Business Operations at Accenture",
-    image:
-      "https://images.unsplash.com/photo-1552058544-f2b08422138a?q=80&w=200&auto=format&fit=crop",
+      image:
+        "/site_assests/4564cb56ad6a43f1af8faa4f29ad9e51.jpg.jpeg",
   },
   {
     quote:
       "The faculty mentorship and practical assignments made a real difference. I could connect theory to real business and technology use-cases quickly.",
     name: "Revathi S.",
     role: "Data Associate at TCS",
-    image:
-      "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=200&auto=format&fit=crop",
+      image:
+        "/site_assests/WhatsApp-Image-2024-11-29-at-2.36.24-PM.jpeg",
   },
 ];
 
@@ -238,22 +238,19 @@ export const newsUpdates = [
     date: "Thu 15 Feb 2024",
     title:
       "Annual Science Exhibition showcases student innovations capable of global impact.",
-    image:
-      "https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=600&auto=format&fit=crop",
+    image: "/site_assests/banner6.jpeg",
   },
   {
     date: "Mon 20 Mar 2024",
     title:
       "National Commerce Conference hosted on campus, drawing industry leaders.",
-    image:
-      "https://images.unsplash.com/photo-1475721028070-96695bce1356?q=80&w=600&auto=format&fit=crop",
+    image: "/site_assests/banner3.jpg.jpeg",
   },
   {
     date: "Wed 05 Apr 2024",
     title:
       "New AI and Machine Learning lab inaugurated to boost advanced research capabilities.",
-    image:
-      "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=600&auto=format&fit=crop",
+    image: "/site_assests/banner.jpg.jpeg",
   },
 ];
 

@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 import { DragScroll } from "@/components/ui/DragScroll";
 
 const campusImages = [
-  "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=800&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?q=80&w=1200&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=800&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1552664730-d307ca884978?q=80&w=800&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?q=80&w=800&auto=format&fit=crop",
+  "/site_assests/banner3.jpg.jpeg",
+  "/site_assests/banner6.jpeg",
+  "/site_assests/facility-bg.jpg.jpeg",
+  "/site_assests/MGL5086-1.webp",
+  "/site_assests/19.jpeg",
 ];
 
 export function CampusLife() {

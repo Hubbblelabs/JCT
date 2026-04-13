@@ -11,8 +11,7 @@ const newsItems = [
     excerpt:
       "A team of 4 CSE students bagged first prize at CodeSprint 2026, competing against 200+ teams from across India.",
     category: "Achievement",
-    image:
-      "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=1200&auto=format&fit=crop",
+    image: "/site_assests/news-1.webp",
   },
   {
     date: "28 Feb 2026",
@@ -20,8 +19,7 @@ const newsItems = [
     excerpt:
       "JCT College of Engineering partners with TCS to offer hands-on training modules and guaranteed internship placements.",
     category: "Partnership",
-    image:
-      "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?q=80&w=1200&auto=format&fit=crop",
+    image: "/site_assests/dummy-news-img.jpg.jpeg",
   },
   {
     date: "15 Feb 2026",
@@ -29,8 +27,7 @@ const newsItems = [
     excerpt:
       "Over 1,500 students participated in inter-department sports events spanning athletics, cricket, basketball, and chess.",
     category: "Campus Life",
-    image:
-      "https://images.unsplash.com/photo-1461896836934-ffe607ba8211?q=80&w=800&auto=format&fit=crop",
+    image: "/site_assests/MGL5086-1.webp",
   },
   {
     date: "22 Feb 2026",
@@ -38,8 +35,7 @@ const newsItems = [
     excerpt:
       "JCT Institutions undergoes peer review for NAAC re-accreditation, with preliminary reports indicating strong outcomes.",
     category: "Accreditation",
-    image:
-      "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1200&auto=format&fit=crop",
+    image: "/site_assests/naac-imggg-01.jpg.jpeg",
   },
 ];
 

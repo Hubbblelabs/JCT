@@ -10,49 +10,49 @@ const categories = ["All", "Labs", "Sports", "Events", "Clubs"] as const;
 
 const photos = [
   {
-    src: "https://images.unsplash.com/photo-1606761568499-6d2451b23c66?q=80&w=800&auto=format&fit=crop",
+    src: "/site_assests/computer-img1.jpg.jpeg",
     caption: "Advanced Computer Lab",
     category: "Labs",
     span: "md:col-span-2 md:row-span-2",
   },
   {
-    src: "https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?q=80&w=600&auto=format&fit=crop",
+    src: "/site_assests/banner3.jpg.jpeg",
     caption: "Annual Sports Day",
     category: "Sports",
     span: "",
   },
   {
-    src: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=600&auto=format&fit=crop",
+    src: "/site_assests/life-img-1.jpg.jpeg",
     caption: "Cultural Fest — Kaleidoscope",
     category: "Events",
     span: "",
   },
   {
-    src: "https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=600&auto=format&fit=crop",
+    src: "/site_assests/MGL5086-1.webp",
     caption: "Robotics Club Workshop",
     category: "Clubs",
     span: "",
   },
   {
-    src: "https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=600&auto=format&fit=crop",
+    src: "/site_assests/facility-bg.jpg.jpeg",
     caption: "Campus Green Walkway",
     category: "Events",
     span: "",
   },
   {
-    src: "https://images.unsplash.com/photo-1571260899304-425eee4c7efc?q=80&w=600&auto=format&fit=crop",
+    src: "/site_assests/eee-img.jpg.jpeg",
     caption: "Electronics & Comm. Lab",
     category: "Labs",
     span: "",
   },
   {
-    src: "https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=600&auto=format&fit=crop",
+    src: "/site_assests/8.jpg.jpeg",
     caption: "Inter-College Basketball",
     category: "Sports",
     span: "md:col-span-2",
   },
   {
-    src: "https://images.unsplash.com/photo-1559223607-b4d0555ae227?q=80&w=600&auto=format&fit=crop",
+    src: "/site_assests/news-1.webp",
     caption: "Coding Club Meetup",
     category: "Clubs",
     span: "",

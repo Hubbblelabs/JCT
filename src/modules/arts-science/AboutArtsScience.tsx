@@ -143,7 +143,7 @@ export function AboutArtsScience() {
                 className="relative h-112.5 w-full overflow-hidden rounded-4xl border-4 border-white shadow-2xl lg:h-137.5"
               >
                 <Image
-                  src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1200&auto=format&fit=crop"
+                  src="/site_assests/arts.jpeg"
                   alt="JCT Arts and Science Campus"
                   fill
                   className="object-cover"
@@ -263,7 +263,7 @@ export function AboutArtsScience() {
                 >
                   <div className="relative mx-auto flex aspect-4/5 w-full max-w-[320px] items-center justify-center overflow-hidden rounded-3xl border-8 border-orange-50 bg-white shadow-lg">
                     <Image
-                      src="/jct_logo.png"
+                      src="/site_assests/logo.webp"
                       alt="Principal"
                       width={200}
                       height={200}

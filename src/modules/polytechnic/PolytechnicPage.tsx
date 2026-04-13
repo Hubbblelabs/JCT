@@ -132,25 +132,25 @@ const facilities = [
     title: "Mechanical Workshop",
     desc: "Lathes, milling machines, welding stations, and a dedicated fitting shop where students learn by building actual components.",
     image:
-      "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&auto=format&fit=crop&q=80",
+      "/site_assests/mech-img.jpg.jpeg",
   },
   {
     title: "Electrical Lab",
     desc: "Transformers, motor test benches, and PLC trainers. Students wire real circuits and troubleshoot faults as part of their coursework.",
     image:
-      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?w=800&auto=format&fit=crop&q=80",
+      "/site_assests/eee-img.jpg.jpeg",
   },
   {
     title: "Computer Lab",
     desc: "Networked workstations with CAD software, programming environments, and simulation tools updated each academic year.",
     image:
-      "https://images.unsplash.com/photo-1606761568499-6d2451b23c66?w=800&auto=format&fit=crop&q=80",
+      "/site_assests/computer-img1.jpg.jpeg",
   },
   {
     title: "Library & Study Hall",
     desc: "Technical reference books, periodicals, past question papers, and a quiet reading area that stays open until evening.",
     image:
-      "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?w=800&auto=format&fit=crop&q=80",
+      "/site_assests/facility-bg.jpg.jpeg",
   },
 ];
 
@@ -164,7 +164,7 @@ export default function PolytechnicPage() {
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?q=80&w=1200&auto=format&fit=crop"
+            src="/site_assests/future-banner.webp"
             alt="Polytechnic workshop"
             fill
             sizes="100vw"
@@ -404,7 +404,7 @@ export default function PolytechnicPage() {
 
                 <div className="hidden aspect-4/3 overflow-hidden rounded-2xl bg-stone-200 lg:block">
                   <Image
-                    src="https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800&auto=format&fit=crop&q=80"
+                    src="/site_assests/mech-img.jpg.jpeg"
                     alt="Students in the polytechnic workshop"
                     width={800}
                     height={600}

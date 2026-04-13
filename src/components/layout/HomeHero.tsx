@@ -16,24 +16,22 @@ const slides = [
     id: 0,
     label: "Engineering College",
     subtitle: "// JCT Flagship Campus",
-    thumb: "/jct_engineering.png",
-    bgImage:
-      "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=2670&auto=format&fit=crop",
+    thumb: "/site_assests/engineering.jpeg",
+    bgImage: "/site_assests/land-ban.webp",
   },
   {
     id: 1,
     label: "Arts & Science",
     subtitle: "// Liberal Arts Campus",
-    thumb: "/assets/home-herosection.jpg",
-    bgImage: "/assets/home-herosection.jpg",
+    thumb: "/site_assests/home-slide.webp",
+    bgImage: "/site_assests/home-slide.webp",
   },
   {
     id: 2,
     label: "Polytechnic College",
     subtitle: "// Technical Education",
-    thumb: "/jct_polytechnic.png",
-    bgImage:
-      "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=2670&auto=format&fit=crop",
+    thumb: "/site_assests/polytechnic.jpeg",
+    bgImage: "/site_assests/future-banner.webp",
   },
 ];
 

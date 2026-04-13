@@ -113,7 +113,7 @@ export function Footer() {
             <div className="flex items-center gap-3">
               <div className="relative h-10 w-10 shrink-0 sm:h-12 sm:w-12">
                 <Image
-                  src="/jct_logo_yellow.png"
+                  src="/site_assests/footer-logo.svg"
                   alt="JCT"
                   fill
                   sizes="(min-width: 640px) 48px, 40px"

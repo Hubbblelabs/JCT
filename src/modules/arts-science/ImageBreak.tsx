@@ -7,7 +7,7 @@ export function ImageBreak() {
   return (
     <section className="relative h-[50vh] min-h-100 overflow-hidden">
       <Image
-        src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop"
+        src="/site_assests/life-img-1.jpg.jpeg"
         alt="Students studying on campus"
         fill
         sizes="100vw"

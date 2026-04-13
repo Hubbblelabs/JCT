@@ -63,7 +63,7 @@ function createArtsDepartment(config: {
     bgColor: "#800020",
     accentColor: "#D4A024",
     heroImage:
-      "https://images.unsplash.com/photo-1498243691581-b145c3f54a5a?q=80&w=1600&auto=format&fit=crop",
+      "/site_assests/arts.jpeg",
     about: {
       paragraphs: [
         `${config.name} offers a contemporary curriculum with a strong blend of academic depth, practical application, and career-oriented training.`,

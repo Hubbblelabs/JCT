@@ -196,7 +196,7 @@ function createEngineeringDepartment(config: {
     bgColor: "#0F172A",
     accentColor: "#D4A024",
     heroImage:
-      "https://images.unsplash.com/photo-1581092160607-ee22731d8f2f?q=80&w=1600&auto=format&fit=crop",
+      "/site_assests/engineering.jpeg",
     about: {
       paragraphs: [
         `${config.name} is offered under JCT College of Engineering and Technology, established by Shri Jagannath Educational Health and Charitable Trust in Coimbatore to serve students from rural and underserved communities.`,

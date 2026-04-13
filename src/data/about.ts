@@ -52,7 +52,7 @@ export const aboutData = {
   chairmansMessage: {
     name: "Dr. R. Jayaraman",
     designation: "Chairman, JCT Group of Institutions",
-    image: "/jct_logo.png",
+    image: "/site_assests/banner2.jpg.jpeg",
     message: [
       "It gives me immense pleasure to welcome you to JCT Group of Institutions — a place where dreams take shape and futures are built on a strong foundation of knowledge, values, and innovation.",
       "Since our inception in 2009, we have been committed to providing world-class education that prepares students not just for careers, but for life. Our philosophy is rooted in the belief that every student possesses unique potential, and it is our responsibility to nurture that potential through excellent teaching, modern facilities, and a supportive environment.",
@@ -64,7 +64,7 @@ export const aboutData = {
   principalsMessage: {
     name: "Dr. S. Karthikeyan",
     designation: "Principal, JCT College of Engineering & Technology",
-    image: "/jct_logo.png",
+    image: "/site_assests/banner3.jpg.jpeg",
     message: [
       "Welcome to JCT College of Engineering & Technology, where we are dedicated to shaping the engineers of tomorrow through a blend of theoretical knowledge and practical expertise.",
       "Our institution stands out for its commitment to academic excellence, research, and holistic student development. We take pride in our experienced faculty, modern infrastructure, and strong industry connections that collectively create an unparalleled learning experience.",

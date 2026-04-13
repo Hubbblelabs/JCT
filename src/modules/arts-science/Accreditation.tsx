@@ -53,7 +53,7 @@ export function Accreditation() {
             className="relative flex aspect-square w-full shrink-0 flex-col items-center justify-center overflow-hidden rounded-2xl lg:aspect-4/3"
           >
             <Image
-              src="https://images.unsplash.com/photo-1562774053-701939374585?q=80&w=1600&auto=format&fit=crop"
+              src="/site_assests/naac-imggg-01.jpg.jpeg"
               alt="Academic accreditation and quality standards at JCT"
               fill
               sizes="(max-width: 1024px) 100vw, 50vw"

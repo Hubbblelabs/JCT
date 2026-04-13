@@ -54,7 +54,7 @@ const jsonLd = {
   "@type": "EducationalOrganization",
   name: siteConfig.name,
   url: siteConfig.url,
-  logo: `${siteConfig.url}/jct_logo.png`,
+  logo: `${siteConfig.url}/site_assests/logo.png`,
   description:
     "JCT Institutions is a premier group of three colleges in Coimbatore offering Engineering, Arts & Science, and Polytechnic programs.",
   foundingDate: "2009",

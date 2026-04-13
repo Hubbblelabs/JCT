@@ -11,7 +11,7 @@ const institutions = [
     slug: "engineering",
     href: "/institutions/engineering",
     // logo: "/jct_engineering1.png",
-    image: "/assets/engineering2-home.png",
+    image: "/site_assests/engineering.jpeg",
     tagline: "Pioneering Technical Education",
     // stat: "6 B.E./B.Tech Programs",
     degreePrograms: [
@@ -40,7 +40,7 @@ const institutions = [
     slug: "arts-science",
     href: "/institutions/arts-science",
     // logo: "/jct_arts1.png",
-    image: "/assets/arts-home.png",
+    image: "/site_assests/arts.jpeg",
     tagline: "Fostering Creativity & Inquiry",
     // stat: "6 UG Programs",
     degreePrograms: [
@@ -57,7 +57,7 @@ const institutions = [
     slug: "polytechnic",
     href: "/institutions/polytechnic",
     // logo: "/jct_polytechnic1.png",
-    image: "/assets/polytechnic1-home.png",
+    image: "/site_assests/polytechnic.jpeg",
     tagline: "Hands-On Technical Training",
     // stat: "5 Diploma Programs",
     degreePrograms: [

@@ -8,9 +8,9 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const CAROUSEL_IMAGES = [
-  "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=1600&auto=format&fit=crop", // Academic Campus
-  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1600&auto=format&fit=crop", // Laboratory/Engineering
-  "https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?q=80&w=1600&auto=format&fit=crop", // Structural/Minimal
+  "/site_assests/polytechnic.jpeg", // Academic Campus
+  "/site_assests/mech-img.jpg.jpeg", // Laboratory/Engineering
+  "/site_assests/future-banner.webp", // Structural/Minimal
 ];
 
 /* ─── Animation helpers ─── */
@@ -31,7 +31,7 @@ export function Hero() {
   }, []);
 
   return (
-    <section className="bg-polytechnic-dark relative flex h-dvh min-h-[600px] flex-col justify-center overflow-hidden">
+    <section className="bg-polytechnic-dark relative flex h-dvh min-h-150 flex-col justify-center overflow-hidden">
       {/* ─── Background Carousel ─── */}
       <div className="absolute inset-0 z-0">
         <AnimatePresence mode="popLayout">

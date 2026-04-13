@@ -24,7 +24,7 @@ export function EngineeringHero() {
         className="absolute inset-0 z-0"
       >
         <Image
-          src="/assets/engineering-landing4.png"
+          src="/site_assests/engineering.jpeg"
           alt="Engineering campus"
           fill
           sizes="100vw"

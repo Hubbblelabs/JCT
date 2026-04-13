@@ -10,7 +10,7 @@ export const siteConfig = {
     phoneAlt: "+91 422 264 5566",
     email: "info@jct.ac.in",
     admissionsEmail: "admissions@jct.ac.in",
-    whatsapp: "919361488801",
+    whatsapp: "919361444408",
   },
 
   address: {
@@ -93,21 +93,21 @@ export const siteConfig = {
       name: "JCT College of Engineering & Technology",
       short: "Engineering",
       href: "/institutions/engineering",
-      logo: "/jct_engineering1.png",
+      logo: "/site_assests/engineering.jpeg",
       desc: "B.E. / B.Tech programs in CS, ECE, Mech, Civil, EEE & IT",
     },
     {
       name: "JCT College of Arts & Science",
       short: "Arts & Science",
       href: "/institutions/arts-science",
-      logo: "/jct_arts1.png",
+      logo: "/site_assests/arts.jpeg",
       desc: "B.Sc, B.Com, BBA programs with placement-focused training",
     },
     {
       name: "JCT Polytechnic College",
       short: "Polytechnic",
       href: "/institutions/polytechnic",
-      logo: "/jct_polytechnic1.png",
+      logo: "/site_assests/polytechnic.jpeg",
       desc: "3-year diploma programs with hands-on lab training",
     },
   ],
