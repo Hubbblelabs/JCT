@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { HomeHero } from "@/components/layout/HomeHero";
+import { TrustHighlightsRow } from "@/components/layout/TrustHighlightsRow";
 import { Institutions } from "@/components/layout/Institutions";
 import { NewsEvents } from "@/components/layout/NewsEvents";
 import { Placements } from "@/components/layout/Placements";
@@ -12,6 +13,7 @@ export default function HomePage() {
     <main className="bg-surface text-foreground min-h-screen overflow-x-hidden">
       <Navbar />
       <HomeHero />
+      <TrustHighlightsRow />
       {/* <WhyJCT /> */}
       <Placements />
       <NewsEvents />

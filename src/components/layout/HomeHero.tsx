@@ -4,33 +4,34 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  ArrowRight,
-  Award,
-  Users,
-  GraduationCap,
-  BadgeDollarSign,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { homeHeroContent } from "@/data/home";
 import { Accreditations } from "@/components/layout/Accreditations";
 
-function getTrustIcon(iconName: string) {
-  switch (iconName) {
-    case "laurel":
-      return <Award className="h-5 w-5" />;
-    case "users":
-      return <Users className="h-5 w-5" />;
-    case "cap":
-      return <GraduationCap className="h-5 w-5" />;
-    case "growth":
-      return <BadgeDollarSign className="h-5 w-5" />;
-    default:
-      return <Award className="h-5 w-5" />;
-  }
-}
+const BACKGROUND_MOTIONS = [
+  {
+    initial: { opacity: 0, scale: 1.08, y: 10 },
+    animate: { opacity: 1, scale: 1, y: 0 },
+    exit: { opacity: 0, scale: 1.02, y: -8 },
+    transition: { duration: 0.7, ease: "easeOut" as const },
+  },
+  {
+    initial: { opacity: 0, x: 28, scale: 1.03 },
+    animate: { opacity: 1, x: 0, scale: 1 },
+    exit: { opacity: 0, x: -18, scale: 1.01 },
+    transition: { duration: 0.8, ease: "easeInOut" as const },
+  },
+  {
+    initial: { opacity: 0, rotate: -1.5, scale: 1.06 },
+    animate: { opacity: 1, rotate: 0, scale: 1 },
+    exit: { opacity: 0, rotate: 1, scale: 1.02 },
+    transition: { duration: 0.78, ease: "easeOut" as const },
+  },
+] as const;
 
 export function HomeHero() {
   const [isTouchScreen, setIsTouchScreen] = useState(false);
+  const [currentBackgroundIndex, setCurrentBackgroundIndex] = useState(0);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [expandedCard, setExpandedCard] = useState<number | null>(null);
 
@@ -49,6 +50,24 @@ export function HomeHero() {
     return () => media.removeListener(update);
   }, []);
 
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setCurrentBackgroundIndex(
+        (currentIndex) =>
+          (currentIndex + 1) % homeHeroContent.backgroundImages.length,
+      );
+    }, 8000);
+
+    return () => window.clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    homeHeroContent.backgroundImages.forEach((src) => {
+      const image = new window.Image();
+      image.src = src;
+    });
+  }, []);
+
   function isCardExpanded(index: number) {
     return isTouchScreen ? expandedCard === index : hoveredCard === index;
   }
@@ -61,48 +80,60 @@ export function HomeHero() {
   }
 
   return (
-    <section className="relative flex min-h-svh w-full flex-col overflow-hidden pt-21 pb-44 lg:pt-26 lg:pb-32">
-      <Image
-        src={homeHeroContent.backgroundImage}
-        alt="JCT campus"
-        fill
-        priority
-        className="object-cover"
-        sizes="100vw"
-      />
-      <div className="absolute inset-0 bg-[#081a34]/22" />
-      <div className="absolute inset-0 bg-linear-to-r from-[#0a1628]/45 via-[#0a1628]/22 to-transparent" />
+    <section className="relative flex min-h-[102svh] w-full flex-col justify-center overflow-hidden pt-18 pb-24 lg:pt-22 lg:pb-16">
+      <div className="absolute inset-0">
+        <AnimatePresence mode="wait">
+          {(() => {
+            const backgroundMotion =
+              BACKGROUND_MOTIONS[
+                currentBackgroundIndex % BACKGROUND_MOTIONS.length
+              ];
 
-      {/* Top Trust Highlights Pill */}
-      <div className="relative z-10 mx-auto mt-2 w-fit max-w-[calc(100%-1.5rem)] rounded-2xl border border-white/20 bg-[#7f9ec7]/35 px-4 py-1.5 shadow-[0_10px_30px_rgba(4,10,24,0.2)] sm:max-w-[calc(100%-2.5rem)] sm:rounded-full sm:px-6 sm:py-1.5">
-        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[13px] font-semibold text-white sm:text-base md:gap-x-8">
-          {homeHeroContent.trustHighlights.map((stat, i) => (
-            <div key={stat.label} className="flex items-center gap-2 md:gap-3">
-              {i > 0 && (
-                <span className="hidden text-white/40 md:inline-block">|</span>
-              )}
-              <span className="text-white/80">{getTrustIcon(stat.icon)}</span>
-              <span>{stat.label}</span>
-            </div>
-          ))}
-        </div>
+            return (
+              <motion.div
+                key={homeHeroContent.backgroundImages[currentBackgroundIndex]}
+                className="absolute inset-0"
+                initial={backgroundMotion.initial}
+                animate={backgroundMotion.animate}
+                exit={backgroundMotion.exit}
+                transition={backgroundMotion.transition}
+              >
+                <Image
+                  src={homeHeroContent.backgroundImages[currentBackgroundIndex]}
+                  alt="JCT campus"
+                  fill
+                  priority={currentBackgroundIndex === 0}
+                  className="object-cover"
+                  sizes="100vw"
+                />
+              </motion.div>
+            );
+          })()}
+        </AnimatePresence>
       </div>
+      <div className="absolute inset-0 bg-[#081a34]/22" />
+      <div className="absolute inset-0 bg-linear-to-r from-[#081327]/48 via-[#081327]/22 to-[#081327]/8" />
 
-      <div className="relative z-10 mx-auto grid w-full max-w-352 flex-1 grid-cols-1 items-center gap-10 px-4 py-8 md:px-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:px-10 lg:py-14 xl:gap-16">
+      <div className="relative z-10 mx-auto grid w-full max-w-352 grid-cols-1 items-center gap-10 px-4 md:px-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:px-10 xl:gap-16">
         {/* Left Content */}
         <div className="flex w-full flex-col items-center text-center lg:items-start lg:text-left">
-          <motion.h1
-            initial={{ opacity: 0, y: 18 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            className="max-w-3xl font-sans text-[2.5rem] leading-[1.05] font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.25rem]"
-          >
-            {homeHeroContent.titleLines.map((line) => (
-              <span key={line} className="block">
+          <h1 className="max-w-3xl font-sans text-[2.5rem] leading-[1.05] font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.25rem]">
+            {homeHeroContent.titleLines.map((line, index) => (
+              <motion.span
+                key={line}
+                className="block"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                  duration: 0.55,
+                  delay: 0.08 * index,
+                  ease: "easeOut",
+                }}
+              >
                 {line}
-              </span>
+              </motion.span>
             ))}
-          </motion.h1>
+          </h1>
 
           <motion.div
             initial={{ opacity: 0, y: 16 }}
@@ -113,7 +144,7 @@ export function HomeHero() {
             {homeHeroContent.ctas.map((cta) => (
               <Link
                 key={cta.label}
-                href={cta.href}
+                href={cta.href.startsWith("#") ? "/admissions" : cta.href}
                 className={`inline-flex h-12 items-center justify-center gap-2 rounded-full px-7 text-sm font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 sm:text-base ${
                   cta.primary
                     ? "bg-gold text-navy hover:bg-gold-light shadow-black/20"
@@ -134,7 +165,7 @@ export function HomeHero() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.65, delay: 0.35, ease: "easeOut" }}
-          className="mx-auto flex w-full max-w-md flex-col items-center gap-4 sm:max-w-xl lg:max-w-none lg:items-end lg:translate-x-8 xl:translate-x-10"
+          className="mx-auto flex w-full max-w-md flex-col items-center gap-4 sm:max-w-xl lg:max-w-none lg:translate-x-8 lg:items-end xl:translate-x-10"
         >
           <div className="flex w-full flex-col items-center gap-4 lg:items-end">
             {homeHeroContent.cards.map((card, index) => {
@@ -164,7 +195,7 @@ export function HomeHero() {
                     }
                   }}
                   tabIndex={isTouchScreen ? 0 : -1}
-                  className={`w-full cursor-default overflow-hidden rounded-xl bg-white shadow-md transition-all duration-300 ease-out sm:w-[24rem] sm:rounded-2xl ${expanded ? "px-5 py-4 shadow-lg" : "px-4 py-3 hover:shadow-lg"}`}
+                  className={`w-full cursor-default overflow-hidden rounded-xl border border-[#f2d89a]/55 bg-[#ffffff]/92 shadow-md transition-all duration-300 ease-out sm:w-[24rem] sm:rounded-2xl ${expanded ? "px-5 py-4 shadow-lg" : "px-4 py-3 hover:shadow-lg"}`}
                   transition={{ duration: 0.28, ease: "easeOut" }}
                 >
                   <div className="min-w-0">
@@ -212,8 +243,14 @@ export function HomeHero() {
         </motion.div>
       </div>
 
-      <div className="absolute right-0 bottom-4 left-0 z-20 md:bottom-6">
-        <Accreditations variant="hero" />
+      <div className="absolute right-0 bottom-3 left-0 z-20 md:bottom-4">
+        <div className="mx-auto w-full max-w-352 px-4 md:px-8 lg:px-10">
+          <div className="flex flex-col items-center gap-2">
+            <div className="w-full">
+              <Accreditations variant="hero" />
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

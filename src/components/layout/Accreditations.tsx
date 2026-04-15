@@ -81,7 +81,7 @@ export function Accreditations({ variant = "default" }: AccreditationsProps) {
 
   return (
     <section
-      className={`relative overflow-hidden py-4 ${isHero ? "bg-transparent" : "bg-white/95 shadow-inner"}`}
+      className={`relative overflow-hidden ${isHero ? "py-1" : "bg-white/95 py-4 shadow-inner"}`}
     >
       <div className="mx-auto flex w-full max-w-5xl flex-col items-center px-4">
         <AnimatePresence mode="wait">
@@ -91,17 +91,17 @@ export function Accreditations({ variant = "default" }: AccreditationsProps) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.32, ease: "easeOut" }}
-            className="mb-3 text-center"
+            className="mb-2 text-center"
           >
             <p
-              className={`font-sans text-sm font-semibold sm:text-base ${
+              className={`font-sans text-sm font-semibold ${
                 isHero ? "text-white" : "text-[#0f2039]"
               }`}
             >
               {activeLogo.name}
             </p>
             <p
-              className={`mt-0.5 text-xs sm:text-sm ${
+              className={`mt-0.5 text-xs ${
                 isHero ? "text-white/75" : "text-slate-600"
               }`}
             >
@@ -110,7 +110,7 @@ export function Accreditations({ variant = "default" }: AccreditationsProps) {
           </motion.div>
         </AnimatePresence>
 
-        <div className="relative flex h-20 w-full items-center justify-center overflow-hidden sm:h-24">
+        <div className="relative flex h-18 w-full items-center justify-center overflow-hidden sm:h-22">
           {VISIBLE_OFFSETS.map((offset) => {
             const wrappedIndex = getWrappedIndex(
               activeIndex + offset,
@@ -141,10 +141,10 @@ export function Accreditations({ variant = "default" }: AccreditationsProps) {
                   className={`relative flex items-center justify-center rounded-full border transition-all ${
                     isActive
                       ? isHero
-                        ? "h-16 w-16 border-[#d4a024]/80 bg-[#f7f9fd]/95 ring-2 ring-[#d4a024]/55 sm:h-18 sm:w-18"
+                        ? "h-16 w-16 border-[#d4a024]/85 bg-[#f3f7ff]/98 ring-2 ring-[#d4a024]/58 sm:h-18 sm:w-18"
                         : "h-16 w-16 border-[#d4a024]/80 bg-white ring-2 ring-[#d4a024]/45 sm:h-18 sm:w-18"
                       : isHero
-                        ? "h-10 w-10 border-white/22 bg-[#8ea5c3]/20 sm:h-14 sm:w-14"
+                        ? "h-10 w-10 border-[#c2d5ef]/38 bg-[#7f98ba]/38 sm:h-14 sm:w-14"
                         : "h-10 w-10 border-slate-200 bg-white sm:h-14 sm:w-14"
                   }`}
                 >

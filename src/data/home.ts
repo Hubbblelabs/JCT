@@ -10,7 +10,11 @@ export type HomeHeroCard = {
 };
 
 export const homeHeroContent = {
-  backgroundImage: "/site_assests/facility-bg.jpg.jpeg",
+  backgroundImages: [
+    "/site_assests/banner2.jpeg",
+    "/site_assests/future-banner.webp",
+    "/site_assests/facility-bg.jpg.jpeg",
+  ],
   titleLines: ["One Campus.", "Three Pathways.", "Unlimited Futures."],
   ctas: [
     {
@@ -32,7 +36,7 @@ export const homeHeroContent = {
   ],
   cards: [
     {
-      title: "Engineering College",
+      title: "Engineering & Technology",
       description:
         "Cutting-edge curriculum and facilities for future engineers.",
       href: "/institutions/engineering",
@@ -41,7 +45,7 @@ export const homeHeroContent = {
       highlights: "200+ Lab Facilities | Top 10 Rankings",
     },
     {
-      title: "Arts & Science College",
+      title: "Arts & Science",
       description:
         "Diverse programs fostering creativity and critical thinking.",
       href: "/institutions/arts-science",
@@ -50,7 +54,7 @@ export const homeHeroContent = {
       highlights: "Research Excellence | Industry Partnerships",
     },
     {
-      title: "Polytechnic College",
+      title: "Polytechnic",
       description: "Practical, hands-on training for technical excellence.",
       href: "/institutions/polytechnic",
       icon: "polytechnic",

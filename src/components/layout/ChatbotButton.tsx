@@ -333,14 +333,19 @@ export function ChatbotButton() {
 
   return (
     <>
-      <button
-        aria-label={isOpen ? "Close chatbot" : "Open chatbot"}
-        aria-expanded={isOpen}
-        onClick={() => setIsOpen((open) => !open)}
-        className="bg-navy hover:bg-navy-mid fixed bottom-5 left-4 z-50 flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:scale-105 active:scale-95 md:bottom-6 md:left-6"
-      >
-        <MessageCircle size={20} className="text-white" />
-      </button>
+      <div className="group fixed bottom-5 left-4 z-50 md:bottom-6 md:left-6">
+        <span className="pointer-events-none absolute top-1/2 left-14 -translate-y-1/2 rounded-md bg-[#0a1628]/92 px-2 py-1 text-xs font-semibold whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100">
+          Need help?
+        </span>
+        <button
+          aria-label={isOpen ? "Close chatbot" : "Open chatbot"}
+          aria-expanded={isOpen}
+          onClick={() => setIsOpen((open) => !open)}
+          className="bg-navy hover:bg-navy-mid flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:scale-105 active:scale-95"
+        >
+          <MessageCircle size={20} className="text-white" />
+        </button>
+      </div>
 
       {isOpen && (
         <div
