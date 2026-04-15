@@ -1,96 +1,356 @@
-# Copilot Instructions for JCT
+# 🚀 Copilot Instructions for JCT (Enhanced with Modular Structure)
 
-## Project overview
+## 🧠 Project Overview
 
-This repository is a marketing and admissions website for JCT Institutions built with Next.js App Router, React 19, TypeScript, Tailwind CSS v4, and Framer Motion.
+This repository is a **marketing, institution, and admissions website for JCT Institutions** built with:
 
-The codebase is content-heavy and design-led.
+* Next.js App Router
+* React 19
+* TypeScript
+* Tailwind CSS v4
+* Framer Motion
 
-This project is a **modern redesign of the existing PHP website**:
+The codebase is **content-heavy and design-led**, focused on **high-conversion admissions UX**.
 
-- https://jct.ac.in
-- https://jct.ac.in/engineering
-- https://jct.ac.in/cas
-- https://jct.ac.in/polytechnic
+This is a **modern redesign** of:
 
-Copilot should use these sites as the **primary source of truth for content**, structure, and institutional information.
+* https://jct.ac.in
+* https://jct.ac.in/engineering
+* https://jct.ac.in/cas
+* https://jct.ac.in/polytechnic
 
-## Content sourcing guidelines
+These sites are the **primary source of truth**.
 
-- Always refer to the original website for content:
-  - https://jct.ac.in
-  - https://jct.ac.in/engineering
-  - https://jct.ac.in/cas
-  - https://jct.ac.in/polytechnic
+---
 
-- This project is a **redesign, not a rewrite of content**.
-- Extract and reuse:
-  - Program details
-  - Department information
-  - Admission content
-  - Facilities and infrastructure
-  - Placement and accreditation details
-  - Contact and institutional data
+# 📦 0. Core Rule — Modular Architecture (STRICT)
 
-- Do NOT invent random content unless explicitly required.
-- If content is unclear or missing:
-  - Keep it minimal and structured
-  - Prefer placeholders or reusable data structures
+🚫 **DO NOT build large pages in a single file**
 
-- Normalize and improve:
-  - Grammar and clarity
-  - Formatting and hierarchy
-  - SEO structure (headings, sections, metadata)
+✅ ALWAYS follow a **modular, scalable structure**
 
-## Architecture
+### 🔥 Golden Rule:
 
-- Keep route files in `src/app` thin. They should usually export metadata and render a page module or shared layout.
-- Put large page implementations in `src/modules/*` when they represent a full institution page such as Engineering, Arts and Science, or Polytechnic.
-- Put reusable layout sections in `src/components/layout/*`.
-- Put reusable primitives in `src/components/ui/*`.
-- Keep institution and department content in `src/data/*` and type it from `src/types/*`.
-- Reuse `DepartmentPageLayout` for department detail pages instead of duplicating section markup.
+> If a file exceeds ~more lines or has multiple responsibilities → **Split it into smaller components** and organize by feature.
 
-## Coding conventions
+---
 
-- Use TypeScript with strict typing. Prefer explicit types for shared data structures and public component props.
-- Use the `@/` path alias for imports from `src`.
-- Prefer server components by default. Add `"use client"` only when a component needs hooks, browser APIs, or Framer Motion interactivity.
-- Follow the existing functional component style and named exports for shared components.
-- Reuse helpers already in the repo, especially `cn` from `src/lib/utils.ts` and existing UI components like `Button` and `DragScroll`.
-- When adding new department or program content:
-  - First extract content from the original website
-  - Then structure it inside `src/data/*`
-  - Avoid hardcoding content directly in components
-- Keep metadata accurate for new top-level or detail pages. Use `generateMetadata` and `generateStaticParams` for slug-driven routes when appropriate.
+## 🧩 Module-Based Structure
 
-## Styling and UX
+### 📁 Page Level (Routing Layer)
 
-- Use Tailwind utility classes first. Only add global CSS when the styling is truly shared across the app.
-- Preserve the current visual language: serif headings, sans-serif body text, strong brand color palettes, layered gradients, and motion-rich sections.
-- Maintain responsive behavior across mobile, tablet, and desktop. Existing pages are highly visual, so check spacing and overflow carefully.
-- Keep navigation and global experience consistent. The sticky navbar, floating WhatsApp CTA, and admissions-focused calls to action are intentional project requirements.
-- Use Framer Motion deliberately for reveal, hover, and scroll-based interactions, but do not add animation that fights readability or performance.
+```
+src/app/*
+```
 
-## Content expectations
+* Keep **VERY THIN**
+* Only:
 
-- This is an institution website, so content should sound credible, clear, and admissions-focused.
-- Content should closely reflect the original JCT website but with improved readability and structure.
-- Keep accreditation, placement, intake, and contact information consistent with the source website.
-- Avoid duplication and inconsistencies across pages.
-- Favor SEO-friendly structure with:
-  - Descriptive headings
-  - Meaningful page titles
-  - Structured sections
-  - Clean metadata
+  * Metadata
+  * Route params
+  * Import + render module
 
-## Workflow
+```tsx
+// ❌ Bad
+export default function Page() {
+  return <HugePageWithEverything />
+}
 
-- Package manager: `pnpm`
-- Useful commands:
-  - `pnpm dev`
-  - `pnpm build`
-  - `pnpm lint`
-  - `pnpm format`
+// ✅ Good
+import { EngineeringPage } from "@/modules/engineering";
 
-There is no dedicated test suite yet, so validate changes with linting, build checks, and careful visual review.
+export default function Page() {
+  return <EngineeringPage />;
+}
+```
+
+---
+
+### 📁 Modules (Feature-Based Pages)
+
+```
+src/modules/<feature>/
+```
+
+Each major page must be split into:
+
+```
+modules/
+  engineering/
+    EngineeringPage.tsx
+    sections/
+      Hero.tsx
+      Programs.tsx
+      Departments.tsx
+      Facilities.tsx
+      Placements.tsx
+      CTA.tsx
+```
+
+👉 Each section = separate component
+👉 No huge monolithic files
+
+---
+
+### 📁 Components
+
+#### Layout Components
+
+```
+src/components/layout/*
+```
+
+* Navbar
+* Footer
+* Section wrappers
+* Containers
+
+#### UI Components
+
+```
+src/components/ui/*
+```
+
+* Button
+* Card
+* Badge
+* Tabs
+* Modal
+
+👉 Must be reusable, generic, and clean
+
+---
+
+### 📁 Data Layer (VERY IMPORTANT)
+
+```
+src/data/*
+```
+
+* Store ALL content here
+* Never hardcode in components
+
+Example:
+
+```ts
+export const engineeringPrograms = [
+  {
+    name: "Computer Science Engineering",
+    duration: "4 Years",
+  }
+];
+```
+
+---
+
+### 📁 Types
+
+```
+src/types/*
+```
+
+* Define shared interfaces
+
+```ts
+export interface Program {
+  name: string;
+  duration: string;
+}
+```
+
+---
+
+## 🧠 Separation of Concerns
+
+| Layer      | Responsibility   |
+| ---------- | ---------------- |
+| app        | Routing only     |
+| modules    | Page composition |
+| components | Reusable UI      |
+| data       | Content          |
+| types      | Contracts        |
+
+---
+
+# 📚 Content Sourcing Guidelines
+
+* Always refer:
+
+  * https://jct.ac.in
+  * https://jct.ac.in/engineering
+  * https://jct.ac.in/cas
+  * https://jct.ac.in/polytechnic
+
+### Rules:
+
+* This is a **redesign, not rewrite**
+* Extract:
+
+  * Programs
+  * Departments
+  * Admissions
+  * Facilities
+  * Placements
+  * Contact info
+
+### ❌ Avoid:
+
+* Fake content
+* Random placeholders (unless necessary)
+
+### ✅ Improve:
+
+* Grammar
+* Structure
+* SEO hierarchy
+
+---
+
+# ⚙️ Coding Conventions
+
+* Use **strict TypeScript**
+* Use `@/` imports
+* Prefer **Server Components**
+* Use `"use client"` only when needed
+
+### Reuse:
+
+* `cn()` utility
+* Existing UI components
+* Shared layouts
+
+---
+
+# 🎨 Styling & UX
+
+* Tailwind-first approach
+
+Maintain design system:
+
+* Dark blue + yellow theme
+* Serif headings
+* Clean spacing
+* Strong CTA focus
+
+### UX Rules:
+
+* Always guide user → **Apply Now**
+
+Maintain:
+
+* Sticky navbar
+* WhatsApp CTA
+* Admission funnel
+
+---
+
+# ⚡ Component Design Rules
+
+## 🧩 Section Components
+
+Each section must:
+
+* Be **self-contained**
+* Accept props
+* Avoid internal hardcoding
+
+```tsx
+type Props = {
+  title: string;
+  items: Program[];
+};
+```
+
+---
+
+## 🔁 Reusability Rule
+
+Before creating new component:
+
+1. Check `components/ui`
+2. Check `components/layout`
+3. Reuse → don’t duplicate
+
+---
+
+## 🧱 Composition Pattern
+
+```tsx
+export function EngineeringPage() {
+  return (
+    <>
+      <Hero />
+      <Programs />
+      <Departments />
+      <Placements />
+      <CTA />
+    </>
+  );
+}
+```
+
+---
+
+# 📱 Responsive Rules
+
+* Mobile-first
+* Stack sections
+* Full-width buttons
+* Sticky bottom CTA
+
+---
+
+# 🔐 Accessibility
+
+* Contrast ≥ 4.5:1
+* Focus states
+* Button height ≥ 44px
+
+---
+
+# 🚀 Performance
+
+* Use WebP images
+* Lazy load sections
+* Avoid heavy animations
+
+---
+
+# 🧪 Workflow
+
+* Package manager: `pnpm`
+
+### Commands:
+
+* `pnpm dev`
+* `pnpm build`
+* `pnpm lint`
+* `pnpm format`
+
+---
+
+# 💡 Final Development Philosophy
+
+### ✅ Build like:
+
+* Scalable SaaS frontend
+* Modular design system
+* High-performance landing page
+
+### ❌ Avoid:
+
+* Single-file pages
+* Hardcoded content
+* Repeated UI blocks
+
+---
+
+# 🎯 Final Goal
+
+The system should be:
+
+* Modular
+* Maintainable
+* Scalable
+* SEO-optimized
+* Conversion-focused

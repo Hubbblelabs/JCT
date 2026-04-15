@@ -81,27 +81,8 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
       ],
     },
     { name: "Admissions", href: "/admissions" },
-    { name: "Placements", href: "/#placements", className: "hidden 2xl:block" },
-    {
-      name: "Testimonials",
-      href: "/#testimonials",
-      className: "hidden 2xl:block",
-    },
-    { name: "Life@JCT", href: "/#happenings", className: "hidden 2xl:block" },
-    {
-      name: "Explore More",
-      href: "#",
-      className: "xl:block 2xl:hidden",
-      children: [
-        { name: "Placements", href: "/#placements", className: "2xl:hidden" },
-        {
-          name: "Testimonials",
-          href: "/#testimonials",
-          className: "2xl:hidden",
-        },
-        { name: "Life@JCT", href: "/#happenings", className: "2xl:hidden" },
-      ],
-    },
+    { name: "Placements", href: "/placements" },
+    { name: "Campus Life", href: "/campus-life" },
   ];
 
   return (
