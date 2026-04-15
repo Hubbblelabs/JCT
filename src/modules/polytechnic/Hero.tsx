@@ -55,9 +55,9 @@ export function Hero() {
         </AnimatePresence>
 
         {/* Deep green & black gradient overlay for contrast */}
-        <div className="from-polytechnic-dark/95 via-polytechnic-dark/70 to-transparent absolute inset-0 bg-linear-to-r" />
+        <div className="from-polytechnic-dark/95 via-polytechnic-dark/70 absolute inset-0 bg-linear-to-r to-transparent" />
         <div className="absolute inset-0 bg-black/40 mix-blend-multiply" />
-        
+
         {/* Subtle grid pattern overlay */}
         <div
           className="pointer-events-none absolute inset-0 z-0 opacity-15"
@@ -68,7 +68,7 @@ export function Hero() {
         />
       </div>
 
-      <div className="relative z-10 container mx-auto flex flex-col justify-center px-4 md:px-6 lg:px-8 mt-20">
+      <div className="relative z-10 container mx-auto mt-20 flex flex-col justify-center px-4 md:px-6 lg:px-8">
         {/* ─── Content ─── */}
         <div className="max-w-3xl">
           <motion.div {...fadeUp(0)}>
@@ -81,7 +81,8 @@ export function Hero() {
             {...fadeUp(0.1)}
             className="mb-6 font-serif text-5xl leading-[1.05] font-bold text-white md:text-6xl lg:text-7xl"
           >
-            Real World Skills.<br />
+            Real World Skills.
+            <br />
             <span className="font-normal text-white/70 italic">
               Future Ready Careers.
             </span>
@@ -91,9 +92,9 @@ export function Hero() {
             {...fadeUp(0.2)}
             className="mb-10 max-w-xl text-base leading-relaxed text-white/80 md:text-lg"
           >
-            At JCT Polytechnic, we focus on hands-on training and workshops. 
-            Graduate with the exact technical skills that top manufacturing, 
-            IT, and engineering firms are actively hiring for today.
+            At JCT Polytechnic, we focus on hands-on training and workshops.
+            Graduate with the exact technical skills that top manufacturing, IT,
+            and engineering firms are actively hiring for today.
           </motion.p>
 
           <motion.div
@@ -102,7 +103,7 @@ export function Hero() {
           >
             <Button
               size="lg"
-              className="bg-polytechnic-light hover:bg-white hover:text-polytechnic-dark h-14 rounded-full px-8 text-sm font-bold text-white shadow-xl transition-all hover:scale-105 active:scale-95 sm:w-auto"
+              className="bg-polytechnic-light hover:text-polytechnic-dark h-14 rounded-full px-8 text-sm font-bold text-white shadow-xl transition-all hover:scale-105 hover:bg-white active:scale-95 sm:w-auto"
             >
               Explore Programs <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
@@ -120,13 +121,15 @@ export function Hero() {
       </div>
 
       {/* ─── Carousel Indicators ─── */}
-      <div className="absolute bottom-10 left-0 right-0 z-20 flex justify-center gap-3">
+      <div className="absolute right-0 bottom-10 left-0 z-20 flex justify-center gap-3">
         {CAROUSEL_IMAGES.map((_, idx) => (
           <button
             key={idx}
             onClick={() => setCurrentIdx(idx)}
             className={`h-1.5 rounded-full transition-all duration-300 ${
-              idx === currentIdx ? "w-8 bg-white" : "w-2 bg-white/40 hover:bg-white/60"
+              idx === currentIdx
+                ? "w-8 bg-white"
+                : "w-2 bg-white/40 hover:bg-white/60"
             }`}
             aria-label={`Go to slide ${idx + 1}`}
           />

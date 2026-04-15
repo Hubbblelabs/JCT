@@ -131,26 +131,22 @@ const facilities = [
   {
     title: "Mechanical Workshop",
     desc: "Lathes, milling machines, welding stations, and a dedicated fitting shop where students learn by building actual components.",
-    image:
-      "/site_assests/mech-img.jpg.jpeg",
+    image: "/site_assests/mech-img.jpg.jpeg",
   },
   {
     title: "Electrical Lab",
     desc: "Transformers, motor test benches, and PLC trainers. Students wire real circuits and troubleshoot faults as part of their coursework.",
-    image:
-      "/site_assests/eee-img.jpg.jpeg",
+    image: "/site_assests/eee-img.jpg.jpeg",
   },
   {
     title: "Computer Lab",
     desc: "Networked workstations with CAD software, programming environments, and simulation tools updated each academic year.",
-    image:
-      "/site_assests/computer-img1.jpg.jpeg",
+    image: "/site_assests/computer-img1.jpg.jpeg",
   },
   {
     title: "Library & Study Hall",
     desc: "Technical reference books, periodicals, past question papers, and a quiet reading area that stays open until evening.",
-    image:
-      "/site_assests/facility-bg.jpg.jpeg",
+    image: "/site_assests/facility-bg.jpg.jpeg",
   },
 ];
 
@@ -191,7 +187,7 @@ export default function PolytechnicPage() {
                 transition={{ duration: 0.6 }}
                 className="mb-4 md:mb-6"
               >
-                <span className="border-polytechnic-light/40 bg-polytechnic-light/20 text-polytechnic-muted inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs md:text-sm font-bold tracking-widest uppercase backdrop-blur-md">
+                <span className="border-polytechnic-light/40 bg-polytechnic-light/20 text-polytechnic-muted inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-xs font-bold tracking-widest uppercase backdrop-blur-md md:text-sm">
                   <Wrench size={14} />
                   Diploma Programs — AICTE Approved
                 </span>
@@ -201,7 +197,7 @@ export default function PolytechnicPage() {
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.1 }}
-                className="mb-6 font-serif text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight text-white"
+                className="mb-6 font-serif text-5xl leading-[1.1] font-bold tracking-tight text-white md:text-6xl lg:text-7xl"
               >
                 Learn a Trade. <br />
                 <span className="font-normal text-white/70 italic">
@@ -213,7 +209,7 @@ export default function PolytechnicPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.25 }}
-                className="mb-8 max-w-lg text-base md:text-lg leading-relaxed text-white/80"
+                className="mb-8 max-w-lg text-base leading-relaxed text-white/80 md:text-lg"
               >
                 JCT Polytechnic College offers three-year diploma programs where
                 students spend as much time in workshops as they do in
@@ -276,15 +272,13 @@ export default function PolytechnicPage() {
                   key={i}
                   className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-md transition-colors hover:bg-white/10"
                 >
-                  <span className="text-polytechnic-light mb-1 block font-sans text-3xl md:text-4xl font-bold">
+                  <span className="text-polytechnic-light mb-1 block font-sans text-3xl font-bold md:text-4xl">
                     {stat.value}
                   </span>
                   <h3 className="mb-1 text-xs font-bold tracking-wider text-white/90 uppercase">
                     {stat.label}
                   </h3>
-                  <p className="text-xs font-bold text-white/60">
-                    {stat.sub}
-                  </p>
+                  <p className="text-xs font-bold text-white/60">{stat.sub}</p>
                 </div>
               ))}
             </motion.div>
@@ -299,13 +293,13 @@ export default function PolytechnicPage() {
             <h2 className="text-polytechnic mb-4 text-sm font-bold tracking-[0.2em] uppercase">
               Programs Offered
             </h2>
-            <h3 className="text-navy mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight">
+            <h3 className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl">
               Six Streams.{" "}
               <span className="font-normal text-stone-300 italic">
                 Clear Outcomes.
               </span>
             </h3>
-            <p className="text-base md:text-lg leading-relaxed text-stone-600">
+            <p className="text-base leading-relaxed text-stone-600 md:text-lg">
               Each diploma program is structured around what you&apos;ll
               actually be able to do when you finish — not just what you&apos;ll
               know in theory.
@@ -333,7 +327,7 @@ export default function PolytechnicPage() {
                         <h3 className="text-navy font-serif text-xl font-bold">
                           {prog.name}
                         </h3>
-                        <span className="text-stone-500 text-sm">
+                        <span className="text-sm text-stone-500">
                           {prog.duration} — Full Time
                         </span>
                       </div>
@@ -348,7 +342,7 @@ export default function PolytechnicPage() {
                       {prog.outcomes.slice(0, 3).map((outcome) => (
                         <div
                           key={outcome}
-                          className="text-stone-600 flex items-center gap-2 text-sm md:text-base leading-relaxed"
+                          className="flex items-center gap-2 text-sm leading-relaxed text-stone-600 md:text-base"
                         >
                           <CheckCircle2
                             size={13}
@@ -389,13 +383,13 @@ export default function PolytechnicPage() {
                 <h2 className="text-polytechnic mb-4 text-sm font-bold tracking-[0.2em] uppercase">
                   Why JCT Polytechnic
                 </h2>
-                <h3 className="text-navy mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight">
+                <h3 className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl">
                   A Practical Start <br />
                   <span className="font-normal text-stone-500 italic">
                     to Working Life.
                   </span>
                 </h3>
-                <p className="mb-8 text-base md:text-lg leading-relaxed text-stone-600">
+                <p className="mb-8 text-base leading-relaxed text-stone-600 md:text-lg">
                   Not every good career begins with a four-year degree. Our
                   diploma programs offer focused, affordable, workshop-driven
                   training — and a clear path forward, whether you join the
@@ -432,7 +426,7 @@ export default function PolytechnicPage() {
                     <h3 className="text-navy mb-2 font-serif text-xl font-bold">
                       {item.title}
                     </h3>
-                    <p className="text-base md:text-lg leading-relaxed text-stone-600">
+                    <p className="text-base leading-relaxed text-stone-600 md:text-lg">
                       {item.desc}
                     </p>
                   </div>
@@ -450,7 +444,7 @@ export default function PolytechnicPage() {
             <h2 className="text-polytechnic mb-4 text-sm font-bold tracking-[0.2em] uppercase">
               Facilities
             </h2>
-            <h3 className="text-navy font-serif text-4xl md:text-5xl font-bold leading-tight mb-8">
+            <h3 className="text-navy mb-8 font-serif text-4xl leading-tight font-bold md:text-5xl">
               Where Training{" "}
               <span className="font-normal text-stone-300 italic">Happens</span>
             </h3>
@@ -513,9 +507,11 @@ export default function PolytechnicPage() {
               <h2 className="text-gold mb-4 text-sm font-bold tracking-[0.2em] uppercase">
                 After Your Diploma
               </h2>
-              <h3 className="text-white mb-8 font-serif text-4xl md:text-5xl font-bold leading-tight">
+              <h3 className="mb-8 font-serif text-4xl leading-tight font-bold text-white md:text-5xl">
                 Two Clear Roads{" "}
-                <span className="font-normal text-white/60 italic">Forward</span>
+                <span className="font-normal text-white/60 italic">
+                  Forward
+                </span>
               </h3>
             </motion.div>
 
@@ -531,7 +527,7 @@ export default function PolytechnicPage() {
                 <h3 className="mb-4 font-serif text-2xl font-bold text-white">
                   Start Working
                 </h3>
-                <p className="mb-6 text-base md:text-lg leading-relaxed text-white/80">
+                <p className="mb-6 text-base leading-relaxed text-white/80 md:text-lg">
                   Diploma holders are eligible for technical positions in
                   manufacturing, construction, IT support, government
                   departments, and more. Many of our graduates are placed
@@ -553,7 +549,7 @@ export default function PolytechnicPage() {
                 <h3 className="mb-4 font-serif text-2xl font-bold text-white">
                   Continue to B.E.
                 </h3>
-                <p className="mb-6 text-base md:text-lg leading-relaxed text-white/80">
+                <p className="mb-6 text-base leading-relaxed text-white/80 md:text-lg">
                   Through lateral entry, you can join the second year of
                   B.E./B.Tech programs at JCT College of Engineering and
                   Technology or any Anna University-affiliated college. Skip a
@@ -618,7 +614,7 @@ export default function PolytechnicPage() {
                         <h3 className="text-navy mb-1 font-serif text-xl font-bold">
                           {item.title}
                         </h3>
-                        <p className="text-base md:text-lg leading-relaxed text-stone-600">
+                        <p className="text-base leading-relaxed text-stone-600 md:text-lg">
                           {item.desc}
                         </p>
                       </div>

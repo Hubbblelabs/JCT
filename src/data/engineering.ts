@@ -54,7 +54,8 @@ export const ugCourses = [
     slug: "eee",
     icon: Zap,
     seats: 60,
-    highlight: "Power Systems, Drives, Control Systems, and Energy Applications",
+    highlight:
+      "Power Systems, Drives, Control Systems, and Energy Applications",
     nbaAccredited: true,
   },
   {
@@ -88,7 +89,8 @@ export const ugCourses = [
     slug: "ft",
     icon: Utensils,
     seats: 60,
-    highlight: "Food Processing, Safety, Quality Assurance, and Product Development",
+    highlight:
+      "Food Processing, Safety, Quality Assurance, and Product Development",
   },
   {
     name: "Petroleum Engineering",
@@ -96,7 +98,8 @@ export const ugCourses = [
     slug: "pe",
     icon: Droplets,
     seats: 60,
-    highlight: "Reservoir Studies, Drilling Technology, and Hydrocarbon Production",
+    highlight:
+      "Reservoir Studies, Drilling Technology, and Hydrocarbon Production",
   },
   {
     name: "Petrochemical Technology",
@@ -104,7 +107,8 @@ export const ugCourses = [
     slug: "pct",
     icon: FlaskConical,
     seats: 60,
-    highlight: "Petrochemical Processing, Industrial Chemistry, and Process Safety",
+    highlight:
+      "Petrochemical Processing, Industrial Chemistry, and Process Safety",
   },
 ];
 
@@ -114,7 +118,8 @@ export const pgCourses = [
     abbr: "M.E.",
     slug: "structural-engineering",
     icon: Building2,
-    highlight: "Advanced Structural Design, Analysis, and Earthquake Engineering",
+    highlight:
+      "Advanced Structural Design, Analysis, and Earthquake Engineering",
   },
   {
     name: "Power Electronics & Drives",
@@ -138,7 +143,8 @@ export const researchCourses = [
     abbr: "Ph.D.",
     slug: "eee-doctoral",
     icon: GraduationCap,
-    highlight: "Doctoral research in advanced Electrical and Electronics domains",
+    highlight:
+      "Doctoral research in advanced Electrical and Electronics domains",
   },
 ];
 

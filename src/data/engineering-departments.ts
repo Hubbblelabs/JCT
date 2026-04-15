@@ -195,8 +195,7 @@ function createEngineeringDepartment(config: {
     college: "engineering",
     bgColor: "#0F172A",
     accentColor: "#D4A024",
-    heroImage:
-      "/site_assests/engineering.jpeg",
+    heroImage: "/site_assests/engineering.jpeg",
     about: {
       paragraphs: [
         `${config.name} is offered under JCT College of Engineering and Technology, established by Shri Jagannath Educational Health and Charitable Trust in Coimbatore to serve students from rural and underserved communities.`,
@@ -326,7 +325,8 @@ function createEngineeringDepartment(config: {
       {
         name: "Entrepreneurship and Innovation Orientation",
         hours: "30 Hours",
-        provider: "Entrepreneurship Development Cell / Innovation and Incubation Centre",
+        provider:
+          "Entrepreneurship Development Cell / Innovation and Incubation Centre",
         description:
           "Hands-on support for startup awareness, ideation, innovation pathways, and industry interaction.",
       },
@@ -358,7 +358,8 @@ function createEngineeringDepartment(config: {
         designation: "Student Support Faculty",
         qualification: "Academic and Counseling Support",
         experience: "Student Progression Support",
-        specialization: "Career Counseling, Personal Counseling, Remedial Coaching",
+        specialization:
+          "Career Counseling, Personal Counseling, Remedial Coaching",
       },
     ],
     labs: [
@@ -407,14 +408,16 @@ function createEngineeringDepartment(config: {
           "Institution-level technical symposium series conducted across engineering departments.",
       },
       {
-        title: "International Conference on Recent Advances in Electrical Science and Technology",
+        title:
+          "International Conference on Recent Advances in Electrical Science and Technology",
         date: "2025-01-01",
         type: "Conference",
         description:
           "Conference and research presentation platform highlighted in the engineering news and events listing.",
       },
       {
-        title: "International Conference on Intelligent Cyber Physical Systems and Internet of Things",
+        title:
+          "International Conference on Intelligent Cyber Physical Systems and Internet of Things",
         date: "2024-01-01",
         type: "Conference",
         description:

@@ -43,7 +43,7 @@ export function EngineeringHero() {
               transition={{ duration: 0.5 }}
               className="mb-4 md:mb-6"
             >
-              <span className="border-engineering-light/30 bg-engineering/20 text-engineering-light inline-block rounded-full border px-4 py-1 text-xs md:text-sm font-bold tracking-[0.2em] uppercase backdrop-blur-md">
+              <span className="border-engineering-light/30 bg-engineering/20 text-engineering-light inline-block rounded-full border px-4 py-1 text-xs font-bold tracking-[0.2em] uppercase backdrop-blur-md md:text-sm">
                 JCT College of Engineering & Technology
               </span>
             </motion.div>
@@ -52,7 +52,7 @@ export function EngineeringHero() {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-6 font-serif text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] tracking-tight text-white"
+              className="mb-6 font-serif text-5xl leading-[1.1] font-bold tracking-tight text-white md:text-6xl lg:text-7xl"
             >
               Engineer the <br />
               Future <span className="text-engineering-light">.</span>
@@ -62,15 +62,15 @@ export function EngineeringHero() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="mb-8 max-w-lg text-base md:text-lg leading-relaxed text-white/80"
+              className="mb-8 max-w-lg text-base leading-relaxed text-white/80 md:text-lg"
             >
               An{" "}
               <span className="text-engineering-muted font-semibold">
                 autonomous
               </span>{" "}
               institution affiliated to Anna University. 11 UG and 4 PG
-              programs, industry-grade labs, and a placement record that
-              speaks for itself.
+              programs, industry-grade labs, and a placement record that speaks
+              for itself.
             </motion.p>
 
             <motion.div

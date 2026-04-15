@@ -188,48 +188,42 @@ export const testimonials = [
       "The education here prepared me for real challenges. I walked into my first job feeling confident and capable, all thanks to the rigorous curriculum and supportive faculty.",
     name: "Rajesh Kumar",
     role: "Engineering at TCS",
-      image:
-        "/site_assests/2.jpeg",
+    image: "/site_assests/2.jpeg",
   },
   {
     quote:
       "I came here uncertain about my direction. The diverse environment and the mentorship I received helped me discover my true passion and shape my career path.",
     name: "Priya Sharma",
     role: "Management at Accenture",
-      image:
-        "/site_assests/3.jpeg",
+    image: "/site_assests/3.jpeg",
   },
   {
     quote:
       "The faculty understood that we needed more than theory. The hands-on projects and industry connections gave me the exact experience I needed to stand out.",
     name: "Arjun Patel",
     role: "Computer Science at Google",
-      image:
-        "/site_assests/8.jpg.jpeg",
+    image: "/site_assests/8.jpg.jpeg",
   },
   {
     quote:
       "The placement cell gave us structured preparation from the second year itself. That consistency helped me clear rounds at a product company.",
     name: "Kirthika M.",
     role: "Associate Analyst at Zoho",
-      image:
-        "/site_assests/19.jpeg",
+    image: "/site_assests/19.jpeg",
   },
   {
     quote:
       "I joined with stage fear and left with confidence. Presentations, seminars, and project reviews made communication one of my strengths.",
     name: "Vignesh R.",
     role: "Business Operations at Accenture",
-      image:
-        "/site_assests/4564cb56ad6a43f1af8faa4f29ad9e51.jpg.jpeg",
+    image: "/site_assests/4564cb56ad6a43f1af8faa4f29ad9e51.jpg.jpeg",
   },
   {
     quote:
       "The faculty mentorship and practical assignments made a real difference. I could connect theory to real business and technology use-cases quickly.",
     name: "Revathi S.",
     role: "Data Associate at TCS",
-      image:
-        "/site_assests/WhatsApp-Image-2024-11-29-at-2.36.24-PM.jpeg",
+    image: "/site_assests/WhatsApp-Image-2024-11-29-at-2.36.24-PM.jpeg",
   },
 ];
 

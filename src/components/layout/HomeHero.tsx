@@ -132,8 +132,8 @@ export function HomeHero() {
           style={{ opacity: overlayOpacity }}
           className="absolute inset-0 bg-[#3f485a] mix-blend-multiply"
         />
-        <div className="from-[#2d3442]/75 via-[#3b4559]/30 absolute inset-0 bg-linear-to-r to-transparent" />
-        <div className="from-[#2e3545]/65 absolute inset-0 bg-linear-to-t via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-r from-[#2d3442]/75 via-[#3b4559]/30 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-[#2e3545]/65 via-transparent to-transparent" />
       </motion.div>
 
       {/* Content */}

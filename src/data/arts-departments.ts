@@ -62,8 +62,7 @@ function createArtsDepartment(config: {
     college: "arts-science",
     bgColor: "#800020",
     accentColor: "#D4A024",
-    heroImage:
-      "/site_assests/arts.jpeg",
+    heroImage: "/site_assests/arts.jpeg",
     about: {
       paragraphs: [
         `${config.name} offers a contemporary curriculum with a strong blend of academic depth, practical application, and career-oriented training.`,

@@ -67,8 +67,7 @@ function createPolyDepartment(config: {
     college: "polytechnic",
     bgColor: "#1A237E",
     accentColor: "#D4A024",
-    heroImage:
-      "/site_assests/polytechnic.jpeg",
+    heroImage: "/site_assests/polytechnic.jpeg",
     about: {
       paragraphs: [
         `${config.name} equips students with core technical skills and practical competencies required for industry-ready diploma professionals.`,
