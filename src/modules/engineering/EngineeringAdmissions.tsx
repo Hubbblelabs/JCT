@@ -13,14 +13,14 @@ export function EngineeringAdmissions() {
             <h2 className="text-engineering-light mb-4 text-sm font-bold tracking-[0.2em] uppercase">
               Admissions 2025-26
             </h2>
-            <h3 className="text-white mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight">
+            <h3 className="mb-6 font-serif text-4xl leading-tight font-bold text-white md:text-5xl">
               Your Engineering <br />
               Journey Starts <span className="text-accent">Here.</span>
             </h3>
-            <p className="mb-10 text-base md:text-lg leading-relaxed text-white/80">
+            <p className="mb-10 text-base leading-relaxed text-white/80 md:text-lg">
               Admissions for B.E. programs are through TNEA counseling (Tamil
-              Nadu Engineering Admissions). Management quota seats are
-              available for eligible candidates.
+              Nadu Engineering Admissions). Management quota seats are available
+              for eligible candidates.
             </p>
 
             <div className="mb-10 space-y-4">

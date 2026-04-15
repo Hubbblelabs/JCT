@@ -138,7 +138,8 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
           className="bg-engineering fixed top-0 right-0 left-0 z-60 px-4 py-2 text-center font-sans text-xs font-bold tracking-wide text-white"
         >
           🎓 Admissions Open 2026-27 | Counselling Code:{" "}
-          <span className="underline">{siteConfig.counsellingCode}</span> | Mobile:{" "}
+          <span className="underline">{siteConfig.counsellingCode}</span> |
+          Mobile:{" "}
           <a
             href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
             className="underline"

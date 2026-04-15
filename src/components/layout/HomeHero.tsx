@@ -10,22 +10,19 @@ import { Accreditations } from "@/components/layout/Accreditations";
 
 const BACKGROUND_MOTIONS = [
   {
-    initial: { opacity: 0, scale: 1.08, y: 10 },
-    animate: { opacity: 1, scale: 1, y: 0 },
-    exit: { opacity: 0, scale: 1.02, y: -8 },
-    transition: { duration: 0.7, ease: "easeOut" as const },
-  },
-  {
-    initial: { opacity: 0, x: 28, scale: 1.03 },
+    initial: { opacity: 0, x: -22, scale: 1.06 },
     animate: { opacity: 1, x: 0, scale: 1 },
-    exit: { opacity: 0, x: -18, scale: 1.01 },
-    transition: { duration: 0.8, ease: "easeInOut" as const },
+    exit: { opacity: 0, x: 14, scale: 1.02 },
   },
   {
-    initial: { opacity: 0, rotate: -1.5, scale: 1.06 },
-    animate: { opacity: 1, rotate: 0, scale: 1 },
-    exit: { opacity: 0, rotate: 1, scale: 1.02 },
-    transition: { duration: 0.78, ease: "easeOut" as const },
+    initial: { opacity: 0, y: 14, scale: 1.05 },
+    animate: { opacity: 1, y: 0, scale: 1 },
+    exit: { opacity: 0, y: -10, scale: 1.015 },
+  },
+  {
+    initial: { opacity: 0, x: 18, scale: 1.045 },
+    animate: { opacity: 1, x: 0, scale: 1 },
+    exit: { opacity: 0, x: -12, scale: 1.02 },
   },
 ] as const;
 
@@ -82,37 +79,62 @@ export function HomeHero() {
   return (
     <section className="relative flex min-h-[102svh] w-full flex-col justify-center overflow-hidden pt-18 pb-24 lg:pt-22 lg:pb-16">
       <div className="absolute inset-0">
-        <AnimatePresence mode="wait">
-          {(() => {
-            const backgroundMotion =
-              BACKGROUND_MOTIONS[
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={homeHeroContent.backgroundImages[currentBackgroundIndex]}
+            className="absolute inset-0"
+            initial={{
+              ...BACKGROUND_MOTIONS[
                 currentBackgroundIndex % BACKGROUND_MOTIONS.length
-              ];
-
-            return (
-              <motion.div
-                key={homeHeroContent.backgroundImages[currentBackgroundIndex]}
-                className="absolute inset-0"
-                initial={backgroundMotion.initial}
-                animate={backgroundMotion.animate}
-                exit={backgroundMotion.exit}
-                transition={backgroundMotion.transition}
-              >
-                <Image
-                  src={homeHeroContent.backgroundImages[currentBackgroundIndex]}
-                  alt="JCT campus"
-                  fill
-                  priority={currentBackgroundIndex === 0}
-                  className="object-cover"
-                  sizes="100vw"
-                />
-              </motion.div>
-            );
-          })()}
+              ].initial,
+              filter: "blur(10px)",
+            }}
+            animate={{
+              ...BACKGROUND_MOTIONS[
+                currentBackgroundIndex % BACKGROUND_MOTIONS.length
+              ].animate,
+              filter: "blur(0px)",
+            }}
+            exit={{
+              ...BACKGROUND_MOTIONS[
+                currentBackgroundIndex % BACKGROUND_MOTIONS.length
+              ].exit,
+              filter: "blur(5px)",
+            }}
+            transition={{
+              duration: 1.05,
+              ease: [0.22, 1, 0.36, 1],
+              opacity: { duration: 0.85, ease: "easeInOut" },
+            }}
+          >
+            <Image
+              src={homeHeroContent.backgroundImages[currentBackgroundIndex]}
+              alt="JCT campus"
+              fill
+              priority={currentBackgroundIndex === 0}
+              className="object-cover"
+              sizes="100vw"
+              quality={90}
+            />
+          </motion.div>
         </AnimatePresence>
       </div>
-      <div className="absolute inset-0 bg-[#081a34]/22" />
-      <div className="absolute inset-0 bg-linear-to-r from-[#081327]/48 via-[#081327]/22 to-[#081327]/8" />
+
+      {/* Radial Gradient Noise Overlay - Masks transition artifacts */}
+      <div
+        className="absolute inset-0 opacity-30 mix-blend-overlay"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle at 35% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%), radial-gradient(circle at 85% 20%, rgba(255, 255, 255, 0.05) 0%, transparent 60%)",
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* Primary overlay */}
+      <div className="absolute inset-0 bg-[#081a34]/20" />
+
+      {/* Gradient overlay with refined opacity */}
+      <div className="absolute inset-0 bg-linear-to-r from-[#081327]/50 via-[#081327]/24 to-[#081327]/10" />
 
       <div className="relative z-10 mx-auto grid w-full max-w-352 grid-cols-1 items-center gap-10 px-4 md:px-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:px-10 xl:gap-16">
         {/* Left Content */}

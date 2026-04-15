@@ -14,17 +14,17 @@ export function EngineeringResearch() {
             <h2 className="text-engineering mb-4 text-sm font-bold tracking-[0.2em] uppercase">
               Research & Innovation
             </h2>
-            <h3 className="text-navy mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight">
+            <h3 className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl">
               Where Theory <br />
               <span className="font-normal text-stone-300 italic">
                 Meets Application
               </span>
             </h3>
-            <p className="mb-8 text-base md:text-lg leading-relaxed text-stone-600">
+            <p className="mb-8 text-base leading-relaxed text-stone-600 md:text-lg">
               Our faculty actively publish in peer-reviewed journals and guide
               student projects that go beyond coursework. The Research &
-              Innovation Cell connects departments and facilitates
-              collaboration with industry partners.
+              Innovation Cell connects departments and facilitates collaboration
+              with industry partners.
             </p>
 
             <div className="mb-10 space-y-6">
@@ -39,7 +39,7 @@ export function EngineeringResearch() {
                     size={16}
                     className="text-accent mt-1 shrink-0"
                   />
-                  <p className="text-base md:text-lg leading-relaxed text-stone-600">
+                  <p className="text-base leading-relaxed text-stone-600 md:text-lg">
                     {item}
                   </p>
                 </div>

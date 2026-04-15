@@ -14,6 +14,15 @@ export type CollegeTestimonialItem = {
 
 const TESTIMONIAL_CATEGORIES = ["Alumini", "Student", "VIP"] as const;
 
+const CATEGORY_ROTATION_CONFIG: Record<
+  TestimonialCategory,
+  { intervalMs: number; initialDelayMs: number }
+> = {
+  Alumini: { intervalMs: 2700, initialDelayMs: 0 },
+  Student: { intervalMs: 3300, initialDelayMs: 600 },
+  VIP: { intervalMs: 3900, initialDelayMs: 1200 },
+};
+
 type TestimonialCategory = (typeof TESTIMONIAL_CATEGORIES)[number];
 
 function normalizeCategory(tag?: string): TestimonialCategory {
@@ -78,22 +87,43 @@ export function CollegeTestimonials({
   });
 
   useEffect(() => {
-    const timers = TESTIMONIAL_CATEGORIES.map((category) =>
-      setInterval(() => {
+    const timers = TESTIMONIAL_CATEGORIES.map((category) => {
+      const { intervalMs, initialDelayMs } = CATEGORY_ROTATION_CONFIG[category];
+      const lane = groupedItems[category];
+
+      if (lane.length <= 1) {
+        return -1;
+      }
+
+      const kickoffTimer = window.setTimeout(() => {
         setActiveIndices((prev) => {
           if (paused[category]) return prev;
-          const lane = groupedItems[category];
-          if (!lane.length) return prev;
           return {
             ...prev,
             [category]: (prev[category] + 1) % lane.length,
           };
         });
-      }, 2800),
-    );
+      }, initialDelayMs);
+
+      const intervalTimer = window.setInterval(() => {
+        setActiveIndices((prev) => {
+          if (paused[category]) return prev;
+          return {
+            ...prev,
+            [category]: (prev[category] + 1) % lane.length,
+          };
+        });
+      }, intervalMs);
+
+      return { kickoffTimer, intervalTimer };
+    });
 
     return () => {
-      timers.forEach((timer) => clearInterval(timer));
+      timers.forEach((timer) => {
+        if (timer === -1) return;
+        clearTimeout(timer.kickoffTimer);
+        clearInterval(timer.intervalTimer);
+      });
     };
   }, [groupedItems, paused]);
 
@@ -117,7 +147,7 @@ export function CollegeTestimonials({
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="font-serif text-4xl md:text-5xl font-bold leading-tight text-navy mb-6"
+              className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl"
             >
               {title === "Testimonials" ? "Stories of Transformation" : title}
             </motion.h2>
@@ -166,7 +196,7 @@ export function CollegeTestimonials({
                       <span className="mt-4 mb-6 block font-serif text-7xl leading-0 text-[#fcebba] opacity-80">
                         &ldquo;
                       </span>
-                      <p className="min-h-35 text-base md:text-lg leading-relaxed text-stone-600 italic">
+                      <p className="min-h-35 text-base leading-relaxed text-stone-600 italic md:text-lg">
                         &quot;{activeItem.quote}&quot;
                       </p>
                     </div>
@@ -182,7 +212,7 @@ export function CollegeTestimonials({
                         />
                       </div>
                       <div>
-                        <h3 className="text-lg font-bold font-serif text-navy">
+                        <h3 className="text-navy font-serif text-lg font-bold">
                           {activeItem.name}
                         </h3>
                         <p className="mt-0.5 text-xs font-bold tracking-widest text-stone-500 uppercase">

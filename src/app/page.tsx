@@ -1,12 +1,12 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { HomeHero } from "@/components/layout/HomeHero";
 import { TrustHighlightsRow } from "@/components/layout/TrustHighlightsRow";
-import { Institutions } from "@/components/layout/Institutions";
-import { NewsEvents } from "@/components/layout/NewsEvents";
 import { Placements } from "@/components/layout/Placements";
 import { Testimonials } from "@/components/layout/Testimonials";
 import { AdmissionsCTA } from "@/components/layout/AdmissionsCTA";
 import { Footer } from "@/components/layout/Footer";
+import { WhyJCT } from "@/components/layout/WhyJCT";
+import { CampusLife } from "@/components/layout/CampusLife";
 
 export default function HomePage() {
   return (
@@ -14,11 +14,10 @@ export default function HomePage() {
       <Navbar />
       <HomeHero />
       <TrustHighlightsRow />
-      {/* <WhyJCT /> */}
+      <WhyJCT />
       <Placements />
-      <NewsEvents />
+      <CampusLife />
       <Testimonials />
-      {/* <CampusLife /> */}
       <AdmissionsCTA />
       <Footer />
     </main>

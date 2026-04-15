@@ -1,18 +1,15 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { CSSProperties } from "react";
-import { Phone, Mail } from "lucide-react";
+import { Mail, MapPin, Phone } from "lucide-react";
 import {
   FaFacebookF,
   FaInstagram,
-  FaYoutube,
   FaLinkedinIn,
-  FaMapMarkerAlt,
-  FaPhone,
-  FaEnvelope,
+  FaYoutube,
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { siteConfig } from "@/data/site";
@@ -25,6 +22,12 @@ const socialLinks = [
   { Icon: FaYoutube, label: "YouTube", href: siteConfig.social.youtube },
 ];
 
+const legalLinks = [
+  { name: "Privacy Policy", href: "/mandatory-disclosure/privacy" },
+  { name: "Terms of Service", href: "/mandatory-disclosure/terms" },
+  { name: "Contact Support", href: "/contact" },
+];
+
 export function Footer() {
   const pathname = usePathname();
 
@@ -35,63 +38,57 @@ export function Footer() {
 
   const footerTheme = isHome
     ? {
-        bg: "#0a1628",
-        surface: "#101f36",
-        card: "#0f1f3a",
-        heading: "#f9fafb",
-        text: "#d2d8e2",
-        muted: "#9aa6ba",
+        bg: "#081322",
+        surface: "#0d1a2d",
+        heading: "#f8fafc",
+        text: "#d9e1ec",
+        muted: "#9aa8bb",
         accent: "#d4a024",
-        border: "rgba(212,160,36,0.25)",
+        border: "rgba(212,160,36,0.28)",
       }
     : isEngineering
       ? {
-          bg: "#0b1628",
-          surface: "#122038",
-          card: "#0f1f3a",
+          bg: "#081322",
+          surface: "#0e1b2f",
           heading: "#f8fafc",
-          text: "#d8e1ee",
-          muted: "#9fb0c8",
+          text: "#dbe4f0",
+          muted: "#a4b3c8",
           accent: "#d4a024",
-          border: "rgba(212,160,36,0.22)",
+          border: "rgba(212,160,36,0.28)",
         }
       : isArts
         ? {
-            bg: "#1b1f27",
-            surface: "#252a33",
-            card: "#232831",
+            bg: "#171b22",
+            surface: "#20252e",
             heading: "#fff7ed",
-            text: "#e5d7cb",
-            muted: "#c6b2a2",
+            text: "#eadbd0",
+            muted: "#c7b6aa",
             accent: "#f97316",
-            border: "rgba(249,115,22,0.25)",
+            border: "rgba(249,115,22,0.28)",
           }
         : isPolytechnic
           ? {
-              bg: "#3a3d47",
-              surface: "#2f333d",
-              card: "#333843",
+              bg: "#2d313a",
+              surface: "#343945",
               heading: "#f8fafc",
-              text: "#dde2ea",
-              muted: "#a7b0bf",
+              text: "#dde4ee",
+              muted: "#aeb8c7",
               accent: "#f4c430",
-              border: "rgba(244,196,48,0.26)",
+              border: "rgba(244,196,48,0.3)",
             }
           : {
-              bg: "#f4efe6",
-              surface: "#ebe4d8",
-              card: "#0f172a",
-              heading: "#1a1a1a",
-              text: "#4b5563",
-              muted: "#6b7280",
+              bg: "#101827",
+              surface: "#162033",
+              heading: "#f8fafc",
+              text: "#d8dee8",
+              muted: "#a1aabb",
               accent: "#d4a024",
-              border: "#e2d8c9",
+              border: "rgba(212,160,36,0.28)",
             };
 
   const footerVars = {
     "--footer-bg": footerTheme.bg,
     "--footer-surface": footerTheme.surface,
-    "--footer-card": footerTheme.card,
     "--footer-heading": footerTheme.heading,
     "--footer-text": footerTheme.text,
     "--footer-muted": footerTheme.muted,
@@ -99,159 +96,122 @@ export function Footer() {
     "--footer-border": footerTheme.border,
   } as CSSProperties;
 
+  const phoneHref = `tel:${siteConfig.contact.phone.replace(/\s/g, "")}`;
+
   return (
     <footer
       id="contact"
-      className="bg-(--footer-bg) font-sans"
+      className="bg-(--footer-bg) font-sans text-(--footer-text)"
       style={footerVars}
     >
-      <div className="container mx-auto px-4 py-6 md:px-8 lg:py-8">
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:gap-8 lg:divide-x-2 lg:divide-dotted lg:divide-(--footer-border)">
-          {/* Column 1: Brand & Helpline */}
-          <div className="flex h-full flex-col gap-5 lg:pr-4">
-            {/* Brand */}
-            <div className="flex items-center gap-3">
-              <div className="relative h-10 w-10 shrink-0 sm:h-12 sm:w-12">
+      <div className="container mx-auto px-4 py-8 md:px-8 lg:py-7">
+        <div className="grid gap-8 lg:grid-cols-[1.05fr_1fr_1fr] lg:gap-0 lg:divide-x lg:divide-dotted lg:divide-(--footer-border)">
+          <div className="flex flex-col gap-7 lg:pr-10">
+            <Link href="/" className="inline-flex items-center gap-3">
+              <span className="relative h-7 w-16 shrink-0">
                 <Image
                   src="/site_assests/footer-logo.svg"
                   alt="JCT"
                   fill
-                  sizes="(min-width: 640px) 48px, 40px"
-                  className="object-contain"
+                  sizes="64px"
+                  className="object-contain object-left"
                 />
-              </div>
-              <span className="font-serif text-xl font-bold text-(--footer-heading) sm:text-2xl">
+              </span>
+              <span className="font-serif text-2xl font-bold text-(--footer-heading) sm:text-3xl">
                 JCT Institutions
               </span>
-            </div>
+            </Link>
 
-            {/* Helpline Card Wrapper for Glow */}
-            <div className="relative flex min-h-55 w-full flex-1 flex-col">
-              {/* Soft external radial glow behind the card */}
-              <div className="pointer-events-none absolute inset-0 scale-105 rounded-full bg-(--footer-accent)/20 blur-[80px]" />
-
-              {/* Helpline Card */}
-              <div className="relative z-10 flex h-full w-full flex-1 flex-col justify-center overflow-hidden rounded-3xl bg-(--footer-card) p-6 text-center text-white shadow-2xl">
-                <div className="absolute top-0 right-0 -mt-10 -mr-10 h-32 w-32 rounded-full bg-(--footer-accent)/10 blur-3xl"></div>
-                <div className="absolute bottom-0 left-0 -mb-10 -ml-10 h-32 w-32 rounded-full bg-(--footer-accent)/10 blur-3xl"></div>
-
-                <div className="relative z-10 flex flex-col items-center">
-                  <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-(--footer-accent)/30 bg-(--footer-accent)/8 shadow-[0_0_20px_rgba(212,160,36,0.15)]">
-                    <Phone
-                      className="h-5 w-5 text-(--footer-accent)"
-                      strokeWidth={1.5}
-                    />
-                  </div>
-
-                  <h3 className="mb-1 font-sans text-sm font-semibold tracking-wide text-(--footer-accent)">
-                    Admissions Helpline
-                  </h3>
-
-                  <a
-                    href="tel:+919361488801"
-                    className="mb-3 font-sans text-2xl font-black tracking-tight text-white transition-colors hover:text-(--footer-accent) xl:text-3xl"
-                  >
-                    +91 93614 88801
-                  </a>
-
-                  <div className="my-1.5 h-px w-full max-w-50 bg-linear-to-r from-transparent via-white/20 to-transparent"></div>
-
-                  <a
-                    href="mailto:admissions@jct.ac.in"
-                    className="mt-3 flex items-center justify-center gap-2 font-sans text-xs font-medium text-white/80 transition-colors hover:text-white"
-                  >
-                    <Mail
-                      className="h-4 w-4 text-(--footer-accent)"
-                      strokeWidth={2}
-                    />
-                    admissions@jct.ac.in
-                  </a>
-                </div>
+            <div className="flex min-h-56 flex-col items-center justify-center rounded-lg bg-(--footer-surface) px-6 py-7 text-center shadow-[0_18px_42px_-28px_rgba(0,0,0,0.8)]">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-(--footer-accent)/35 text-(--footer-accent)">
+                <Phone className="h-5 w-5" strokeWidth={1.7} />
               </div>
+
+              <p className="text-sm font-bold tracking-wide text-(--footer-accent)">
+                Admissions Helpline
+              </p>
+              <a
+                href={phoneHref}
+                className="mt-2 text-3xl font-black tracking-tight text-white transition-colors hover:text-(--footer-accent) sm:text-4xl"
+              >
+                {siteConfig.contact.phone}
+              </a>
+
+              <a
+                href={`mailto:${siteConfig.contact.admissionsEmail}`}
+                className="mt-9 inline-flex items-center gap-2 text-sm font-semibold text-(--footer-text) transition-colors hover:text-(--footer-accent)"
+              >
+                <Mail className="h-4 w-4 text-(--footer-accent)" />
+                {siteConfig.contact.admissionsEmail}
+              </a>
             </div>
           </div>
 
-          {/* Column 2: Contact Us Details & Navigation */}
-          <div className="flex h-full flex-col gap-4 lg:px-6">
-            <div className="flex h-10 items-center">
-              <h3 className="mb-0 text-sm font-bold tracking-widest text-(--footer-heading) uppercase">
-                Contact Us
-              </h3>
-            </div>
+          <div className="lg:px-14">
+            <h2 className="text-sm font-extrabold tracking-wide text-(--footer-heading) uppercase">
+              Contact Us
+            </h2>
 
-            <ul className="space-y-4">
-              <li className="flex items-start gap-3 text-[14px] leading-relaxed text-(--footer-text)">
-                <div className="mt-1 flex text-(--footer-accent)">
-                  <FaMapMarkerAlt size={16} />
-                </div>
-                <span>
+            <div className="mt-7 space-y-5">
+              <div className="flex items-start gap-4 text-[15px] leading-7 text-(--footer-text)">
+                <MapPin className="mt-1 h-4 w-4 shrink-0 text-(--footer-accent)" />
+                <p>
                   {siteConfig.address.line1}
                   <br />
                   {siteConfig.address.line2}
                   <br />
                   {siteConfig.address.city} - {siteConfig.address.pincode},{" "}
                   {siteConfig.address.state}
-                </span>
-              </li>
-              <li>
-                <a
-                  href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-                  className="flex items-center gap-3 text-[14px] text-(--footer-text) transition-colors hover:text-(--footer-accent)"
-                >
-                  <div className="flex text-(--footer-accent)">
-                    <FaPhone size={14} />
-                  </div>
-                  {siteConfig.contact.phone}
-                </a>
-              </li>
-              <li>
-                <a
-                  href={`mailto:${siteConfig.contact.email}`}
-                  className="flex items-center gap-3 text-[14px] text-(--footer-text) transition-colors hover:text-(--footer-accent)"
-                >
-                  <div className="flex text-(--footer-accent)">
-                    <FaEnvelope size={14} />
-                  </div>
-                  {siteConfig.contact.email}
-                </a>
-              </li>
-            </ul>
+                </p>
+              </div>
 
-            {/* Social Links inside left contact area */}
-            <div className="mt-2">
-              <h3 className="mb-3 text-xs font-bold tracking-widest text-(--footer-heading) uppercase">
+              <a
+                href={phoneHref}
+                className="flex items-center gap-4 text-[15px] text-(--footer-text) transition-colors hover:text-(--footer-accent)"
+              >
+                <Phone className="h-4 w-4 text-(--footer-accent)" />
+                {siteConfig.contact.phone}
+              </a>
+
+              <a
+                href={`mailto:${siteConfig.contact.email}`}
+                className="flex items-center gap-4 text-[15px] text-(--footer-text) transition-colors hover:text-(--footer-accent)"
+              >
+                <Mail className="h-4 w-4 text-(--footer-accent)" />
+                {siteConfig.contact.email}
+              </a>
+            </div>
+
+            <div className="mt-7">
+              <h3 className="text-xs font-extrabold tracking-wide text-(--footer-heading) uppercase">
                 Connect With Us
               </h3>
-              <div className="flex flex-wrap gap-2">
+              <div className="mt-3 flex flex-wrap gap-3">
                 {socialLinks.map(({ Icon, label, href }) => (
                   <a
                     key={label}
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-(--footer-muted) shadow-[0_4px_10px_rgba(0,0,0,0.05)] transition-all duration-300 hover:-translate-y-1 hover:scale-110 hover:bg-(--footer-accent) hover:text-white hover:shadow-[0_8px_15px_rgba(212,160,36,0.3)]"
                     aria-label={label}
+                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-slate-500 transition-colors hover:bg-(--footer-accent) hover:text-(--footer-bg)"
                   >
-                    <Icon size={16} />
+                    <Icon size={15} />
                   </a>
                 ))}
               </div>
             </div>
           </div>
 
-          {/* Column 3: Map Column */}
-          <div className="flex h-full flex-col gap-4 lg:pl-6">
-            <div className="flex h-10 items-center">
-              <h3 className="mb-0 text-sm font-bold tracking-widest text-(--footer-heading) uppercase">
-                Location Map
-              </h3>
-            </div>
-            <div className="relative h-62.5 min-h-55 w-full overflow-hidden rounded-3xl shadow-[0_8px_30px_rgba(0,0,0,0.08)] lg:h-auto lg:flex-1">
-              {/* Subtle map glow */}
-              <div className="pointer-events-none absolute inset-0 z-10 bg-white/10 mix-blend-overlay"></div>
+          <div className="lg:pl-14">
+            <h2 className="text-sm font-extrabold tracking-wide text-(--footer-heading) uppercase">
+              Location Map
+            </h2>
+
+            <div className="mt-7 overflow-hidden rounded-lg bg-(--footer-surface) shadow-[0_18px_42px_-28px_rgba(0,0,0,0.8)]">
               <iframe
                 src={siteConfig.address.mapEmbedUrl}
-                className="absolute inset-0 h-full w-full transition-transform duration-700 hover:scale-105"
+                className="h-56 w-full"
                 style={{ border: 0 }}
                 allowFullScreen
                 loading="lazy"
@@ -262,32 +222,27 @@ export function Footer() {
           </div>
         </div>
       </div>
-      {/* Bottom bar */}
-      <div className="border-t border-(--footer-border) bg-(--footer-surface) px-4 pt-6 pb-32 md:px-8 md:pt-8 md:pb-30 lg:pb-10">
-        <div className="container mx-auto flex flex-col items-center justify-between gap-6 text-center text-[13px] text-(--footer-text) sm:flex-row lg:pr-80">
-          <p className="w-full font-medium sm:w-auto">
-            © {new Date().getFullYear()} JCT Institutions. All rights reserved.
+
+      <div className="border-t border-(--footer-border) bg-(--footer-surface) px-4 pt-4 pb-28 md:px-8 md:pb-24 lg:pb-24">
+        <div className="container mx-auto flex flex-col items-center justify-between gap-3 text-center text-sm text-(--footer-muted) lg:flex-row lg:text-left">
+          <p>
+            © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
           </p>
-          <div className="flex w-full flex-col flex-wrap items-center justify-center gap-3 font-medium sm:w-auto sm:flex-row sm:gap-6">
-            <Link
-              href="/mandatory-disclosure/privacy"
-              className="transition-colors hover:text-(--footer-accent)"
-            >
-              Privacy Policy
-            </Link>
-            <Link
-              href="/mandatory-disclosure/terms"
-              className="transition-colors hover:text-(--footer-accent)"
-            >
-              Terms of Service
-            </Link>
-            <Link
-              href="/contact"
-              className="transition-colors hover:text-(--footer-accent)"
-            >
-              Contact Support
-            </Link>
-          </div>
+
+          <nav
+            aria-label="Footer legal links"
+            className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2"
+          >
+            {legalLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className="transition-colors hover:text-(--footer-accent)"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>

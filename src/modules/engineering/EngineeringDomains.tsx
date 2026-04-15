@@ -40,14 +40,14 @@ export function EngineeringDomains() {
             <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
               Undergraduate Programs
             </h2>
-            <h3 className="text-navy font-serif text-4xl md:text-5xl font-bold leading-tight mb-6">
+            <h3 className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl">
               11 UG Courses,{" "}
               <span className="font-normal text-stone-300 italic">
                 One Standard.
               </span>
             </h3>
           </div>
-          <p className="text-stone-600 text-base md:text-lg leading-relaxed max-w-sm">
+          <p className="max-w-sm text-base leading-relaxed text-stone-600 md:text-lg">
             4-year B.E. / B.Tech programs approved by AICTE and affiliated to
             Anna University, Chennai. Each department has dedicated labs,
             workshops, and faculty with industry experience.
@@ -96,7 +96,7 @@ export function EngineeringDomains() {
                   </div>
                 </div>
                 <div>
-                  <p className="text-stone-600 text-base leading-relaxed">
+                  <p className="text-base leading-relaxed text-stone-600">
                     {dept.highlight}
                   </p>
                 </div>
@@ -105,7 +105,7 @@ export function EngineeringDomains() {
               <div className="border-border mt-6 flex items-center justify-between border-t pt-6">
                 <div className="flex items-center gap-2">
                   <Users size={14} className="text-stone-400" />
-                  <span className="text-stone-600 text-sm font-bold">
+                  <span className="text-sm font-bold text-stone-600">
                     {dept.seats} Seats
                   </span>
                   {dept.nbaAccredited && (
@@ -138,14 +138,14 @@ export function EngineeringDomains() {
             <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
               Postgraduate Programs
             </h2>
-            <h3 className="text-navy font-serif text-4xl md:text-5xl font-bold leading-tight mb-6">
+            <h3 className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl">
               3 M.E. Courses,{" "}
               <span className="font-normal text-stone-300 italic">
                 Advanced Learning.
               </span>
             </h3>
           </div>
-          <p className="text-stone-600 text-base md:text-lg leading-relaxed max-w-sm">
+          <p className="max-w-sm text-base leading-relaxed text-stone-600 md:text-lg">
             M.E. programs for advanced learning and specialized expertise in
             engineering.
           </p>
@@ -174,7 +174,7 @@ export function EngineeringDomains() {
                   <h3 className="text-navy mb-2 font-serif text-xl font-bold">
                     {course.name}
                   </h3>
-                  <p className="text-stone-600 text-base leading-relaxed">
+                  <p className="text-base leading-relaxed text-stone-600">
                     {course.highlight}
                   </p>
                 </div>
@@ -191,14 +191,14 @@ export function EngineeringDomains() {
             <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
               Research Programs
             </h2>
-            <h3 className="text-navy font-serif text-4xl md:text-5xl font-bold leading-tight mb-6">
+            <h3 className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl">
               Ph.D. Programs,{" "}
               <span className="font-normal text-stone-300 italic">
                 Leading Innovation.
               </span>
             </h3>
           </div>
-          <p className="text-stone-600 text-base md:text-lg leading-relaxed max-w-sm">
+          <p className="max-w-sm text-base leading-relaxed text-stone-600 md:text-lg">
             Doctoral programs for deep research, innovation, and specialized
             expertise.
           </p>
@@ -227,7 +227,7 @@ export function EngineeringDomains() {
                   <h3 className="text-navy mb-2 font-serif text-xl font-bold">
                     {course.name}
                   </h3>
-                  <p className="text-stone-600 text-base leading-relaxed">
+                  <p className="text-base leading-relaxed text-stone-600">
                     {course.highlight}
                   </p>
                 </div>

@@ -57,7 +57,7 @@ function CompanyCard({ company }: { company: { name: string; logo: string } }) {
           loading="lazy"
         />
       </div>
-      <span className="text-stone-500 mt-1 text-[10px] font-bold tracking-wider uppercase">
+      <span className="mt-1 text-[10px] font-bold tracking-wider text-stone-500 uppercase">
         {company.name}
       </span>
     </div>
@@ -85,10 +85,10 @@ export function Placements() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-navy mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight"
+            className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl"
           >
             Our Recruiters{" "}
-            <span className="text-stone-500 font-normal italic">
+            <span className="font-normal text-stone-500 italic">
               Trust Our Graduates
             </span>
           </motion.h2>
@@ -97,7 +97,7 @@ export function Placements() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-stone-600 mx-auto max-w-xl text-base md:text-lg leading-relaxed"
+            className="mx-auto max-w-xl text-base leading-relaxed text-stone-600 md:text-lg"
           >
             Leading organizations across IT, engineering, and consulting
             regularly recruit from JCT campuses.
@@ -127,7 +127,7 @@ export function Placements() {
                 className="text-gold mx-auto mb-2"
                 strokeWidth={1.5}
               />
-              <span className="text-navy mb-1 block font-sans text-3xl md:text-4xl font-bold">
+              <span className="text-navy mb-1 block font-sans text-3xl font-bold md:text-4xl">
                 {stat.value}
               </span>
               <span className="text-muted-foreground font-sans text-xs font-bold tracking-wider uppercase">

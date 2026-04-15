@@ -41,7 +41,7 @@ const pathways = [
 
 export function AdmissionsCTA() {
   return (
-    <section id="admissions" className="bg-surface py-10 md:py-16">
+    <section id="admissions" className="bg-surface pb-10 md:pb-16">
       <div className="container mx-auto px-4 md:px-6">
         <div className="mx-auto max-w-5xl">
           <div className="mb-6 text-center md:mb-10">

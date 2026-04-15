@@ -1,15 +1,15 @@
-import { EngineeringNavbar } from './EngineeringNavbar';
-import { Placements } from '@/components/layout/Placements';
-import { Footer } from '@/components/layout/Footer';
-import { CollegeTestimonials } from '@/components/layout/CollegeTestimonials';
+import { EngineeringNavbar } from "./EngineeringNavbar";
+import { Placements } from "@/components/layout/Placements";
+import { Footer } from "@/components/layout/Footer";
+import { CollegeTestimonials } from "@/components/layout/CollegeTestimonials";
 
-import { EngineeringHero } from './EngineeringHero';
-import { EngineeringAbout } from './EngineeringAbout';
-import { EngineeringDomains } from './EngineeringDomains';
-import { EngineeringMetrics } from './EngineeringMetrics';
-import { EngineeringResearch } from './EngineeringResearch';
-import { EngineeringAdmissions } from './EngineeringAdmissions';
-import { testimonials } from '@/data/engineering';
+import { EngineeringHero } from "./EngineeringHero";
+import { EngineeringAbout } from "./EngineeringAbout";
+import { EngineeringDomains } from "./EngineeringDomains";
+import { EngineeringMetrics } from "./EngineeringMetrics";
+import { EngineeringResearch } from "./EngineeringResearch";
+import { EngineeringAdmissions } from "./EngineeringAdmissions";
+import { testimonials } from "@/data/engineering";
 
 export default function EngineeringPage() {
   return (

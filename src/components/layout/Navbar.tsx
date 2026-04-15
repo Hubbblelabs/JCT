@@ -194,31 +194,51 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                   {hasDropdown && (
                     <AnimatePresence>
                       {isExpanded && (
-                        <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: 10 }}
-                          transition={{ duration: 0.2 }}
-                          className="absolute top-full left-0 mt-2 w-64 rounded-xl border border-white/10 bg-[#0a1628]/95 p-2 shadow-xl backdrop-blur-md"
-                        >
-                          {link.children?.map((child: NavChild) => (
-                            <Link
-                              key={child.name}
-                              href={child.href}
-                              onClick={() => setDesktopExpanded(null)}
-                              className={`block rounded-lg px-4 py-3 font-sans transition-colors hover:bg-white/10 ${child.className || ""}`}
-                            >
-                              <div className="text-[15px] font-medium whitespace-nowrap text-white/90">
-                                {child.name}
-                              </div>
-                              {child.desc && (
-                                <div className="mt-0.5 text-[13px] whitespace-nowrap text-white/50">
-                                  {child.desc}
+                        <div className="absolute top-full left-0 z-50 pt-4">
+                          <motion.div
+                            initial={{ opacity: 0, y: 8, scale: 0.985 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 8, scale: 0.985 }}
+                            transition={{ duration: 0.22, ease: "easeOut" }}
+                            className={`w-64 rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
+                              isSolid
+                                ? "border-white/10 bg-[#0a1628]/96"
+                                : "border-white/20 bg-white/12"
+                            }`}
+                          >
+                            {link.children?.map((child: NavChild) => (
+                              <Link
+                                key={child.name}
+                                href={child.href}
+                                onClick={() => setDesktopExpanded(null)}
+                                className={`block rounded-lg px-4 py-3 font-sans transition-colors ${
+                                  isSolid
+                                    ? "hover:bg-white/10"
+                                    : "hover:bg-white/15"
+                                } ${child.className || ""}`}
+                              >
+                                <div
+                                  className={`text-[15px] font-medium whitespace-nowrap ${
+                                    isSolid ? "text-white/90" : "text-white"
+                                  }`}
+                                >
+                                  {child.name}
                                 </div>
-                              )}
-                            </Link>
-                          ))}
-                        </motion.div>
+                                {child.desc && (
+                                  <div
+                                    className={`mt-0.5 text-[13px] whitespace-nowrap ${
+                                      isSolid
+                                        ? "text-white/50"
+                                        : "text-white/75"
+                                    }`}
+                                  >
+                                    {child.desc}
+                                  </div>
+                                )}
+                              </Link>
+                            ))}
+                          </motion.div>
+                        </div>
                       )}
                     </AnimatePresence>
                   )}

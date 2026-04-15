@@ -11,7 +11,7 @@ export function EngineeringMetrics() {
           <h2 className="text-engineering-light mb-4 text-sm font-bold tracking-[0.2em] uppercase">
             By the Numbers
           </h2>
-          <h3 className="text-white mb-6 font-serif text-4xl md:text-5xl font-bold leading-tight">
+          <h3 className="mb-6 font-serif text-4xl leading-tight font-bold text-white md:text-5xl">
             Performance That{" "}
             <span className="font-normal text-white/40 italic">Speaks.</span>
           </h3>
@@ -27,10 +27,10 @@ export function EngineeringMetrics() {
               transition={{ duration: 0.3, delay: index * 0.06 }}
               className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center transition-colors hover:bg-white/10"
             >
-              <span className="text-engineering-light mb-1 block font-sans text-4xl md:text-5xl font-bold">
+              <span className="text-engineering-light mb-1 block font-sans text-4xl font-bold md:text-5xl">
                 {m.value}
               </span>
-              <span className="mb-1 block text-base md:text-lg font-bold text-white">
+              <span className="mb-1 block text-base font-bold text-white md:text-lg">
                 {m.label}
               </span>
               <span className="text-xs font-bold tracking-wider text-white/80 uppercase">
