@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useEffect, useRef, type MouseEvent } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { Menu, X, ChevronDown, ArrowRight, Phone } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { siteConfig } from "@/data/site";
@@ -44,12 +45,47 @@ const engineeringNavigation: EngineeringNavItem[] = [
       },
     ],
   },
-  { name: "About Us", href: "#about" },
-  { name: "Courses", href: "#courses" },
-  { name: "Placements", href: "#placements" },
-  { name: "CoE", href: "#research" },
-  { name: "Research", href: "#research" },
-  { name: "Life@JCT", href: "#life-jct" },
+  {
+    name: "Academics",
+    href: "/academics",
+    children: [
+      {
+        name: "Programs Offered",
+        href: "/academics/programs",
+        desc: "UG, PG and specialisation tracks",
+      },
+      {
+        name: "Departments",
+        href: "/academics/departments",
+        desc: "Schools and department ecosystem",
+      },
+      {
+        name: "Academic Calendar",
+        href: "/academics/calendar",
+        desc: "Important semester timelines",
+      },
+      {
+        name: "Regulations",
+        href: "/academics/regulations",
+        desc: "Academic rules and standards",
+      },
+    ],
+  },
+  { name: "Admissions", href: "/admissions" },
+  { name: "Placements", href: "/placements" },
+  { name: "Campus Life", href: "/campus-life" },
+  { name: "About", href: "/about" },
+  {
+    name: "More",
+    href: "#",
+    children: [
+      { name: "Examinations", href: "/examinations" },
+      { name: "Governance", href: "/governance" },
+      { name: "Quality", href: "/quality" },
+      { name: "Mandatory Disclosure", href: "/mandatory-disclosure" },
+      { name: "Contact", href: "/contact" },
+    ],
+  },
 ];
 
 type NavbarProps = {
@@ -57,49 +93,12 @@ type NavbarProps = {
 };
 
 export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
+  const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [desktopExpanded, setDesktopExpanded] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const [bannerVisible, setBannerVisible] = useState(true);
-  const bannerRef = useRef<HTMLDivElement>(null);
-  const [bannerHeight, setBannerHeight] = useState(32);
-
-  const isSamePageHashLink = (href: string) =>
-    href.startsWith("#") || href.startsWith("/institutions/engineering#");
-
-  const scrollToSection = (hash: string) => {
-    const target = document.querySelector(hash) as HTMLElement | null;
-    if (!target) return;
-
-    const nav = document.querySelector("nav") as HTMLElement | null;
-    const offset = (nav?.offsetHeight ?? 56) + 8;
-    const top = target.getBoundingClientRect().top + window.scrollY - offset;
-
-    window.scrollTo({ top, behavior: "smooth" });
-  };
-
-  const handleNavClick = (
-    e: MouseEvent<HTMLAnchorElement>,
-    href: string,
-    closeMobileMenu = false,
-  ) => {
-    if (closeMobileMenu) {
-      setIsOpen(false);
-      setMobileExpanded(null);
-    }
-
-    if (!isSamePageHashLink(href)) return;
-
-    const hash = href.includes("#") ? href.slice(href.indexOf("#")) : href;
-    if (!hash || hash === "#") {
-      e.preventDefault();
-      return;
-    }
-
-    e.preventDefault();
-    scrollToSection(hash);
-  };
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -107,12 +106,6 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  useEffect(() => {
-    if (bannerRef.current) {
-      setBannerHeight(bannerRef.current.offsetHeight);
-    }
-  }, [bannerVisible]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "unset";
@@ -127,196 +120,229 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
 
   const isSolid = scrolled || forceSolidOnTop;
 
-  const mobileNavItems = engineeringNavigation;
-
   return (
     <>
-      {/* Announcement Bar */}
       {bannerVisible && (
-        <div
-          ref={bannerRef}
-          className="bg-engineering fixed top-0 right-0 left-0 z-60 px-4 py-2 text-center font-sans text-xs font-bold tracking-wide text-white"
-        >
-          🎓 Admissions Open 2026-27 | Counselling Code:{" "}
-          <span className="underline">{siteConfig.counsellingCode}</span> |
-          Mobile:{" "}
-          <a
-            href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-            className="underline"
-          >
-            {siteConfig.contact.phone}
-          </a>
-          <button
-            onClick={() => setBannerVisible(false)}
-            className="absolute top-1/2 right-3 -translate-y-1/2 rounded p-0.5 opacity-70 transition-opacity hover:opacity-100"
-            aria-label="Dismiss announcement"
-          >
-            <X size={14} />
-          </button>
+        <div className="bg-gold fixed top-0 right-0 left-0 z-60 text-[#0B1628]">
+          <div className="relative flex w-full items-center justify-center px-10 py-2 text-center font-sans text-xs font-bold tracking-wide">
+            <span>
+              Admissions Open 2026-27 | Counselling Code:{" "}
+              {siteConfig.counsellingCode} -
+            </span>
+            <Link
+              href="/admissions/apply"
+              className="pl-1 font-extrabold underline underline-offset-2 hover:no-underline"
+            >
+              Apply Now
+            </Link>
+            <button
+              onClick={() => setBannerVisible(false)}
+              className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-0.5 opacity-70 transition-opacity hover:bg-[#0B1628]/10 hover:opacity-100"
+              aria-label="Dismiss announcement"
+            >
+              <X size={14} />
+            </button>
+          </div>
         </div>
       )}
-      <nav
-        style={{ top: bannerVisible ? bannerHeight : 0 }}
-        className={`fixed right-0 left-0 z-50 transition-all duration-300 ${
-          isSolid
-            ? "bg-[#0B1628]/95 py-2 shadow-lg shadow-black/20 backdrop-blur-xl"
-            : "bg-transparent py-4"
-        }`}
-      >
-        <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
-          <Link
-            href="/institutions/engineering"
-            className="flex shrink-0 items-center gap-3"
-          >
-            <div className="relative h-10 w-10 md:h-11 md:w-11">
-              <Image
-                src="/jct_logo_yellow.png"
-                alt="JCT"
-                fill
-                sizes="(min-width: 768px) 44px, 40px"
-                className="object-contain"
-                priority
-              />
-            </div>
-            <div className="flex flex-col text-white">
-              <span className="font-serif text-sm leading-none font-bold tracking-tight md:text-lg">
-                JCT
-              </span>
-              <span className="pt-0.5 font-sans text-[10px] font-medium tracking-widest whitespace-nowrap text-white/70 uppercase">
-                Engineering & Technology
-              </span>
-            </div>
-          </Link>
 
-          {/* Desktop Links */}
-          <div className="hidden items-center gap-1 lg:flex">
-            {engineeringNavigation.map((link) => (
-              <div
-                key={link.name}
-                className={`relative ${link.className || ""}`}
-                onMouseEnter={() =>
-                  link.children && setActiveDropdown(link.name)
-                }
-                onMouseLeave={() => setActiveDropdown(null)}
-              >
-                {link.children && link.href === "#" ? (
-                  <button
-                    type="button"
-                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium whitespace-nowrap text-white transition-colors hover:text-white/70"
-                  >
-                    {link.name}
-                    <ChevronDown
-                      size={12}
-                      className={`transition-transform duration-200 ${
-                        activeDropdown === link.name ? "rotate-180" : ""
+      <nav
+        className={`fixed right-0 left-0 z-50 px-4 transition-all duration-300 md:px-8 ${bannerVisible ? "top-11" : "top-4"}`}
+      >
+        <div
+          className={`mx-auto flex w-full max-w-360 items-center justify-between rounded-full border px-4 py-2.5 transition-all duration-300 lg:px-7 ${
+            isSolid
+              ? "border-white/10 bg-[#0B1628]/95 shadow-[0_8px_30px_rgba(0,0,0,0.4)] backdrop-blur-md"
+              : "border-white/0 bg-transparent"
+          }`}
+        >
+          <div className="z-50 flex shrink-0 items-center justify-start xl:flex-1">
+            <Link
+              href="/institutions/engineering"
+              className="flex shrink-0 items-center gap-2 lg:gap-3"
+            >
+              <div className="relative h-7 w-7 lg:h-10 lg:w-10">
+                <Image
+                  src="/jct_logo_yellow.png"
+                  alt="JCT Logo"
+                  fill
+                  sizes="(min-width: 1024px) 40px, 28px"
+                  className="object-contain"
+                  priority
+                />
+              </div>
+              <div className="flex flex-col text-white">
+                <span className="font-serif text-[18px] leading-none font-bold tracking-tight lg:text-[22px]">
+                  JCT
+                </span>
+                <span className="pt-0.5 font-sans text-[9px] font-semibold tracking-[0.18em] whitespace-nowrap text-white/70 uppercase lg:text-[11px]">
+                  Engineering &amp; Technology
+                </span>
+              </div>
+            </Link>
+          </div>
+
+          <div className="hidden items-center justify-center whitespace-nowrap xl:flex">
+            {engineeringNavigation.map((link) => {
+              const hasDropdown = !!link.children;
+              const isExpanded = desktopExpanded === link.name;
+              const isActive =
+                link.href !== "#" &&
+                (link.href === "/institutions/engineering"
+                  ? pathname === "/institutions/engineering"
+                  : pathname.startsWith(link.href));
+
+              return (
+                <div
+                  key={link.name}
+                  className="relative"
+                  onMouseEnter={() =>
+                    hasDropdown && setDesktopExpanded(link.name)
+                  }
+                  onMouseLeave={() => hasDropdown && setDesktopExpanded(null)}
+                >
+                  {hasDropdown ? (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setDesktopExpanded(isExpanded ? null : link.name)
+                      }
+                      className={`relative flex items-center justify-center gap-1.5 px-3 py-2 font-sans text-sm font-medium transition-colors xl:px-5 xl:text-[15px] ${
+                        isExpanded
+                          ? "text-[#d4a024]"
+                          : "text-white/90 hover:text-white"
                       }`}
-                    />
-                  </button>
-                ) : (
-                  <Link
-                    href={link.href}
-                    onClick={(e) => handleNavClick(e, link.href)}
-                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium whitespace-nowrap text-white transition-colors hover:text-white/70"
-                  >
-                    {link.name}
-                    {link.children && (
+                    >
+                      {link.name}
                       <ChevronDown
-                        size={12}
+                        size={14}
                         className={`transition-transform duration-200 ${
-                          activeDropdown === link.name ? "rotate-180" : ""
+                          isExpanded ? "rotate-180" : ""
                         }`}
                       />
-                    )}
-                  </Link>
-                )}
+                    </button>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      className={`relative flex items-center justify-center px-3 py-2 font-sans text-sm font-medium transition-colors xl:px-5 xl:text-[15px] ${
+                        isActive
+                          ? "text-[#d4a024]"
+                          : "text-white/90 hover:text-white"
+                      }`}
+                    >
+                      {link.name}
+                      {isActive && (
+                        <span className="absolute right-3 bottom-1 left-3 h-0.5 bg-[#d4a024] xl:right-5 xl:left-5" />
+                      )}
+                    </Link>
+                  )}
 
-                {link.children && (
-                  <AnimatePresence>
-                    {activeDropdown === link.name && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 4 }}
-                        transition={{ duration: 0.15, ease: "easeOut" }}
-                        className="absolute top-full left-0 w-64 pt-3"
-                      >
-                        <div className="overflow-hidden rounded-xl border border-white/10 bg-[#0B1628]/95 p-2 shadow-2xl shadow-black/30 backdrop-blur-2xl">
-                          <div className="space-y-0.5">
-                            {link.children.map((child) => (
+                  {hasDropdown && (
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <div className="absolute top-full left-0 z-50 pt-4">
+                          <motion.div
+                            initial={{ opacity: 0, y: 8, scale: 0.985 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 8, scale: 0.985 }}
+                            transition={{ duration: 0.22, ease: "easeOut" }}
+                            className={`w-70 rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
+                              isSolid
+                                ? "border-white/10 bg-[#0B1628]/96"
+                                : "border-white/20 bg-white/12"
+                            }`}
+                          >
+                            {link.children?.map((child) => (
                               <Link
                                 key={child.name}
                                 href={child.href}
-                                onClick={(e) => handleNavClick(e, child.href)}
-                                className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all hover:bg-white/6 ${child.className || ""}`}
+                                onClick={() => setDesktopExpanded(null)}
+                                className={`group block rounded-lg px-4 py-3 font-sans transition-colors ${
+                                  isSolid
+                                    ? "hover:bg-white/10"
+                                    : "hover:bg-white/15"
+                                } ${child.className || ""}`}
                               >
-                                <div>
-                                  <p className="font-sans text-[14px] font-medium text-white/90 transition-colors group-hover:text-amber-400">
-                                    {child.name}
-                                  </p>
-                                  {child.desc && (
-                                    <p className="mt-0.5 font-sans text-xs text-white/40">
-                                      {child.desc}
-                                    </p>
-                                  )}
+                                <div className="flex items-center justify-between gap-3">
+                                  <div>
+                                    <div
+                                      className={`text-[15px] font-medium whitespace-nowrap ${
+                                        isSolid ? "text-white/90" : "text-white"
+                                      }`}
+                                    >
+                                      {child.name}
+                                    </div>
+                                    {child.desc && (
+                                      <div
+                                        className={`mt-0.5 text-[13px] ${
+                                          isSolid
+                                            ? "text-white/50"
+                                            : "text-white/75"
+                                        }`}
+                                      >
+                                        {child.desc}
+                                      </div>
+                                    )}
+                                  </div>
+                                  <ArrowRight
+                                    size={14}
+                                    className="shrink-0 text-[#d4a024] opacity-0 transition-opacity group-hover:opacity-100"
+                                  />
                                 </div>
-                                <ArrowRight
-                                  size={12}
-                                  className="shrink-0 text-amber-400 opacity-0 transition-opacity group-hover:opacity-100"
-                                />
                               </Link>
                             ))}
-                          </div>
+                          </motion.div>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                )}
-              </div>
-            ))}
+                      )}
+                    </AnimatePresence>
+                  )}
+                </div>
+              );
+            })}
           </div>
 
-          {/* Desktop Right */}
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="z-50 hidden shrink-0 items-center justify-end gap-3 whitespace-nowrap xl:flex xl:flex-1 xl:gap-6">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="hidden items-center gap-1.5 font-sans text-sm whitespace-nowrap text-white/60 transition-colors hover:text-white xl:flex"
+              className="flex items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white xl:gap-2 xl:text-[15px]"
             >
-              <Phone size={16} /> {siteConfig.contact.phone}
+              <Phone size={16} className="h-3.5 w-3.5 xl:h-4 xl:w-4" />
+              {siteConfig.contact.phone}
             </a>
           </div>
 
-          {/* Mobile Toggle */}
           <button
-            className="p-2 text-white/70 transition-colors hover:text-white lg:hidden"
+            className="z-50 ml-auto p-2 text-white transition-colors hover:text-white/80 xl:hidden"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
-            {isOpen ? <X size={24} /> : <Menu size={24} />}
+            {isOpen ? (
+              <X size={32} strokeWidth={1.5} />
+            ) : (
+              <Menu size={32} strokeWidth={1.5} />
+            )}
           </button>
         </div>
       </nav>
-      {/* Mobile Drawer — matches arts-science / polytechnic style */}
+
       <AnimatePresence>
         {isOpen && (
           <>
-            {/* Backdrop */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-60 bg-black/40 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-60 bg-black/40 backdrop-blur-sm xl:hidden"
               onClick={() => setIsOpen(false)}
             />
 
-            {/* Drawer — floating rounded panel from right */}
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="fixed inset-y-4 right-4 z-61 flex w-70 flex-col rounded-3xl border border-white/10 bg-[#0B1628]/90 shadow-2xl backdrop-blur-xl lg:hidden"
+              className="fixed inset-y-4 right-4 z-61 flex w-72 flex-col rounded-3xl border border-white/10 bg-[#0B1628]/90 shadow-2xl backdrop-blur-xl xl:hidden"
             >
-              {/* Header */}
               <div className="flex items-center justify-between border-b border-white/5 p-5">
                 <div className="flex items-center gap-3">
                   <div className="relative h-9 w-9">
@@ -332,8 +358,8 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                     <span className="font-serif text-lg leading-none font-bold text-white">
                       JCT
                     </span>
-                    <span className="mt-0.5 text-[9px] font-medium tracking-widest text-white/50 uppercase">
-                      Engineering
+                    <span className="mt-0.5 text-[9px] font-medium tracking-[0.14em] text-white/50 uppercase">
+                      Engineering &amp; Technology
                     </span>
                   </div>
                 </div>
@@ -345,82 +371,74 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 </button>
               </div>
 
-              {/* Links */}
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
                 <div className="space-y-1">
-                  {mobileNavItems.map(
-                    (link: EngineeringNavItem, index: number) => (
-                      <div
-                        key={`${link.name}-${link.href}-${index}`}
-                        className="overflow-hidden"
-                      >
-                        {link.children ? (
-                          <div>
-                            <button
-                              type="button"
-                              onClick={() => toggleMobileSection(link.name)}
-                              className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${
-                                mobileExpanded === link.name
-                                  ? "bg-white/10 text-white shadow-sm"
-                                  : "text-white/70 hover:bg-white/5 hover:text-white"
-                              }`}
-                            >
-                              {link.name}
-                              <ChevronDown
-                                size={16}
-                                className={`transition-transform duration-300 ${
-                                  mobileExpanded === link.name
-                                    ? "rotate-180"
-                                    : ""
-                                }`}
-                              />
-                            </button>
-                            <AnimatePresence>
-                              {mobileExpanded === link.name && (
-                                <motion.div
-                                  initial={{ height: 0, opacity: 0 }}
-                                  animate={{ height: "auto", opacity: 1 }}
-                                  exit={{ height: 0, opacity: 0 }}
-                                  transition={{
-                                    duration: 0.25,
-                                    ease: "easeInOut",
-                                  }}
-                                  className="overflow-hidden"
-                                >
-                                  <div className="space-y-1 py-1 pr-2 pl-4">
-                                    {link.children.map((child) => (
-                                      <Link
-                                        key={child.name}
-                                        href={child.href}
-                                        onClick={(e) =>
-                                          handleNavClick(e, child.href, true)
-                                        }
-                                        className="block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-amber-400"
-                                      >
-                                        {child.name}
-                                      </Link>
-                                    ))}
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        ) : (
-                          <Link
-                            href={link.href}
-                            onClick={(e) => handleNavClick(e, link.href, true)}
-                            className="block rounded-xl px-4 py-3 font-sans text-[15px] font-medium text-white/70 transition-all hover:bg-white/5 hover:text-white"
+                  {engineeringNavigation.map((link) => (
+                    <div key={link.name} className="overflow-hidden">
+                      {link.children ? (
+                        <div>
+                          <button
+                            type="button"
+                            onClick={() => toggleMobileSection(link.name)}
+                            className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${
+                              mobileExpanded === link.name
+                                ? "bg-white/10 text-white shadow-sm"
+                                : "text-white/70 hover:bg-white/5 hover:text-white"
+                            }`}
                           >
                             {link.name}
-                          </Link>
-                        )}
-                      </div>
-                    ),
-                  )}
+                            <ChevronDown
+                              size={16}
+                              className={`transition-transform duration-300 ${
+                                mobileExpanded === link.name ? "rotate-180" : ""
+                              }`}
+                            />
+                          </button>
+                          <AnimatePresence>
+                            {mobileExpanded === link.name && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{
+                                  duration: 0.25,
+                                  ease: "easeInOut",
+                                }}
+                                className="overflow-hidden"
+                              >
+                                <div className="space-y-1 py-1 pr-2 pl-4">
+                                  {link.children.map((child) => (
+                                    <Link
+                                      key={child.name}
+                                      href={child.href}
+                                      onClick={() => {
+                                        setIsOpen(false);
+                                        setMobileExpanded(null);
+                                      }}
+                                      className="block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5 hover:text-amber-400"
+                                    >
+                                      {child.name}
+                                    </Link>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      ) : (
+                        <Link
+                          href={link.href}
+                          onClick={() => setIsOpen(false)}
+                          className="block rounded-xl px-4 py-3 font-sans text-[15px] font-medium text-white/70 transition-all hover:bg-white/5 hover:text-white"
+                        >
+                          {link.name}
+                        </Link>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Footer */}
               <div className="space-y-3 border-t border-white/5 p-5 pt-2">
                 <a
                   href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}

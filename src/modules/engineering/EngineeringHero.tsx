@@ -1,154 +1,153 @@
 "use client";
 
 import { useRef } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Button } from "@/components/ui/button";
-import { ArrowRight, Award, Sparkles } from "lucide-react";
-import { siteConfig } from "@/data/site";
+import { Code } from "lucide-react";
+import { Accreditations } from "@/components/layout/Accreditations";
 
 export function EngineeringHero() {
-  const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.6], [1, 1.08]);
+  const heroRef = useRef<HTMLElement | null>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 50]);
 
   return (
     <section
       id="hero"
       ref={heroRef}
-      className="bg-navy relative flex min-h-[90vh] items-center overflow-hidden md:min-h-screen"
+      className="relative flex min-h-screen items-center overflow-hidden bg-[#07111d] pt-20 lg:pt-0"
     >
+      {/* Immersive Dark Background */}
       <motion.div
-        style={{ opacity: heroOpacity, scale: heroScale }}
-        className="absolute inset-0 z-0"
+        style={{ y: backgroundY }}
+        className="pointer-events-none absolute inset-0"
       >
-        <Image
-          src="/site_assests/engineering.jpeg"
-          alt="Engineering campus"
-          fill
-          sizes="100vw"
-          className="object-cover opacity-65"
-          priority
-        />
-        <div className="from-navy/65 via-navy/45 to-navy/20 absolute inset-0 bg-linear-to-r" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#081426] via-[#0b1830] to-[#050b15]" />
+        <div className="absolute top-0 right-0 h-[50rem] w-[50rem] translate-x-1/3 -translate-y-1/2 rounded-full bg-[#d4a024]/5 blur-[120px]" />
+        <div className="absolute bottom-0 left-0 h-[40rem] w-[40rem] -translate-x-1/3 translate-y-1/3 rounded-full bg-[#1d4ed8]/5 blur-[120px]" />
       </motion.div>
 
-      <div className="relative z-10 container mx-auto px-4 pt-32 pb-16 md:px-6 md:pt-40 lg:pt-44">
-        <div className="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          <div className="max-w-2xl">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="mb-4 md:mb-6"
-            >
-              <span className="border-engineering-light/30 bg-engineering/20 text-engineering-light inline-block rounded-full border px-4 py-1 text-xs font-bold tracking-[0.2em] uppercase backdrop-blur-md md:text-sm">
-                JCT College of Engineering & Technology
-              </span>
-            </motion.div>
-
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col px-4 py-12 md:px-6 lg:py-0">
+        <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-8 xl:gap-16">
+          {/* Left Text Content */}
+          <div className="flex flex-col items-start justify-center">
             <motion.h1
-              initial={{ opacity: 0, y: 30 }}
+              initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-6 font-serif text-5xl leading-[1.1] font-bold tracking-tight text-white md:text-6xl lg:text-7xl"
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              className="relative max-w-[15ch] font-serif text-5xl leading-[1.1] font-bold tracking-tight text-white md:text-6xl lg:text-[4.5rem] xl:text-[5.5rem]"
             >
-              Engineer the <br />
-              Future <span className="text-engineering-light">.</span>
+              Where Engineers Build the Future.
+              <motion.span
+                initial={{ opacity: 0, scale: 0.5, rotate: -20 }}
+                animate={{ opacity: 1, scale: 1, rotate: 10 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                className="absolute -top-4 right-10 hidden text-white/50 lg:right-0 lg:block xl:-right-8"
+              >
+                <Code size={42} strokeWidth={1.5} />
+              </motion.span>
             </motion.h1>
 
             <motion.p
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="mb-8 max-w-lg text-base leading-relaxed text-white/80 md:text-lg"
+              transition={{ duration: 0.65, delay: 0.1 }}
+              className="mt-8 max-w-md text-base leading-relaxed text-white/70 md:text-lg"
             >
-              An{" "}
-              <span className="text-engineering-muted font-semibold">
-                autonomous
-              </span>{" "}
-              institution affiliated to Anna University. 11 UG and 4 PG
-              programs, industry-grade labs, and a placement record that speaks
-              for itself.
+              Learn AI, coding, and core engineering through hands-on labs and
+              career-focused training.
             </motion.p>
 
             <motion.div
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.15 }}
-              className="mb-6 flex flex-wrap items-center gap-3"
+              transition={{ duration: 0.65, delay: 0.18 }}
+              className="mt-10 flex w-full flex-col gap-4 sm:w-auto sm:flex-row"
             >
-              <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-400/15 px-4 py-1.5 backdrop-blur-md">
-                <Award size={16} className="text-amber-400" />
-                <span className="text-xs font-extrabold tracking-wider text-amber-300 uppercase">
-                  Autonomous
-                </span>
-              </span>
-              <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 backdrop-blur-md">
-                <Sparkles size={14} className="text-engineering-muted" />
-                <span className="text-xs font-bold tracking-wider text-white/90">
-                  Counselling Code:{" "}
-                  <span className="text-engineering-muted font-extrabold">
-                    {siteConfig.counsellingCode}
-                  </span>{" "}
-                  | Mobile:{" "}
-                  <span className="text-engineering-muted font-extrabold">
-                    {siteConfig.contact.phone}
-                  </span>
-                </span>
-              </span>
+              <Link
+                href="/admissions/apply"
+                className="inline-flex h-14 items-center justify-center rounded-xl bg-[#c1ff00] px-8 text-sm font-bold tracking-wide text-[#081323] transition-all hover:bg-[#aee600] active:scale-[0.98]"
+                style={{ backgroundColor: "#d4a024", color: "#081323" }} // Adjusted to current theme but modeled after reference
+              >
+                APPLY NOW
+              </Link>
+              <Link
+                href="#engineering-domains"
+                className="inline-flex h-14 items-center justify-center rounded-xl border border-white/20 bg-transparent px-8 text-sm font-bold tracking-wide text-white transition-all hover:bg-white/5 active:scale-[0.98]"
+              >
+                EXPLORE PROGRAMS
+              </Link>
             </motion.div>
 
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="flex flex-col gap-4 sm:flex-row"
+              transition={{ duration: 0.65, delay: 0.24 }}
+              className="mt-12 flex flex-col items-start gap-4 sm:flex-row sm:items-center"
             >
-              <Button
-                size="lg"
-                className="bg-engineering hover:bg-engineering-light shadow-engineering/20 h-12 w-full rounded-xl px-8 font-bold text-white shadow-xl transition-all hover:scale-105 active:scale-95 sm:w-auto md:h-14"
-              >
-                Apply Now <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-              <Button
-                variant="outline"
-                size="lg"
-                className="h-12 w-full rounded-xl border-white/20 bg-white/5 px-8 font-bold text-white backdrop-blur-sm hover:bg-white/10 hover:text-white sm:w-auto md:h-14"
-              >
-                View Placements
-              </Button>
+              <div className="flex -space-x-3">
+                {/* Simulated Avatars */}
+                <div
+                  className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#07111d] bg-[#1a2c47] bg-cover bg-center text-xs font-semibold text-white shadow-sm"
+                  style={{
+                    backgroundImage: "url('https://i.pravatar.cc/100?img=11')",
+                  }}
+                />
+                <div
+                  className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#07111d] bg-[#274060] bg-cover bg-center text-xs font-semibold text-white shadow-sm"
+                  style={{
+                    backgroundImage: "url('https://i.pravatar.cc/100?img=12')",
+                  }}
+                />
+                <div
+                  className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#07111d] bg-[#3a5a82] bg-cover bg-center text-xs font-semibold text-white shadow-sm"
+                  style={{
+                    backgroundImage: "url('https://i.pravatar.cc/100?img=33')",
+                  }}
+                />
+                <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#07111d] bg-black text-[10px] font-bold text-white shadow-sm">
+                  10K+
+                </div>
+              </div>
+              <p className="text-sm font-medium text-white/80">
+                10,000+ students already joined us
+              </p>
             </motion.div>
           </div>
 
+          {/* Right Image Content */}
           <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-8 grid grid-cols-2 gap-3 md:gap-4 lg:mt-0"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+              duration: 1,
+              delay: 0.2,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+            className="flex w-full justify-center lg:justify-end"
           >
-            {[
-              { val: "11", label: "UG Programs", accent: true },
-              { val: "3", label: "PG Programs", accent: false },
-              { val: "2769", label: "Counselling Code", accent: false },
-              { val: "92%", label: "Placement Rate", accent: true },
-            ].map((s) => (
-              <div
-                key={s.label}
-                className={`rounded-2xl border p-4 backdrop-blur-md md:p-6 ${s.accent ? "border-engineering-light/30 bg-engineering/20" : "border-white/10 bg-white/5"}`}
-              >
-                <span
-                  className={`mb-1 block font-sans text-2xl font-black md:mb-2 md:text-4xl ${s.accent ? "text-engineering-muted" : "text-white"}`}
-                >
-                  {s.val}
-                </span>
-                <span className="text-xs font-bold tracking-wider text-white/70 uppercase">
-                  {s.label}
-                </span>
-              </div>
-            ))}
+            <div className="relative aspect-[4/5] w-full max-w-[500px] overflow-hidden rounded-[2rem] lg:max-w-none">
+              <Image
+                src="/site_assests/computer-img1.jpg.jpeg"
+                alt="Engineering student at JCT"
+                fill
+                priority
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                className="object-cover object-center"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#07111d]/60 via-transparent to-transparent" />
+              <div className="absolute inset-0 bg-black/10 mix-blend-overlay" />
+            </div>
           </motion.div>
+        </div>
+        <div className="mt-12 pb-8 lg:mt-0 lg:pt-16">
+          <Accreditations variant="hero" />
         </div>
       </div>
     </section>
