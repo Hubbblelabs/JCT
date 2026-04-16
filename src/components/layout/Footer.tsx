@@ -110,7 +110,7 @@ export function Footer() {
             <Link href="/" className="inline-flex items-center gap-3">
               <span className="relative h-7 w-16 shrink-0">
                 <Image
-                  src="/site_assests/footer-logo.svg"
+                  src="/jct_logo.svg"
                   alt="JCT"
                   fill
                   sizes="64px"
