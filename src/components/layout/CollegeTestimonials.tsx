@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 
 export type CollegeTestimonialItem = {
@@ -157,9 +157,9 @@ export function CollegeTestimonials({
             {TESTIMONIAL_CATEGORIES.map((category, laneIndex) => {
               const laneItems = groupedItems[category];
               const activeIndex = activeIndices[category] % laneItems.length;
-              const activeItem = laneItems[activeIndex];
 
-              if (!activeItem) return null;
+              if (laneItems.length === 0) return null;
+              const activeItem = laneItems[activeIndex];
 
               return (
                 <motion.article
@@ -182,45 +182,52 @@ export function CollegeTestimonials({
                     }))
                   }
                 >
-                  <motion.div
-                    key={`${category}-${activeItem.name}-${activeIndex}`}
-                    initial={{ opacity: 0, scale: 0.98 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4, ease: "easeOut" }}
-                    className="flex flex-1 flex-col rounded-3xl border border-transparent bg-white p-8 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] transition-colors hover:border-gray-100 md:p-10"
-                  >
-                    <div className="relative flex-1">
-                      <span className="absolute -top-2 right-0 rounded-full bg-[#f4f5f7] px-3 py-1 text-[10px] font-bold tracking-widest text-[#a0842c] uppercase">
-                        {category}
-                      </span>
-                      <span className="mt-4 mb-6 block font-serif text-7xl leading-0 text-[#fcebba] opacity-80">
-                        &ldquo;
-                      </span>
-                      <p className="min-h-35 text-base leading-relaxed text-stone-600 italic md:text-lg">
-                        &quot;{activeItem.quote}&quot;
-                      </p>
-                    </div>
+                  <div className="grid w-full flex-1 overflow-hidden pb-4">
+                    <AnimatePresence initial={false}>
+                      <motion.div
+                        key={activeIndex}
+                        initial={{ x: "100%", opacity: 0 }}
+                        animate={{ x: 0, opacity: 1 }}
+                        exit={{ x: "-100%", opacity: 0 }}
+                        transition={{ type: "spring", stiffness: 250, damping: 25 }}
+                        className="col-start-1 row-start-1 flex w-full shrink-0 flex-col px-1"
+                      >
+                        <div className="flex h-full flex-col rounded-3xl border border-transparent bg-white p-8 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] transition-colors hover:border-gray-100 md:p-10">
+                          <div className="relative flex-1">
+                            <span className="absolute -top-2 right-0 rounded-full bg-[#f4f5f7] px-3 py-1 text-[10px] font-bold tracking-widest text-[#a0842c] uppercase">
+                              {category}
+                            </span>
+                            <span className="mt-4 mb-6 block font-serif text-7xl leading-0 text-[#fcebba] opacity-80">
+                              &ldquo;
+                            </span>
+                            <p className="min-h-35 text-base leading-relaxed text-stone-600 italic md:text-lg">
+                              &quot;{activeItem.quote}&quot;
+                            </p>
+                          </div>
 
-                    <div className="mt-4 flex items-center gap-4 border-t border-gray-100/80 pt-4">
-                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-gray-100">
-                        <Image
-                          src={activeItem.image}
-                          alt={activeItem.name}
-                          fill
-                          sizes="48px"
-                          className="object-cover"
-                        />
-                      </div>
-                      <div>
-                        <h3 className="text-navy font-serif text-lg font-bold">
-                          {activeItem.name}
-                        </h3>
-                        <p className="mt-0.5 text-xs font-bold tracking-widest text-stone-500 uppercase">
-                          {activeItem.role}
-                        </p>
-                      </div>
-                    </div>
-                  </motion.div>
+                          <div className="mt-4 flex items-center gap-4 border-t border-gray-100/80 pt-4">
+                            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-gray-100">
+                              <Image
+                                src={activeItem.image}
+                                alt={activeItem.name}
+                                fill
+                                sizes="48px"
+                                className="object-cover"
+                              />
+                            </div>
+                            <div>
+                              <h3 className="text-navy font-serif text-lg font-bold">
+                                {activeItem.name}
+                              </h3>
+                              <p className="mt-0.5 text-xs font-bold tracking-widest text-stone-500 uppercase">
+                                {activeItem.role}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
 
                   <div className="mt-8 flex items-center justify-center gap-2">
                     {laneItems.length > 1 &&
