@@ -61,7 +61,7 @@ function createArtsDepartment(config: {
     shortName: config.shortName,
     college: "arts-science",
     bgColor: "#800020",
-    accentColor: "#D4A024",
+    accentColor: "#FFC917",
     heroImage: "/site_assests/arts.jpeg",
     about: {
       paragraphs: [

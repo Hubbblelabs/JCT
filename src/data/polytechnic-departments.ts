@@ -66,7 +66,7 @@ function createPolyDepartment(config: {
     shortName: config.shortName,
     college: "polytechnic",
     bgColor: "#1A237E",
-    accentColor: "#D4A024",
+    accentColor: "#FFC917",
     heroImage: "/site_assests/polytechnic.jpeg",
     about: {
       paragraphs: [
