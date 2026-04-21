@@ -187,7 +187,7 @@ export const testimonials = [
     name: "Harish V.",
     role: "Software Engineer at Infosys",
     image: "/site_assests/2.jpeg",
-    tag: "Alumini",
+    tag: "Alumni",
   },
   {
     quote:
@@ -211,7 +211,7 @@ export const testimonials = [
     name: "Vikram N.",
     role: "Design Engineer at L&T",
     image: "/site_assests/19.jpeg",
-    tag: "Alumini",
+    tag: "Alumni",
   },
   {
     quote:

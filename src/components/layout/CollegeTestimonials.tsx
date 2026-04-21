@@ -12,13 +12,13 @@ export type CollegeTestimonialItem = {
   tag?: string;
 };
 
-const TESTIMONIAL_CATEGORIES = ["Alumini", "Student", "VIP"] as const;
+const TESTIMONIAL_CATEGORIES = ["Alumni", "Student", "VIP"] as const;
 
 const CATEGORY_ROTATION_CONFIG: Record<
   TestimonialCategory,
   { intervalMs: number; initialDelayMs: number }
 > = {
-  Alumini: { intervalMs: 2700, initialDelayMs: 0 },
+  Alumni: { intervalMs: 2700, initialDelayMs: 0 },
   Student: { intervalMs: 3300, initialDelayMs: 600 },
   VIP: { intervalMs: 3900, initialDelayMs: 1200 },
 };
@@ -26,11 +26,11 @@ const CATEGORY_ROTATION_CONFIG: Record<
 type TestimonialCategory = (typeof TESTIMONIAL_CATEGORIES)[number];
 
 function normalizeCategory(tag?: string): TestimonialCategory {
-  if (!tag) return "Alumini";
+  if (!tag) return "Alumni";
   const value = tag.toLowerCase();
   if (value === "student") return "Student";
   if (value === "vip") return "VIP";
-  return "Alumini";
+  return "Alumni";
 }
 
 type CollegeTestimonialsProps = {
@@ -52,7 +52,7 @@ export function CollegeTestimonials({
 }: CollegeTestimonialsProps) {
   const groupedItems = useMemo(() => {
     const groups: Record<TestimonialCategory, CollegeTestimonialItem[]> = {
-      Alumini: [],
+      Alumni: [],
       Student: [],
       VIP: [],
     };
@@ -76,12 +76,12 @@ export function CollegeTestimonials({
   const [activeIndices, setActiveIndices] = useState<
     Record<TestimonialCategory, number>
   >({
-    Alumini: 0,
+    Alumni: 0,
     Student: 0,
     VIP: 0,
   });
   const [paused, setPaused] = useState<Record<TestimonialCategory, boolean>>({
-    Alumini: false,
+    Alumni: false,
     Student: false,
     VIP: false,
   });
@@ -233,11 +233,10 @@ export function CollegeTestimonials({
                               [category]: dotIndex,
                             }))
                           }
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            dotIndex === activeIndex
+                          className={`h-2 rounded-full transition-all duration-300 ${dotIndex === activeIndex
                               ? "w-6 bg-[#3b475c]"
                               : "w-2 bg-[#d1d5db] hover:bg-[#9ca3af]"
-                          }`}
+                            }`}
                           aria-label={`Go to slide ${dotIndex + 1}`}
                         />
                       ))}

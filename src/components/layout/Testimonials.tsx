@@ -54,7 +54,7 @@ const testimonials = [
 ];
 
 export function Testimonials() {
-  const categories = ["Alumini", "Student", "VIP"] as const;
+  const categories = ["Alumni", "Student", "VIP"] as const;
 
   return (
     <CollegeTestimonials
