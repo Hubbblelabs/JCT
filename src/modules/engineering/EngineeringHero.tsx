@@ -4,7 +4,6 @@ import { useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { Code } from "lucide-react";
 
 export function EngineeringHero() {
   const heroRef = useRef<HTMLElement | null>(null);
@@ -36,7 +35,7 @@ export function EngineeringHero() {
           className="object-cover object-center opacity-40"
         />
 
-        <div className="absolute inset-0 bg-gradient-to-b from-[#07111d]/90 via-[#07111d]/85 to-[#07111d]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#07111d]/80 via-[#07111d]/45 to-[#07111d]/0" />
         <div className="absolute top-0 right-0 h-[50rem] w-[50rem] translate-x-1/3 -translate-y-1/2 rounded-full bg-[#d4a024]/10 mix-blend-screen blur-[120px]" />
         <div className="absolute bottom-0 left-0 h-[40rem] w-[40rem] -translate-x-1/3 translate-y-1/3 rounded-full bg-[#1d4ed8]/10 mix-blend-screen blur-[120px]" />
       </motion.div>
