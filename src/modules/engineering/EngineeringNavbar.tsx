@@ -74,11 +74,11 @@ const engineeringNavigation: EngineeringNavItem[] = [
   { name: "Admissions", href: "/admissions" },
   { name: "Placements", href: "/placements" },
   { name: "Campus Life", href: "/campus-life" },
-  { name: "About", href: "/about" },
   {
     name: "More",
     href: "#",
     children: [
+      { name: "About", href: "/about" },
       { name: "Examinations", href: "/examinations" },
       { name: "Governance", href: "/governance" },
       { name: "Quality", href: "/quality" },
