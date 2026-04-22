@@ -87,12 +87,16 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [showPhoneCta, setShowPhoneCta] = useState(false);
   const [desktopExpanded, setDesktopExpanded] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const [bannerVisible, setBannerVisible] = useState(true);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+      setShowPhoneCta(window.scrollY > window.innerHeight * 0.8);
+    };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
@@ -120,12 +124,12 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
               Admissions Open 2026-27 | Counselling Code:{" "}
               {siteConfig.counsellingCode} -
             </span>
-            <Link
-              href="/admissions/apply"
-              className="pl-1 font-extrabold underline underline-offset-2 hover:no-underline"
-            >
-              Apply Now
-            </Link>
+              <a
+                href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
+                className="pl-1 font-extrabold underline underline-offset-2 hover:no-underline"
+              >
+                {siteConfig.contact.phone}
+              </a>
             <button
               onClick={() => setBannerVisible(false)}
               className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-0.5 opacity-70 transition-opacity hover:bg-[#0B1628]/10 hover:opacity-100"
@@ -295,23 +299,42 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
           </div>
 
           <div className="z-50 hidden shrink-0 items-center justify-end gap-3 whitespace-nowrap xl:flex xl:flex-1 xl:gap-6">
-            <a
-              href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="flex items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white xl:gap-2 xl:text-[15px]"
-            >
-              <Phone size={16} className="h-3.5 w-3.5 xl:h-4 xl:w-4" />
-              {siteConfig.contact.phone}
-            </a>
-            <Link
-              href="/admissions/apply"
-              className={`inline-flex h-9.5 items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10.5 xl:px-8 xl:text-[15px] ${
-                isSolid
-                  ? "bg-[#d4a024] font-semibold text-[#0B1628] shadow-lg shadow-black/20 hover:bg-[#e8b84a]"
-                  : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
-              }`}
-            >
-              Apply Now
-            </Link>
+            <AnimatePresence mode="wait" initial={false}>
+              {showPhoneCta ? (
+                <motion.a
+                  key="phone"
+                  href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
+                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                  className="flex items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white xl:gap-2 xl:text-[15px]"
+                >
+                  <Phone size={16} className="h-3.5 w-3.5 xl:h-4 xl:w-4" />
+                  {siteConfig.contact.phone}
+                </motion.a>
+              ) : (
+                <motion.div
+                  key="apply"
+                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                  className="inline-flex"
+                >
+                  <Link
+                    href="/admissions/apply"
+                    className={`inline-flex h-9.5 items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10.5 xl:px-8 xl:text-[15px] ${
+                      isSolid
+                        ? "bg-[#d4a024] font-semibold text-[#0B1628] shadow-lg shadow-black/20 hover:bg-[#e8b84a]"
+                        : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
+                    }`}
+                  >
+                    Apply Now
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           <button
@@ -443,12 +466,6 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
               </div>
 
               <div className="space-y-3 border-t border-white/5 p-5 pt-2">
-                <a
-                  href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-white/5 font-sans text-sm font-medium text-white transition-all hover:bg-white/10"
-                >
-                  <Phone size={16} /> {siteConfig.contact.phone}
-                </a>
                 <Link
                   href="/admissions/apply"
                   onClick={() => setIsOpen(false)}
