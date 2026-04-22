@@ -23,7 +23,7 @@ type EngineeringNavItem = {
 };
 
 const engineeringNavigation: EngineeringNavItem[] = [
-  { name: "Home", href: "/institutions/engineering" },
+  { name: "Home", href: "/institutions/engineering#top" },
   {
     name: "Institutions",
     href: "#",
@@ -46,36 +46,27 @@ const engineeringNavigation: EngineeringNavItem[] = [
     ],
   },
   {
-    name: "Academics",
-    href: "/academics",
-    children: [
-      {
-        name: "Programs Offered",
-        href: "/academics/programs",
-        desc: "UG, PG and specialisation tracks",
-      },
-      {
-        name: "Departments",
-        href: "/academics/departments",
-        desc: "Schools and department ecosystem",
-      },
-      {
-        name: "Academic Calendar",
-        href: "/academics/calendar",
-        desc: "Important semester timelines",
-      },
-      {
-        name: "Regulations",
-        href: "/academics/regulations",
-        desc: "Academic rules and standards",
-      },
-    ],
+    name: "About Us",
+    href: "/institutions/engineering#about",
   },
-  { name: "Admissions", href: "/admissions" },
-  { name: "Placements", href: "/placements" },
-  { name: "Campus Life", href: "/campus-life" },
   {
-    name: "More",
+    name: "Courses",
+    href: "/institutions/engineering#courses",
+  },
+  {
+    name: "Placements",
+    href: "/institutions/engineering#placements",
+  },
+  {
+    name: "COE",
+    href: "/examinations",
+  },
+  {
+    name: "Life @ JCT",
+    href: "/institutions/engineering#life-at-jct",
+  },
+  {
+    name: "Explore More",
     href: "#",
     children: [
       { name: "About", href: "/about" },
@@ -186,11 +177,13 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
             {engineeringNavigation.map((link) => {
               const hasDropdown = !!link.children;
               const isExpanded = desktopExpanded === link.name;
+              const linkPath = link.href.split("#")[0];
               const isActive =
-                link.href !== "#" &&
-                (link.href === "/institutions/engineering"
+                link.name === "Home"
                   ? pathname === "/institutions/engineering"
-                  : pathname.startsWith(link.href));
+                  : link.href !== "#" &&
+                    !link.href.includes("#") &&
+                    pathname.startsWith(linkPath);
 
               return (
                 <div
@@ -309,6 +302,16 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
               <Phone size={16} className="h-3.5 w-3.5 xl:h-4 xl:w-4" />
               {siteConfig.contact.phone}
             </a>
+            <Link
+              href="/admissions/apply"
+              className={`inline-flex h-9.5 items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10.5 xl:px-8 xl:text-[15px] ${
+                isSolid
+                  ? "bg-[#d4a024] font-semibold text-[#0B1628] shadow-lg shadow-black/20 hover:bg-[#e8b84a]"
+                  : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
+              }`}
+            >
+              Apply Now
+            </Link>
           </div>
 
           <button
@@ -446,6 +449,13 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 >
                   <Phone size={16} /> {siteConfig.contact.phone}
                 </a>
+                <Link
+                  href="/admissions/apply"
+                  onClick={() => setIsOpen(false)}
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#d4a024] font-sans text-sm font-bold text-[#0B1628] shadow-lg shadow-[#d4a024]/10 transition-all hover:bg-[#e8b84a] hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Apply Now <ArrowRight size={14} />
+                </Link>
               </div>
             </motion.div>
           </>

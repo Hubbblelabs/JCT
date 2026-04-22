@@ -13,7 +13,10 @@ import { testimonials } from "@/data/engineering";
 
 export default function EngineeringPage() {
   return (
-    <main className="bg-background text-foreground engineering-theme min-h-screen overflow-x-hidden">
+    <main
+      id="top"
+      className="bg-background text-foreground engineering-theme min-h-screen overflow-x-hidden"
+    >
       <EngineeringNavbar />
 
       <EngineeringHero />
@@ -24,7 +27,7 @@ export default function EngineeringPage() {
 
       <Placements />
 
-      <div id="life-jct">
+      <div id="life-at-jct">
         <CollegeTestimonials
           title="Testimonials"
           subtitle="Stories from engineering students, alumni, and hiring partners who have experienced JCT's outcome-focused learning."
