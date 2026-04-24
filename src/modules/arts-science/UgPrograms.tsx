@@ -188,9 +188,6 @@ export function UgPrograms() {
               Study what moves you forward
             </h3>
           </div>
-          <p className="max-w-sm text-base leading-relaxed text-stone-600 md:text-lg">
-            Choose from diverse academic pathways designed to prepare you for meaningful careers in your field of choice. Discover your potential in a vibrant learning environment.
-          </p>
         </div>
       </div>
 

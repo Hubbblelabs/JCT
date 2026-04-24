@@ -77,8 +77,7 @@ export function AdmissionsCTA() {
             </motion.p>
           </div>
 
-          <div className="snap-container scrollbar-hide -mx-4 mb-8 flex gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:mb-10 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0">
-            <div className="w-1 shrink-0 md:hidden"></div>
+          <div className="snap-container scrollbar-hide mb-8 flex gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:mb-10 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0">
             {pathways.map((item, i) => (
               <motion.div
                 key={item.title}
@@ -113,7 +112,6 @@ export function AdmissionsCTA() {
                 </div>
               </motion.div>
             ))}
-            <div className="w-1 shrink-0 md:hidden"></div>
           </div>
 
           <motion.div

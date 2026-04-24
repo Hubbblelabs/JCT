@@ -249,18 +249,18 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 href={child.href}
                                 onClick={(e) => handleNavClick(e, child.href)}
                                 className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all duration-300 ${
-                                  (scrolled || forceSolidOnTop) ? "hover:bg-white/6" : "hover:bg-white/15"
+                                  (scrolled || forceSolidOnTop) ? "hover:bg-white/8" : "hover:bg-white/12"
                                 } ${child.className || ""}`}
                               >
                                 <div>
-                                  <p className={`group-hover:text-polytechnic-light font-sans text-[15px] font-medium whitespace-nowrap transition-colors ${
-                                    (scrolled || forceSolidOnTop) ? "text-white/90" : "text-white"
+                                  <p className={`font-sans text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-white ${
+                                    (scrolled || forceSolidOnTop) ? "text-white/95" : "text-white"
                                   }`}>
                                     {child.name}
                                   </p>
                                   {child.desc && (
-                                    <p className={`mt-0.5 font-sans text-xs ${
-                                      (scrolled || forceSolidOnTop) ? "text-white/40" : "text-white/75"
+                                    <p className={`mt-0.5 font-sans text-xs transition-colors ${
+                                      (scrolled || forceSolidOnTop) ? "text-white/55 group-hover:text-white/75" : "text-white/78 group-hover:text-white"
                                     }`}>
                                       {child.desc}
                                     </p>
@@ -268,7 +268,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 </div>
                                 <ArrowRight
                                   size={12}
-                                  className="text-polytechnic-light shrink-0 opacity-0 transition-opacity group-hover:opacity-100"
+                                  className="shrink-0 text-white/70 opacity-0 transition-opacity group-hover:opacity-100"
                                 />
                               </Link>
                             ))}

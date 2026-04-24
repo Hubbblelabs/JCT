@@ -27,8 +27,8 @@ export default function RndCellPage() {
         { label: "R&D Cell" },
       ]}
     >
-      <div className="space-y-12">
-        <section>
+      <div className="space-y-10 md:space-y-12">
+        <section className="rounded-2xl border border-border/60 bg-white p-5 shadow-sm md:p-6">
           <h2 className="text-foreground font-serif text-2xl font-bold">
             About the R&D Cell
           </h2>
@@ -37,13 +37,16 @@ export default function RndCellPage() {
           </p>
         </section>
 
-        <section>
+        <section className="rounded-2xl border border-border/60 bg-white p-5 shadow-sm md:p-6">
           <h2 className="text-foreground font-serif text-2xl font-bold">
             Functions
           </h2>
-          <ul className="mt-4 space-y-3">
+          <ul className="mt-4 grid gap-3 sm:grid-cols-2">
             {functions.map((fn, index) => (
-              <li key={index} className="flex items-start gap-3">
+              <li
+                key={index}
+                className="flex items-start gap-3 rounded-xl bg-slate-50 p-4"
+              >
                 <span className="bg-gold/10 text-gold mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold">
                   {index + 1}
                 </span>

@@ -56,7 +56,7 @@ export function EngineeringResearch() {
           </div>
 
           {/* Right: facility cards */}
-          <div className="grid w-full grid-cols-1 gap-4 md:grid-cols-2">
+          <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-6 -mx-4 px-4 md:grid md:w-full md:grid-cols-2 md:overflow-visible md:pb-0 md:mx-0 md:px-0 scrollbar-hide">
             {facilities.map((fac, index) => (
               <motion.div
                 key={fac.title}
@@ -64,7 +64,7 @@ export function EngineeringResearch() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.08 }}
-                className="hover:border-accent/20 group rounded-2xl border border-stone-100 bg-white p-5 transition-all duration-300 hover:shadow-md"
+                className="w-[75vw] sm:w-[45vw] md:w-auto shrink-0 snap-center hover:border-accent/20 group rounded-2xl border border-stone-100 bg-white p-5 transition-all duration-300 hover:shadow-md"
               >
                 <div className="flex flex-col gap-3">
                   <div className="text-primary group-hover:bg-accent/10 group-hover:text-accent w-fit shrink-0 rounded-xl bg-stone-50 p-3 transition-colors">

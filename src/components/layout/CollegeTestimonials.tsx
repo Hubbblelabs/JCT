@@ -186,7 +186,7 @@ export function CollegeTestimonials({
 
           <div 
             ref={scrollContainerRef}
-            className="flex snap-x snap-mandatory overflow-x-auto pb-6 -mx-6 px-6 gap-6 md:grid md:grid-cols-3 md:pb-0 md:mx-0 md:px-0 md:overflow-visible scrollbar-hide"
+            className="flex items-start snap-x snap-mandatory overflow-x-auto pb-6 -mx-6 px-6 gap-6 md:grid md:grid-cols-3 md:items-stretch md:pb-0 md:mx-0 md:px-0 md:overflow-visible scrollbar-hide"
           >
             {TESTIMONIAL_CATEGORIES.map((category, laneIndex) => {
               const laneItems = groupedItems[category];
@@ -202,7 +202,7 @@ export function CollegeTestimonials({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.25 }}
                   transition={{ duration: 0.5, delay: laneIndex * 0.1 }}
-                  className="flex h-full flex-col min-w-[85vw] snap-center shrink-0 md:min-w-0"
+                  className="flex w-[85vw] max-w-[340px] snap-center shrink-0 flex-col self-start md:max-w-none md:w-auto md:min-w-0 md:self-stretch"
                   onMouseEnter={() =>
                     setPaused((prev) => ({
                       ...prev,
@@ -216,8 +216,8 @@ export function CollegeTestimonials({
                     }))
                   }
                 >
-                  <div className="flex flex-1 flex-col rounded-3xl border border-transparent bg-white p-8 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] transition-colors hover:border-gray-100 md:p-10">
-                    <div className="relative flex-1">
+                  <div className="flex h-full flex-col rounded-3xl border border-transparent bg-white p-8 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] transition-colors hover:border-gray-100 md:p-10">
+                    <div className="relative">
                       <span className="absolute -top-2 right-0 rounded-full bg-[#f4f5f7] px-3 py-1 text-[10px] font-bold tracking-widest text-[#a0842c] uppercase">
                         {category}
                       </span>
@@ -232,7 +232,7 @@ export function CollegeTestimonials({
                           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                           exit={{ opacity: 0, y: -12, filter: "blur(3px)" }}
                           transition={{ duration: 0.32, ease: "easeInOut" }}
-                          className="min-h-35"
+                          className="min-h-24 md:min-h-35"
                         >
                           <p className="text-base leading-relaxed text-stone-600 italic md:text-lg">
                             &quot;{activeItem.quote}&quot;
