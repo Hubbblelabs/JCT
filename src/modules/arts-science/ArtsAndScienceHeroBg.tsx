@@ -22,15 +22,15 @@ export function ArtsAndScienceHeroBg() {
   }, []);
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-[#0d1421]">
+    <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-[#081018]">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentIdx}
           className="absolute inset-0"
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 1.4, ease: "easeInOut" }}
+          initial={{ opacity: 0, scale: 1.12, y: 8 }}
+          animate={{ opacity: 1, scale: 1.04, y: 0 }}
+          exit={{ opacity: 0, scale: 1.02 }}
+          transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
         >
           <Image
             src={CAROUSEL_IMAGES[currentIdx]}
@@ -38,18 +38,16 @@ export function ArtsAndScienceHeroBg() {
             fill
             priority={currentIdx === 0}
             sizes="100vw"
-            className="object-cover object-center"
+            className="object-cover object-center brightness-[0.9] contrast-[1.18] saturate-[1.12]"
           />
         </motion.div>
       </AnimatePresence>
 
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_28%,rgba(255,255,255,0.22),transparent_32%),linear-gradient(90deg,rgba(10,16,28,0.86)_0%,rgba(10,16,28,0.55)_42%,rgba(10,16,28,0.35)_100%)]" />
-      <div className="absolute inset-0 bg-black/18 mix-blend-multiply" />
-      <div className="absolute top-0 right-0 h-[32rem] w-[32rem] translate-x-1/3 -translate-y-1/3 rounded-full bg-orange-400/15 blur-[110px]" />
-      <div className="absolute bottom-0 left-0 h-[28rem] w-[28rem] -translate-x-1/3 translate-y-1/3 rounded-full bg-white/10 blur-[120px]" />
+      <div className="absolute inset-0 bg-black/0" />
+      <div className="absolute inset-0 bg-linear-to-t from-black/0 via-transparent to-black/0" />
 
       <div
-        className="absolute inset-0 opacity-[0.12]"
+        className="absolute inset-0 opacity-[0.1]"
         style={{
           backgroundImage: "radial-gradient(rgba(255,255,255,0.85) 1px, transparent 1px)",
           backgroundSize: "26px 26px",

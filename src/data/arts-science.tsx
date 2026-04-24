@@ -29,6 +29,9 @@ export const ugPrograms = [
     name: "B.Sc Computer Science",
     slug: "bsc-computer-science",
     duration: "3 Years",
+    abbr: "B.Sc. CS",
+    image: "/site_assests/computer-img1.jpg.jpeg",
+    highlight: "Foundational technology for building a rich information society",
     icon: Atom,
     desc: "Bachelor of Computer Science (B.Sc. CS) is the foundational technology for building a rich and fulfilling information society.",
     longDesc: [
@@ -48,6 +51,9 @@ export const ugPrograms = [
     name: "B.Sc Artificial Intelligence and Machine Learning",
     slug: "bsc-ai-ml",
     duration: "3 Years",
+    abbr: "B.Sc. AI&ML",
+    image: "/site_assests/course-img1.webp",
+    highlight: "Skills to perform intelligent data analysis for real-world applications",
     icon: Lightbulb,
     desc: "Programme prepares students with the skills to perform intelligent data analysis which is a key component in numerous real-world applications.",
     longDesc: [
@@ -67,6 +73,9 @@ export const ugPrograms = [
     name: "BCA (Bachelor of Computer Applications)",
     slug: "bca",
     duration: "3 Years",
+    abbr: "BCA",
+    image: "/site_assests/course-img2.webp",
+    highlight: "Career in computers and its applications",
     icon: Calculator,
     desc: "A three-year undergraduate degree program for candidates wishing to start a career in computers and its applications.",
     longDesc: [
@@ -86,6 +95,9 @@ export const ugPrograms = [
     name: "B.Com Logistics and Supply Chain Management",
     slug: "bcom-logistics-supply-chain",
     duration: "3 Years",
+    abbr: "B.Com",
+    image: "/site_assests/banner2.jpeg",
+    highlight: "Commerce with conceptual and practical knowledge in logistics",
     icon: BarChart3,
     desc: "Undergraduate programme focusing on quality education in commerce with conceptual and practical knowledge.",
     longDesc: [
@@ -105,6 +117,9 @@ export const ugPrograms = [
     name: "BBA Logistics",
     slug: "bba-logistics",
     duration: "3 Years",
+    abbr: "BBA",
+    image: "/site_assests/banner.jpg.jpeg",
+    highlight: "Concepts and processes involved in logistics and shipping",
     icon: Briefcase,
     desc: "Three-year full-time degree program covering concepts and processes involved in logistics and shipping.",
     longDesc: [

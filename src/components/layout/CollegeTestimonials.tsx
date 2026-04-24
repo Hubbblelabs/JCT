@@ -18,7 +18,7 @@ const CATEGORY_ROTATION_CONFIG: Record<
   TestimonialCategory,
   { intervalMs: number; initialDelayMs: number }
 > = {
-  Alumini: { intervalMs: 4200, initialDelayMs: 0 },
+  Alumni: { intervalMs: 4200, initialDelayMs: 0 },
   Student: { intervalMs: 5000, initialDelayMs: 900 },
   VIP: { intervalMs: 5800, initialDelayMs: 1800 },
 };
@@ -99,7 +99,7 @@ export function CollegeTestimonials({
 
   useEffect(() => {
     setActiveIndices({
-      Alumini: getRandomIndex(groupedItems.Alumini.length),
+      Alumni: getRandomIndex(groupedItems.Alumni.length),
       Student: getRandomIndex(groupedItems.Student.length),
       VIP: getRandomIndex(groupedItems.VIP.length),
     });

@@ -3,26 +3,164 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Clock } from "lucide-react";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type MouseEvent,
-} from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { diplomaPrograms } from "@/data/polytechnic";
+import { DragScroll } from "@/components/ui/DragScroll";
 import {
-  PolyButtonLink,
   PolySection,
   PolySectionHeader,
+  PolyButtonLink
 } from "@/modules/polytechnic/PolyUI";
 
-export function DiplomaPrograms() {
-  const [isCarouselPaused, setIsCarouselPaused] = useState(false);
-  const resumeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+type PolytechnicCourse = {
+  name: string;
+  slug: string;
+  image?: string;
+  icon?: any;
+};
 
-  const handleMouseMove = (e: MouseEvent<HTMLElement>) => {
+function CourseCard({ course }: { course: PolytechnicCourse }) {
+  return (
+    <motion.article
+      initial={{ opacity: 0, x: 20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.35 }}
+      data-course-card="true"
+      className="border-polytechnic/12 group flex h-[21.25rem] w-[18.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-white shadow-sm transition-all sm:h-[21.75rem] sm:w-[20rem] md:h-[21.75rem] md:w-[21.5rem] lg:w-[22rem]"
+      draggable={false}
+    >
+      <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
+        {course.image ? (
+          <Image
+            src={course.image}
+            alt={`${course.name} course image`}
+            fill
+            sizes="(min-width: 1024px) 352px, (min-width: 640px) 320px, 296px"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-slate-200">
+            {course.icon && <course.icon className="h-16 w-16 text-slate-400" />}
+          </div>
+        )}
+        <div className="absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent" />
+        
+        {/* AICTE Badge */}
+        <div className="absolute top-3 right-3 flex items-center gap-2 rounded-full bg-white/92 px-2.5 py-1 shadow-sm backdrop-blur-sm">
+          <Image
+            src="/aicte.png"
+            alt="AICTE"
+            width={56}
+            height={22}
+            style={{ width: "auto" }}
+            className="h-4 object-contain"
+          />
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col px-5 py-3.5">
+        <div className="space-y-1.5 flex flex-col h-full">
+          <h3 className="text-polytechnic-dark line-clamp-3 text-[1.35rem] leading-snug font-semibold md:text-[1.45rem]">
+            {course.name}
+          </h3>
+
+          <div className="flex items-center justify-between gap-3 pt-1 mt-auto">
+            <span className="text-polytechnic block text-[0.75rem] font-bold tracking-wider uppercase">
+              Diploma
+            </span>
+            <Link
+              href={`/institutions/polytechnic/departments/${course.slug}`}
+              className="text-polytechnic inline-flex items-center text-[0.95rem] font-semibold hover:underline"
+            >
+              Program Details
+              <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+            </Link>
+          </div>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+function CourseCarouselSection({
+  courses,
+}: {
+  courses: PolytechnicCourse[];
+}) {
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [showArrows, setShowArrows] = useState(false);
+
+  useEffect(() => {
+    const container = carouselRef.current;
+    if (!container) return;
+
+    const updateArrows = () => {
+      setShowArrows(container.scrollWidth > container.clientWidth + 2);
+    };
+
+    updateArrows();
+
+    const observer = new ResizeObserver(updateArrows);
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, [courses.length]);
+
+  const scrollCarousel = (direction: "left" | "right") => {
+    const container = carouselRef.current;
+    if (!container) return;
+
+    const card = container.querySelector<HTMLElement>('[data-course-card="true"]');
+    const cardWidth = card?.offsetWidth ?? 300;
+    const gap = 24;
+
+    container.scrollBy({
+      left: direction === "left" ? -(cardWidth + gap) : cardWidth + gap,
+      behavior: "smooth",
+    });
+  };
+
+  return (
+    <div className="relative z-10 w-full pb-8">
+      {showArrows && (
+        <div className="mb-4 flex justify-end gap-2 px-4 md:px-0">
+          <button
+            type="button"
+            onClick={() => scrollCarousel("left")}
+            aria-label="Scroll courses left"
+            className="border-border bg-white text-polytechnic-dark hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => scrollCarousel("right")}
+            aria-label="Scroll courses right"
+            className="border-border bg-white text-polytechnic-dark hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+          >
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
+      <DragScroll className="snap-container scrollbar-hide flex w-full items-stretch gap-4 overflow-x-auto px-4 pb-4 md:gap-6 md:px-0">
+        <div className="flex w-max items-stretch gap-4 md:gap-6">
+          {courses.map((course) => (
+            <CourseCard
+              key={course.slug}
+              course={course}
+            />
+          ))}
+        </div>
+      </DragScroll>
+    </div>
+  );
+}
+
+export function DiplomaPrograms() {
+  const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -30,29 +168,11 @@ export function DiplomaPrograms() {
     e.currentTarget.style.setProperty("--mouse-y", `${y}px`);
   };
 
-  const pauseCarouselTemporarily = useCallback((delay = 1800) => {
-    setIsCarouselPaused(true);
-    if (resumeTimerRef.current) {
-      clearTimeout(resumeTimerRef.current);
-    }
-    resumeTimerRef.current = setTimeout(() => {
-      setIsCarouselPaused(false);
-    }, delay);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (resumeTimerRef.current) {
-        clearTimeout(resumeTimerRef.current);
-      }
-    };
-  }, []);
-
   return (
     <PolySection
       id="programs"
       tone="transparent"
-      className="group/section relative overflow-hidden border-t border-slate-100 bg-[#f6f8f7]"
+      className="group/section relative overflow-hidden border-t border-slate-100 bg-[#f6f8f7] pt-20 pb-12"
       onMouseMove={handleMouseMove}
     >
       <div
@@ -84,8 +204,8 @@ export function DiplomaPrograms() {
       <div className="bg-polytechnic-accent/5 pointer-events-none absolute top-0 right-0 z-0 h-125 w-125 translate-x-1/3 -translate-y-1/3 rounded-full blur-3xl" />
       <div className="bg-polytechnic-dark/5 pointer-events-none absolute bottom-0 left-0 z-0 h-100 w-100 -translate-x-1/3 translate-y-1/3 rounded-full blur-3xl" />
 
-      <div className="relative z-10">
-        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+      <div className="relative z-10 container mx-auto px-4 md:px-6">
+        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between mb-8">
           <PolySectionHeader
             eyebrow="Programs"
             title="Diploma Programs"
@@ -101,89 +221,7 @@ export function DiplomaPrograms() {
           </PolyButtonLink>
         </div>
 
-        <div
-          className="group/carousel relative mt-10 mb-2 flex w-full overflow-hidden py-4"
-          onWheel={() => pauseCarouselTemporarily()}
-          onTouchStart={() => pauseCarouselTemporarily()}
-          onTouchMove={() => pauseCarouselTemporarily()}
-          onMouseDown={() => pauseCarouselTemporarily()}
-        >
-          <style>{`
-          @keyframes poly-marquee {
-            to { transform: translateX(-50%); }
-          }
-        `}</style>
-          <div
-            className="relative z-10 flex w-max items-stretch gap-6 pr-6 md:gap-8 md:pr-8"
-            style={{
-              animation: "poly-marquee 65s linear infinite",
-              animationPlayState: isCarouselPaused ? "paused" : "running",
-            }}
-          >
-            {[
-              ...diplomaPrograms,
-              ...diplomaPrograms,
-              ...diplomaPrograms,
-              ...diplomaPrograms,
-            ].map((prog, index) => (
-              <motion.article
-                key={`${prog.slug}-${index}`}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{
-                  duration: 0.45,
-                  delay: (index % diplomaPrograms.length) * 0.06,
-                }}
-                className="border-polytechnic/12 group flex h-full w-[84vw] shrink-0 flex-col overflow-hidden rounded-xl border bg-white shadow-[0_8px_24px_rgba(2,42,50,0.06)] sm:w-[70vw] md:w-[50vw] lg:w-95"
-              >
-                <div className="relative aspect-16/10 overflow-hidden">
-                  {prog.image ? (
-                    <Image
-                      src={prog.image}
-                      alt={prog.name}
-                      fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-103"
-                    />
-                  ) : (
-                    <div className="bg-polytechnic-muted absolute inset-0 flex items-center justify-center">
-                      <prog.icon className="text-polytechnic/45 h-16 w-16" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent" />
-                  <div className="absolute top-3 left-3 rounded-full bg-white/92 px-3 py-1 text-[11px] font-semibold text-slate-700">
-                    AICTE Approved
-                  </div>
-                </div>
-
-                <div className="flex flex-1 flex-col p-5">
-                  <div className="mb-3 flex items-center gap-2 text-xs font-medium tracking-wide text-slate-500 uppercase">
-                    <Clock className="text-polytechnic h-3.5 w-3.5" />
-                    {prog.duration}
-                  </div>
-
-                  <h3 className="text-polytechnic-dark mb-2 line-clamp-2 text-xl leading-snug font-semibold">
-                    {prog.name}
-                  </h3>
-
-                  <p className="mb-5 line-clamp-3 text-sm leading-relaxed text-slate-600">
-                    {prog.desc}
-                  </p>
-
-                  <div className="mt-auto">
-                    <Link
-                      href={`/institutions/polytechnic/departments/${prog.slug}`}
-                      className="text-polytechnic inline-flex items-center text-sm font-semibold hover:underline"
-                    >
-                      Program Details
-                      <ArrowRight className="ml-1.5 h-4 w-4" />
-                    </Link>
-                  </div>
-                </div>
-              </motion.article>
-            ))}
-          </div>
-        </div>
+        <CourseCarouselSection courses={diplomaPrograms as PolytechnicCourse[]} />
       </div>
     </PolySection>
   );

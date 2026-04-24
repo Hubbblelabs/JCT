@@ -203,7 +203,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                       onClick={() =>
                         setDesktopExpanded(isExpanded ? null : link.name)
                       }
-                      className={`relative flex items-center justify-center gap-1.5 px-3 py-2 font-sans text-sm font-medium transition-colors xl:px-5 xl:text-[15px] ${
+                      className={`group relative flex items-center justify-center gap-1.5 px-3 py-2 font-sans text-sm font-medium transition-colors xl:px-5 xl:text-[15px] ${
                         isExpanded
                           ? "text-[#d4a024]"
                           : "text-white/90 hover:text-white"
@@ -216,19 +216,22 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                           isExpanded ? "rotate-180" : ""
                         }`}
                       />
+                      <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-[#d4a024] transition-transform duration-300 group-hover:scale-x-100 xl:right-5 xl:left-5" />
                     </button>
                   ) : (
                     <Link
                       href={link.href}
-                      className={`relative flex items-center justify-center px-3 py-2 font-sans text-sm font-medium transition-colors xl:px-5 xl:text-[15px] ${
+                      className={`group relative flex items-center justify-center px-3 py-2 font-sans text-sm font-medium transition-colors xl:px-5 xl:text-[15px] ${
                         isActive
                           ? "text-[#d4a024]"
                           : "text-white/90 hover:text-white"
                       }`}
                     >
                       {link.name}
-                      {isActive && (
+                      {isActive ? (
                         <span className="absolute right-3 bottom-1 left-3 h-0.5 bg-[#d4a024] xl:right-5 xl:left-5" />
+                      ) : (
+                        <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-[#d4a024] transition-transform duration-300 group-hover:scale-x-100 xl:right-5 xl:left-5" />
                       )}
                     </Link>
                   )}

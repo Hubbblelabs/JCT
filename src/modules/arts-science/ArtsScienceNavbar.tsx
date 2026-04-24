@@ -7,8 +7,6 @@ import { ChevronDown, ArrowRight, Menu, Phone, X } from "lucide-react";
 import {
   motion,
   AnimatePresence,
-  useScroll,
-  useTransform,
 } from "framer-motion";
 import { siteConfig } from "@/data/site";
 
@@ -153,19 +151,6 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
     setMobileExpanded(mobileExpanded === name ? null : name);
   };
 
-  const { scrollY } = useScroll();
-  const navBackground = useTransform(
-    scrollY,
-    [0, 50],
-    ["rgba(17, 24, 39, 0)", "rgba(17, 24, 39, 0.95)"],
-  );
-
-  const navBorder = useTransform(
-    scrollY,
-    [0, 50],
-    ["rgba(55, 65, 81, 0)", "rgba(55, 65, 81, 0.4)"],
-  );
-
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll, { passive: true });
@@ -186,32 +171,16 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
     <>
       {/* Announcement Bar */}
       {/* Main Nav */}
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
+      <nav
         className="fixed top-0 right-0 left-0 z-50 px-4 py-3 transition-all duration-300 md:px-8"
       >
         <div
-          style={{
-            backgroundColor: showPill
-              ? forceSolidOnTop
-                ? "rgba(17, 24, 39, 0.95)"
-                : navBackground
-              : "transparent",
-            borderColor: showPill
-              ? forceSolidOnTop
-                ? "rgba(55, 65, 81, 0.4)"
-                : navBorder
-              : "transparent",
-          }}
           className={`mx-auto flex w-full max-w-360 items-center justify-between px-4 py-2.5 transition-all duration-300 lg:px-7 ${
             showPill
-              ? "rounded-full border shadow-[0_8px_30px_rgba(0,0,0,0.28)] backdrop-blur-xl"
+              ? "rounded-full border border-white/14 bg-[#0b1a31]/95 shadow-[0_14px_36px_rgba(2,8,20,0.52)] backdrop-blur-xl"
               : "rounded-none border-transparent shadow-none backdrop-blur-0"
           }`}
         >
-          {/* Logo */}
           <Link
             href="/institutions/arts-science"
             className="flex shrink-0 items-center gap-3"
@@ -236,7 +205,6 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
             </div>
           </Link>
 
-          {/* Desktop Links */}
           <div className="hidden items-center gap-2 lg:flex">
             {artsNav.map((link) => (
               <div
@@ -250,7 +218,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 {link.children && link.href === "#" ? (
                   <button
                     type="button"
-                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium whitespace-nowrap text-white transition-colors hover:text-white/70"
+                    className="group relative flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-semibold whitespace-nowrap text-white/92 transition-colors duration-300 hover:text-white"
                   >
                     {link.name}
                     <ChevronDown
@@ -259,88 +227,81 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                         activeDropdown === link.name ? "rotate-180" : ""
                       }`}
                     />
+                    <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-[#f07b1a] transition-transform duration-300 group-hover:scale-x-100" />
                   </button>
                 ) : (
                   <Link
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    className="flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-medium text-white transition-colors hover:text-white/70"
+                    className="group relative flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-semibold text-white/92 transition-colors duration-300 hover:text-white"
                   >
                     {link.name}
                     {link.children && (
-                      <ChevronDown
-                        size={12}
-                        className={`transition-transform duration-200 ${
-                          activeDropdown === link.name ? "rotate-180" : ""
-                        }`}
-                      />
+                      <>
+                        <ChevronDown
+                          size={12}
+                          className={`transition-transform duration-200 ${
+                            activeDropdown === link.name ? "rotate-180" : ""
+                          }`}
+                        />
+                        <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-[#f07b1a] transition-transform duration-300 group-hover:scale-x-100" />
+                      </>
                     )}
                   </Link>
                 )}
 
-                {/* Dropdown */}
-                {link.children && (
-                  <AnimatePresence>
-                    {activeDropdown === link.name && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 4 }}
-                        transition={{ duration: 0.15, ease: "easeOut" }}
-                        className="absolute top-full left-0 w-64 pt-3"
-                      >
-                        <div className="overflow-hidden rounded-xl border border-white/10 bg-[#111827]/95 p-2 shadow-2xl shadow-black/30 backdrop-blur-2xl">
-                          <div className="space-y-0.5">
-                            {link.children.map((child) => (
-                              <Link
-                                key={child.name}
-                                href={child.href}
-                                onClick={(e) => handleNavClick(e, child.href)}
-                                className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all hover:bg-white/5 ${child.className || ""}`}
-                              >
-                                <div>
-                                  <p className="group-hover:text-arts-science-primary font-sans text-[15px] font-medium whitespace-nowrap text-white/90 transition-colors group-hover:text-amber-500">
-                                    {child.name}
+                <AnimatePresence>
+                  {link.children && activeDropdown === link.name && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 4 }}
+                      transition={{ duration: 0.15, ease: "easeOut" }}
+                      className="absolute top-full left-0 w-64 pt-3"
+                    >
+                      <div className="overflow-hidden rounded-xl border border-white/15 bg-[#0b1a31]/96 p-2 shadow-2xl shadow-black/40 backdrop-blur-2xl">
+                        <div className="space-y-0.5">
+                          {link.children.map((child) => (
+                            <Link
+                              key={child.name}
+                              href={child.href}
+                              onClick={(event) => handleNavClick(event, child.href)}
+                              className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all duration-300 hover:bg-white/8 ${child.className || ""}`}
+                            >
+                              <div>
+                                <p className="font-sans text-[15px] font-medium whitespace-nowrap text-white/92 transition-colors group-hover:text-[#ffae4c]">
+                                  {child.name}
+                                </p>
+                                {child.description && (
+                                  <p className="mt-0.5 font-sans text-xs text-white/55">
+                                    {child.description}
                                   </p>
-                                  {child.description && (
-                                    <p className="mt-0.5 font-sans text-xs text-white/40">
-                                      {child.description}
-                                    </p>
-                                  )}
-                                </div>
-                                <ArrowRight
-                                  size={12}
-                                  className="shrink-0 text-amber-500 opacity-0 transition-opacity group-hover:opacity-100"
-                                />
-                              </Link>
-                            ))}
-                          </div>
+                                )}
+                              </div>
+                              <ArrowRight
+                                size={12}
+                                className="shrink-0 text-[#ffae4c] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                              />
+                            </Link>
+                          ))}
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                )}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             ))}
           </div>
 
-          {/* Desktop Right */}
           <div className="hidden items-center gap-3 lg:flex">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="hidden items-center gap-1.5 font-sans text-sm whitespace-nowrap text-white transition-colors hover:text-white/60 xl:flex"
+              className="hidden items-center gap-1.5 font-sans text-sm font-medium whitespace-nowrap text-white/90 transition-colors duration-300 hover:text-white xl:flex"
             >
               <Phone size={14} /> {siteConfig.contact.phone}
             </a>
-            <Link
-              href="/admissions/apply"
-              className="bg-arts-science-accent shadow-arts-science-accent/20 inline-flex h-9 shrink-0 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold whitespace-nowrap text-white shadow-lg transition-all hover:scale-105 hover:bg-orange-500 active:scale-95"
-            >
-              Apply Now <ArrowRight size={14} />
-            </Link>
           </div>
 
-          {/* Mobile Toggle */}
           <button
             className="p-2 text-white/70 transition-colors hover:text-white lg:hidden"
             onClick={() => setIsOpen(!isOpen)}
@@ -349,8 +310,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
-      </motion.nav>
-      {/* Mobile Drawer */}
+      </nav>
       <AnimatePresence>
         {isOpen && (
           <>
@@ -368,7 +328,6 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
               className="fixed inset-y-4 right-4 z-61 flex w-70 flex-col rounded-3xl border border-white/10 bg-[#111827]/90 shadow-2xl backdrop-blur-xl lg:hidden"
             >
-              {/* Header */}
               <div className="flex items-center justify-between border-b border-white/5 p-5">
                 <div className="flex items-center gap-3">
                   <div className="relative h-9 w-9">
@@ -397,7 +356,6 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 </button>
               </div>
 
-              {/* Links */}
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
                 <div className="space-y-1">
                   {artsNav
@@ -441,20 +399,18 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                   className="overflow-hidden"
                                 >
                                   <div className="space-y-1 py-1 pr-2 pl-4">
-                                    {link.children.map(
-                                      (child: ArtsNavChild) => (
-                                        <Link
-                                          key={child.name}
-                                          href={child.href}
-                                          onClick={(e) =>
-                                            handleNavClick(e, child.href, true)
-                                          }
-                                          className="hover:text-arts-science-accent block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5"
-                                        >
-                                          {child.name}
-                                        </Link>
-                                      ),
-                                    )}
+                                    {link.children.map((child: ArtsNavChild) => (
+                                      <Link
+                                        key={child.name}
+                                        href={child.href}
+                                        onClick={(e) =>
+                                          handleNavClick(e, child.href, true)
+                                        }
+                                        className="hover:text-arts-science-accent block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5"
+                                      >
+                                        {child.name}
+                                      </Link>
+                                    ))}
                                   </div>
                                 </motion.div>
                               )}
@@ -474,7 +430,6 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 </div>
               </div>
 
-              {/* Footer */}
               <div className="space-y-3 border-t border-white/5 p-5 pt-2">
                 <a
                   href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}

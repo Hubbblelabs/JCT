@@ -47,7 +47,7 @@ export function Hero() {
   return (
     <section
       id="hero"
-      className="group/section bg-arts-science-muted relative flex min-h-screen flex-col overflow-hidden"
+      className="group/section relative flex min-h-screen flex-col overflow-hidden bg-[#060d19]"
       onMouseMove={handleMouseMove}
     >
       <div className="pointer-events-none absolute inset-0 origin-top overflow-hidden">
@@ -55,7 +55,7 @@ export function Hero() {
       </div>
 
       <div className="pointer-events-none absolute inset-0 z-0 mask-[radial-gradient(ellipse_at_center,black_60%,transparent_100%)]">
-        <div className="absolute inset-0 bg-orange-200 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px] opacity-20 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-orange-300 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px] opacity-14 mix-blend-soft-light" />
 
         {/* Spotlight dots layer tracking the mouse */}
         <div
@@ -69,6 +69,8 @@ export function Hero() {
         </div>
       </div>
 
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(112deg,rgba(4,13,30,0.92)_8%,rgba(5,15,35,0.76)_46%,rgba(7,20,42,0.58)_100%)]" />
+
       {/* Announcement Banner */}
       {/* <div className="relative z-10 flex items-center justify-center gap-2 bg-arts-science px-3 py-2 text-center text-xs sm:text-sm text-white">
         <span className="bg-arts-science-accent rounded px-2 py-0.5 text-xs font-semibold text-white">
@@ -80,64 +82,114 @@ export function Hero() {
       </div> */}
 
       {/* Hero Content */}
-      <div className="relative z-10 container mx-auto flex flex-1 flex-col items-center justify-center gap-6 px-4 pt-28 pb-12 text-center sm:gap-8 sm:pt-32 sm:pb-16 md:gap-10 md:pt-36 md:pb-20 lg:pt-40 lg:pb-24">
+      <div className="relative z-10 container mx-auto flex flex-1 flex-col items-center justify-center gap-6 px-4 pt-24 pb-8 text-center sm:gap-8 sm:pt-32 sm:pb-16 md:gap-10 md:pt-36 md:pb-20 lg:pt-40 lg:pb-24">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: "easeOut", staggerChildren: 0.1 }}
+          transition={{ duration: 1, ease: "easeOut" }}
           className="flex max-w-4xl flex-col items-center"
         >
-          <h1 className="mb-4 font-serif text-4xl leading-tight font-bold text-gray-900 sm:text-5xl md:text-6xl lg:text-7xl">
+          <motion.h1
+            initial={{ opacity: 0, y: 34 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+            className="mb-4 font-sans text-4xl leading-[0.98] font-extrabold tracking-[-0.03em] text-white drop-shadow-[0_12px_24px_rgba(2,10,24,0.55)] sm:text-5xl md:text-6xl lg:text-7xl"
+          >
             Good Education
             <br />
-            <span className="text-arts-science-accent font-bold">for </span>A
+            <span className="text-[#ff8a1f] font-extrabold">
+              for{" "}
+            </span>
+            A
             Better Future
-          </h1>
+          </motion.h1>
 
-          <p className="mb-6 max-w-2xl text-sm leading-relaxed text-gray-600 sm:text-base md:text-lg">
+          <motion.p
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.75, delay: 0.12, ease: "easeOut" }}
+            className="mb-6 max-w-2xl text-sm leading-relaxed font-medium text-white/78 drop-shadow-[0_8px_20px_rgba(2,10,24,0.42)] sm:text-base md:text-lg"
+          >
             We offer a quality education that provides not only lessons but also
             real experience in every field. Embrace the future with our
             immersive, industry-aligned programs.
-          </p>
+          </motion.p>
 
           {/* CTA Buttons */}
-          <div className="mb-8 flex w-full max-w-md flex-col gap-2.5 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4 md:mb-10">
+          <motion.div
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: {},
+              show: {
+                transition: {
+                  staggerChildren: 0.12,
+                  delayChildren: 0.22,
+                },
+              },
+            }}
+            className="mb-8 flex w-full max-w-md flex-col gap-2.5 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4 md:mb-10"
+          >
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, y: 18 },
+                show: { opacity: 1, y: 0 },
+              }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            >
             <Link
               href="/admissions"
-              className="group bg-arts-science-accent inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl px-5 font-sans text-sm font-semibold text-white shadow-[0_10px_20px_-10px_rgba(234,88,12,0.65)] transition-all hover:-translate-y-0.5 hover:bg-orange-500 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
+              className="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#f07b1a] px-5 font-sans text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#e06b0a] hover:shadow-xl active:translate-y-0 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
             >
               Apply Now
               <ArrowRight
                 size={16}
-                className="transition-transform group-hover:translate-x-0.5"
+                className="transition-transform duration-300 group-hover:translate-x-1"
               />
             </Link>
-            <Link
-              href="#courses"
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-gray-300/80 bg-white/90 px-5 font-sans text-sm font-semibold text-gray-700 shadow-[0_8px_18px_-14px_rgba(15,23,42,0.55)] transition-all hover:-translate-y-0.5 hover:border-gray-400 hover:bg-white sm:h-12 sm:w-auto sm:min-w-48 sm:px-7 sm:text-base"
-            >
-              Explore Programs
-            </Link>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Stats Row */}
-          <div className="flex w-full flex-wrap justify-center gap-4 border-t border-slate-200/50 pt-6 sm:gap-6 sm:pt-8 md:gap-10 md:pt-10 lg:gap-16">
-            {heroStats.map((stat) => (
-              <div
+          <motion.div
+            initial="hidden"
+            animate="show"
+            variants={{
+              hidden: {},
+              show: {
+                transition: {
+                  staggerChildren: 0.1,
+                  delayChildren: 0.35,
+                },
+              },
+            }}
+            className="grid w-full grid-cols-2 justify-center gap-x-4 gap-y-6 border-t border-white/26 pt-6 sm:flex sm:flex-wrap sm:gap-6 sm:pt-8 md:gap-10 md:pt-10 lg:gap-16"
+          >
+            {heroStats.map((stat, index) => (
+              <motion.div
                 key={stat.label}
+                variants={{
+                  hidden: { opacity: 0, y: 16 },
+                  show: { opacity: 1, y: 0 },
+                }}
+                transition={{ duration: 0.5, delay: index * 0.02, ease: "easeOut" }}
                 className="flex min-w-fit flex-col items-center text-center"
               >
                 <span
-                  className={`text-2xl font-black sm:text-3xl md:text-4xl ${stat.accent ? "text-arts-science-accent" : "text-gray-900"}`}
+                  className={`text-2xl font-extrabold tracking-tight drop-shadow-[0_8px_18px_rgba(2,10,24,0.5)] sm:text-3xl md:text-4xl ${
+                    stat.accent
+                      ? "text-[#ff8a1f]"
+                      : "text-white"
+                  }`}
                 >
                   <AnimatedNumber value={stat.value} />
                 </span>
-                <span className="mt-1 text-xs font-medium tracking-wider text-gray-500 uppercase sm:mt-2 sm:text-sm">
+                <span className="mt-1 text-xs font-semibold tracking-[0.18em] text-white/72 uppercase sm:mt-2 sm:text-sm">
                   {stat.label}
                 </span>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </motion.div>
       </div>
 
@@ -146,21 +198,21 @@ export function Hero() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.3 }}
-        className="bg-arts-science border-arts-science-light/20 relative z-20 mt-10 w-full border-t sm:mt-12 md:mt-16"
+        className="relative z-20 mt-10 w-full border-t border-white/10 bg-[#0a111a] sm:mt-12 md:mt-16"
       >
         <div className="container mx-auto px-4 py-6 sm:py-8 md:py-10 lg:py-12">
-          <div className="grid grid-cols-1 gap-6 divide-y divide-white/20 sm:gap-8 md:grid-cols-3 md:gap-4 md:divide-x md:divide-y-0">
+          <div className="grid grid-cols-1 gap-6 divide-y divide-white/10 sm:gap-8 md:grid-cols-3 md:gap-4 md:divide-x md:divide-y-0">
             <div className="flex flex-col items-center px-3 py-4 text-center sm:px-4 md:px-6 md:py-0 lg:px-8">
               <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3">
                 <Award
                   size={18}
-                  className="text-arts-science-accent sm:h-5 sm:w-5"
+                  className="text-[#f07b1a] sm:h-5 sm:w-5"
                 />
-                <h3 className="font-serif text-base font-bold text-white sm:text-lg md:text-xl">
+                <h3 className="font-sans text-base font-bold tracking-tight text-white sm:text-lg md:text-xl">
                   Quality
                 </h3>
               </div>
-              <p className="text-xs leading-relaxed font-light text-white/80 sm:text-sm">
+              <p className="text-xs leading-relaxed font-medium text-white/82 sm:text-sm">
                 Experience a world-class education and unlock your potential at
                 our university
               </p>
@@ -170,13 +222,13 @@ export function Hero() {
               <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3">
                 <Users
                   size={18}
-                  className="text-arts-science-accent sm:h-5 sm:w-5"
+                  className="text-[#f07b1a] sm:h-5 sm:w-5"
                 />
-                <h3 className="font-serif text-base font-bold text-white sm:text-lg md:text-xl">
+                <h3 className="font-sans text-base font-bold tracking-tight text-white sm:text-lg md:text-xl">
                   Leadership
                 </h3>
               </div>
-              <p className="text-xs leading-relaxed font-light text-white/80 sm:text-sm">
+              <p className="text-xs leading-relaxed font-medium text-white/82 sm:text-sm">
                 Guided by visionary leadership, inspires growth, and shapes
                 future leaders
               </p>
@@ -186,13 +238,13 @@ export function Hero() {
               <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3">
                 <BookOpen
                   size={18}
-                  className="text-arts-science-accent sm:h-5 sm:w-5"
+                  className="text-[#f07b1a] sm:h-5 sm:w-5"
                 />
-                <h3 className="font-serif text-base font-bold text-white sm:text-lg md:text-xl">
+                <h3 className="font-sans text-base font-bold tracking-tight text-white sm:text-lg md:text-xl">
                   Experience
                 </h3>
               </div>
-              <p className="text-xs leading-relaxed font-light text-white/80 sm:text-sm">
+              <p className="text-xs leading-relaxed font-medium text-white/82 sm:text-sm">
                 Embark on a transformative journey of personal and professional
                 growth
               </p>

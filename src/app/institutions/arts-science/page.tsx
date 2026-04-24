@@ -28,8 +28,8 @@ export default function ArtsSciencePage() {
     <main className="bg-background text-foreground arts-science-theme min-h-screen overflow-x-hidden">
       <ArtsScienceNavbar />
       <Hero />
-      <AboutArtsScience />
       <UgPrograms />
+      <AboutArtsScience />
       {/* <Distinction /> */}
       <Accreditation /> <Placements /> <CampusLife />
       <Testimonials />
