@@ -50,7 +50,7 @@ export function HomePopup() {
             {/* Close Button */}
             <button
               onClick={handleClose}
-              className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-md transition-colors hover:bg-black/40 hover:text-white md:right-4 md:top-4 md:bg-white/90 md:text-black md:hover:bg-white"
+              className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-md transition-colors hover:bg-black/40 hover:text-white md:top-4 md:right-4 md:bg-white/90 md:text-black md:hover:bg-white"
               aria-label="Close popup"
             >
               <X size={18} />
@@ -71,7 +71,7 @@ export function HomePopup() {
                   <Award size={14} className="text-[#FFC917]" />
                   <span>NAAC & NBA Accredited</span>
                 </div>
-                <h3 className="font-serif text-3xl font-bold leading-tight md:text-4xl">
+                <h3 className="font-serif text-3xl leading-tight font-bold md:text-4xl">
                   Transforming <span className="text-[#FFC917]">Futures</span>
                 </h3>
                 <p className="mt-2 text-sm text-white/80 md:text-base">

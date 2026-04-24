@@ -23,8 +23,10 @@ export function CampusLife() {
     const scrollLeft = container.scrollLeft;
     const maxScroll = container.scrollWidth - container.clientWidth;
     if (maxScroll <= 0) return;
-    
-    const index = Math.round((scrollLeft / maxScroll) * (campusImages.length - 1));
+
+    const index = Math.round(
+      (scrollLeft / maxScroll) * (campusImages.length - 1),
+    );
     setActiveIndex(Math.min(Math.max(index, 0), campusImages.length - 1));
   };
 
@@ -68,7 +70,7 @@ export function CampusLife() {
 
           {/* Right: Drag-scroll gallery */}
           <div>
-            <DragScroll 
+            <DragScroll
               className="relative flex h-110 w-full snap-x snap-mandatory gap-4 scroll-smooth pb-4 md:h-130"
               onScroll={handleScroll}
             >

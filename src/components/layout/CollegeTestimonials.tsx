@@ -105,7 +105,9 @@ export function CollegeTestimonials({
       setTimeout(() => {
         const centerCard = container.children[1] as HTMLElement;
         if (centerCard) {
-          container.scrollLeft = centerCard.offsetLeft - (container.clientWidth - centerCard.clientWidth) / 2;
+          container.scrollLeft =
+            centerCard.offsetLeft -
+            (container.clientWidth - centerCard.clientWidth) / 2;
         }
       }, 100);
     }
@@ -184,9 +186,9 @@ export function CollegeTestimonials({
             </motion.h2>
           </div>
 
-          <div 
+          <div
             ref={scrollContainerRef}
-            className="flex items-start snap-x snap-mandatory overflow-x-auto pb-6 -mx-6 px-6 gap-6 md:grid md:grid-cols-3 md:items-stretch md:pb-0 md:mx-0 md:px-0 md:overflow-visible scrollbar-hide"
+            className="scrollbar-hide -mx-6 flex snap-x snap-mandatory items-start gap-6 overflow-x-auto px-6 pb-6 md:mx-0 md:grid md:grid-cols-3 md:items-stretch md:overflow-visible md:px-0 md:pb-0"
           >
             {TESTIMONIAL_CATEGORIES.map((category, laneIndex) => {
               const laneItems = groupedItems[category];
@@ -202,7 +204,7 @@ export function CollegeTestimonials({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.25 }}
                   transition={{ duration: 0.5, delay: laneIndex * 0.1 }}
-                  className="flex w-[85vw] max-w-[340px] snap-center shrink-0 flex-col self-start md:max-w-none md:w-auto md:min-w-0 md:self-stretch"
+                  className="flex w-[85vw] max-w-[340px] shrink-0 snap-center flex-col self-start md:w-auto md:max-w-none md:min-w-0 md:self-stretch"
                   onMouseEnter={() =>
                     setPaused((prev) => ({
                       ...prev,
@@ -282,10 +284,11 @@ export function CollegeTestimonials({
                               [category]: dotIndex,
                             }))
                           }
-                          className={`h-2 rounded-full transition-all duration-300 ${dotIndex === activeIndex
+                          className={`h-2 rounded-full transition-all duration-300 ${
+                            dotIndex === activeIndex
                               ? "w-6 bg-[#3b475c]"
                               : "w-2 bg-[#d1d5db] hover:bg-[#9ca3af]"
-                            }`}
+                          }`}
                           aria-label={`Go to slide ${dotIndex + 1}`}
                         />
                       ))}

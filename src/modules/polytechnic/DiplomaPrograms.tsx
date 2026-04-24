@@ -10,7 +10,7 @@ import { DragScroll } from "@/components/ui/DragScroll";
 import {
   PolySection,
   PolySectionHeader,
-  PolyButtonLink
+  PolyButtonLink,
 } from "@/modules/polytechnic/PolyUI";
 
 type PolytechnicCourse = {
@@ -42,11 +42,13 @@ function CourseCard({ course }: { course: PolytechnicCourse }) {
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-slate-200">
-            {course.icon && <course.icon className="h-16 w-16 text-slate-400" />}
+            {course.icon && (
+              <course.icon className="h-16 w-16 text-slate-400" />
+            )}
           </div>
         )}
         <div className="absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent" />
-        
+
         {/* AICTE Badge */}
         <div className="absolute top-3 right-3 flex items-center gap-2 rounded-full bg-white/92 px-2.5 py-1 shadow-sm backdrop-blur-sm">
           <Image
@@ -61,12 +63,12 @@ function CourseCard({ course }: { course: PolytechnicCourse }) {
       </div>
 
       <div className="flex flex-1 flex-col px-5 py-3.5">
-        <div className="space-y-1.5 flex flex-col h-full">
+        <div className="flex h-full flex-col space-y-1.5">
           <h3 className="text-polytechnic-dark line-clamp-3 text-[1.35rem] leading-snug font-semibold md:text-[1.45rem]">
             {course.name}
           </h3>
 
-          <div className="flex items-center justify-end pt-1 mt-auto">
+          <div className="mt-auto flex items-center justify-end pt-1">
             <Link
               href={`/institutions/polytechnic/departments/${course.slug}`}
               className="text-polytechnic inline-flex items-center text-[0.95rem] font-semibold hover:underline"
@@ -81,11 +83,7 @@ function CourseCard({ course }: { course: PolytechnicCourse }) {
   );
 }
 
-function CourseCarouselSection({
-  courses,
-}: {
-  courses: PolytechnicCourse[];
-}) {
+function CourseCarouselSection({ courses }: { courses: PolytechnicCourse[] }) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [showArrows, setShowArrows] = useState(false);
 
@@ -109,7 +107,9 @@ function CourseCarouselSection({
     const container = carouselRef.current;
     if (!container) return;
 
-    const card = container.querySelector<HTMLElement>('[data-course-card="true"]');
+    const card = container.querySelector<HTMLElement>(
+      '[data-course-card="true"]',
+    );
     const cardWidth = card?.offsetWidth ?? 300;
     const gap = 24;
 
@@ -127,7 +127,7 @@ function CourseCarouselSection({
             type="button"
             onClick={() => scrollCarousel("left")}
             aria-label="Scroll courses left"
-            className="border-border bg-white text-polytechnic-dark hover:border-polytechnic-light/30 hover:text-polytechnic-light inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+            className="border-border text-polytechnic-dark hover:border-polytechnic-light/30 hover:text-polytechnic-light inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white shadow-sm transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
@@ -135,7 +135,7 @@ function CourseCarouselSection({
             type="button"
             onClick={() => scrollCarousel("right")}
             aria-label="Scroll courses right"
-            className="border-border bg-white text-polytechnic-dark hover:border-polytechnic-light/30 hover:text-polytechnic-light inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+            className="border-border text-polytechnic-dark hover:border-polytechnic-light/30 hover:text-polytechnic-light inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white shadow-sm transition-colors"
           >
             <ArrowRight className="h-4 w-4" />
           </button>
@@ -145,10 +145,7 @@ function CourseCarouselSection({
       <DragScroll className="snap-container scrollbar-hide flex w-full items-stretch gap-4 overflow-x-auto px-4 pb-4 md:gap-6 md:px-0">
         <div className="flex w-max items-stretch gap-4 md:gap-6">
           {courses.map((course) => (
-            <CourseCard
-              key={course.slug}
-              course={course}
-            />
+            <CourseCard key={course.slug} course={course} />
           ))}
         </div>
       </DragScroll>
@@ -202,14 +199,13 @@ export function DiplomaPrograms() {
       <div className="bg-polytechnic-dark/5 pointer-events-none absolute bottom-0 left-0 z-0 h-100 w-100 -translate-x-1/3 translate-y-1/3 rounded-full blur-3xl" />
 
       <div className="relative z-10 container mx-auto px-4 md:px-6">
-        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between mb-8">
-          <PolySectionHeader
-            title="Diploma Programs"
-            className="mb-0"
-          />
+        <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+          <PolySectionHeader title="Diploma Programs" className="mb-0" />
         </div>
 
-        <CourseCarouselSection courses={diplomaPrograms as PolytechnicCourse[]} />
+        <CourseCarouselSection
+          courses={diplomaPrograms as PolytechnicCourse[]}
+        />
       </div>
     </PolySection>
   );

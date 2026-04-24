@@ -108,7 +108,7 @@ export function Footer() {
         <div className="grid gap-8 lg:grid-cols-[1.05fr_1fr_1fr] lg:gap-0 lg:divide-x lg:divide-dotted lg:divide-(--footer-border)">
           <div className="flex flex-col gap-5 lg:pr-10">
             <Link href="/" className="inline-flex items-center gap-3">
-              <span className="relative h-7 w-6 shrink-0 mt-2">
+              <span className="relative mt-2 h-7 w-6 shrink-0">
                 <Image
                   src="/jct_logo_yellow.png"
                   alt="JCT"

@@ -50,7 +50,7 @@ function CourseCard({ course }: { course: ArtsScienceCourse }) {
             {course.highlight}
           </p>
 
-          <div className="flex items-center justify-between gap-3 pt-1 mt-auto">
+          <div className="mt-auto flex items-center justify-between gap-3 pt-1">
             <span className="text-arts-science block text-[0.75rem] font-bold tracking-wider uppercase">
               {course.abbr}
             </span>
@@ -68,11 +68,7 @@ function CourseCard({ course }: { course: ArtsScienceCourse }) {
   );
 }
 
-function CourseCarouselSection({
-  courses,
-}: {
-  courses: ArtsScienceCourse[];
-}) {
+function CourseCarouselSection({ courses }: { courses: ArtsScienceCourse[] }) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [showArrows, setShowArrows] = useState(false);
 
@@ -96,7 +92,9 @@ function CourseCarouselSection({
     const container = carouselRef.current;
     if (!container) return;
 
-    const card = container.querySelector<HTMLElement>('[data-course-card="true"]');
+    const card = container.querySelector<HTMLElement>(
+      '[data-course-card="true"]',
+    );
     const cardWidth = card?.offsetWidth ?? 300;
     const gap = 24;
 
@@ -115,7 +113,7 @@ function CourseCarouselSection({
               type="button"
               onClick={() => scrollCarousel("left")}
               aria-label="Scroll courses left"
-              className="border-border bg-white text-arts-science hover:border-arts-science-accent/30 hover:text-arts-science-accent inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+              className="border-border text-arts-science hover:border-arts-science-accent/30 hover:text-arts-science-accent inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white shadow-sm transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
             </button>
@@ -123,7 +121,7 @@ function CourseCarouselSection({
               type="button"
               onClick={() => scrollCarousel("right")}
               aria-label="Scroll courses right"
-              className="border-border bg-white text-arts-science hover:border-arts-science-accent/30 hover:text-arts-science-accent inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+              className="border-border text-arts-science hover:border-arts-science-accent/30 hover:text-arts-science-accent inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white shadow-sm transition-colors"
             >
               <ArrowRight className="h-4 w-4" />
             </button>
@@ -133,10 +131,7 @@ function CourseCarouselSection({
         <DragScroll className="snap-container scrollbar-hide flex w-full items-stretch gap-4 overflow-x-auto px-4 md:gap-6 md:px-6">
           <div className="flex w-max items-stretch gap-4 md:gap-6">
             {courses.map((course) => (
-              <CourseCard
-                key={course.slug}
-                course={course}
-              />
+              <CourseCard key={course.slug} course={course} />
             ))}
           </div>
         </DragScroll>

@@ -74,7 +74,7 @@ export function NewsEvents() {
           >
             <Link
               href="/campus-life"
-              className="font-sans text-[15px] font-bold tracking-wide text-accent underline-offset-4 hover:underline"
+              className="text-accent font-sans text-[15px] font-bold tracking-wide underline-offset-4 hover:underline"
             >
               View All News
             </Link>
@@ -100,7 +100,7 @@ export function NewsEvents() {
             />
             <div className="absolute inset-0 bg-linear-to-t from-[#1a2332]/90 via-[#1a2332]/20 to-transparent" />
             <div className="absolute right-8 bottom-10 left-8 z-10 text-white">
-              <span className="mb-5 inline-block rounded bg-accent px-2.5 py-1 text-[10px] font-bold tracking-widest text-white uppercase">
+              <span className="bg-accent mb-5 inline-block rounded px-2.5 py-1 text-[10px] font-bold tracking-widest text-white uppercase">
                 {newsItems[0].category}
               </span>
               <h3 className="font-serif text-[28px] leading-[1.2] text-white/95 italic md:text-[34px]">

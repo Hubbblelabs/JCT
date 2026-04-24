@@ -91,7 +91,8 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
       {bannerVisible && !isHomePage && (
         <div className="bg-gold text-navy fixed top-0 right-0 left-0 z-60 px-3 py-2 text-center font-sans text-[11px] font-bold tracking-wide sm:px-4 sm:text-xs">
           <span className="block pr-6 leading-tight whitespace-nowrap">
-            🎓 Admissions Open 2026-27 | Counselling Code: {siteConfig.counsellingCode}
+            🎓 Admissions Open 2026-27 | Counselling Code:{" "}
+            {siteConfig.counsellingCode}
           </span>
           <Link
             href="/admissions/apply"

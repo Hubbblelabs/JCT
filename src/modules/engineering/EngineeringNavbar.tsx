@@ -121,7 +121,8 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
         <div className="bg-gold fixed top-0 right-0 left-0 z-60 text-[#0B1628]">
           <div className="relative flex w-full items-center justify-center px-3 py-2 text-center font-sans text-[11px] font-bold tracking-wide sm:px-10 sm:text-xs">
             <span className="pr-6 leading-tight whitespace-nowrap">
-              Admissions Open 2026-27 | Counselling Code: {siteConfig.counsellingCode}
+              Admissions Open 2026-27 | Counselling Code:{" "}
+              {siteConfig.counsellingCode}
             </span>
             <Link
               href="/admissions/apply"
@@ -441,7 +442,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
               <div className="space-y-3 border-t border-white/5 p-5 pt-2">
                 <a
                   href={`tel:${siteConfig.contact.phone.replace(/\\s/g, "")}`}
-                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#d4a024] font-sans text-sm font-bold text-[#0B1628] shadow-lg shadow-[#d4a024]/10 transition-all hover:bg-[#e8b84a] hover:scale-[1.02] active:scale-[0.98]"
+                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#d4a024] font-sans text-sm font-bold text-[#0B1628] shadow-lg shadow-[#d4a024]/10 transition-all hover:scale-[1.02] hover:bg-[#e8b84a] active:scale-[0.98]"
                 >
                   <Phone size={16} /> {siteConfig.contact.phone}
                 </a>

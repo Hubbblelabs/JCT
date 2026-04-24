@@ -20,8 +20,10 @@ export function CampusLife() {
     const scrollLeft = container.scrollLeft;
     const maxScroll = container.scrollWidth - container.clientWidth;
     if (maxScroll <= 0) return;
-    
-    const index = Math.round((scrollLeft / maxScroll) * (campusImages.length - 1));
+
+    const index = Math.round(
+      (scrollLeft / maxScroll) * (campusImages.length - 1),
+    );
     setActiveIndex(Math.min(Math.max(index, 0), campusImages.length - 1));
   };
 
@@ -37,7 +39,7 @@ export function CampusLife() {
           </h3>
         </div>
 
-        <DragScroll 
+        <DragScroll
           className="scrollbar-hide relative flex h-100 w-full snap-x snap-mandatory gap-4 scroll-smooth md:h-125 md:gap-6"
           onScroll={handleScroll}
         >

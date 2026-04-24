@@ -147,14 +147,12 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
   return (
     <>
       {/* Main Nav */}
-      <nav
-        className="fixed top-0 right-0 left-0 z-50 px-4 py-3 transition-all duration-300 md:px-8"
-      >
+      <nav className="fixed top-0 right-0 left-0 z-50 px-4 py-3 transition-all duration-300 md:px-8">
         <div
           className={`mx-auto flex w-full max-w-360 items-center justify-between px-4 py-2.5 transition-all duration-300 lg:px-7 ${
             scrolled || forceSolidOnTop
               ? "rounded-full border border-white/10 bg-[#0B1628]/95 shadow-[0_8px_30px_rgba(0,0,0,0.4)] backdrop-blur-md"
-              : "rounded-none border-transparent shadow-none backdrop-blur-0"
+              : "backdrop-blur-0 rounded-none border-transparent shadow-none"
           }`}
         >
           {/* Logo */}
@@ -237,11 +235,13 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                         transition={{ duration: 0.15, ease: "easeOut" }}
                         className="absolute top-full left-0 w-64 pt-3"
                       >
-                        <div className={`overflow-hidden rounded-xl border p-2 shadow-2xl backdrop-blur-2xl ${
-                            (scrolled || forceSolidOnTop)
+                        <div
+                          className={`overflow-hidden rounded-xl border p-2 shadow-2xl backdrop-blur-2xl ${
+                            scrolled || forceSolidOnTop
                               ? "border-white/10 bg-[#0B1628]/95 shadow-black/30"
                               : "border-white/20 bg-white/12 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)]"
-                          }`}>
+                          }`}
+                        >
                           <div className="space-y-0.5">
                             {link.children.map((child) => (
                               <Link
@@ -249,19 +249,29 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 href={child.href}
                                 onClick={(e) => handleNavClick(e, child.href)}
                                 className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all duration-300 ${
-                                  (scrolled || forceSolidOnTop) ? "hover:bg-white/8" : "hover:bg-white/12"
+                                  scrolled || forceSolidOnTop
+                                    ? "hover:bg-white/8"
+                                    : "hover:bg-white/12"
                                 } ${child.className || ""}`}
                               >
                                 <div>
-                                  <p className={`font-sans text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-white ${
-                                    (scrolled || forceSolidOnTop) ? "text-white/95" : "text-white"
-                                  }`}>
+                                  <p
+                                    className={`font-sans text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-white ${
+                                      scrolled || forceSolidOnTop
+                                        ? "text-white/95"
+                                        : "text-white"
+                                    }`}
+                                  >
                                     {child.name}
                                   </p>
                                   {child.desc && (
-                                    <p className={`mt-0.5 font-sans text-xs transition-colors ${
-                                      (scrolled || forceSolidOnTop) ? "text-white/55 group-hover:text-white/75" : "text-white/78 group-hover:text-white"
-                                    }`}>
+                                    <p
+                                      className={`mt-0.5 font-sans text-xs transition-colors ${
+                                        scrolled || forceSolidOnTop
+                                          ? "text-white/55 group-hover:text-white/75"
+                                          : "text-white/78 group-hover:text-white"
+                                      }`}
+                                    >
                                       {child.desc}
                                     </p>
                                   )}

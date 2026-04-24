@@ -53,7 +53,6 @@ export function NewsEvents() {
             </Button>
           </div>
         </div>
-
       </div>
     </section>
   );

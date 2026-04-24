@@ -4,10 +4,7 @@ import { useState, useEffect, type MouseEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown, ArrowRight, Menu, Phone, X } from "lucide-react";
-import {
-  motion,
-  AnimatePresence,
-} from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { siteConfig } from "@/data/site";
 
 type ArtsNavItem = {
@@ -129,14 +126,12 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
     <>
       {/* Announcement Bar */}
       {/* Main Nav */}
-      <nav
-        className="fixed top-0 right-0 left-0 z-50 px-4 py-3 transition-all duration-300 md:px-8"
-      >
+      <nav className="fixed top-0 right-0 left-0 z-50 px-4 py-3 transition-all duration-300 md:px-8">
         <div
           className={`mx-auto flex w-full max-w-360 items-center justify-between px-4 py-2.5 transition-all duration-300 lg:px-7 ${
             showPill
               ? "rounded-full border border-white/14 bg-[#0b1a31]/95 shadow-[0_14px_36px_rgba(2,8,20,0.52)] backdrop-blur-xl"
-              : "rounded-none border-transparent shadow-none backdrop-blur-0"
+              : "backdrop-blur-0 rounded-none border-transparent shadow-none"
           }`}
         >
           <Link
@@ -215,31 +210,43 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                       transition={{ duration: 0.15, ease: "easeOut" }}
                       className="absolute top-full left-0 w-64 pt-3"
                     >
-                      <div className={`overflow-hidden rounded-xl border p-2 shadow-2xl backdrop-blur-2xl ${
+                      <div
+                        className={`overflow-hidden rounded-xl border p-2 shadow-2xl backdrop-blur-2xl ${
                           showPill
                             ? "border-white/15 bg-[#0b1a31]/96 shadow-black/40"
                             : "border-white/20 bg-white/12 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)]"
-                        }`}>
+                        }`}
+                      >
                         <div className="space-y-0.5">
                           {link.children.map((child) => (
                             <Link
                               key={child.name}
                               href={child.href}
-                              onClick={(event) => handleNavClick(event, child.href)}
+                              onClick={(event) =>
+                                handleNavClick(event, child.href)
+                              }
                               className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all duration-300 ${
-                                showPill ? "hover:bg-white/8" : "hover:bg-white/15"
+                                showPill
+                                  ? "hover:bg-white/8"
+                                  : "hover:bg-white/15"
                               } ${child.className || ""}`}
                             >
                               <div>
-                                <p className={`font-sans text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-[#ffae4c] ${
-                                  showPill ? "text-white/92" : "text-white"
-                                }`}>
+                                <p
+                                  className={`font-sans text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-[#ffae4c] ${
+                                    showPill ? "text-white/92" : "text-white"
+                                  }`}
+                                >
                                   {child.name}
                                 </p>
                                 {child.description && (
-                                  <p className={`mt-0.5 font-sans text-xs ${
-                                    showPill ? "text-white/55" : "text-white/75"
-                                  }`}>
+                                  <p
+                                    className={`mt-0.5 font-sans text-xs ${
+                                      showPill
+                                        ? "text-white/55"
+                                        : "text-white/75"
+                                    }`}
+                                  >
                                     {child.description}
                                   </p>
                                 )}
@@ -365,18 +372,20 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                   className="overflow-hidden"
                                 >
                                   <div className="space-y-1 py-1 pr-2 pl-4">
-                                    {link.children.map((child: ArtsNavChild) => (
-                                      <Link
-                                        key={child.name}
-                                        href={child.href}
-                                        onClick={(e) =>
-                                          handleNavClick(e, child.href, true)
-                                        }
-                                        className="hover:text-arts-science-accent block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5"
-                                      >
-                                        {child.name}
-                                      </Link>
-                                    ))}
+                                    {link.children.map(
+                                      (child: ArtsNavChild) => (
+                                        <Link
+                                          key={child.name}
+                                          href={child.href}
+                                          onClick={(e) =>
+                                            handleNavClick(e, child.href, true)
+                                          }
+                                          className="hover:text-arts-science-accent block rounded-lg px-4 py-2.5 font-sans text-sm text-white/50 transition-colors hover:bg-white/5"
+                                        >
+                                          {child.name}
+                                        </Link>
+                                      ),
+                                    )}
                                   </div>
                                 </motion.div>
                               )}

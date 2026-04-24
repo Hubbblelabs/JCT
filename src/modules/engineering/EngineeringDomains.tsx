@@ -150,7 +150,9 @@ function CourseCarouselSection({
     const container = carouselRef.current;
     if (!container) return;
 
-    const card = container.querySelector<HTMLElement>('[data-course-card="true"]');
+    const card = container.querySelector<HTMLElement>(
+      '[data-course-card="true"]',
+    );
     const cardWidth = card?.offsetWidth ?? 300;
     const gap = 24;
 
@@ -169,7 +171,10 @@ function CourseCarouselSection({
               {eyebrow}
             </h2>
             <h3 className="text-navy mb-0 font-serif text-4xl leading-tight font-bold md:text-5xl">
-              {title} <span className="font-normal text-stone-300 italic">{subtitle}</span>
+              {title}{" "}
+              <span className="font-normal text-stone-300 italic">
+                {subtitle}
+              </span>
             </h3>
           </div>
 
@@ -179,7 +184,7 @@ function CourseCarouselSection({
                 type="button"
                 onClick={() => scrollCarousel("left")}
                 aria-label="Scroll courses left"
-                className="border-border bg-white text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+                className="border-border text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white shadow-sm transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" />
               </button>
@@ -187,7 +192,7 @@ function CourseCarouselSection({
                 type="button"
                 onClick={() => scrollCarousel("right")}
                 aria-label="Scroll courses right"
-                className="border-border bg-white text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+                className="border-border text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white shadow-sm transition-colors"
               >
                 <ArrowRight className="h-4 w-4" />
               </button>
@@ -196,14 +201,16 @@ function CourseCarouselSection({
         </div>
       )}
 
-      <div className={`relative mx-auto w-full ${showHeader ? "pt-2 pb-8" : "pt-4 pb-8"}`}>
+      <div
+        className={`relative mx-auto w-full ${showHeader ? "pt-2 pb-8" : "pt-4 pb-8"}`}
+      >
         {controlsPlacement === "top" && showArrows && (
           <div className="mb-4 flex justify-end gap-2 px-4 md:px-6">
             <button
               type="button"
               onClick={() => scrollCarousel("left")}
               aria-label="Scroll courses left"
-              className="border-border bg-white text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+              className="border-border text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white shadow-sm transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
             </button>
@@ -211,7 +218,7 @@ function CourseCarouselSection({
               type="button"
               onClick={() => scrollCarousel("right")}
               aria-label="Scroll courses right"
-              className="border-border bg-white text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+              className="border-border text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white shadow-sm transition-colors"
             >
               <ArrowRight className="h-4 w-4" />
             </button>
@@ -271,7 +278,10 @@ export function EngineeringDomains() {
               Undergraduate Programs
             </h2>
             <h3 className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl">
-              11 UG Courses, <span className="font-normal text-stone-300 italic">One Standard.</span>
+              11 UG Courses,{" "}
+              <span className="font-normal text-stone-300 italic">
+                One Standard.
+              </span>
             </h3>
           </div>
           <p className="max-w-sm text-base leading-relaxed text-stone-600 md:text-lg">

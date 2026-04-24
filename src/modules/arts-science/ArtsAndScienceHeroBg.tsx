@@ -49,7 +49,8 @@ export function ArtsAndScienceHeroBg() {
       <div
         className="absolute inset-0 opacity-[0.1]"
         style={{
-          backgroundImage: "radial-gradient(rgba(255,255,255,0.85) 1px, transparent 1px)",
+          backgroundImage:
+            "radial-gradient(rgba(255,255,255,0.85) 1px, transparent 1px)",
           backgroundSize: "26px 26px",
         }}
       />

@@ -56,7 +56,7 @@ export function EngineeringResearch() {
           </div>
 
           {/* Right: facility cards */}
-          <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-6 -mx-4 px-4 md:grid md:w-full md:grid-cols-2 md:overflow-visible md:pb-0 md:mx-0 md:px-0 scrollbar-hide">
+          <div className="scrollbar-hide -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-6 md:mx-0 md:grid md:w-full md:grid-cols-2 md:overflow-visible md:px-0 md:pb-0">
             {facilities.map((fac, index) => (
               <motion.div
                 key={fac.title}
@@ -64,14 +64,14 @@ export function EngineeringResearch() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.4, delay: index * 0.08 }}
-                className="w-[75vw] sm:w-[45vw] md:w-auto shrink-0 snap-center hover:border-accent/20 group rounded-2xl border border-stone-100 bg-white p-5 transition-all duration-300 hover:shadow-md"
+                className="hover:border-accent/20 group w-[75vw] shrink-0 snap-center rounded-2xl border border-stone-100 bg-white p-5 transition-all duration-300 hover:shadow-md sm:w-[45vw] md:w-auto"
               >
                 <div className="flex flex-col gap-3">
                   <div className="text-primary group-hover:bg-accent/10 group-hover:text-accent w-fit shrink-0 rounded-xl bg-stone-50 p-3 transition-colors">
                     <fac.icon size={24} strokeWidth={1.5} />
                   </div>
                   <div>
-                    <h3 className="text-navy mb-0 font-serif text-xl font-bold leading-snug">
+                    <h3 className="text-navy mb-0 font-serif text-xl leading-snug font-bold">
                       {fac.title}
                     </h3>
                   </div>

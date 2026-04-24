@@ -1,7 +1,0 @@
-{
-  "error": {
-    "code": 400,
-    "message": "Invalid JSON payload received. Unexpected token.\n{contents:[{role:user,parts:[{text:He\n                 ^",
-    "status": "INVALID_ARGUMENT"
-  }
-}

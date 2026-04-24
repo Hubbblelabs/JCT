@@ -42,7 +42,7 @@ export function EngineeringHero() {
       </motion.div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col px-4 py-12 md:px-6 lg:py-0">
-        <div className="flex flex-col items-center justify-center gap-12 pt-28 pb-12 text-center lg:pt-4 lg:gap-16">
+        <div className="flex flex-col items-center justify-center gap-12 pt-28 pb-12 text-center lg:gap-16 lg:pt-4">
           {/* Centered Text Content */}
           <div className="mx-auto flex max-w-4xl flex-col items-center justify-center">
             <motion.h1
@@ -97,7 +97,7 @@ export function EngineeringHero() {
               transition={{ duration: 0.65, delay: 0.24 }}
               className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm font-medium text-white/85 backdrop-blur-sm"
             >
-              <span className="uppercase tracking-[0.18em] text-white/55">
+              <span className="tracking-[0.18em] text-white/55 uppercase">
                 Counselling Code
               </span>
               <span className="font-bold text-[#d4a024]">

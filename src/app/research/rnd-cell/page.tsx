@@ -28,7 +28,7 @@ export default function RndCellPage() {
       ]}
     >
       <div className="space-y-10 md:space-y-12">
-        <section className="rounded-2xl border border-border/60 bg-white p-5 shadow-sm md:p-6">
+        <section className="border-border/60 rounded-2xl border bg-white p-5 shadow-sm md:p-6">
           <h2 className="text-foreground font-serif text-2xl font-bold">
             About the R&D Cell
           </h2>
@@ -37,7 +37,7 @@ export default function RndCellPage() {
           </p>
         </section>
 
-        <section className="rounded-2xl border border-border/60 bg-white p-5 shadow-sm md:p-6">
+        <section className="border-border/60 rounded-2xl border bg-white p-5 shadow-sm md:p-6">
           <h2 className="text-foreground font-serif text-2xl font-bold">
             Functions
           </h2>

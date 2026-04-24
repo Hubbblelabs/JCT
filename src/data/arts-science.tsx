@@ -31,7 +31,8 @@ export const ugPrograms = [
     duration: "3 Years",
     abbr: "B.Sc. CS",
     image: "/site_assests/computer-img1.jpg.jpeg",
-    highlight: "Foundational technology for building a rich information society",
+    highlight:
+      "Foundational technology for building a rich information society",
     icon: Atom,
     desc: "Bachelor of Computer Science (B.Sc. CS) is the foundational technology for building a rich and fulfilling information society.",
     longDesc: [
@@ -53,7 +54,8 @@ export const ugPrograms = [
     duration: "3 Years",
     abbr: "B.Sc. AI&ML",
     image: "/site_assests/course-img1.webp",
-    highlight: "Skills to perform intelligent data analysis for real-world applications",
+    highlight:
+      "Skills to perform intelligent data analysis for real-world applications",
     icon: Lightbulb,
     desc: "Programme prepares students with the skills to perform intelligent data analysis which is a key component in numerous real-world applications.",
     longDesc: [
