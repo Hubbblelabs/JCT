@@ -8,7 +8,6 @@ import { EngineeringAbout } from "./EngineeringAbout";
 import { EngineeringDomains } from "./EngineeringDomains";
 import { EngineeringMetrics } from "./EngineeringMetrics";
 import { EngineeringResearch } from "./EngineeringResearch";
-import { EngineeringAdmissions } from "./EngineeringAdmissions";
 import { testimonials } from "@/data/engineering";
 
 export default function EngineeringPage() {
@@ -37,9 +36,6 @@ export default function EngineeringPage() {
           items={testimonials}
         />
       </div>
-
-      <EngineeringAdmissions />
-
       <div id="footer">
         <Footer />
       </div>

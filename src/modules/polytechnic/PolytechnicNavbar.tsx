@@ -185,13 +185,15 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
     <>
       {/* Main Nav */}
       <nav
-        className={`fixed top-0 right-0 left-0 z-50 transition-all duration-300 ${
-          scrolled || forceSolidOnTop
-            ? "bg-polytechnic-dark/95 shadow-polytechnic-dark/50 py-2 shadow-lg backdrop-blur-xl"
-            : "bg-transparent py-4"
-        }`}
+        className="fixed top-0 right-0 left-0 z-50 px-4 py-3 transition-all duration-300 md:px-8"
       >
-        <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
+        <div
+          className={`mx-auto flex w-full max-w-360 items-center justify-between rounded-full border px-4 py-2.5 shadow-[0_8px_30px_rgba(0,0,0,0.28)] backdrop-blur-xl transition-all duration-300 lg:px-7 ${
+            scrolled || forceSolidOnTop
+              ? "border-white/10 bg-polytechnic-dark/95"
+              : "border-white/0 bg-transparent"
+          }`}
+        >
           {/* Logo */}
           <Link
             href="/institutions/polytechnic"

@@ -106,6 +106,7 @@ type NavbarProps = {
 
 export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
 
@@ -166,6 +167,15 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
   );
 
   useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const showPill = scrolled || forceSolidOnTop;
+
+  useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "unset";
     return () => {
       document.body.style.overflow = "unset";
@@ -180,16 +190,27 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        style={{
-          backgroundColor: forceSolidOnTop
-            ? "rgba(17, 24, 39, 0.95)"
-            : navBackground,
-          borderColor: forceSolidOnTop ? "rgba(55, 65, 81, 0.4)" : navBorder,
-          borderBottomWidth: "1px",
-        }}
-        className="fixed top-0 right-0 left-0 z-50 py-3 shadow-lg backdrop-blur-xl transition-all duration-300"
+        className="fixed top-0 right-0 left-0 z-50 px-4 py-3 transition-all duration-300 md:px-8"
       >
-        <div className="container mx-auto flex items-center justify-between px-4 md:px-6">
+        <div
+          style={{
+            backgroundColor: showPill
+              ? forceSolidOnTop
+                ? "rgba(17, 24, 39, 0.95)"
+                : navBackground
+              : "transparent",
+            borderColor: showPill
+              ? forceSolidOnTop
+                ? "rgba(55, 65, 81, 0.4)"
+                : navBorder
+              : "transparent",
+          }}
+          className={`mx-auto flex w-full max-w-360 items-center justify-between px-4 py-2.5 transition-all duration-300 lg:px-7 ${
+            showPill
+              ? "rounded-full border shadow-[0_8px_30px_rgba(0,0,0,0.28)] backdrop-blur-xl"
+              : "rounded-none border-transparent shadow-none backdrop-blur-0"
+          }`}
+        >
           {/* Logo */}
           <Link
             href="/institutions/arts-science"

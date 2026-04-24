@@ -26,7 +26,7 @@ import { Placements } from "@/components/layout/Placements";
 export default function ArtsSciencePage() {
   return (
     <main className="bg-background text-foreground arts-science-theme min-h-screen overflow-x-hidden">
-      <ArtsScienceNavbar forceSolidOnTop />
+      <ArtsScienceNavbar />
       <Hero />
       <AboutArtsScience />
       <UgPrograms />

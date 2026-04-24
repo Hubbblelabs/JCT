@@ -106,11 +106,11 @@ export function Footer() {
     >
       <div className="container mx-auto px-4 py-8 md:px-8 lg:py-7">
         <div className="grid gap-8 lg:grid-cols-[1.05fr_1fr_1fr] lg:gap-0 lg:divide-x lg:divide-dotted lg:divide-(--footer-border)">
-          <div className="flex flex-col gap-7 lg:pr-10">
+          <div className="flex flex-col gap-4 mlg:pr-10">
             <Link href="/" className="inline-flex items-center gap-3">
-              <span className="relative h-7 w-16 shrink-0">
+              <span className="relative h-7 w-6 shrink-0 mt-2">
                 <Image
-                  src="/jct_logo.svg"
+                  src="/jct_logo_yellow.png"
                   alt="JCT"
                   fill
                   sizes="64px"
@@ -122,29 +122,36 @@ export function Footer() {
               </span>
             </Link>
 
-            <div className="flex min-h-56 flex-col items-center justify-center rounded-lg bg-(--footer-surface) px-6 py-7 text-center shadow-[0_18px_42px_-28px_rgba(0,0,0,0.8)]">
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-(--footer-accent)/35 text-(--footer-accent)">
-                <Phone className="h-5 w-5" strokeWidth={1.7} />
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
+              <div className="flex min-h-56 flex-1 flex-col items-center justify-center rounded-lg bg-(--footer-surface) px-6 py-7 text-center shadow-[0_18px_42px_-28px_rgba(0,0,0,0.8)]">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-(--footer-accent)/35 text-(--footer-accent)">
+                  <Phone className="h-5 w-5" strokeWidth={1.7} />
+                </div>
+
+                <p className="text-sm font-bold tracking-wide text-(--footer-accent)">
+                  Admissions Helpline
+                </p>
+                <a
+                  href={phoneHref}
+                  className="mt-2 text-3xl font-black tracking-tight text-white transition-colors hover:text-(--footer-accent) sm:text-4xl"
+                >
+                  {siteConfig.contact.phone}
+                </a>
+
+                <a
+                  href={`mailto:${siteConfig.contact.admissionsEmail}`}
+                  className="mt-9 inline-flex items-center gap-2 text-sm font-semibold text-(--footer-text) transition-colors hover:text-(--footer-accent)"
+                >
+                  <Mail className="h-4 w-4 text-(--footer-accent)" />
+                  {siteConfig.contact.admissionsEmail}
+                </a>
               </div>
-
-              <p className="text-sm font-bold tracking-wide text-(--footer-accent)">
-                Admissions Helpline
-              </p>
-              <a
-                href={phoneHref}
-                className="mt-2 text-3xl font-black tracking-tight text-white transition-colors hover:text-(--footer-accent) sm:text-4xl"
-              >
-                {siteConfig.contact.phone}
-              </a>
-
-              <a
-                href={`mailto:${siteConfig.contact.admissionsEmail}`}
-                className="mt-9 inline-flex items-center gap-2 text-sm font-semibold text-(--footer-text) transition-colors hover:text-(--footer-accent)"
-              >
-                <Mail className="h-4 w-4 text-(--footer-accent)" />
-                {siteConfig.contact.admissionsEmail}
-              </a>
             </div>
+
+            <p className="text-sm leading-6 text-(--footer-muted)">
+              © {new Date().getFullYear()} {siteConfig.name}. All rights
+              reserved.
+            </p>
           </div>
 
           <div className="lg:px-14">
@@ -219,30 +226,22 @@ export function Footer() {
                 title="JCT Institutions Location"
               />
             </div>
+
+            <nav
+              aria-label="Footer legal links"
+              className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-(--footer-muted)"
+            >
+              {legalLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  className="transition-colors hover:text-(--footer-accent)"
+                >
+                  {link.name}
+                </Link>
+              ))}
+            </nav>
           </div>
-        </div>
-      </div>
-
-      <div className="border-t border-(--footer-border) bg-(--footer-surface) px-4 pt-4 pb-28 md:px-8 md:pb-24 lg:pb-24">
-        <div className="container mx-auto flex flex-col items-center justify-between gap-3 text-center text-sm text-(--footer-muted) lg:flex-row lg:text-left">
-          <p>
-            © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
-          </p>
-
-          <nav
-            aria-label="Footer legal links"
-            className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2"
-          >
-            {legalLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className="transition-colors hover:text-(--footer-accent)"
-              >
-                {link.name}
-              </Link>
-            ))}
-          </nav>
         </div>
       </div>
     </footer>
