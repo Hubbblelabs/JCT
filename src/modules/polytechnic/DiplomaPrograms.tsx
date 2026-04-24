@@ -66,10 +66,7 @@ function CourseCard({ course }: { course: PolytechnicCourse }) {
             {course.name}
           </h3>
 
-          <div className="flex items-center justify-between gap-3 pt-1 mt-auto">
-            <span className="text-polytechnic block text-[0.75rem] font-bold tracking-wider uppercase">
-              Diploma
-            </span>
+          <div className="flex items-center justify-end pt-1 mt-auto">
             <Link
               href={`/institutions/polytechnic/departments/${course.slug}`}
               className="text-polytechnic inline-flex items-center text-[0.95rem] font-semibold hover:underline"
@@ -130,7 +127,7 @@ function CourseCarouselSection({
             type="button"
             onClick={() => scrollCarousel("left")}
             aria-label="Scroll courses left"
-            className="border-border bg-white text-polytechnic-dark hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+            className="border-border bg-white text-polytechnic-dark hover:border-polytechnic-light/30 hover:text-polytechnic-light inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
@@ -138,7 +135,7 @@ function CourseCarouselSection({
             type="button"
             onClick={() => scrollCarousel("right")}
             aria-label="Scroll courses right"
-            className="border-border bg-white text-polytechnic-dark hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+            className="border-border bg-white text-polytechnic-dark hover:border-polytechnic-light/30 hover:text-polytechnic-light inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
           >
             <ArrowRight className="h-4 w-4" />
           </button>
@@ -207,18 +204,9 @@ export function DiplomaPrograms() {
       <div className="relative z-10 container mx-auto px-4 md:px-6">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between mb-8">
           <PolySectionHeader
-            eyebrow="Programs"
             title="Diploma Programs"
-            description="Six industry-relevant diploma streams with practical training and structured academic support."
             className="mb-0"
           />
-          <PolyButtonLink
-            href="/institutions/polytechnic/departments"
-            variant="outline"
-          >
-            View All Programs
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </PolyButtonLink>
         </div>
 
         <CourseCarouselSection courses={diplomaPrograms as PolytechnicCourse[]} />

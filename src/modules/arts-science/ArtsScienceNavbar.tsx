@@ -47,55 +47,13 @@ const artsNav: ArtsNavItem[] = [
       },
     ],
   },
-  { name: "About Us", href: "#about", className: "hidden xl:block" },
-  { name: "Courses", href: "#courses", className: "hidden xl:block" },
-  { name: "Admission", href: "#admission", className: "hidden 2xl:block" },
-  { name: "Contact", href: "#contact", className: "hidden 2xl:block" },
-  {
-    name: "Explore More",
-    href: "#",
-    children: [
-      {
-        name: "About Us",
-        href: "#about",
-        description: "About our institution",
-        className: "xl:hidden",
-      },
-      {
-        name: "Courses",
-        href: "#courses",
-        description: "Programs offered",
-        className: "xl:hidden",
-      },
-      {
-        name: "Admission",
-        href: "#admission",
-        description: "Admission process & criteria",
-        className: "2xl:hidden",
-      },
-      {
-        name: "Contact",
-        href: "#contact",
-        description: "Get in touch with us",
-        className: "2xl:hidden",
-      },
-      {
-        name: "Placements",
-        href: "#placements",
-        description: "Our recruitment partners & stats",
-      },
-      {
-        name: "Life @ JCT",
-        href: "#life",
-        description: "News, events & student life",
-      },
-      {
-        name: "Testimonials",
-        href: "#testimonials",
-        description: "Voices from our community",
-      },
-    ],
-  },
+  { name: "About Us", href: "#about" },
+  { name: "Courses", href: "#courses" },
+  { name: "Admission", href: "#admission" },
+  { name: "Contact", href: "#contact" },
+  { name: "Placements", href: "#placements" },
+  { name: "Life @ JCT", href: "#life" },
+  { name: "Testimonials", href: "#testimonials" },
 ];
 
 type NavbarProps = {
@@ -197,7 +155,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
             </div>
             <div className="flex flex-col text-white">
               <span className="font-serif text-sm leading-none font-bold tracking-tight md:text-lg">
-                JCT
+                JCT College of
               </span>
               <span className="pt-0.5 font-sans text-[10px] font-medium tracking-widest whitespace-nowrap text-white/70 uppercase">
                 Arts & Science
@@ -205,7 +163,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
             </div>
           </Link>
 
-          <div className="hidden items-center gap-2 lg:flex">
+          <div className="hidden items-center gap-2 xl:flex">
             {artsNav.map((link) => (
               <div
                 key={link.name}
@@ -237,16 +195,14 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                   >
                     {link.name}
                     {link.children && (
-                      <>
-                        <ChevronDown
-                          size={12}
-                          className={`transition-transform duration-200 ${
-                            activeDropdown === link.name ? "rotate-180" : ""
-                          }`}
-                        />
-                        <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-[#f07b1a] transition-transform duration-300 group-hover:scale-x-100" />
-                      </>
+                      <ChevronDown
+                        size={12}
+                        className={`transition-transform duration-200 ${
+                          activeDropdown === link.name ? "rotate-180" : ""
+                        }`}
+                      />
                     )}
+                    <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-[#f07b1a] transition-transform duration-300 group-hover:scale-x-100" />
                   </Link>
                 )}
 
@@ -259,21 +215,31 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                       transition={{ duration: 0.15, ease: "easeOut" }}
                       className="absolute top-full left-0 w-64 pt-3"
                     >
-                      <div className="overflow-hidden rounded-xl border border-white/15 bg-[#0b1a31]/96 p-2 shadow-2xl shadow-black/40 backdrop-blur-2xl">
+                      <div className={`overflow-hidden rounded-xl border p-2 shadow-2xl backdrop-blur-2xl ${
+                          showPill
+                            ? "border-white/15 bg-[#0b1a31]/96 shadow-black/40"
+                            : "border-white/20 bg-white/12 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)]"
+                        }`}>
                         <div className="space-y-0.5">
                           {link.children.map((child) => (
                             <Link
                               key={child.name}
                               href={child.href}
                               onClick={(event) => handleNavClick(event, child.href)}
-                              className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all duration-300 hover:bg-white/8 ${child.className || ""}`}
+                              className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all duration-300 ${
+                                showPill ? "hover:bg-white/8" : "hover:bg-white/15"
+                              } ${child.className || ""}`}
                             >
                               <div>
-                                <p className="font-sans text-[15px] font-medium whitespace-nowrap text-white/92 transition-colors group-hover:text-[#ffae4c]">
+                                <p className={`font-sans text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-[#ffae4c] ${
+                                  showPill ? "text-white/92" : "text-white"
+                                }`}>
                                   {child.name}
                                 </p>
                                 {child.description && (
-                                  <p className="mt-0.5 font-sans text-xs text-white/55">
+                                  <p className={`mt-0.5 font-sans text-xs ${
+                                    showPill ? "text-white/55" : "text-white/75"
+                                  }`}>
                                     {child.description}
                                   </p>
                                 )}
@@ -293,7 +259,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
             ))}
           </div>
 
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="hidden items-center gap-3 xl:flex">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
               className="hidden items-center gap-1.5 font-sans text-sm font-medium whitespace-nowrap text-white/90 transition-colors duration-300 hover:text-white xl:flex"
@@ -303,7 +269,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
           </div>
 
           <button
-            className="p-2 text-white/70 transition-colors hover:text-white lg:hidden"
+            className="p-2 text-white/70 transition-colors hover:text-white xl:hidden"
             onClick={() => setIsOpen(!isOpen)}
             aria-label="Toggle menu"
           >
@@ -318,7 +284,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-60 bg-black/40 backdrop-blur-sm lg:hidden"
+              className="fixed inset-0 z-60 bg-black/40 backdrop-blur-sm xl:hidden"
               onClick={() => setIsOpen(false)}
             />
             <motion.div
@@ -326,7 +292,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="fixed inset-y-4 right-4 z-61 flex w-70 flex-col rounded-3xl border border-white/10 bg-[#111827]/90 shadow-2xl backdrop-blur-xl lg:hidden"
+              className="fixed inset-y-4 right-4 z-61 flex w-70 flex-col rounded-3xl border border-white/10 bg-[#111827]/90 shadow-2xl backdrop-blur-xl xl:hidden"
             >
               <div className="flex items-center justify-between border-b border-white/5 p-5">
                 <div className="flex items-center gap-3">
@@ -341,7 +307,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                   </div>
                   <div className="flex flex-col text-white">
                     <span className="font-serif text-lg leading-none font-bold">
-                      JCT
+                      JCT College of
                     </span>
                     <span className="mt-0.5 font-sans text-[9px] font-medium tracking-widest text-white/70 uppercase">
                       Arts & Science

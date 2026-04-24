@@ -54,51 +54,6 @@ export function NewsEvents() {
           </div>
         </div>
 
-        {/* Events Section */}
-        <div className="mx-auto max-w-4xl border-t border-stone-300 pt-24 text-center">
-          <h2 className="text-arts-science-dark mb-12 font-sans text-3xl font-bold md:text-4xl">
-            Upcoming events
-          </h2>
-
-          <div className="flex flex-col gap-4 divide-y divide-stone-300 border-y border-stone-300 text-left">
-            {campusEvents.map((event, index) => (
-              <div
-                key={index}
-                className="-mx-4 flex flex-col items-start justify-between gap-6 px-4 py-6 transition-colors hover:bg-white/50 sm:flex-row sm:items-center"
-              >
-                <div className="flex-1">
-                  <h4 className="text-arts-science-dark mb-3 font-sans text-xl font-bold md:text-2xl">
-                    {event.title}
-                  </h4>
-                  <div className="flex flex-wrap items-center gap-4 text-sm font-light text-stone-500">
-                    <span className="flex items-center gap-1.5">
-                      <Tag className="h-4 w-4" /> {event.category}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <MapPin className="h-4 w-4" /> {event.location}
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                      <Calendar className="h-4 w-4" /> {event.time}
-                    </span>
-                  </div>
-                </div>
-                <a
-                  href="/institutions/arts-science/events"
-                  className="group text-arts-science-dark flex shrink-0 items-center font-semibold hover:underline"
-                >
-                  View event{" "}
-                  <ChevronRight className="ml-1 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </a>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-12 flex justify-center text-center">
-            <Button className="from-arts-science-accent h-14 rounded-full border border-orange-400/70 bg-linear-to-r to-orange-600 px-8 font-bold text-white shadow-[0_10px_24px_rgba(249,115,22,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-110">
-              View all events
-            </Button>
-          </div>
-        </div>
       </div>
     </section>
   );

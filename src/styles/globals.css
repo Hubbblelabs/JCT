@@ -270,8 +270,8 @@ h6 {
     var(--color-polytechnic-dark) 18%,
     transparent
   );
-  --scrollbar-thumb: var(--color-gold);
-  --scrollbar-thumb-hover: var(--color-gold-light);
+  --scrollbar-thumb: var(--color-polytechnic-light);
+  --scrollbar-thumb-hover: var(--color-polytechnic);
 }
 
 html,
@@ -318,7 +318,7 @@ body,
 
 .polytechnic-theme {
   --color-primary: var(--color-polytechnic-dark);
-  --color-accent: var(--color-gold);
+  --color-accent: var(--color-polytechnic-light);
   --color-background: #f8f9fa;
   --color-foreground: #212121;
 }

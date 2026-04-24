@@ -44,7 +44,7 @@ export function Connect() {
 
             <Link
               href="/about"
-              className="group to-gold text-polytechnic-dark inline-flex h-12 items-center gap-2 rounded-full border border-[#ffd166]/70 bg-linear-to-r from-[#ffd166] px-8 text-sm font-semibold shadow-[0_10px_24px_rgba(255,179,0,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
+              className="group text-white inline-flex h-12 items-center gap-2 rounded-full bg-polytechnic hover:bg-polytechnic-light px-8 text-sm font-semibold shadow-[0_10px_24px_rgba(58,67,84,0.35)] transition-all hover:-translate-y-0.5"
             >
               Learn More
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />

@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 export default function PolytechnicPage() {
   return (
     <main className="polytechnic-theme min-h-screen overflow-x-hidden bg-[#F8F9FA] font-sans">
-      <PolytechnicNavbar forceSolidOnTop />
+      <PolytechnicNavbar />
       <Hero />
       <DiplomaPrograms />
       <AboutPolytechnic />

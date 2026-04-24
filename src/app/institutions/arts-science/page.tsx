@@ -17,10 +17,8 @@ export const metadata: Metadata = {
 import { Hero } from "@/modules/arts-science/Hero";
 import { AboutArtsScience } from "@/modules/arts-science/AboutArtsScience";
 import { UgPrograms } from "@/modules/arts-science/UgPrograms";
-import { Accreditation } from "@/modules/arts-science/Accreditation";
 import { CampusLife } from "@/modules/arts-science/CampusLife";
 import { Testimonials } from "@/modules/arts-science/Testimonials";
-import { NewsEvents } from "@/modules/arts-science/NewsEvents";
 import { Placements } from "@/components/layout/Placements";
 
 export default function ArtsSciencePage() {
@@ -31,9 +29,8 @@ export default function ArtsSciencePage() {
       <UgPrograms />
       <AboutArtsScience />
       {/* <Distinction /> */}
-      <Accreditation /> <Placements /> <CampusLife />
+      <Placements /> <CampusLife />
       <Testimonials />
-      <NewsEvents />
       {/* <CTA /> */}
       <Footer />
     </main>

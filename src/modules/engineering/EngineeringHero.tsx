@@ -20,7 +20,7 @@ export function EngineeringHero() {
     <section
       id="hero"
       ref={heroRef}
-      className="relative flex min-h-screen items-center overflow-hidden bg-[#07111d] pt-20 lg:pt-0"
+      className="relative flex min-h-screen items-center overflow-hidden bg-[#07111d] pt-20 lg:pt-24"
     >
       {/* Immersive Dark Background with Image */}
       <motion.div
@@ -42,7 +42,7 @@ export function EngineeringHero() {
       </motion.div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col px-4 py-12 md:px-6 lg:py-0">
-        <div className="flex flex-col items-center justify-center gap-12 pt-24 pb-12 text-center lg:gap-16">
+        <div className="flex flex-col items-center justify-center gap-12 pt-28 pb-12 text-center lg:pt-4 lg:gap-16">
           {/* Centered Text Content */}
           <div className="mx-auto flex max-w-4xl flex-col items-center justify-center">
             <motion.h1

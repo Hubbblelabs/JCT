@@ -78,7 +78,7 @@ export function AboutArtsScience() {
       <div className="bg-arts-science/5 absolute -top-40 -right-40 h-120 w-120 rounded-full blur-[100px]" />
       <div className="bg-arts-science/5 absolute -bottom-40 -left-40 h-120 w-120 rounded-full blur-[100px]" />
 
-      <ArtsSection tone="transparent" className="relative">
+      <ArtsSection tone="transparent" className="relative pt-0 md:pt-2">
         {/* Tab Navigation */}
         <div className="relative z-10 mb-10 flex justify-center px-4">
           <div className="no-scrollbar flex max-w-full overflow-x-auto rounded-full border border-orange-100 bg-white/80 p-1 shadow-sm backdrop-blur-sm">

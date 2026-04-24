@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, type UIEvent } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -15,6 +16,18 @@ const campusImages = [
 ];
 
 export function CampusLife() {
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const handleScroll = (e: UIEvent<HTMLDivElement>) => {
+    const container = e.currentTarget;
+    const scrollLeft = container.scrollLeft;
+    const maxScroll = container.scrollWidth - container.clientWidth;
+    if (maxScroll <= 0) return;
+    
+    const index = Math.round((scrollLeft / maxScroll) * (campusImages.length - 1));
+    setActiveIndex(Math.min(Math.max(index, 0), campusImages.length - 1));
+  };
+
   return (
     <section className="overflow-hidden bg-white py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-8">
@@ -46,7 +59,7 @@ export function CampusLife() {
             </p>
             <Link
               href="/institutions/polytechnic/campus-life"
-              className="group to-gold text-polytechnic-dark inline-flex h-12 items-center gap-2 rounded-full border border-[#ffd166]/70 bg-linear-to-r from-[#ffd166] px-8 text-sm font-semibold shadow-[0_10px_24px_rgba(255,179,0,0.35)] transition-all hover:-translate-y-0.5 hover:brightness-95"
+              className="group bg-polytechnic hover:bg-polytechnic-light inline-flex h-12 items-center gap-2 rounded-full px-8 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(58,67,84,0.35)] transition-all hover:-translate-y-0.5"
             >
               Find Out More
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -55,7 +68,10 @@ export function CampusLife() {
 
           {/* Right: Drag-scroll gallery */}
           <div>
-            <DragScroll className="relative flex h-110 w-full snap-x snap-mandatory gap-4 scroll-smooth pb-4 md:h-130">
+            <DragScroll 
+              className="relative flex h-110 w-full snap-x snap-mandatory gap-4 scroll-smooth pb-4 md:h-130"
+              onScroll={handleScroll}
+            >
               {campusImages.map((src, index) => (
                 <motion.div
                   key={index}
@@ -77,12 +93,11 @@ export function CampusLife() {
               ))}
             </DragScroll>
 
-            {/* Pagination dots */}
             <div className="mt-4 flex items-center justify-center gap-2">
               {campusImages.map((_, i) => (
                 <div
                   key={i}
-                  className={`rounded-full transition-all ${i === 0 ? "bg-polytechnic-dark h-2 w-6" : "h-2 w-2 bg-stone-300"}`}
+                  className={`rounded-full transition-all ${i === activeIndex ? "bg-polytechnic-dark h-2 w-6" : "h-2 w-2 bg-stone-300"}`}
                 />
               ))}
             </div>

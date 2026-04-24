@@ -62,7 +62,7 @@ export function AboutPolytechnic() {
       <PolySection
         id="about-institution"
         tone="transparent"
-        className="relative"
+        className="relative pt-0 md:pt-2"
       >
         <div className="bg-polytechnic-accent/5 pointer-events-none absolute top-0 right-0 z-0 -mt-32 -mr-32 h-125 w-125 rounded-full blur-3xl"></div>
         <div className="bg-polytechnic-dark/5 pointer-events-none absolute bottom-0 left-0 z-0 -mb-32 -ml-32 h-100 w-100 rounded-full blur-3xl"></div>
@@ -170,7 +170,7 @@ export function AboutPolytechnic() {
                     >
                       <path
                         d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM11 7H13V13H11V7ZM11 15H13V17H11V15Z"
-                        fill="#D4A024"
+                        fill="#4f617b"
                       />
                     </svg>
                   </div>
@@ -204,7 +204,7 @@ export function AboutPolytechnic() {
                     >
                       <path
                         d="M12 2L2 12H5V22H19V12H22L12 2ZM17 20H7V10H17V20Z"
-                        fill="#D4A024"
+                        fill="#4f617b"
                       />
                     </svg>
                   </div>

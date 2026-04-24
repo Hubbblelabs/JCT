@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 
 export type CollegeTestimonialItem = {
   quote: string;
@@ -97,6 +97,20 @@ export function CollegeTestimonials({
     VIP: false,
   });
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (scrollContainerRef.current && window.innerWidth < 768) {
+      const container = scrollContainerRef.current;
+      setTimeout(() => {
+        const centerCard = container.children[1] as HTMLElement;
+        if (centerCard) {
+          container.scrollLeft = centerCard.offsetLeft - (container.clientWidth - centerCard.clientWidth) / 2;
+        }
+      }, 100);
+    }
+  }, []);
+
   useEffect(() => {
     setActiveIndices({
       Alumni: getRandomIndex(groupedItems.Alumni.length),
@@ -170,7 +184,10 @@ export function CollegeTestimonials({
             </motion.h2>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-8">
+          <div 
+            ref={scrollContainerRef}
+            className="flex snap-x snap-mandatory overflow-x-auto pb-6 -mx-6 px-6 gap-6 md:grid md:grid-cols-3 md:pb-0 md:mx-0 md:px-0 md:overflow-visible scrollbar-hide"
+          >
             {TESTIMONIAL_CATEGORIES.map((category, laneIndex) => {
               const laneItems = groupedItems[category];
               const activeIndex = activeIndices[category] % laneItems.length;
@@ -185,7 +202,7 @@ export function CollegeTestimonials({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.25 }}
                   transition={{ duration: 0.5, delay: laneIndex * 0.1 }}
-                  className="flex h-full flex-col"
+                  className="flex h-full flex-col min-w-[85vw] snap-center shrink-0 md:min-w-0"
                   onMouseEnter={() =>
                     setPaused((prev) => ({
                       ...prev,

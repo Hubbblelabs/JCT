@@ -7,6 +7,7 @@ import { EngineeringHero } from "./EngineeringHero";
 import { EngineeringDomains } from "./EngineeringDomains";
 import { EngineeringMetrics } from "./EngineeringMetrics";
 import { EngineeringResearch } from "./EngineeringResearch";
+import { CampusLife } from "./CampusLife";
 import { testimonials } from "@/data/engineering";
 
 export default function EngineeringPage() {
@@ -23,6 +24,7 @@ export default function EngineeringPage() {
       <EngineeringResearch />
 
       <Placements />
+      <CampusLife />
 
       <div id="life-at-jct">
         <CollegeTestimonials

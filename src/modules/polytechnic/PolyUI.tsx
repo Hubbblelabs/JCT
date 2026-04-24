@@ -85,7 +85,7 @@ export function PolyButtonLink({
     variant === "outline"
       ? "border border-polytechnic/25 bg-transparent text-polytechnic-dark hover:bg-polytechnic-muted"
       : variant === "secondary"
-        ? "bg-gold text-navy hover:bg-gold-light"
+        ? "bg-polytechnic-light text-white hover:bg-polytechnic"
         : "bg-polytechnic text-white hover:bg-polytechnic-dark";
 
   return (

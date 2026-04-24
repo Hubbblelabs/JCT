@@ -6,12 +6,14 @@ interface DragScrollProps {
   children: React.ReactNode;
   className?: string;
   style?: React.CSSProperties;
+  onScroll?: React.UIEventHandler<HTMLDivElement>;
 }
 
 export function DragScroll({
   children,
   className = "",
   style = {},
+  onScroll,
 }: DragScrollProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -45,6 +47,7 @@ export function DragScroll({
       onMouseLeave={onMouseLeave}
       onMouseUp={onMouseUp}
       onMouseMove={onMouseMove}
+      onScroll={onScroll}
     >
       {children}
     </div>

@@ -46,7 +46,7 @@ const placementStats = [
 
 function CompanyCard({ company }: { company: { name: string; logo: string } }) {
   return (
-    <div className="border-border hover:border-gold/30 flex h-16 w-36 flex-col items-center justify-center rounded-xl border bg-white px-3 py-2 transition-all duration-300 hover:scale-105 hover:shadow-md sm:h-18 sm:w-40 md:h-20 md:w-44">
+    <div className="border-border hover:border-accent/30 flex h-16 w-36 flex-col items-center justify-center rounded-xl border bg-white px-3 py-2 transition-all duration-300 hover:scale-105 hover:shadow-md sm:h-18 sm:w-40 md:h-20 md:w-44">
       <div className="relative h-8 w-full sm:h-9">
         <Image
           src={company.logo}
@@ -76,7 +76,7 @@ export function Placements() {
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-gold mb-4 inline-block text-sm font-bold tracking-[0.2em] uppercase"
+            className="text-accent mb-4 inline-block text-sm font-bold tracking-[0.2em] uppercase"
           >
             Placement Highlights
           </motion.span>
@@ -124,7 +124,7 @@ export function Placements() {
             >
               <stat.icon
                 size={20}
-                className="text-gold mx-auto mb-2"
+                className="text-accent mx-auto mb-2"
                 strokeWidth={1.5}
               />
               <span className="text-navy mb-1 block font-sans text-3xl font-bold md:text-4xl">

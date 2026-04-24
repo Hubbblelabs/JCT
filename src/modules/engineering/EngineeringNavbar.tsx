@@ -167,10 +167,10 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
               </div>
               <div className="flex flex-col text-white">
                 <span className="font-serif text-[18px] leading-none font-bold tracking-tight lg:text-[22px]">
-                  JCT
+                  JCT College of
                 </span>
                 <span className="pt-0.5 font-sans text-[9px] font-semibold tracking-[0.18em] whitespace-nowrap text-white/70 uppercase lg:text-[11px]">
-                  Engineering &amp; Technology
+                  Engineering & Technology
                 </span>
               </div>
             </Link>
@@ -301,42 +301,13 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
           </div>
 
           <div className="z-50 hidden shrink-0 items-center justify-end gap-3 whitespace-nowrap xl:flex xl:flex-1 xl:gap-6">
-            <AnimatePresence mode="wait" initial={false}>
-              {showPhoneCta ? (
-                <motion.a
-                  key="phone"
-                  href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-                  className="flex items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white xl:gap-2 xl:text-[15px]"
-                >
-                  <Phone size={16} className="h-3.5 w-3.5 xl:h-4 xl:w-4" />
-                  {siteConfig.contact.phone}
-                </motion.a>
-              ) : (
-                <motion.div
-                  key="apply"
-                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
-                  transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-                  className="inline-flex"
-                >
-                  <Link
-                    href="/admissions/apply"
-                    className={`inline-flex h-9.5 items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10.5 xl:px-8 xl:text-[15px] ${
-                      isSolid
-                        ? "bg-[#d4a024] font-semibold text-[#0B1628] shadow-lg shadow-black/20 hover:bg-[#e8b84a]"
-                        : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
-                    }`}
-                  >
-                    Apply Now
-                  </Link>
-                </motion.div>
-              )}
-            </AnimatePresence>
+            <a
+              href={`tel:${siteConfig.contact.phone.replace(/\\s/g, "")}`}
+              className="flex items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white xl:gap-2 xl:text-[15px]"
+            >
+              <Phone size={16} className="h-3.5 w-3.5 xl:h-4 xl:w-4" />
+              {siteConfig.contact.phone}
+            </a>
           </div>
 
           <button
@@ -384,10 +355,10 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                   </div>
                   <div className="flex flex-col">
                     <span className="font-serif text-lg leading-none font-bold text-white">
-                      JCT
+                      JCT College of
                     </span>
                     <span className="mt-0.5 text-[9px] font-medium tracking-[0.14em] text-white/50 uppercase">
-                      Engineering &amp; Technology
+                      Engineering & Technology
                     </span>
                   </div>
                 </div>
@@ -468,13 +439,12 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
               </div>
 
               <div className="space-y-3 border-t border-white/5 p-5 pt-2">
-                <Link
-                  href="/admissions/apply"
-                  onClick={() => setIsOpen(false)}
+                <a
+                  href={`tel:${siteConfig.contact.phone.replace(/\\s/g, "")}`}
                   className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#d4a024] font-sans text-sm font-bold text-[#0B1628] shadow-lg shadow-[#d4a024]/10 transition-all hover:bg-[#e8b84a] hover:scale-[1.02] active:scale-[0.98]"
                 >
-                  Apply Now <ArrowRight size={14} />
-                </Link>
+                  <Phone size={16} /> {siteConfig.contact.phone}
+                </a>
               </div>
             </motion.div>
           </>
