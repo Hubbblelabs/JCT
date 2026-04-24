@@ -104,9 +104,9 @@ export function Footer() {
       className="bg-(--footer-bg) font-sans text-(--footer-text)"
       style={footerVars}
     >
-      <div className="container mx-auto px-4 py-8 md:px-8 lg:py-7">
+      <div className="container mx-auto px-4 pt-8 pb-[calc(env(safe-area-inset-bottom)+6.5rem)] md:px-8 md:pb-[calc(env(safe-area-inset-bottom)+5.5rem)] lg:py-7 lg:pb-[calc(env(safe-area-inset-bottom)+4.25rem)]">
         <div className="grid gap-8 lg:grid-cols-[1.05fr_1fr_1fr] lg:gap-0 lg:divide-x lg:divide-dotted lg:divide-(--footer-border)">
-          <div className="flex flex-col gap-4 mlg:pr-10">
+          <div className="flex flex-col gap-5 lg:pr-10">
             <Link href="/" className="inline-flex items-center gap-3">
               <span className="relative h-7 w-6 shrink-0 mt-2">
                 <Image

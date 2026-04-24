@@ -2,11 +2,247 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { DragScroll } from "@/components/ui/DragScroll";
 import { ugCourses, pgCourses, researchCourses } from "@/data/engineering";
 
+type EngineeringCourse = {
+  name: string;
+  abbr: string;
+  slug: string;
+  image: string;
+  highlight: string;
+  nbaAccredited?: boolean;
+};
+
+function CourseCard({
+  course,
+  href,
+  showAccreditationBadges,
+  showDescription,
+}: {
+  course: EngineeringCourse;
+  href?: string;
+  showAccreditationBadges: boolean;
+  showDescription: boolean;
+}) {
+  return (
+    <motion.article
+      initial={{ opacity: 0, x: 20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.35 }}
+      data-course-card="true"
+      className="border-engineering/12 group flex h-[21.25rem] w-[18.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-white transition-all sm:h-[21.75rem] sm:w-[20rem] md:h-[21.75rem] md:w-[21.5rem] lg:w-[22rem]"
+      draggable={false}
+    >
+      <div className="relative aspect-[16/9] overflow-hidden">
+        <Image
+          src={course.image}
+          alt={`${course.name} course image`}
+          fill
+          sizes="(min-width: 1024px) 352px, (min-width: 640px) 320px, 296px"
+          className="object-cover transition-transform duration-500 group-hover:scale-103"
+        />
+        <div className="absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent" />
+        {showAccreditationBadges && (
+          <div className="absolute top-3 right-3 flex items-center gap-2 rounded-full bg-white/92 px-2.5 py-1 shadow-sm backdrop-blur-sm">
+            <Image
+              src="/aicte.png"
+              alt="AICTE"
+              width={56}
+              height={22}
+              style={{ width: "auto" }}
+              className="h-4 object-contain"
+            />
+            {course.nbaAccredited && (
+              <Image
+                src="/nba.png"
+                alt="NBA Accredited"
+                width={56}
+                height={22}
+                style={{ width: "auto" }}
+                className="h-4 object-contain"
+              />
+            )}
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-1 flex-col px-5 py-3.5">
+        <div className="space-y-1.5">
+          <h3 className="text-navy line-clamp-2 text-[1.35rem] leading-snug font-semibold md:text-[1.45rem]">
+            {course.name}
+          </h3>
+
+          {showDescription && (
+            <p className="line-clamp-2 text-sm leading-relaxed text-slate-600">
+              {course.highlight}
+            </p>
+          )}
+
+          <div className="flex items-center justify-between gap-3 pt-1">
+            <span className="text-engineering block text-[0.75rem] font-bold tracking-wider uppercase">
+              {course.abbr}
+            </span>
+            {href ? (
+              <Link
+                href={href}
+                className="text-engineering inline-flex items-center text-[0.95rem] font-semibold hover:underline"
+              >
+                Program Details
+                <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+              </Link>
+            ) : (
+              <span className="text-engineering inline-flex items-center text-[0.95rem] font-semibold">
+                Program Details
+                <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </motion.article>
+  );
+}
+
+function CourseCarouselSection({
+  eyebrow,
+  title,
+  subtitle,
+  courses,
+  showAccreditationBadges,
+  showDescription,
+  showHeader = true,
+  controlsPlacement = "top",
+}: {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  courses: EngineeringCourse[];
+  showAccreditationBadges: boolean;
+  showDescription: boolean;
+  showHeader?: boolean;
+  controlsPlacement?: "top" | "header";
+}) {
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [showArrows, setShowArrows] = useState(false);
+
+  useEffect(() => {
+    const container = carouselRef.current;
+    if (!container) return;
+
+    const updateArrows = () => {
+      setShowArrows(container.scrollWidth > container.clientWidth + 2);
+    };
+
+    updateArrows();
+
+    const observer = new ResizeObserver(updateArrows);
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, [courses.length]);
+
+  const scrollCarousel = (direction: "left" | "right") => {
+    const container = carouselRef.current;
+    if (!container) return;
+
+    const card = container.querySelector<HTMLElement>('[data-course-card="true"]');
+    const cardWidth = card?.offsetWidth ?? 300;
+    const gap = 24;
+
+    container.scrollBy({
+      left: direction === "left" ? -(cardWidth + gap) : cardWidth + gap,
+      behavior: "smooth",
+    });
+  };
+
+  return (
+    <div className="relative z-10 container mx-auto mt-12 px-4 md:px-6">
+      {showHeader && (
+        <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div>
+            <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
+              {eyebrow}
+            </h2>
+            <h3 className="text-navy mb-0 font-serif text-4xl leading-tight font-bold md:text-5xl">
+              {title} <span className="font-normal text-stone-300 italic">{subtitle}</span>
+            </h3>
+          </div>
+
+          {controlsPlacement === "header" && showArrows && (
+            <div className="flex gap-2 self-start md:self-auto">
+              <button
+                type="button"
+                onClick={() => scrollCarousel("left")}
+                aria-label="Scroll courses left"
+                className="border-border bg-white text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollCarousel("right")}
+                aria-label="Scroll courses right"
+                className="border-border bg-white text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className={`relative mx-auto w-full ${showHeader ? "pt-2 pb-8" : "pt-4 pb-8"}`}>
+        {controlsPlacement === "top" && showArrows && (
+          <div className="mb-4 flex justify-end gap-2 px-4 md:px-6">
+            <button
+              type="button"
+              onClick={() => scrollCarousel("left")}
+              aria-label="Scroll courses left"
+              className="border-border bg-white text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => scrollCarousel("right")}
+              aria-label="Scroll courses right"
+              className="border-border bg-white text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border shadow-sm transition-colors"
+            >
+              <ArrowRight className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        <DragScroll className="snap-container scrollbar-hide flex w-full items-stretch gap-4 overflow-x-auto px-4 md:gap-6 md:px-6">
+          <div className="flex w-max items-stretch gap-4 md:gap-6">
+            {courses.map((course) => (
+              <CourseCard
+                key={course.slug}
+                course={course}
+                href={
+                  showAccreditationBadges
+                    ? `/institutions/engineering/departments/${course.slug}`
+                    : undefined
+                }
+                showAccreditationBadges={showAccreditationBadges}
+                showDescription={showDescription}
+              />
+            ))}
+          </div>
+        </DragScroll>
+      </div>
+    </div>
+  );
+}
+
 export function EngineeringDomains() {
+  const postgraduateCourses = [...pgCourses, ...researchCourses];
+
   return (
     <section
       id="engineering-domains"
@@ -17,15 +253,8 @@ export function EngineeringDomains() {
           0% { background-position: 0 0; }
           100% { background-position: -28.28px 0; }
         }
-        @keyframes marquee-courses {
-          to { transform: translateX(calc(-50% - 12px)); }
-        }
-        @media (min-width: 768px) {
-          @keyframes marquee-courses {
-            to { transform: translateX(calc(-50% - 16px)); }
-          }
-        }
       `}</style>
+
       <div
         className="absolute inset-0 opacity-[0.02] group-hover/section:animate-[slide-bg_2s_linear_infinite]"
         style={{
@@ -34,6 +263,7 @@ export function EngineeringDomains() {
           backgroundSize: "28.28px 28.28px",
         }}
       />
+
       <div className="relative z-10 container mx-auto mb-8 w-full px-4 md:px-6">
         <div className="mb-0 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <div>
@@ -41,10 +271,7 @@ export function EngineeringDomains() {
               Undergraduate Programs
             </h2>
             <h3 className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl">
-              11 UG Courses,{" "}
-              <span className="font-normal text-stone-300 italic">
-                One Standard.
-              </span>
+              11 UG Courses, <span className="font-normal text-stone-300 italic">One Standard.</span>
             </h3>
           </div>
           <p className="max-w-sm text-base leading-relaxed text-stone-600 md:text-lg">
@@ -55,187 +282,27 @@ export function EngineeringDomains() {
         </div>
       </div>
 
-      <div className="group/carousel relative flex w-full overflow-hidden mask-[linear-gradient(to_right,transparent,black_5%,black_95%,transparent)] pt-4 pb-8 md:mask-[linear-gradient(to_right,transparent,black_10%,black_90%,transparent)]">
-        <div
-          className="flex w-max items-stretch gap-6 pl-6 group-hover/carousel:[animation-play-state:paused]! md:gap-8 md:pl-8"
-          style={{ animation: "marquee-courses 30s linear infinite" }}
-        >
-          {[...ugCourses, ...ugCourses].map((dept, index) => (
-            <motion.div
-              key={`${dept.abbr}-${index}`}
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{
-                duration: 0.35,
-                delay: (index % ugCourses.length) * 0.05,
-              }}
-              className="group border-border hover:border-engineering/30 card-hover-lift relative flex min-h-75 w-72.5 shrink-0 flex-col justify-between rounded-2xl border bg-white p-6 shadow-sm shadow-slate-200/50 transition-all hover:shadow-xl md:w-[320px] md:p-8"
-              draggable={false}
-            >
-              <Link
-                href={`/institutions/engineering/departments/${dept.slug}`}
-                className="absolute inset-0 z-10"
-              >
-                <span className="sr-only">
-                  View {dept.name} department page
-                </span>
-              </Link>
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="text-engineering group-hover:bg-engineering bg-engineering-muted shrink-0 rounded-xl p-3 transition-colors group-hover:text-white">
-                    <dept.icon size={24} strokeWidth={1.5} />
-                  </div>
-                  <div>
-                    <h3 className="text-navy font-serif text-xl font-bold">
-                      {dept.name}
-                    </h3>
-                    <span className="text-engineering mt-1 text-sm font-bold tracking-wider uppercase">
-                      {dept.abbr}
-                    </span>
-                  </div>
-                </div>
-                <div>
-                  <p className="text-base leading-relaxed text-stone-600">
-                    {dept.highlight}
-                  </p>
-                </div>
-              </div>
+      <CourseCarouselSection
+        eyebrow="Undergraduate Programs"
+        title="11 UG Courses,"
+        subtitle="One Standard."
+        courses={ugCourses as EngineeringCourse[]}
+        showAccreditationBadges
+        showDescription={false}
+        showHeader={false}
+        controlsPlacement="top"
+      />
 
-              <div className="border-border mt-6 flex items-center justify-between border-t pt-6">
-                <div className="flex items-center gap-2">
-                  <Users size={14} className="text-stone-400" />
-                  <span className="text-sm font-bold text-stone-600">
-                    {dept.seats} Seats
-                  </span>
-                  {dept.nbaAccredited && (
-                    <div className="ml-1 flex items-center rounded border border-stone-100 bg-white px-1.5 py-0.5 shadow-xs">
-                      <Image
-                        src="/nba.png"
-                        alt="NBA Accredited"
-                        width={60}
-                        height={24}
-                        style={{ width: "auto" }}
-                        className="h-5 object-contain"
-                      />
-                    </div>
-                  )}
-                </div>
-                <ArrowRight
-                  size={18}
-                  className="text-engineering/40 group-hover:text-engineering transition-all group-hover:translate-x-1"
-                />
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── PG Programs ── */}
-      <div className="relative z-10 container mx-auto mt-16 px-4 md:px-6">
-        <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div>
-            <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
-              Postgraduate Programs
-            </h2>
-            <h3 className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl">
-              3 M.E. Courses,{" "}
-              <span className="font-normal text-stone-300 italic">
-                Advanced Learning.
-              </span>
-            </h3>
-          </div>
-          <p className="max-w-sm text-base leading-relaxed text-stone-600 md:text-lg">
-            M.E. programs for advanced learning and specialized expertise in
-            engineering.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {pgCourses.map((course, index) => (
-            <motion.div
-              key={course.slug}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.35, delay: index * 0.08 }}
-              className="group hover:border-engineering/30 rounded-2xl border border-stone-100 bg-white p-6 transition-all hover:shadow-md"
-            >
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="text-engineering group-hover:bg-engineering bg-engineering-muted shrink-0 rounded-xl p-3 transition-colors group-hover:text-white">
-                    <course.icon size={22} strokeWidth={1.5} />
-                  </div>
-                  <span className="rounded-full border border-stone-200 bg-stone-50 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-stone-500 uppercase">
-                    {course.abbr}
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-navy mb-2 font-serif text-xl font-bold">
-                    {course.name}
-                  </h3>
-                  <p className="text-base leading-relaxed text-stone-600">
-                    {course.highlight}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Research Programs ── */}
-      <div className="relative z-10 container mx-auto mt-16 px-4 md:px-6">
-        <div className="mb-10 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <div>
-            <h2 className="text-engineering-light mb-4 text-xs font-bold tracking-[0.2em] uppercase">
-              Research Programs
-            </h2>
-            <h3 className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl">
-              Ph.D. Programs,{" "}
-              <span className="font-normal text-stone-300 italic">
-                Leading Innovation.
-              </span>
-            </h3>
-          </div>
-          <p className="max-w-sm text-base leading-relaxed text-stone-600 md:text-lg">
-            Doctoral programs for deep research, innovation, and specialized
-            expertise.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {researchCourses.map((course, index) => (
-            <motion.div
-              key={course.slug}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.35, delay: index * 0.08 }}
-              className="group hover:border-engineering/30 rounded-2xl border border-stone-100 bg-white p-6 transition-all hover:shadow-md"
-            >
-              <div className="flex flex-col gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="text-engineering group-hover:bg-engineering bg-engineering-muted shrink-0 rounded-xl p-3 transition-colors group-hover:text-white">
-                    <course.icon size={22} strokeWidth={1.5} />
-                  </div>
-                  <span className="rounded-full border border-stone-200 bg-stone-50 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-stone-500 uppercase">
-                    {course.abbr}
-                  </span>
-                </div>
-                <div>
-                  <h3 className="text-navy mb-2 font-serif text-xl font-bold">
-                    {course.name}
-                  </h3>
-                  <p className="text-base leading-relaxed text-stone-600">
-                    {course.highlight}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+      <CourseCarouselSection
+        eyebrow="Postgraduate Programs"
+        title={`${postgraduateCourses.length} PG Courses,`}
+        subtitle="Advanced Learning."
+        courses={postgraduateCourses as EngineeringCourse[]}
+        showAccreditationBadges={false}
+        showDescription={false}
+        showHeader
+        controlsPlacement="header"
+      />
     </section>
   );
 }

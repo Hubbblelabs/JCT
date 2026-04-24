@@ -119,17 +119,16 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
     <>
       {bannerVisible && (
         <div className="bg-gold fixed top-0 right-0 left-0 z-60 text-[#0B1628]">
-          <div className="relative flex w-full items-center justify-center px-10 py-2 text-center font-sans text-xs font-bold tracking-wide">
-            <span>
-              Admissions Open 2026-27 | Counselling Code:{" "}
-              {siteConfig.counsellingCode} -
+          <div className="relative flex w-full items-center justify-center px-3 py-2 text-center font-sans text-[11px] font-bold tracking-wide sm:px-10 sm:text-xs">
+            <span className="pr-6 leading-tight whitespace-nowrap">
+              Admissions Open 2026-27 | Counselling Code: {siteConfig.counsellingCode}
             </span>
-              <a
-                href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-                className="pl-1 font-extrabold underline underline-offset-2 hover:no-underline"
-              >
-                {siteConfig.contact.phone}
-              </a>
+            <Link
+              href="/admissions/apply"
+              className="hidden pl-1 font-extrabold underline underline-offset-2 hover:no-underline sm:inline"
+            >
+              Apply Now
+            </Link>
             <button
               onClick={() => setBannerVisible(false)}
               className="absolute top-1/2 right-2 -translate-y-1/2 rounded p-0.5 opacity-70 transition-opacity hover:bg-[#0B1628]/10 hover:opacity-100"

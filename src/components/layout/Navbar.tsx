@@ -89,12 +89,13 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
     <>
       {/* Announcement Bar — Counselling Code */}
       {bannerVisible && !isHomePage && (
-        <div className="bg-gold text-navy fixed top-0 right-0 left-0 z-60 px-4 py-2 text-center font-sans text-xs font-bold tracking-wide">
-          🎓 Admissions Open 2026-27 | Counselling Code:{" "}
-          <span className="underline">{siteConfig.counsellingCode}</span> —{" "}
+        <div className="bg-gold text-navy fixed top-0 right-0 left-0 z-60 px-3 py-2 text-center font-sans text-[11px] font-bold tracking-wide sm:px-4 sm:text-xs">
+          <span className="block pr-6 leading-tight whitespace-nowrap">
+            🎓 Admissions Open 2026-27 | Counselling Code: {siteConfig.counsellingCode}
+          </span>
           <Link
             href="/admissions/apply"
-            className="underline underline-offset-2 hover:no-underline"
+            className="ml-1 hidden underline underline-offset-2 hover:no-underline sm:inline"
           >
             Apply Now
           </Link>

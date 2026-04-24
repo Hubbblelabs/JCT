@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { homeHeroContent } from "@/data/home";
 import { Accreditations } from "@/components/layout/Accreditations";
@@ -27,10 +28,10 @@ const BACKGROUND_MOTIONS = [
 ] as const;
 
 export function HomeHero() {
+  const router = useRouter();
   const [isTouchScreen, setIsTouchScreen] = useState(false);
   const [currentBackgroundIndex, setCurrentBackgroundIndex] = useState(0);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
-  const [expandedCard, setExpandedCard] = useState<number | null>(null);
 
   useEffect(() => {
     const media = window.matchMedia("(hover: none), (pointer: coarse)");
@@ -66,14 +67,7 @@ export function HomeHero() {
   }, []);
 
   function isCardExpanded(index: number) {
-    return isTouchScreen ? expandedCard === index : hoveredCard === index;
-  }
-
-  function toggleCard(index: number) {
-    if (!isTouchScreen) {
-      return;
-    }
-    setExpandedCard((prev) => (prev === index ? null : index));
+    return hoveredCard === index;
   }
 
   return (
@@ -206,18 +200,16 @@ export function HomeHero() {
                       setHoveredCard(null);
                     }
                   }}
-                  onClick={() => toggleCard(index)}
+                  onClick={() => router.push(card.href)}
                   onKeyDown={(event) => {
-                    if (!isTouchScreen) {
-                      return;
-                    }
                     if (event.key === "Enter" || event.key === " ") {
                       event.preventDefault();
-                      toggleCard(index);
+                      router.push(card.href);
                     }
                   }}
-                  tabIndex={isTouchScreen ? 0 : -1}
-                  className={`w-full cursor-default overflow-hidden rounded-xl border border-[#f2d89a]/55 bg-[#ffffff]/92 shadow-md transition-all duration-300 ease-out sm:w-[24rem] sm:rounded-2xl ${expanded ? "px-5 py-4 shadow-lg" : "px-4 py-3 hover:shadow-lg"}`}
+                  role="link"
+                  tabIndex={0}
+                  className={`w-full cursor-pointer overflow-hidden rounded-xl border border-[#f2d89a]/55 bg-[#ffffff]/92 shadow-md transition-all duration-300 ease-out sm:w-[24rem] sm:rounded-2xl ${expanded ? "px-5 py-4 shadow-lg" : "px-4 py-3 hover:shadow-lg"}`}
                   transition={{ duration: 0.28, ease: "easeOut" }}
                 >
                   <div className="min-w-0">
@@ -225,14 +217,10 @@ export function HomeHero() {
                       {card.title}
                     </h3>
                     <div className="mt-1.5 flex items-center gap-1.5 text-xs">
-                      <Link
-                        href={card.href}
-                        className="inline-flex items-center gap-1 font-bold text-[#d4a024]"
-                        onClick={(event) => event.stopPropagation()}
-                      >
+                      <span className="inline-flex items-center gap-1 font-bold text-[#d4a024]">
                         {card.ctaLabel}
                         <ArrowRight className="h-3 w-3" aria-hidden="true" />
-                      </Link>
+                      </span>
                     </div>
 
                     <AnimatePresence initial={false}>

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState } from "react";
 
 export type CollegeTestimonialItem = {
@@ -18,9 +18,9 @@ const CATEGORY_ROTATION_CONFIG: Record<
   TestimonialCategory,
   { intervalMs: number; initialDelayMs: number }
 > = {
-  Alumni: { intervalMs: 2700, initialDelayMs: 0 },
-  Student: { intervalMs: 3300, initialDelayMs: 600 },
-  VIP: { intervalMs: 3900, initialDelayMs: 1200 },
+  Alumini: { intervalMs: 4200, initialDelayMs: 0 },
+  Student: { intervalMs: 5000, initialDelayMs: 900 },
+  VIP: { intervalMs: 5800, initialDelayMs: 1800 },
 };
 
 type TestimonialCategory = (typeof TESTIMONIAL_CATEGORIES)[number];
@@ -31,6 +31,17 @@ function normalizeCategory(tag?: string): TestimonialCategory {
   if (value === "student") return "Student";
   if (value === "vip") return "VIP";
   return "Alumni";
+}
+
+function getRandomIndex(length: number, excludeIndex?: number) {
+  if (length <= 1) return 0;
+
+  let nextIndex = Math.floor(Math.random() * length);
+  while (nextIndex === excludeIndex) {
+    nextIndex = Math.floor(Math.random() * length);
+  }
+
+  return nextIndex;
 }
 
 type CollegeTestimonialsProps = {
@@ -87,6 +98,12 @@ export function CollegeTestimonials({
   });
 
   useEffect(() => {
+    setActiveIndices({
+      Alumini: getRandomIndex(groupedItems.Alumini.length),
+      Student: getRandomIndex(groupedItems.Student.length),
+      VIP: getRandomIndex(groupedItems.VIP.length),
+    });
+
     const timers = TESTIMONIAL_CATEGORIES.map((category) => {
       const { intervalMs, initialDelayMs } = CATEGORY_ROTATION_CONFIG[category];
       const lane = groupedItems[category];
@@ -100,7 +117,7 @@ export function CollegeTestimonials({
           if (paused[category]) return prev;
           return {
             ...prev,
-            [category]: (prev[category] + 1) % lane.length,
+            [category]: getRandomIndex(lane.length, prev[category]),
           };
         });
       }, initialDelayMs);
@@ -110,7 +127,7 @@ export function CollegeTestimonials({
           if (paused[category]) return prev;
           return {
             ...prev,
-            [category]: (prev[category] + 1) % lane.length,
+            [category]: getRandomIndex(lane.length, prev[category]),
           };
         });
       }, intervalMs);
@@ -182,48 +199,56 @@ export function CollegeTestimonials({
                     }))
                   }
                 >
-                  <div className="grid w-full flex-1 overflow-hidden pb-4">
-                    <AnimatePresence initial={false}>
-                      <motion.div
-                        key={activeIndex}
-                        initial={{ x: "100%", opacity: 0 }}
-                        animate={{ x: 0, opacity: 1 }}
-                        exit={{ x: "-100%", opacity: 0 }}
-                        transition={{ type: "spring", stiffness: 250, damping: 25 }}
-                        className="col-start-1 row-start-1 flex w-full shrink-0 flex-col px-1"
-                      >
-                        <div className="flex h-full flex-col rounded-3xl border border-transparent bg-white p-8 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] transition-colors hover:border-gray-100 md:p-10">
-                          <div className="relative flex-1">
-                            <span className="absolute -top-2 right-0 rounded-full bg-[#f4f5f7] px-3 py-1 text-[10px] font-bold tracking-widest text-[#a0842c] uppercase">
-                              {category}
-                            </span>
-                            <span className="mt-4 mb-6 block font-serif text-7xl leading-0 text-[#fcebba] opacity-80">
-                              &ldquo;
-                            </span>
-                            <p className="min-h-35 text-base leading-relaxed text-stone-600 italic md:text-lg">
-                              &quot;{activeItem.quote}&quot;
-                            </p>
-                          </div>
+                  <div className="flex flex-1 flex-col rounded-3xl border border-transparent bg-white p-8 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] transition-colors hover:border-gray-100 md:p-10">
+                    <div className="relative flex-1">
+                      <span className="absolute -top-2 right-0 rounded-full bg-[#f4f5f7] px-3 py-1 text-[10px] font-bold tracking-widest text-[#a0842c] uppercase">
+                        {category}
+                      </span>
+                      <span className="mt-4 mb-6 block font-serif text-7xl leading-0 text-[#fcebba] opacity-80">
+                        &ldquo;
+                      </span>
 
-                          <div className="mt-4 flex items-center gap-4 border-t border-gray-100/80 pt-4">
-                            <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-gray-100">
-                              <Image
-                                src={activeItem.image}
-                                alt={activeItem.name}
-                                fill
-                                sizes="48px"
-                                className="object-cover"
-                              />
-                            </div>
-                            <div>
-                              <h3 className="text-navy font-serif text-lg font-bold">
-                                {activeItem.name}
-                              </h3>
-                              <p className="mt-0.5 text-xs font-bold tracking-widest text-stone-500 uppercase">
-                                {activeItem.role}
-                              </p>
-                            </div>
-                          </div>
+                      <AnimatePresence mode="wait" initial={false}>
+                        <motion.div
+                          key={`${category}-${activeItem.name}-${activeIndex}`}
+                          initial={{ opacity: 0, y: 12, filter: "blur(3px)" }}
+                          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                          exit={{ opacity: 0, y: -12, filter: "blur(3px)" }}
+                          transition={{ duration: 0.32, ease: "easeInOut" }}
+                          className="min-h-35"
+                        >
+                          <p className="text-base leading-relaxed text-stone-600 italic md:text-lg">
+                            &quot;{activeItem.quote}&quot;
+                          </p>
+                        </motion.div>
+                      </AnimatePresence>
+                    </div>
+
+                    <AnimatePresence mode="wait" initial={false}>
+                      <motion.div
+                        key={`${category}-${activeItem.name}-${activeIndex}-meta`}
+                        initial={{ opacity: 0, y: 8, filter: "blur(2px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        exit={{ opacity: 0, y: -8, filter: "blur(2px)" }}
+                        transition={{ duration: 0.28, ease: "easeInOut" }}
+                        className="mt-4 flex items-center gap-4 border-t border-gray-100/80 pt-4"
+                      >
+                        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-gray-100">
+                          <Image
+                            src={activeItem.image}
+                            alt={activeItem.name}
+                            fill
+                            sizes="48px"
+                            className="object-cover"
+                          />
+                        </div>
+                        <div>
+                          <h3 className="text-navy font-serif text-lg font-bold">
+                            {activeItem.name}
+                          </h3>
+                          <p className="mt-0.5 text-xs font-bold tracking-widest text-stone-500 uppercase">
+                            {activeItem.role}
+                          </p>
                         </div>
                       </motion.div>
                     </AnimatePresence>
