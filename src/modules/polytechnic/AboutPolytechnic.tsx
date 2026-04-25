@@ -69,7 +69,7 @@ export function AboutPolytechnic() {
 
         {/* Tab Navigation */}
         <div className="relative z-10 mb-10 flex justify-center px-4">
-          <div className="no-scrollbar flex flex-col md:flex-row max-w-full overflow-x-auto rounded-3xl md:rounded-full border border-slate-200 bg-white/80 p-1 shadow-sm backdrop-blur-sm">
+          <div className="no-scrollbar flex max-w-full flex-col overflow-x-auto rounded-3xl border border-slate-200 bg-white/80 p-1 shadow-sm backdrop-blur-sm md:flex-row md:rounded-full">
             {tabs.map((tab) => (
               <button
                 key={tab.key}

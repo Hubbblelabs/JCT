@@ -3,21 +3,18 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, LucideIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { diplomaPrograms } from "@/data/polytechnic";
 import { DragScroll } from "@/components/ui/DragScroll";
-import {
-  PolySection,
-  PolySectionHeader,
-} from "@/modules/polytechnic/PolyUI";
+import { PolySection, PolySectionHeader } from "@/modules/polytechnic/PolyUI";
 
 type PolytechnicCourse = {
   name: string;
   slug: string;
   image?: string;
-  icon?: React.ReactNode;
+  icon?: LucideIcon;
 };
 
 function CourseCard({ course }: { course: PolytechnicCourse }) {
@@ -32,7 +29,7 @@ function CourseCard({ course }: { course: PolytechnicCourse }) {
       transition={{ duration: 0.35 }}
       data-course-card="true"
       onClick={() => router.push(href)}
-      className="border-polytechnic/12 group flex h-full min-h-[20rem] w-[18.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-white shadow-sm transition-all sm:w-[20rem] md:w-[21.5rem] lg:w-[22rem] pb-4 cursor-pointer hover:shadow-md"
+      className="border-polytechnic/12 group flex h-full min-h-[20rem] w-[18.5rem] shrink-0 cursor-pointer snap-start flex-col overflow-hidden rounded-xl border bg-white pb-4 shadow-sm transition-all hover:shadow-md sm:w-[20rem] md:w-[21.5rem] lg:w-[22rem]"
       draggable={false}
     >
       <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
@@ -66,12 +63,12 @@ function CourseCard({ course }: { course: PolytechnicCourse }) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col px-5 pt-3.5 pb-2 justify-between">
+      <div className="flex flex-1 flex-col justify-between px-5 pt-3.5 pb-2">
         <h3 className="text-polytechnic-dark line-clamp-3 text-[1.35rem] leading-snug font-semibold md:text-[1.45rem]">
           {course.name}
         </h3>
 
-        <div className="flex flex-col flex-1 justify-end pt-4">
+        <div className="flex flex-1 flex-col justify-end pt-4">
           <div className="flex items-center justify-end">
             <Link
               href={href}

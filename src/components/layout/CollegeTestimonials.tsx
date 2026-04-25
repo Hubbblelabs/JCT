@@ -163,7 +163,7 @@ export function CollegeTestimonials({
   return (
     <section id={sectionId} className={`py-8 md:py-16 ${sectionBgClassName}`}>
       <div className="container mx-auto px-4 md:px-6">
-        <div className="rounded-[3rem] bg-[#f2f4f7] p-6 pb-8 md:pb-10 shadow-inner md:rounded-[4rem] md:p-10 lg:p-14">
+        <div className="rounded-[3rem] bg-[#f2f4f7] p-6 pb-8 shadow-inner md:rounded-[4rem] md:p-10 md:pb-10 lg:p-14">
           <div className="mb-8 text-center">
             {subtitle && (
               <motion.span

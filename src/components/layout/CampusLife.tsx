@@ -38,7 +38,7 @@ const photos = [
     caption: "Campus Green Walkway",
     category: "Events",
     span: "",
-  }
+  },
 ];
 
 export function CampusLife() {

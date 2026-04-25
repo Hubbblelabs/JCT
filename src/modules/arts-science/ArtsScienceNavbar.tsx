@@ -44,7 +44,6 @@ const artsNav: ArtsNavItem[] = [
       },
     ],
   },
-  { name: "About Us", href: "#about" },
   { name: "Programs", href: "#programs" },
   { name: "Admission", href: "#admission" },
   { name: "Placements", href: "#placements" },
@@ -275,7 +274,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
           <div className="hidden items-center gap-3 xl:flex">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="hidden items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors duration-300 hover:text-white xl:flex max-w-[140px] min-[1350px]:max-w-none"
+              className="hidden max-w-[140px] items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors duration-300 hover:text-white min-[1350px]:max-w-none xl:flex"
             >
               <Phone size={14} className="shrink-0" />
               <span className="truncate">{siteConfig.contact.phone}</span>
@@ -340,9 +339,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 <div className="space-y-1">
                   {artsNav
                     .flatMap((item: ArtsNavItem) =>
-                      item.name === "More"
-                        ? item.children || []
-                        : [item],
+                      item.name === "More" ? item.children || [] : [item],
                     )
                     .filter(
                       (link) =>

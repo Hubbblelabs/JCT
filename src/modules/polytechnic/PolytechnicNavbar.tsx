@@ -48,10 +48,6 @@ const polytechnicNavigation: PolytechnicNavItem[] = [
     ],
   },
   {
-    name: "About Us",
-    href: "/institutions/polytechnic#about-institution",
-  },
-  {
     name: "Programs",
     href: "/institutions/polytechnic#programs",
   },
@@ -296,7 +292,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
           <div className="hidden items-center gap-4 xl:flex">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="flex items-center gap-1.5 font-sans text-base text-white/60 transition-colors hover:text-white max-w-[140px] min-[1350px]:max-w-none"
+              className="flex max-w-[140px] items-center gap-1.5 font-sans text-base text-white/60 transition-colors hover:text-white min-[1350px]:max-w-none"
             >
               <Phone size={16} className="shrink-0" />
               <span className="truncate">{siteConfig.contact.phone}</span>
@@ -365,9 +361,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 <div className="space-y-1">
                   {polytechnicNavigation
                     .flatMap((item: PolytechnicNavItem) =>
-                      item.name === "More"
-                        ? item.children || []
-                        : [item],
+                      item.name === "More" ? item.children || [] : [item],
                     )
                     .filter(
                       (link) =>

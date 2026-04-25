@@ -254,7 +254,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
           <div className="z-50 hidden shrink-0 items-center justify-end gap-3 whitespace-nowrap xl:flex xl:flex-1 xl:gap-6">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="flex items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white xl:gap-2 xl:text-[15px] max-w-[140px] min-[1350px]:max-w-none"
+              className="flex max-w-[140px] items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white min-[1350px]:max-w-none xl:gap-2 xl:text-[15px]"
             >
               <Phone size={16} className="h-3.5 w-3.5 shrink-0 xl:h-4 xl:w-4" />
               <span className="truncate">{siteConfig.contact.phone}</span>
@@ -336,65 +336,65 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
                 <div className="space-y-1">
                   {navigationLinks.map((link) => (
-                      <div key={link.name} className="overflow-hidden">
-                        {"children" in link && link.children ? (
-                          <div>
-                            <button
-                              onClick={() => toggleMobileSection(link.name)}
-                              className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${mobileExpanded === link.name ? "bg-white/10 text-white shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
-                            >
-                              {link.name}
-                              <ChevronDown
-                                size={16}
-                                className={`transition-transform duration-300 ${mobileExpanded === link.name ? "rotate-180" : ""}`}
-                              />
-                            </button>
-                            <AnimatePresence>
-                              {mobileExpanded === link.name && (
-                                <motion.div
-                                  initial={{ height: 0, opacity: 0 }}
-                                  animate={{ height: "auto", opacity: 1 }}
-                                  exit={{ height: 0, opacity: 0 }}
-                                  transition={{
-                                    duration: 0.25,
-                                    ease: "easeInOut",
-                                  }}
-                                  className="overflow-hidden"
-                                >
-                                  <div className="space-y-1 py-1 pr-2 pl-4">
-                                    {link.children?.map((child: NavChild) => (
-                                      <Link
-                                        key={child.name}
-                                        href={child.href}
-                                        onClick={() => setIsOpen(false)}
-                                        className="block rounded-lg px-4 py-3 font-sans transition-colors hover:bg-white/5 hover:text-[#d4a024]"
-                                      >
-                                        <div className="text-sm text-white/70">
-                                          {child.name}
-                                        </div>
-                                        {child.desc && (
-                                          <div className="mt-0.5 text-xs text-white/40">
-                                            {child.desc}
-                                          </div>
-                                        )}
-                                      </Link>
-                                    ))}
-                                  </div>
-                                </motion.div>
-                              )}
-                            </AnimatePresence>
-                          </div>
-                        ) : (
-                          <Link
-                            href={link.href}
-                            onClick={() => setIsOpen(false)}
-                            className={`block rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${pathname === link.href ? "bg-white/10 text-[#d4a024] shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                    <div key={link.name} className="overflow-hidden">
+                      {"children" in link && link.children ? (
+                        <div>
+                          <button
+                            onClick={() => toggleMobileSection(link.name)}
+                            className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${mobileExpanded === link.name ? "bg-white/10 text-white shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
                           >
                             {link.name}
-                          </Link>
-                        )}
-                      </div>
-                    ))}
+                            <ChevronDown
+                              size={16}
+                              className={`transition-transform duration-300 ${mobileExpanded === link.name ? "rotate-180" : ""}`}
+                            />
+                          </button>
+                          <AnimatePresence>
+                            {mobileExpanded === link.name && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{
+                                  duration: 0.25,
+                                  ease: "easeInOut",
+                                }}
+                                className="overflow-hidden"
+                              >
+                                <div className="space-y-1 py-1 pr-2 pl-4">
+                                  {link.children?.map((child: NavChild) => (
+                                    <Link
+                                      key={child.name}
+                                      href={child.href}
+                                      onClick={() => setIsOpen(false)}
+                                      className="block rounded-lg px-4 py-3 font-sans transition-colors hover:bg-white/5 hover:text-[#d4a024]"
+                                    >
+                                      <div className="text-sm text-white/70">
+                                        {child.name}
+                                      </div>
+                                      {child.desc && (
+                                        <div className="mt-0.5 text-xs text-white/40">
+                                          {child.desc}
+                                        </div>
+                                      )}
+                                    </Link>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      ) : (
+                        <Link
+                          href={link.href}
+                          onClick={() => setIsOpen(false)}
+                          className={`block rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${pathname === link.href ? "bg-white/10 text-[#d4a024] shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                        >
+                          {link.name}
+                        </Link>
+                      )}
+                    </div>
+                  ))}
                 </div>
               </div>
 

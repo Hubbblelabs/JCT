@@ -256,14 +256,14 @@ export function ChatbotButton() {
     if (active) {
       setMessages((prev) => {
         if (prev.length === 0 || prev[0].id !== "welcome") {
-           return [
+          return [
             {
               id: "welcome",
               role: "assistant",
               content: meta.welcome,
               timestamp: new Date(),
             },
-            ...prev
+            ...prev,
           ];
         }
         return prev;

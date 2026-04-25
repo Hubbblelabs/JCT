@@ -46,10 +46,6 @@ const engineeringNavigation: EngineeringNavItem[] = [
     ],
   },
   {
-    name: "About Us",
-    href: "/institutions/engineering#about",
-  },
-  {
     name: "Programs",
     href: "/institutions/engineering#programs",
   },
@@ -302,7 +298,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
           <div className="z-50 hidden shrink-0 items-center justify-end gap-3 whitespace-nowrap xl:flex xl:flex-1 xl:gap-6">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\\s/g, "")}`}
-              className="flex items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white xl:gap-2 xl:text-[15px] max-w-[140px] min-[1350px]:max-w-none"
+              className="flex max-w-[140px] items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white min-[1350px]:max-w-none xl:gap-2 xl:text-[15px]"
             >
               <Phone size={16} className="h-3.5 w-3.5 shrink-0 xl:h-4 xl:w-4" />
               <span className="truncate">{siteConfig.contact.phone}</span>

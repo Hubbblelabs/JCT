@@ -113,7 +113,7 @@ export function Hero() {
               <Button
                 variant="outline"
                 size="lg"
-                className="h-14 rounded-full border-white/20 bg-white/5 px-8 text-sm font-bold text-white backdrop-blur-sm hover:bg-white hover:text-polytechnic-dark sm:w-auto transition-all"
+                className="hover:text-polytechnic-dark h-14 rounded-full border-white/20 bg-white/5 px-8 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white sm:w-auto"
               >
                 Admission Info
               </Button>
