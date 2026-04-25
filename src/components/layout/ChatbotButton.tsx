@@ -209,13 +209,36 @@ export function ChatbotButton() {
   const frequentQuestions = FREQUENT_QUESTIONS[collegeId];
 
   useEffect(() => {
-    setMessages([
-      {
-        id: "welcome",
-        role: "assistant",
-        content: meta.welcome,
-      },
-    ]);
+    let active = true;
+    if (active) {
+      setMessages((prev) => {
+        if (prev.length === 0 || prev[0].id !== "welcome") {
+          return [
+            {
+              id: "welcome",
+              role: "assistant",
+              content: meta.welcome,
+            },
+            ...prev,
+          ];
+        }
+
+        if (prev[0].content === meta.welcome) {
+          return prev;
+        }
+
+        return [
+          {
+            ...prev[0],
+            content: meta.welcome,
+          },
+          ...prev.slice(1),
+        ];
+      });
+    }
+    return () => {
+      active = false;
+    };
   }, [meta.welcome]);
 
   useEffect(() => {
@@ -232,13 +255,14 @@ export function ChatbotButton() {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
 
+    const now = Date.now();
     const userMsg: Message = {
-      id: String(Date.now()),
+      id: String(now),
       role: "user",
       content: trimmed,
     };
     const assistantMsg: Message = {
-      id: String(Date.now() + 1),
+      id: String(now + 1),
       role: "assistant",
       content: "",
     };

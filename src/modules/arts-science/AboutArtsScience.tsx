@@ -81,7 +81,7 @@ export function AboutArtsScience() {
       <ArtsSection tone="transparent" className="relative pt-0 md:pt-2">
         {/* Tab Navigation */}
         <div className="relative z-10 mb-10 flex justify-center px-4">
-          <div className="no-scrollbar flex max-w-full overflow-x-auto rounded-full border border-orange-100 bg-white/80 p-1 shadow-sm backdrop-blur-sm">
+          <div className="no-scrollbar flex flex-col md:flex-row max-w-full overflow-x-auto rounded-3xl md:rounded-full border border-orange-100 bg-white/80 p-1 shadow-sm backdrop-blur-sm">
             {tabs.map((tab) => (
               <button
                 key={tab.key}

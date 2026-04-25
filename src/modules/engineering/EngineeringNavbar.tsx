@@ -66,10 +66,10 @@ const engineeringNavigation: EngineeringNavItem[] = [
     href: "/institutions/engineering#life-at-jct",
   },
   {
-    name: "Explore More",
+    name: "More",
     href: "#",
     children: [
-      { name: "About", href: "/about" },
+      { name: "About Us", href: "/institutions/engineering#about" },
       { name: "Examinations", href: "/examinations" },
       { name: "Governance", href: "/governance" },
       { name: "Quality", href: "/quality" },
@@ -87,7 +87,6 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [showPhoneCta, setShowPhoneCta] = useState(false);
   const [desktopExpanded, setDesktopExpanded] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const [bannerVisible, setBannerVisible] = useState(true);
@@ -95,7 +94,6 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
-      setShowPhoneCta(window.scrollY > window.innerHeight * 0.8);
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     handleScroll();

@@ -11,14 +11,13 @@ import { DragScroll } from "@/components/ui/DragScroll";
 import {
   PolySection,
   PolySectionHeader,
-  PolyButtonLink,
 } from "@/modules/polytechnic/PolyUI";
 
 type PolytechnicCourse = {
   name: string;
   slug: string;
   image?: string;
-  icon?: any;
+  icon?: React.ReactNode;
 };
 
 function CourseCard({ course }: { course: PolytechnicCourse }) {
