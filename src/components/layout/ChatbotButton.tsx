@@ -213,16 +213,27 @@ export function ChatbotButton() {
     if (active) {
       setMessages((prev) => {
         if (prev.length === 0 || prev[0].id !== "welcome") {
-           return [
+          return [
             {
               id: "welcome",
               role: "assistant",
               content: meta.welcome,
             },
-            ...prev
+            ...prev,
           ];
         }
-        return prev;
+
+        if (prev[0].content === meta.welcome) {
+          return prev;
+        }
+
+        return [
+          {
+            ...prev[0],
+            content: meta.welcome,
+          },
+          ...prev.slice(1),
+        ];
       });
     }
     return () => {
