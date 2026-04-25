@@ -6,7 +6,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X, ChevronDown, Phone, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { navigationData, type NavItem, type NavChild } from "@/data/navigation";
+import { type NavChild } from "@/data/navigation";
 import { siteConfig } from "@/data/site";
 
 type NavbarProps = {
@@ -15,7 +15,6 @@ type NavbarProps = {
 
 export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const pathname = usePathname();
-  const isHomePage = pathname === "/";
   const isEngineeringPage = pathname === "/institutions/engineering";
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);

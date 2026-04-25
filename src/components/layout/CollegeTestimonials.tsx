@@ -114,11 +114,11 @@ export function CollegeTestimonials({
   }, []);
 
   useEffect(() => {
-    setActiveIndices({
-      Alumni: getRandomIndex(groupedItems.Alumni.length),
-      Student: getRandomIndex(groupedItems.Student.length),
-      VIP: getRandomIndex(groupedItems.VIP.length),
-    });
+    setActiveIndices((prev) => ({
+      Alumni: prev.Alumni || getRandomIndex(groupedItems.Alumni.length),
+      Student: prev.Student || getRandomIndex(groupedItems.Student.length),
+      VIP: prev.VIP || getRandomIndex(groupedItems.VIP.length),
+    }));
 
     const timers = TESTIMONIAL_CATEGORIES.map((category) => {
       const { intervalMs, initialDelayMs } = CATEGORY_ROTATION_CONFIG[category];
@@ -161,9 +161,9 @@ export function CollegeTestimonials({
   }, [groupedItems, paused]);
 
   return (
-    <section id={sectionId} className={`py-10 md:py-16 ${sectionBgClassName}`}>
+    <section id={sectionId} className={`py-8 md:py-16 ${sectionBgClassName}`}>
       <div className="container mx-auto px-4 md:px-6">
-        <div className="rounded-[3rem] bg-[#f2f4f7] p-6 shadow-inner md:rounded-[4rem] md:p-10 lg:p-14">
+        <div className="rounded-[3rem] bg-[#f2f4f7] p-6 pb-8 md:pb-10 shadow-inner md:rounded-[4rem] md:p-10 lg:p-14">
           <div className="mb-8 text-center">
             {subtitle && (
               <motion.span
@@ -188,7 +188,7 @@ export function CollegeTestimonials({
 
           <div
             ref={scrollContainerRef}
-            className="scrollbar-hide -mx-6 flex snap-x snap-mandatory items-start gap-6 overflow-x-auto px-6 pb-6 md:mx-0 md:grid md:grid-cols-3 md:items-stretch md:overflow-visible md:px-0 md:pb-0"
+            className="scrollbar-hide -mx-6 flex snap-x snap-mandatory items-stretch gap-6 overflow-x-auto px-6 pb-4 md:mx-0 md:grid md:grid-cols-3 md:overflow-visible md:px-0 md:pb-0"
           >
             {TESTIMONIAL_CATEGORIES.map((category, laneIndex) => {
               const laneItems = groupedItems[category];
@@ -204,7 +204,7 @@ export function CollegeTestimonials({
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, amount: 0.25 }}
                   transition={{ duration: 0.5, delay: laneIndex * 0.1 }}
-                  className="flex w-[85vw] max-w-[340px] shrink-0 snap-center flex-col self-start md:w-auto md:max-w-none md:min-w-0 md:self-stretch"
+                  className="flex w-[85vw] max-w-[340px] shrink-0 snap-center flex-col self-stretch md:w-auto md:max-w-none md:min-w-0 md:self-stretch"
                   onMouseEnter={() =>
                     setPaused((prev) => ({
                       ...prev,

@@ -48,20 +48,12 @@ const polytechnicNavigation: PolytechnicNavItem[] = [
     ],
   },
   {
-    name: "About Us",
-    href: "/institutions/polytechnic#about-institution",
-  },
-  {
     name: "Courses",
     href: "/institutions/polytechnic#programs",
   },
   {
     name: "Admission",
     href: "/institutions/polytechnic#admissions",
-  },
-  {
-    name: "Contact",
-    href: "/institutions/polytechnic#contact",
   },
   {
     name: "Placements",
@@ -72,8 +64,12 @@ const polytechnicNavigation: PolytechnicNavItem[] = [
     href: "/institutions/polytechnic#happenings",
   },
   {
-    name: "Testimonials",
-    href: "/institutions/polytechnic#testimonials",
+    name: "More",
+    href: "#",
+    children: [
+      { name: "About Us", href: "/institutions/polytechnic#about-institution" },
+      { name: "Testimonials", href: "/institutions/polytechnic#testimonials" },
+    ],
   },
 ];
 
@@ -365,7 +361,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 <div className="space-y-1">
                   {polytechnicNavigation
                     .flatMap((item: PolytechnicNavItem) =>
-                      item.name === "Explore More"
+                      item.name === "More"
                         ? item.children || []
                         : [item],
                     )

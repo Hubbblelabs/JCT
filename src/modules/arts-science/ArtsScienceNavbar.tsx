@@ -44,13 +44,18 @@ const artsNav: ArtsNavItem[] = [
       },
     ],
   },
-  { name: "About Us", href: "#about" },
   { name: "Courses", href: "#courses" },
   { name: "Admission", href: "#admission" },
-  { name: "Contact", href: "#contact" },
   { name: "Placements", href: "#placements" },
   { name: "Life @ JCT", href: "#life" },
-  { name: "Testimonials", href: "#testimonials" },
+  {
+    name: "More",
+    href: "#",
+    children: [
+      { name: "About Us", href: "#about" },
+      { name: "Testimonials", href: "#testimonials" },
+    ],
+  },
 ];
 
 type NavbarProps = {
@@ -334,7 +339,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 <div className="space-y-1">
                   {artsNav
                     .flatMap((item: ArtsNavItem) =>
-                      item.name === "Explore More"
+                      item.name === "More"
                         ? item.children || []
                         : [item],
                     )

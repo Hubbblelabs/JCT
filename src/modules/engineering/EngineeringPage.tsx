@@ -1,4 +1,5 @@
 import { EngineeringNavbar } from "./EngineeringNavbar";
+import { EngineeringPopup } from "./EngineeringPopup";
 import { Placements } from "@/components/layout/Placements";
 import { Footer } from "@/components/layout/Footer";
 import { CollegeTestimonials } from "@/components/layout/CollegeTestimonials";
@@ -17,6 +18,7 @@ export default function EngineeringPage() {
       className="bg-background text-foreground engineering-theme min-h-screen overflow-x-hidden"
     >
       <EngineeringNavbar />
+      <EngineeringPopup />
 
       <EngineeringHero />
       <EngineeringDomains />

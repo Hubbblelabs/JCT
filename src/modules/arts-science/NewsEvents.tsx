@@ -1,8 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { newsUpdates, campusEvents } from "@/data/arts-science";
-import { ChevronRight, Calendar, MapPin, Tag } from "lucide-react";
+import { newsUpdates } from "@/data/arts-science";
+import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function NewsEvents() {
