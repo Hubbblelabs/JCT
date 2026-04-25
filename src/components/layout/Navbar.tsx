@@ -65,9 +65,9 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
       href: "#",
       children: [
         {
-          name: "Engineering",
+          name: "Engineering (Autonomous)",
           href: "/institutions/engineering",
-          desc: "B.E, B.Tech, M.E programs",
+          desc: "B.E, B.Tech, M.E, Ph.D programs",
         },
         {
           name: "Arts & Science",
@@ -83,7 +83,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
     },
     { name: "Admissions", href: "/admissions" },
     { name: "Placements", href: "/placements" },
-    { name: "Campus Life", href: "/campus-life" },
+    { name: "Life @ JCT", href: "/campus-life" },
   ];
 
   return (

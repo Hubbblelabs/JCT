@@ -29,9 +29,9 @@ const engineeringNavigation: EngineeringNavItem[] = [
     href: "#",
     children: [
       {
-        name: "Engineering",
+        name: "Engineering (Autonomous)",
         href: "/institutions/engineering",
-        desc: "B.E, B.Tech, M.E programs",
+        desc: "B.E, B.Tech, M.E, Ph.D programs",
       },
       {
         name: "Arts & Science",
@@ -46,8 +46,12 @@ const engineeringNavigation: EngineeringNavItem[] = [
     ],
   },
   {
-    name: "Courses",
-    href: "/institutions/engineering#courses",
+    name: "About Us",
+    href: "/institutions/engineering#about",
+  },
+  {
+    name: "Programs",
+    href: "/institutions/engineering#programs",
   },
   {
     name: "Placements",

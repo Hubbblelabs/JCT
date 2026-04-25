@@ -31,9 +31,9 @@ const polytechnicNavigation: PolytechnicNavItem[] = [
     href: "#",
     children: [
       {
-        name: "Engineering",
+        name: "Engineering (Autonomous)",
         href: "/institutions/engineering",
-        desc: "B.E, B.Tech, M.E programs",
+        desc: "B.E, B.Tech, M.E, Ph.D programs",
       },
       {
         name: "Arts & Science",
@@ -48,7 +48,11 @@ const polytechnicNavigation: PolytechnicNavItem[] = [
     ],
   },
   {
-    name: "Courses",
+    name: "About Us",
+    href: "/institutions/polytechnic#about-institution",
+  },
+  {
+    name: "Programs",
     href: "/institutions/polytechnic#programs",
   },
   {

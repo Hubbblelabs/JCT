@@ -28,9 +28,9 @@ const artsNav: ArtsNavItem[] = [
     href: "#",
     children: [
       {
-        name: "Engineering",
+        name: "Engineering (Autonomous)",
         href: "/institutions/engineering",
-        description: "B.E, B.Tech, M.E programs",
+        description: "B.E, B.Tech, M.E, Ph.D programs",
       },
       {
         name: "Arts & Science",
@@ -44,7 +44,8 @@ const artsNav: ArtsNavItem[] = [
       },
     ],
   },
-  { name: "Courses", href: "#courses" },
+  { name: "About Us", href: "#about" },
+  { name: "Programs", href: "#programs" },
   { name: "Admission", href: "#admission" },
   { name: "Placements", href: "#placements" },
   { name: "Life @ JCT", href: "#life" },
