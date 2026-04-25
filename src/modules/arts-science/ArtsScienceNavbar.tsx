@@ -28,9 +28,9 @@ const artsNav: ArtsNavItem[] = [
     href: "#",
     children: [
       {
-        name: "Engineering",
+        name: "Engineering (Autonomous)",
         href: "/institutions/engineering",
-        description: "B.E, B.Tech, M.E programs",
+        description: "B.E, B.Tech, M.E, Ph.D programs",
       },
       {
         name: "Arts & Science",
@@ -45,7 +45,7 @@ const artsNav: ArtsNavItem[] = [
     ],
   },
   { name: "About Us", href: "#about" },
-  { name: "Courses", href: "#courses" },
+  { name: "Programs", href: "#programs" },
   { name: "Admission", href: "#admission" },
   { name: "Contact", href: "#contact" },
   { name: "Placements", href: "#placements" },

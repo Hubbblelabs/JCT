@@ -1,0 +1,97 @@
+Main Landing:
+
+Home
+Institutions ▼
+Admissions
+Placements
+Life @ JCT
+
+Contact
+Apply Now
+
+
+/
+├── About JCT
+├── Chairman Message
+├── Legacy / History
+├── Admissions
+├── Scholarships
+├── Placements
+├── Recruiters
+├── Campus Life
+├── Hostel
+├── Transport
+├── Gallery
+├── News / Events
+├── Careers
+├── Contact
+├── Apply Now
+└── Download Brochure
+
+
+Engineering:
+Home
+About
+Programs
+Placements
+COE
+Life @ JCT
+
+Contact
+Apply Now
+
+
+/institutions/engineering
+├── About Us, Vision & Mission, Principal Message
+├── Approvals & Accreditation
+├── Departments, Facilities
+├── Programs, Individual Course Detail Pages
+├── Admissions, Lateral Entry, Fee Structure, Scholarships
+├── Placements, Recruiters, Internship Cell
+├── Centre of Excellence, Research Cell, Patents / Publication
+├── Labs, Library, Hostel, Sports
+├── Clubs, Events, Gallery
+├── Alumni
+
+
+Arts:
+Home
+About
+Programs
+Placements
+Life @ JCT
+
+Contact
+Apply Now
+
+
+/institutions/arts-science
+├── About Us, Vision & Mission, Principal Message
+├── Departments, Faculties
+├── Programs,  Course Detail Pages
+├── Admissions, Fees, Scholarships
+├── Placements, Training Cell
+├── Labs, Clubs, NSS / NCC
+├── Events, Gallery
+
+
+Polytechnic:
+Home
+About
+Programs
+Facilities
+Placements
+Life @ JCT
+
+Contact
+Apply Now
+
+
+/ institutions/polytechnic
+├── About, Principal Message
+├── Diploma Courses, Course Detail Pages
+├── Admissions, After 10th Join Polytechnic, Fee Structure, Scholarships
+├── Placements, Apprenticeship, Workshops, Labs
+├── Industrial Visits, Student Projects
+├── Hostel, Transport, 
+├── Gallery

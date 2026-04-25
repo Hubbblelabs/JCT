@@ -1,0 +1,570 @@
+JCT FULL WEBSITE PAGE WIREFRAME + COMPLETE PAGE STRUCTURE
+(Optimized for Redesign / CMS / SEO / Better UX)
+
+============================================================
+MASTER WEBSITE STRUCTURE
+============================================================
+
+COMMON SHARED PAGES (used by all institutions)
+
+Admissions
+Apply Now
+Scholarships
+Placements
+Recruiters
+Gallery
+Events / News
+Hostel
+Transport
+Contact
+Download Brochure
+Careers
+
+============================================================
+1. MAIN LANDING WEBSITE
+============================================================
+
+NAVBAR
+
+Home
+Institutions ▼
+Admissions
+Placements
+Life @ JCT
+Contact
+Apply Now
+
+------------------------------------------------------------
+PAGE: HOME
+URL: /
+------------------------------------------------------------
+
+1. Hero Banner
+   - Main headline
+   - CTA Apply Now
+   - CTA Explore Institutions
+
+2. JCT Introduction
+   - Short trust statement
+   - Legacy summary
+
+3. Institutions Section
+   - Engineering
+   - Arts & Science
+   - Polytechnic
+
+4. Why Choose JCT
+   - Placements
+   - Infrastructure
+   - Faculty
+   - Industry Ready Education
+
+5. Courses Snapshot
+
+6. Placement Highlights
+
+7. Recruiters Logos
+
+8. Life @ JCT Preview
+
+9. Testimonials
+
+10. Final CTA
+
+------------------------------------------------------------
+PAGE: ABOUT JCT
+URL: /about
+------------------------------------------------------------
+
+1. About Institution Group
+2. Legacy / History Timeline
+3. Vision & Mission
+4. Founder Values
+5. Milestones
+6. Awards / Recognition
+7. Campus Overview
+
+------------------------------------------------------------
+PAGE: LEADERSHIP
+URL: /leadership
+------------------------------------------------------------
+
+1. Chairman Message
+2. Trustee Profiles
+3. Principal / Directors
+4. Leadership Philosophy
+
+------------------------------------------------------------
+PAGE: ADMISSIONS
+URL: /admissions
+------------------------------------------------------------
+
+1. Admission Overview
+2. Courses by Institution
+3. Eligibility Criteria
+4. How to Apply
+5. Required Documents
+6. Scholarships
+7. Fee Support
+8. FAQ
+9. Apply CTA
+
+------------------------------------------------------------
+PAGE: PLACEMENTS
+URL: /placements
+------------------------------------------------------------
+
+1. Placement Overview
+2. Placement Statistics
+3. Top Recruiters
+4. Highest Packages
+5. Training Process
+6. Student Success Stories
+
+------------------------------------------------------------
+PAGE: LIFE @ JCT
+URL: /campus-life
+------------------------------------------------------------
+
+1. Campus Life Intro
+2. Hostel
+3. Transport
+4. Sports
+5. Clubs
+6. Student Activities
+7. Events
+
+------------------------------------------------------------
+PAGE: MEDIA CENTER
+URL: /media
+------------------------------------------------------------
+
+1. Gallery
+2. Videos
+3. News
+4. Events
+5. Announcements
+
+------------------------------------------------------------
+PAGE: CAREERS
+URL: /careers
+------------------------------------------------------------
+
+1. Open Positions
+2. Faculty Jobs
+3. Staff Jobs
+4. Apply Form
+
+------------------------------------------------------------
+PAGE: CONTACT
+URL: /contact
+------------------------------------------------------------
+
+1. Address
+2. Google Map
+3. Phone Numbers
+4. Email
+5. Enquiry Form
+
+------------------------------------------------------------
+PAGE: APPLY NOW
+URL: /apply-now
+------------------------------------------------------------
+
+1. Choose Institution
+2. Choose Program
+3. Applicant Form
+4. Upload Documents
+5. Submit
+
+============================================================
+2. ENGINEERING WEBSITE
+============================================================
+
+URL BASE:
+/institutions/engineering
+
+NAVBAR
+
+Home
+About
+Programs
+Placements
+COE
+Life @ JCT
+Contact
+Apply Now
+
+------------------------------------------------------------
+PAGE: HOME
+------------------------------------------------------------
+
+1. Hero Banner
+2. Rankings / Highlights
+3. Departments Snapshot
+4. Labs Preview
+5. Placements
+6. Recruiters
+7. CTA
+
+------------------------------------------------------------
+PAGE: ABOUT
+URL: /institutions/engineering/about
+------------------------------------------------------------
+
+1. About Engineering College
+2. Vision & Mission
+3. Principal Message
+4. Accreditation
+5. AICTE / NBA / Affiliations
+6. Campus Highlights
+
+------------------------------------------------------------
+PAGE: PROGRAMS
+URL: /institutions/engineering/programs
+------------------------------------------------------------
+
+1. UG Programs
+2. PG Programs
+3. Departments
+4. Intake Details
+5. Career Scope
+6. CTA
+
+Departments:
+- CSE
+- AI & DS
+- ECE
+- EEE
+- Mechanical
+- Civil
+- Others
+
+------------------------------------------------------------
+PAGE: COURSE DETAIL (Dynamic)
+URL Example:
+/institutions/engineering/cse
+------------------------------------------------------------
+
+1. Course Overview
+2. Eligibility
+3. Duration
+4. Curriculum Highlights
+5. Labs
+6. Placement Opportunities
+7. Career Scope
+8. Apply CTA
+
+------------------------------------------------------------
+PAGE: ADMISSIONS
+URL: /institutions/engineering/admissions
+------------------------------------------------------------
+
+1. Admission Process
+2. Counselling Code
+3. Lateral Entry
+4. Fee Structure
+5. Scholarships
+6. Apply CTA
+
+------------------------------------------------------------
+PAGE: PLACEMENTS
+URL: /institutions/engineering/placements
+------------------------------------------------------------
+
+1. Placement Overview
+2. Recruiters
+3. Internship Cell
+4. Placement Training
+5. Placement Stats
+6. Success Stories
+
+------------------------------------------------------------
+PAGE: COE
+URL: /institutions/engineering/coe
+------------------------------------------------------------
+
+1. Centre of Excellence
+2. Research Cell
+3. Innovation Labs
+4. Industry Tie-ups
+5. Patents
+6. Publications
+
+------------------------------------------------------------
+PAGE: LIFE @ JCT
+URL: /institutions/engineering/life
+------------------------------------------------------------
+
+1. Hostel
+2. Sports
+3. Clubs
+4. Events
+5. Gallery
+6. Student Life
+
+------------------------------------------------------------
+PAGE: ALUMNI
+URL: /institutions/engineering/alumni
+------------------------------------------------------------
+
+1. Alumni Network
+2. Achievers
+3. Testimonials
+
+------------------------------------------------------------
+PAGE: CONTACT
+------------------------------------------------------------
+
+============================================================
+3. ARTS & SCIENCE WEBSITE
+============================================================
+
+URL BASE:
+/institutions/arts-science
+
+NAVBAR
+
+Home
+About
+Programs
+Placements
+Life @ JCT
+Contact
+Apply Now
+
+------------------------------------------------------------
+PAGE: HOME
+------------------------------------------------------------
+
+1. Hero
+2. Popular Courses
+3. Career Focused Education
+4. Placements
+5. Campus Life
+6. CTA
+
+------------------------------------------------------------
+PAGE: ABOUT
+------------------------------------------------------------
+
+1. About College
+2. Vision & Mission
+3. Principal Message
+4. Why Choose JCT Arts
+
+------------------------------------------------------------
+PAGE: PROGRAMS
+------------------------------------------------------------
+
+1. UG Courses
+2. PG Courses
+3. Departments
+4. Faculty Highlights
+5. Labs
+
+Departments:
+- Computer Science
+- Commerce
+- Management
+- Logistics
+- Others
+
+------------------------------------------------------------
+PAGE: COURSE DETAIL (Dynamic)
+Examples:
+
+/institutions/arts-science/bca
+/institutions/arts-science/bba
+
+------------------------------------------------------------
+
+1. Overview
+2. Eligibility
+3. Duration
+4. Syllabus Highlights
+5. Career Opportunities
+6. Placements
+7. Apply CTA
+
+------------------------------------------------------------
+PAGE: ADMISSIONS
+------------------------------------------------------------
+
+1. Admission Process
+2. Fees
+3. Scholarships
+4. Apply CTA
+
+------------------------------------------------------------
+PAGE: PLACEMENTS
+------------------------------------------------------------
+
+1. Placement Cell
+2. Training Cell
+3. Recruiters
+4. Student Success
+
+------------------------------------------------------------
+PAGE: LIFE @ JCT
+------------------------------------------------------------
+
+1. Labs
+2. Clubs
+3. NSS
+4. NCC
+5. Events
+6. Gallery
+
+------------------------------------------------------------
+PAGE: CONTACT
+------------------------------------------------------------
+
+============================================================
+4. POLYTECHNIC WEBSITE
+============================================================
+
+URL BASE:
+/institutions/polytechnic
+
+NAVBAR
+
+Home
+About
+Programs
+Facilities
+Placements
+Life @ JCT
+Contact
+Apply Now
+
+------------------------------------------------------------
+PAGE: HOME
+------------------------------------------------------------
+
+1. Hero
+2. Diploma Programs
+3. Skill Based Education
+4. Placements
+5. Workshops
+6. CTA
+
+------------------------------------------------------------
+PAGE: ABOUT
+------------------------------------------------------------
+
+1. About Polytechnic
+2. Principal Message
+3. Vision
+4. Why JCT Polytechnic
+
+------------------------------------------------------------
+PAGE: PROGRAMS
+------------------------------------------------------------
+
+1. Diploma Courses
+2. After 10th Join Polytechnic
+3. Course Cards
+
+Courses:
+- Mechanical
+- Civil
+- EEE
+- ECE
+- Computer
+
+------------------------------------------------------------
+PAGE: COURSE DETAIL (Dynamic)
+------------------------------------------------------------
+
+1. Course Overview
+2. Eligibility
+3. Duration
+4. Practical Labs
+5. Career Scope
+6. Apprenticeship
+7. Apply CTA
+
+------------------------------------------------------------
+PAGE: ADMISSIONS
+------------------------------------------------------------
+
+1. How to Join
+2. Fees
+3. Scholarships
+4. Apply CTA
+
+------------------------------------------------------------
+PAGE: FACILITIES
+------------------------------------------------------------
+
+1. Workshops
+2. Labs
+3. Hostel
+4. Transport
+5. Library
+
+------------------------------------------------------------
+PAGE: PLACEMENTS
+------------------------------------------------------------
+
+1. Placement Overview
+2. Apprenticeship
+3. Recruiters
+4. Industry Tie-ups
+
+------------------------------------------------------------
+PAGE: LIFE @ JCT
+------------------------------------------------------------
+
+1. Industrial Visits
+2. Student Projects
+3. Events
+4. Gallery
+
+------------------------------------------------------------
+PAGE: CONTACT
+------------------------------------------------------------
+
+============================================================
+CMS DYNAMIC COLLECTIONS
+============================================================
+
+Courses
+Departments
+Faculty
+Recruiters
+Testimonials
+Gallery
+Events
+News
+Placements Data
+Downloads
+Careers
+
+============================================================
+FINAL PAGE COUNT
+============================================================
+
+Main Website        : 10 Pages
+Engineering         : 10 + Dynamic Courses
+Arts & Science      : 7 + Dynamic Courses
+Polytechnic         : 8 + Dynamic Courses
+
+Total Core Pages    : 35+
+Scalable Dynamic    : Unlimited
+
+============================================================
+BEST BUILD STACK
+============================================================
+
+Frontend:
+Next.js / React
+
+Backend:
+Laravel / Node / Headless CMS
+
+CMS:
+Strapi / WordPress Headless / Custom Admin
+
+============================================================
