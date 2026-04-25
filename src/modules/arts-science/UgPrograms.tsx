@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ugPrograms } from "@/data/arts-science";
 import React, { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { DragScroll } from "@/components/ui/DragScroll";
 
 type ArtsScienceCourse = {
@@ -17,6 +18,8 @@ type ArtsScienceCourse = {
 };
 
 function CourseCard({ course }: { course: ArtsScienceCourse }) {
+  const router = useRouter();
+  const href = `/institutions/arts-science/departments/${course.slug}`;
   return (
     <motion.article
       initial={{ opacity: 0, x: 20 }}
@@ -24,7 +27,8 @@ function CourseCard({ course }: { course: ArtsScienceCourse }) {
       viewport={{ once: true }}
       transition={{ duration: 0.35 }}
       data-course-card="true"
-      className="border-arts-science/10 group flex h-[21.25rem] w-[18.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-white transition-all sm:h-[21.75rem] sm:w-[20rem] md:h-[21.75rem] md:w-[21.5rem] lg:w-[22rem]"
+      onClick={() => router.push(href)}
+      className="border-arts-science/10 group cursor-pointer hover:shadow-md flex h-full min-h-[20rem] w-[18.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-white transition-all sm:w-[20rem] md:w-[21.5rem] lg:w-[22rem] pb-4"
       draggable={false}
     >
       <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
@@ -40,7 +44,7 @@ function CourseCard({ course }: { course: ArtsScienceCourse }) {
         <div className="absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent" />
       </div>
 
-      <div className="flex flex-1 flex-col px-5 py-3.5">
+      <div className="flex flex-1 flex-col px-5 pt-3.5 pb-2 justify-between">
         <div className="space-y-1.5">
           <h3 className="text-arts-science line-clamp-2 text-[1.35rem] leading-snug font-semibold md:text-[1.45rem]">
             {course.name}
@@ -49,14 +53,17 @@ function CourseCard({ course }: { course: ArtsScienceCourse }) {
           <p className="line-clamp-2 text-sm leading-relaxed text-slate-600">
             {course.highlight}
           </p>
+        </div>
 
-          <div className="mt-auto flex items-center justify-between gap-3 pt-1">
+        <div className="flex flex-col flex-1 justify-end pt-4">
+          <div className="flex items-center justify-between gap-3">
             <span className="text-arts-science block text-[0.75rem] font-bold tracking-wider uppercase">
               {course.abbr}
             </span>
             <Link
-              href={`/institutions/arts-science/departments/${course.slug}`}
+              href={href}
               className="text-arts-science inline-flex items-center text-[0.95rem] font-semibold hover:underline"
+              onClick={(e) => e.stopPropagation()}
             >
               Program Details
               <ArrowRight className="ml-1.5 h-3.5 w-3.5" />

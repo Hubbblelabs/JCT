@@ -77,7 +77,7 @@ export function AdmissionsCTA() {
             </motion.p>
           </div>
 
-          <div className="snap-container scrollbar-hide mb-8 flex gap-4 overflow-x-auto px-4 pb-4 md:mx-0 md:mb-10 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0">
+          <div className="scrollbar-hide mb-8 flex gap-4 overflow-x-auto overflow-y-hidden snap-x snap-mandatory px-4 pb-4 md:mb-10 md:grid md:grid-cols-3 md:gap-6 md:px-0 md:pb-0 md:overflow-visible">
             {pathways.map((item, i) => (
               <motion.div
                 key={item.title}
@@ -85,7 +85,7 @@ export function AdmissionsCTA() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="snap-item w-65 shrink-0 sm:w-75 md:w-auto"
+                className="w-[85vw] shrink-0 snap-center sm:w-[50vw] md:w-auto"
               >
                 <div className="group border-border hover:border-gold/30 card-hover-lift h-full rounded-2xl border bg-white p-5 md:p-8">
                   <div

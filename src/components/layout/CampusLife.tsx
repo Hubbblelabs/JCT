@@ -22,9 +22,9 @@ const photos = [
     span: "",
   },
   {
-    src: "/site_assests/life-img-1.jpg.jpeg",
-    caption: "Cultural Fest — Kaleidoscope",
-    category: "Events",
+    src: "/site_assests/8.jpg.jpeg",
+    caption: "Inter-College Basketball",
+    category: "Sports",
     span: "",
   },
   {
@@ -38,25 +38,7 @@ const photos = [
     caption: "Campus Green Walkway",
     category: "Events",
     span: "",
-  },
-  {
-    src: "/site_assests/eee-img.jpg.jpeg",
-    caption: "Electronics & Comm. Lab",
-    category: "Labs",
-    span: "",
-  },
-  {
-    src: "/site_assests/8.jpg.jpeg",
-    caption: "Inter-College Basketball",
-    category: "Sports",
-    span: "md:col-span-2",
-  },
-  {
-    src: "/site_assests/news-1.webp",
-    caption: "Coding Club Meetup",
-    category: "Clubs",
-    span: "",
-  },
+  }
 ];
 
 export function CampusLife() {

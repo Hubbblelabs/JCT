@@ -71,7 +71,7 @@ export function HomeHero() {
   }
 
   return (
-    <section className="relative flex min-h-[102svh] w-full flex-col justify-center overflow-hidden pt-18 pb-24 lg:pt-22 lg:pb-16">
+    <section className="relative flex min-h-[102svh] w-full flex-col justify-center overflow-hidden pt-28 pb-40 lg:pt-32 lg:pb-24">
       <div className="absolute inset-0">
         <AnimatePresence mode="sync">
           <motion.div

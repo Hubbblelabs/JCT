@@ -296,9 +296,10 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
           <div className="hidden items-center gap-4 xl:flex">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="flex items-center gap-1.5 font-sans text-base whitespace-nowrap text-white/60 transition-colors hover:text-white"
+              className="flex items-center gap-1.5 font-sans text-base text-white/60 transition-colors hover:text-white max-w-[140px] min-[1350px]:max-w-none"
             >
-              <Phone size={16} /> {siteConfig.contact.phone}
+              <Phone size={16} className="shrink-0" />
+              <span className="truncate">{siteConfig.contact.phone}</span>
             </a>
           </div>
 

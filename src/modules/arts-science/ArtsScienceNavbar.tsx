@@ -269,9 +269,10 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
           <div className="hidden items-center gap-3 xl:flex">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="hidden items-center gap-1.5 font-sans text-sm font-medium whitespace-nowrap text-white/90 transition-colors duration-300 hover:text-white xl:flex"
+              className="hidden items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors duration-300 hover:text-white xl:flex max-w-[140px] min-[1350px]:max-w-none"
             >
-              <Phone size={14} /> {siteConfig.contact.phone}
+              <Phone size={14} className="shrink-0" />
+              <span className="truncate">{siteConfig.contact.phone}</span>
             </a>
           </div>
 

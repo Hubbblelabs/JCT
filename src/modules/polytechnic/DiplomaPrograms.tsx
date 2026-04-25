@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { diplomaPrograms } from "@/data/polytechnic";
 import { DragScroll } from "@/components/ui/DragScroll";
 import {
@@ -21,6 +22,9 @@ type PolytechnicCourse = {
 };
 
 function CourseCard({ course }: { course: PolytechnicCourse }) {
+  const router = useRouter();
+  const href = `/institutions/polytechnic/departments/${course.slug}`;
+
   return (
     <motion.article
       initial={{ opacity: 0, x: 20 }}
@@ -28,7 +32,8 @@ function CourseCard({ course }: { course: PolytechnicCourse }) {
       viewport={{ once: true }}
       transition={{ duration: 0.35 }}
       data-course-card="true"
-      className="border-polytechnic/12 group flex h-[21.25rem] w-[18.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-white shadow-sm transition-all sm:h-[21.75rem] sm:w-[20rem] md:h-[21.75rem] md:w-[21.5rem] lg:w-[22rem]"
+      onClick={() => router.push(href)}
+      className="border-polytechnic/12 group flex h-full min-h-[20rem] w-[18.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-white shadow-sm transition-all sm:w-[20rem] md:w-[21.5rem] lg:w-[22rem] pb-4 cursor-pointer hover:shadow-md"
       draggable={false}
     >
       <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
@@ -62,16 +67,17 @@ function CourseCard({ course }: { course: PolytechnicCourse }) {
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col px-5 py-3.5">
-        <div className="flex h-full flex-col space-y-1.5">
-          <h3 className="text-polytechnic-dark line-clamp-3 text-[1.35rem] leading-snug font-semibold md:text-[1.45rem]">
-            {course.name}
-          </h3>
+      <div className="flex flex-1 flex-col px-5 pt-3.5 pb-2 justify-between">
+        <h3 className="text-polytechnic-dark line-clamp-3 text-[1.35rem] leading-snug font-semibold md:text-[1.45rem]">
+          {course.name}
+        </h3>
 
-          <div className="mt-auto flex items-center justify-end pt-1">
+        <div className="flex flex-col flex-1 justify-end pt-4">
+          <div className="flex items-center justify-end">
             <Link
-              href={`/institutions/polytechnic/departments/${course.slug}`}
+              href={href}
               className="text-polytechnic inline-flex items-center text-[0.95rem] font-semibold hover:underline"
+              onClick={(e) => e.stopPropagation()}
             >
               Program Details
               <ArrowRight className="ml-1.5 h-3.5 w-3.5" />

@@ -41,8 +41,8 @@ export function EngineeringHero() {
         <div className="absolute bottom-0 left-0 h-[40rem] w-[40rem] -translate-x-1/3 translate-y-1/3 rounded-full bg-[#1d4ed8]/10 mix-blend-screen blur-[120px]" />
       </motion.div>
 
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col px-4 py-12 md:px-6 lg:py-0">
-        <div className="flex flex-col items-center justify-center gap-12 pt-28 pb-12 text-center lg:gap-16 lg:pt-4">
+      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col px-4 py-6 md:px-6 lg:py-0">
+        <div className="flex flex-col items-center justify-center gap-12 pt-8 pb-12 text-center lg:gap-16 lg:pt-4">
           {/* Centered Text Content */}
           <div className="mx-auto flex max-w-4xl flex-col items-center justify-center">
             <motion.h1
@@ -95,14 +95,20 @@ export function EngineeringHero() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, delay: 0.24 }}
-              className="mt-5 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/8 px-4 py-2 text-sm font-medium text-white/85 backdrop-blur-sm"
+              className="mt-8 flex flex-col md:flex-row items-center gap-2 rounded-2xl md:rounded-full border border-white/15 bg-white/8 px-6 py-3 text-sm font-medium text-white/85 backdrop-blur-sm"
             >
-              <span className="tracking-[0.18em] text-white/55 uppercase">
-                Counselling Code
+              <span className="font-bold text-[#d4a024] tracking-[0.1em] uppercase">
+                An Autonomous Institution
               </span>
-              <span className="font-bold text-[#d4a024]">
-                {siteConfig.counsellingCode}
-              </span>
+              <span className="hidden md:inline mx-2 text-white/30">|</span>
+              <div className="flex items-center gap-2">
+                <span className="tracking-[0.15em] text-white font-bold uppercase">
+                  Counselling Code:
+                </span>
+                <span className="font-extrabold text-[#d4a024] text-lg">
+                  {siteConfig.counsellingCode}
+                </span>
+              </div>
             </motion.div>
 
             <motion.div

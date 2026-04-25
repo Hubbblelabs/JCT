@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -28,6 +29,8 @@ function CourseCard({
   showAccreditationBadges: boolean;
   showDescription: boolean;
 }) {
+  const router = useRouter();
+  
   return (
     <motion.article
       initial={{ opacity: 0, x: 20 }}
@@ -35,7 +38,8 @@ function CourseCard({
       viewport={{ once: true }}
       transition={{ duration: 0.35 }}
       data-course-card="true"
-      className="border-engineering/12 group flex h-[21.25rem] w-[18.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-white transition-all sm:h-[21.75rem] sm:w-[20rem] md:h-[21.75rem] md:w-[21.5rem] lg:w-[22rem]"
+      onClick={() => { if (href) router.push(href); }}
+      className={`border-engineering/12 group flex h-full min-h-[20rem] w-[18.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-white transition-all sm:w-[20rem] md:w-[21.5rem] lg:w-[22rem] pb-4 ${href ? 'cursor-pointer hover:shadow-md' : ''}`}
       draggable={false}
     >
       <div className="relative aspect-[16/9] overflow-hidden">
@@ -71,7 +75,7 @@ function CourseCard({
         )}
       </div>
 
-      <div className="flex flex-1 flex-col px-5 py-3.5">
+      <div className="flex flex-1 flex-col justify-between px-5 pt-3.5 pb-2">
         <div className="space-y-1.5">
           <h3 className="text-navy line-clamp-2 text-[1.35rem] leading-snug font-semibold md:text-[1.45rem]">
             {course.name}
@@ -82,14 +86,17 @@ function CourseCard({
               {course.highlight}
             </p>
           )}
+        </div>
 
-          <div className="flex items-center justify-between gap-3 pt-1">
+        <div className="flex flex-col flex-1 justify-end pt-4">
+          <div className="flex items-center justify-between gap-3">
             <span className="text-engineering block text-[0.75rem] font-bold tracking-wider uppercase">
               {course.abbr}
             </span>
             {href ? (
               <Link
                 href={href}
+                onClick={(e) => e.stopPropagation()}
                 className="text-engineering inline-flex items-center text-[0.95rem] font-semibold hover:underline"
               >
                 Program Details

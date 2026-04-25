@@ -82,7 +82,7 @@ export function Hero() {
       </div> */}
 
       {/* Hero Content */}
-      <div className="relative z-10 container mx-auto flex flex-1 flex-col items-center justify-center gap-6 px-4 pt-24 pb-8 text-center sm:gap-8 sm:pt-32 sm:pb-16 md:gap-10 md:pt-36 md:pb-20 lg:pt-40 lg:pb-24">
+      <div className="relative z-10 container mx-auto flex flex-1 flex-col items-center justify-center gap-4 px-4 pt-20 pb-4 text-center sm:gap-8 sm:pt-32 sm:pb-16 md:gap-10 md:pt-36 md:pb-20 lg:pt-40 lg:pb-24">
         <motion.div
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
@@ -93,7 +93,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 34 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
-            className="mb-4 font-sans text-4xl leading-[0.98] font-extrabold tracking-[-0.03em] text-white drop-shadow-[0_12px_24px_rgba(2,10,24,0.55)] sm:text-5xl md:text-6xl lg:text-7xl"
+            className="mb-2 font-sans text-4xl leading-[0.98] font-extrabold tracking-[-0.03em] text-white drop-shadow-[0_12px_24px_rgba(2,10,24,0.55)] sm:mb-4 sm:text-5xl md:text-6xl lg:text-7xl"
           >
             Good Education
             <br />
@@ -105,7 +105,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.75, delay: 0.12, ease: "easeOut" }}
-            className="mb-6 max-w-2xl text-sm leading-relaxed font-medium text-white/78 drop-shadow-[0_8px_20px_rgba(2,10,24,0.42)] sm:text-base md:text-lg"
+            className="mb-4 max-w-2xl text-sm leading-relaxed font-medium text-white/78 drop-shadow-[0_8px_20px_rgba(2,10,24,0.42)] sm:mb-6 sm:text-base md:text-lg"
           >
             We offer a quality education that provides not only lessons but also
             real experience in every field. Embrace the future with our
@@ -125,7 +125,7 @@ export function Hero() {
                 },
               },
             }}
-            className="mb-8 flex w-full max-w-md flex-col gap-2.5 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4 md:mb-10"
+            className="mb-6 flex w-full max-w-md flex-col gap-2.5 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4 md:mb-10"
           >
             <motion.div
               variants={{
@@ -197,7 +197,7 @@ export function Hero() {
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.3 }}
-        className="relative z-20 mt-10 w-full border-t border-white/10 bg-[#0a111a] sm:mt-12 md:mt-16"
+        className="relative z-20 mt-4 w-full border-t border-white/10 bg-[#0a111a] sm:mt-12 md:mt-16"
       >
         <div className="container mx-auto px-4 py-6 sm:py-8 md:py-10 lg:py-12">
           <div className="grid grid-cols-1 gap-6 divide-y divide-white/10 sm:gap-8 md:grid-cols-3 md:gap-4 md:divide-x md:divide-y-0">

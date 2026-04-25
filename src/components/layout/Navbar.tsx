@@ -16,10 +16,12 @@ type NavbarProps = {
 export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const pathname = usePathname();
   const isHomePage = pathname === "/";
+  const isEngineeringPage = pathname === "/institutions/engineering";
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
-  const [bannerVisible, setBannerVisible] = useState(true);
+  const [showBanner, setShowBanner] = useState(true);
+  const bannerVisible = isEngineeringPage && showBanner;
 
   const [desktopExpanded, setDesktopExpanded] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -88,7 +90,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   return (
     <>
       {/* Announcement Bar — Counselling Code */}
-      {bannerVisible && !isHomePage && (
+      {bannerVisible && (
         <div className="bg-gold text-navy fixed top-0 right-0 left-0 z-60 px-3 py-2 text-center font-sans text-[11px] font-bold tracking-wide sm:px-4 sm:text-xs">
           <span className="block pr-6 leading-tight whitespace-nowrap">
             🎓 Admissions Open 2026-27 | Counselling Code:{" "}
@@ -101,7 +103,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             Apply Now
           </Link>
           <button
-            onClick={() => setBannerVisible(false)}
+            onClick={() => setShowBanner(false)}
             className="absolute top-1/2 right-3 -translate-y-1/2 rounded p-0.5 opacity-70 transition-opacity hover:opacity-100"
             aria-label="Dismiss announcement"
           >
@@ -111,7 +113,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
       )}
       {/* Main Nav */}
       <nav
-        className={`fixed ${bannerVisible && !isHomePage ? "top-10" : "top-4"} right-0 left-0 z-50 px-4 transition-all duration-300 md:px-8`}
+        className={`fixed ${bannerVisible ? "top-10" : "top-4"} right-0 left-0 z-50 px-4 transition-all duration-300 md:px-8`}
       >
         <div
           className={`mx-auto flex w-full max-w-360 items-center justify-between rounded-full border px-4 py-2.5 transition-all duration-300 lg:px-7 ${isSolid ? "border-white/10 bg-[#0a1628]/95 shadow-[0_8px_30px_rgba(0,0,0,0.4)] backdrop-blur-md" : "border-white/0 bg-transparent"}`}
@@ -253,10 +255,10 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
           <div className="z-50 hidden shrink-0 items-center justify-end gap-3 whitespace-nowrap xl:flex xl:flex-1 xl:gap-6">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="flex items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white xl:gap-2 xl:text-[15px]"
+              className="flex items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white xl:gap-2 xl:text-[15px] max-w-[140px] min-[1350px]:max-w-none"
             >
-              <Phone size={16} className="h-3.5 w-3.5 xl:h-4 xl:w-4" />
-              {siteConfig.contact.phone}
+              <Phone size={16} className="h-3.5 w-3.5 shrink-0 xl:h-4 xl:w-4" />
+              <span className="truncate">{siteConfig.contact.phone}</span>
             </a>
             <Link
               href="/admissions/apply"
@@ -334,13 +336,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               {/* Links */}
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
                 <div className="space-y-1">
-                  {navigationData
-                    .flatMap((item: NavItem) =>
-                      item.name === "Explore More"
-                        ? item.children || []
-                        : [item],
-                    )
-                    .map((link: NavItem | NavChild) => (
+                  {navigationLinks.map((link) => (
                       <div key={link.name} className="overflow-hidden">
                         {"children" in link && link.children ? (
                           <div>
