@@ -24,6 +24,24 @@
 .DS_Store
 *.pem
 
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Jupyter
+*.ipynb
+
+# Editor swap files
+*.swp
+*.swo
+
+# IDE settings
+.vscode/
+.idea/
+
 # debug
 npm-debug.log*
 yarn-debug.log*
@@ -39,3 +57,14 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Data (ignore all, except site_map.json)
+data/
+!data/site_map.json
+
+# Python venv and FAISS index
+chatbot/venv/
+chatbot/faiss_index/
+
+# Large video files
+public/assets/videos/
