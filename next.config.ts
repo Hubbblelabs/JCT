@@ -1,6 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async rewrites() {
+    return [
+      {
+        source: "/api/chatbot/:path*",
+        destination: "http://127.0.0.1:8001/:path*",
+      },
+    ];
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "companieslogo.com" },
@@ -11,6 +19,7 @@ const nextConfig: NextConfig = {
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    qualities: [75, 90],
   },
 };
 

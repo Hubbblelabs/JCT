@@ -1,4 +1,4 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+﻿# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
 /node_modules
@@ -68,3 +68,7 @@ chatbot/faiss_index/
 
 # Large video files
 public/assets/videos/
+
+# Large media files
+20260423-1547-51.4144032.mp4
+*.mp4
