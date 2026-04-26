@@ -3,6 +3,7 @@ import { Playfair_Display, Inter } from "next/font/google";
 import "@/styles/globals.css";
 import { StickyApplyButton } from "@/components/layout/StickyApplyButton";
 import { ChatbotButton } from "@/components/layout/ChatbotButton";
+import { RouteQuickNav } from "@/components/layout/RouteQuickNav";
 import { siteConfig } from "@/data/site";
 
 const playfair = Playfair_Display({
@@ -102,6 +103,7 @@ export default function RootLayout({
         {/* Global sticky elements */}
         <StickyApplyButton />
         <ChatbotButton />
+        {process.env.NODE_ENV !== "production" && <RouteQuickNav />}
 
         {/* Floating WhatsApp Button */}
         <div className="group fixed right-4 bottom-5 z-50 md:right-6 md:bottom-6">
