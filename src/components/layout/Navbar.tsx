@@ -96,7 +96,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             {siteConfig.counsellingCode}
           </span>
           <Link
-            href="/admissions/apply"
+            href="/apply-now"
             className="ml-1 hidden underline underline-offset-2 hover:no-underline sm:inline"
           >
             Apply Now
@@ -260,7 +260,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               <span className="truncate">{siteConfig.contact.phone}</span>
             </a>
             <Link
-              href="/admissions/apply"
+              href="/apply-now"
               className={`inline-flex h-9.5 items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10.5 xl:px-8 xl:text-[15px] ${
                 isSolid
                   ? "bg-[#d4a024] font-semibold text-[#0a1628] shadow-lg shadow-black/20 hover:bg-[#e8b84a]"
