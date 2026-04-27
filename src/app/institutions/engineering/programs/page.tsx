@@ -233,7 +233,7 @@ export default function EngineeringProgramsPage() {
             </p>
             <div className="flex justify-center gap-4">
               <Link
-                href="/institutions/engineering/admissions"
+                href="/admissions"
                 className="rounded-full border border-white/20 px-6 py-3 font-medium transition-colors hover:bg-white/10"
               >
                 View Admission Process

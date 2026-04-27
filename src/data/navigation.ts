@@ -58,29 +58,6 @@ export const navigationData: NavItem[] = [
   {
     name: "Admissions",
     href: "/admissions",
-    children: [
-      { name: "Why Choose JCT", href: "/admissions/why-jct" },
-      { name: "Programs Offered", href: "/admissions/programs" },
-      { name: "Eligibility Criteria", href: "/admissions/eligibility" },
-      { name: "Prospectus Download", href: "/admissions/prospectus" },
-      { name: "Available Seats", href: "/admissions/seats" },
-      { name: "Scholarships", href: "/admissions/scholarships" },
-      { name: "Fee Structure", href: "/admissions/fee-structure" },
-      { name: "Admission Process", href: "/admissions/process" },
-      { name: "Apply Now", href: "/admissions/apply" },
-    ],
-  },
-  {
-    name: "Academics",
-    href: "/academics",
-    children: [
-      { name: "Programs Offered", href: "/academics/programs" },
-      { name: "Departments", href: "/academics/departments" },
-      { name: "Academic Calendar", href: "/academics/calendar" },
-      { name: "Academic Regulations", href: "/academics/regulations" },
-      { name: "Curriculum & Syllabus", href: "/academics/curriculum" },
-      { name: "Academic Council", href: "/academics/council" },
-    ],
   },
   {
     name: "Placements",
@@ -98,16 +75,6 @@ export const navigationData: NavItem[] = [
   {
     name: "Research",
     href: "/research",
-    children: [
-      { name: "Research Policy", href: "/research/policy" },
-      { name: "R&D Cell", href: "/research/rnd-cell" },
-      { name: "Research Centres", href: "/research/centres" },
-      { name: "Publications", href: "/research/publications" },
-      { name: "Funded Projects", href: "/research/funded-projects" },
-      { name: "Patents", href: "/research/patents" },
-      { name: "Innovation Activities", href: "/research/innovation" },
-      { name: "Workshops & Conferences", href: "/research/workshops" },
-    ],
   },
   {
     name: "Campus Life",
@@ -125,63 +92,16 @@ export const navigationData: NavItem[] = [
     ],
   },
   {
-    name: "Examinations",
-    href: "/examinations",
-    children: [
-      { name: "Examination Cell", href: "/examinations/cell" },
-      { name: "Result Passing Board", href: "/examinations/passing-board" },
-      { name: "Results", href: "/examinations/results" },
-      { name: "Exam Notifications", href: "/examinations/notifications" },
-    ],
-  },
-  {
     name: "Governance",
     href: "/governance",
-    children: [
-      { name: "Anti-Ragging Cell", href: "/governance/anti-ragging" },
-      { name: "SC/ST Cell", href: "/governance/sc-st-cell" },
-      { name: "Internal Complaints Committee", href: "/governance/icc" },
-      { name: "Grievance Redressal Cell", href: "/governance/grievance" },
-      { name: "Women Empowerment Cell", href: "/governance/women-empowerment" },
-      { name: "Student Welfare Cell", href: "/governance/student-welfare" },
-      { name: "Equal Opportunity Cell", href: "/governance/equal-opportunity" },
-    ],
   },
   {
     name: "Quality",
     href: "/quality",
-    children: [
-      {
-        name: "Accreditations & Recognitions",
-        href: "/quality/accreditations",
-      },
-      { name: "IQAC", href: "/quality/iqac" },
-      { name: "Feedback Systems", href: "/quality/feedback" },
-      { name: "Awards & Achievements", href: "/quality/awards" },
-    ],
   },
   {
     name: "Mandatory Disclosure",
     href: "/mandatory-disclosure",
-    children: [
-      {
-        name: "Code of Conduct",
-        href: "/mandatory-disclosure/code-of-conduct",
-      },
-      {
-        name: "Policies & Regulations",
-        href: "/mandatory-disclosure/policies",
-      },
-      { name: "Professional Ethics", href: "/mandatory-disclosure/ethics" },
-      { name: "HR Manual", href: "/mandatory-disclosure/hr-manual" },
-      {
-        name: "Student Satisfaction Survey",
-        href: "/mandatory-disclosure/survey",
-      },
-      { name: "Privacy Policy", href: "/mandatory-disclosure/privacy" },
-      { name: "Terms & Conditions", href: "/mandatory-disclosure/terms" },
-      { name: "Disclaimer", href: "/mandatory-disclosure/disclaimer" },
-    ],
   },
   {
     name: "Contact",

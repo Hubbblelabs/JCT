@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type MouseEvent } from "react";
+import { useState, useEffect, useRef, type MouseEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ChevronDown, ArrowRight, Menu, Phone, X } from "lucide-react";
@@ -45,9 +45,9 @@ const artsNav: ArtsNavItem[] = [
     ],
   },
   { name: "Programs", href: "#programs" },
-  { name: "Admission", href: "#admission" },
-  { name: "Placements", href: "#placements" },
-  { name: "Life @ JCT", href: "#life" },
+  { name: "Admission", href: "/admissions" },
+  { name: "Placements", href: "/placements" },
+  { name: "Life @ JCT", href: "/campus-life" },
   {
     name: "More",
     href: "#",
@@ -67,6 +67,10 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  const [dropdownSolidOverride, setDropdownSolidOverride] = useState(false);
+  const solidOverrideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   const isSamePageHashLink = (href: string) =>
     href.startsWith("#") || href.startsWith("/institutions/arts-science#");
@@ -118,7 +122,24 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!scrolled && !forceSolidOnTop) {
+      setDropdownSolidOverride(true);
+      if (solidOverrideTimeoutRef.current)
+        clearTimeout(solidOverrideTimeoutRef.current);
+      solidOverrideTimeoutRef.current = setTimeout(
+        () => setDropdownSolidOverride(false),
+        400,
+      );
+    }
+    return () => {
+      if (solidOverrideTimeoutRef.current)
+        clearTimeout(solidOverrideTimeoutRef.current);
+    };
+  }, [scrolled, forceSolidOnTop]);
+
   const showPill = scrolled || forceSolidOnTop;
+  const isDropdownSolid = showPill || dropdownSolidOverride;
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "unset";
@@ -217,9 +238,9 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                     >
                       <div
                         className={`overflow-hidden rounded-xl border p-2 shadow-2xl backdrop-blur-2xl ${
-                          showPill
+                          isDropdownSolid
                             ? "border-white/15 bg-[#0b1a31]/96 shadow-black/40"
-                            : "border-white/20 bg-white/12 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)]"
+                            : "border-white/20 bg-[#0b1a31]/70 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)]"
                         }`}
                       >
                         <div className="space-y-0.5">
@@ -231,7 +252,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 handleNavClick(event, child.href)
                               }
                               className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all duration-300 ${
-                                showPill
+                                isDropdownSolid
                                   ? "hover:bg-white/8"
                                   : "hover:bg-white/15"
                               } ${child.className || ""}`}
@@ -239,7 +260,9 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                               <div>
                                 <p
                                   className={`font-sans text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-[#ffae4c] ${
-                                    showPill ? "text-white/92" : "text-white"
+                                    isDropdownSolid
+                                      ? "text-white/92"
+                                      : "text-white"
                                   }`}
                                 >
                                   {child.name}
@@ -247,7 +270,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 {child.description && (
                                   <p
                                     className={`mt-0.5 font-sans text-xs ${
-                                      showPill
+                                      isDropdownSolid
                                         ? "text-white/55"
                                         : "text-white/75"
                                     }`}
@@ -417,8 +440,8 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                   <Phone size={16} /> {siteConfig.contact.phone}
                 </a>
                 <Link
-                  href="#admission"
-                  onClick={(e) => handleNavClick(e, "#admission", true)}
+                  href="/apply-now"
+                  onClick={() => setIsOpen(false)}
                   className="bg-arts-science-accent shadow-arts-science-accent/10 flex h-12 w-full items-center justify-center gap-2 rounded-2xl font-sans text-sm font-bold text-white shadow-lg transition-all hover:scale-[1.02] hover:bg-orange-500 active:scale-[0.98]"
                 >
                   Apply Now <ArrowRight size={14} />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type MouseEvent } from "react";
+import { useState, useEffect, useRef, type MouseEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, ChevronDown, ArrowRight, Phone } from "lucide-react";
@@ -53,15 +53,15 @@ const polytechnicNavigation: PolytechnicNavItem[] = [
   },
   {
     name: "Admission",
-    href: "/institutions/polytechnic#admissions",
+    href: "/admissions",
   },
   {
     name: "Placements",
-    href: "/institutions/polytechnic#placements",
+    href: "/placements",
   },
   {
     name: "Life @ JCT",
-    href: "/institutions/polytechnic#happenings",
+    href: "/campus-life",
   },
   {
     name: "More",
@@ -82,6 +82,10 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  const [dropdownSolidOverride, setDropdownSolidOverride] = useState(false);
+  const solidOverrideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   const isSamePageHashLink = (href: string) =>
     href.startsWith("#") || href.startsWith("/institutions/polytechnic#");
@@ -130,6 +134,22 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
   }, []);
 
   useEffect(() => {
+    if (!scrolled && !forceSolidOnTop) {
+      setDropdownSolidOverride(true);
+      if (solidOverrideTimeoutRef.current)
+        clearTimeout(solidOverrideTimeoutRef.current);
+      solidOverrideTimeoutRef.current = setTimeout(
+        () => setDropdownSolidOverride(false),
+        400,
+      );
+    }
+    return () => {
+      if (solidOverrideTimeoutRef.current)
+        clearTimeout(solidOverrideTimeoutRef.current);
+    };
+  }, [scrolled, forceSolidOnTop]);
+
+  useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "unset";
     return () => {
       document.body.style.overflow = "unset";
@@ -139,6 +159,8 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const toggleMobileSection = (name: string) => {
     setMobileExpanded(mobileExpanded === name ? null : name);
   };
+
+  const isDropdownSolid = scrolled || forceSolidOnTop || dropdownSolidOverride;
 
   return (
     <>
@@ -233,9 +255,9 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                       >
                         <div
                           className={`overflow-hidden rounded-xl border p-2 shadow-2xl backdrop-blur-2xl ${
-                            scrolled || forceSolidOnTop
+                            isDropdownSolid
                               ? "border-white/10 bg-[#0B1628]/95 shadow-black/30"
-                              : "border-white/20 bg-white/12 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)]"
+                              : "border-white/20 bg-[#0B1628]/70 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)]"
                           }`}
                         >
                           <div className="space-y-0.5">
@@ -245,7 +267,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 href={child.href}
                                 onClick={(e) => handleNavClick(e, child.href)}
                                 className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all duration-300 ${
-                                  scrolled || forceSolidOnTop
+                                  isDropdownSolid
                                     ? "hover:bg-white/8"
                                     : "hover:bg-white/12"
                                 } ${child.className || ""}`}
@@ -253,7 +275,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 <div>
                                   <p
                                     className={`font-sans text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-white ${
-                                      scrolled || forceSolidOnTop
+                                      isDropdownSolid
                                         ? "text-white/95"
                                         : "text-white"
                                     }`}
@@ -263,7 +285,7 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                   {child.desc && (
                                     <p
                                       className={`mt-0.5 font-sans text-xs transition-colors ${
-                                        scrolled || forceSolidOnTop
+                                        isDropdownSolid
                                           ? "text-white/55 group-hover:text-white/75"
                                           : "text-white/78 group-hover:text-white"
                                       }`}

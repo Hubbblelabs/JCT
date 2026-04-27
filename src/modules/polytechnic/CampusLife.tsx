@@ -60,7 +60,7 @@ export function CampusLife() {
               programme that keeps student life vibrant throughout the year.
             </p>
             <Link
-              href="/institutions/polytechnic/campus-life"
+              href="/campus-life"
               className="group bg-polytechnic hover:bg-polytechnic-light inline-flex h-12 items-center gap-2 rounded-full px-8 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(58,67,84,0.35)] transition-all hover:-translate-y-0.5"
             >
               Find Out More

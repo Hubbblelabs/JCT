@@ -1,8 +1,22 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+import { siteConfig } from "@/data/site";
+
+export const metadata: Metadata = {
+  title: `Admissions | ${siteConfig.name}`,
+  description:
+    "Admissions open at JCT Institutions. Explore programs, eligibility, scholarships, fee structure, and the application process.",
+  openGraph: {
+    title: `Admissions | ${siteConfig.name}`,
+    description:
+      "Admissions open at JCT Institutions. Explore programs, eligibility, scholarships, and the application process.",
+    type: "website",
+  },
+};
 
 export default function AdmissionsPage() {
   return (
@@ -25,8 +39,8 @@ export default function AdmissionsPage() {
             <div className="text-muted-foreground mt-4 leading-relaxed">
               <p>
                 Welcome to the Admissions Portal of JCT Institutions. We offer a
-                diverse range of programs across Engineering, Arts & Science,
-                and Polytechnic disciplines.
+                diverse range of programs across Engineering, Arts &amp;
+                Science, and Polytechnic disciplines.
               </p>
               <p className="mt-2">
                 Our admission process is designed to be transparent,
@@ -51,12 +65,12 @@ export default function AdmissionsPage() {
                   <li>B.E. Computer Science</li>
                   <li>B.E. Mechanical Engineering</li>
                   <li>B.Tech Artificial Intelligence</li>
-                  <li>B.E. Electronics & Communication</li>
+                  <li>B.E. Electronics &amp; Communication</li>
                 </ul>
               </div>
               <div className="border-border rounded-xl border bg-white/5 p-6">
                 <h3 className="text-gold mb-4 text-xl font-bold">
-                  Arts & Science
+                  Arts &amp; Science
                 </h3>
                 <ul className="text-muted-foreground space-y-2">
                   <li>B.Sc. Computer Science</li>
@@ -108,7 +122,7 @@ export default function AdmissionsPage() {
                   </tr>
                   <tr>
                     <td className="border border-white/10 p-3">
-                      Arts & Science (UG)
+                      Arts &amp; Science (UG)
                     </td>
                     <td className="border border-white/10 p-3">
                       Pass in 10+2 or equivalent from a recognized board
@@ -203,7 +217,7 @@ export default function AdmissionsPage() {
             </div>
             <div className="rounded-2xl border border-white/10 bg-white/5 p-8">
               <h2 className="text-foreground mb-4 font-serif text-2xl font-bold">
-                Fee Support & Loans
+                Fee Support &amp; Loans
               </h2>
               <p className="text-muted-foreground mb-4">
                 JCT provides assistance in securing educational loans from

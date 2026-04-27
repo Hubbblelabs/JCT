@@ -148,7 +148,7 @@ export default function PolytechnicProgramsPage() {
                   </ul>
                 </div>
                 <Link
-                  href="/institutions/polytechnic/admissions"
+                  href="/admissions"
                   className="bg-gold text-navy mt-8 inline-block rounded-full px-8 py-3 font-bold transition-colors hover:bg-[#e8b84a]"
                 >
                   Learn About Admissions

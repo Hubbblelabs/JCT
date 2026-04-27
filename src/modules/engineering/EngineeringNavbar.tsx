@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -51,22 +51,22 @@ const engineeringNavigation: EngineeringNavItem[] = [
   },
   {
     name: "Placements",
-    href: "/institutions/engineering#placements",
+    href: "/placements",
   },
   {
-    name: "COE",
-    href: "/examinations",
+    name: "Research",
+    href: "/research",
   },
   {
     name: "Life @ JCT",
-    href: "/institutions/engineering#life-at-jct",
+    href: "/campus-life",
   },
   {
     name: "More",
     href: "#",
     children: [
       { name: "About Us", href: "/institutions/engineering#about" },
-      { name: "Examinations", href: "/examinations" },
+      { name: "Alumni", href: "/alumni" },
       { name: "Governance", href: "/governance" },
       { name: "Quality", href: "/quality" },
       { name: "Mandatory Disclosure", href: "/mandatory-disclosure" },
@@ -86,6 +86,10 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const [desktopExpanded, setDesktopExpanded] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const [bannerVisible, setBannerVisible] = useState(true);
+  const [dropdownSolidOverride, setDropdownSolidOverride] = useState(false);
+  const solidOverrideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   useEffect(() => {
     const handleScroll = () => {
@@ -95,6 +99,22 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    if (!scrolled && !forceSolidOnTop) {
+      setDropdownSolidOverride(true);
+      if (solidOverrideTimeoutRef.current)
+        clearTimeout(solidOverrideTimeoutRef.current);
+      solidOverrideTimeoutRef.current = setTimeout(
+        () => setDropdownSolidOverride(false),
+        400,
+      );
+    }
+    return () => {
+      if (solidOverrideTimeoutRef.current)
+        clearTimeout(solidOverrideTimeoutRef.current);
+    };
+  }, [scrolled, forceSolidOnTop]);
 
   useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "unset";
@@ -108,6 +128,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
   };
 
   const isSolid = scrolled || forceSolidOnTop;
+  const isDropdownSolid = isSolid || dropdownSolidOverride;
 
   return (
     <>
@@ -119,7 +140,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
               {siteConfig.counsellingCode}
             </span>
             <Link
-              href="/admissions/apply"
+              href="/apply-now"
               className="hidden pl-1 font-extrabold underline underline-offset-2 hover:no-underline sm:inline"
             >
               Apply Now
@@ -241,9 +262,9 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                             exit={{ opacity: 0, y: 8, scale: 0.985 }}
                             transition={{ duration: 0.22, ease: "easeOut" }}
                             className={`w-70 rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
-                              isSolid
+                              isDropdownSolid
                                 ? "border-white/10 bg-[#0B1628]/96"
-                                : "border-white/20 bg-white/12"
+                                : "border-white/20 bg-[#0B1628]/70"
                             }`}
                           >
                             {link.children?.map((child) => (
@@ -252,7 +273,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 href={child.href}
                                 onClick={() => setDesktopExpanded(null)}
                                 className={`group block rounded-lg px-4 py-3 font-sans transition-colors ${
-                                  isSolid
+                                  isDropdownSolid
                                     ? "hover:bg-white/10"
                                     : "hover:bg-white/15"
                                 } ${child.className || ""}`}

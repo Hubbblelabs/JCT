@@ -19,7 +19,7 @@ export const homeHeroContent = {
   ctas: [
     {
       label: "Apply Now",
-      href: "/admissions/apply",
+      href: "/apply-now",
       primary: true,
     },
     {

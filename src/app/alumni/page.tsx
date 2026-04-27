@@ -13,13 +13,7 @@ export default function EngineeringAlumniPage() {
       />
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-        <Breadcrumb
-          items={[
-            { label: "Institutions", href: "/institutions" },
-            { label: "Engineering", href: "/institutions/engineering" },
-            { label: "Alumni" },
-          ]}
-        />
+        <Breadcrumb items={[{ label: "Alumni" }]} />
 
         <div className="mt-12 space-y-20">
           {/* 1. Alumni Network Overview */}

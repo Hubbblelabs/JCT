@@ -23,7 +23,12 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const bannerVisible = isEngineeringPage && showBanner;
 
   const [desktopExpanded, setDesktopExpanded] = useState<string | null>(null);
+  // Track if dropdown was recently open (prevents transparent flash on scroll-up)
+  const [dropdownSolidOverride, setDropdownSolidOverride] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const solidOverrideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -52,11 +57,33 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
     };
   }, [isOpen]);
 
+  // When scrolled state changes from true→false, hold the solid state briefly
+  // so the dropdown doesn't flash transparent during the transition
+  useEffect(() => {
+    if (!scrolled && !forceSolidOnTop) {
+      // Just scrolled back to top — hold solid briefly
+      setDropdownSolidOverride(true);
+      if (solidOverrideTimeoutRef.current) {
+        clearTimeout(solidOverrideTimeoutRef.current);
+      }
+      solidOverrideTimeoutRef.current = setTimeout(() => {
+        setDropdownSolidOverride(false);
+      }, 400);
+    }
+    return () => {
+      if (solidOverrideTimeoutRef.current) {
+        clearTimeout(solidOverrideTimeoutRef.current);
+      }
+    };
+  }, [scrolled, forceSolidOnTop]);
+
   const toggleMobileSection = (name: string) => {
     setMobileExpanded(mobileExpanded === name ? null : name);
   };
 
   const isSolid = scrolled || forceSolidOnTop;
+  // Use solid styles for dropdown if navbar is solid OR if we're in the brief override window OR if a dropdown is actively open
+  const isDropdownSolid = isSolid || dropdownSolidOverride || !!desktopExpanded;
 
   const navigationLinks = [
     { name: "Home", href: "/" },
@@ -84,6 +111,42 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
     { name: "Admissions", href: "/admissions" },
     { name: "Placements", href: "/placements" },
     { name: "Life @ JCT", href: "/campus-life" },
+    {
+      name: "More",
+      href: "#",
+      children: [
+        { name: "About", href: "/about", desc: "Our story & leadership" },
+        { name: "Alumni", href: "/alumni", desc: "Connect with our network" },
+        { name: "Careers", href: "/careers", desc: "Join our team" },
+        { name: "Contact", href: "/contact", desc: "Get in touch" },
+        {
+          name: "Governance",
+          href: "/governance",
+          desc: "Cells & committees",
+        },
+        {
+          name: "Leadership",
+          href: "/leadership",
+          desc: "Management & council",
+        },
+        {
+          name: "Mandatory Disclosure",
+          href: "/mandatory-disclosure",
+          desc: "Policies & compliance",
+        },
+        { name: "Media", href: "/media", desc: "News & gallery" },
+        {
+          name: "Quality",
+          href: "/quality",
+          desc: "Accreditations & IQAC",
+        },
+        {
+          name: "Research",
+          href: "/research",
+          desc: "R&D, CoE & publications",
+        },
+      ],
+    },
   ];
 
   return (
@@ -96,7 +159,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             {siteConfig.counsellingCode}
           </span>
           <Link
-            href="/admissions/apply"
+            href="/apply-now"
             className="ml-1 hidden underline underline-offset-2 hover:no-underline sm:inline"
           >
             Apply Now
@@ -204,9 +267,9 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                             exit={{ opacity: 0, y: 8, scale: 0.985 }}
                             transition={{ duration: 0.22, ease: "easeOut" }}
                             className={`w-64 rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
-                              isSolid
+                              isDropdownSolid
                                 ? "border-white/10 bg-[#0a1628]/96"
-                                : "border-white/20 bg-white/12"
+                                : "border-white/20 bg-[#0a1628]/70"
                             }`}
                           >
                             {link.children?.map((child: NavChild) => (
@@ -215,14 +278,16 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                 href={child.href}
                                 onClick={() => setDesktopExpanded(null)}
                                 className={`block rounded-lg px-4 py-3 font-sans transition-colors ${
-                                  isSolid
+                                  isDropdownSolid
                                     ? "hover:bg-white/10"
                                     : "hover:bg-white/15"
                                 } ${child.className || ""}`}
                               >
                                 <div
                                   className={`text-[15px] font-medium whitespace-nowrap ${
-                                    isSolid ? "text-white/90" : "text-white"
+                                    isDropdownSolid
+                                      ? "text-white/90"
+                                      : "text-white"
                                   }`}
                                 >
                                   {child.name}
@@ -230,7 +295,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                 {child.desc && (
                                   <div
                                     className={`mt-0.5 text-[13px] whitespace-nowrap ${
-                                      isSolid
+                                      isDropdownSolid
                                         ? "text-white/50"
                                         : "text-white/75"
                                     }`}
@@ -260,7 +325,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               <span className="truncate">{siteConfig.contact.phone}</span>
             </a>
             <Link
-              href="/admissions/apply"
+              href="/apply-now"
               className={`inline-flex h-9.5 items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10.5 xl:px-8 xl:text-[15px] ${
                 isSolid
                   ? "bg-[#d4a024] font-semibold text-[#0a1628] shadow-lg shadow-black/20 hover:bg-[#e8b84a]"
@@ -407,7 +472,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                   <Phone size={16} /> {siteConfig.contact.phone}
                 </a>
                 <Link
-                  href="/admissions/apply"
+                  href="/apply-now"
                   onClick={() => setIsOpen(false)}
                   className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#d4a024] font-sans text-sm font-bold text-[#0a1628] shadow-lg shadow-[#d4a024]/10 transition-all hover:scale-[1.02] hover:bg-[#e8b84a] active:scale-[0.98]"
                 >
