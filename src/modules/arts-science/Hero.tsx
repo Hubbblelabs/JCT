@@ -135,7 +135,7 @@ export function Hero() {
               transition={{ duration: 0.5, ease: "easeOut" }}
             >
               <Link
-                href="/apply-now"
+                href="/admissions"
                 className="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#f07b1a] px-5 font-sans text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#e06b0a] hover:shadow-xl active:translate-y-0 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
               >
                 Apply Now

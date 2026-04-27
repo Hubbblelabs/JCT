@@ -51,15 +51,15 @@ const engineeringNavigation: EngineeringNavItem[] = [
   },
   {
     name: "Placements",
-    href: "/placements",
+    href: "/institutions/engineering#placements",
   },
   {
     name: "COE",
-    href: "/research",
+    href: "/examinations",
   },
   {
     name: "Life @ JCT",
-    href: "/campus-life",
+    href: "/institutions/engineering#life-at-jct",
   },
   {
     name: "More",
@@ -119,7 +119,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
               {siteConfig.counsellingCode}
             </span>
             <Link
-              href="/apply-now"
+              href="/admissions/apply"
               className="hidden pl-1 font-extrabold underline underline-offset-2 hover:no-underline sm:inline"
             >
               Apply Now

@@ -45,9 +45,9 @@ const artsNav: ArtsNavItem[] = [
     ],
   },
   { name: "Programs", href: "#programs" },
-  { name: "Admissions", href: "/admissions" },
-  { name: "Placements", href: "/placements" },
-  { name: "Life @ JCT", href: "/campus-life" },
+  { name: "Admission", href: "#admission" },
+  { name: "Placements", href: "#placements" },
+  { name: "Life @ JCT", href: "#life" },
   {
     name: "More",
     href: "#",

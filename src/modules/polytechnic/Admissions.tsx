@@ -24,7 +24,7 @@ export function Admissions() {
             description="Simple and transparent admissions aligned with current DOTE and Tamil Nadu polytechnic guidelines."
             className="mb-0"
           />
-          <PolyButtonLink href="/apply-now" className="shrink-0">
+          <PolyButtonLink href="/admissions/apply" className="shrink-0">
             Apply Now
             <ArrowRight className="ml-2 h-4 w-4" />
           </PolyButtonLink>

@@ -52,16 +52,16 @@ const polytechnicNavigation: PolytechnicNavItem[] = [
     href: "/institutions/polytechnic#programs",
   },
   {
-    name: "Admissions",
-    href: "/admissions",
+    name: "Admission",
+    href: "/institutions/polytechnic#admissions",
   },
   {
     name: "Placements",
-    href: "/placements",
+    href: "/institutions/polytechnic#placements",
   },
   {
     name: "Life @ JCT",
-    href: "/campus-life",
+    href: "/institutions/polytechnic#happenings",
   },
   {
     name: "More",

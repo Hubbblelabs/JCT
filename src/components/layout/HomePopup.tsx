@@ -99,12 +99,11 @@ export function HomePopup() {
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/apply-now"
+                  href="/admissions/apply"
                   onClick={handleClose}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FFC917] px-6 py-3 font-sans text-sm font-bold text-black transition-transform hover:scale-105"
                 >
-                  Apply Now
-                  <ArrowRight size={16} />
+                  Apply Now <ArrowRight size={16} />
                 </Link>
                 <Link
                   href="/institutions/engineering"
