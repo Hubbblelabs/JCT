@@ -114,7 +114,8 @@ export function CollegeTestimonials({
   }, []);
 
   useEffect(() => {
-    setActiveIndices((prev) => ({
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+setActiveIndices((prev) => ({
       Alumni: prev.Alumni || getRandomIndex(groupedItems.Alumni.length),
       Student: prev.Student || getRandomIndex(groupedItems.Student.length),
       VIP: prev.VIP || getRandomIndex(groupedItems.VIP.length),

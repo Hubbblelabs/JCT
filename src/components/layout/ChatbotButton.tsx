@@ -211,7 +211,8 @@ export function ChatbotButton() {
   useEffect(() => {
     let active = true;
     if (active) {
-      setMessages((prev) => {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+setMessages((prev) => {
         if (prev.length === 0 || prev[0].id !== "welcome") {
           return [
             {
@@ -255,6 +256,7 @@ export function ChatbotButton() {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
 
+    // eslint-disable-next-line react-hooks/purity
     const now = Date.now();
     const userMsg: Message = {
       id: String(now),

@@ -33,9 +33,6 @@ import {
 } from "lucide-react";
 import type { DepartmentData } from "@/types/department";
 import { Navbar } from "@/components/layout/Navbar";
-import { ArtsScienceNavbar } from "@/modules/arts-science/ArtsScienceNavbar";
-import { EngineeringNavbar } from "@/modules/engineering/EngineeringNavbar";
-import { PolytechnicNavbar } from "@/modules/polytechnic/PolytechnicNavbar";
 import { Footer } from "@/components/layout/Footer";
 
 // ─── Tab Definition ──────────────────────────────────────────────────────────
@@ -1420,15 +1417,7 @@ export function DepartmentPageLayout({
 
   return (
     <>
-      {dept.college === "engineering" ? (
-        <EngineeringNavbar forceSolidOnTop />
-      ) : dept.college === "arts-science" ? (
-        <ArtsScienceNavbar forceSolidOnTop />
-      ) : dept.college === "polytechnic" ? (
-        <PolytechnicNavbar forceSolidOnTop />
-      ) : (
-        <Navbar />
-      )}
+      <Navbar forceSolidOnTop />
 
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <header

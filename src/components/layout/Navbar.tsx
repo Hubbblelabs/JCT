@@ -6,8 +6,16 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X, ChevronDown, Phone, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { type NavChild } from "@/data/navigation";
 import { siteConfig } from "@/data/site";
+import { useInstitution } from "@/contexts/InstitutionContext";
+import {
+  mainNavigation,
+  engineeringNavigation,
+  artsNavigation,
+  polytechnicNavigation,
+  type NavItem,
+  type NavChild,
+} from "@/data/all-navigations";
 
 type NavbarProps = {
   forceSolidOnTop?: boolean;
@@ -15,7 +23,9 @@ type NavbarProps = {
 
 export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const pathname = usePathname();
-  const isEngineeringPage = pathname === "/institutions/engineering";
+  const { institution } = useInstitution();
+
+  const isEngineeringPage = institution === "engineering";
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
@@ -23,7 +33,6 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const bannerVisible = isEngineeringPage && showBanner;
 
   const [desktopExpanded, setDesktopExpanded] = useState<string | null>(null);
-  // Track if dropdown was recently open (prevents transparent flash on scroll-up)
   const [dropdownSolidOverride, setDropdownSolidOverride] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const solidOverrideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
@@ -57,11 +66,9 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
     };
   }, [isOpen]);
 
-  // When scrolled state changes from true→false, hold the solid state briefly
-  // so the dropdown doesn't flash transparent during the transition
   useEffect(() => {
     if (!scrolled && !forceSolidOnTop) {
-      // Just scrolled back to top — hold solid briefly
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDropdownSolidOverride(true);
       if (solidOverrideTimeoutRef.current) {
         clearTimeout(solidOverrideTimeoutRef.current);
@@ -82,76 +89,98 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   };
 
   const isSolid = scrolled || forceSolidOnTop;
-  // Use solid styles for dropdown if navbar is solid OR if we're in the brief override window OR if a dropdown is actively open
   const isDropdownSolid = isSolid || dropdownSolidOverride || !!desktopExpanded;
 
-  const navigationLinks = [
-    { name: "Home", href: "/" },
-    {
-      name: "Institutions",
-      href: "#",
-      children: [
-        {
-          name: "Engineering (Autonomous)",
-          href: "/institutions/engineering",
-          desc: "B.E, B.Tech, M.E, Ph.D programs",
-        },
-        {
-          name: "Arts & Science",
-          href: "/institutions/arts-science",
-          desc: "B.A, B.Sc, B.Com, BBA programs",
-        },
-        {
-          name: "Polytechnic",
-          href: "/institutions/polytechnic",
-          desc: "Diploma programs",
-        },
-      ],
-    },
-    { name: "Admissions", href: "/admissions" },
-    { name: "Placements", href: "/placements" },
-    { name: "Life @ JCT", href: "/campus-life" },
-    {
-      name: "More",
-      href: "#",
-      children: [
-        { name: "About", href: "/about", desc: "Our story & leadership" },
-        { name: "Alumni", href: "/alumni", desc: "Connect with our network" },
-        { name: "Careers", href: "/careers", desc: "Join our team" },
-        { name: "Contact", href: "/contact", desc: "Get in touch" },
-        {
-          name: "Governance",
-          href: "/governance",
-          desc: "Cells & committees",
-        },
-        {
-          name: "Leadership",
-          href: "/leadership",
-          desc: "Management & council",
-        },
-        {
-          name: "Mandatory Disclosure",
-          href: "/mandatory-disclosure",
-          desc: "Policies & compliance",
-        },
-        { name: "Media", href: "/media", desc: "News & gallery" },
-        {
-          name: "Quality",
-          href: "/quality",
-          desc: "Accreditations & IQAC",
-        },
-        {
-          name: "Research",
-          href: "/research",
-          desc: "R&D, CoE & publications",
-        },
-      ],
-    },
-  ];
+  let navigationLinks: NavItem[] = mainNavigation;
+  let logoText = "JCT Institutions";
+  let logoSubText = "";
+  let logoLink = "/";
+  let highlightColor = "text-[#d4a024]";
+  let highlightBgColor = "bg-[#d4a024]";
+  let highlightHoverBgColor = "hover:bg-[#e8b84a]";
+  let highlightShadowColor = "shadow-[#d4a024]/10";
+  let highlightGroupHoverTextColor = "group-hover:text-[#d4a024]";
+  let highlightHoverTextColor = "hover:text-[#d4a024]";
+
+  if (institution === "engineering") {
+    navigationLinks = engineeringNavigation;
+    logoText = "JCT College of";
+    logoSubText = "Engineering & Technology";
+    logoLink = "/institutions/engineering";
+  } else if (institution === "arts-science") {
+    navigationLinks = artsNavigation;
+    logoText = "JCT College of";
+    logoSubText = "Arts and Science";
+    logoLink = "/institutions/arts-science";
+    highlightColor = "text-amber-400";
+    highlightBgColor = "bg-amber-400";
+    highlightHoverBgColor = "hover:bg-amber-500";
+    highlightShadowColor = "shadow-amber-400/10";
+    highlightGroupHoverTextColor = "group-hover:text-amber-400";
+    highlightHoverTextColor = "hover:text-amber-400";
+  } else if (institution === "polytechnic") {
+    navigationLinks = polytechnicNavigation;
+    logoText = "JCT Polytechnic College";
+    logoSubText = "Est. 2009";
+    logoLink = "/institutions/polytechnic";
+    highlightColor = "text-blue-400";
+    highlightBgColor = "bg-blue-500";
+    highlightHoverBgColor = "hover:bg-blue-600";
+    highlightShadowColor = "shadow-blue-500/10";
+    highlightGroupHoverTextColor = "group-hover:text-blue-400";
+    highlightHoverTextColor = "hover:text-blue-400";
+  }
+
+  const isSamePageHashLink = (href: string) => {
+    return href.startsWith("#") || href.includes("#");
+  };
+
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string,
+    closeMobileMenu = false,
+  ) => {
+    if (closeMobileMenu) {
+      setIsOpen(false);
+      setMobileExpanded(null);
+    }
+
+    if (href === "#") {
+      e.preventDefault();
+      return;
+    }
+
+    if (!isSamePageHashLink(href)) return;
+
+    const hashIndex = href.indexOf("#");
+    const hash = hashIndex !== -1 ? href.slice(hashIndex) : "";
+    const basePath = hashIndex !== -1 ? href.slice(0, hashIndex) : href;
+
+    if (!hash || hash === "#") return;
+
+    if (
+      window.location.pathname === basePath ||
+      (basePath === "" && window.location.pathname === logoLink)
+    ) {
+      e.preventDefault();
+      const target = document.querySelector(hash) as HTMLElement | null;
+      if (!target) return;
+
+      const nav = document.querySelector("nav") as HTMLElement | null;
+      const offset = (nav?.offsetHeight ?? 88) + 8;
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+
+      window.scrollTo({ top, behavior: "smooth" });
+      window.history.replaceState(
+        null,
+        "",
+        `${window.location.pathname}${hash}`,
+      );
+    }
+  };
 
   return (
     <>
-      {/* Announcement Bar — Counselling Code */}
       {bannerVisible && (
         <div className="bg-gold text-navy fixed top-0 right-0 left-0 z-60 px-3 py-2 text-center font-sans text-[11px] font-bold tracking-wide sm:px-4 sm:text-xs">
           <span className="block pr-6 leading-tight whitespace-nowrap">
@@ -173,17 +202,16 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
           </button>
         </div>
       )}
-      {/* Main Nav */}
+
       <nav
         className={`fixed ${bannerVisible ? "top-10" : "top-4"} right-0 left-0 z-50 px-4 transition-all duration-300 md:px-8`}
       >
         <div
           className={`mx-auto flex w-full max-w-360 items-center justify-between rounded-full border px-4 py-2.5 transition-all duration-300 lg:px-7 ${isSolid ? "border-white/10 bg-[#0a1628]/95 shadow-[0_8px_30px_rgba(0,0,0,0.4)] backdrop-blur-md" : "border-white/0 bg-transparent"}`}
         >
-          {/* Logo Container */}
           <div className="z-50 flex shrink-0 items-center justify-start xl:flex-1">
             <Link
-              href="/"
+              href={logoLink}
               className="flex shrink-0 items-center gap-2 lg:gap-3"
             >
               <div className="relative h-7 w-7 lg:h-10 lg:w-10">
@@ -195,13 +223,19 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                   className="object-contain"
                 />
               </div>
-              <span className="font-sans text-lg font-bold tracking-tight whitespace-nowrap text-white drop-shadow-sm transition-colors lg:text-xl xl:text-[24px]">
-                JCT Institutions
-              </span>
+              <div className="flex flex-col justify-center">
+                <span className="font-sans text-lg leading-none font-bold tracking-tight whitespace-nowrap text-white drop-shadow-sm transition-colors lg:text-xl xl:text-[20px]">
+                  {logoText}
+                </span>
+                {logoSubText && (
+                  <span className="mt-1 font-sans text-[9px] leading-none font-medium tracking-[0.14em] text-white/60 uppercase lg:text-[10px]">
+                    {logoSubText}
+                  </span>
+                )}
+              </div>
             </Link>
           </div>
 
-          {/* Desktop Links */}
           <div
             className="hidden items-center justify-center whitespace-nowrap xl:flex"
             ref={dropdownRef}
@@ -210,7 +244,8 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               const isActive =
                 link.href === "/"
                   ? pathname === "/"
-                  : pathname.startsWith(link.href) && !link.href.includes("#");
+                  : pathname.startsWith(link.href.split("#")[0]) &&
+                    !link.href.includes("#");
               const hasDropdown = !!link.children;
               const isExpanded = desktopExpanded === link.name;
 
@@ -223,14 +258,14 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                   }
                   onMouseLeave={() => hasDropdown && setDesktopExpanded(null)}
                 >
-                  {hasDropdown ? (
+                  {hasDropdown && link.href === "#" ? (
                     <button
                       onClick={(e) => {
                         e.preventDefault();
                         setDesktopExpanded(isExpanded ? null : link.name);
                       }}
                       className={`group relative flex items-center justify-center gap-1.5 px-3 py-2 font-sans text-sm font-medium transition-colors hover:text-white xl:px-5 xl:text-[15px] ${
-                        isExpanded ? "text-[#d4a024]" : "text-white/90"
+                        isExpanded ? highlightColor : "text-white/90"
                       }`}
                     >
                       {link.name}
@@ -239,19 +274,26 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                         className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
                       />
                       <span
-                        className={`absolute right-3 bottom-1 left-3 h-[1.5px] origin-left bg-[#d4a024] transition-transform duration-300 xl:right-5 xl:left-5 ${isExpanded ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
+                        className={`absolute right-3 bottom-1 left-3 h-[1.5px] origin-left ${highlightBgColor} transition-transform duration-300 xl:right-5 xl:left-5 ${isExpanded ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
                       />
                     </button>
                   ) : (
                     <Link
                       href={link.href}
+                      onClick={(e) => handleNavClick(e, link.href)}
                       className={`group relative flex items-center justify-center px-3 py-2 font-sans text-sm font-medium transition-colors hover:text-white xl:px-5 xl:text-[15px] ${
-                        isActive ? "text-[#d4a024]" : "text-white/90"
+                        isActive ? highlightColor : "text-white/90"
                       }`}
                     >
                       {link.name}
+                      {hasDropdown && (
+                        <ChevronDown
+                          size={14}
+                          className={`ml-1.5 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+                        />
+                      )}
                       <span
-                        className={`absolute right-3 bottom-1 left-3 h-[1.5px] origin-left bg-[#d4a024] transition-transform duration-300 xl:right-5 xl:left-5 ${isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
+                        className={`absolute right-3 bottom-1 left-3 h-[1.5px] origin-left ${highlightBgColor} transition-transform duration-300 xl:right-5 xl:left-5 ${isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
                       />
                     </Link>
                   )}
@@ -281,7 +323,10 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                               <Link
                                 key={child.name}
                                 href={child.href}
-                                onClick={() => setDesktopExpanded(null)}
+                                onClick={(e) => {
+                                  setDesktopExpanded(null);
+                                  handleNavClick(e, child.href);
+                                }}
                                 className={`group block rounded-lg px-4 py-3 font-sans transition-colors ${
                                   isDropdownSolid
                                     ? "hover:bg-white/10"
@@ -291,7 +336,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                 <div className="flex items-center justify-between gap-3">
                                   <div>
                                     <div
-                                      className={`text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-[#d4a024] ${
+                                      className={`text-[15px] font-medium whitespace-nowrap transition-colors ${highlightColor.replace("text-", "group-hover:text-")} ${
                                         isDropdownSolid
                                           ? "text-white/90"
                                           : "text-white"
@@ -313,7 +358,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                   </div>
                                   <ArrowRight
                                     size={14}
-                                    className="shrink-0 -translate-x-1 text-[#d4a024] opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                                    className={`shrink-0 -translate-x-1 ${highlightColor} opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100`}
                                   />
                                 </div>
                               </Link>
@@ -328,7 +373,6 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             })}
           </div>
 
-          {/* Desktop Right */}
           <div className="z-50 hidden shrink-0 items-center justify-end gap-3 whitespace-nowrap xl:flex xl:flex-1 xl:gap-6">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
@@ -341,7 +385,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               href="/apply-now"
               className={`inline-flex h-9.5 items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10.5 xl:px-8 xl:text-[15px] ${
                 isSolid
-                  ? "bg-[#d4a024] font-semibold text-[#0a1628] shadow-lg shadow-black/20 hover:bg-[#e8b84a]"
+                  ? `${highlightBgColor} font-semibold text-[#0a1628] shadow-lg shadow-black/20 ${highlightHoverBgColor}`
                   : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
               }`}
             >
@@ -349,7 +393,6 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             </Link>
           </div>
 
-          {/* Mobile Toggle */}
           <button
             className="z-50 ml-auto p-2 text-white transition-colors hover:text-white/80 xl:hidden"
             onClick={() => setIsOpen(!isOpen)}
@@ -363,7 +406,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
           </button>
         </div>
       </nav>
-      {/* Mobile Drawer */}
+
       <AnimatePresence>
         {isOpen && (
           <>
@@ -379,9 +422,8 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="fixed inset-y-4 right-4 z-61 flex w-70 flex-col rounded-3xl border border-white/10 bg-[#0a1628]/90 shadow-2xl backdrop-blur-xl xl:hidden"
+              className="fixed inset-y-4 right-4 z-61 flex w-76 flex-col rounded-3xl border border-white/10 bg-[#0a1628]/95 shadow-2xl backdrop-blur-xl xl:hidden"
             >
-              {/* Header */}
               <div className="flex items-center justify-between border-b border-white/5 p-5">
                 <div className="flex items-center gap-3">
                   <div className="relative h-9 w-9">
@@ -395,11 +437,13 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                   </div>
                   <div className="flex flex-col">
                     <span className="font-serif text-lg leading-none font-bold text-white">
-                      JCT
+                      {logoText}
                     </span>
-                    <span className="mt-0.5 text-[10px] font-medium tracking-widest text-white/50 uppercase">
-                      Institutions
-                    </span>
+                    {logoSubText && (
+                      <span className="mt-0.5 text-[9px] font-medium tracking-[0.14em] text-white/50 uppercase">
+                        {logoSubText}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <button
@@ -410,7 +454,6 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                 </button>
               </div>
 
-              {/* Links */}
               <div className="scrollbar-hide flex-1 overflow-y-auto px-4 py-4">
                 <div className="space-y-1">
                   {navigationLinks.map((link) => (
@@ -418,6 +461,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                       {"children" in link && link.children ? (
                         <div>
                           <button
+                            type="button"
                             onClick={() => toggleMobileSection(link.name)}
                             className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${mobileExpanded === link.name ? "bg-white/10 text-white shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
                           >
@@ -444,8 +488,10 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                     <Link
                                       key={child.name}
                                       href={child.href}
-                                      onClick={() => setIsOpen(false)}
-                                      className="block rounded-lg px-4 py-3 font-sans transition-colors hover:bg-white/5 hover:text-[#d4a024]"
+                                      onClick={(e) =>
+                                        handleNavClick(e, child.href, true)
+                                      }
+                                      className={`block rounded-lg px-4 py-3 font-sans transition-colors hover:bg-white/5 ${highlightColor.replace("text-", "hover:text-")}`}
                                     >
                                       <div className="text-sm text-white/70">
                                         {child.name}
@@ -465,8 +511,8 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                       ) : (
                         <Link
                           href={link.href}
-                          onClick={() => setIsOpen(false)}
-                          className={`block rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${pathname === link.href ? "bg-white/10 text-[#d4a024] shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                          onClick={(e) => handleNavClick(e, link.href, true)}
+                          className={`block rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${pathname === link.href ? `bg-white/10 ${highlightColor} shadow-sm` : "text-white/70 hover:bg-white/5 hover:text-white"}`}
                         >
                           {link.name}
                         </Link>
@@ -476,7 +522,6 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                 </div>
               </div>
 
-              {/* Footer */}
               <div className="space-y-3 border-t border-white/5 p-5 pt-2">
                 <a
                   href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
@@ -487,7 +532,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                 <Link
                   href="/apply-now"
                   onClick={() => setIsOpen(false)}
-                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#d4a024] font-sans text-sm font-bold text-[#0a1628] shadow-lg shadow-[#d4a024]/10 transition-all hover:scale-[1.02] hover:bg-[#e8b84a] active:scale-[0.98]"
+                  className={`flex h-12 w-full items-center justify-center gap-2 rounded-2xl ${highlightBgColor} font-sans text-sm font-bold text-[#0a1628] shadow-lg ${highlightShadowColor} transition-all hover:scale-[1.02] ${highlightHoverBgColor} active:scale-[0.98]`}
                 >
                   Apply Now <ArrowRight size={14} />
                 </Link>

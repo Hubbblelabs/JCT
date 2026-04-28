@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Footer } from "@/components/layout/Footer";
-import { ArtsScienceNavbar } from "@/modules/arts-science/ArtsScienceNavbar";
+import { Navbar } from "@/components/layout/Navbar";
 
 export const metadata: Metadata = {
   title: "Admissions | JCT College of Arts & Science, Coimbatore",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 export default function ArtsScienceAdmissionsPage() {
   return (
     <main className="bg-background text-foreground arts-science-theme min-h-screen">
-      <ArtsScienceNavbar forceSolidOnTop />
+      <Navbar forceSolidOnTop />
       <PageHero
         title="Admissions"
         subtitle="Begin Your Journey at JCT Arts & Science"
