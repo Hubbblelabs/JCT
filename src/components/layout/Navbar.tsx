@@ -229,10 +229,8 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                         e.preventDefault();
                         setDesktopExpanded(isExpanded ? null : link.name);
                       }}
-                      className={`relative flex items-center justify-center gap-1.5 px-3 py-2 font-sans text-sm font-medium transition-colors xl:px-5 xl:text-[15px] ${
-                        isExpanded
-                          ? "text-[#d4a024]"
-                          : "text-white/90 hover:text-white"
+                      className={`group relative flex items-center justify-center gap-1.5 px-3 py-2 font-sans text-sm font-medium transition-colors hover:text-white xl:px-5 xl:text-[15px] ${
+                        isExpanded ? "text-[#d4a024]" : "text-white/90"
                       }`}
                     >
                       {link.name}
@@ -240,33 +238,40 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                         size={14}
                         className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
                       />
+                      <span
+                        className={`absolute right-3 bottom-1 left-3 h-[1.5px] origin-left bg-[#d4a024] transition-transform duration-300 xl:right-5 xl:left-5 ${isExpanded ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
+                      />
                     </button>
                   ) : (
                     <Link
                       href={link.href}
-                      className={`relative flex items-center justify-center px-3 py-2 font-sans text-sm font-medium transition-colors xl:px-5 xl:text-[15px] ${
-                        isActive
-                          ? "text-[#d4a024]"
-                          : "text-white/90 hover:text-white"
+                      className={`group relative flex items-center justify-center px-3 py-2 font-sans text-sm font-medium transition-colors hover:text-white xl:px-5 xl:text-[15px] ${
+                        isActive ? "text-[#d4a024]" : "text-white/90"
                       }`}
                     >
                       {link.name}
-                      {isActive && (
-                        <span className="absolute right-3 bottom-1 left-3 h-0.5 bg-[#d4a024] xl:right-5 xl:left-5" />
-                      )}
+                      <span
+                        className={`absolute right-3 bottom-1 left-3 h-[1.5px] origin-left bg-[#d4a024] transition-transform duration-300 xl:right-5 xl:left-5 ${isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
+                      />
                     </Link>
                   )}
 
                   {hasDropdown && (
                     <AnimatePresence>
                       {isExpanded && (
-                        <div className="absolute top-full left-0 z-50 pt-4">
+                        <div
+                          className={`absolute top-full z-50 pt-4 ${link.name === "More" ? "right-0" : "left-0"}`}
+                        >
                           <motion.div
                             initial={{ opacity: 0, y: 8, scale: 0.985 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 8, scale: 0.985 }}
                             transition={{ duration: 0.22, ease: "easeOut" }}
-                            className={`w-64 rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
+                            className={`rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
+                              link.name === "More"
+                                ? "grid w-[600px] grid-cols-2 gap-x-2 gap-y-1"
+                                : "w-72"
+                            } ${
                               isDropdownSolid
                                 ? "border-white/10 bg-[#0a1628]/96"
                                 : "border-white/20 bg-[#0a1628]/70"
@@ -277,32 +282,40 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                 key={child.name}
                                 href={child.href}
                                 onClick={() => setDesktopExpanded(null)}
-                                className={`block rounded-lg px-4 py-3 font-sans transition-colors ${
+                                className={`group block rounded-lg px-4 py-3 font-sans transition-colors ${
                                   isDropdownSolid
                                     ? "hover:bg-white/10"
                                     : "hover:bg-white/15"
                                 } ${child.className || ""}`}
                               >
-                                <div
-                                  className={`text-[15px] font-medium whitespace-nowrap ${
-                                    isDropdownSolid
-                                      ? "text-white/90"
-                                      : "text-white"
-                                  }`}
-                                >
-                                  {child.name}
-                                </div>
-                                {child.desc && (
-                                  <div
-                                    className={`mt-0.5 text-[13px] whitespace-nowrap ${
-                                      isDropdownSolid
-                                        ? "text-white/50"
-                                        : "text-white/75"
-                                    }`}
-                                  >
-                                    {child.desc}
+                                <div className="flex items-center justify-between gap-3">
+                                  <div>
+                                    <div
+                                      className={`text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-[#d4a024] ${
+                                        isDropdownSolid
+                                          ? "text-white/90"
+                                          : "text-white"
+                                      }`}
+                                    >
+                                      {child.name}
+                                    </div>
+                                    {child.desc && (
+                                      <div
+                                        className={`mt-0.5 text-[13px] whitespace-nowrap transition-colors group-hover:text-white/80 ${
+                                          isDropdownSolid
+                                            ? "text-white/50"
+                                            : "text-white/75"
+                                        }`}
+                                      >
+                                        {child.desc}
+                                      </div>
+                                    )}
                                   </div>
-                                )}
+                                  <ArrowRight
+                                    size={14}
+                                    className="shrink-0 -translate-x-1 text-[#d4a024] opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                                  />
+                                </div>
                               </Link>
                             ))}
                           </motion.div>

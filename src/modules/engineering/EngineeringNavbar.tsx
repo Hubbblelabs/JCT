@@ -47,7 +47,7 @@ const engineeringNavigation: EngineeringNavItem[] = [
   },
   {
     name: "Programs",
-    href: "/institutions/engineering#programs",
+    href: "/institutions/engineering/programs",
   },
   {
     name: "Placements",
@@ -65,12 +65,28 @@ const engineeringNavigation: EngineeringNavItem[] = [
     name: "More",
     href: "#",
     children: [
-      { name: "About Us", href: "/institutions/engineering#about" },
-      { name: "Alumni", href: "/alumni" },
-      { name: "Governance", href: "/governance" },
-      { name: "Quality", href: "/quality" },
-      { name: "Mandatory Disclosure", href: "/mandatory-disclosure" },
-      { name: "Contact", href: "/contact" },
+      {
+        name: "About Us",
+        href: "/institutions/engineering/about",
+        desc: "Our story & leadership",
+      },
+      {
+        name: "Admissions",
+        href: "/institutions/engineering/admissions",
+        desc: "Apply to Engineering",
+      },
+      { name: "Alumni", href: "/alumni", desc: "Connect with our network" },
+      { name: "Careers", href: "/careers", desc: "Join our team" },
+      { name: "Contact", href: "/contact", desc: "Get in touch" },
+      { name: "Governance", href: "/governance", desc: "Cells & committees" },
+      { name: "Leadership", href: "/leadership", desc: "Management & council" },
+      {
+        name: "Mandatory Disclosure",
+        href: "/mandatory-disclosure",
+        desc: "Policies & compliance",
+      },
+      { name: "Media", href: "/media", desc: "News & gallery" },
+      { name: "Quality", href: "/quality", desc: "Accreditations & IQAC" },
     ],
   },
 ];
@@ -255,13 +271,19 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                   {hasDropdown && (
                     <AnimatePresence>
                       {isExpanded && (
-                        <div className="absolute top-full left-0 z-50 pt-4">
+                        <div
+                          className={`absolute top-full z-50 pt-4 ${link.name === "More" ? "right-0" : "left-0"}`}
+                        >
                           <motion.div
                             initial={{ opacity: 0, y: 8, scale: 0.985 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 8, scale: 0.985 }}
                             transition={{ duration: 0.22, ease: "easeOut" }}
-                            className={`w-70 rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
+                            className={`rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
+                              link.name === "More"
+                                ? "grid w-[600px] grid-cols-2 gap-x-2 gap-y-1"
+                                : "w-72"
+                            } ${
                               isDropdownSolid
                                 ? "border-white/10 bg-[#0B1628]/96"
                                 : "border-white/20 bg-[#0B1628]/70"
@@ -281,7 +303,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 <div className="flex items-center justify-between gap-3">
                                   <div>
                                     <div
-                                      className={`text-[15px] font-medium whitespace-nowrap ${
+                                      className={`text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-[#d4a024] ${
                                         isSolid ? "text-white/90" : "text-white"
                                       }`}
                                     >
@@ -289,7 +311,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                     </div>
                                     {child.desc && (
                                       <div
-                                        className={`mt-0.5 text-[13px] ${
+                                        className={`mt-0.5 text-[13px] transition-colors group-hover:text-white/80 ${
                                           isSolid
                                             ? "text-white/50"
                                             : "text-white/75"
@@ -301,7 +323,7 @@ export function EngineeringNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                   </div>
                                   <ArrowRight
                                     size={14}
-                                    className="shrink-0 text-[#d4a024] opacity-0 transition-opacity group-hover:opacity-100"
+                                    className="shrink-0 -translate-x-1 text-[#d4a024] opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
                                   />
                                 </div>
                               </Link>

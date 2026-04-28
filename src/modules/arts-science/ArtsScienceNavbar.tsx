@@ -44,16 +44,47 @@ const artsNav: ArtsNavItem[] = [
       },
     ],
   },
-  { name: "Programs", href: "#programs" },
-  { name: "Admission", href: "/admissions" },
+  { name: "Programs", href: "/institutions/arts-science/programs" },
+  { name: "Admissions", href: "/institutions/arts-science/admissions" },
   { name: "Placements", href: "/placements" },
   { name: "Life @ JCT", href: "/campus-life" },
   {
     name: "More",
     href: "#",
     children: [
-      { name: "About Us", href: "#about" },
-      { name: "Testimonials", href: "#testimonials" },
+      {
+        name: "About Us",
+        href: "/institutions/arts-science/about",
+        description: "Our story & leadership",
+      },
+      {
+        name: "Alumni",
+        href: "/alumni",
+        description: "Connect with our network",
+      },
+      { name: "Careers", href: "/careers", description: "Join our team" },
+      { name: "Contact", href: "/contact", description: "Get in touch" },
+      {
+        name: "Leadership",
+        href: "/leadership",
+        description: "Management & council",
+      },
+      {
+        name: "Mandatory Disclosure",
+        href: "/mandatory-disclosure",
+        description: "Policies & compliance",
+      },
+      { name: "Media", href: "/media", description: "News & gallery" },
+      {
+        name: "Quality",
+        href: "/quality",
+        description: "Accreditations & IQAC",
+      },
+      {
+        name: "Research",
+        href: "/research",
+        description: "R&D, CoE & publications",
+      },
     ],
   },
 ];
@@ -185,66 +216,79 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
           </Link>
 
           <div className="hidden items-center gap-2 xl:flex">
-            {artsNav.map((link) => (
-              <div
-                key={link.name}
-                className={`relative ${link.className || ""}`}
-                onMouseEnter={() =>
-                  link.children && setActiveDropdown(link.name)
-                }
-                onMouseLeave={() => setActiveDropdown(null)}
-              >
-                {link.children && link.href === "#" ? (
-                  <button
-                    type="button"
-                    className="group relative flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-semibold whitespace-nowrap text-white/92 transition-colors duration-300 hover:text-white"
-                  >
-                    {link.name}
-                    <ChevronDown
-                      size={12}
-                      className={`transition-transform duration-200 ${
-                        activeDropdown === link.name ? "rotate-180" : ""
+            {artsNav.map((link) => {
+              const hasDropdown = !!link.children;
+              const isExpanded = activeDropdown === link.name;
+
+              return (
+                <div
+                  key={link.name}
+                  className={`relative ${link.className || ""}`}
+                  onMouseEnter={() =>
+                    link.children && setActiveDropdown(link.name)
+                  }
+                  onMouseLeave={() => setActiveDropdown(null)}
+                >
+                  {hasDropdown && link.href === "#" ? (
+                    <button
+                      type="button"
+                      className={`group relative flex items-center justify-center gap-1.5 px-3 py-2 font-sans text-sm font-medium transition-colors hover:text-orange-500 xl:px-5 xl:text-[15px] ${
+                        isExpanded ? "text-orange-500" : "text-white/90"
                       }`}
-                    />
-                    <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-[#f07b1a] transition-transform duration-300 group-hover:scale-x-100" />
-                  </button>
-                ) : (
-                  <Link
-                    href={link.href}
-                    onClick={(e) => handleNavClick(e, link.href)}
-                    className="group relative flex items-center gap-1 px-3 py-2 font-sans text-[14px] font-semibold text-white/92 transition-colors duration-300 hover:text-white"
-                  >
-                    {link.name}
-                    {link.children && (
+                    >
+                      {link.name}
                       <ChevronDown
-                        size={12}
+                        size={14}
                         className={`transition-transform duration-200 ${
-                          activeDropdown === link.name ? "rotate-180" : ""
+                          isExpanded ? "rotate-180" : ""
                         }`}
                       />
-                    )}
-                    <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-[#f07b1a] transition-transform duration-300 group-hover:scale-x-100" />
-                  </Link>
-                )}
-
-                <AnimatePresence>
-                  {link.children && activeDropdown === link.name && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: 4 }}
-                      transition={{ duration: 0.15, ease: "easeOut" }}
-                      className="absolute top-full left-0 w-64 pt-3"
+                      <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-[#f97316] transition-transform duration-300 group-hover:scale-x-100 xl:right-5 xl:left-5" />
+                    </button>
+                  ) : (
+                    <Link
+                      href={link.href}
+                      onClick={(e) => handleNavClick(e, link.href)}
+                      className="group relative flex items-center justify-center px-3 py-2 font-sans text-sm font-medium text-white/90 transition-colors hover:text-orange-500 xl:px-5 xl:text-[15px]"
                     >
-                      <div
-                        className={`overflow-hidden rounded-xl border p-2 shadow-2xl backdrop-blur-2xl ${
-                          isDropdownSolid
-                            ? "border-white/15 bg-[#0b1a31]/96 shadow-black/40"
-                            : "border-white/20 bg-[#0b1a31]/70 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)]"
+                      {link.name}
+                      {hasDropdown && (
+                        <ChevronDown
+                          size={14}
+                          className={`transition-transform duration-200 ${
+                            isExpanded ? "rotate-180" : ""
+                          }`}
+                        />
+                      )}
+                      <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-[#f97316] transition-transform duration-300 group-hover:scale-x-100 xl:right-5 xl:left-5" />
+                    </Link>
+                  )}
+
+                  <AnimatePresence>
+                    {hasDropdown && isExpanded && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: 4 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        className={`absolute top-full pt-3 ${
+                          link.name === "More"
+                            ? "right-0 w-[600px]"
+                            : "left-0 w-72"
                         }`}
                       >
-                        <div className="space-y-0.5">
-                          {link.children.map((child) => (
+                        <div
+                          className={`overflow-hidden rounded-xl border p-2 shadow-2xl backdrop-blur-2xl ${
+                            link.name === "More"
+                              ? "grid grid-cols-2 gap-x-2 gap-y-1"
+                              : "space-y-0.5"
+                          } ${
+                            isDropdownSolid
+                              ? "border-white/15 bg-[#0b1a31]/96 shadow-black/40"
+                              : "border-white/20 bg-[#0b1a31]/70 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)]"
+                          }`}
+                        >
+                          {link.children?.map((child) => (
                             <Link
                               key={child.name}
                               href={child.href}
@@ -259,7 +303,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                             >
                               <div>
                                 <p
-                                  className={`font-sans text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-[#ffae4c] ${
+                                  className={`font-sans text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-orange-500 ${
                                     isDropdownSolid
                                       ? "text-white/92"
                                       : "text-white"
@@ -269,7 +313,7 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                                 </p>
                                 {child.description && (
                                   <p
-                                    className={`mt-0.5 font-sans text-xs ${
+                                    className={`mt-0.5 font-sans text-[13px] transition-colors group-hover:text-white/80 ${
                                       isDropdownSolid
                                         ? "text-white/55"
                                         : "text-white/75"
@@ -281,17 +325,17 @@ export function ArtsScienceNavbar({ forceSolidOnTop = false }: NavbarProps) {
                               </div>
                               <ArrowRight
                                 size={12}
-                                className="shrink-0 text-[#ffae4c] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                                className="shrink-0 text-[#ffd36b] opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                               />
                             </Link>
                           ))}
                         </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              );
+            })}
           </div>
 
           <div className="hidden items-center gap-3 xl:flex">
