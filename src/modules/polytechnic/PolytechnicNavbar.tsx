@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, type MouseEvent } from "react";
+import { useState, useEffect, useRef, type MouseEvent } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X, ChevronDown, ArrowRight, Phone } from "lucide-react";
@@ -49,26 +49,41 @@ const polytechnicNavigation: PolytechnicNavItem[] = [
   },
   {
     name: "Programs",
-    href: "/institutions/polytechnic#programs",
+    href: "/institutions/polytechnic/programs",
   },
   {
-    name: "Admission",
-    href: "/institutions/polytechnic#admissions",
+    name: "Admissions",
+    href: "/institutions/polytechnic/admissions",
   },
   {
     name: "Placements",
-    href: "/institutions/polytechnic#placements",
+    href: "/placements",
   },
   {
     name: "Life @ JCT",
-    href: "/institutions/polytechnic#happenings",
+    href: "/campus-life",
   },
   {
     name: "More",
     href: "#",
     children: [
-      { name: "About Us", href: "/institutions/polytechnic#about-institution" },
-      { name: "Testimonials", href: "/institutions/polytechnic#testimonials" },
+      {
+        name: "About Us",
+        href: "/institutions/polytechnic#about-institution",
+        desc: "Our story & leadership",
+      },
+      { name: "Alumni", href: "/alumni", desc: "Connect with our network" },
+      { name: "Careers", href: "/careers", desc: "Join our team" },
+      { name: "Contact", href: "/contact", desc: "Get in touch" },
+      { name: "Leadership", href: "/leadership", desc: "Management & council" },
+      {
+        name: "Mandatory Disclosure",
+        href: "/mandatory-disclosure",
+        desc: "Policies & compliance",
+      },
+      { name: "Media", href: "/media", desc: "News & gallery" },
+      { name: "Quality", href: "/quality", desc: "Accreditations & IQAC" },
+      { name: "Research", href: "/research", desc: "R&D, CoE & publications" },
     ],
   },
 ];
@@ -82,6 +97,10 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
+  const [dropdownSolidOverride, setDropdownSolidOverride] = useState(false);
+  const solidOverrideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   const isSamePageHashLink = (href: string) =>
     href.startsWith("#") || href.startsWith("/institutions/polytechnic#");
@@ -130,6 +149,22 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
   }, []);
 
   useEffect(() => {
+    if (!scrolled && !forceSolidOnTop) {
+      setDropdownSolidOverride(true);
+      if (solidOverrideTimeoutRef.current)
+        clearTimeout(solidOverrideTimeoutRef.current);
+      solidOverrideTimeoutRef.current = setTimeout(
+        () => setDropdownSolidOverride(false),
+        400,
+      );
+    }
+    return () => {
+      if (solidOverrideTimeoutRef.current)
+        clearTimeout(solidOverrideTimeoutRef.current);
+    };
+  }, [scrolled, forceSolidOnTop]);
+
+  useEffect(() => {
     document.body.style.overflow = isOpen ? "hidden" : "unset";
     return () => {
       document.body.style.overflow = "unset";
@@ -139,6 +174,8 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
   const toggleMobileSection = (name: string) => {
     setMobileExpanded(mobileExpanded === name ? null : name);
   };
+
+  const isDropdownSolid = scrolled || forceSolidOnTop || dropdownSolidOverride;
 
   return (
     <>
@@ -190,33 +227,37 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                 {link.children && link.href === "#" ? (
                   <button
                     type="button"
-                    className="group relative flex items-center gap-1 px-3 py-2 font-sans text-base font-medium whitespace-nowrap text-white transition-colors hover:text-white/70"
+                    className={`group relative flex items-center justify-center gap-1.5 px-3 py-2 font-sans text-sm font-medium transition-colors hover:text-blue-400 xl:px-5 xl:text-[15px] ${
+                      activeDropdown === link.name
+                        ? "text-blue-400"
+                        : "text-white/90"
+                    }`}
                   >
                     {link.name}
                     <ChevronDown
-                      size={12}
+                      size={14}
                       className={`transition-transform duration-200 ${
                         activeDropdown === link.name ? "rotate-180" : ""
                       }`}
                     />
-                    <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-[#4f617b] transition-transform duration-300 group-hover:scale-x-100" />
+                    <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-blue-400 transition-transform duration-300 group-hover:scale-x-100 xl:right-5 xl:left-5" />
                   </button>
                 ) : (
                   <Link
                     href={link.href}
                     onClick={(e) => handleNavClick(e, link.href)}
-                    className="group relative flex items-center gap-1 px-3 py-2 font-sans text-base font-medium whitespace-nowrap text-white transition-colors hover:text-white/70"
+                    className="group relative flex items-center justify-center px-3 py-2 font-sans text-sm font-medium text-white/90 transition-colors hover:text-blue-400 xl:px-5 xl:text-[15px]"
                   >
                     {link.name}
                     {link.children && (
                       <ChevronDown
-                        size={12}
+                        size={14}
                         className={`transition-transform duration-200 ${
                           activeDropdown === link.name ? "rotate-180" : ""
                         }`}
                       />
                     )}
-                    <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-[#4f617b] transition-transform duration-300 group-hover:scale-x-100" />
+                    <span className="absolute right-3 bottom-1 left-3 h-[1.5px] origin-left scale-x-0 bg-blue-400 transition-transform duration-300 group-hover:scale-x-100 xl:right-5 xl:left-5" />
                   </Link>
                 )}
 
@@ -229,56 +270,58 @@ export function PolytechnicNavbar({ forceSolidOnTop = false }: NavbarProps) {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 4 }}
                         transition={{ duration: 0.15, ease: "easeOut" }}
-                        className="absolute top-full left-0 w-64 pt-3"
+                        className={`absolute top-full pt-3 ${link.name === "More" ? "right-0 w-[600px]" : "left-0 w-72"}`}
                       >
                         <div
                           className={`overflow-hidden rounded-xl border p-2 shadow-2xl backdrop-blur-2xl ${
-                            scrolled || forceSolidOnTop
+                            link.name === "More"
+                              ? "grid grid-cols-2 gap-x-2 gap-y-1"
+                              : ""
+                          } ${
+                            isDropdownSolid
                               ? "border-white/10 bg-[#0B1628]/95 shadow-black/30"
-                              : "border-white/20 bg-white/12 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)]"
+                              : "border-white/20 bg-[#0B1628]/70 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)]"
                           }`}
                         >
-                          <div className="space-y-0.5">
-                            {link.children.map((child) => (
-                              <Link
-                                key={child.name}
-                                href={child.href}
-                                onClick={(e) => handleNavClick(e, child.href)}
-                                className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all duration-300 ${
-                                  scrolled || forceSolidOnTop
-                                    ? "hover:bg-white/8"
-                                    : "hover:bg-white/12"
-                                } ${child.className || ""}`}
-                              >
-                                <div>
+                          {link.children.map((child) => (
+                            <Link
+                              key={child.name}
+                              href={child.href}
+                              onClick={(e) => handleNavClick(e, child.href)}
+                              className={`group flex items-center justify-between rounded-lg px-3 py-2.5 transition-all duration-300 ${
+                                isDropdownSolid
+                                  ? "hover:bg-white/10"
+                                  : "hover:bg-white/15"
+                              } ${child.className || ""}`}
+                            >
+                              <div>
+                                <p
+                                  className={`font-sans text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-blue-400 ${
+                                    isDropdownSolid
+                                      ? "text-white/90"
+                                      : "text-white"
+                                  }`}
+                                >
+                                  {child.name}
+                                </p>
+                                {child.desc && (
                                   <p
-                                    className={`font-sans text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-white ${
-                                      scrolled || forceSolidOnTop
-                                        ? "text-white/95"
-                                        : "text-white"
+                                    className={`mt-0.5 font-sans text-[13px] transition-colors ${
+                                      isDropdownSolid
+                                        ? "text-white/55 group-hover:text-white/80"
+                                        : "text-white/75 group-hover:text-white/90"
                                     }`}
                                   >
-                                    {child.name}
+                                    {child.desc}
                                   </p>
-                                  {child.desc && (
-                                    <p
-                                      className={`mt-0.5 font-sans text-xs transition-colors ${
-                                        scrolled || forceSolidOnTop
-                                          ? "text-white/55 group-hover:text-white/75"
-                                          : "text-white/78 group-hover:text-white"
-                                      }`}
-                                    >
-                                      {child.desc}
-                                    </p>
-                                  )}
-                                </div>
-                                <ArrowRight
-                                  size={12}
-                                  className="shrink-0 text-white/70 opacity-0 transition-opacity group-hover:opacity-100"
-                                />
-                              </Link>
-                            ))}
-                          </div>
+                                )}
+                              </div>
+                              <ArrowRight
+                                size={14}
+                                className="shrink-0 -translate-x-1 text-blue-400 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                              />
+                            </Link>
+                          ))}
                         </div>
                       </motion.div>
                     )}

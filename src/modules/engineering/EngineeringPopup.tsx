@@ -120,7 +120,7 @@ export function EngineeringPopup() {
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/admissions/apply"
+                  href="/apply-now"
                   onClick={handleClose}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FFC917] px-6 py-3 font-sans text-sm font-bold text-black transition-transform hover:scale-105"
                 >

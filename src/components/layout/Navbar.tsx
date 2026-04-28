@@ -23,7 +23,12 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const bannerVisible = isEngineeringPage && showBanner;
 
   const [desktopExpanded, setDesktopExpanded] = useState<string | null>(null);
+  // Track if dropdown was recently open (prevents transparent flash on scroll-up)
+  const [dropdownSolidOverride, setDropdownSolidOverride] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const solidOverrideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -52,11 +57,33 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
     };
   }, [isOpen]);
 
+  // When scrolled state changes from true→false, hold the solid state briefly
+  // so the dropdown doesn't flash transparent during the transition
+  useEffect(() => {
+    if (!scrolled && !forceSolidOnTop) {
+      // Just scrolled back to top — hold solid briefly
+      setDropdownSolidOverride(true);
+      if (solidOverrideTimeoutRef.current) {
+        clearTimeout(solidOverrideTimeoutRef.current);
+      }
+      solidOverrideTimeoutRef.current = setTimeout(() => {
+        setDropdownSolidOverride(false);
+      }, 400);
+    }
+    return () => {
+      if (solidOverrideTimeoutRef.current) {
+        clearTimeout(solidOverrideTimeoutRef.current);
+      }
+    };
+  }, [scrolled, forceSolidOnTop]);
+
   const toggleMobileSection = (name: string) => {
     setMobileExpanded(mobileExpanded === name ? null : name);
   };
 
   const isSolid = scrolled || forceSolidOnTop;
+  // Use solid styles for dropdown if navbar is solid OR if we're in the brief override window OR if a dropdown is actively open
+  const isDropdownSolid = isSolid || dropdownSolidOverride || !!desktopExpanded;
 
   const navigationLinks = [
     { name: "Home", href: "/" },
@@ -84,6 +111,42 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
     { name: "Admissions", href: "/admissions" },
     { name: "Placements", href: "/placements" },
     { name: "Life @ JCT", href: "/campus-life" },
+    {
+      name: "More",
+      href: "#",
+      children: [
+        { name: "About", href: "/about", desc: "Our story & leadership" },
+        { name: "Alumni", href: "/alumni", desc: "Connect with our network" },
+        { name: "Careers", href: "/careers", desc: "Join our team" },
+        { name: "Contact", href: "/contact", desc: "Get in touch" },
+        {
+          name: "Governance",
+          href: "/governance",
+          desc: "Cells & committees",
+        },
+        {
+          name: "Leadership",
+          href: "/leadership",
+          desc: "Management & council",
+        },
+        {
+          name: "Mandatory Disclosure",
+          href: "/mandatory-disclosure",
+          desc: "Policies & compliance",
+        },
+        { name: "Media", href: "/media", desc: "News & gallery" },
+        {
+          name: "Quality",
+          href: "/quality",
+          desc: "Accreditations & IQAC",
+        },
+        {
+          name: "Research",
+          href: "/research",
+          desc: "R&D, CoE & publications",
+        },
+      ],
+    },
   ];
 
   return (
@@ -96,7 +159,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             {siteConfig.counsellingCode}
           </span>
           <Link
-            href="/admissions/apply"
+            href="/apply-now"
             className="ml-1 hidden underline underline-offset-2 hover:no-underline sm:inline"
           >
             Apply Now
@@ -166,10 +229,8 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                         e.preventDefault();
                         setDesktopExpanded(isExpanded ? null : link.name);
                       }}
-                      className={`relative flex items-center justify-center gap-1.5 px-3 py-2 font-sans text-sm font-medium transition-colors xl:px-5 xl:text-[15px] ${
-                        isExpanded
-                          ? "text-[#d4a024]"
-                          : "text-white/90 hover:text-white"
+                      className={`group relative flex items-center justify-center gap-1.5 px-3 py-2 font-sans text-sm font-medium transition-colors hover:text-white xl:px-5 xl:text-[15px] ${
+                        isExpanded ? "text-[#d4a024]" : "text-white/90"
                       }`}
                     >
                       {link.name}
@@ -177,36 +238,43 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                         size={14}
                         className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
                       />
+                      <span
+                        className={`absolute right-3 bottom-1 left-3 h-[1.5px] origin-left bg-[#d4a024] transition-transform duration-300 xl:right-5 xl:left-5 ${isExpanded ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
+                      />
                     </button>
                   ) : (
                     <Link
                       href={link.href}
-                      className={`relative flex items-center justify-center px-3 py-2 font-sans text-sm font-medium transition-colors xl:px-5 xl:text-[15px] ${
-                        isActive
-                          ? "text-[#d4a024]"
-                          : "text-white/90 hover:text-white"
+                      className={`group relative flex items-center justify-center px-3 py-2 font-sans text-sm font-medium transition-colors hover:text-white xl:px-5 xl:text-[15px] ${
+                        isActive ? "text-[#d4a024]" : "text-white/90"
                       }`}
                     >
                       {link.name}
-                      {isActive && (
-                        <span className="absolute right-3 bottom-1 left-3 h-0.5 bg-[#d4a024] xl:right-5 xl:left-5" />
-                      )}
+                      <span
+                        className={`absolute right-3 bottom-1 left-3 h-[1.5px] origin-left bg-[#d4a024] transition-transform duration-300 xl:right-5 xl:left-5 ${isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
+                      />
                     </Link>
                   )}
 
                   {hasDropdown && (
                     <AnimatePresence>
                       {isExpanded && (
-                        <div className="absolute top-full left-0 z-50 pt-4">
+                        <div
+                          className={`absolute top-full z-50 pt-4 ${link.name === "More" ? "right-0" : "left-0"}`}
+                        >
                           <motion.div
                             initial={{ opacity: 0, y: 8, scale: 0.985 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 8, scale: 0.985 }}
                             transition={{ duration: 0.22, ease: "easeOut" }}
-                            className={`w-64 rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
-                              isSolid
+                            className={`rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
+                              link.name === "More"
+                                ? "grid w-[600px] grid-cols-2 gap-x-2 gap-y-1"
+                                : "w-72"
+                            } ${
+                              isDropdownSolid
                                 ? "border-white/10 bg-[#0a1628]/96"
-                                : "border-white/20 bg-white/12"
+                                : "border-white/20 bg-[#0a1628]/70"
                             }`}
                           >
                             {link.children?.map((child: NavChild) => (
@@ -214,30 +282,40 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                 key={child.name}
                                 href={child.href}
                                 onClick={() => setDesktopExpanded(null)}
-                                className={`block rounded-lg px-4 py-3 font-sans transition-colors ${
-                                  isSolid
+                                className={`group block rounded-lg px-4 py-3 font-sans transition-colors ${
+                                  isDropdownSolid
                                     ? "hover:bg-white/10"
                                     : "hover:bg-white/15"
                                 } ${child.className || ""}`}
                               >
-                                <div
-                                  className={`text-[15px] font-medium whitespace-nowrap ${
-                                    isSolid ? "text-white/90" : "text-white"
-                                  }`}
-                                >
-                                  {child.name}
-                                </div>
-                                {child.desc && (
-                                  <div
-                                    className={`mt-0.5 text-[13px] whitespace-nowrap ${
-                                      isSolid
-                                        ? "text-white/50"
-                                        : "text-white/75"
-                                    }`}
-                                  >
-                                    {child.desc}
+                                <div className="flex items-center justify-between gap-3">
+                                  <div>
+                                    <div
+                                      className={`text-[15px] font-medium whitespace-nowrap transition-colors group-hover:text-[#d4a024] ${
+                                        isDropdownSolid
+                                          ? "text-white/90"
+                                          : "text-white"
+                                      }`}
+                                    >
+                                      {child.name}
+                                    </div>
+                                    {child.desc && (
+                                      <div
+                                        className={`mt-0.5 text-[13px] whitespace-nowrap transition-colors group-hover:text-white/80 ${
+                                          isDropdownSolid
+                                            ? "text-white/50"
+                                            : "text-white/75"
+                                        }`}
+                                      >
+                                        {child.desc}
+                                      </div>
+                                    )}
                                   </div>
-                                )}
+                                  <ArrowRight
+                                    size={14}
+                                    className="shrink-0 -translate-x-1 text-[#d4a024] opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100"
+                                  />
+                                </div>
                               </Link>
                             ))}
                           </motion.div>
@@ -260,7 +338,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               <span className="truncate">{siteConfig.contact.phone}</span>
             </a>
             <Link
-              href="/admissions/apply"
+              href="/apply-now"
               className={`inline-flex h-9.5 items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10.5 xl:px-8 xl:text-[15px] ${
                 isSolid
                   ? "bg-[#d4a024] font-semibold text-[#0a1628] shadow-lg shadow-black/20 hover:bg-[#e8b84a]"
@@ -407,7 +485,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                   <Phone size={16} /> {siteConfig.contact.phone}
                 </a>
                 <Link
-                  href="/admissions/apply"
+                  href="/apply-now"
                   onClick={() => setIsOpen(false)}
                   className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-[#d4a024] font-sans text-sm font-bold text-[#0a1628] shadow-lg shadow-[#d4a024]/10 transition-all hover:scale-[1.02] hover:bg-[#e8b84a] active:scale-[0.98]"
                 >

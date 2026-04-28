@@ -7,40 +7,68 @@ export default function LeadershipPage() {
   return (
     <main className="bg-surface text-foreground min-h-screen">
       <Navbar />
-      <PageHero title="Leadership" subtitle="Guiding Our Journey to Excellence" />
+      <PageHero
+        title="Leadership"
+        subtitle="Guiding Our Journey to Excellence"
+      />
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
         <Breadcrumb items={[{ label: "Leadership" }]} />
 
         <div className="mt-12 space-y-20">
           {/* 1. Chairman Message */}
-          <section className="grid md:grid-cols-[1fr_2fr] gap-8 items-start">
-            <div className="bg-white/5 rounded-2xl aspect-[3/4] border border-white/10 flex items-center justify-center">
+          <section className="grid items-start gap-8 md:grid-cols-[1fr_2fr]">
+            <div className="flex aspect-[3/4] items-center justify-center rounded-2xl border border-white/10 bg-white/5">
               <span className="text-muted-foreground">[Chairman Photo]</span>
             </div>
             <div>
-              <h2 className="font-serif text-3xl font-bold text-foreground">Chairman Message</h2>
-              <h3 className="text-xl text-gold mt-2 font-medium">Shri. S. A. Subramanian</h3>
-              <div className="mt-4 text-muted-foreground leading-relaxed space-y-4">
-                <p>&quot;Education is the most powerful weapon which you can use to change the world. At JCT, we believe in empowering our students with the knowledge, skills, and values required to excel in the global landscape.&quot;</p>
-                <p>Our commitment is not just towards academic excellence, but holistic development. We strive to create an environment that fosters innovation, critical thinking, and social responsibility.</p>
+              <h2 className="text-foreground font-serif text-3xl font-bold">
+                Chairman Message
+              </h2>
+              <h3 className="text-gold mt-2 text-xl font-medium">
+                Shri. S. A. Subramanian
+              </h3>
+              <div className="text-muted-foreground mt-4 space-y-4 leading-relaxed">
+                <p>
+                  &quot;Education is the most powerful weapon which you can use
+                  to change the world. At JCT, we believe in empowering our
+                  students with the knowledge, skills, and values required to
+                  excel in the global landscape.&quot;
+                </p>
+                <p>
+                  Our commitment is not just towards academic excellence, but
+                  holistic development. We strive to create an environment that
+                  fosters innovation, critical thinking, and social
+                  responsibility.
+                </p>
               </div>
             </div>
           </section>
 
           {/* 2. Trustee Profiles */}
           <section>
-            <h2 className="font-serif text-3xl font-bold text-foreground">Trustee Profiles</h2>
-            <div className="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <h2 className="text-foreground font-serif text-3xl font-bold">
+              Trustee Profiles
+            </h2>
+            <div className="mt-8 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-surface border border-border rounded-xl overflow-hidden shadow-sm">
-                  <div className="h-48 bg-white/5 flex items-center justify-center">
-                    <span className="text-muted-foreground">[Trustee {i} Photo]</span>
+                <div
+                  key={i}
+                  className="bg-surface border-border overflow-hidden rounded-xl border shadow-sm"
+                >
+                  <div className="flex h-48 items-center justify-center bg-white/5">
+                    <span className="text-muted-foreground">
+                      [Trustee {i} Photo]
+                    </span>
                   </div>
                   <div className="p-6">
-                    <h3 className="font-bold text-lg">Trustee Name {i}</h3>
+                    <h3 className="text-lg font-bold">Trustee Name {i}</h3>
                     <p className="text-gold text-sm font-medium">Position</p>
-                    <p className="mt-4 text-muted-foreground text-sm line-clamp-3">A brief description of the trustee&apos;s background, contributions to the institution, and vision for the future of education at JCT.</p>
+                    <p className="text-muted-foreground mt-4 line-clamp-3 text-sm">
+                      A brief description of the trustee&apos;s background,
+                      contributions to the institution, and vision for the
+                      future of education at JCT.
+                    </p>
                   </div>
                 </div>
               ))}
@@ -49,55 +77,74 @@ export default function LeadershipPage() {
 
           {/* 3. Principal / Directors */}
           <section>
-            <h2 className="font-serif text-3xl font-bold text-foreground">Principals & Directors</h2>
-            <div className="mt-8 grid sm:grid-cols-2 gap-8">
-              <div className="flex gap-6 items-start bg-white/5 p-6 rounded-2xl border border-white/10">
-                <div className="w-24 h-24 shrink-0 rounded-full bg-white/10 flex items-center justify-center">
-                  <span className="text-xs text-muted-foreground">[Photo]</span>
+            <h2 className="text-foreground font-serif text-3xl font-bold">
+              Principals & Directors
+            </h2>
+            <div className="mt-8 grid gap-8 sm:grid-cols-2">
+              <div className="flex items-start gap-6 rounded-2xl border border-white/10 bg-white/5 p-6">
+                <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-white/10">
+                  <span className="text-muted-foreground text-xs">[Photo]</span>
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg">Dr. Principal Name</h3>
+                  <h3 className="text-lg font-bold">Dr. Principal Name</h3>
                   <p className="text-gold text-sm">Principal, Engineering</p>
-                  <p className="mt-2 text-muted-foreground text-sm">Leading the engineering college with a focus on innovation and research-driven learning methodologies.</p>
+                  <p className="text-muted-foreground mt-2 text-sm">
+                    Leading the engineering college with a focus on innovation
+                    and research-driven learning methodologies.
+                  </p>
                 </div>
               </div>
-              <div className="flex gap-6 items-start bg-white/5 p-6 rounded-2xl border border-white/10">
-                <div className="w-24 h-24 shrink-0 rounded-full bg-white/10 flex items-center justify-center">
-                  <span className="text-xs text-muted-foreground">[Photo]</span>
+              <div className="flex items-start gap-6 rounded-2xl border border-white/10 bg-white/5 p-6">
+                <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-white/10">
+                  <span className="text-muted-foreground text-xs">[Photo]</span>
                 </div>
                 <div>
-                  <h3 className="font-bold text-lg">Dr. Director Name</h3>
+                  <h3 className="text-lg font-bold">Dr. Director Name</h3>
                   <p className="text-gold text-sm">Principal, Arts & Science</p>
-                  <p className="mt-2 text-muted-foreground text-sm">Driving academic excellence and holistic development in the arts and science domains.</p>
+                  <p className="text-muted-foreground mt-2 text-sm">
+                    Driving academic excellence and holistic development in the
+                    arts and science domains.
+                  </p>
                 </div>
               </div>
             </div>
           </section>
 
           {/* 4. Leadership Philosophy */}
-          <section className="bg-gradient-to-br from-[#0a1628] to-[#112240] p-8 md:p-12 rounded-3xl border border-white/10">
-            <h2 className="font-serif text-3xl font-bold text-white text-center">Leadership Philosophy</h2>
-            <div className="mt-8 grid md:grid-cols-3 gap-8">
+          <section className="rounded-3xl border border-white/10 bg-gradient-to-br from-[#0a1628] to-[#112240] p-8 md:p-12">
+            <h2 className="text-center font-serif text-3xl font-bold text-white">
+              Leadership Philosophy
+            </h2>
+            <div className="mt-8 grid gap-8 md:grid-cols-3">
               <div className="text-center">
-                <div className="w-16 h-16 mx-auto bg-gold/20 rounded-full flex items-center justify-center mb-4">
+                <div className="bg-gold/20 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
                   <span className="text-gold text-xl">🎯</span>
                 </div>
-                <h3 className="text-white font-bold mb-2">Student-Centric</h3>
-                <p className="text-white/70 text-sm">Placing the growth and success of our students at the heart of every decision we make.</p>
+                <h3 className="mb-2 font-bold text-white">Student-Centric</h3>
+                <p className="text-sm text-white/70">
+                  Placing the growth and success of our students at the heart of
+                  every decision we make.
+                </p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 mx-auto bg-gold/20 rounded-full flex items-center justify-center mb-4">
+                <div className="bg-gold/20 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
                   <span className="text-gold text-xl">💡</span>
                 </div>
-                <h3 className="text-white font-bold mb-2">Innovation-Driven</h3>
-                <p className="text-white/70 text-sm">Fostering a culture of continuous learning, research, and adaptation to new technologies.</p>
+                <h3 className="mb-2 font-bold text-white">Innovation-Driven</h3>
+                <p className="text-sm text-white/70">
+                  Fostering a culture of continuous learning, research, and
+                  adaptation to new technologies.
+                </p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 mx-auto bg-gold/20 rounded-full flex items-center justify-center mb-4">
+                <div className="bg-gold/20 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full">
                   <span className="text-gold text-xl">🤝</span>
                 </div>
-                <h3 className="text-white font-bold mb-2">Inclusive Growth</h3>
-                <p className="text-white/70 text-sm">Ensuring equitable opportunities and supporting the holistic development of all community members.</p>
+                <h3 className="mb-2 font-bold text-white">Inclusive Growth</h3>
+                <p className="text-sm text-white/70">
+                  Ensuring equitable opportunities and supporting the holistic
+                  development of all community members.
+                </p>
               </div>
             </div>
           </section>
