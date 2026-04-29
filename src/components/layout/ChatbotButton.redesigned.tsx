@@ -1,4 +1,5 @@
 "use client";
+import { useInstitution } from "@/contexts/InstitutionContext";
 
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -236,6 +237,22 @@ function TypingIndicator() {
 }
 
 export function ChatbotButton() {
+  const { institution } = useInstitution();
+
+  let highlightBgColorFrom = "from-[#d4a024]";
+  let highlightBgColorTo = "to-[#e8b84a]";
+  let iconBgColor = "bg-[#d4a024]";
+
+  if (institution === "arts-science") {
+    highlightBgColorFrom = "from-orange-500";
+    highlightBgColorTo = "to-orange-400";
+    iconBgColor = "bg-orange-500";
+  } else if (institution === "polytechnic") {
+    highlightBgColorFrom = "from-slate-600";
+    highlightBgColorTo = "to-slate-500";
+    iconBgColor = "bg-slate-600";
+  }
+
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -404,7 +421,7 @@ setMessages((prev) => {
         className={`fixed bottom-6 left-4 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-xl transition-all md:bottom-8 md:left-6 md:h-16 md:w-16 ${
           isOpen
             ? "bg-red-500 hover:bg-red-600"
-            : `bg-linear-to-br ${meta.color} hover:shadow-2xl`
+            : `bg-linear-to-br ${highlightBgColorFrom} ${highlightBgColorTo} hover:shadow-2xl`
         }`}
       >
         <AnimatePresence mode="wait">
