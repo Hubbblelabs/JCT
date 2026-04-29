@@ -232,7 +232,7 @@ export function ChatbotButton() {
     let active = true;
     if (active) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-setMessages((prev) => {
+      setMessages((prev) => {
         if (prev.length === 0 || prev[0].id !== "welcome") {
           return [
             {
@@ -389,7 +389,12 @@ setMessages((prev) => {
           onClick={() => setIsOpen((open) => !open)}
           className={`${themeBg} flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:scale-105 active:scale-95`}
         >
-          <MessageCircle size={20} className={institution === "engineering" ? "text-navy" : "text-white"} />
+          <MessageCircle
+            size={20}
+            className={
+              institution === "engineering" ? "text-navy" : "text-white"
+            }
+          />
         </button>
       </div>
 
@@ -400,10 +405,16 @@ setMessages((prev) => {
           aria-label={`${meta.title} chat`}
           className="fixed bottom-20 left-4 z-50 flex h-128 w-88 flex-col overflow-hidden rounded-2xl border border-white/20 bg-white shadow-2xl md:bottom-20 md:left-6 md:w-[24rem]"
         >
-          <div className={`${headerBg} flex items-center justify-between px-4 py-3 ${institution === "engineering" ? "text-navy" : "text-white"}`}>
+          <div
+            className={`${headerBg} flex items-center justify-between px-4 py-3 ${institution === "engineering" ? "text-navy" : "text-white"}`}
+          >
             <div>
               <p className="text-sm font-semibold">{meta.title}</p>
-              <p className={`text-xs ${institution === "engineering" ? "text-navy/80" : "text-white/80"}`}>JCT Admissions Assistant</p>
+              <p
+                className={`text-xs ${institution === "engineering" ? "text-navy/80" : "text-white/80"}`}
+              >
+                JCT Admissions Assistant
+              </p>
             </div>
             <button
               onClick={() => setIsOpen(false)}

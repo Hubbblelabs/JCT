@@ -255,7 +255,7 @@ export function ChatbotButton() {
     let active = true;
     if (active) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
-setMessages((prev) => {
+      setMessages((prev) => {
         if (prev.length === 0 || prev[0].id !== "welcome") {
           return [
             {

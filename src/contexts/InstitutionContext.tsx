@@ -3,16 +3,26 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
-export type InstitutionType = "main" | "engineering" | "arts-science" | "polytechnic";
+export type InstitutionType =
+  | "main"
+  | "engineering"
+  | "arts-science"
+  | "polytechnic";
 
 interface InstitutionContextType {
   institution: InstitutionType;
   setInstitution: (inst: InstitutionType) => void;
 }
 
-const InstitutionContext = createContext<InstitutionContextType | undefined>(undefined);
+const InstitutionContext = createContext<InstitutionContextType | undefined>(
+  undefined,
+);
 
-export function InstitutionProvider({ children }: { children: React.ReactNode }) {
+export function InstitutionProvider({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname() || "";
 
   const getPathnameInstitution = (path: string): InstitutionType | null => {
@@ -25,7 +35,9 @@ export function InstitutionProvider({ children }: { children: React.ReactNode })
 
   const initialPathInst = getPathnameInstitution(pathname);
 
-  const [institution, setInstitutionState] = useState<InstitutionType>(initialPathInst || "main");
+  const [institution, setInstitutionState] = useState<InstitutionType>(
+    initialPathInst || "main",
+  );
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -33,8 +45,13 @@ export function InstitutionProvider({ children }: { children: React.ReactNode })
     setIsMounted(true);
 
     if (initialPathInst === null) {
-      const stored = sessionStorage.getItem("currentInstitution") as InstitutionType | null;
-      if (stored && ["main", "engineering", "arts-science", "polytechnic"].includes(stored)) {
+      const stored = sessionStorage.getItem(
+        "currentInstitution",
+      ) as InstitutionType | null;
+      if (
+        stored &&
+        ["main", "engineering", "arts-science", "polytechnic"].includes(stored)
+      ) {
         setInstitutionState(stored);
       }
     } else {
@@ -69,7 +86,9 @@ export function InstitutionProvider({ children }: { children: React.ReactNode })
 export function useInstitution() {
   const context = useContext(InstitutionContext);
   if (context === undefined) {
-    throw new Error("useInstitution must be used within an InstitutionProvider");
+    throw new Error(
+      "useInstitution must be used within an InstitutionProvider",
+    );
   }
   return context;
 }

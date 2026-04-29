@@ -101,12 +101,11 @@ export default function RootLayout({
       >
         <InstitutionProvider>
           {children}
+          {/* Global sticky elements */}
+          <StickyApplyButton />
+          <ChatbotButton />
+          {process.env.NODE_ENV !== "production" && <RouteQuickNav />}
         </InstitutionProvider>
-
-        {/* Global sticky elements */}
-        <StickyApplyButton />
-        <ChatbotButton />
-        {process.env.NODE_ENV !== "production" && <RouteQuickNav />}
 
         {/* Floating WhatsApp Button */}
         <div className="group fixed right-4 bottom-5 z-50 md:right-6 md:bottom-6">
