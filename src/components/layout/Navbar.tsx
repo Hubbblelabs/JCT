@@ -265,7 +265,9 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                         setDesktopExpanded(isExpanded ? null : link.name);
                       }}
                       className={`group relative flex items-center justify-center gap-1.5 px-2 py-2 font-sans text-sm font-medium transition-colors xl:px-4 xl:text-[15px] ${
-                        isExpanded ? highlightColor : "text-white/90 hover:text-white"
+                        isExpanded
+                          ? highlightColor
+                          : "text-white/90 hover:text-white"
                       }`}
                     >
                       {link.name}
@@ -282,7 +284,9 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                       href={link.href}
                       onClick={(e) => handleNavClick(e, link.href)}
                       className={`group relative flex items-center justify-center px-2 py-2 font-sans text-sm font-medium transition-colors xl:px-4 xl:text-[15px] ${
-                        isActive ? highlightColor : "text-white/90 hover:text-white"
+                        isActive
+                          ? highlightColor
+                          : "text-white/90 hover:text-white"
                       }`}
                     >
                       {link.name}
@@ -399,7 +403,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             {institution === "main" && (
               <Link
                 href="/apply-now"
-                className={`inline-flex h-9.5 items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10.5 xl:px-5 2xl:px-8 xl:text-[15px] ${
+                className={`inline-flex h-9.5 items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10.5 xl:px-5 xl:text-[15px] 2xl:px-8 ${
                   isSolid
                     ? `${highlightBgColor} font-semibold text-[#0a1628] shadow-lg shadow-black/20 ${highlightHoverBgColor}`
                     : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
@@ -502,7 +506,8 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                               >
                                 <div className="space-y-1 py-1 pr-2 pl-4">
                                   {link.children?.map((child: NavChild) => {
-                                    const isChildHashLink = child.href.includes("#");
+                                    const isChildHashLink =
+                                      child.href.includes("#");
                                     const childPath = child.href.split("#")[0];
                                     const isChildActive =
                                       !isChildHashLink &&

@@ -51,43 +51,78 @@ export default function AdmissionsPage() {
             </div>
           </section>
 
-          {/* 2. Courses by Institution */}
+          {/* 2. Programs by Institution */}
           <section>
             <h2 className="text-foreground font-serif text-3xl font-bold">
-              Courses by Institution
+              Programs by Institution
             </h2>
-            <div className="mt-6 grid gap-6 md:grid-cols-3">
-              <div className="border-border rounded-xl border bg-white/5 p-6">
-                <h3 className="text-gold mb-4 text-xl font-bold">
+            <div className="mt-6 grid gap-6 md:grid-cols-3 md:grid-rows-2">
+              {/* Engineering Card - 2/3 Width, 2/2 Height */}
+              <div className="border-border flex flex-col rounded-xl border bg-white/5 p-6 md:col-span-2 md:row-span-2 lg:p-8">
+                <h3 className="text-gold mb-6 text-2xl font-bold">
                   Engineering College
                 </h3>
-                <ul className="text-muted-foreground space-y-2">
-                  <li>B.E. Computer Science</li>
-                  <li>B.E. Mechanical Engineering</li>
-                  <li>B.Tech Artificial Intelligence</li>
-                  <li>B.E. Electronics &amp; Communication</li>
-                </ul>
+
+                <div className="mb-4">
+                  <div className="text-foreground/90 mb-3 text-sm font-extrabold tracking-widest uppercase">
+                    UG COURSES
+                  </div>
+                  <ul className="text-muted-foreground grid grid-cols-1 gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2">
+                    <li>B.Tech. Artificial Intelligence And Data Science</li>
+                    <li>B.Tech. Bio-Technology and Bio-Chemical Engineering</li>
+                    <li>B.Tech. Petrochemical Technology</li>
+                    <li>B.Tech. Food Technology</li>
+                    <li>B.E. Petroleum Engineering</li>
+                    <li>B.Tech. Computer Science and Business Systems</li>
+                    <li>B.E. Electrical and Electronics Engineering</li>
+                    <li>B.E. Electronics and Communication Engineering</li>
+                    <li>B.E. Computer Science & Engineering</li>
+                    <li>B.E. Civil Engineering</li>
+                    <li>B.E. Mechanical Engineering</li>
+                  </ul>
+                </div>
+
+                <div className="mt-auto border-t border-white/5 pt-6">
+                  <div className="text-foreground/90 mb-3 text-sm font-extrabold tracking-widest uppercase">
+                    PG COURSES & RESEARCH
+                  </div>
+                  <ul className="text-muted-foreground grid grid-cols-1 gap-x-8 gap-y-1.5 text-[14px] sm:grid-cols-2">
+                    <li>M.E. Structural Engineering</li>
+                    <li>M.E. Power Electronics and Drives</li>
+                    <li>
+                      M.E. CSE (Artificial Intelligence & Machine Learning)
+                    </li>
+                    <li>Ph.D. Electrical and Electronics Engineering</li>
+                  </ul>
+                </div>
               </div>
-              <div className="border-border rounded-xl border bg-white/5 p-6">
+
+              {/* Arts & Science Card - 1/3 Width, 1/2 Height */}
+              <div className="border-border rounded-xl border bg-white/5 p-6 md:col-span-1 md:row-span-1">
                 <h3 className="text-gold mb-4 text-xl font-bold">
                   Arts &amp; Science
                 </h3>
-                <ul className="text-muted-foreground space-y-2">
-                  <li>B.Sc. Computer Science</li>
-                  <li>B.Com (Computer Applications)</li>
-                  <li>B.B.A</li>
-                  <li>B.A. English Literature</li>
+                <ul className="text-muted-foreground space-y-1.5 text-[14px]">
+                  <li>B.Sc Computer Science</li>
+                  <li>B.Sc Artificial Intelligence and Machine Learning</li>
+                  <li>BCA (Bachelor of Computer Applications)</li>
+                  <li>B.Com Logistics and Supply chain Management</li>
+                  <li>BBA Logistics</li>
                 </ul>
               </div>
-              <div className="border-border rounded-xl border bg-white/5 p-6">
+
+              {/* Polytechnic Card - 1/3 Width, 1/2 Height */}
+              <div className="border-border rounded-xl border bg-white/5 p-6 md:col-span-1 md:row-span-1">
                 <h3 className="text-gold mb-4 text-xl font-bold">
                   Polytechnic
                 </h3>
-                <ul className="text-muted-foreground space-y-2">
-                  <li>Diploma in Mechanical</li>
-                  <li>Diploma in Civil</li>
-                  <li>Diploma in Automobile</li>
-                  <li>Diploma in EEE</li>
+                <ul className="text-muted-foreground space-y-1.5 text-[14px]">
+                  <li>Diploma in Computer Technology</li>
+                  <li>Diploma in Agricultural Engineering</li>
+                  <li>Diploma in Petrochemical Engineering</li>
+                  <li>Diploma in Mechanical Engineering</li>
+                  <li>Diploma in Electrical and Electronics Engineering</li>
+                  <li>Diploma in Civil Engineering</li>
                 </ul>
               </div>
             </div>
@@ -146,27 +181,33 @@ export default function AdmissionsPage() {
             <h2 className="text-foreground font-serif text-3xl font-bold">
               How to Apply
             </h2>
-            <div className="mt-6 flex flex-col gap-6 md:flex-row">
+            <p className="text-muted-foreground mt-4">
+              Candidates can apply for their desired programs through both
+              online and offline modes. You can either register through our
+              online portal or visit our college campus directly to collect and
+              submit the application form in person.
+            </p>
+            <div className="mt-8 flex flex-col gap-6 md:flex-row">
               {[
                 {
                   step: 1,
-                  title: "Online Registration",
-                  desc: "Fill out the online application form with basic details.",
+                  title: "Registration (Online or Offline)",
+                  desc: "Register via the online portal or visit the campus admission office.",
                 },
                 {
                   step: 2,
-                  title: "Document Upload",
-                  desc: "Upload scanned copies of required academic documents.",
+                  title: "Document Submission",
+                  desc: "Upload scanned copies online or submit physical copies at the office.",
                 },
                 {
                   step: 3,
                   title: "Application Review",
-                  desc: "Our admissions team will review your application.",
+                  desc: "Our admissions team will review your application and documents.",
                 },
                 {
                   step: 4,
                   title: "Admission Offer",
-                  desc: "Receive your admission offer and complete fee payment.",
+                  desc: "Receive your admission offer and complete the fee payment process.",
                 },
               ].map((s) => (
                 <div
@@ -269,7 +310,7 @@ export default function AdmissionsPage() {
             </h2>
             <p className="mx-auto mb-8 max-w-2xl opacity-90">
               Admissions are now open for the upcoming academic year. Apply
-              online today and join the JCT family.
+              online or visit our campus today to join the JCT family.
             </p>
             <Link
               href="/apply-now"

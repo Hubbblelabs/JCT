@@ -1,7 +1,29 @@
+import Image from "next/image";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+
+const recruiterLogos = [
+  { name: "Google", src: "/company_logo/google-color.svg" },
+  { name: "Microsoft", src: "/company_logo/microsoft.png" },
+  { name: "Apple", src: "/company_logo/apple.png" },
+  { name: "Amazon", src: "/company_logo/AMZN_BIG.svg" },
+  { name: "TCS", src: "/company_logo/TCS.NS_BIG.svg" },
+  { name: "IBM", src: "/company_logo/IBM.svg" },
+  { name: "Intel", src: "/company_logo/INTC.svg" },
+  { name: "Cisco", src: "/company_logo/CSCO.svg" },
+  { name: "Adobe", src: "/company_logo/ADBE_BIG.svg" },
+  { name: "Dell", src: "/company_logo/DELL_BIG.svg" },
+  { name: "Oracle", src: "/company_logo/ORCL_BIG.svg" },
+  { name: "Meta", src: "/company_logo/META_BIG.svg" },
+  { name: "Netflix", src: "/company_logo/NFLX_BIG.svg" },
+  { name: "NVIDIA", src: "/company_logo/NVDA_BIG.svg" },
+  { name: "Ford", src: "/company_logo/F_BIG.svg" },
+  { name: "Visa", src: "/company_logo/V.svg" },
+  { name: "Mastercard", src: "/company_logo/MA.svg" },
+  { name: "Walmart", src: "/company_logo/WMT_BIG.svg" },
+];
 
 export default function PlacementsPage() {
   return (
@@ -68,27 +90,25 @@ export default function PlacementsPage() {
             <h2 className="text-foreground font-serif text-3xl font-bold">
               Top Recruiters
             </h2>
-            <div className="mt-6 rounded-3xl border border-white/10 bg-white/5 p-8 text-center">
-              <p className="text-muted-foreground mb-8">
+            <div className="border-border bg-surface mt-6 rounded-3xl border p-8 text-center shadow-sm">
+              <p className="text-muted-foreground mb-10">
                 We are proud to partner with some of the world&apos;s leading
                 companies.
               </p>
-              <div className="flex flex-wrap justify-center gap-8 opacity-70">
-                {[
-                  "TCS",
-                  "Infosys",
-                  "Wipro",
-                  "Cognizant",
-                  "HCL",
-                  "Tech Mahindra",
-                  "Amazon",
-                  "IBM",
-                ].map((company) => (
+              <div className="grid grid-cols-2 gap-x-8 gap-y-12 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                {recruiterLogos.map((company) => (
                   <div
-                    key={company}
-                    className="rounded-lg bg-white/10 px-6 py-3 text-lg font-bold"
+                    key={company.name}
+                    className="group relative flex items-center justify-center px-4"
                   >
-                    {company}
+                    <div className="relative h-12 w-full transition-all duration-300 group-hover:scale-110">
+                      <Image
+                        src={company.src}
+                        alt={company.name}
+                        fill
+                        className="object-contain opacity-50 grayscale transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
@@ -115,9 +135,9 @@ export default function PlacementsPage() {
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="flex items-center gap-6 rounded-2xl border border-white/10 bg-gradient-to-r from-white/5 to-transparent p-6"
+                  className="border-border bg-surface flex items-center gap-6 rounded-2xl border p-6 shadow-sm"
                 >
-                  <div className="bg-gold/20 border-gold/30 flex h-20 w-20 shrink-0 items-center justify-center rounded-full border">
+                  <div className="bg-gold/10 border-gold/20 flex h-20 w-20 shrink-0 items-center justify-center rounded-full border">
                     <span className="text-gold text-xl font-bold">🏆</span>
                   </div>
                   <div>
@@ -139,7 +159,7 @@ export default function PlacementsPage() {
             <h2 className="text-foreground font-serif text-3xl font-bold">
               Our Training Process
             </h2>
-            <div className="relative mt-8 ml-4 space-y-8 border-l-2 border-white/10 pl-8">
+            <div className="border-border relative mt-8 ml-4 space-y-8 border-l-2 pl-8">
               {[
                 {
                   title: "Aptitude & Soft Skills",
@@ -159,7 +179,7 @@ export default function PlacementsPage() {
                 },
               ].map((step, i) => (
                 <div key={i} className="relative">
-                  <div className="bg-gold border-surface absolute top-1 -left-[41px] h-5 w-5 rounded-full border-4" />
+                  <div className="bg-gold border-background absolute top-1 -left-[41px] h-5 w-5 rounded-full border-4" />
                   <h3 className="text-xl font-bold">{step.title}</h3>
                   <p className="text-muted-foreground mt-2">{step.desc}</p>
                 </div>
@@ -176,10 +196,10 @@ export default function PlacementsPage() {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="bg-surface border-border rounded-xl border p-6"
+                  className="bg-surface border-border rounded-xl border p-6 shadow-sm"
                 >
                   <div className="mb-4 flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-xs">
+                    <div className="bg-muted text-muted-foreground flex h-12 w-12 items-center justify-center rounded-full text-[10px]">
                       Photo
                     </div>
                     <div>
