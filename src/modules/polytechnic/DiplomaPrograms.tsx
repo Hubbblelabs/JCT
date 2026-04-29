@@ -17,7 +17,7 @@ type PolytechnicCourse = {
   name: string;
   slug: string;
   image?: string;
-  icon?: React.ReactNode;
+  icon?: React.ElementType;
 };
 
 function CourseCard({ course }: { course: PolytechnicCourse }) {
