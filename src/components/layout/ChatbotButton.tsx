@@ -16,6 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
+import { useInstitution } from "@/contexts/InstitutionContext";
 
 type CollegeId = "engineering" | "arts" | "polytechnic" | "all";
 
@@ -194,12 +195,31 @@ function getCollegeIdFromPath(pathname: string): CollegeId {
 
 export function ChatbotButton() {
   const pathname = usePathname();
+  const { institution } = useInstitution();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const endRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  let themeBg = "bg-navy hover:bg-[#1a2d42]";
+  let headerBg = "bg-navy";
+  let botBubbleBg = "bg-[#0D3B66]";
+
+  if (institution === "arts-science") {
+    themeBg = "bg-orange-500 hover:bg-orange-600";
+    headerBg = "bg-orange-500";
+    botBubbleBg = "bg-orange-600";
+  } else if (institution === "polytechnic") {
+    themeBg = "bg-slate-500 hover:bg-slate-600";
+    headerBg = "bg-slate-500";
+    botBubbleBg = "bg-slate-600";
+  } else if (institution === "engineering") {
+    themeBg = "bg-[#d4a024] hover:bg-[#e8b84a]";
+    headerBg = "bg-[#d4a024]";
+    botBubbleBg = "bg-[#d4a024]";
+  }
 
   const collegeId = useMemo(
     () => getCollegeIdFromPath(pathname || ""),
@@ -211,7 +231,8 @@ export function ChatbotButton() {
   useEffect(() => {
     let active = true;
     if (active) {
-      setMessages((prev) => {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+setMessages((prev) => {
         if (prev.length === 0 || prev[0].id !== "welcome") {
           return [
             {
@@ -255,6 +276,7 @@ export function ChatbotButton() {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
 
+    // eslint-disable-next-line react-hooks/purity
     const now = Date.now();
     const userMsg: Message = {
       id: String(now),
@@ -365,9 +387,9 @@ export function ChatbotButton() {
           aria-label={isOpen ? "Close chatbot" : "Open chatbot"}
           aria-expanded={isOpen}
           onClick={() => setIsOpen((open) => !open)}
-          className="bg-navy hover:bg-navy-mid flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:scale-105 active:scale-95"
+          className={`${themeBg} flex h-12 w-12 items-center justify-center rounded-full shadow-lg transition-all hover:scale-105 active:scale-95`}
         >
-          <MessageCircle size={20} className="text-white" />
+          <MessageCircle size={20} className={institution === "engineering" ? "text-navy" : "text-white"} />
         </button>
       </div>
 
@@ -378,14 +400,14 @@ export function ChatbotButton() {
           aria-label={`${meta.title} chat`}
           className="fixed bottom-20 left-4 z-50 flex h-128 w-88 flex-col overflow-hidden rounded-2xl border border-white/20 bg-white shadow-2xl md:bottom-20 md:left-6 md:w-[24rem]"
         >
-          <div className="bg-navy flex items-center justify-between px-4 py-3 text-white">
+          <div className={`${headerBg} flex items-center justify-between px-4 py-3 ${institution === "engineering" ? "text-navy" : "text-white"}`}>
             <div>
               <p className="text-sm font-semibold">{meta.title}</p>
-              <p className="text-xs text-white/80">JCT Admissions Assistant</p>
+              <p className={`text-xs ${institution === "engineering" ? "text-navy/80" : "text-white/80"}`}>JCT Admissions Assistant</p>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="rounded-full p-1 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+              className={`rounded-full p-1 transition-colors ${institution === "engineering" ? "text-navy/80 hover:bg-navy/10 hover:text-navy" : "text-white/80 hover:bg-white/10 hover:text-white"}`}
               aria-label="Close chatbot"
             >
               <X size={18} />
@@ -408,7 +430,7 @@ export function ChatbotButton() {
                 <div
                   className={
                     msg.role === "user"
-                      ? "max-w-[85%] rounded-2xl rounded-br-md bg-[#0D3B66] px-3 py-2 text-sm whitespace-pre-wrap text-white"
+                      ? `max-w-[85%] rounded-2xl rounded-br-md ${botBubbleBg} px-3 py-2 text-sm whitespace-pre-wrap ${institution === "engineering" ? "text-navy" : "text-white"}`
                       : "max-w-[85%] rounded-2xl rounded-bl-md bg-white px-3 py-2 text-sm whitespace-pre-wrap text-slate-700 shadow"
                   }
                 >

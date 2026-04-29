@@ -5,6 +5,7 @@ import { StickyApplyButton } from "@/components/layout/StickyApplyButton";
 import { ChatbotButton } from "@/components/layout/ChatbotButton";
 import { RouteQuickNav } from "@/components/layout/RouteQuickNav";
 import { siteConfig } from "@/data/site";
+import { InstitutionProvider } from "@/contexts/InstitutionContext";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -98,7 +99,9 @@ export default function RootLayout({
       <body
         className={`${playfair.variable} ${inter.variable} bg-surface text-foreground flex min-h-screen flex-col antialiased`}
       >
-        {children}
+        <InstitutionProvider>
+          {children}
+        </InstitutionProvider>
 
         {/* Global sticky elements */}
         <StickyApplyButton />
