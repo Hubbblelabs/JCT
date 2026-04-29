@@ -1,12 +1,28 @@
 "use client";
 
 import Link from "next/link";
+import { useInstitution } from "@/contexts/InstitutionContext";
 import { GraduationCap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function StickyApplyButton() {
   const [isVisible, setIsVisible] = useState(false);
+  const { institution } = useInstitution();
+
+  let highlightBgColor = "bg-[#d4a024]";
+  let highlightHoverBgColor = "hover:bg-[#e8b84a]";
+  let textColor = "text-[#0a1628]";
+
+  if (institution === "arts-science") {
+    highlightBgColor = "bg-orange-500";
+    highlightHoverBgColor = "hover:bg-orange-600";
+    textColor = "text-white";
+  } else if (institution === "polytechnic") {
+    highlightBgColor = "bg-slate-500";
+    highlightHoverBgColor = "hover:bg-slate-600";
+    textColor = "text-white";
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -37,7 +53,7 @@ export function StickyApplyButton() {
         >
           <Link
             href="/apply-now"
-            className="bg-gold text-navy hover:bg-gold-light flex h-12 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold shadow-xl transition-all hover:scale-105 active:scale-95"
+            className={`flex h-12 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold shadow-xl transition-all hover:scale-105 active:scale-95 ${highlightBgColor} ${highlightHoverBgColor} ${textColor}`}
             aria-label="Apply for Admission"
           >
             <GraduationCap className="h-[18px] w-[18px] shrink-0" />
