@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
@@ -48,45 +49,59 @@ export default function QualityPage() {
             <h2 className="text-foreground mb-8 font-serif text-3xl font-bold">
               Accreditations & Recognitions
             </h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {[
                 {
-                  logo: "🏛️",
+                  logo: "/naac.png",
                   name: "NAAC",
                   detail:
                     "Accredited by the National Assessment and Accreditation Council (NAAC), affirming our commitment to quality education.",
                   badge: "Accredited",
                 },
                 {
-                  logo: "🏅",
+                  logo: "/nba.png",
                   name: "NBA",
                   detail:
                     "Multiple programs accredited by the National Board of Accreditation (NBA), validating our engineering curriculum quality.",
                   badge: "Accredited",
                 },
                 {
-                  logo: "🎓",
+                  logo: "/anna.png",
                   name: "Anna University",
                   detail:
                     "Affiliated to Anna University, one of India's premier technical universities, ensuring curriculum standards.",
                   badge: "Affiliated",
                 },
                 {
-                  logo: "✅",
+                  logo: "/bharathiar_university.png",
+                  name: "Bharathiar University",
+                  detail:
+                    "Our Arts and Science courses are affiliated with Bharathiar University, ensuring academic excellence and recognition.",
+                  badge: "Affiliated",
+                },
+                {
+                  logo: "/aicte.png",
                   name: "AICTE",
                   detail:
                     "Approved by All India Council for Technical Education (AICTE), meeting all statutory requirements.",
                   badge: "Approved",
                 },
                 {
-                  logo: "🌐",
+                  logo: "/ugc.png",
                   name: "UGC",
                   detail:
                     "Recognized under University Grants Commission, ensuring academic standards and research quality.",
                   badge: "Recognized",
                 },
                 {
-                  logo: "⭐",
+                  logo: "/dote.png",
+                  name: "DOTE",
+                  detail:
+                    "Directorate of Technical Education (DOTE) approval for technical and polytechnic programs.",
+                  badge: "Approved",
+                },
+                {
+                  logo: "/iso.png",
                   name: "ISO 9001:2015",
                   detail:
                     "Certified for quality management systems ensuring consistent service delivery across all departments.",
@@ -95,11 +110,16 @@ export default function QualityPage() {
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="bg-surface rounded-2xl border border-white/10 p-6"
+                  className="bg-surface flex flex-col rounded-2xl border border-white/10 p-6 transition-colors hover:border-gold/30"
                 >
-                  <div className="mb-4 flex items-center justify-between">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 text-2xl">
-                      {item.logo}
+                  <div className="mb-6 flex items-center justify-between">
+                    <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl bg-white p-2">
+                      <Image
+                        src={item.logo}
+                        alt={item.name}
+                        fill
+                        className="object-contain p-1"
+                      />
                     </div>
                     <span className="bg-gold/10 text-gold rounded-full px-3 py-1 text-xs font-medium">
                       {item.badge}
@@ -108,7 +128,9 @@ export default function QualityPage() {
                   <h3 className="text-foreground mb-2 font-bold">
                     {item.name}
                   </h3>
-                  <p className="text-muted-foreground text-sm">{item.detail}</p>
+                  <p className="text-muted-foreground text-sm flex-grow">
+                    {item.detail}
+                  </p>
                 </div>
               ))}
             </div>

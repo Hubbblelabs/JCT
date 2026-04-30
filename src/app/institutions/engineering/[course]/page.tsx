@@ -499,7 +499,7 @@ export default async function CourseDetailPage({
                   <div className="text-muted-foreground mb-1 text-sm">
                     Counselling Code
                   </div>
-                  <div className="text-gold text-2xl font-bold">2734</div>
+                  <div className="text-gold text-2xl font-bold">2769</div>
                 </div>
               </div>
 

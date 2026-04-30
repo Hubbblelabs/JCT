@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Banknote, GraduationCap, ClipboardCheck } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Footer } from "@/components/layout/Footer";
@@ -70,7 +71,7 @@ export default function PolytechnicAdmissionsPage() {
                 <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6">
                   <div className="absolute top-0 right-0 h-24 w-24 rounded-bl-full bg-white/5"></div>
                   <h3 className="text-foreground mb-4 flex items-center gap-2 text-xl font-bold">
-                    <span className="text-2xl">💰</span> Fees Structure
+                    <Banknote className="text-gold h-6 w-6" /> Fees Structure
                   </h3>
                   <p className="text-muted-foreground mb-4 text-sm">
                     JCT Polytechnic offers a highly affordable and transparent
@@ -86,7 +87,7 @@ export default function PolytechnicAdmissionsPage() {
                 <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-6">
                   <div className="bg-gold/10 absolute top-0 right-0 h-24 w-24 rounded-bl-full"></div>
                   <h3 className="text-foreground mb-4 flex items-center gap-2 text-xl font-bold">
-                    <span className="text-2xl">🎓</span> Scholarships
+                    <GraduationCap className="text-gold h-6 w-6" /> Scholarships
                   </h3>
                   <p className="text-muted-foreground mb-4 text-sm">
                     We are committed to supporting meritorious and economically
@@ -132,7 +133,7 @@ export default function PolytechnicAdmissionsPage() {
               {/* 4. Apply CTA Sidebar */}
               <div className="border-gold/30 shadow-gold/5 sticky top-32 rounded-3xl border bg-gradient-to-br from-[#0a1628] to-[#112240] p-8 text-center shadow-xl">
                 <div className="bg-gold/10 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full">
-                  <span className="text-gold text-4xl">📝</span>
+                  <ClipboardCheck className="text-gold h-10 w-10" />
                 </div>
                 <h3 className="mb-4 text-2xl font-bold text-white">
                   Admissions Open 2025-2026

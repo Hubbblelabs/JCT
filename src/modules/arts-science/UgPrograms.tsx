@@ -158,7 +158,7 @@ export function UgPrograms() {
 
   return (
     <section
-      id="courses"
+      id="programs"
       className="group/section relative overflow-hidden bg-slate-50 py-20 md:py-32"
       onMouseMove={handleMouseMove}
     >

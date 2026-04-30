@@ -289,7 +289,7 @@ export default function AdmissionsPage() {
                 },
                 {
                   q: "What is the counseling code for Engineering?",
-                  a: "Our TNEA counseling code is 2734.",
+                  a: "Our TNEA counseling code is 2769.",
                 },
               ].map((faq, i) => (
                 <div

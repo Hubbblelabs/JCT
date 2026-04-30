@@ -134,7 +134,7 @@ export default function CampusLifePage() {
             {...slideInRight}
             className="relative"
           >
-            <div className="relative aspect-square overflow-hidden rounded-[2.5rem] shadow-2xl">
+            <div className="relative aspect-[20/12] overflow-hidden rounded-[2.5rem] shadow-2xl">
               <Image
                 src="/jct-life/building1.webp"
                 alt="JCT Main Building"
@@ -344,7 +344,7 @@ export default function CampusLifePage() {
           <div className="space-y-16">
             {/* Arts Club - Cinematic Aspect Ratio */}
             <motion.div {...fadeIn} className="group relative overflow-hidden rounded-[3rem] shadow-2xl">
-              <div className="relative aspect-[4/3] md:aspect-[21/9] w-full overflow-hidden">
+              <div className="relative aspect-[4/3] md:aspect-[32/9] w-full overflow-hidden">
                 <Image
                   src="/jct-life/arts-club1.webp"
                   alt="Arts Club"

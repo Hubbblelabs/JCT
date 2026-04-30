@@ -2,6 +2,16 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+import Image from "next/image";
+import { 
+  Users, 
+  Presentation, 
+  Handshake, 
+  Quote, 
+  ArrowRight,
+  GraduationCap,
+  Globe
+} from "lucide-react";
 
 export default function EngineeringAlumniPage() {
   return (
@@ -15,23 +25,27 @@ export default function EngineeringAlumniPage() {
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
         <Breadcrumb items={[{ label: "Alumni" }]} />
 
-        <div className="mt-12 space-y-20">
+        <div className="mt-12 space-y-24">
           {/* 1. Alumni Network Overview */}
-          <section className="grid items-center gap-12 md:grid-cols-[2fr_1fr]">
+          <section className="grid items-center gap-12 lg:grid-cols-2">
             <div>
-              <h2 className="text-foreground mb-6 font-serif text-3xl font-bold">
+              <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-gold/10 px-4 py-1.5 text-sm font-medium text-gold">
+                <Globe className="h-4 w-4" />
+                <span>Global Community</span>
+              </div>
+              <h2 className="text-foreground mb-6 font-serif text-3xl font-bold md:text-4xl">
                 Our Global Alumni Network
               </h2>
-              <p className="text-muted-foreground mb-6 leading-relaxed">
+              <p className="text-muted-foreground mb-6 text-lg leading-relaxed">
                 The JCT Alumni Association is a vibrant community of over 10,000
                 graduates spread across the globe. Our alumni are our proudest
                 ambassadors, making significant marks in leading multinational
                 corporations, government sectors, and as successful
                 entrepreneurs.
               </p>
-              <p className="text-muted-foreground mb-6 leading-relaxed">
+              <p className="text-muted-foreground mb-8 leading-relaxed">
                 We actively engage with our alumni through annual meets, guest
-                lecture series (&quot;Alumni Talk Series&quot;), and mentorship
+                lecture series ("Alumni Talk Series"), and mentorship
                 programs, fostering a strong bond between the institution and
                 its past students.
               </p>
@@ -39,112 +53,137 @@ export default function EngineeringAlumniPage() {
                 href="https://alumni.jct.ac.in/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-foreground bg-surface inline-block rounded-full border border-white/20 px-6 py-3 font-medium transition-colors hover:bg-white"
+                className="group inline-flex items-center gap-2 rounded-full bg-gold px-8 py-4 font-bold text-black transition-all hover:bg-gold/90 hover:shadow-lg hover:shadow-gold/20"
               >
-                Visit Alumni Portal ↗
+                Visit Alumni Portal
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </a>
             </div>
-            <div className="from-gold/20 border-gold/30 shadow-gold/5 flex aspect-square flex-col items-center justify-center rounded-full border bg-gradient-to-br to-transparent p-8 text-center shadow-2xl">
-              <div className="text-gold mb-2 text-5xl font-bold">10K+</div>
-              <div className="text-foreground font-medium">Strong Network</div>
+            
+            <div className="relative">
+              <div className="relative z-10 overflow-hidden rounded-3xl border border-white/10 shadow-2xl">
+                <Image
+                  src="/assets/alumni.webp" 
+                  alt="JCT Alumni Network"
+                  width={600}
+                  height={450}
+                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+              
+              {/* Floating Stat Card */}
+              <div className="absolute -bottom-6 -left-6 z-20 hidden rounded-2xl border border-white/10 bg-surface/90 p-8 shadow-xl backdrop-blur-md md:block">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold/20 text-gold">
+                    <GraduationCap className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <div className="text-3xl font-bold text-gold">10K+</div>
+                    <div className="text-sm font-medium text-foreground/70 uppercase tracking-wider">Strong Network</div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Decorative Elements */}
+              <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-gold/5 blur-3xl" />
+              <div className="absolute -bottom-10 -left-10 h-40 w-40 rounded-full bg-gold/10 blur-3xl" />
             </div>
           </section>
 
           {/* 2. Achievers & Initiatives */}
           <section>
-            <h2 className="text-foreground mb-8 text-center font-serif text-3xl font-bold">
-              Alumni Initiatives
-            </h2>
-            <div className="grid gap-6 sm:grid-cols-3">
-              <div className="bg-surface rounded-2xl border border-white/10 p-6">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/5 text-xl">
-                  🎤
+            <div className="mb-12 text-center">
+              <h2 className="text-foreground mb-4 font-serif text-3xl font-bold md:text-4xl">
+                Alumni Initiatives
+              </h2>
+              <p className="mx-auto max-w-2xl text-muted-foreground">
+                We bridge the gap between academia and industry through various collaborative programs led by our experienced graduates.
+              </p>
+            </div>
+            
+            <div className="grid gap-8 sm:grid-cols-3">
+              {[
+                {
+                  title: "Alumni Talk Series",
+                  desc: "Regular expert sessions where distinguished alumni share industry insights, technical knowledge, and career guidance with current students.",
+                  icon: Presentation,
+                  color: "bg-blue-500/10 text-blue-500"
+                },
+                {
+                  title: "Mentorship Program",
+                  desc: "Connecting pre-final and final year students with alumni mentors for project guidance, mock interviews, and career counseling.",
+                  icon: Handshake,
+                  color: "bg-gold/10 text-gold"
+                },
+                {
+                  title: "Annual Alumni Meet",
+                  desc: "A grand homecoming event organized yearly, bringing together alumni from various batches to reconnect, network, and celebrate.",
+                  icon: Users,
+                  color: "bg-green-500/10 text-green-500"
+                }
+              ].map((item, idx) => (
+                <div key={idx} className="group relative overflow-hidden rounded-2xl border border-white/10 bg-surface p-8 transition-all hover:-translate-y-1 hover:border-gold/30 hover:shadow-xl">
+                  <div className={`mb-6 flex h-14 w-14 items-center justify-center rounded-xl transition-colors ${item.color}`}>
+                    <item.icon className="h-7 w-7" />
+                  </div>
+                  <h3 className="mb-3 text-xl font-bold">{item.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    {item.desc}
+                  </p>
+                  <div className="absolute -bottom-2 -right-2 h-20 w-20 rounded-full bg-gold/5 blur-2xl transition-all group-hover:bg-gold/10" />
                 </div>
-                <h3 className="mb-2 text-lg font-bold">Alumni Talk Series</h3>
-                <p className="text-muted-foreground text-sm">
-                  Regular expert sessions where distinguished alumni share
-                  industry insights, technical knowledge, and career guidance
-                  with current students.
-                </p>
-              </div>
-              <div className="bg-surface rounded-2xl border border-white/10 p-6">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/5 text-xl">
-                  🤝
-                </div>
-                <h3 className="mb-2 text-lg font-bold">Mentorship Program</h3>
-                <p className="text-muted-foreground text-sm">
-                  Connecting pre-final and final year students with alumni
-                  mentors for project guidance, mock interviews, and career
-                  counseling.
-                </p>
-              </div>
-              <div className="bg-surface rounded-2xl border border-white/10 p-6">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-white/5 text-xl">
-                  🎉
-                </div>
-                <h3 className="mb-2 text-lg font-bold">Annual Alumni Meet</h3>
-                <p className="text-muted-foreground text-sm">
-                  A grand homecoming event organized yearly, bringing together
-                  alumni from various batches to reconnect, network, and
-                  celebrate their alma mater.
-                </p>
-              </div>
+              ))}
             </div>
           </section>
 
           {/* 3. Testimonials */}
-          <section className="rounded-3xl border border-white/10 bg-white/5 p-8 lg:p-12">
-            <h2 className="text-foreground mb-10 text-center font-serif text-3xl font-bold">
-              What Our Alumni Say
+          <section className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 lg:p-16">
+            <div className="absolute top-0 right-0 p-8 opacity-5">
+              <Quote className="h-32 w-32" />
+            </div>
+            
+            <h2 className="text-foreground relative z-10 mb-12 text-center font-serif text-3xl font-bold md:text-4xl">
+              Voice of Our Alumni
             </h2>
-            <div className="grid gap-8 md:grid-cols-2">
-              <div className="bg-surface relative rounded-2xl border border-white/5 p-6">
-                <div className="text-gold/20 absolute top-4 right-6 font-serif text-4xl">
-                  &quot;
-                </div>
-                <p className="text-muted-foreground relative z-10 mb-6 text-sm leading-relaxed italic">
-                  &quot;The foundation I received at JCT Engineering was
-                  instrumental in my career. The faculty&apos;s dedication and
-                  the state-of-the-art labs provided me with the practical
-                  knowledge needed to excel in the software industry. I am proud
-                  to be a JCTian.&quot;
-                </p>
-                <div className="flex items-center gap-3 border-t border-white/10 pt-4">
-                  <div className="h-10 w-10 rounded-full bg-white/10"></div>
-                  <div>
-                    <div className="text-foreground text-sm font-bold">
-                      Sudeesh B Kannath
+            
+            <div className="relative z-10 grid gap-10 md:grid-cols-2">
+              {[
+                {
+                  quote: "The foundation I received at JCT Engineering was instrumental in my career. The faculty's dedication and the state-of-the-art labs provided me with the practical knowledge needed to excel in the software industry. I am proud to be a JCTian.",
+                  name: "Sudeesh B Kannath",
+                  role: "Software Consultant, UK",
+                  image: "/site_assests/logo-1.webp" // Placeholder or real image
+                },
+                {
+                  quote: "JCT provided me not just with an engineering degree, but with a platform to develop my overall personality. The placement training and the numerous symposiums helped build my confidence, which was key to cracking my core company interview.",
+                  name: "R. Praveen",
+                  role: "Mechanical Engineering (2013-2017)",
+                  image: "/site_assests/logo-2.webp" // Placeholder or real image
+                }
+              ].map((testimonial, idx) => (
+                <div key={idx} className="flex flex-col rounded-2xl bg-surface/50 p-8 backdrop-blur-sm border border-white/5">
+                  <div className="mb-6 text-gold">
+                    <Quote className="h-8 w-8 fill-gold/20" />
+                  </div>
+                  <p className="text-muted-foreground mb-8 flex-grow text-lg italic leading-relaxed">
+                    "{testimonial.quote}"
+                  </p>
+                  <div className="flex items-center gap-4 pt-6 border-t border-white/10">
+                    <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-gold/30 bg-white/10">
+                      <Image
+                        src={testimonial.image}
+                        alt={testimonial.name}
+                        fill
+                        className="object-cover opacity-60"
+                      />
                     </div>
-                    <div className="text-gold text-xs">
-                      Software Consultant, UK
+                    <div>
+                      <div className="text-foreground font-bold">{testimonial.name}</div>
+                      <div className="text-gold text-sm">{testimonial.role}</div>
                     </div>
                   </div>
                 </div>
-              </div>
-
-              <div className="bg-surface relative rounded-2xl border border-white/5 p-6">
-                <div className="text-gold/20 absolute top-4 right-6 font-serif text-4xl">
-                  &quot;
-                </div>
-                <p className="text-muted-foreground relative z-10 mb-6 text-sm leading-relaxed italic">
-                  &quot;JCT provided me not just with an engineering degree, but
-                  with a platform to develop my overall personality. The
-                  placement training and the numerous symposiums helped build my
-                  confidence, which was key to cracking my core company
-                  interview.&quot;
-                </p>
-                <div className="flex items-center gap-3 border-t border-white/10 pt-4">
-                  <div className="h-10 w-10 rounded-full bg-white/10"></div>
-                  <div>
-                    <div className="text-foreground text-sm font-bold">
-                      R. Praveen
-                    </div>
-                    <div className="text-gold text-xs">
-                      Mechanical Engineering Batch (2013-2017)
-                    </div>
-                  </div>
-                </div>
-              </div>
+              ))}
             </div>
           </section>
         </div>

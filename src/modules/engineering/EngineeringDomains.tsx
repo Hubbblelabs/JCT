@@ -261,7 +261,7 @@ export function EngineeringDomains() {
 
   return (
     <section
-      id="engineering-domains"
+      id="programs"
       className="group/section relative overflow-hidden bg-white py-16 md:py-24"
     >
       <style>{`

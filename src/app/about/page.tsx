@@ -156,12 +156,13 @@ export default function AboutPage() {
                 library, modern hostels, and extensive sports facilities.
               </p>
             </div>
-            <div className="relative mt-8 aspect-video overflow-hidden rounded-2xl shadow-xl">
+            <div className="mt-6 relative w-full overflow-hidden rounded-2xl shadow-xl">
               <Image
-                src="/assets/campus1.webp"
+                src="/assets/college1.webp"
                 alt="JCT Group of Institutions Campus"
-                fill
-                className="object-cover transition-transform duration-700 hover:scale-105"
+                width={2000}
+                height={900}
+                className="w-full h-auto rounded-2xl shadow-xl transition-transform duration-700 hover:scale-105"
               />
             </div>
           </section>

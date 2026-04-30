@@ -84,7 +84,7 @@ export function EngineeringHero() {
                 APPLY NOW
               </Link>
               <Link
-                href="#engineering-domains"
+                href="#programs"
                 className="inline-flex h-14 items-center justify-center rounded-xl border border-white/20 bg-transparent px-8 text-sm font-bold tracking-wide text-white transition-all hover:bg-white/5 active:scale-[0.98]"
               >
                 EXPLORE PROGRAMS

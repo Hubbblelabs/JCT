@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Banknote, GraduationCap, School } from "lucide-react";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Footer } from "@/components/layout/Footer";
@@ -82,7 +83,7 @@ export default function EngineeringAdmissionsPage() {
               <section className="grid gap-6 sm:grid-cols-2">
                 <div className="bg-surface border-border rounded-2xl border p-6">
                   <h3 className="text-foreground mb-4 flex items-center gap-2 text-xl font-bold">
-                    <span>💰</span> Fee Structure
+                    <Banknote className="text-gold h-6 w-6" /> Fee Structure
                   </h3>
                   <p className="text-muted-foreground mb-4 text-sm">
                     Fees are collected as per the norms prescribed by the
@@ -98,7 +99,7 @@ export default function EngineeringAdmissionsPage() {
 
                 <div className="bg-surface border-border rounded-2xl border p-6">
                   <h3 className="text-foreground mb-4 flex items-center gap-2 text-xl font-bold">
-                    <span>🎓</span> Scholarships
+                    <GraduationCap className="text-gold h-6 w-6" /> Scholarships
                   </h3>
                   <ul className="text-muted-foreground list-inside list-disc space-y-2 text-sm">
                     <li>First Generation Graduate Scholarship</li>
@@ -116,13 +117,13 @@ export default function EngineeringAdmissionsPage() {
               {/* 2. Counselling Code Sidebar */}
               <div className="border-gold/30 shadow-gold/5 sticky top-32 rounded-3xl border bg-gradient-to-br from-[#0a1628] to-[#112240] p-8 text-center shadow-xl">
                 <div className="bg-gold/10 mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full">
-                  <span className="text-gold text-4xl">🏛️</span>
+                  <School className="text-gold h-10 w-10" />
                 </div>
                 <h3 className="mb-2 text-sm font-medium tracking-wider text-white/80 uppercase">
                   TNEA Counselling Code
                 </h3>
                 <div className="text-gold mb-4 font-serif text-6xl font-bold">
-                  2734
+                  2769
                 </div>
                 <p className="mb-8 text-sm text-white/70">
                   Select this code to choose JCT College of Engineering and
