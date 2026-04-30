@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Footer } from "@/components/layout/Footer";
@@ -147,7 +148,7 @@ export default function AboutPage() {
             <h2 className="text-foreground font-serif text-3xl font-bold">
               Campus Overview
             </h2>
-            <div className="text-muted-foreground mt-6">
+            <div className="text-muted-foreground mt-6 leading-relaxed">
               <p>
                 Nestled in the serene surroundings of Pichanur, Coimbatore, our
                 sprawling campus provides an ideal environment for learning.
@@ -155,10 +156,13 @@ export default function AboutPage() {
                 library, modern hostels, and extensive sports facilities.
               </p>
             </div>
-            <div className="mt-6 flex h-64 items-center justify-center rounded-2xl border border-white/5 bg-white/10">
-              <span className="text-muted-foreground">
-                [Campus Image Placeholder]
-              </span>
+            <div className="relative mt-8 aspect-video overflow-hidden rounded-2xl shadow-xl">
+              <Image
+                src="/assets/campus1.webp"
+                alt="JCT Group of Institutions Campus"
+                fill
+                className="object-cover transition-transform duration-700 hover:scale-105"
+              />
             </div>
           </section>
         </div>
