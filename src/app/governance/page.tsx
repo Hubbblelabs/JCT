@@ -5,6 +5,16 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { siteConfig } from "@/data/site";
 
+import {
+  ShieldAlert,
+  Users,
+  Scale,
+  Megaphone,
+  GraduationCap,
+  Heart,
+  Zap,
+} from "lucide-react";
+
 export const metadata: Metadata = {
   title: `Governance | ${siteConfig.name}`,
   description:
@@ -19,7 +29,7 @@ export const metadata: Metadata = {
 
 const cells = [
   {
-    icon: "🛡️",
+    icon: ShieldAlert,
     name: "Anti-Ragging Cell",
     description:
       "JCT Institutions enforces a zero-tolerance policy against ragging in any form. The Anti-Ragging Committee actively monitors the campus and hostel areas, conducts awareness programs, and ensures swift action against any reported incident. Students can report ragging anonymously through our dedicated helpline.",
@@ -30,7 +40,7 @@ const cells = [
     ],
   },
   {
-    icon: "🤝",
+    icon: Users,
     name: "SC/ST Cell",
     description:
       "The SC/ST Cell is dedicated to the welfare, advancement, and empowerment of students and staff from Scheduled Caste and Scheduled Tribe communities. The cell ensures access to government scholarships, special coaching, and addresses any grievances related to discrimination.",
@@ -41,7 +51,7 @@ const cells = [
     ],
   },
   {
-    icon: "⚖️",
+    icon: Scale,
     name: "Internal Complaints Committee (ICC)",
     description:
       "Constituted as per the Sexual Harassment of Women at Workplace Act, 2013, the ICC provides a safe and confidential mechanism for addressing complaints of sexual harassment. The committee comprises senior faculty and external members to ensure impartial proceedings.",
@@ -52,7 +62,7 @@ const cells = [
     ],
   },
   {
-    icon: "📣",
+    icon: Megaphone,
     name: "Grievance Redressal Cell",
     description:
       "The Grievance Redressal Cell provides students, faculty, and staff a transparent mechanism to voice concerns related to academic, administrative, or personal matters. All grievances are addressed within a stipulated time frame to ensure satisfaction.",
@@ -63,7 +73,7 @@ const cells = [
     ],
   },
   {
-    icon: "👩‍🎓",
+    icon: GraduationCap,
     name: "Women Empowerment Cell",
     description:
       "The Women Empowerment Cell organizes programs, workshops, and seminars focused on the physical, mental, and professional well-being of female students and staff. Activities include self-defense training, legal awareness sessions, and career guidance.",
@@ -74,7 +84,7 @@ const cells = [
     ],
   },
   {
-    icon: "❤️",
+    icon: Heart,
     name: "Student Welfare Cell",
     description:
       "The Student Welfare Cell is the backbone of student support at JCT. It addresses the holistic needs of students — from academic support and counseling to financial aid and scholarship guidance. Our trained counselors are available for one-on-one sessions.",
@@ -85,7 +95,7 @@ const cells = [
     ],
   },
   {
-    icon: "🌈",
+    icon: Zap,
     name: "Equal Opportunity Cell",
     description:
       "The Equal Opportunity Cell works to create an inclusive campus environment for students with disabilities and those from economically disadvantaged backgrounds. The cell ensures barrier-free access to all campus facilities and academic resources.",
@@ -133,7 +143,7 @@ export default function GovernancePage() {
               >
                 <div className="mb-4 flex items-center gap-4">
                   <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white/5 text-3xl">
-                    {cell.icon}
+                    <cell.icon size={28} className="text-[#FFC917]" />
                   </div>
                   <h3 className="text-foreground font-serif text-xl font-bold">
                     {cell.name}

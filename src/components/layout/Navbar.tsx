@@ -264,7 +264,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                         e.preventDefault();
                         setDesktopExpanded(isExpanded ? null : link.name);
                       }}
-                      className={`group relative flex items-center justify-center gap-1.5 px-2 py-2 font-sans text-sm font-medium transition-colors xl:px-4 xl:text-[15px] ${
+                      className={`group relative flex items-center justify-center gap-1 px-2 py-2 font-sans text-sm font-medium transition-colors xl:gap-1.5 xl:px-3 xl:text-[14px] 2xl:px-4 2xl:text-[15px] ${
                         isExpanded
                           ? highlightColor
                           : "text-white/90 hover:text-white"
@@ -276,14 +276,14 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                         className={`transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
                       />
                       <span
-                        className={`absolute right-2 bottom-1 left-2 h-[1.5px] origin-left ${highlightBgColor} transition-transform duration-300 xl:right-4 xl:left-4 ${isExpanded ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
+                        className={`absolute right-1 bottom-1 left-1 h-[1.5px] origin-left ${highlightBgColor} transition-transform duration-300 xl:right-3 xl:left-3 2xl:right-4 2xl:left-4 ${isExpanded ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
                       />
                     </button>
                   ) : (
                     <Link
                       href={link.href}
                       onClick={(e) => handleNavClick(e, link.href)}
-                      className={`group relative flex items-center justify-center px-2 py-2 font-sans text-sm font-medium transition-colors xl:px-4 xl:text-[15px] ${
+                      className={`group relative flex items-center justify-center gap-1 px-2 py-2 font-sans text-sm font-medium transition-colors xl:gap-1.5 xl:px-3 xl:text-[14px] 2xl:px-4 2xl:text-[15px] ${
                         isActive
                           ? highlightColor
                           : "text-white/90 hover:text-white"
@@ -293,11 +293,11 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                       {hasDropdown && (
                         <ChevronDown
                           size={14}
-                          className={`ml-1.5 transition-transform duration-200 ${isExpanded ? "rotate-180" : ""}`}
+                          className={`ml-1 transition-transform duration-200 xl:ml-1.5 ${isExpanded ? "rotate-180" : ""}`}
                         />
                       )}
                       <span
-                        className={`absolute right-2 bottom-1 left-2 h-[1.5px] origin-left ${highlightBgColor} transition-transform duration-300 xl:right-4 xl:left-4 ${isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
+                        className={`absolute right-1 bottom-1 left-1 h-[1.5px] origin-left ${highlightBgColor} transition-transform duration-300 xl:right-3 xl:left-3 2xl:right-4 2xl:left-4 ${isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}
                       />
                     </Link>
                   )}
@@ -392,10 +392,10 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             })}
           </div>
 
-          <div className="z-50 hidden shrink-0 items-center justify-end gap-3 whitespace-nowrap xl:flex xl:flex-1 xl:gap-4 2xl:gap-6">
+          <div className="z-50 hidden shrink-0 items-center justify-end gap-2 whitespace-nowrap xl:flex xl:flex-1 xl:gap-3 2xl:gap-6">
             <a
               href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="flex max-w-[140px] items-center gap-1.5 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white min-[1400px]:max-w-none xl:gap-2 xl:text-[15px]"
+              className="flex max-w-[180px] items-center gap-1 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white min-[1400px]:max-w-none xl:gap-1.5 xl:text-[14px] 2xl:text-[15px]"
             >
               <Phone size={16} className="h-3.5 w-3.5 shrink-0 xl:h-4 xl:w-4" />
               <span className="truncate">{siteConfig.contact.phone}</span>
@@ -403,7 +403,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             {institution === "main" && (
               <Link
                 href="/apply-now"
-                className={`inline-flex h-9.5 items-center justify-center rounded-full px-5 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10.5 xl:px-5 xl:text-[15px] 2xl:px-8 ${
+                className={`inline-flex h-9 items-center justify-center rounded-full px-4 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10 xl:px-5 xl:text-[14px] 2xl:text-[15px] ${
                   isSolid
                     ? `${highlightBgColor} font-semibold text-[#0a1628] shadow-lg shadow-black/20 ${highlightHoverBgColor}`
                     : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
