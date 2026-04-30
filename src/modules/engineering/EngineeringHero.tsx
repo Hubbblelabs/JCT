@@ -77,14 +77,14 @@ export function EngineeringHero() {
               className="mt-10 flex w-full flex-col items-center justify-center gap-4 sm:w-auto sm:flex-row"
             >
               <Link
-                href="/admissions/apply"
+                href="/apply-now"
                 className="inline-flex h-14 items-center justify-center rounded-xl px-8 text-sm font-bold tracking-wide transition-all hover:brightness-110 active:scale-[0.98]"
                 style={{ backgroundColor: "#d4a024", color: "#081323" }} // Adjusted to current theme but modeled after reference
               >
                 APPLY NOW
               </Link>
               <Link
-                href="#engineering-domains"
+                href="#programs"
                 className="inline-flex h-14 items-center justify-center rounded-xl border border-white/20 bg-transparent px-8 text-sm font-bold tracking-wide text-white transition-all hover:bg-white/5 active:scale-[0.98]"
               >
                 EXPLORE PROGRAMS
@@ -95,17 +95,17 @@ export function EngineeringHero() {
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.65, delay: 0.24 }}
-              className="mt-8 flex flex-col md:flex-row items-center gap-2 rounded-2xl md:rounded-full border border-white/15 bg-white/8 px-6 py-3 text-sm font-medium text-white/85 backdrop-blur-sm"
+              className="mt-8 flex flex-col items-center gap-2 rounded-2xl border border-white/15 bg-white/8 px-6 py-3 text-sm font-medium text-white/85 backdrop-blur-sm md:flex-row md:rounded-full"
             >
-              <span className="font-bold text-[#d4a024] tracking-[0.1em] uppercase">
+              <span className="font-bold tracking-[0.1em] text-[#d4a024] uppercase">
                 An Autonomous Institution
               </span>
-              <span className="hidden md:inline mx-2 text-white/30">|</span>
+              <span className="mx-2 hidden text-white/30 md:inline">|</span>
               <div className="flex items-center gap-2">
-                <span className="tracking-[0.15em] text-white font-bold uppercase">
+                <span className="font-bold tracking-[0.15em] text-white uppercase">
                   Counselling Code:
                 </span>
-                <span className="font-extrabold text-[#d4a024] text-lg">
+                <span className="text-lg font-extrabold text-[#d4a024]">
                   {siteConfig.counsellingCode}
                 </span>
               </div>

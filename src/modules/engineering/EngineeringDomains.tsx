@@ -30,7 +30,7 @@ function CourseCard({
   showDescription: boolean;
 }) {
   const router = useRouter();
-  
+
   return (
     <motion.article
       initial={{ opacity: 0, x: 20 }}
@@ -38,8 +38,10 @@ function CourseCard({
       viewport={{ once: true }}
       transition={{ duration: 0.35 }}
       data-course-card="true"
-      onClick={() => { if (href) router.push(href); }}
-      className={`border-engineering/12 group flex h-full min-h-[20rem] w-[18.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-white transition-all sm:w-[20rem] md:w-[21.5rem] lg:w-[22rem] pb-4 ${href ? 'cursor-pointer hover:shadow-md' : ''}`}
+      onClick={() => {
+        if (href) router.push(href);
+      }}
+      className={`border-engineering/12 group flex h-full min-h-[20rem] w-[18.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-white pb-4 transition-all sm:w-[20rem] md:w-[21.5rem] lg:w-[22rem] ${href ? "cursor-pointer hover:shadow-md" : ""}`}
       draggable={false}
     >
       <div className="relative aspect-[16/9] overflow-hidden">
@@ -88,7 +90,7 @@ function CourseCard({
           )}
         </div>
 
-        <div className="flex flex-col flex-1 justify-end pt-4">
+        <div className="flex flex-1 flex-col justify-end pt-4">
           <div className="flex items-center justify-between gap-3">
             <span className="text-engineering block text-[0.75rem] font-bold tracking-wider uppercase">
               {course.abbr}
@@ -259,7 +261,7 @@ export function EngineeringDomains() {
 
   return (
     <section
-      id="engineering-domains"
+      id="programs"
       className="group/section relative overflow-hidden bg-white py-16 md:py-24"
     >
       <style>{`

@@ -23,7 +23,7 @@ const pathways = [
     icon: CalendarCheck,
     title: "After 12th Standard",
     desc: "Choose B.E./B.Tech at Engineering or B.Sc/B.Com/BBA at Arts & Science — depending on your stream.",
-    link: "/admissions/apply",
+    link: "/apply-now",
     linkText: "Apply now",
     gradient: "from-blue-50 to-indigo-50",
     iconColor: "text-navy",
@@ -77,7 +77,7 @@ export function AdmissionsCTA() {
             </motion.p>
           </div>
 
-          <div className="scrollbar-hide mb-8 flex gap-4 overflow-x-auto overflow-y-hidden snap-x snap-mandatory px-4 pb-4 md:mb-10 md:grid md:grid-cols-3 md:gap-6 md:px-0 md:pb-0 md:overflow-visible">
+          <div className="scrollbar-hide mb-8 flex snap-x snap-mandatory gap-4 overflow-x-auto overflow-y-hidden px-4 pb-4 md:mb-10 md:grid md:grid-cols-3 md:gap-6 md:overflow-visible md:px-0 md:pb-0">
             {pathways.map((item, i) => (
               <motion.div
                 key={item.title}

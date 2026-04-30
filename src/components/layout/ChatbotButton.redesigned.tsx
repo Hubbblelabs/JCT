@@ -254,16 +254,17 @@ export function ChatbotButton() {
   useEffect(() => {
     let active = true;
     if (active) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMessages((prev) => {
         if (prev.length === 0 || prev[0].id !== "welcome") {
-           return [
+          return [
             {
               id: "welcome",
               role: "assistant",
               content: meta.welcome,
               timestamp: new Date(),
             },
-            ...prev
+            ...prev,
           ];
         }
         return prev;
@@ -288,6 +289,7 @@ export function ChatbotButton() {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
 
+    // eslint-disable-next-line react-hooks/purity
     const now = Date.now();
     const userMsg: Message = {
       id: String(now),

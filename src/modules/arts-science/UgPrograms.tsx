@@ -28,7 +28,7 @@ function CourseCard({ course }: { course: ArtsScienceCourse }) {
       transition={{ duration: 0.35 }}
       data-course-card="true"
       onClick={() => router.push(href)}
-      className="border-arts-science/10 group cursor-pointer hover:shadow-md flex h-full min-h-[20rem] w-[18.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-white transition-all sm:w-[20rem] md:w-[21.5rem] lg:w-[22rem] pb-4"
+      className="border-arts-science/10 group flex h-full min-h-[20rem] w-[18.5rem] shrink-0 cursor-pointer snap-start flex-col overflow-hidden rounded-xl border bg-white pb-4 transition-all hover:shadow-md sm:w-[20rem] md:w-[21.5rem] lg:w-[22rem]"
       draggable={false}
     >
       <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
@@ -44,7 +44,7 @@ function CourseCard({ course }: { course: ArtsScienceCourse }) {
         <div className="absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent" />
       </div>
 
-      <div className="flex flex-1 flex-col px-5 pt-3.5 pb-2 justify-between">
+      <div className="flex flex-1 flex-col justify-between px-5 pt-3.5 pb-2">
         <div className="space-y-1.5">
           <h3 className="text-arts-science line-clamp-2 text-[1.35rem] leading-snug font-semibold md:text-[1.45rem]">
             {course.name}
@@ -55,7 +55,7 @@ function CourseCard({ course }: { course: ArtsScienceCourse }) {
           </p>
         </div>
 
-        <div className="flex flex-col flex-1 justify-end pt-4">
+        <div className="flex flex-1 flex-col justify-end pt-4">
           <div className="flex items-center justify-between gap-3">
             <span className="text-arts-science block text-[0.75rem] font-bold tracking-wider uppercase">
               {course.abbr}
@@ -158,7 +158,7 @@ export function UgPrograms() {
 
   return (
     <section
-      id="courses"
+      id="programs"
       className="group/section relative overflow-hidden bg-slate-50 py-20 md:py-32"
       onMouseMove={handleMouseMove}
     >

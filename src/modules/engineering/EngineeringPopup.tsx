@@ -93,26 +93,34 @@ export function EngineeringPopup() {
               </h2>
 
               <p className="mb-4 text-stone-600">
-                Start your engineering journey with JCT. Applications are now open for B.E. / B.Tech programs.
+                Start your engineering journey with JCT. Applications are now
+                open for B.E. / B.Tech programs.
               </p>
 
-              <div className="mb-8 flex flex-col gap-2 rounded-xl bg-stone-50 p-4 border border-stone-100">
-                 <div className="flex items-center gap-2">
-                    <span className="font-semibold text-stone-700">Counselling Code:</span>
-                    <span className="font-bold text-[#d4a024] text-lg">{siteConfig.counsellingCode}</span>
-                 </div>
-                 <div className="flex items-center gap-2">
-                    <span className="font-semibold text-stone-700">Contact:</span>
-                    <a href={`tel:${siteConfig.contact.phone.replace(/\\s/g, "")}`} className="flex items-center gap-1 font-bold text-[#0a1628] hover:text-[#d4a024] transition-colors">
-                      <Phone size={14} />
-                      {siteConfig.contact.phone}
-                    </a>
-                 </div>
+              <div className="mb-8 flex flex-col gap-2 rounded-xl border border-stone-100 bg-stone-50 p-4">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-stone-700">
+                    Counselling Code:
+                  </span>
+                  <span className="text-lg font-bold text-[#d4a024]">
+                    {siteConfig.counsellingCode}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-stone-700">Contact:</span>
+                  <a
+                    href={`tel:${siteConfig.contact.phone.replace(/\\s/g, "")}`}
+                    className="flex items-center gap-1 font-bold text-[#0a1628] transition-colors hover:text-[#d4a024]"
+                  >
+                    <Phone size={14} />
+                    {siteConfig.contact.phone}
+                  </a>
+                </div>
               </div>
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/admissions/apply"
+                  href="/apply-now"
                   onClick={handleClose}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FFC917] px-6 py-3 font-sans text-sm font-bold text-black transition-transform hover:scale-105"
                 >
