@@ -185,7 +185,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
 
             <Link
               href="/apply-now"
-              className="shrink-0 underline underline-offset-2 hover:no-underline"
+              className="hidden shrink-0 underline underline-offset-2 hover:no-underline sm:inline"
             >
               Apply Now
             </Link>

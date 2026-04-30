@@ -185,7 +185,7 @@ export const artsNavigation: NavItem[] = [
     children: [
       {
         name: "About Us",
-        href: "/institutions/arts-science#about-institution",
+        href: "/institutions/arts-science/about",
         desc: "Our story & leadership",
       },
       { name: "Alumni", href: "/alumni", desc: "Connect with our network" },
@@ -249,7 +249,7 @@ export const polytechnicNavigation: NavItem[] = [
     children: [
       {
         name: "About Us",
-        href: "/institutions/polytechnic#about-institution",
+        href: "/institutions/polytechnic/about",
         desc: "Our story & leadership",
       },
       { name: "Alumni", href: "/alumni", desc: "Connect with our network" },

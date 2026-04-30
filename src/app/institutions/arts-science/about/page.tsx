@@ -2,6 +2,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+import { Target, Lightbulb, Sprout, GitBranch } from "lucide-react";
 
 export default function ArtsScienceAboutPage() {
   return (
@@ -113,22 +114,22 @@ export default function ArtsScienceAboutPage() {
               {[
                 {
                   title: "Result Oriented Education",
-                  icon: "🎯",
+                  icon: Target,
                   desc: "Focusing on academic excellence and measurable outcomes.",
                 },
                 {
                   title: "Innovative Learning Practice",
-                  icon: "💡",
+                  icon: Lightbulb,
                   desc: "Modern pedagogical tools and interactive sessions.",
                 },
                 {
                   title: "Student Centric Growth",
-                  icon: "🌱",
+                  icon: Sprout,
                   desc: "Personalized attention and holistic development.",
                 },
                 {
                   title: "Interdisciplinary Model",
-                  icon: "🔄",
+                  icon: GitBranch,
                   desc: "Bridging gaps between various fields of study.",
                 },
               ].map((reason, i) => (
@@ -136,8 +137,8 @@ export default function ArtsScienceAboutPage() {
                   key={i}
                   className="hover:border-gold/30 rounded-2xl border border-white/10 bg-white/5 p-6 text-center transition-colors"
                 >
-                  <div className="bg-surface mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-white/5 text-2xl">
-                    {reason.icon}
+                  <div className="bg-gold/10 text-gold mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-white/5">
+                    <reason.icon size={32} />
                   </div>
                   <h3 className="text-foreground mb-2 text-lg font-bold">
                     {reason.title}

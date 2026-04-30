@@ -27,7 +27,7 @@ export default function EngineeringAlumniPage() {
 
         <div className="mt-12 space-y-24">
           {/* 1. Alumni Network Overview */}
-          <section className="grid items-center gap-12 lg:grid-cols-2">
+          <section className="relative grid items-center gap-12 overflow-hidden lg:grid-cols-2">
             <div>
               <div className="bg-gold/10 text-gold mb-4 inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium">
                 <Globe className="h-4 w-4" />
@@ -45,9 +45,9 @@ export default function EngineeringAlumniPage() {
               </p>
               <p className="text-muted-foreground mb-8 leading-relaxed">
                 We actively engage with our alumni through annual meets, guest
-                lecture series ("Alumni Talk Series"), and mentorship programs,
-                fostering a strong bond between the institution and its past
-                students.
+                lecture series &quot;Alumni Talk Series&quot;, and mentorship
+                programs, fostering a strong bond between the institution and
+                its past students.
               </p>
               <a
                 href="https://alumni.jct.ac.in/"
@@ -72,7 +72,7 @@ export default function EngineeringAlumniPage() {
               </div>
 
               {/* Floating Stat Card */}
-              <div className="bg-surface/90 absolute -bottom-6 -left-6 z-20 hidden rounded-2xl border border-white/10 p-8 shadow-xl backdrop-blur-md md:block">
+              <div className="bg-surface/90 absolute -bottom-6 left-4 z-20 hidden rounded-2xl border border-white/10 p-6 shadow-xl backdrop-blur-md md:-left-6 md:block md:p-8">
                 <div className="flex items-center gap-4">
                   <div className="bg-gold/20 text-gold flex h-12 w-12 items-center justify-center rounded-xl">
                     <GraduationCap className="h-6 w-6" />
@@ -179,7 +179,7 @@ export default function EngineeringAlumniPage() {
                     <Quote className="fill-gold/20 h-8 w-8" />
                   </div>
                   <p className="text-muted-foreground mb-8 flex-grow text-lg leading-relaxed italic">
-                    "{testimonial.quote}"
+                    &quot;{testimonial.quote}&quot;
                   </p>
                   <div className="flex items-center gap-4 border-t border-white/10 pt-6">
                     <div className="border-gold/30 relative h-14 w-14 overflow-hidden rounded-full border-2 bg-white/10">

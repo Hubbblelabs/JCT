@@ -2,6 +2,15 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+import {
+  Eye,
+  Settings,
+  Handshake,
+  Factory,
+  Briefcase,
+  GraduationCap,
+  Star,
+} from "lucide-react";
 
 export default function PolytechnicAboutPage() {
   return (
@@ -46,8 +55,8 @@ export default function PolytechnicAboutPage() {
 
           {/* 3. Vision */}
           <section className="mx-auto max-w-4xl rounded-3xl border border-white/10 bg-gradient-to-br from-[#0a1628] to-[#112240] p-10 text-center">
-            <div className="bg-gold/20 mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full text-3xl">
-              👁️
+            <div className="bg-gold/20 text-gold mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full">
+              <Eye size={32} />
             </div>
             <h2 className="mb-4 font-serif text-3xl font-bold text-white">
               Our Vision
@@ -100,32 +109,32 @@ export default function PolytechnicAboutPage() {
               {[
                 {
                   title: "Skill-Embedded Education",
-                  icon: "🛠️",
+                  icon: Settings,
                   desc: "Focusing heavily on hands-on practical training rather than just theory.",
                 },
                 {
                   title: "Strong Industry Tie-ups",
-                  icon: "🤝",
+                  icon: Handshake,
                   desc: "Active MoUs and regular corporate interaction for better employability.",
                 },
                 {
                   title: "Modern Facilities",
-                  icon: "🏭",
+                  icon: Factory,
                   desc: "State-of-the-art laboratories and extensive library resources.",
                 },
                 {
                   title: "Dedicated Placement Cell",
-                  icon: "💼",
+                  icon: Briefcase,
                   desc: "Ensuring lucrative job opportunities with top engineering and manufacturing firms.",
                 },
                 {
                   title: "Experienced Faculty",
-                  icon: "👨‍🏫",
+                  icon: GraduationCap,
                   desc: "Learn from mentors with rich academic and industrial backgrounds.",
                 },
                 {
                   title: "Holistic Development",
-                  icon: "🌟",
+                  icon: Star,
                   desc: "Extracurriculars, sports, and life skills for overall growth.",
                 },
               ].map((reason, i) => (
@@ -133,7 +142,9 @@ export default function PolytechnicAboutPage() {
                   key={i}
                   className="rounded-2xl border border-white/10 bg-white/5 p-6"
                 >
-                  <div className="mb-4 text-4xl">{reason.icon}</div>
+                  <div className="text-gold mb-4">
+                    <reason.icon size={40} />
+                  </div>
                   <h3 className="text-foreground mb-2 text-lg font-bold">
                     {reason.title}
                   </h3>

@@ -106,7 +106,7 @@ export default function PlacementsPage() {
                         src={company.src}
                         alt={company.name}
                         fill
-                        className="object-contain opacity-50 grayscale transition-all duration-300 group-hover:opacity-100 group-hover:grayscale-0"
+                        className="object-contain transition-all duration-300"
                       />
                     </div>
                   </div>

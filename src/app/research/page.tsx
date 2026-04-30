@@ -14,8 +14,6 @@ import {
   Coins,
   ScrollText,
   BookOpen,
-  ArrowRight,
-  FlaskConical,
   Microscope,
   FileText,
   Award,
@@ -159,8 +157,8 @@ export default function ResearchPage() {
                     50+ Projects
                   </div>
                   <p className="text-muted-foreground mt-2 font-serif text-sm italic">
-                    "Fueling the next generation of technological
-                    breakthroughs."
+                    &quot;Fueling the next generation of technological
+                    breakthroughs.&quot;
                   </p>
                 </div>
               </div>

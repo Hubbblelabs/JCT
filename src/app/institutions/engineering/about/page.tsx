@@ -2,6 +2,15 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
+import Image from "next/image";
+import {
+  Monitor,
+  FlaskConical,
+  Clock,
+  BookOpen,
+  Trophy,
+  Bus,
+} from "lucide-react";
 
 export default function EngineeringAboutPage() {
   return (
@@ -111,21 +120,32 @@ export default function EngineeringAboutPage() {
             </h2>
             <div className="grid grid-cols-2 gap-6 md:grid-cols-3 lg:grid-cols-6">
               {[
-                { name: "AICTE", desc: "Approved" },
-                { name: "NBA", desc: "Accredited Programs" },
-                { name: "NAAC", desc: '"A" Grade' },
-                { name: "Anna University", desc: "Affiliated" },
-                { name: "UGC", desc: "Recognized" },
-                { name: "ISO 9001:2015", desc: "Certified" },
+                { name: "AICTE", desc: "Approved", logo: "/aicte.png" },
+                {
+                  name: "NBA",
+                  desc: "Accredited Programs",
+                  logo: "/nba.png",
+                },
+                { name: "NAAC", desc: '"A" Grade', logo: "/naac.png" },
+                {
+                  name: "Anna University",
+                  desc: "Affiliated",
+                  logo: "/anna.png",
+                },
+                { name: "UGC", desc: "Recognized", logo: "/ugc.png" },
+                { name: "ISO 9001:2015", desc: "Certified", logo: "/iso.png" },
               ].map((acc) => (
                 <div
                   key={acc.name}
                   className="bg-surface border-border flex aspect-square flex-col items-center justify-center rounded-xl border p-6 text-center shadow-sm"
                 >
-                  <div className="mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-white/5">
-                    <span className="text-gold text-xl font-bold">
-                      {acc.name[0]}
-                    </span>
+                  <div className="relative mb-3 flex h-16 w-full items-center justify-center">
+                    <Image
+                      src={acc.logo}
+                      alt={acc.name}
+                      fill
+                      className="object-contain"
+                    />
                   </div>
                   <h3 className="text-sm font-bold">{acc.name}</h3>
                   <p className="text-muted-foreground mt-1 text-xs">
@@ -145,32 +165,32 @@ export default function EngineeringAboutPage() {
               {[
                 {
                   title: "Hi-Tech Classrooms",
-                  icon: "🏫",
+                  icon: Monitor,
                   desc: "Smart, ICT-enabled classrooms for interactive learning.",
                 },
                 {
                   title: "Modern Laboratories",
-                  icon: "🔬",
+                  icon: FlaskConical,
                   desc: "State-of-the-art labs equipped with the latest technology.",
                 },
                 {
                   title: "24x7 Campus",
-                  icon: "🕒",
+                  icon: Clock,
                   desc: "A secure, vibrant campus alive around the clock.",
                 },
                 {
                   title: "Extensive Library",
-                  icon: "📚",
+                  icon: BookOpen,
                   desc: "Digital library with thousands of e-journals and books.",
                 },
                 {
                   title: "Sports Infrastructure",
-                  icon: "⚽",
+                  icon: Trophy,
                   desc: "Excellent facilities for both indoor and outdoor sports.",
                 },
                 {
                   title: "Transport Fleet",
-                  icon: "🚌",
+                  icon: Bus,
                   desc: "Extensive bus network covering major routes in Coimbatore and Kerala.",
                 },
               ].map((feature, i) => (
@@ -178,7 +198,9 @@ export default function EngineeringAboutPage() {
                   key={i}
                   className="rounded-xl border border-white/10 bg-white/5 p-6"
                 >
-                  <div className="mb-4 text-4xl">{feature.icon}</div>
+                  <div className="bg-gold/10 text-gold mb-4 flex h-12 w-12 items-center justify-center rounded-lg">
+                    <feature.icon size={24} />
+                  </div>
                   <h3 className="mb-2 text-lg font-bold">{feature.title}</h3>
                   <p className="text-muted-foreground text-sm">
                     {feature.desc}

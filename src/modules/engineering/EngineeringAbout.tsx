@@ -2,6 +2,7 @@
 
 import { Award, BookOpen } from "lucide-react";
 import { siteConfig } from "@/data/site";
+import Image from "next/image";
 
 export function EngineeringAbout() {
   return (
@@ -56,33 +57,38 @@ export function EngineeringAbout() {
           <div className="grid grid-cols-2 gap-4">
             {[
               {
-                val: "AICTE",
+                logo: "/aicte.png",
                 label: "Approved",
                 desc: "All India Council for Technical Education",
               },
               {
-                val: "Anna",
+                logo: "/anna.png",
                 label: "University",
                 desc: "Affiliated to Anna University, Chennai",
               },
               {
-                val: "ISO",
+                logo: "/iso.png",
                 label: "9001:2015",
                 desc: "Certified quality management system",
               },
               {
-                val: "NBA",
+                logo: "/nba.png",
                 label: "Accredited",
                 desc: "National Board of Accreditation",
               },
             ].map((item) => (
               <div
                 key={item.label}
-                className="hover:border-engineering/20 rounded-2xl border border-stone-100 bg-stone-50 p-6 transition-colors"
+                className="group hover:border-engineering/20 rounded-2xl border border-stone-100 bg-stone-50 p-6 transition-colors"
               >
-                <span className="text-engineering mb-1 block font-sans text-2xl font-bold md:text-3xl">
-                  {item.val}
-                </span>
+                <div className="relative mb-3 h-12 w-full">
+                  <Image
+                    src={item.logo}
+                    alt={item.label}
+                    fill
+                    className="object-contain transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
                 <span className="text-navy block text-sm font-bold">
                   {item.label}
                 </span>
