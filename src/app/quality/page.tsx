@@ -5,6 +5,17 @@ import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { siteConfig } from "@/data/site";
+import {
+  BarChart3,
+  Search,
+  TrendingUp,
+  GraduationCap,
+  MessageSquare,
+  Award,
+  User,
+  Users,
+  Briefcase,
+} from "lucide-react";
 
 export const metadata: Metadata = {
   title: `Quality Assurance | ${siteConfig.name}`,
@@ -110,7 +121,7 @@ export default function QualityPage() {
               ].map((item, i) => (
                 <div
                   key={i}
-                  className="bg-surface flex flex-col rounded-2xl border border-white/10 p-6 transition-colors hover:border-gold/30"
+                  className="bg-surface hover:border-gold/30 flex flex-col rounded-2xl border border-white/10 p-6 transition-colors"
                 >
                   <div className="mb-6 flex items-center justify-between">
                     <div className="relative flex h-16 w-16 items-center justify-center overflow-hidden rounded-xl bg-white p-2">
@@ -128,7 +139,7 @@ export default function QualityPage() {
                   <h3 className="text-foreground mb-2 font-bold">
                     {item.name}
                   </h3>
-                  <p className="text-muted-foreground text-sm flex-grow">
+                  <p className="text-muted-foreground flex-grow text-sm">
                     {item.detail}
                   </p>
                 </div>
@@ -151,32 +162,32 @@ export default function QualityPage() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 {
-                  icon: "📊",
+                  icon: BarChart3,
                   title: "Annual Quality Reports",
                   desc: "Preparing and submitting Annual Quality Assurance Reports (AQAR) to NAAC.",
                 },
                 {
-                  icon: "🔍",
+                  icon: Search,
                   title: "Academic Audits",
                   desc: "Conducting regular academic and administrative audits to identify improvement areas.",
                 },
                 {
-                  icon: "📈",
+                  icon: TrendingUp,
                   title: "Benchmarking",
                   desc: "Comparing practices with best-in-class institutions nationally and internationally.",
                 },
                 {
-                  icon: "🎓",
+                  icon: GraduationCap,
                   title: "Faculty Development",
                   desc: "Organizing FDPs and workshops to enhance teaching-learning quality.",
                 },
                 {
-                  icon: "💬",
+                  icon: MessageSquare,
                   title: "Feedback Analysis",
                   desc: "Systematic collection and analysis of feedback from all stakeholders.",
                 },
                 {
-                  icon: "🏆",
+                  icon: Award,
                   title: "Best Practices",
                   desc: "Identifying and institutionalizing best practices for sustained quality.",
                 },
@@ -185,7 +196,9 @@ export default function QualityPage() {
                   key={i}
                   className="bg-surface rounded-2xl border border-white/5 p-5"
                 >
-                  <div className="mb-3 text-2xl">{item.icon}</div>
+                  <div className="mb-3 text-2xl">
+                    <item.icon size={28} className="text-[#FFC917]" />
+                  </div>
                   <h3 className="text-foreground mb-1 font-bold">
                     {item.title}
                   </h3>
@@ -209,22 +222,22 @@ export default function QualityPage() {
             <div className="grid gap-6 md:grid-cols-2">
               {[
                 {
-                  icon: "👩‍🎓",
+                  icon: User,
                   title: "Student Feedback",
                   desc: "Semester-end feedback on teaching quality, curriculum relevance, and campus facilities collected through a structured online portal.",
                 },
                 {
-                  icon: "👨‍👩‍👧",
+                  icon: Users,
                   title: "Parent Feedback",
                   desc: "Annual parent surveys and interactions during Parent-Teacher Meets to understand student progress and institutional performance.",
                 },
                 {
-                  icon: "👔",
+                  icon: Briefcase,
                   title: "Employer Feedback",
                   desc: "Regular feedback from recruiting companies on graduate competency, skills, and industry readiness.",
                 },
                 {
-                  icon: "🎓",
+                  icon: GraduationCap,
                   title: "Alumni Feedback",
                   desc: "Structured surveys and alumni meets to gather insights on curriculum relevance and skill gaps in the current job market.",
                 },
@@ -233,7 +246,9 @@ export default function QualityPage() {
                   key={i}
                   className="bg-surface rounded-2xl border border-white/10 p-6"
                 >
-                  <div className="mb-3 text-3xl">{item.icon}</div>
+                  <div className="mb-3 text-3xl">
+                    <item.icon size={32} className="text-[#FFC917]" />
+                  </div>
                   <h3 className="text-foreground mb-2 font-bold">
                     {item.title}
                   </h3>

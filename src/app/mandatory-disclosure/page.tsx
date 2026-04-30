@@ -5,6 +5,17 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { siteConfig } from "@/data/site";
 
+import {
+  BookOpen,
+  ClipboardList,
+  Compass,
+  Users,
+  BarChart3,
+  Lock,
+  FileText,
+  AlertTriangle,
+} from "lucide-react";
+
 export const metadata: Metadata = {
   title: `Mandatory Disclosure | ${siteConfig.name}`,
   description:
@@ -19,49 +30,49 @@ export const metadata: Metadata = {
 
 const disclosures = [
   {
-    icon: "📖",
+    icon: BookOpen,
     name: "Code of Conduct",
     description:
       "The Code of Conduct sets the standards of behavior expected of all students, faculty, and staff at JCT Institutions. It covers academic integrity, professional behavior, campus etiquette, and the consequences of misconduct.",
   },
   {
-    icon: "📋",
+    icon: ClipboardList,
     name: "Policies & Regulations",
     description:
       "Institutional policies governing academic activities, examination procedures, leave regulations, fee refund policy, and all administrative processes. Updated regularly to align with UGC and Anna University guidelines.",
   },
   {
-    icon: "🧭",
+    icon: Compass,
     name: "Professional Ethics",
     description:
       "Our Professional Ethics handbook outlines the guiding principles for ethical conduct in academic and research activities. It covers intellectual integrity, conflict of interest, and responsible use of institutional resources.",
   },
   {
-    icon: "👥",
+    icon: Users,
     name: "HR Manual",
     description:
       "The HR Manual provides comprehensive guidelines for faculty and staff management including recruitment procedures, service conditions, appraisal processes, leave policies, and disciplinary procedures.",
   },
   {
-    icon: "📊",
+    icon: BarChart3,
     name: "Student Satisfaction Survey",
     description:
       "As mandated by NAAC and UGC, we conduct regular Student Satisfaction Surveys to measure and improve the quality of our services. The results are used to drive data-backed improvements across all departments.",
   },
   {
-    icon: "🔒",
+    icon: Lock,
     name: "Privacy Policy",
     description:
       "This policy governs how JCT Institutions collects, uses, stores, and protects the personal information of students, faculty, staff, and website visitors, in compliance with applicable data protection laws.",
   },
   {
-    icon: "📝",
+    icon: FileText,
     name: "Terms & Conditions",
     description:
       "The terms governing the use of our website, digital portals, and institutional services. By accessing our platforms, users agree to these terms which include acceptable use, intellectual property rights, and limitations of liability.",
   },
   {
-    icon: "⚠️",
+    icon: AlertTriangle,
     name: "Disclaimer",
     description:
       "While JCT Institutions makes every effort to ensure the accuracy of information on this website, we provide this disclaimer to address potential inaccuracies, third-party links, and limitations on our liability.",
@@ -104,7 +115,7 @@ export default function MandatoryDisclosurePage() {
               >
                 <div className="mb-4 flex items-center gap-4">
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/5 text-2xl">
-                    {item.icon}
+                    <item.icon size={24} className="text-[#FFC917]" />
                   </div>
                   <h3 className="text-foreground font-serif text-xl font-bold">
                     {item.name}

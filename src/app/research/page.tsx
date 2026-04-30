@@ -5,21 +5,21 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { siteConfig } from "@/data/site";
 import Image from "next/image";
-import { 
-  Lightbulb, 
-  Handshake, 
-  Rocket, 
-  ClipboardList, 
-  ShieldCheck, 
-  Coins, 
-  ScrollText, 
+import {
+  Lightbulb,
+  Handshake,
+  Rocket,
+  ClipboardList,
+  ShieldCheck,
+  Coins,
+  ScrollText,
   BookOpen,
   ArrowRight,
   FlaskConical,
   Microscope,
   FileText,
   Award,
-  Cpu
+  Cpu,
 } from "lucide-react";
 
 export const metadata: Metadata = {
@@ -49,7 +49,7 @@ export default function ResearchPage() {
         <div className="mt-12 space-y-24">
           {/* 1. Overview */}
           <section className="mx-auto max-w-4xl">
-            <div className="grid gap-12 items-center md:grid-cols-2">
+            <div className="grid items-center gap-12 md:grid-cols-2">
               <div>
                 <h2 className="text-foreground mb-6 font-serif text-3xl font-bold md:text-4xl">
                   Research at JCT
@@ -57,13 +57,13 @@ export default function ResearchPage() {
                 <p className="text-muted-foreground mb-6 text-lg leading-relaxed">
                   JCT Institutions fosters a vibrant research ecosystem with
                   dedicated centres, funded projects, and a strong publication
-                  record. 
+                  record.
                 </p>
                 <p className="text-muted-foreground leading-relaxed">
-                  Our Centre of Excellence and R&D Cell are driving
-                  innovation and bridging the gap between academic knowledge and
-                  real-world application, empowering students and faculty to solve 
-                  complex global challenges.
+                  Our Centre of Excellence and R&D Cell are driving innovation
+                  and bridging the gap between academic knowledge and real-world
+                  application, empowering students and faculty to solve complex
+                  global challenges.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -77,11 +77,11 @@ export default function ResearchPage() {
                     key={i}
                     className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-white/5 p-6 text-center transition-colors hover:bg-white/10"
                   >
-                    <item.icon className="h-6 w-6 text-gold mb-3" />
+                    <item.icon className="text-gold mb-3 h-6 w-6" />
                     <div className="text-gold mb-1 text-2xl font-bold">
                       {item.stat}
                     </div>
-                    <div className="text-muted-foreground text-xs font-medium uppercase tracking-wider">
+                    <div className="text-muted-foreground text-xs font-medium tracking-wider uppercase">
                       {item.label}
                     </div>
                   </div>
@@ -100,8 +100,8 @@ export default function ResearchPage() {
                 <p className="text-muted-foreground mb-6 leading-relaxed">
                   JCT College of Engineering and Technology has established
                   advanced Centres of Excellence to bridge the gap between
-                  academic curriculum and industry demands. These centres focus on
-                  specialized training, research, and product development in
+                  academic curriculum and industry demands. These centres focus
+                  on specialized training, research, and product development in
                   cutting-edge technologies.
                 </p>
                 <div className="grid gap-4 sm:grid-cols-2">
@@ -109,29 +109,32 @@ export default function ResearchPage() {
                     "AI & Machine Learning",
                     "CNC Machines (CAM)",
                     "Advanced Welding Technology",
-                    "Cloud & Azure DevOps"
+                    "Cloud & Azure DevOps",
                   ].map((item, i) => (
-                    <div key={i} className="flex items-center gap-3 text-muted-foreground bg-white/5 p-3 rounded-xl border border-white/5 text-sm">
-                      <div className="h-2 w-2 rounded-full bg-gold" />
+                    <div
+                      key={i}
+                      className="text-muted-foreground flex items-center gap-3 rounded-xl border border-white/5 bg-white/5 p-3 text-sm"
+                    >
+                      <div className="bg-gold h-2 w-2 rounded-full" />
                       {item}
                     </div>
                   ))}
                 </div>
               </div>
-              
+
               <div className="relative overflow-hidden rounded-3xl border border-white/10 shadow-xl">
                 <Image
                   src="/jct-life/computer-lab2.webp"
                   alt="Research Laboratory"
                   width={600}
                   height={350}
-                  className="w-full object-cover h-[300px]"
+                  className="h-[300px] w-full object-cover"
                 />
               </div>
             </div>
 
             <div className="flex flex-col rounded-3xl border border-white/10 bg-white/5 p-8 lg:p-10">
-              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-gold/20 text-gold">
+              <div className="bg-gold/20 text-gold mb-6 flex h-14 w-14 items-center justify-center rounded-2xl">
                 <Microscope className="h-8 w-8" />
               </div>
               <h2 className="text-foreground mb-6 font-serif text-3xl font-bold">
@@ -143,15 +146,22 @@ export default function ResearchPage() {
                 patents. We provide a conducive environment and funding support
                 for innovative ideas.
               </p>
-              
+
               <div className="mt-auto space-y-4">
                 <div className="bg-surface rounded-2xl border border-white/10 p-6">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-muted-foreground text-sm font-medium uppercase tracking-widest">Active Research</span>
-                    <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-muted-foreground text-sm font-medium tracking-widest uppercase">
+                      Active Research
+                    </span>
+                    <div className="h-2 w-2 animate-pulse rounded-full bg-green-500" />
                   </div>
-                  <div className="text-3xl font-bold text-foreground">50+ Projects</div>
-                  <p className="text-muted-foreground text-sm mt-2 font-serif italic">"Fueling the next generation of technological breakthroughs."</p>
+                  <div className="text-foreground text-3xl font-bold">
+                    50+ Projects
+                  </div>
+                  <p className="text-muted-foreground mt-2 font-serif text-sm italic">
+                    "Fueling the next generation of technological
+                    breakthroughs."
+                  </p>
                 </div>
               </div>
             </div>
@@ -163,40 +173,46 @@ export default function ResearchPage() {
               <h2 className="text-foreground mb-4 font-serif text-3xl font-bold md:text-4xl">
                 Innovation & Industry Collaboration
               </h2>
-              <p className="mx-auto max-w-2xl text-muted-foreground leading-relaxed">
-                Empowering the startup spirit and bridging the gap between academia and real-world industrial challenges.
+              <p className="text-muted-foreground mx-auto max-w-2xl leading-relaxed">
+                Empowering the startup spirit and bridging the gap between
+                academia and real-world industrial challenges.
               </p>
             </div>
-            
+
             <div className="grid gap-8 md:grid-cols-3">
               {[
                 {
                   title: "Institution's Innovation Council (IIC)",
                   desc: "Recognized by the Ministry of Education, our IIC actively promotes an innovation and startup ecosystem through hackathons and mentorship.",
                   icon: Lightbulb,
-                  color: "bg-amber-500/20 text-amber-400"
+                  color: "bg-amber-500/20 text-amber-400",
                 },
                 {
                   title: "MoUs & Tie-ups",
                   desc: "Strategic partnerships with industry leaders like Gateway Software Solutions and international universities to facilitate technology transfer.",
                   icon: Handshake,
-                  color: "bg-blue-500/20 text-blue-400"
+                  color: "bg-blue-500/20 text-blue-400",
                 },
                 {
                   title: "Incubation Centre",
                   desc: "Supporting student entrepreneurs with seed funding, workspace, and expert guidance to turn prototypes into successful market-ready startups.",
                   icon: Rocket,
-                  color: "bg-purple-500/20 text-purple-400"
-                }
+                  color: "bg-purple-500/20 text-purple-400",
+                },
               ].map((item, i) => (
-                <div key={i} className="group rounded-3xl border border-white/10 bg-gradient-to-br from-[#0a1628] to-[#112240] p-8 transition-transform hover:-translate-y-1">
-                  <div className={`mb-6 flex h-14 w-14 items-center justify-center rounded-2xl ${item.color}`}>
+                <div
+                  key={i}
+                  className="group rounded-3xl border border-white/10 bg-gradient-to-br from-[#0a1628] to-[#112240] p-8 transition-transform hover:-translate-y-1"
+                >
+                  <div
+                    className={`mb-6 flex h-14 w-14 items-center justify-center rounded-2xl ${item.color}`}
+                  >
                     <item.icon className="h-7 w-7" />
                   </div>
                   <h3 className="mb-4 text-xl font-bold text-white/95">
                     {item.title}
                   </h3>
-                  <p className="text-white/70 text-sm leading-relaxed">
+                  <p className="text-sm leading-relaxed text-white/70">
                     {item.desc}
                   </p>
                 </div>
@@ -212,8 +228,8 @@ export default function ResearchPage() {
               </h2>
               <p className="text-muted-foreground mb-10 max-w-3xl text-lg leading-relaxed">
                 JCT Institutions maintains a comprehensive research policy
-                framework that ensures ethical standards, intellectual property protection, and equitable
-                recognition of contributions.
+                framework that ensures ethical standards, intellectual property
+                protection, and equitable recognition of contributions.
               </p>
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {[
@@ -235,19 +251,21 @@ export default function ResearchPage() {
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="bg-surface rounded-2xl border border-white/5 p-6 hover:border-gold/30 transition-colors"
+                    className="bg-surface hover:border-gold/30 rounded-2xl border border-white/5 p-6 transition-colors"
                   >
-                    <item.icon className="mb-4 h-8 w-8 text-gold" />
+                    <item.icon className="text-gold mb-4 h-8 w-8" />
                     <h3 className="text-foreground mb-2 font-bold">
                       {item.title}
                     </h3>
-                    <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
+                    <p className="text-muted-foreground text-sm leading-relaxed">
+                      {item.desc}
+                    </p>
                   </div>
                 ))}
               </div>
             </div>
             {/* Background Accent */}
-            <div className="absolute -bottom-24 -right-24 h-64 w-64 rounded-full bg-gold/5 blur-3xl" />
+            <div className="bg-gold/5 absolute -right-24 -bottom-24 h-64 w-64 rounded-full blur-3xl" />
           </section>
 
           {/* 6. Patents & Publications */}
@@ -268,13 +286,13 @@ export default function ResearchPage() {
                 ].map((patent, i) => (
                   <div
                     key={i}
-                    className="group bg-surface rounded-2xl border border-white/5 p-5 transition-all hover:border-gold/20"
+                    className="group bg-surface hover:border-gold/20 rounded-2xl border border-white/5 p-5 transition-all"
                   >
-                    <p className="text-foreground text-sm font-semibold mb-2 leading-relaxed">
+                    <p className="text-foreground mb-2 text-sm leading-relaxed font-semibold">
                       {patent}
                     </p>
-                    <div className="flex items-center gap-2 text-xs font-medium text-gold/80">
-                      <div className="h-1.5 w-1.5 rounded-full bg-gold" />
+                    <div className="text-gold/80 flex items-center gap-2 text-xs font-medium">
+                      <div className="bg-gold h-1.5 w-1.5 rounded-full" />
                       Status: Published
                     </div>
                   </div>
@@ -291,19 +309,34 @@ export default function ResearchPage() {
               </h2>
               <div className="space-y-4">
                 {[
-                  { title: "Recycling Techniques for Concrete Pavements", source: "IEEE Access" },
+                  {
+                    title: "Recycling Techniques for Concrete Pavements",
+                    source: "IEEE Access",
+                  },
                   { title: "AI & ML in Power Systems", source: "Springer" },
-                  { title: "Tandem Photoelectrochemical Cell Analysis", source: "Journal of Solar Energy" },
-                  { title: "Well Testing in Petroleum Reservoirs", source: "Elsevier" },
+                  {
+                    title: "Tandem Photoelectrochemical Cell Analysis",
+                    source: "Journal of Solar Energy",
+                  },
+                  {
+                    title: "Well Testing in Petroleum Reservoirs",
+                    source: "Elsevier",
+                  },
                 ].map((pub, i) => (
                   <div
                     key={i}
-                    className="bg-surface rounded-2xl border border-white/5 p-5 transition-all hover:border-gold/20"
+                    className="bg-surface hover:border-gold/20 rounded-2xl border border-white/5 p-5 transition-all"
                   >
-                    <p className="text-foreground text-sm font-semibold mb-2 leading-relaxed">{pub.title}</p>
-                    <div className="flex justify-between items-center text-xs">
-                      <span className="text-muted-foreground font-medium">{pub.source}</span>
-                      <span className="bg-white/5 px-2 py-1 rounded text-gold">2024</span>
+                    <p className="text-foreground mb-2 text-sm leading-relaxed font-semibold">
+                      {pub.title}
+                    </p>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className="text-muted-foreground font-medium">
+                        {pub.source}
+                      </span>
+                      <span className="text-gold rounded bg-white/5 px-2 py-1">
+                        2024
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -313,7 +346,7 @@ export default function ResearchPage() {
 
           {/* 7. Funded Projects */}
           <section>
-            <h2 className="text-foreground mb-10 font-serif text-3xl font-bold md:text-4xl text-center">
+            <h2 className="text-foreground mb-10 text-center font-serif text-3xl font-bold md:text-4xl">
               Funded Projects
             </h2>
             <div className="grid gap-6 md:grid-cols-2">
@@ -345,11 +378,11 @@ export default function ResearchPage() {
               ].map((project, i) => (
                 <div
                   key={i}
-                  className="group bg-surface rounded-2xl border border-white/10 p-8 transition-all hover:border-gold/30 shadow-lg shadow-black/20"
+                  className="group bg-surface hover:border-gold/30 rounded-2xl border border-white/10 p-8 shadow-lg shadow-black/20 transition-all"
                 >
                   <div className="mb-6 flex items-center justify-between">
                     <span
-                      className={`rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wider ${project.status === "Ongoing" ? "bg-green-500/10 text-green-400" : "bg-white/10 text-white/40"}`}
+                      className={`rounded-full px-4 py-1.5 text-xs font-bold tracking-wider uppercase ${project.status === "Ongoing" ? "bg-green-500/10 text-green-400" : "bg-white/10 text-white/40"}`}
                     >
                       {project.status}
                     </span>
@@ -357,11 +390,11 @@ export default function ResearchPage() {
                       {project.amount}
                     </span>
                   </div>
-                  <h3 className="text-foreground mb-3 text-xl font-bold leading-tight group-hover:text-gold transition-colors">
+                  <h3 className="text-foreground group-hover:text-gold mb-3 text-xl leading-tight font-bold transition-colors">
                     {project.title}
                   </h3>
-                  <div className="text-muted-foreground text-sm flex items-center gap-2">
-                    <div className="h-1 w-4 rounded-full bg-gold/30" />
+                  <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                    <div className="bg-gold/30 h-1 w-4 rounded-full" />
                     {project.agency}
                   </div>
                 </div>
@@ -394,14 +427,14 @@ export default function ResearchPage() {
                   key={i}
                   className="flex flex-col items-start gap-8 border-b border-white/5 pb-10 last:border-0 last:pb-0 md:flex-row"
                 >
-                  <div className="bg-gold text-black flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-2xl font-black italic">
+                  <div className="bg-gold flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-2xl font-black text-black italic">
                     {i + 1}
                   </div>
                   <div>
                     <h3 className="text-foreground mb-4 text-2xl font-bold">
                       {event.title}
                     </h3>
-                    <p className="text-muted-foreground text-lg leading-relaxed max-w-4xl">
+                    <p className="text-muted-foreground max-w-4xl text-lg leading-relaxed">
                       {event.desc}
                     </p>
                   </div>

@@ -10,20 +10,15 @@ export function HomePopup() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const hasSeenPopup = sessionStorage.getItem("jct-home-popup-seen");
+    const timer = setTimeout(() => {
+      setIsOpen(true);
+    }, 1000);
 
-    if (!hasSeenPopup) {
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-      }, 1000);
-
-      return () => clearTimeout(timer);
-    }
+    return () => clearTimeout(timer);
   }, []);
 
   const handleClose = () => {
     setIsOpen(false);
-    sessionStorage.setItem("jct-home-popup-seen", "true");
   };
 
   return (
@@ -50,10 +45,10 @@ export function HomePopup() {
             {/* Close Button */}
             <button
               onClick={handleClose}
-              className="absolute top-3 right-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-md transition-colors hover:bg-black/40 hover:text-white md:top-4 md:right-4 md:bg-white/90 md:text-black md:hover:bg-white"
+              className="absolute top-3 right-3 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-md transition-colors hover:bg-black/40 md:top-4 md:right-4 md:h-8 md:w-8 md:bg-white/90 md:text-black md:hover:bg-white md:hover:text-black"
               aria-label="Close popup"
             >
-              <X size={18} />
+              <X size={20} />
             </button>
 
             {/* Image / Graphic Side */}
