@@ -172,4 +172,3 @@ export const testimonials = [
     image: "/site_assests/WhatsApp-Image-2024-11-29-at-2.36.24-PM.jpeg",
   },
 ];
-
