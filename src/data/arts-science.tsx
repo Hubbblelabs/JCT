@@ -3,12 +3,7 @@ import {
   Atom,
   BarChart3,
   Briefcase,
-  BookOpen,
-  Feather,
   Lightbulb,
-  MessageSquare,
-  Palette,
-  Users,
 } from "lucide-react";
 
 export const heroStats = [
@@ -16,12 +11,6 @@ export const heroStats = [
   { value: "5", label: "Programs", accent: false },
   { value: "60+", label: "Faculty Members", accent: false },
   { value: "15+", label: "Years of Excellence", accent: true },
-];
-
-export const philosophyStats = [
-  { value: "6", label: "Departments" },
-  { value: "30:1", label: "Student-Faculty Ratio" },
-  { value: "UGC", label: "Recognized" },
 ];
 
 export const ugPrograms = [
@@ -139,66 +128,6 @@ export const ugPrograms = [
   },
 ];
 
-export const academicLife = [
-  {
-    icon: BookOpen,
-    title: "Departmental Seminars",
-    desc: "Each department hosts monthly seminars where students present papers, discuss ideas, and engage with faculty-led research topics.",
-  },
-  {
-    icon: Feather,
-    title: "Literary & Debate Society",
-    desc: "The college has an active literary club that organizes essay competitions, poetry readings, and inter-college debate tournaments.",
-  },
-  {
-    icon: Lightbulb,
-    title: "Undergraduate Research",
-    desc: "Final-year students in science programs undertake guided research projects. Several have been presented at state-level conferences.",
-  },
-  {
-    icon: MessageSquare,
-    title: "Guest Lecture Series",
-    desc: "Industry professionals, academics, and alumni visit regularly for talks that connect classroom theory to real-world practice.",
-  },
-  {
-    icon: Palette,
-    title: "Cultural Festivals",
-    desc: "An annual arts festival brings together drama, music, dance, and visual arts — organized and run entirely by students.",
-  },
-  {
-    icon: Users,
-    title: "Community Outreach",
-    desc: "NSS and extension activities connect students with local communities — from literacy drives to environmental cleanup campaigns.",
-  },
-];
-
-export const admissionsCriteria = [
-  {
-    title: "UG Eligibility",
-    items: [
-      "Passed 12th (HSC) from a recognized board",
-      "Relevant subject combination",
-      "Minimum aggregate per university norms",
-    ],
-  },
-  {
-    title: "PG Eligibility",
-    items: [
-      "Relevant bachelor's degree",
-      "Minimum percentage as prescribed",
-      "Interview for select programs",
-    ],
-  },
-  {
-    title: "How to Apply",
-    items: [
-      "Fill out the online application",
-      "Attend counseling with original documents",
-      "Confirm enrollment with fee payment",
-    ],
-  },
-];
-
 export const testimonials = [
   {
     quote:
@@ -244,44 +173,3 @@ export const testimonials = [
   },
 ];
 
-export const newsUpdates = [
-  {
-    date: "Thu 15 Feb 2024",
-    title:
-      "Annual Science Exhibition showcases student innovations capable of global impact.",
-    image: "/site_assests/banner6.jpeg",
-  },
-  {
-    date: "Mon 20 Mar 2024",
-    title:
-      "National Commerce Conference hosted on campus, drawing industry leaders.",
-    image: "/site_assests/banner3.jpg.jpeg",
-  },
-  {
-    date: "Wed 05 Apr 2024",
-    title:
-      "New AI and Machine Learning lab inaugurated to boost advanced research capabilities.",
-    image: "/site_assests/banner.jpg.jpeg",
-  },
-];
-
-export const campusEvents = [
-  {
-    title: "Industry leaders speak",
-    category: "Seminar",
-    location: "Main auditorium",
-    time: "10:00 AM",
-  },
-  {
-    title: "Coding bootcamp begins",
-    category: "Workshop",
-    location: "Tech lab",
-    time: "02:00 PM",
-  },
-  {
-    title: "Campus recruitment drive",
-    category: "Placement",
-    location: "Placement office",
-    time: "09:00 AM",
-  },
-];

@@ -1,14 +1,3 @@
-export type HomeHeroCardIcon = "engineering" | "arts" | "polytechnic";
-
-export type HomeHeroCard = {
-  title: string;
-  description: string;
-  href: string;
-  icon: HomeHeroCardIcon;
-  ctaLabel: string;
-  highlights: string;
-};
-
 export const homeHeroContent = {
   backgroundImages: [
     "/site_assests/banner2.jpeg",
@@ -61,5 +50,12 @@ export const homeHeroContent = {
       ctaLabel: "Explore",
       highlights: "Industry-Aligned Skills | 50+ Partner Companies",
     },
-  ] satisfies HomeHeroCard[],
+  ] satisfies {
+    title: string;
+    description: string;
+    href: string;
+    icon: "engineering" | "arts" | "polytechnic";
+    ctaLabel: string;
+    highlights: string;
+  }[],
 } as const;

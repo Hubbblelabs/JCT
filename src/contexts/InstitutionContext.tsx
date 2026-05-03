@@ -3,15 +3,11 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
-export type InstitutionType =
-  | "main"
-  | "engineering"
-  | "arts-science"
-  | "polytechnic";
-
 interface InstitutionContextType {
-  institution: InstitutionType;
-  setInstitution: (inst: InstitutionType) => void;
+  institution: "main" | "engineering" | "arts-science" | "polytechnic";
+  setInstitution: (
+    inst: "main" | "engineering" | "arts-science" | "polytechnic",
+  ) => void;
 }
 
 const InstitutionContext = createContext<InstitutionContextType | undefined>(
@@ -25,7 +21,9 @@ export function InstitutionProvider({
 }) {
   const pathname = usePathname() || "";
 
-  const getPathnameInstitution = (path: string): InstitutionType | null => {
+  const getPathnameInstitution = (
+    path: string,
+  ): "main" | "engineering" | "arts-science" | "polytechnic" | null => {
     if (path === "/") return "main";
     if (path.startsWith("/institutions/engineering")) return "engineering";
     if (path.startsWith("/institutions/arts-science")) return "arts-science";
@@ -35,9 +33,9 @@ export function InstitutionProvider({
 
   const initialPathInst = getPathnameInstitution(pathname);
 
-  const [institution, setInstitutionState] = useState<InstitutionType>(
-    initialPathInst || "main",
-  );
+  const [institution, setInstitutionState] = useState<
+    "main" | "engineering" | "arts-science" | "polytechnic"
+  >(initialPathInst || "main");
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -45,9 +43,12 @@ export function InstitutionProvider({
     setIsMounted(true);
 
     if (initialPathInst === null) {
-      const stored = sessionStorage.getItem(
-        "currentInstitution",
-      ) as InstitutionType | null;
+      const stored = sessionStorage.getItem("currentInstitution") as
+        | "main"
+        | "engineering"
+        | "arts-science"
+        | "polytechnic"
+        | null;
       if (
         stored &&
         ["main", "engineering", "arts-science", "polytechnic"].includes(stored)
@@ -59,7 +60,9 @@ export function InstitutionProvider({
     }
   }, [initialPathInst]);
 
-  const setInstitution = (inst: InstitutionType) => {
+  const setInstitution = (
+    inst: "main" | "engineering" | "arts-science" | "polytechnic",
+  ) => {
     setInstitutionState(inst);
     if (typeof window !== "undefined") {
       sessionStorage.setItem("currentInstitution", inst);

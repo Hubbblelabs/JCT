@@ -1,18 +1,5 @@
 import { Cpu, Cog, Zap, HardHat, FlaskConical, Leaf } from "lucide-react";
 
-export const heroStats = [
-  { value: "1,200+", label: "Students", accent: true },
-  { value: "6", label: "Programs", accent: false },
-  { value: "85%", label: "Placement Rate", accent: false },
-  { value: "3 Yrs", label: "Duration", accent: true },
-];
-
-export const connectStats = [
-  { value: "6", label: "Departments" },
-  { value: "25:1", label: "Student–Faculty Ratio" },
-  { value: "AICTE", label: "Approved" },
-];
-
 export const diplomaPrograms = [
   {
     name: "Diploma in Computer Technology",
@@ -134,81 +121,6 @@ export const diplomaPrograms = [
       "Supervise site operations and coordinate workforce and material resources effectively.",
     ],
   },
-];
-
-export const newsUpdates = [
-  {
-    date: "Tue 15 Aug 2023",
-    title:
-      "Independence Day Celebrations mark the 76th anniversary with cultural performances and flag hoisting across campus.",
-    image: "/site_assests/banner6.jpeg",
-  },
-  {
-    date: "Wed 18 Oct 2022",
-    title:
-      "Entrepreneur Talk organised by the Entrepreneurship Development Cell draws students and industry mentors.",
-    image: "/site_assests/MGL5086-1.webp",
-  },
-  {
-    date: "Mon 10 Oct 2022",
-    title:
-      "EEE Department signs landmark MOU with Shree Technology to provide industry training and live projects.",
-    image: "/site_assests/life-img-1.jpg.jpeg",
-  },
-  {
-    date: "Sat 08 Oct 2022",
-    title:
-      "Mechanical students gain real-world exposure during Industrial Visit to Veerakumar Industries.",
-    image: "/site_assests/mech-img.jpg.jpeg",
-  },
-  {
-    date: "Thu 15 Sep 2022",
-    title:
-      "Engineer's Day celebrated with technical quiz, paper presentations, and felicitation of top students.",
-    image: "/site_assests/banner3.jpg.jpeg",
-  },
-  {
-    date: "Mon 05 Sep 2022",
-    title:
-      "Onam celebrations bring together students and faculty in a showcase of cultural unity and tradition.",
-    image: "/site_assests/food-img-1.jpg.jpeg",
-  },
-];
-
-export const campusEvents = [
-  {
-    title: "Entrepreneur Talk by EDC",
-    category: "Development",
-    location: "Seminar Hall",
-    time: "10:00 AM",
-  },
-  {
-    title: "Campus Recruitment Drive",
-    category: "Placement",
-    location: "Placement Office",
-    time: "09:00 AM",
-  },
-  {
-    title: "Technical Workshop on PLC Programming",
-    category: "Workshop",
-    location: "EEE Lab",
-    time: "02:00 PM",
-  },
-];
-
-export const recruiters = [
-  { name: "TCS", logo: "/company_logo/TCS.NS_BIG.svg" },
-  { name: "Caterpillar", logo: "/company_logo/CAT_BIG.svg" },
-  { name: "Volvo", logo: "/company_logo/VOLV-A.ST.svg" },
-  { name: "Ford", logo: "/company_logo/F_BIG.svg" },
-  { name: "JSW Steel", logo: "/company_logo/JSWSTEEL.NS.svg" },
-  { name: "IBM", logo: "/company_logo/IBM.svg" },
-  { name: "Rolls-Royce", logo: "/company_logo/RR.L_BIG.svg" },
-  { name: "Dell", logo: "/company_logo/DELL_BIG.svg" },
-  { name: "Intel", logo: "/company_logo/INTC.svg" },
-  { name: "Nvidia", logo: "/company_logo/NVDA_BIG.svg" },
-  { name: "Sony", logo: "/company_logo/SONY_BIG.svg" },
-  { name: "AMD", logo: "/company_logo/AMD_BIG.svg" },
 ];
 
 export const testimonials = [
