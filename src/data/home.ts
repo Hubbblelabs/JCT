@@ -12,8 +12,8 @@ export const homeHeroContent = {
       primary: true,
     },
     {
-      label: "Enquire Admissions",
-      href: "#admissions",
+      label: "Take a Virtual Campus Tour",
+      href: "#campus-tour",
       primary: false,
     },
   ],

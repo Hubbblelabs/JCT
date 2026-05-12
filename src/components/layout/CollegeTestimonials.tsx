@@ -4,7 +4,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState, useRef } from "react";
 
-const TESTIMONIAL_CATEGORIES = ["Alumni", "Student", "VIP"] as const;
+const TESTIMONIAL_CATEGORIES = ["Alumni", "Student", "INDUSTRY"] as const;
 
 const CATEGORY_ROTATION_CONFIG: Record<
   TestimonialCategory,
@@ -12,7 +12,7 @@ const CATEGORY_ROTATION_CONFIG: Record<
 > = {
   Alumni: { intervalMs: 4200, initialDelayMs: 0 },
   Student: { intervalMs: 5000, initialDelayMs: 900 },
-  VIP: { intervalMs: 5800, initialDelayMs: 1800 },
+  INDUSTRY: { intervalMs: 5800, initialDelayMs: 1800 },
 };
 
 type TestimonialCategory = (typeof TESTIMONIAL_CATEGORIES)[number];
@@ -21,7 +21,7 @@ function normalizeCategory(tag?: string): TestimonialCategory {
   if (!tag) return "Alumni";
   const value = tag.toLowerCase();
   if (value === "student") return "Student";
-  if (value === "vip") return "VIP";
+  if (value === "INDUSTRY") return "INDUSTRY";
   return "Alumni";
 }
 
@@ -72,7 +72,7 @@ export function CollegeTestimonials({
     > = {
       Alumni: [],
       Student: [],
-      VIP: [],
+      INDUSTRY: [],
     };
 
     items.forEach((item) => {
@@ -96,12 +96,12 @@ export function CollegeTestimonials({
   >({
     Alumni: 0,
     Student: 0,
-    VIP: 0,
+    INDUSTRY: 0,
   });
   const [paused, setPaused] = useState<Record<TestimonialCategory, boolean>>({
     Alumni: false,
     Student: false,
-    VIP: false,
+    INDUSTRY: false,
   });
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -125,7 +125,7 @@ export function CollegeTestimonials({
     setActiveIndices((prev) => ({
       Alumni: prev.Alumni || getRandomIndex(groupedItems.Alumni.length),
       Student: prev.Student || getRandomIndex(groupedItems.Student.length),
-      VIP: prev.VIP || getRandomIndex(groupedItems.VIP.length),
+      INDUSTRY: prev.INDUSTRY || getRandomIndex(groupedItems.INDUSTRY.length),
     }));
 
     const timers = TESTIMONIAL_CATEGORIES.map((category) => {
@@ -292,11 +292,10 @@ export function CollegeTestimonials({
                               [category]: dotIndex,
                             }))
                           }
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            dotIndex === activeIndex
+                          className={`h-2 rounded-full transition-all duration-300 ${dotIndex === activeIndex
                               ? "w-6 bg-[#3b475c]"
                               : "w-2 bg-[#d1d5db] hover:bg-[#9ca3af]"
-                          }`}
+                            }`}
                           aria-label={`Go to slide ${dotIndex + 1}`}
                         />
                       ))}

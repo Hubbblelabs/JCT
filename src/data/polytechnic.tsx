@@ -129,42 +129,42 @@ export const testimonials = [
       "The practical workshop training at JCT Polytechnic gave me skills that my peers from other colleges simply didn't have. I landed my first job within two months of graduating.",
     name: "Murugan S.",
     role: "Maintenance Technician at L&T",
-    image: "/site_assests/19.jpeg",
+    image: "/assets/avatars/male_avatar.png",
   },
   {
     quote:
       "The faculty here cared about more than just classroom theory. By the time I finished my diploma, I had already completed a live project with a local electrical contractor.",
     name: "Kavitha R.",
     role: "Junior Engineer at TNEB",
-    image: "/site_assests/3.jpeg",
+    image: "/assets/avatars/female_avatar.png",
   },
   {
     quote:
       "I used my diploma as a stepping stone — I'm now in the final year of B.E. through lateral entry. JCT Polytechnic gave me the foundation I needed to compete with degree students.",
     name: "Aravind P.",
     role: "B.E. Mechanical (Lateral Entry)",
-    image: "/site_assests/8.jpg.jpeg",
+    image: "/assets/avatars/male_avatar.png",
   },
   {
     quote:
       "Our workshop sessions were highly practical. I handled real machine components and maintenance drills that directly matched shop-floor work.",
     name: "Ramesh K.",
     role: "Production Technician at Bosch",
-    image: "/site_assests/2.jpeg",
+    image: "/assets/avatars/male_avatar.png",
   },
   {
     quote:
       "I appreciated how instructors focused on discipline, safety, and documentation. Those habits helped me adapt quickly during my apprenticeship.",
     name: "Dhanalakshmi T.",
     role: "Apprentice Engineer at TVS",
-    image: "/site_assests/4564cb56ad6a43f1af8faa4f29ad9e51.jpg.jpeg",
+    image: "/assets/avatars/female_avatar.png",
   },
   {
     quote:
       "The college encouraged us to participate in technical events and mini-projects. That exposure gave me confidence to pursue lateral entry successfully.",
     name: "Sathish M.",
     role: "B.E. EEE (Lateral Entry)",
-    image: "/site_assests/WhatsApp-Image-2024-11-29-at-3.06.58-PM.jpeg",
+    image: "/assets/avatars/male_avatar.png",
   },
 ];
 

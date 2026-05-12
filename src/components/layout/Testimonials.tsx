@@ -9,7 +9,7 @@ const testimonials = [
     company: "Infosys",
     quote:
       "The practical exposure at JCT gave me real confidence. From hackathons to internships, every experience prepared me for my career at Infosys.",
-    avatar: "https://i.pravatar.cc/150?u=priya",
+    avatar: "/assets/avatars/female_avatar.png",
   },
   {
     name: "Arjun Raghavan",
@@ -17,7 +17,7 @@ const testimonials = [
     company: "Caterpillar",
     quote:
       "JCT's engineering labs and faculty mentorship helped me develop real-world problem-solving skills. I landed my dream role straight from campus.",
-    avatar: "https://i.pravatar.cc/150?u=arjun",
+    avatar: "/assets/avatars/male_avatar.png",
   },
   {
     name: "Sneha Patel",
@@ -25,7 +25,7 @@ const testimonials = [
     company: "TCS",
     quote:
       "The Arts & Science college provided a perfect blend of theory and practice. The coding bootcamps and placement training made all the difference.",
-    avatar: "https://i.pravatar.cc/150?u=sneha",
+    avatar: "/assets/avatars/female_avatar.png",
   },
   {
     name: "Karthik Sundaram",
@@ -33,7 +33,7 @@ const testimonials = [
     company: "TVS Motors",
     quote:
       "JCT Polytechnic's hands-on approach gave me skills employers value. I was offered a role before even completing my final semester.",
-    avatar: "https://i.pravatar.cc/150?u=karthik",
+    avatar: "/assets/avatars/male_avatar.png",
   },
   {
     name: "Anjali Devi",
@@ -41,7 +41,7 @@ const testimonials = [
     company: "Zoho Corp",
     quote:
       "The faculty at JCT go beyond textbooks. They helped me prepare for competitive exams, interviews, and real-world business scenarios.",
-    avatar: "https://i.pravatar.cc/150?u=anjali",
+    avatar: "/assets/avatars/female_avatar.png",
   },
   {
     name: "Muthu Selvan",
@@ -49,12 +49,12 @@ const testimonials = [
     company: "L&T",
     quote:
       "Hands-on lab sessions and workshop discipline gave me confidence from day one in my trainee role.",
-    avatar: "https://i.pravatar.cc/150?u=muthu",
+    avatar: "/assets/avatars/male_avatar.png",
   },
 ];
 
 export function Testimonials() {
-  const categories = ["Alumni", "Student", "VIP"] as const;
+  const categories = ["Alumni", "Student", "INDUSTRY"] as const;
 
   return (
     <CollegeTestimonials

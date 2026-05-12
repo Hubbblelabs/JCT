@@ -161,14 +161,14 @@ export default function EngineeringAlumniPage() {
                     "The foundation I received at JCT Engineering was instrumental in my career. The faculty's dedication and the state-of-the-art labs provided me with the practical knowledge needed to excel in the software industry. I am proud to be a JCTian.",
                   name: "Sudeesh B Kannath",
                   role: "Software Consultant, UK",
-                  image: "/site_assests/logo-1.webp", // Placeholder or real image
+                  image: "/assets/avatars/male_avatar.png",
                 },
                 {
                   quote:
                     "JCT provided me not just with an engineering degree, but with a platform to develop my overall personality. The placement training and the numerous symposiums helped build my confidence, which was key to cracking my core company interview.",
                   name: "R. Praveen",
                   role: "Mechanical Engineering (2013-2017)",
-                  image: "/site_assests/logo-2.webp", // Placeholder or real image
+                  image: "/assets/avatars/male_avatar.png",
                 },
               ].map((testimonial, idx) => (
                 <div
@@ -187,7 +187,7 @@ export default function EngineeringAlumniPage() {
                         src={testimonial.image}
                         alt={testimonial.name}
                         fill
-                        className="object-cover opacity-60"
+                        className="object-cover"
                       />
                     </div>
                     <div>

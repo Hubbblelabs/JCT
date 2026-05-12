@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 import { homeHeroContent } from "@/data/home";
 import { Accreditations } from "@/components/layout/Accreditations";
 
@@ -32,6 +32,7 @@ export function HomeHero() {
   const [isTouchScreen, setIsTouchScreen] = useState(false);
   const [currentBackgroundIndex, setCurrentBackgroundIndex] = useState(0);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const [isVideoOpen, setIsVideoOpen] = useState(false);
 
   useEffect(() => {
     const media = window.matchMedia("(hover: none), (pointer: coarse)");
@@ -114,6 +115,42 @@ export function HomeHero() {
         </AnimatePresence>
       </div>
 
+      <AnimatePresence>
+        {isVideoOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/90 p-4 backdrop-blur-sm md:p-10"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="relative aspect-video w-full max-w-6xl overflow-hidden rounded-2xl bg-black shadow-2xl"
+            >
+              <button
+                onClick={() => setIsVideoOpen(false)}
+                className="absolute top-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white backdrop-blur-md transition-colors hover:bg-white/20"
+              >
+                <X size={24} />
+              </button>
+              <iframe
+                src="https://www.youtube.com/embed/RBzA0cneWRA?autoplay=1"
+                title="JCT Campus Tour"
+                className="h-full w-full border-none"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            </motion.div>
+            <div
+              className="absolute inset-0 -z-10"
+              onClick={() => setIsVideoOpen(false)}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Radial Gradient Noise Overlay - Masks transition artifacts */}
       <div
         className="absolute inset-0 opacity-30 mix-blend-overlay"
@@ -157,22 +194,35 @@ export function HomeHero() {
             transition={{ duration: 0.55, delay: 0.18, ease: "easeOut" }}
             className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start"
           >
-            {homeHeroContent.ctas.map((cta) => (
-              <Link
-                key={cta.label}
-                href={cta.href.startsWith("#") ? "/admissions" : cta.href}
-                className={`inline-flex h-12 items-center justify-center gap-2 rounded-full px-7 text-sm font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 sm:text-base ${
-                  cta.primary
-                    ? "bg-gold text-navy hover:bg-gold-light shadow-black/20"
-                    : "border border-white/30 bg-transparent text-white backdrop-blur-sm hover:bg-white/10"
-                }`}
-              >
-                {cta.label}
-                {cta.primary && (
-                  <ArrowRight className="h-4 w-4" aria-hidden="true" />
-                )}
-              </Link>
-            ))}
+            {homeHeroContent.ctas.map((cta) => {
+              if (cta.label === "Take a Virtual Campus Tour") {
+                return (
+                  <button
+                    key={cta.label}
+                    onClick={() => setIsVideoOpen(true)}
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/30 bg-transparent px-7 text-sm font-bold text-white shadow-lg backdrop-blur-sm transition-transform hover:bg-white/10 hover:scale-105 active:scale-95 sm:text-base"
+                  >
+                    {cta.label}
+                  </button>
+                );
+              }
+              return (
+                <Link
+                  key={cta.label}
+                  href={cta.href.startsWith("#") ? "/admissions" : cta.href}
+                  className={`inline-flex h-12 items-center justify-center gap-2 rounded-full px-7 text-sm font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 sm:text-base ${
+                    cta.primary
+                      ? "bg-gold text-navy hover:bg-gold-light shadow-black/20"
+                      : "border border-white/30 bg-transparent text-white backdrop-blur-sm hover:bg-white/10"
+                  }`}
+                >
+                  {cta.label}
+                  {cta.primary && (
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  )}
+                </Link>
+              );
+            })}
           </motion.div>
         </div>
 

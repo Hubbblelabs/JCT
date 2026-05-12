@@ -201,7 +201,7 @@ export const testimonials = [
       "Our final-year project was reviewed by industry mentors, and that experience changed how I approached problem-solving in real engineering teams.",
     name: "Harish V.",
     role: "Software Engineer at Infosys",
-    image: "/site_assests/2.jpeg",
+    image: "/assets/avatars/male_avatar.png",
     tag: "Alumni",
   },
   {
@@ -209,7 +209,7 @@ export const testimonials = [
       "The placement training and mock interviews made a huge difference. I stepped into campus recruitment with confidence and secured my offer early.",
     name: "Keerthana M.",
     role: "Graduate Engineer Trainee at Caterpillar",
-    image: "/site_assests/3.jpeg",
+    image: "/assets/avatars/female_avatar.png",
     tag: "Student",
   },
   {
@@ -217,15 +217,15 @@ export const testimonials = [
       "JCT students stand out for practical clarity. They arrive ready for production environments, not just textbook discussions.",
     name: "R. Suresh",
     role: "Senior Manager, Industry Partner",
-    image: "/site_assests/8.jpg.jpeg",
-    tag: "VIP",
+    image: "/assets/avatars/male_avatar.png",
+    tag: "INDUSTRY",
   },
   {
     quote:
       "Faculty encouraged us to build beyond syllabus requirements. That project depth helped me during technical interviews and onboarding.",
     name: "Vikram N.",
     role: "Design Engineer at L&T",
-    image: "/site_assests/19.jpeg",
+    image: "/assets/avatars/male_avatar.png",
     tag: "Alumni",
   },
   {
@@ -233,7 +233,7 @@ export const testimonials = [
       "The coding and aptitude sessions were consistent and practical. I improved every month and was ready by placement season.",
     name: "Janani P.",
     role: "Final Year ECE Student",
-    image: "/site_assests/4564cb56ad6a43f1af8faa4f29ad9e51.jpg.jpeg",
+    image: "/assets/avatars/female_avatar.png",
     tag: "Student",
   },
   {
@@ -241,7 +241,7 @@ export const testimonials = [
       "The graduates we recruit from JCT show strong fundamentals and discipline in execution, especially in quality and documentation workflows.",
     name: "Mohan Raj",
     role: "Plant Operations Lead, Caterpillar",
-    image: "/site_assests/WhatsApp-Image-2024-11-29-at-2.36.24-PM.jpeg",
-    tag: "VIP",
+    image: "/assets/avatars/male_avatar.png",
+    tag: "INDUSTRY",
   },
 ];

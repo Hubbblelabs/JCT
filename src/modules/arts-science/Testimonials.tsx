@@ -4,7 +4,7 @@ import { CollegeTestimonials } from "@/components/layout/CollegeTestimonials";
 import { testimonials } from "@/data/arts-science";
 
 export function Testimonials() {
-  const categories = ["Alumni", "Student", "VIP"] as const;
+  const categories = ["Alumni", "Student", "INDUSTRY"] as const;
 
   return (
     <div id="testimonials">
