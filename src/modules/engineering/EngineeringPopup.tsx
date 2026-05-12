@@ -54,60 +54,69 @@ export function EngineeringPopup() {
 
             {/* Image / Graphic Side */}
             <div className="bg-navy relative h-[200px] w-full overflow-hidden md:h-auto md:w-1/2">
-              <div className="absolute inset-0 z-0 opacity-40 mix-blend-overlay">
+              <div className="absolute inset-0 z-0 opacity-40">
                 <Image
-                  src="/site_assests/engineering.jpeg"
+                  src="/assets/engineering-landing4.png"
                   alt="Campus"
                   fill
                   className="object-cover"
                 />
               </div>
               <div className="relative z-10 flex h-full flex-col justify-end p-8 text-white">
-                <div className="mb-4 inline-flex items-center gap-2 self-start rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur-md">
-                  <Award size={14} className="text-[#FFC917]" />
-                  <span>NAAC & NBA Accredited</span>
+                <div className="mb-4 flex flex-wrap items-center gap-2 self-start">
+                  <div className="inline-flex items-center gap-1.5 rounded-full bg-[#FFC917] px-2.5 py-1 text-[10px] font-black tracking-wider text-black uppercase shadow-sm">
+                    Autonomous
+                  </div>
+                  <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur-md">
+                    <Award size={14} className="text-[#FFC917]" />
+                    <span>NAAC & NBA Accredited</span>
+                  </div>
                 </div>
                 <h3 className="font-serif text-3xl leading-tight font-bold md:text-4xl">
                   Transforming <span className="text-[#FFC917]">Futures</span>
                 </h3>
                 <p className="mt-2 text-sm text-white/80 md:text-base">
-                  16+ Years of Academic Excellence & 96% Placement Success Rate.
+                  16+ Years of Academic Excellence & 92% Placement Success Rate.
                 </p>
               </div>
             </div>
 
             {/* Content Side */}
             <div className="flex w-full flex-col justify-center p-8 md:w-1/2 md:p-12">
-              <div className="mb-6 inline-flex items-center gap-2 font-sans text-sm font-bold tracking-widest text-[#FFc917] uppercase">
+              {/* <div className="mb-6 inline-flex items-center gap-2 font-sans text-sm font-bold tracking-widest text-[#FFc917] uppercase">
                 <Megaphone size={16} />
                 <span>Admissions 2026-27</span>
-              </div>
+              </div> */}
 
+              <div className="mb-1 inline-block text-[20px] font-black tracking-widest text-[#d4a024] uppercase">
+                Autonomous Institution
+              </div>
               <h2 className="text-navy mb-4 font-serif text-3xl font-bold md:text-4xl">
                 Admissions Open
               </h2>
 
-              <p className="mb-4 text-stone-600">
+               <p className="mb-4 text-stone-600">
                 Start your engineering journey with JCT. Applications are now
                 open for B.E. / B.Tech programs.
               </p>
 
-              <div className="mb-8 flex flex-col gap-2 rounded-xl border border-stone-100 bg-stone-50 p-4">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-stone-700">
+              <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
+                  <span className="text-lg font-semibold text-stone-600">
                     Counselling Code:
                   </span>
-                  <span className="text-lg font-bold text-[#d4a024]">
+                  <span className="text-3xl font-black tracking-tight text-[#d4a024] md:text-4xl">
                     {siteConfig.counsellingCode}
                   </span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-stone-700">Contact:</span>
+                <div className="h-px w-full bg-stone-200" />
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
+                  <span className="text-lg font-semibold text-stone-600">Contact:</span>
                   <a
-                    href={`tel:${siteConfig.contact.phone.replace(/\\s/g, "")}`}
-                    className="flex items-center gap-1 font-bold text-[#0a1628] transition-colors hover:text-[#d4a024]"
+                    href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
+                    className="flex items-center gap-2 text-xl font-bold text-[#0a1628] transition-colors hover:text-[#d4a024]"
                   >
-                    <Phone size={14} />
+                    <Phone size={20} className="text-[#d4a024]" />
                     {siteConfig.contact.phone}
                   </a>
                 </div>
@@ -115,7 +124,7 @@ export function EngineeringPopup() {
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="https://admissions.jct.ac.in"
+                  href="https://admissions.jct.ac.in/"
                   onClick={handleClose}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FFC917] px-6 py-3 font-sans text-sm font-bold text-black transition-transform hover:scale-105"
                 >
