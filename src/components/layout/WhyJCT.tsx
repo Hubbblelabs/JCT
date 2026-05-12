@@ -53,7 +53,7 @@ const features = [
 const counters = [
   { value: 16, suffix: "+", label: "Years of Excellence" },
   { value: 10000, suffix: "+", label: "Alumni Worldwide" },
-  { value: 92, suffix: "%", label: "Students Placed" },
+  { value: 98, suffix: "%", label: "Students Placed" },
   { value: 100, suffix: "+", label: "Industry Awards" },
 ];
 
