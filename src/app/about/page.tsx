@@ -112,7 +112,7 @@ export default function AboutPage() {
             </h2>
             <ul className="text-muted-foreground mt-6 list-inside list-disc space-y-4">
               <li>12,000+ Alumni across the globe.</li>
-              <li>Consistently achieving 96% placement records.</li>
+              <li>Consistently achieving 98% placement records.</li>
               <li>NBA & NAAC Accreditations.</li>
               <li>50+ Programs offered.</li>
             </ul>

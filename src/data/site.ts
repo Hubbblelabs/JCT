@@ -44,9 +44,9 @@ export const siteConfig = {
     recruiters: 200,
     alumni: 12000,
     programs: 50,
-    placementRate: 96,
-    highestPackage: "12 LPA",
-    averagePackage: "4.5 LPA",
+    placementRate: 98,
+    highestPackage: "70 LPA",
+    averagePackage: "9 LPA",
   },
 
   accreditations: [

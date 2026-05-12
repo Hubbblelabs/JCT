@@ -33,7 +33,7 @@ const features = [
   {
     icon: Briefcase,
     title: "Strong Placement Record",
-    desc: "96% placement support with 500+ recruiting partners, including TCS, Infosys, Wipro, and more.",
+    desc: "98% placement support with 500+ recruiting partners, including TCS, Infosys, Wipro, and more.",
     gradient: "from-amber-50 to-yellow-50",
   },
   {

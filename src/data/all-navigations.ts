@@ -35,9 +35,9 @@ export const mainNavigation: NavItem[] = [
       },
     ],
   },
-  { name: "Admissions", href: "/admissions" },
-  { name: "Placements", href: "/placements" },
-  { name: "Life @ JCT", href: "/campus-life" },
+  { name: "Admissions", href: "/#admissions" },
+  { name: "Placements", href: "/#placements" },
+  { name: "Life @ JCT", href: "/#campus-life" },
  
 ];
 

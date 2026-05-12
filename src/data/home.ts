@@ -21,7 +21,7 @@ export const homeHeroContent = {
     { icon: "laurel", label: "NAAC Accredited" },
     { icon: "users", label: "100+ Recruiters" },
     { icon: "cap", label: "10,000+ Students" },
-    { icon: "growth", label: "95% Placement Rate" },
+    { icon: "badge", label: "98% Placement Rate" },
   ],
   cards: [
     {

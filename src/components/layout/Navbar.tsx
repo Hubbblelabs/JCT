@@ -212,25 +212,16 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               href={logoLink}
               className="flex shrink-0 items-center gap-2 lg:gap-3"
             >
-              <div className="relative h-7 w-7 lg:h-10 lg:w-10">
+              <div className="relative h-12 w-48 lg:h-14 lg:w-72">
                 <Image
-                  src="/jct_logo_yellow.png"
+                  src="/logo/JCT-Institutions-whitebg.png"
                   alt="JCT Logo"
                   fill
-                  sizes="(min-width: 1024px) 40px, 28px"
-                  className="object-contain"
+                  sizes="(min-width: 1204px) 240px, 28px"
+                  className=""
                 />
               </div>
-              <div className="flex flex-col justify-center">
-                <span className="font-sans text-lg leading-none font-bold tracking-tight whitespace-nowrap text-white drop-shadow-sm transition-colors lg:text-xl xl:text-[20px]">
-                  {logoText}
-                </span>
-                {logoSubText && (
-                  <span className="mt-1 font-sans text-[9px] leading-none font-medium tracking-[0.14em] text-white/60 uppercase lg:text-[10px]">
-                    {logoSubText}
-                  </span>
-                )}
-              </div>
+              
             </Link>
           </div>
 

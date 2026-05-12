@@ -164,8 +164,8 @@ export const researchCourses = [
 ];
 
 export const metrics = [
-  { value: "92%", label: "Placement Rate", sub: "2023-24 Batch" },
-  { value: "₹8.4L", label: "Highest Package", sub: "On-campus" },
+  { value: "98%", label: "Placement Rate", sub: "2023-24 Batch" },
+  { value: "₹70L", label: "Highest Package", sub: "On-campus" },
   { value: "45+", label: "Recruiters", sub: "Annual visits" },
   { value: "500+", label: "Offers Made", sub: "Last 3 years" },
   { value: "100%", label: "Lab Access", sub: "Industry-grade" },

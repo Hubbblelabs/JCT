@@ -70,7 +70,7 @@ export function HomePopup() {
                   Transforming <span className="text-[#FFC917]">Futures</span>
                 </h3>
                 <p className="mt-2 text-sm text-white/80 md:text-base">
-                  16+ Years of Academic Excellence & 96% Placement Success Rate.
+                  16+ Years of Academic Excellence & 98% Placement Success Rate.
                 </p>
               </div>
             </div>

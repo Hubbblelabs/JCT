@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   title:
     "JCT Institutions — Engineering, Arts & Science, Polytechnic | Coimbatore",
   description:
-    "JCT Institutions is a premier group of three colleges in Coimbatore, Tamil Nadu — offering Engineering, Arts & Science, and Polytechnic programs. NAAC & NBA Accredited. 96% Placement Rate. 12,000+ Alumni.",
+    "JCT Institutions is a premier group of three colleges in Coimbatore, Tamil Nadu — offering Engineering, Arts & Science, and Polytechnic programs. NAAC & NBA Accredited. 98% Placement Rate. 12,000+ Alumni.",
   keywords: [
     "JCT Institutions",
     "JCT College Coimbatore",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "JCT Institutions — Three Colleges, One Commitment to Excellence",
     description:
-      "Premier Engineering, Arts & Science, and Polytechnic colleges in Coimbatore. Established 2009. 96% Placement Rate.",
+      "Premier Engineering, Arts & Science, and Polytechnic colleges in Coimbatore. Established 2009. 98% Placement Rate.",
     url: siteConfig.url,
     siteName: "JCT Institutions",
     locale: "en_IN",

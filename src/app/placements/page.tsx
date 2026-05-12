@@ -65,10 +65,10 @@ export default function PlacementsPage() {
             </h2>
             <div className="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {[
-                { label: "Placement Rate", value: "96%" },
+                { label: "Placement Rate", value: "98%" },
                 { label: "Top Recruiters", value: "250+" },
                 { label: "Total Offers", value: "1500+" },
-                { label: "Highest Package", value: "12 LPA" },
+                { label: "Highest Package", value: "70 LPA" },
               ].map((stat) => (
                 <div
                   key={stat.label}
@@ -123,12 +123,12 @@ export default function PlacementsPage() {
             <div className="mt-6 grid gap-8 md:grid-cols-2">
               {[
                 {
-                  package: "12 LPA",
+                  package: "70 LPA",
                   company: "Leading Product MNC",
                   role: "Software Development Engineer",
                 },
                 {
-                  package: "10 LPA",
+                  package: "44 LPA",
                   company: "Global Tech Giant",
                   role: "Data Scientist",
                 },

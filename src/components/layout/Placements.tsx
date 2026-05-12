@@ -38,9 +38,9 @@ const companies = [
 ];
 
 const placementStats = [
-  { icon: TrendingUp, value: "96%", label: "Placement Rate" },
-  { icon: Award, value: "₹8.5 LPA", label: "Average Package" },
-  { icon: Award, value: "₹24 LPA", label: "Highest Package" },
+  { icon: TrendingUp, value: "98%", label: "Placement Rate" },
+  { icon: Award, value: "₹9 LPA", label: "Average Package" },
+  { icon: Award, value: "₹70 LPA", label: "Highest Package" },
   { icon: Building, value: "500+", label: "Recruiting Partners" },
 ];
 
