@@ -23,13 +23,13 @@ export async function generateMetadata({
   }
 
   return {
-    title: `${dept.name} | JCT College of Arts & Science`,
+    title: `${dept.name} | JCT College of Arts and Science`,
     description: dept.about.paragraphs[0],
     alternates: {
       canonical: `${siteConfig.url}/institutions/arts-science/departments/${dept.slug}`,
     },
     openGraph: {
-      title: `${dept.name} | JCT College of Arts & Science`,
+      title: `${dept.name} | JCT College of Arts and Science`,
       description: dept.about.paragraphs[0],
       type: "website",
     },

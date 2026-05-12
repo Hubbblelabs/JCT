@@ -77,14 +77,14 @@ export function EngineeringHero() {
               className="mt-10 flex w-full flex-col items-center justify-center gap-4 sm:w-auto sm:flex-row"
             >
               <Link
-                href="/admissions/apply"
+                href="/apply-now"
                 className="inline-flex h-14 items-center justify-center rounded-xl px-8 text-sm font-bold tracking-wide transition-all hover:brightness-110 active:scale-[0.98]"
                 style={{ backgroundColor: "#d4a024", color: "#081323" }} // Adjusted to current theme but modeled after reference
               >
                 APPLY NOW
               </Link>
               <Link
-                href="#engineering-domains"
+                href="#programs"
                 className="inline-flex h-14 items-center justify-center rounded-xl border border-white/20 bg-transparent px-8 text-sm font-bold tracking-wide text-white transition-all hover:bg-white/5 active:scale-[0.98]"
               >
                 EXPLORE PROGRAMS

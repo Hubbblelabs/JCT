@@ -4,14 +4,6 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState, useRef } from "react";
 
-export type CollegeTestimonialItem = {
-  quote: string;
-  name: string;
-  role: string;
-  image: string;
-  tag?: string;
-};
-
 const TESTIMONIAL_CATEGORIES = ["Alumni", "Student", "VIP"] as const;
 
 const CATEGORY_ROTATION_CONFIG: Record<
@@ -47,7 +39,13 @@ function getRandomIndex(length: number, excludeIndex?: number) {
 type CollegeTestimonialsProps = {
   title: string;
   subtitle?: string;
-  items: CollegeTestimonialItem[];
+  items: {
+    quote: string;
+    name: string;
+    role: string;
+    image: string;
+    tag?: string;
+  }[];
   accentColor: string;
   sectionBgClassName?: string;
   sectionId?: string;
@@ -62,7 +60,16 @@ export function CollegeTestimonials({
   sectionId,
 }: CollegeTestimonialsProps) {
   const groupedItems = useMemo(() => {
-    const groups: Record<TestimonialCategory, CollegeTestimonialItem[]> = {
+    const groups: Record<
+      TestimonialCategory,
+      {
+        quote: string;
+        name: string;
+        role: string;
+        image: string;
+        tag?: string;
+      }[]
+    > = {
       Alumni: [],
       Student: [],
       VIP: [],
@@ -114,6 +121,7 @@ export function CollegeTestimonials({
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveIndices((prev) => ({
       Alumni: prev.Alumni || getRandomIndex(groupedItems.Alumni.length),
       Student: prev.Student || getRandomIndex(groupedItems.Student.length),

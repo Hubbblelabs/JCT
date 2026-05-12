@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { PolytechnicNavbar } from "@/modules/polytechnic/PolytechnicNavbar";
+import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/modules/polytechnic/Hero";
 import { AboutPolytechnic } from "@/modules/polytechnic/AboutPolytechnic";
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
 export default function PolytechnicPage() {
   return (
     <main className="polytechnic-theme min-h-screen overflow-x-hidden bg-[#F8F9FA] font-sans">
-      <PolytechnicNavbar />
+      <Navbar />
       <Hero />
       <DiplomaPrograms />
       <AboutPolytechnic />

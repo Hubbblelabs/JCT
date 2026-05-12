@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ArtsScienceNavbar } from "@/modules/arts-science/ArtsScienceNavbar";
+import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ import { Placements } from "@/components/layout/Placements";
 export default function ArtsSciencePage() {
   return (
     <main className="bg-background text-foreground arts-science-theme min-h-screen overflow-x-hidden">
-      <ArtsScienceNavbar />
+      <Navbar />
       <Hero />
       <UgPrograms />
       <AboutArtsScience />

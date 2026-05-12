@@ -23,7 +23,7 @@ const pathways = [
     icon: CalendarCheck,
     title: "After 12th Standard",
     desc: "Choose B.E./B.Tech at Engineering or B.Sc/B.Com/BBA at Arts & Science — depending on your stream.",
-    link: "/admissions/apply",
+    link: "/apply-now",
     linkText: "Apply now",
     gradient: "from-blue-50 to-indigo-50",
     iconColor: "text-navy",

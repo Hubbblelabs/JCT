@@ -4,9 +4,18 @@ import Link from "next/link";
 import { GraduationCap } from "lucide-react";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useInstitution } from "@/contexts/InstitutionContext";
 
 export function StickyApplyButton() {
   const [isVisible, setIsVisible] = useState(false);
+  const { institution } = useInstitution();
+
+  let themeClasses = "bg-gold text-navy hover:bg-[#e8b84a]";
+  if (institution === "arts-science") {
+    themeClasses = "bg-orange-500 text-white hover:bg-orange-600";
+  } else if (institution === "polytechnic") {
+    themeClasses = "bg-slate-500 text-white hover:bg-slate-600";
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,8 +45,8 @@ export function StickyApplyButton() {
           className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 md:right-24 md:bottom-6 md:left-auto md:translate-x-0"
         >
           <Link
-            href="/admissions/apply"
-            className="bg-gold text-navy hover:bg-gold-light flex h-12 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold shadow-xl transition-all hover:scale-105 active:scale-95"
+            href="/apply-now"
+            className={`${themeClasses} flex h-12 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold shadow-xl transition-all hover:scale-105 active:scale-95`}
             aria-label="Apply for Admission"
           >
             <GraduationCap className="h-[18px] w-[18px] shrink-0" />
