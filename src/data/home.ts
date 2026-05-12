@@ -25,7 +25,7 @@ export const homeHeroContent = {
   ],
   cards: [
     {
-      title: "Engineering & Technology",
+      title: "Engineering & Technology (Autonomous)",
       description:
         "Cutting-edge curriculum and facilities for future engineers.",
       href: "/institutions/engineering",

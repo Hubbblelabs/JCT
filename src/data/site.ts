@@ -38,7 +38,7 @@ export const siteConfig = {
   },
 
   stats: {
-    yearsOfExcellence: 15,
+    yearsOfExcellence: 16,
     students: 5000,
     faculty: 300,
     recruiters: 200,

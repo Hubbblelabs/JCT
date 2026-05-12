@@ -45,7 +45,11 @@ export function StickyApplyButton() {
           className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 md:right-24 md:bottom-6 md:left-auto md:translate-x-0"
         >
           <Link
+<<<<<<< Updated upstream
             href="https://admissions.jct.ac.in/"
+=======
+            href="https://admissions.jct.ac.in"
+>>>>>>> Stashed changes
             className={`${themeClasses} flex h-12 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold shadow-xl transition-all hover:scale-105 active:scale-95`}
             aria-label="Apply for Admission"
           >

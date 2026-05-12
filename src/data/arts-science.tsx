@@ -10,7 +10,7 @@ export const heroStats = [
   { value: "2,500+", label: "Students", accent: true },
   { value: "5", label: "Programs", accent: false },
   { value: "60+", label: "Faculty Members", accent: false },
-  { value: "15+", label: "Years of Excellence", accent: true },
+  { value: "16+", label: "Years of Excellence", accent: true },
 ];
 
 export const ugPrograms = [
