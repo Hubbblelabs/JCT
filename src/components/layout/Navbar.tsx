@@ -184,11 +184,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             </span>
 
             <Link
-<<<<<<< Updated upstream
-              href="https://admissions.jct.ac.in/"
-=======
               href="https://admissions.jct.ac.in"
->>>>>>> Stashed changes
               className="hidden shrink-0 underline underline-offset-2 hover:no-underline sm:inline"
             >
               Apply Now
@@ -399,14 +395,9 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             </a>
             {institution === "main" && (
               <Link
-<<<<<<< Updated upstream
-                href="https://admissions.jct.ac.in/"
-                className={`inline-flex h-9 items-center justify-center rounded-full px-4 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10 xl:px-5 xl:text-[14px] 2xl:text-[15px] ${isSolid
-=======
                 href="https://admissions.jct.ac.in"
                 className={`inline-flex h-9 items-center justify-center rounded-full px-4 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10 xl:px-5 xl:text-[14px] 2xl:text-[15px] ${
                   isSolid
->>>>>>> Stashed changes
                     ? `${highlightBgColor} font-semibold text-[#0a1628] shadow-lg shadow-black/20 ${highlightHoverBgColor}`
                     : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
                   }`}
@@ -570,11 +561,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                 </a>
                 {institution === "main" && (
                   <Link
-<<<<<<< Updated upstream
-                    href="https://admissions.jct.ac.in/"
-=======
                     href="https://admissions.jct.ac.in"
->>>>>>> Stashed changes
                     onClick={() => setIsOpen(false)}
                     className={`flex h-12 w-full items-center justify-center gap-2 rounded-2xl ${highlightBgColor} font-sans text-sm font-bold text-[#0a1628] shadow-lg ${highlightShadowColor} transition-all hover:scale-[1.02] ${highlightHoverBgColor} active:scale-[0.98]`}
                   >

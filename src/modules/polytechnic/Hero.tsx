@@ -101,11 +101,7 @@ export function Hero() {
             {...fadeUp(0.3)}
             className="flex flex-col gap-4 sm:flex-row"
           >
-<<<<<<< Updated upstream
-            <Link href="https://admissions.jct.ac.in/">
-=======
             <Link href="https://admissions.jct.ac.in">
->>>>>>> Stashed changes
               <Button
                 size="lg"
                 className="bg-polytechnic-light hover:text-polytechnic-dark h-14 rounded-full px-8 text-sm font-bold text-white shadow-xl transition-all hover:scale-105 hover:bg-white active:scale-95 sm:w-auto"

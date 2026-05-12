@@ -24,11 +24,7 @@ export function Admissions() {
             description="Simple and transparent admissions aligned with current DOTE and Tamil Nadu polytechnic guidelines."
             className="mb-0"
           />
-<<<<<<< Updated upstream
-          <PolyButtonLink href="https://admissions.jct.ac.in/" className="shrink-0">
-=======
           <PolyButtonLink href="https://admissions.jct.ac.in" className="shrink-0">
->>>>>>> Stashed changes
             Apply Now
             <ArrowRight className="ml-2 h-4 w-4" />
           </PolyButtonLink>
