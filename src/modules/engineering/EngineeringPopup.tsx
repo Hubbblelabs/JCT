@@ -96,7 +96,7 @@ export function EngineeringPopup() {
                 Admissions Open
               </h2>
 
-               <p className="mb-4 text-stone-600">
+              <p className="mb-4 text-stone-600">
                 Start your engineering journey with JCT. Applications are now
                 open for B.E. / B.Tech programs.
               </p>
@@ -112,7 +112,9 @@ export function EngineeringPopup() {
                 </div>
                 <div className="h-px w-full bg-stone-200" />
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-                  <span className="text-lg font-semibold text-stone-600">Contact:</span>
+                  <span className="text-lg font-semibold text-stone-600">
+                    Contact:
+                  </span>
                   <a
                     href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
                     className="flex items-center gap-2 text-xl font-bold text-[#0a1628] transition-colors hover:text-[#d4a024]"

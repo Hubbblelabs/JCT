@@ -47,7 +47,7 @@ export function Phamplets() {
             {/* Close Button */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 z-[60] flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white shadow-lg backdrop-blur-md transition-all hover:bg-black/80 hover:rotate-90 md:h-12 md:w-12"
+              className="absolute top-4 right-4 z-[60] flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white shadow-lg backdrop-blur-md transition-all hover:rotate-90 hover:bg-black/80 md:h-12 md:w-12"
               aria-label="Close popup"
             >
               <X size={24} />
@@ -86,9 +86,13 @@ export function Phamplets() {
                 <Link
                   href="/apply-now"
                   onClick={handleClose}
-                  className="group flex items-center gap-3 rounded-full bg-gold px-10 py-4 text-base font-bold text-black shadow-[0_20px_40px_-10px_rgba(212,160,36,0.6)] transition-all hover:scale-105 hover:bg-white active:scale-95 sm:px-12 sm:text-lg"
+                  className="group bg-gold flex items-center gap-3 rounded-full px-10 py-4 text-base font-bold text-black shadow-[0_20px_40px_-10px_rgba(212,160,36,0.6)] transition-all hover:scale-105 hover:bg-white active:scale-95 sm:px-12 sm:text-lg"
                 >
-                  Apply Now <ArrowRight size={22} className="transition-transform group-hover:translate-x-1" />
+                  Apply Now{" "}
+                  <ArrowRight
+                    size={22}
+                    className="transition-transform group-hover:translate-x-1"
+                  />
                 </Link>
               </div>
             </div>

@@ -292,10 +292,11 @@ export function CollegeTestimonials({
                               [category]: dotIndex,
                             }))
                           }
-                          className={`h-2 rounded-full transition-all duration-300 ${dotIndex === activeIndex
+                          className={`h-2 rounded-full transition-all duration-300 ${
+                            dotIndex === activeIndex
                               ? "w-6 bg-[#3b475c]"
                               : "w-2 bg-[#d1d5db] hover:bg-[#9ca3af]"
-                            }`}
+                          }`}
                           aria-label={`Go to slide ${dotIndex + 1}`}
                         />
                       ))}

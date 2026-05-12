@@ -126,12 +126,15 @@ export function AdmissionsCTA() {
             >
               Apply Online <ArrowRight size={16} />
             </Link>
-            <Link
-              href="#"
+            <a
+              href="/documents/jct.pdf"
+              download
+              target="_blank"
+              rel="noopener noreferrer"
               className="border-border text-navy hover:bg-muted inline-flex h-14 items-center justify-center rounded-full border-2 px-8 font-sans text-base font-semibold transition-all"
             >
               Download Prospectus
-            </Link>
+            </a>
           </motion.div>
         </div>
       </div>

@@ -128,10 +128,11 @@ export function Hero() {
           <button
             key={idx}
             onClick={() => setCurrentIdx(idx)}
-            className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentIdx
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              idx === currentIdx
                 ? "w-8 bg-white"
                 : "w-2 bg-white/40 hover:bg-white/60"
-              }`}
+            }`}
             aria-label={`Go to slide ${idx + 1}`}
           />
         ))}

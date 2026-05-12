@@ -75,19 +75,24 @@ export function ArtsSciencePopup() {
               </h2>
 
               <p className="mb-4 text-stone-600">
-                Explore a world of opportunities in Arts, Science, and Commerce. Our industry-aligned programs prepare you for global success.
+                Explore a world of opportunities in Arts, Science, and Commerce.
+                Our industry-aligned programs prepare you for global success.
               </p>
 
               <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-                  <span className="text-lg font-semibold text-stone-600">Explore Programs:</span>
+                  <span className="text-lg font-semibold text-stone-600">
+                    Explore Programs:
+                  </span>
                   <span className="text-xl font-bold text-[#d4a024]">
                     CS, AI, Commerce & more
                   </span>
                 </div>
                 <div className="h-px w-full bg-stone-200" />
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-                  <span className="text-lg font-semibold text-stone-600">Contact:</span>
+                  <span className="text-lg font-semibold text-stone-600">
+                    Contact:
+                  </span>
                   <a
                     href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
                     className="flex items-center gap-2 text-xl font-bold text-[#0a1628] transition-colors hover:text-[#d4a024]"

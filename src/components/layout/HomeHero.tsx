@@ -200,7 +200,7 @@ export function HomeHero() {
                   <button
                     key={cta.label}
                     onClick={() => setIsVideoOpen(true)}
-                    className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/30 bg-transparent px-7 text-sm font-bold text-white shadow-lg backdrop-blur-sm transition-transform hover:bg-white/10 hover:scale-105 active:scale-95 sm:text-base"
+                    className="inline-flex h-12 items-center justify-center gap-2 rounded-full border border-white/30 bg-transparent px-7 text-sm font-bold text-white shadow-lg backdrop-blur-sm transition-transform hover:scale-105 hover:bg-white/10 active:scale-95 sm:text-base"
                   >
                     {cta.label}
                   </button>
@@ -303,7 +303,7 @@ export function HomeHero() {
         </motion.div>
       </div>
 
-      <div className="absolute right-0 bottom-3 left-0 z-20 md:bottom-4">
+      <div className="pointer-events-none absolute right-0 bottom-3 left-0 z-20 md:bottom-4">
         <div className="mx-auto w-full max-w-352 px-4 md:px-8 lg:px-10">
           <div className="flex flex-col items-center gap-2">
             <div className="w-full">
