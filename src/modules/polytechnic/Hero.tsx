@@ -101,7 +101,7 @@ export function Hero() {
             {...fadeUp(0.3)}
             className="flex flex-col gap-4 sm:flex-row"
           >
-            <Link href="/apply-now">
+            <Link href="https://admissions.jct.ac.in/">
               <Button
                 size="lg"
                 className="bg-polytechnic-light hover:text-polytechnic-dark h-14 rounded-full px-8 text-sm font-bold text-white shadow-xl transition-all hover:scale-105 hover:bg-white active:scale-95 sm:w-auto"
@@ -128,11 +128,10 @@ export function Hero() {
           <button
             key={idx}
             onClick={() => setCurrentIdx(idx)}
-            className={`h-1.5 rounded-full transition-all duration-300 ${
-              idx === currentIdx
+            className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentIdx
                 ? "w-8 bg-white"
                 : "w-2 bg-white/40 hover:bg-white/60"
-            }`}
+              }`}
             aria-label={`Go to slide ${idx + 1}`}
           />
         ))}

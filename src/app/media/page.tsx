@@ -56,7 +56,7 @@ export default function MediaCenterPage() {
               </h2>
               <div className="space-y-4">
                 {[
-                  "Admissions open for Academic Year 2024-25. Apply online now.",
+                  "Admissions open for Academic Year 2026-27. Apply online now.",
                   "Semester examination timetable released for all UG & PG programs.",
                   "Campus placement drive by leading IT companies scheduled for next month.",
                   "Scholarship applications for the current semester are now being accepted.",

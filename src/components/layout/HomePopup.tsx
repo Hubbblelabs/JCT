@@ -53,9 +53,9 @@ export function HomePopup() {
 
             {/* Image / Graphic Side */}
             <div className="bg-navy relative h-[200px] w-full overflow-hidden md:h-auto md:w-1/2">
-              <div className="absolute inset-0 z-0 opacity-40 mix-blend-overlay">
+              <div className="absolute inset-0 z-0 opacity-50">
                 <Image
-                  src="/site_assests/engineering.jpeg"
+                  src="/assets/home-herosection.jpg"
                   alt="Campus"
                   fill
                   className="object-cover"
@@ -79,7 +79,7 @@ export function HomePopup() {
             <div className="flex w-full flex-col justify-center p-8 md:w-1/2 md:p-12">
               <div className="mb-6 inline-flex items-center gap-2 font-sans text-sm font-bold tracking-widest text-[#FFc917] uppercase">
                 <Megaphone size={16} />
-                <span>Admissions 2024-25</span>
+                <span>Admissions 2026-27</span>
               </div>
 
               <h2 className="text-navy mb-4 font-serif text-3xl font-bold md:text-4xl">
@@ -94,7 +94,7 @@ export function HomePopup() {
 
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link
-                  href="/apply-now"
+                  href="https://admissions.jct.ac.in/"
                   onClick={handleClose}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FFC917] px-6 py-3 font-sans text-sm font-bold text-black transition-transform hover:scale-105"
                 >

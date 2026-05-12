@@ -144,7 +144,7 @@ export default function PolytechnicAdmissionsPage() {
                 </p>
 
                 <Link
-                  href="/apply-now"
+                  href="https://admissions.jct.ac.in/"
                   className="bg-gold text-navy block w-full rounded-xl py-4 font-bold shadow-lg shadow-black/20 transition-colors hover:bg-[#e8b84a]"
                 >
                   Apply Online Now

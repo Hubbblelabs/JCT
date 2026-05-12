@@ -313,7 +313,7 @@ export default function AdmissionsPage() {
               online or visit our campus today to join the JCT family.
             </p>
             <Link
-              href="/apply-now"
+              href="https://admissions.jct.ac.in/"
               className="inline-block rounded-full bg-[#0a1628] px-8 py-4 font-bold text-white transition-colors hover:bg-[#112240]"
             >
               Apply Now

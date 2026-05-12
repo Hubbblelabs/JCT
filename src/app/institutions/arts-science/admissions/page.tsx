@@ -248,7 +248,7 @@ export default function ArtsScienceAdmissionsPage() {
               and begin your journey to excellence.
             </p>
             <Link
-              href="/apply-now"
+              href="https://admissions.jct.ac.in/"
               className="inline-block rounded-full bg-[#0a1628] px-8 py-4 font-bold text-white transition-colors hover:bg-[#112240]"
             >
               Apply Now

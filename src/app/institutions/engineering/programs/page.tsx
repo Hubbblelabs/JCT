@@ -239,7 +239,7 @@ export default function EngineeringProgramsPage() {
                 View Admission Process
               </Link>
               <Link
-                href="/apply-now"
+                href="https://admissions.jct.ac.in/"
                 className="bg-gold text-navy rounded-full px-8 py-3 font-bold transition-colors hover:bg-[#e8b84a]"
               >
                 Apply Now

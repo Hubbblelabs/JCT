@@ -184,7 +184,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             </span>
 
             <Link
-              href="/apply-now"
+              href="https://admissions.jct.ac.in/"
               className="hidden shrink-0 underline underline-offset-2 hover:no-underline sm:inline"
             >
               Apply Now
@@ -264,11 +264,10 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                         e.preventDefault();
                         setDesktopExpanded(isExpanded ? null : link.name);
                       }}
-                      className={`group relative flex items-center justify-center gap-1 px-2 py-2 font-sans text-sm font-medium transition-colors xl:gap-1.5 xl:px-3 xl:text-[14px] 2xl:px-4 2xl:text-[15px] ${
-                        isExpanded
+                      className={`group relative flex items-center justify-center gap-1 px-2 py-2 font-sans text-sm font-medium transition-colors xl:gap-1.5 xl:px-3 xl:text-[14px] 2xl:px-4 2xl:text-[15px] ${isExpanded
                           ? highlightColor
                           : "text-white/90 hover:text-white"
-                      }`}
+                        }`}
                     >
                       {link.name}
                       <ChevronDown
@@ -283,11 +282,10 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                     <Link
                       href={link.href}
                       onClick={(e) => handleNavClick(e, link.href)}
-                      className={`group relative flex items-center justify-center gap-1 px-2 py-2 font-sans text-sm font-medium transition-colors xl:gap-1.5 xl:px-3 xl:text-[14px] 2xl:px-4 2xl:text-[15px] ${
-                        isActive
+                      className={`group relative flex items-center justify-center gap-1 px-2 py-2 font-sans text-sm font-medium transition-colors xl:gap-1.5 xl:px-3 xl:text-[14px] 2xl:px-4 2xl:text-[15px] ${isActive
                           ? highlightColor
                           : "text-white/90 hover:text-white"
-                      }`}
+                        }`}
                     >
                       {link.name}
                       {hasDropdown && (
@@ -313,15 +311,13 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 8, scale: 0.985 }}
                             transition={{ duration: 0.22, ease: "easeOut" }}
-                            className={`rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
-                              link.name === "More"
+                            className={`rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${link.name === "More"
                                 ? "grid w-[600px] grid-cols-2 gap-x-2 gap-y-1"
                                 : "w-72"
-                            } ${
-                              isDropdownSolid
+                              } ${isDropdownSolid
                                 ? "border-white/10 bg-[#0a1628]/96"
                                 : "border-white/20 bg-[#0a1628]/70"
-                            }`}
+                              }`}
                           >
                             {link.children?.map((child: NavChild) => {
                               const isChildHashLink = child.href.includes("#");
@@ -330,7 +326,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                 !isChildHashLink &&
                                 (childPath !== "/"
                                   ? pathname === childPath ||
-                                    pathname.startsWith(`${childPath}/`)
+                                  pathname.startsWith(`${childPath}/`)
                                   : pathname === "/");
 
                               return (
@@ -341,34 +337,31 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                     setDesktopExpanded(null);
                                     handleNavClick(e, child.href);
                                   }}
-                                  className={`group block rounded-lg px-4 py-3 font-sans transition-colors ${
-                                    isDropdownSolid
+                                  className={`group block rounded-lg px-4 py-3 font-sans transition-colors ${isDropdownSolid
                                       ? "hover:bg-white/10"
                                       : "hover:bg-white/15"
-                                  } ${isChildActive ? "bg-white/10" : ""} ${child.className || ""}`}
+                                    } ${isChildActive ? "bg-white/10" : ""} ${child.className || ""}`}
                                 >
                                   <div className="flex items-center justify-between gap-3">
                                     <div>
                                       <div
-                                        className={`text-[15px] font-medium whitespace-nowrap transition-colors ${highlightColor.replace("text-", "group-hover:text-")} ${
-                                          isChildActive
+                                        className={`text-[15px] font-medium whitespace-nowrap transition-colors ${highlightColor.replace("text-", "group-hover:text-")} ${isChildActive
                                             ? highlightColor
                                             : isDropdownSolid
                                               ? "text-white/90"
                                               : "text-white"
-                                        }`}
+                                          }`}
                                       >
                                         {child.name}
                                       </div>
                                       {child.desc && (
                                         <div
-                                          className={`mt-0.5 text-[13px] whitespace-nowrap transition-colors group-hover:text-white/80 ${
-                                            isChildActive
+                                          className={`mt-0.5 text-[13px] whitespace-nowrap transition-colors group-hover:text-white/80 ${isChildActive
                                               ? "text-white/70"
                                               : isDropdownSolid
                                                 ? "text-white/50"
                                                 : "text-white/75"
-                                          }`}
+                                            }`}
                                         >
                                           {child.desc}
                                         </div>
@@ -402,12 +395,11 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             </a>
             {institution === "main" && (
               <Link
-                href="/apply-now"
-                className={`inline-flex h-9 items-center justify-center rounded-full px-4 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10 xl:px-5 xl:text-[14px] 2xl:text-[15px] ${
-                  isSolid
+                href="https://admissions.jct.ac.in/"
+                className={`inline-flex h-9 items-center justify-center rounded-full px-4 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10 xl:px-5 xl:text-[14px] 2xl:text-[15px] ${isSolid
                     ? `${highlightBgColor} font-semibold text-[#0a1628] shadow-lg shadow-black/20 ${highlightHoverBgColor}`
                     : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
-                }`}
+                  }`}
               >
                 Apply Now
               </Link>
@@ -513,7 +505,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                       !isChildHashLink &&
                                       (childPath !== "/"
                                         ? pathname === childPath ||
-                                          pathname.startsWith(`${childPath}/`)
+                                        pathname.startsWith(`${childPath}/`)
                                         : pathname === "/");
 
                                     return (
@@ -568,7 +560,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                 </a>
                 {institution === "main" && (
                   <Link
-                    href="/apply-now"
+                    href="https://admissions.jct.ac.in/"
                     onClick={() => setIsOpen(false)}
                     className={`flex h-12 w-full items-center justify-center gap-2 rounded-2xl ${highlightBgColor} font-sans text-sm font-bold text-[#0a1628] shadow-lg ${highlightShadowColor} transition-all hover:scale-[1.02] ${highlightHoverBgColor} active:scale-[0.98]`}
                   >
