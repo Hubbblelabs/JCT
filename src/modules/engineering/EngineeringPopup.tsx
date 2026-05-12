@@ -53,8 +53,8 @@ export function EngineeringPopup() {
             </button>
 
             {/* Image / Graphic Side */}
-            <div className="bg-navy relative h-[200px] w-full overflow-hidden md:h-auto md:w-1/2">
-              <div className="absolute inset-0 z-0 ">
+            <div className="relative h-[450px] w-full overflow-hidden bg-white md:h-auto md:w-[45%]">
+              <div className="absolute inset-0 z-0">
                 <Image
                   src="/phamplets/engineerinig-placement.jpeg"
                   alt="Engineering Placement Brochure"

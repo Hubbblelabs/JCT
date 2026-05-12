@@ -53,8 +53,8 @@ export function ArtsSciencePopup() {
             </button>
 
             {/* Image / Graphic Side */}
-            <div className="relative h-[450px] w-full overflow-hidden bg-stone-100 md:h-auto md:w-[40%]">
-              <div className="absolute inset-0 z-0 opacity-90">
+            <div className="relative h-[450px] w-full overflow-hidden bg-white md:h-auto md:w-[45%]">
+              <div className="absolute inset-0 z-0">
                 <Image
                   src="/assets/engineering-landing4.png"
                   alt="Arts & Science Admission Brochure"

@@ -54,29 +54,29 @@ export function Phamplets() {
             </button>
 
             {/* Split Images Container */}
-            <div className="relative flex h-[85vh] min-h-[600px] flex-col overflow-hidden md:flex-row">
+            <div className="relative flex h-[75vh] min-h-[550px] flex-col overflow-hidden md:flex-row">
               {/* Left Image - Main Brochure */}
-              <div className="relative h-1/2 w-full overflow-hidden bg-white md:h-auto md:w-1/2">
+              <div className="relative h-1/2 w-full overflow-hidden bg-white md:h-auto md:w-[45%]">
                 <Image
                   src="/phamplets/mainleft.jpeg"
-                  alt="Engineering Placement"
+                  alt="Main Brochure"
                   fill
-                  className="object-contain object-top"
+                  className="object-cover object-top"
                 />
               </div>
 
               {/* Right Image - Engineering Placement */}
-              <div className="relative h-1/2 w-full overflow-hidden bg-white md:h-auto md:w-1/2">
+              <div className="relative h-1/2 w-full overflow-hidden bg-white md:h-auto md:w-[55%]">
                 <Image
                   src="/phamplets/engineerinig-placement.jpeg"
-                  alt="Engineering Admission"
+                  alt="Engineering Placement"
                   fill
-                  className="object-contain object-top"
+                  className="object-cover object-top"
                 />
               </div>
 
               {/* Action Buttons Overlay */}
-              <div className="absolute right-6 bottom-8 z-50 flex flex-wrap items-center justify-end gap-3 md:right-10 md:bottom-10">
+              <div className="absolute right-6 bottom-4 z-50 flex flex-wrap items-center justify-end gap-3 md:right-8 md:bottom-6">
                 <button
                   onClick={() => setIsVideoOpen(true)}
                   className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:px-10"
