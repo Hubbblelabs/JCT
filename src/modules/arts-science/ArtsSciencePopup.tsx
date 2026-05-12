@@ -4,16 +4,16 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight, Award, Megaphone, Phone } from "lucide-react";
+import { X, ArrowRight, Phone } from "lucide-react";
 import { siteConfig } from "@/data/site";
 
-export function EngineeringPopup() {
+export function ArtsSciencePopup() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsOpen(true);
-    }, 1000);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -46,68 +46,43 @@ export function EngineeringPopup() {
             {/* Close Button */}
             <button
               onClick={handleClose}
-              className="absolute top-3 right-3 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-md transition-colors hover:bg-black/40 md:top-4 md:right-4 md:h-8 md:w-8 md:bg-white/90 md:text-black md:hover:bg-white md:hover:text-black"
+              className="absolute top-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition-colors hover:bg-black/80 md:h-8 md:w-8"
               aria-label="Close popup"
             >
               <X size={20} />
             </button>
 
             {/* Image / Graphic Side */}
-            <div className="bg-navy relative h-[200px] w-full overflow-hidden md:h-auto md:w-1/2">
-              <div className="absolute inset-0 z-0 ">
+            <div className="relative h-[450px] w-full overflow-hidden bg-stone-100 md:h-auto md:w-[40%]">
+              <div className="absolute inset-0 z-0 opacity-90">
                 <Image
-                  src="/phamplets/engineerinig-placement.jpeg"
-                  alt="Engineering Placement Brochure"
+                  src="/assets/engineering-landing4.png"
+                  alt="Arts & Science Admission Brochure"
                   fill
                   className="object-cover object-top"
                   priority
                 />
               </div>
-              {/* <div className="relative z-10 flex h-full flex-col justify-end p-8 text-white">
-                <div className="mb-4 flex flex-wrap items-center gap-2 self-start">
-                  <div className="inline-flex items-center gap-1.5 rounded-full bg-[#FFC917] px-2.5 py-1 text-[10px] font-black tracking-wider text-black uppercase shadow-sm">
-                    Autonomous
-                  </div>
-                  <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur-md">
-                    <Award size={14} className="text-[#FFC917]" />
-                    <span>NAAC & NBA Accredited</span>
-                  </div>
-                </div>
-                <h3 className="font-serif text-3xl leading-tight font-bold md:text-4xl">
-                  Transforming <span className="text-[#FFC917]">Futures</span>
-                </h3>
-                <p className="mt-2 text-sm text-white/80 md:text-base">
-                  16+ Years of Academic Excellence & 98% Placement Success Rate.
-                </p>
-              </div> */}
             </div>
 
             {/* Content Side */}
             <div className="flex w-full flex-col justify-center p-8 md:w-[60%] md:p-12">
-              {/* <div className="mb-6 inline-flex items-center gap-2 font-sans text-sm font-bold tracking-widest text-[#FFc917] uppercase">
-                <Megaphone size={16} />
-                <span>Admissions 2026-27</span>
-              </div> */}
-
               <div className="mb-1 inline-block text-[20px] font-black tracking-widest text-[#d4a024] uppercase">
-                Autonomous Institution
+                Admissions Open 2026-27
               </div>
               <h2 className="text-navy mb-4 font-serif text-3xl font-bold md:text-4xl">
-                Admissions Open
+                Shape Your Future at JCT
               </h2>
 
-               <p className="mb-4 text-stone-600">
-                Start your engineering journey with JCT. Applications are now
-                open for B.E. / B.Tech programs.
+              <p className="mb-4 text-stone-600">
+                Explore a world of opportunities in Arts, Science, and Commerce. Our industry-aligned programs prepare you for global success.
               </p>
 
               <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
                 <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-                  <span className="text-lg font-semibold text-stone-600">
-                    Counselling Code:
-                  </span>
-                  <span className="text-3xl font-black tracking-tight text-[#d4a024] md:text-4xl">
-                    {siteConfig.counsellingCode}
+                  <span className="text-lg font-semibold text-stone-600">Explore Programs:</span>
+                  <span className="text-xl font-bold text-[#d4a024]">
+                    CS, AI, Commerce & more
                   </span>
                 </div>
                 <div className="h-px w-full bg-stone-200" />
@@ -127,7 +102,7 @@ export function EngineeringPopup() {
                 <Link
                   href="https://admissions.jct.ac.in/"
                   onClick={handleClose}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FFC917] px-6 py-3 font-sans text-sm font-bold text-black transition-transform hover:scale-105"
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FFC917] px-8 py-3 font-sans text-sm font-bold text-black transition-transform hover:scale-105"
                 >
                   Apply Now <ArrowRight size={16} />
                 </Link>

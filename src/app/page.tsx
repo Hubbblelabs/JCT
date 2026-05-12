@@ -8,12 +8,14 @@ import { Footer } from "@/components/layout/Footer";
 import { WhyJCT } from "@/components/layout/WhyJCT";
 import { CampusLife } from "@/components/layout/CampusLife";
 import { HomePopup } from "@/components/layout/HomePopup";
+import { Phamplets } from "@/components/layout/Phamplets";
 
 export default function HomePage() {
   return (
     <main className="bg-surface text-foreground min-h-screen overflow-x-hidden">
       <Navbar />
-      <HomePopup />
+      {/*   <HomePopup /> */}
+      <Phamplets />
       <HomeHero />
       <TrustHighlightsRow />
       <WhyJCT />
