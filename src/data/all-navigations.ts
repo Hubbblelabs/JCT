@@ -26,12 +26,17 @@ export const mainNavigation: NavItem[] = [
       {
         name: "Arts & Science",
         href: "/institutions/arts-science",
-        desc: "B.A, B.Sc, B.Com, BBA programs",
+        desc: "B.Sc, B.Com, BBA programs",
       },
       {
         name: "Polytechnic",
         href: "/institutions/polytechnic",
-        desc: "Diploma programs",
+        desc: "Mech, Agri, PetriChemical, CT programs",
+      },
+      {
+        name: "JCT Institutions",
+        href: "/",
+        desc: "Explore the Excellence",
       },
     ],
   },
@@ -55,14 +60,23 @@ export const engineeringNavigation: NavItem[] = [
       {
         name: "Arts & Science",
         href: "/institutions/arts-science",
-        desc: "B.A, B.Sc, B.Com, BBA programs",
+        desc: "B.Sc, B.Com, BBA programs",
       },
       {
         name: "Polytechnic",
         href: "/institutions/polytechnic",
-        desc: "Diploma programs",
+        desc: "Mech, Agri, PetriChemical, CT programs",
+      },
+      {
+        name: "JCT Institutions",
+        href: "/",
+        desc: "Explore the Excellence",
       },
     ],
+  },
+  {
+    name: "About Us",
+    href: "/institutions/engineering/about",
   },
   {
     name: "Programs",
@@ -73,30 +87,8 @@ export const engineeringNavigation: NavItem[] = [
     href: "/institutions/engineering#placements",
   },
   {
-    name: "Life @ JCT",
-    href: "/institutions/engineering#campus-life",
-  },
-  {
-    name: "About Us",
-    href: "/institutions/engineering/about",
-  },
-  {
-    name: "More",
-    href: "#",
-    children: [
-      { name: "Alumni", href: "/alumni", desc: "Connect with our network" },
-      { name: "Research", href: "/research", desc: "R&D, CoE & publications" },
-      { name: "Careers", href: "/careers", desc: "Join our team" },
-      { name: "Contact", href: "/contact", desc: "Get in touch" },
-      { name: "Leadership", href: "/leadership", desc: "Management & council" },
-      {
-        name: "Mandatory Disclosure",
-        href: "/mandatory-disclosure",
-        desc: "Policies & compliance",
-      },
-      { name: "Media", href: "/media", desc: "News & gallery" },
-      { name: "Quality", href: "/quality", desc: "Accreditations & IQAC" },
-    ],
+    name: "COE",
+    href: "/research",
   },
 ];
 
@@ -114,58 +106,41 @@ export const artsNavigation: NavItem[] = [
       {
         name: "Arts & Science",
         href: "/institutions/arts-science",
-        desc: "B.A, B.Sc, B.Com, BBA programs",
+        desc: "B.Sc, B.Com, BBA programs",
       },
       {
         name: "Polytechnic",
         href: "/institutions/polytechnic",
-        desc: "Diploma programs",
+        desc: "Mech, Agri, PetriChemical, CT programs",
+      },
+      {
+        name: "JCT Institutions",
+        href: "/",
+        desc: "Explore the Excellence",
       },
     ],
+  },
+  {
+    name: "About Us",
+    href: "/institutions/arts-science#about",
   },
   {
     name: "Programs",
     href: "/institutions/arts-science#programs",
   },
   {
-    name: "Admissions",
-    href: "/institutions/arts-science/admissions",
-  },
-  {
     name: "Placements",
-    href: "/placements",
+    href: "/institutions/arts-science#placements",
   },
   {
-    name: "Life @ JCT",
-    href: "/campus-life",
-  },
-  {
-    name: "More",
-    href: "#",
-    children: [
-      {
-        name: "About Us",
-        href: "/institutions/arts-science/about",
-        desc: "Our story & leadership",
-      },
-      { name: "Alumni", href: "/alumni", desc: "Connect with our network" },
-      { name: "Careers", href: "/careers", desc: "Join our team" },
-      { name: "Contact", href: "/contact", desc: "Get in touch" },
-      { name: "Leadership", href: "/leadership", desc: "Management & council" },
-      {
-        name: "Mandatory Disclosure",
-        href: "/mandatory-disclosure",
-        desc: "Policies & compliance",
-      },
-      { name: "Media", href: "/media", desc: "News & gallery" },
-      { name: "Quality", href: "/quality", desc: "Accreditations & IQAC" },
-      { name: "Research", href: "/research", desc: "R&D, CoE & publications" },
-    ],
+    name: "COE",
+    href: "/research",
   },
 ];
 
 export const polytechnicNavigation: NavItem[] = [
-  { name: "Home", href: "/institutions/polytechnic#top" },
+  { name: "Home",
+     href: "/institutions/polytechnic#top" },
   {
     name: "Institutions",
     href: "#",
@@ -178,52 +153,34 @@ export const polytechnicNavigation: NavItem[] = [
       {
         name: "Arts & Science",
         href: "/institutions/arts-science",
-        desc: "B.A, B.Sc, B.Com, BBA",
+        desc: "B.Sc, B.Com, BBA programs",
       },
       {
         name: "Polytechnic",
         href: "/institutions/polytechnic",
-        desc: "Diploma programs",
+        desc: "Mech, Agri, PetriChemical, CT programs",
+      },
+      {
+        name: "JCT Institutions",
+        href: "/",
+        desc: "Explore the Excellence",
       },
     ],
+  },
+  {
+    name: "About Us",
+    href: "/institutions/polytechnic#about",
   },
   {
     name: "Programs",
     href: "/institutions/polytechnic#programs",
   },
   {
-    name: "Admissions",
-    href: "/institutions/polytechnic/admissions",
-  },
-  {
     name: "Placements",
-    href: "/placements",
+    href: "/institutions/polytechnic#placements",
   },
   {
-    name: "Life @ JCT",
-    href: "/campus-life",
-  },
-  {
-    name: "More",
-    href: "#",
-    children: [
-      {
-        name: "About Us",
-        href: "/institutions/polytechnic/about",
-        desc: "Our story & leadership",
-      },
-      { name: "Alumni", href: "/alumni", desc: "Connect with our network" },
-      { name: "Careers", href: "/careers", desc: "Join our team" },
-      { name: "Contact", href: "/contact", desc: "Get in touch" },
-      { name: "Leadership", href: "/leadership", desc: "Management & council" },
-      {
-        name: "Mandatory Disclosure",
-        href: "/mandatory-disclosure",
-        desc: "Policies & compliance",
-      },
-      { name: "Media", href: "/media", desc: "News & gallery" },
-      { name: "Quality", href: "/quality", desc: "Accreditations & IQAC" },
-      { name: "Research", href: "/research", desc: "R&D, CoE & publications" },
-    ],
+    name: "COE",
+    href: "/research",
   },
 ];

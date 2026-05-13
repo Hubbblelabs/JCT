@@ -46,6 +46,8 @@ export function StickyApplyButton() {
         >
           <Link
             href="https://admissions.jct.ac.in"
+            target="_blank"
+            rel="noopener noreferrer"
             className={`${themeClasses} flex h-12 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold shadow-xl transition-all hover:scale-105 active:scale-95`}
             aria-label="Apply for Admission"
           >

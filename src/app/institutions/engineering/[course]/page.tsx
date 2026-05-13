@@ -506,6 +506,8 @@ export default async function CourseDetailPage({
               {/* 8. Apply CTA */}
               <Link
                 href="https://admissions.jct.ac.in/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="bg-gold text-navy mt-8 block w-full rounded-xl py-4 text-center font-bold transition-colors hover:bg-[#e8b84a]"
               >
                 Apply Now

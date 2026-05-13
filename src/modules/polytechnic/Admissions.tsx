@@ -26,6 +26,8 @@ export function Admissions() {
           />
           <PolyButtonLink
             href="https://admissions.jct.ac.in"
+            target="_blank"
+            rel="noopener noreferrer"
             className="shrink-0"
           >
             Apply Now

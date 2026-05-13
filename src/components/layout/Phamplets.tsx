@@ -86,7 +86,9 @@ export function Phamplets() {
                   <Play size={20} className="fill-current" /> Virtual Tour
                 </button>
                 <Link
-                  href="/apply-now"
+                  href="https://admissions.jct.ac.in"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={handleClose}
                   className="group bg-gold flex items-center gap-3 rounded-full px-10 py-4 text-base font-bold text-black shadow-[0_20px_40px_-10px_rgba(212,160,36,0.6)] transition-all hover:scale-105 hover:bg-white active:scale-95 sm:px-12 sm:text-lg"
                 >

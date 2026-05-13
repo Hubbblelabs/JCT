@@ -114,6 +114,8 @@ export function EngineeringPopup() {
                   <div className="flex flex-col gap-4 sm:flex-row">
                     <Link
                       href="https://admissions.jct.ac.in/"
+                      target="_blank"
+                      rel="noopener noreferrer"
                       onClick={handleClose}
                       className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FFC917] px-8 py-3 font-sans text-sm font-bold text-black transition-transform hover:scale-105"
                     >

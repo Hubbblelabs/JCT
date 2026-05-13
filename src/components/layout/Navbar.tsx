@@ -185,6 +185,8 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
 
             <Link
               href="https://admissions.jct.ac.in"
+              target="_blank"
+              rel="noopener noreferrer"
               className="hidden shrink-0 underline underline-offset-2 hover:no-underline sm:inline"
             >
               Apply Now
@@ -400,18 +402,18 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               <Phone size={16} className="h-3.5 w-3.5 shrink-0 xl:h-4 xl:w-4" />
               <span className="truncate">{siteConfig.contact.phone}</span>
             </a>
-            {institution === "main" && (
-              <Link
-                href="https://admissions.jct.ac.in"
-                className={`inline-flex h-9 items-center justify-center rounded-full px-4 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10 xl:px-5 xl:text-[14px] 2xl:text-[15px] ${
-                  isSolid
-                    ? `${highlightBgColor} font-semibold text-[#0a1628] shadow-lg shadow-black/20 ${highlightHoverBgColor}`
-                    : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
-                }`}
-              >
-                Apply Now
-              </Link>
-            )}
+            <Link
+              href="https://admissions.jct.ac.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex h-9 items-center justify-center rounded-full px-4 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10 xl:px-5 xl:text-[14px] 2xl:text-[15px] ${
+                isSolid
+                  ? `${highlightBgColor} font-semibold text-[#0a1628] shadow-lg shadow-black/20 ${highlightHoverBgColor}`
+                  : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
+              }`}
+            >
+              Apply Now
+            </Link>
           </div>
 
           <button
@@ -566,15 +568,15 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                 >
                   <Phone size={16} /> {siteConfig.contact.phone}
                 </a>
-                {institution === "main" && (
-                  <Link
-                    href="https://admissions.jct.ac.in"
-                    onClick={() => setIsOpen(false)}
-                    className={`flex h-12 w-full items-center justify-center gap-2 rounded-2xl ${highlightBgColor} font-sans text-sm font-bold text-[#0a1628] shadow-lg ${highlightShadowColor} transition-all hover:scale-[1.02] ${highlightHoverBgColor} active:scale-[0.98]`}
-                  >
-                    Apply Now <ArrowRight size={14} />
-                  </Link>
-                )}
+                <Link
+                  href="https://admissions.jct.ac.in"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsOpen(false)}
+                  className={`flex h-12 w-full items-center justify-center gap-2 rounded-2xl ${highlightBgColor} font-sans text-sm font-bold text-[#0a1628] shadow-lg ${highlightShadowColor} transition-all hover:scale-[1.02] ${highlightHoverBgColor} active:scale-[0.98]`}
+                >
+                  Apply Now <ArrowRight size={14} />
+                </Link>
               </div>
             </motion.div>
           </>

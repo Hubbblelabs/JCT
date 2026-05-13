@@ -73,13 +73,14 @@ type PolyButtonLinkProps = {
   children: React.ReactNode;
   variant?: "primary" | "secondary" | "outline";
   className?: string;
-};
+} & React.ComponentPropsWithoutRef<typeof Link>;
 
 export function PolyButtonLink({
   href,
   children,
   variant = "primary",
   className,
+  ...props
 }: PolyButtonLinkProps) {
   const variantClass =
     variant === "outline"
@@ -96,6 +97,7 @@ export function PolyButtonLink({
         variantClass,
         className,
       )}
+      {...props}
     >
       {children}
     </Link>

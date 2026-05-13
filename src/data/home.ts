@@ -8,7 +8,7 @@ export const homeHeroContent = {
   ctas: [
     {
       label: "Apply Now",
-      href: "/apply-now",
+      href: "https://admissions.jct.ac.in",
       primary: true,
     },
     {

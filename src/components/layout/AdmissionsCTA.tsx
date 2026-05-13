@@ -105,6 +105,8 @@ export function AdmissionsCTA() {
                   </p>
                   <Link
                     href={item.link}
+                    target={item.link.startsWith("http") ? "_blank" : undefined}
+                    rel={item.link.startsWith("http") ? "noopener noreferrer" : undefined}
                     className="text-navy hover:text-gold inline-flex items-center gap-1 font-sans text-sm font-semibold transition-colors group-hover:gap-2"
                   >
                     {item.linkText} <ArrowRight size={14} />
@@ -121,7 +123,9 @@ export function AdmissionsCTA() {
             className="flex flex-col justify-center gap-3 sm:flex-row"
           >
             <Link
-              href="#contact"
+              href="https://admissions.jct.ac.in/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="bg-navy hover:bg-navy-light shadow-navy/20 inline-flex h-14 items-center justify-center gap-2 rounded-full px-8 font-sans text-base font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95"
             >
               Apply Online <ArrowRight size={16} />

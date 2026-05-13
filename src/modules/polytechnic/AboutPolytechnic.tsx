@@ -60,7 +60,7 @@ export function AboutPolytechnic() {
       </div>
 
       <PolySection
-        id="about-institution"
+        id="about"
         tone="transparent"
         className="relative pt-0 md:pt-2"
       >

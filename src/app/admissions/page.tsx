@@ -314,6 +314,8 @@ export default function AdmissionsPage() {
             </p>
             <Link
               href="https://admissions.jct.ac.in/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-block rounded-full bg-[#0a1628] px-8 py-4 font-bold text-white transition-colors hover:bg-[#112240]"
             >
               Apply Now
