@@ -4,3 +4,7 @@ node_modules
 Dockerfile
 dist
 coverage
+node_modules
+.vscode
+README.md
+.env
