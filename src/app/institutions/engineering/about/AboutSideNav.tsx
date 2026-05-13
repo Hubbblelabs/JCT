@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import {
   Landmark,
@@ -9,24 +9,32 @@ import {
   Award,
   School,
   Star,
-  Phone,
-  MapPin,
-  ArrowRight,
+  Users,
+  Heart,
+  ChevronRight,
 } from "lucide-react";
 
 const navSections = [
-  { id: "about", label: "About the Institution", icon: Landmark },
+  { id: "about", label: "About", icon: Landmark },
   { id: "vision", label: "Vision & Mission", icon: Target },
   { id: "principal", label: "Principal's Message", icon: MessageSquareQuote },
-  { id: "accreditations", label: "Approvals & Accreditations", icon: Award },
-  { id: "campus", label: "Campus Highlights", icon: School },
-  { id: "why-jct", label: "Why Choose JCT?", icon: Star },
+  { id: "leadership", label: "Leadership", icon: Users },
+  { id: "core-values", label: "Core Values", icon: Heart },
+  { id: "accreditations", label: "Accreditations", icon: Award },
+  { id: "campus", label: "Campus", icon: School },
+  { id: "why-jct", label: "Why JCT?", icon: Star },
 ];
 
-export function AboutSideNav() {
-  const [activeId, setActiveId] = useState<string>("about");
+interface AboutSideNavProps {
+  activeId: string;
+  setActiveId: (id: string) => void;
+}
 
+export function AboutSideNav({ activeId, setActiveId }: AboutSideNavProps) {
   useEffect(() => {
+    // Only run intersection observers on desktop screens where all sections are visible
+    if (window.innerWidth < 1024) return;
+
     const observers: IntersectionObserver[] = [];
 
     navSections.forEach(({ id }) => {
@@ -40,7 +48,7 @@ export function AboutSideNav() {
           }
         },
         {
-          rootMargin: "-30% 0px -60% 0px",
+          rootMargin: "-25% 0px -65% 0px",
           threshold: 0,
         },
       );
@@ -50,100 +58,126 @@ export function AboutSideNav() {
     });
 
     return () => observers.forEach((obs) => obs.disconnect());
-  }, []);
+  }, [setActiveId]);
 
   const handleClick = (id: string) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const offset = 100;
-    const top = el.getBoundingClientRect().top + window.scrollY - offset;
-    window.scrollTo({ top, behavior: "smooth" });
+    setActiveId(id);
+
+    if (window.innerWidth >= 1024) {
+      // Desktop: Smooth scroll to section
+      const el = document.getElementById(id);
+      if (!el) return;
+      const offset = 120;
+      const top = el.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
   };
 
   return (
-    <div className="bg-surface border-border rounded-3xl border p-6">
-      {/* Section Navigation */}
-      <h3 className="mb-5 border-b border-white/10 pb-4 text-sm font-bold uppercase tracking-wider">
-        On This Page
-      </h3>
-
-      <nav className="space-y-1">
-        {navSections.map(({ id, label, icon: Icon }) => {
-          const isActive = activeId === id;
-          return (
-            <button
-              key={id}
-              onClick={() => handleClick(id)}
-              className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all ${
-                isActive
-                  ? "bg-gold/15 text-gold"
-                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-              }`}
-            >
-              <Icon
-                size={16}
-                className={`shrink-0 transition-colors ${
-                  isActive ? "text-gold" : "text-muted-foreground group-hover:text-foreground"
+    <>
+      {/* ── Mobile / Tablet: horizontal scrollable pill bar ── */}
+      <div className="-mx-4 w-full overflow-x-auto px-4 pb-2 lg:hidden">
+        <div className="flex w-max gap-2">
+          {navSections.map(({ id, label, icon: Icon }) => {
+            const isActive = activeId === id;
+            return (
+              <button
+                key={id}
+                onClick={() => handleClick(id)}
+                className={`flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all ${
+                  isActive
+                    ? "border-gold bg-gold/15 text-gold"
+                    : "text-muted-foreground hover:text-foreground border-white/10 bg-white/5 hover:border-white/20"
                 }`}
-              />
-              <span>{label}</span>
-              {isActive && (
-                <span className="bg-gold ml-auto h-1.5 w-1.5 rounded-full" />
-              )}
-            </button>
-          );
-        })}
-      </nav>
-
-      {/* Quick Facts */}
-      <div className="mt-6 space-y-4 border-t border-white/10 pt-6">
-        <h3 className="text-sm font-bold uppercase tracking-wider">
-          Quick Facts
-        </h3>
-
-        <div className="space-y-3">
-          {[
-            { label: "Established", value: "2009" },
-            { label: "Autonomous Status", value: "Granted" },
-            { label: "Affiliation", value: "Anna University" },
-            { label: "NAAC Grade", value: '"A" Grade' },
-          ].map((fact) => (
-            <div key={fact.label} className="flex flex-col gap-0.5">
-              <span className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
-                {fact.label}
-              </span>
-              <span className="text-foreground text-sm font-bold">
-                {fact.value}
-              </span>
-            </div>
-          ))}
-
-          <div className="flex flex-col gap-0.5">
-            <span className="text-muted-foreground text-xs font-medium uppercase tracking-wide">
-              Counselling Code
-            </span>
-            <span className="text-gold text-2xl font-bold">2769</span>
-          </div>
+              >
+                <Icon size={13} className="shrink-0" />
+                {label}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {/* Apply CTA */}
-      <Link
-        href="https://admissions.jct.ac.in/"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="bg-gold text-navy mt-6 block w-full rounded-xl py-4 text-center font-bold transition-colors hover:bg-[#e8b84a]"
-      >
-        Apply Now
-      </Link>
+      {/* ── Desktop: sticky sidebar ── */}
+      <div className="bg-surface border-border hidden rounded-3xl border p-6 lg:block">
+        {/* Section Navigation */}
+        <h3 className="mb-5 border-b border-white/10 pb-4 text-sm font-bold tracking-wider uppercase">
+          On This Page
+        </h3>
 
-      {/* Contact */}
-    
+        <nav className="space-y-1">
+          {navSections.map(({ id, label, icon: Icon }) => {
+            const isActive = activeId === id;
+            return (
+              <button
+                key={id}
+                onClick={() => handleClick(id)}
+                className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all ${
+                  isActive
+                    ? "bg-gold/15 text-gold"
+                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+                }`}
+              >
+                <Icon
+                  size={16}
+                  className={`shrink-0 transition-colors ${
+                    isActive
+                      ? "text-gold"
+                      : "text-muted-foreground group-hover:text-foreground"
+                  }`}
+                />
+                <span>{label}</span>
+                {isActive && (
+                  <span className="bg-gold ml-auto h-1.5 w-1.5 rounded-full" />
+                )}
+              </button>
+            );
+          })}
+        </nav>
 
-      {/* Program links */}
-     
-      
+        {/* Quick Facts */}
+        <div className="mt-6 space-y-4 border-t border-white/10 pt-6">
+          <h3 className="text-sm font-bold tracking-wider uppercase">
+            Quick Facts
+          </h3>
 
-    </div>
+          <div className="space-y-3">
+            {[
+              { label: "Established", value: "2009" },
+              { label: "Autonomous Status", value: "Granted" },
+              { label: "Affiliation", value: "Anna University" },
+              { label: "NAAC Grade", value: '"A" Grade' },
+            ].map((fact) => (
+              <div key={fact.label} className="flex flex-col gap-0.5">
+                <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                  {fact.label}
+                </span>
+                <span className="text-foreground text-sm font-bold">
+                  {fact.value}
+                </span>
+              </div>
+            ))}
+
+            <div className="flex flex-col gap-0.5">
+              <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                Counselling Code
+              </span>
+              <span className="text-gold text-2xl font-bold">2769</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Apply CTA */}
+        <Link
+          href="https://admissions.jct.ac.in/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-gold text-navy mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-center font-bold transition-colors hover:bg-[#e8b84a]"
+        >
+          Apply Now
+          <ChevronRight size={16} />
+        </Link>
+      </div>
+    </>
   );
 }

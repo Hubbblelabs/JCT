@@ -211,7 +211,11 @@ export function HomeHero() {
                   key={cta.label}
                   href={cta.href.startsWith("#") ? "/admissions" : cta.href}
                   target={cta.href.startsWith("http") ? "_blank" : undefined}
-                  rel={cta.href.startsWith("http") ? "noopener noreferrer" : undefined}
+                  rel={
+                    cta.href.startsWith("http")
+                      ? "noopener noreferrer"
+                      : undefined
+                  }
                   className={`inline-flex h-12 items-center justify-center gap-2 rounded-full px-7 text-sm font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 sm:text-base ${
                     cta.primary
                       ? "bg-gold text-navy hover:bg-gold-light shadow-black/20"

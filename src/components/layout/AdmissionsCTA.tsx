@@ -106,7 +106,11 @@ export function AdmissionsCTA() {
                   <Link
                     href={item.link}
                     target={item.link.startsWith("http") ? "_blank" : undefined}
-                    rel={item.link.startsWith("http") ? "noopener noreferrer" : undefined}
+                    rel={
+                      item.link.startsWith("http")
+                        ? "noopener noreferrer"
+                        : undefined
+                    }
                     className="text-navy hover:text-gold inline-flex items-center gap-1 font-sans text-sm font-semibold transition-colors group-hover:gap-2"
                   >
                     {item.linkText} <ArrowRight size={14} />

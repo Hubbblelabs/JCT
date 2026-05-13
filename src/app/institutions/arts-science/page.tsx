@@ -24,7 +24,10 @@ import { Placements } from "@/components/layout/Placements";
 
 export default function ArtsSciencePage() {
   return (
-    <main id="top" className="bg-background text-foreground arts-science-theme min-h-screen overflow-x-hidden">
+    <main
+      id="top"
+      className="bg-background text-foreground arts-science-theme min-h-screen overflow-x-hidden"
+    >
       <Navbar />
       <ArtsSciencePopup />
       <Hero />

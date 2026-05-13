@@ -545,7 +545,6 @@ export default function CampusLifePage() {
             <Link
               href="https://admissions.jct.ac.in/"
               target="_blank"
-            
               className="bg-navy hover:bg-navy-mid flex items-center gap-2 rounded-full px-10 py-4 text-base font-bold text-white shadow-2xl transition-all hover:scale-105 active:scale-95 md:px-12 md:py-5 md:text-lg"
             >
               Apply Now <ArrowRight size={20} />
