@@ -127,7 +127,7 @@ export function AdmissionsCTA() {
               Apply Online <ArrowRight size={16} />
             </Link>
             <a
-              href="/documents/jct.pdf"
+              href="/documents/JCT.pdf"
               download
               target="_blank"
               rel="noopener noreferrer"
