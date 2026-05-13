@@ -26,7 +26,9 @@ export default function EngineeringPage() {
       <EngineeringResearch />
 
       <Placements />
-      <CampusLife />
+      <div id="campus-life">
+        <CampusLife />
+      </div>
 
       <div id="life-at-jct">
         <CollegeTestimonials

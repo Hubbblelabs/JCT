@@ -125,7 +125,6 @@ const photo = [
   },
 ];
 
-
 const photos = [
   // --- All / Curated items (The original 5) ---
   {
@@ -185,7 +184,6 @@ const photos = [
   {
     src: "/jct-life/sports4.webp",
     caption: "Football Championship",
-
 
     category: "Sports",
   },

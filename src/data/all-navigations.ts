@@ -69,27 +69,23 @@ export const engineeringNavigation: NavItem[] = [
     href: "/institutions/engineering#programs",
   },
   {
-    name: "Admissions",
-    href: "/institutions/engineering/admissions",
-  },
-  {
     name: "Placements",
-    href: "/placements",
+    href: "/institutions/engineering#placements",
   },
   {
     name: "Life @ JCT",
-    href: "/campus-life",
+    href: "/institutions/engineering#campus-life",
+  },
+  {
+    name: "About Us",
+    href: "/institutions/engineering/about",
   },
   {
     name: "More",
     href: "#",
     children: [
-      {
-        name: "About Us",
-        href: "/institutions/engineering/about",
-        desc: "Our story & leadership",
-      },
       { name: "Alumni", href: "/alumni", desc: "Connect with our network" },
+      { name: "Research", href: "/research", desc: "R&D, CoE & publications" },
       { name: "Careers", href: "/careers", desc: "Join our team" },
       { name: "Contact", href: "/contact", desc: "Get in touch" },
       { name: "Leadership", href: "/leadership", desc: "Management & council" },
@@ -100,7 +96,6 @@ export const engineeringNavigation: NavItem[] = [
       },
       { name: "Media", href: "/media", desc: "News & gallery" },
       { name: "Quality", href: "/quality", desc: "Accreditations & IQAC" },
-      { name: "Research", href: "/research", desc: "R&D, CoE & publications" },
     ],
   },
 ];
