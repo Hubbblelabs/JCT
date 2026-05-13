@@ -61,7 +61,7 @@ export function ArtsSciencePopup() {
                   alt="Arts & Science Admission Brochure"
                   width={800}
                   height={1131}
-                  className="h-auto w-full block"
+                  className="block h-auto w-full"
                   priority
                 />
               </div>
@@ -81,24 +81,24 @@ export function ArtsSciencePopup() {
                   </h2>
 
                   <p className="mb-3 text-xs leading-relaxed text-stone-600 md:text-sm">
-                    Explore a world of opportunities in Arts, Science, and Commerce.
-                    Our programs prepare you for global success.
+                    Explore a world of opportunities in Arts, Science, and
+                    Commerce. Our programs prepare you for global success.
                   </p>
 
                   <div className="mb-5 flex flex-col gap-2 rounded-xl border border-stone-200 bg-stone-50/50 p-4">
                     <div className="flex flex-col">
-                      <span className="text-xs font-semibold text-stone-500 uppercase tracking-tighter">
+                      <span className="text-xs font-semibold tracking-tighter text-stone-500 uppercase">
                         Explore Programs:
                       </span>
                       <span className="text-base font-bold text-[#d4a024]">
                         CS, AI, Commerce & more
                       </span>
                     </div>
-                    
+
                     <div className="h-px w-full bg-stone-200" />
-                    
+
                     <div className="flex flex-col">
-                      <span className="text-xs font-semibold text-stone-500 uppercase tracking-tighter">
+                      <span className="text-xs font-semibold tracking-tighter text-stone-500 uppercase">
                         Contact:
                       </span>
                       <a

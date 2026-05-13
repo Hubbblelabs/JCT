@@ -61,6 +61,7 @@ export function Phamplets() {
                   src="/phamplets/mainleft.jpeg"
                   alt="Main Brochure"
                   fill
+                  sizes="(min-width: 768px) 45vw, 100vw"
                   className="object-cover object-top"
                 />
               </div>
@@ -71,6 +72,7 @@ export function Phamplets() {
                   src="/phamplets/engineerinig-placement.jpeg"
                   alt="Engineering Placement"
                   fill
+                  sizes="(min-width: 768px) 55vw, 100vw"
                   className="object-cover object-top"
                 />
               </div>

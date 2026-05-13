@@ -3,12 +3,11 @@
 import { useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, ArrowRight, Play, X } from "lucide-react";
-import Link from "next/link";
+import { Camera, ArrowRight, X } from "lucide-react";
 
 const categories = ["All", "Labs", "Sports", "Events", "Clubs"] as const;
 
-const photo = [
+const photos = [
   // --- All / Curated items (The original 5) ---
   {
     src: "/site_assests/computer-img1.jpg.jpeg",
@@ -125,124 +124,6 @@ const photo = [
   },
 ];
 
-const photos = [
-  // --- All / Curated items (The original 5) ---
-  {
-    src: "/site_assests/computer-img1.jpg.jpeg",
-    caption: "Advanced Computer Lab",
-    category: "Labs",
-    isAll: true,
-  },
-  {
-    src: "/jct-life/sports3.webp",
-    caption: "Annual Sports Day",
-    category: "Sports",
-    isAll: true,
-  },
-  {
-    src: "/jct-life/sports2.webp",
-    caption: "Inter-College Basketball",
-    category: "Sports",
-    isAll: true,
-  },
-  {
-    src: "/site_assests/MGL5086-1.webp",
-    caption: "Induction Program",
-    category: "Clubs",
-    isAll: true,
-  },
-  {
-    src: "/site_assests/facility-bg.jpg.jpeg",
-    caption: "Campus Green Walkway",
-    category: "Events",
-    isAll: true,
-  },
-
-  // --- Additional Labs ---
-  {
-    src: "/jct-life/chemical-lab.webp",
-    caption: "Bio-Technology Research",
-    category: "Labs",
-  },
-  {
-    src: "/site_assests/mech-img.jpg.jpeg",
-    caption: "Electrical Engineering Lab",
-    category: "Labs",
-  },
-  {
-    src: "/jct-life/mechnical-lab.webp",
-    caption: "Mechanical Workshop",
-    category: "Labs",
-  },
-  {
-    src: "/site_assests/p-c-img.jpg.jpeg",
-    caption: "Petrochemical Lab",
-    category: "Labs",
-  },
-
-  // --- Additional Sports ---
-  {
-    src: "/jct-life/sports4.webp",
-    caption: "Football Championship",
-
-    category: "Sports",
-  },
-  {
-    src: "/jct-life/sports3.webp",
-    caption: "Cricket Tournament",
-    category: "Sports",
-  },
-  {
-    src: "/jct-life/sports1.webp",
-    caption: "Athletics Meet",
-    category: "Sports",
-  },
-
-  // --- Additional Events ---
-  {
-    src: "/site_assests/video-img-1.webp",
-    caption: "Cultural Fest Highlights",
-    category: "Events",
-  },
-  {
-    src: "/site_assests/IMG_20220915_123024_174-scaled.jpg.jpeg",
-    caption: "Guest Lecture Series",
-    category: "Events",
-  },
-  {
-    src: "/site_assests/WhatsApp-Image-2024-11-29-at-3.06.58-PM.jpeg",
-    caption: "Technical Symposium",
-    category: "Events",
-  },
-  {
-    src: "/site_assests/WhatsApp-Image-2024-12-09-at-10.54.24-AM.jpeg",
-    caption: "Graduation Ceremony",
-    category: "Events",
-  },
-
-  // --- Additional Clubs ---
-  {
-    src: "/site_assests/life-img-1.jpg.jpeg",
-    caption: "Photography Club Outing",
-    category: "Clubs",
-  },
-  {
-    src: "/site_assests/WhatsApp-Image-2024-12-09-at-10.54.24-AM.jpeg",
-    caption: "Coding Club Hackathon",
-    category: "Clubs",
-  },
-  {
-    src: "/site_assests/WhatsApp-Image-2024-11-29-at-2.36.24-PM.jpeg",
-    caption: "Arts & Music Performance",
-    category: "Clubs",
-  },
-  {
-    src: "/site_assests/future-banner.webp",
-    caption: "Innovation & Startup Cell",
-    category: "Clubs",
-  },
-];
-
 export function CampusLife() {
   const [activeFilter, setActiveFilter] =
     useState<(typeof categories)[number]>("All");
@@ -250,7 +131,7 @@ export function CampusLife() {
 
   const filtered =
     activeFilter === "All"
-      ? photos.filter((p) => "isAll" in p && (p as any).isAll)
+      ? photos.filter((p) => "isAll" in p && (p as { isAll?: boolean }).isAll)
       : photos.filter((p) => p.category === activeFilter);
 
   const [isVideoOpen, setIsVideoOpen] = useState(false);
@@ -354,6 +235,7 @@ export function CampusLife() {
                 src={photo.src}
                 alt={photo.caption}
                 fill
+                sizes="(min-width: 768px) 50vw, 100vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 flex items-end bg-linear-to-t from-black/70 via-black/10 to-transparent p-3 transition-opacity duration-300 md:p-5 md:opacity-0 md:group-hover:opacity-100">

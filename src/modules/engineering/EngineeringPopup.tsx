@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight, Award, Megaphone, Phone } from "lucide-react";
+import { X, ArrowRight, Phone } from "lucide-react";
 import { siteConfig } from "@/data/site";
 
 export function EngineeringPopup() {
@@ -61,7 +61,7 @@ export function EngineeringPopup() {
                   alt="Engineering Placement Brochure"
                   width={800}
                   height={1131}
-                  className="h-auto w-full block"
+                  className="block h-auto w-full"
                   priority
                 />
               </div>
@@ -81,8 +81,8 @@ export function EngineeringPopup() {
                   </h2>
 
                   <p className="mb-6 text-sm leading-relaxed text-stone-600 md:text-base">
-                    Start your engineering journey with JCT. Applications are now
-                    open for B.E. / B.Tech programs.
+                    Start your engineering journey with JCT. Applications are
+                    now open for B.E. / B.Tech programs.
                   </p>
 
                   <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-stone-200 bg-stone-50/50 p-6">
@@ -94,9 +94,9 @@ export function EngineeringPopup() {
                         {siteConfig.counsellingCode}
                       </span>
                     </div>
-                    
+
                     <div className="h-px w-full bg-stone-200" />
-                    
+
                     <div className="flex items-center gap-4">
                       <span className="text-lg font-medium text-stone-600">
                         Contact:

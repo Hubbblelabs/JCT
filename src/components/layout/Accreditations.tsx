@@ -153,8 +153,8 @@ export function Accreditations({ variant = "default" }: AccreditationsProps) {
                       src={logo.src}
                       alt={logo.name}
                       fill
-                      className="object-contain"
                       sizes="72px"
+                      className="object-contain"
                     />
                   </div>
                 </div>

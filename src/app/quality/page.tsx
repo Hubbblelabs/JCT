@@ -129,6 +129,7 @@ export default function QualityPage() {
                         src={item.logo}
                         alt={item.name}
                         fill
+                        sizes="64px"
                         className="object-contain p-1"
                       />
                     </div>

@@ -187,6 +187,7 @@ export default function EngineeringAlumniPage() {
                         src={testimonial.image}
                         alt={testimonial.name}
                         fill
+                        sizes="56px"
                         className="object-cover"
                       />
                     </div>

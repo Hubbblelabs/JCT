@@ -99,6 +99,7 @@ export default function CampusLifePage() {
           src="/jct-life/jct-life1.webp"
           alt="JCT Campus Life"
           fill
+          sizes="100vw"
           className="object-cover brightness-[0.55]"
           priority
         />
@@ -220,6 +221,7 @@ export default function CampusLifePage() {
                       src={item.image}
                       alt={item.title}
                       fill
+                      sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw"
                       className="object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                   </div>
@@ -299,6 +301,7 @@ export default function CampusLifePage() {
                     src={service.image}
                     alt={service.title}
                     fill
+                    sizes="(min-width: 768px) 50vw, 100vw"
                     className="object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute top-6 left-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/95 shadow-xl backdrop-blur-sm transition-transform duration-500 group-hover:rotate-[360deg] md:h-14 md:w-14">
@@ -342,6 +345,7 @@ export default function CampusLifePage() {
                       src="/jct-life/sports1.webp"
                       alt="Sports"
                       fill
+                      sizes="(min-width: 768px) 30vw, 50vw"
                       className="object-cover transition-transform group-hover:scale-110"
                     />
                   </div>
@@ -350,6 +354,7 @@ export default function CampusLifePage() {
                       src="/jct-life/sports4.webp"
                       alt="Sports"
                       fill
+                      sizes="(min-width: 768px) 30vw, 50vw"
                       className="object-cover transition-transform group-hover:scale-110"
                     />
                   </div>
@@ -360,6 +365,7 @@ export default function CampusLifePage() {
                       src="/jct-life/sports3.webp"
                       alt="Sports"
                       fill
+                      sizes="(min-width: 768px) 30vw, 50vw"
                       className="object-cover transition-transform group-hover:scale-110"
                     />
                   </div>
@@ -368,6 +374,7 @@ export default function CampusLifePage() {
                       src="/jct-life/sports2.webp"
                       alt="Sports"
                       fill
+                      sizes="(min-width: 768px) 30vw, 50vw"
                       className="object-cover transition-transform group-hover:scale-110"
                     />
                   </div>
@@ -448,6 +455,7 @@ export default function CampusLifePage() {
                   src="/jct-life/arts-club1.webp"
                   alt="Arts Club"
                   fill
+                  sizes="100vw"
                   className="object-cover"
                 />
                 <div className="from-navy/90 via-navy/20 absolute inset-0 bg-gradient-to-t to-transparent" />

@@ -266,6 +266,7 @@ export function AboutPolytechnic() {
                       src="/site_assests/logo.webp"
                       alt="Principal"
                       fill
+                      sizes="280px"
                       className="bg-white object-contain"
                     />
                   </div>

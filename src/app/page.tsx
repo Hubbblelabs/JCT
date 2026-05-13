@@ -7,7 +7,6 @@ import { AdmissionsCTA } from "@/components/layout/AdmissionsCTA";
 import { Footer } from "@/components/layout/Footer";
 import { WhyJCT } from "@/components/layout/WhyJCT";
 import { CampusLife } from "@/components/layout/CampusLife";
-import { HomePopup } from "@/components/layout/HomePopup";
 import { Phamplets } from "@/components/layout/Phamplets";
 
 export default function HomePage() {
