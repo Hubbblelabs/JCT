@@ -46,7 +46,7 @@ export function EngineeringPopup() {
             {/* Close Button */}
             <button
               onClick={handleClose}
-              className="absolute top-3 right-3 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-black/20 text-white backdrop-blur-md transition-colors hover:bg-black/40 md:top-4 md:right-4 md:h-8 md:w-8 md:bg-white/90 md:text-black md:hover:bg-white md:hover:text-black"
+              className="absolute top-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition-colors hover:bg-black/80 md:h-8 md:w-8"
               aria-label="Close popup"
             >
               <X size={20} />
