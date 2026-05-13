@@ -46,71 +46,81 @@ export function ArtsSciencePopup() {
             {/* Close Button */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition-colors hover:bg-black/80 md:h-8 md:w-8"
+              className="absolute top-4 right-4 z-[100] flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
               aria-label="Close popup"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
 
-            {/* Image / Graphic Side */}
-            <div className="relative h-[450px] w-full overflow-hidden bg-white md:h-auto md:w-[45%]">
-              <div className="absolute inset-0 z-0">
+            {/* Scrollable Wrapper for Mobile */}
+            <div className="flex h-full max-h-[85vh] w-full flex-col overflow-y-auto md:max-h-none md:flex-row">
+              {/* Image / Graphic Side */}
+              <div className="relative w-full bg-white md:w-[60%]">
                 <Image
-                  src="/assets/engineering-landing4.png"
+                  src="/phamplets/arts.jpeg"
                   alt="Arts & Science Admission Brochure"
-                  fill
-                  className="object-cover object-top"
+                  width={800}
+                  height={1131}
+                  className="h-auto w-full block"
                   priority
                 />
               </div>
-            </div>
 
-            {/* Content Side */}
-            <div className="flex w-full flex-col justify-center p-8 md:w-[60%] md:p-12">
-              <div className="mb-1 inline-block text-[20px] font-black tracking-widest text-[#d4a024] uppercase">
-                Admissions Open 2026-27
-              </div>
-              <h2 className="text-navy mb-4 font-serif text-3xl font-bold md:text-4xl">
-                Shape Your Future at JCT
-              </h2>
-
-              <p className="mb-4 text-stone-600">
-                Explore a world of opportunities in Arts, Science, and Commerce.
-                Our industry-aligned programs prepare you for global success.
-              </p>
-
-              <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-                  <span className="text-lg font-semibold text-stone-600">
-                    Explore Programs:
-                  </span>
-                  <span className="text-xl font-bold text-[#d4a024]">
-                    CS, AI, Commerce & more
-                  </span>
-                </div>
-                <div className="h-px w-full bg-stone-200" />
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-                  <span className="text-lg font-semibold text-stone-600">
-                    Contact:
-                  </span>
-                  <a
-                    href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-                    className="flex items-center gap-2 text-xl font-bold text-[#0a1628] transition-colors hover:text-[#d4a024]"
-                  >
-                    <Phone size={20} className="text-[#d4a024]" />
-                    {siteConfig.contact.phone}
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href="https://admissions.jct.ac.in/"
-                  onClick={handleClose}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FFC917] px-8 py-3 font-sans text-sm font-bold text-black transition-transform hover:scale-105"
+              {/* Content Side */}
+              <div className="flex w-full flex-col justify-center p-6 md:w-[40%] md:p-6">
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
                 >
-                  Apply Now <ArrowRight size={16} />
-                </Link>
+                  <div className="mb-0.5 text-[12px] font-bold tracking-wider text-[#d4a024] uppercase">
+                    Admissions 2026-27
+                  </div>
+                  <h2 className="mb-2 font-serif text-2xl font-bold text-[#0a1628] md:text-3xl">
+                    Shape Your Future
+                  </h2>
+
+                  <p className="mb-3 text-xs leading-relaxed text-stone-600 md:text-sm">
+                    Explore a world of opportunities in Arts, Science, and Commerce.
+                    Our programs prepare you for global success.
+                  </p>
+
+                  <div className="mb-5 flex flex-col gap-2 rounded-xl border border-stone-200 bg-stone-50/50 p-4">
+                    <div className="flex flex-col">
+                      <span className="text-xs font-semibold text-stone-500 uppercase tracking-tighter">
+                        Explore Programs:
+                      </span>
+                      <span className="text-base font-bold text-[#d4a024]">
+                        CS, AI, Commerce & more
+                      </span>
+                    </div>
+                    
+                    <div className="h-px w-full bg-stone-200" />
+                    
+                    <div className="flex flex-col">
+                      <span className="text-xs font-semibold text-stone-500 uppercase tracking-tighter">
+                        Contact:
+                      </span>
+                      <a
+                        href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
+                        className="flex items-center gap-1 text-base font-bold text-[#0a1628] transition-colors hover:text-[#d4a024]"
+                      >
+                        <Phone size={14} className="text-[#d4a024]" />
+                        {siteConfig.contact.phone}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-4 sm:flex-row">
+                    <Link
+                      href="https://admissions.jct.ac.in/"
+                      onClick={handleClose}
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FFC917] px-6 py-2.5 font-sans text-xs font-bold text-black transition-transform hover:scale-105"
+                    >
+                      Apply Now <ArrowRight size={14} />
+                    </Link>
+                  </div>
+                </motion.div>
               </div>
             </div>
           </motion.div>

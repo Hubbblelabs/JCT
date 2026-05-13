@@ -46,93 +46,81 @@ export function EngineeringPopup() {
             {/* Close Button */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-md transition-colors hover:bg-black/80 md:h-8 md:w-8"
+              className="absolute top-4 right-4 z-[100] flex h-8 w-8 items-center justify-center rounded-full bg-black/50 text-white transition-colors hover:bg-black/70"
               aria-label="Close popup"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
 
-            {/* Image / Graphic Side */}
-            <div className="relative h-[450px] w-full overflow-hidden bg-white md:h-auto md:w-[45%]">
-              <div className="absolute inset-0 z-0">
+            {/* Scrollable Wrapper for Mobile */}
+            <div className="flex h-full max-h-[85vh] w-full flex-col overflow-y-auto md:max-h-none md:flex-row">
+              {/* Image / Graphic Side */}
+              <div className="relative w-full bg-[#f8f9fa] md:w-[50%]">
                 <Image
                   src="/phamplets/engineerinig-placement.jpeg"
                   alt="Engineering Placement Brochure"
-                  fill
-                  className="object-cover object-top"
+                  width={800}
+                  height={1131}
+                  className="h-auto w-full block"
                   priority
                 />
               </div>
-              {/* <div className="relative z-10 flex h-full flex-col justify-end p-8 text-white">
-                <div className="mb-4 flex flex-wrap items-center gap-2 self-start">
-                  <div className="inline-flex items-center gap-1.5 rounded-full bg-[#FFC917] px-2.5 py-1 text-[10px] font-black tracking-wider text-black uppercase shadow-sm">
-                    Autonomous
-                  </div>
-                  <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-medium backdrop-blur-md">
-                    <Award size={14} className="text-[#FFC917]" />
-                    <span>NAAC & NBA Accredited</span>
-                  </div>
-                </div>
-                <h3 className="font-serif text-3xl leading-tight font-bold md:text-4xl">
-                  Transforming <span className="text-[#FFC917]">Futures</span>
-                </h3>
-                <p className="mt-2 text-sm text-white/80 md:text-base">
-                  16+ Years of Academic Excellence & 98% Placement Success Rate.
-                </p>
-              </div> */}
-            </div>
 
-            {/* Content Side */}
-            <div className="flex w-full flex-col justify-center p-8 md:w-[60%] md:p-12">
-              {/* <div className="mb-6 inline-flex items-center gap-2 font-sans text-sm font-bold tracking-widest text-[#FFc917] uppercase">
-                <Megaphone size={16} />
-                <span>Admissions 2026-27</span>
-              </div> */}
-
-              <div className="mb-1 inline-block text-[20px] font-black tracking-widest text-[#d4a024] uppercase">
-                Autonomous Institution
-              </div>
-              <h2 className="text-navy mb-4 font-serif text-3xl font-bold md:text-4xl">
-                Admissions Open
-              </h2>
-
-              <p className="mb-4 text-stone-600">
-                Start your engineering journey with JCT. Applications are now
-                open for B.E. / B.Tech programs.
-              </p>
-
-              <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-6 shadow-sm">
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-                  <span className="text-lg font-semibold text-stone-600">
-                    Counselling Code:
-                  </span>
-                  <span className="text-3xl font-black tracking-tight text-[#d4a024] md:text-4xl">
-                    {siteConfig.counsellingCode}
-                  </span>
-                </div>
-                <div className="h-px w-full bg-stone-200" />
-                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-4">
-                  <span className="text-lg font-semibold text-stone-600">
-                    Contact:
-                  </span>
-                  <a
-                    href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-                    className="flex items-center gap-2 text-xl font-bold text-[#0a1628] transition-colors hover:text-[#d4a024]"
-                  >
-                    <Phone size={20} className="text-[#d4a024]" />
-                    {siteConfig.contact.phone}
-                  </a>
-                </div>
-              </div>
-
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Link
-                  href="https://admissions.jct.ac.in/"
-                  onClick={handleClose}
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FFC917] px-6 py-3 font-sans text-sm font-bold text-black transition-transform hover:scale-105"
+              {/* Content Side */}
+              <div className="flex w-full flex-col justify-center p-8 md:w-[50%] md:p-10">
+                <motion.div
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 }}
                 >
-                  Apply Now <ArrowRight size={16} />
-                </Link>
+                  <div className="mb-1 text-[16px] font-bold tracking-wider text-[#d4a024] uppercase">
+                    Autonomous Institution
+                  </div>
+                  <h2 className="mb-4 font-serif text-3xl font-bold text-[#0a1628] md:text-4xl">
+                    Admissions Open
+                  </h2>
+
+                  <p className="mb-6 text-sm leading-relaxed text-stone-600 md:text-base">
+                    Start your engineering journey with JCT. Applications are now
+                    open for B.E. / B.Tech programs.
+                  </p>
+
+                  <div className="mb-8 flex flex-col gap-4 rounded-2xl border border-stone-200 bg-stone-50/50 p-6">
+                    <div className="flex items-center gap-4">
+                      <span className="text-lg font-medium text-stone-600">
+                        Counselling Code:
+                      </span>
+                      <span className="text-2xl font-bold text-[#d4a024]">
+                        {siteConfig.counsellingCode}
+                      </span>
+                    </div>
+                    
+                    <div className="h-px w-full bg-stone-200" />
+                    
+                    <div className="flex items-center gap-4">
+                      <span className="text-lg font-medium text-stone-600">
+                        Contact:
+                      </span>
+                      <a
+                        href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
+                        className="flex items-center gap-2 text-xl font-bold text-[#0a1628] transition-colors hover:text-[#d4a024]"
+                      >
+                        <Phone size={18} className="text-[#d4a024]" />
+                        {siteConfig.contact.phone}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-4 sm:flex-row">
+                    <Link
+                      href="https://admissions.jct.ac.in/"
+                      onClick={handleClose}
+                      className="inline-flex items-center justify-center gap-2 rounded-full bg-[#FFC917] px-8 py-3 font-sans text-sm font-bold text-black transition-transform hover:scale-105"
+                    >
+                      Apply Now <ArrowRight size={16} />
+                    </Link>
+                  </div>
+                </motion.div>
               </div>
             </div>
           </motion.div>
