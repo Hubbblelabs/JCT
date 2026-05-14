@@ -9,8 +9,8 @@ import Link from "next/link";
 
 const CAROUSEL_IMAGES = [
   "/site_assests/polytechnic.jpeg", // Academic Campus
-  "/site_assests/mech-img.jpg.jpeg", // Laboratory/Engineering
-  "/site_assests/future-banner.webp", // Structural/Minimal
+  "/assets/lab4.webp", // Laboratory/Engineering
+  "/assets/jct-life8.webp", // Structural/Minimal
 ];
 
 /* ─── Animation helpers ─── */

@@ -10,7 +10,7 @@ const categories = ["All", "Labs", "Sports", "Events", "Clubs"] as const;
 const photos = [
   // --- All / Curated items (The original 5) ---
   {
-    src: "/site_assests/computer-img1.jpg.jpeg",
+    src: "/assets/lab2.webp",
     caption: "Advanced Computer Lab",
     category: "Labs",
     isAll: true,
@@ -28,13 +28,13 @@ const photos = [
     isAll: true,
   },
   {
-    src: "/site_assests/MGL5086-1.webp",
+    src: "/assets/jct-life12.webp",
     caption: "Robotics Club Workshop",
     category: "Clubs",
     isAll: true,
   },
   {
-    src: "/site_assests/facility-bg.jpg.jpeg",
+    src: "/assets/campus1.webp",
     caption: "Campus Green Walkway",
     category: "Events",
     isAll: true,
@@ -42,22 +42,22 @@ const photos = [
 
   // --- Additional Labs ---
   {
-    src: "/site_assests/bio-lab-img.jpg.jpeg",
+    src: "/assets/lab1.webp",
     caption: "Bio-Technology Research",
     category: "Labs",
   },
   {
-    src: "/site_assests/eee-img.jpg.jpeg",
+    src: "/assets/lab3.webp",
     caption: "Electrical Engineering Lab",
     category: "Labs",
   },
   {
-    src: "/site_assests/mech-img.jpg.jpeg",
+    src: "/assets/lab4.webp",
     caption: "Mechanical Workshop",
     category: "Labs",
   },
   {
-    src: "/site_assests/p-c-img.jpg.jpeg",
+    src: "/assets/lab5.webp",
     caption: "Petrochemical Lab",
     category: "Labs",
   },
@@ -81,44 +81,44 @@ const photos = [
 
   // --- Additional Events ---
   {
-    src: "/site_assests/video-img-1.webp",
+    src: "/assets/jct-life14.webp",
     caption: "Cultural Fest Highlights",
     category: "Events",
   },
   {
-    src: "/site_assests/IMG_20220915_123024_174-scaled.jpg.jpeg",
+    src: "/assets/campus4.webp",
     caption: "Guest Lecture Series",
     category: "Events",
   },
   {
-    src: "/site_assests/WhatsApp-Image-2024-11-29-at-3.06.58-PM.jpeg",
+    src: "/assets/jct-life1.webp",
     caption: "Technical Symposium",
     category: "Events",
   },
   {
-    src: "/site_assests/WhatsApp-Image-2024-12-09-at-10.54.24-AM.jpeg",
+    src: "/assets/jct-life9.webp",
     caption: "Graduation Ceremony",
     category: "Events",
   },
 
   // --- Additional Clubs ---
   {
-    src: "/site_assests/life-img-1.jpg.jpeg",
+    src: "/assets/jct-life11.webp",
     caption: "Photography Club Outing",
     category: "Clubs",
   },
   {
-    src: "/site_assests/WhatsApp-Image-2024-12-09-at-10.54.24-AM.jpeg",
+    src: "/assets/jct-life9.webp",
     caption: "Coding Club Hackathon",
     category: "Clubs",
   },
   {
-    src: "/site_assests/WhatsApp-Image-2024-11-29-at-2.36.24-PM.jpeg",
+    src: "/assets/jct-life10.webp",
     caption: "Arts & Music Performance",
     category: "Clubs",
   },
   {
-    src: "/site_assests/future-banner.webp",
+    src: "/assets/jct-life8.webp",
     caption: "Innovation & Startup Cell",
     category: "Clubs",
   },

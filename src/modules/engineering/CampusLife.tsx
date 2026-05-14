@@ -7,8 +7,8 @@ import { DragScroll } from "@/components/ui/DragScroll";
 const campusImages = [
   "/site_assests/banner3.jpg.jpeg",
   "/site_assests/banner6.jpeg",
-  "/site_assests/facility-bg.jpg.jpeg",
-  "/site_assests/MGL5086-1.webp",
+  "/assets/campus1.webp",
+  "/assets/jct-life12.webp",
   "/site_assests/19.jpeg",
 ];
 

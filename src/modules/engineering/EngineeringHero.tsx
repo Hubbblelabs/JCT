@@ -28,7 +28,7 @@ export function EngineeringHero() {
         className="pointer-events-none absolute inset-0"
       >
         <Image
-          src="/site_assests/facility-bg.jpg.jpeg"
+          src="/assets/campus1.webp"
           alt="JCT Engineering Campus"
           fill
           priority

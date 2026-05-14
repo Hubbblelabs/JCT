@@ -5,9 +5,9 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 
 const CAROUSEL_IMAGES = [
-  "/site_assests/banner.jpg.jpeg",
-  "/site_assests/banner2.jpeg",
-  "/site_assests/hostel-1.jpeg",
+  "/assets/jct-life4.webp",
+  "/assets/jct-life5.webp",
+  "/assets/campus5.webp",
 ];
 
 export function ArtsAndScienceHeroBg() {

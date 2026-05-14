@@ -11,7 +11,7 @@ const newsItems = [
     excerpt:
       "A team of 4 CSE students bagged first prize at CodeSprint 2026, competing against 200+ teams from across India.",
     category: "Achievement",
-    image: "/site_assests/news-1.webp",
+    image: "/assets/jct-life13.webp",
   },
   {
     date: "28 Feb 2026",
@@ -19,7 +19,7 @@ const newsItems = [
     excerpt:
       "JCT College of Engineering partners with TCS to offer hands-on training modules and guaranteed internship placements.",
     category: "Partnership",
-    image: "/site_assests/3.jpeg",
+    image: "/assets/jct-life2.webp",
   },
   {
     date: "15 Feb 2026",
@@ -35,7 +35,7 @@ const newsItems = [
     excerpt:
       "JCT Institutions undergoes peer review for NAAC re-accreditation, with preliminary reports indicating strong outcomes.",
     category: "Accreditation",
-    image: "/site_assests/naac-imggg-01.jpg.jpeg",
+    image: "/naac.png",
   },
 ];
 

@@ -55,7 +55,7 @@ export function HomePopup() {
             <div className="bg-navy relative h-[200px] w-full overflow-hidden md:h-auto md:w-1/2">
               <div className="absolute inset-0 z-0 opacity-50">
                 <Image
-                  src="/assets/home-herosection.jpg"
+                  src="/assets/campus3.webp"
                   alt="Campus"
                   fill
                   sizes="(min-width: 768px) 50vw, 100vw"
