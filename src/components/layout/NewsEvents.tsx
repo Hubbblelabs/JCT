@@ -19,7 +19,7 @@ const newsItems = [
     excerpt:
       "JCT College of Engineering partners with TCS to offer hands-on training modules and guaranteed internship placements.",
     category: "Partnership",
-    image: "/site_assests/dummy-news-img.jpg.jpeg",
+    image: "/site_assests/3.jpeg",
   },
   {
     date: "15 Feb 2026",
@@ -27,7 +27,7 @@ const newsItems = [
     excerpt:
       "Over 1,500 students participated in inter-department sports events spanning athletics, cricket, basketball, and chess.",
     category: "Campus Life",
-    image: "/site_assests/MGL5086-1.webp",
+    image: "/jct-life/sports3.webp",
   },
   {
     date: "22 Feb 2026",
