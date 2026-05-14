@@ -403,18 +403,18 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               <span className="truncate">{siteConfig.contact.phone}</span>
             </a>
             {institution === "main" && (
-            <Link
-              href="https://admissions.jct.ac.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`inline-flex h-9 items-center justify-center rounded-full px-4 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10 xl:px-5 xl:text-[14px] 2xl:text-[15px] ${
-                isSolid
-                  ? `${highlightBgColor} font-semibold text-[#0a1628] shadow-lg shadow-black/20 ${highlightHoverBgColor}`
-                  : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
-              }`}
-            >
-              Apply Now
-            </Link>
+              <Link
+                href="https://admissions.jct.ac.in"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex h-9 items-center justify-center rounded-full px-4 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10 xl:px-5 xl:text-[14px] 2xl:text-[15px] ${
+                  isSolid
+                    ? `${highlightBgColor} font-semibold text-[#0a1628] shadow-lg shadow-black/20 ${highlightHoverBgColor}`
+                    : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
+                }`}
+              >
+                Apply Now
+              </Link>
             )}
           </div>
 

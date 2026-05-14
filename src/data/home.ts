@@ -1,8 +1,8 @@
 export const homeHeroContent = {
   backgroundImages: [
-    "/site_assests/banner2.jpeg",
-    "/site_assests/future-banner.webp",
-    "/site_assests/facility-bg.jpg.jpeg",
+    "/assets/jct-life5.webp",
+    "/assets/campus1.webp",
+    "/assets/jct-life8.webp",
   ],
   titleLines: ["One Campus.", "Three Pathways.", "Unlimited Futures."],
   ctas: [

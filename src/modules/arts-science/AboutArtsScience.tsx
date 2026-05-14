@@ -249,7 +249,8 @@ export function AboutArtsScience() {
                   </li>
                   <li>
                     To ensure continuous improvement in academic and
-                    co-curricular programs aligned with evolving global standards.
+                    co-curricular programs aligned with evolving global
+                    standards.
                   </li>
                 </ul>
               </motion.div>
@@ -307,8 +308,8 @@ export function AboutArtsScience() {
                   <div className="text-arts-science-dark/80 space-y-5 font-sans text-lg leading-relaxed italic md:text-[19px]">
                     <p>
                       &ldquo;Education is the most powerful weapon which you can
-                      use to change the world. At JCTCAS, we continuously
-                      update our practices to match dynamic societal changes and
+                      use to change the world. At JCTCAS, we continuously update
+                      our practices to match dynamic societal changes and
                       technological progress, while staying true to our motto:
                       Educate, Empower and Elevate.&rdquo;
                     </p>

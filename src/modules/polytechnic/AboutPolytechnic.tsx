@@ -218,9 +218,7 @@ export function AboutPolytechnic() {
                     Skills embedded education for productive careers and higher
                     studies.
                   </li>
-                  <li>
-                    Value and ethics integrated technical education.
-                  </li>
+                  <li>Value and ethics integrated technical education.</li>
                   <li>
                     To promote industry-academia partnerships and continuous
                     professional development.

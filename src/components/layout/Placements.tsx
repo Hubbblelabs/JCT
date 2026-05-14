@@ -6,7 +6,10 @@ import { TrendingUp, Award, Building } from "lucide-react";
 
 const companies = [
   { name: "Abiba", logo: "/company-logos/abiba.webp" },
-  { name: "Aditya Birla Group", logo: "/company-logos/aditya-birla-group.webp" },
+  {
+    name: "Aditya Birla Group",
+    logo: "/company-logos/aditya-birla-group.webp",
+  },
   { name: "AIS India Glass", logo: "/company-logos/ais-india-glass.webp" },
   { name: "Alstom", logo: "/company-logos/alstom.webp" },
   { name: "Ashok Leyland", logo: "/company-logos/ashok-leyland.webp" },
@@ -36,7 +39,10 @@ const companies = [
   { name: "Tagros", logo: "/company-logos/tagros.webp" },
   { name: "TCS", logo: "/company-logos/tcs.webp" },
   { name: "Tech Mahindra", logo: "/company-logos/tech-mahindra.webp" },
-  { name: "Thirumalai Chemicals", logo: "/company-logos/thirumalai-chemicals.webp" },
+  {
+    name: "Thirumalai Chemicals",
+    logo: "/company-logos/thirumalai-chemicals.webp",
+  },
   { name: "Trika", logo: "/company-logos/trika.webp" },
   { name: "Trioticz", logo: "/company-logos/trioticz.webp" },
   { name: "Tudip", logo: "/company-logos/tudip.webp" },

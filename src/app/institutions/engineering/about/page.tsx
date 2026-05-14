@@ -68,11 +68,23 @@ const campusHighlights = [
 
 const accreditations = [
   { name: "AICTE", desc: "Approved", logo: "/accreditations/aicte.webp" },
-  { name: "NBA", desc: "Accredited Programs", logo: "/accreditations/nba.webp" },
+  {
+    name: "NBA",
+    desc: "Accredited Programs",
+    logo: "/accreditations/nba.webp",
+  },
   { name: "NAAC", desc: '"A" Grade', logo: "/accreditations/naac.webp" },
-  { name: "Anna University", desc: "Affiliated", logo: "/accreditations/anna.webp" },
+  {
+    name: "Anna University",
+    desc: "Affiliated",
+    logo: "/accreditations/anna.webp",
+  },
   { name: "UGC", desc: "Recognized", logo: "/accreditations/ugc.webp" },
-  { name: "ISO 9001:2015", desc: "Certified", logo: "/accreditations/iso.webp" },
+  {
+    name: "ISO 9001:2015",
+    desc: "Certified",
+    logo: "/accreditations/iso.webp",
+  },
 ];
 
 const missionPoints = [
