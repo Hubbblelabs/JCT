@@ -27,7 +27,7 @@ const newsItems = [
     excerpt:
       "Over 1,500 students participated in inter-department sports events spanning athletics, cricket, basketball, and chess.",
     category: "Campus Life",
-    image: "/jct-life/sports3.webp",
+    image: "/campus-life-assets/sports3.webp",
   },
   {
     date: "22 Feb 2026",
@@ -35,7 +35,7 @@ const newsItems = [
     excerpt:
       "JCT Institutions undergoes peer review for NAAC re-accreditation, with preliminary reports indicating strong outcomes.",
     category: "Accreditation",
-    image: "/naac.png",
+    image: "/accreditations/naac.webp",
   },
 ];
 

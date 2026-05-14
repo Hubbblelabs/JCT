@@ -48,43 +48,43 @@ const HIGHLIGHTS = [
   {
     id: 1,
     title: "Student Hub",
-    image: "/jct-life/jct-life2.webp",
+    image: "/campus-life-assets/jct-life2.webp",
     aspect: "aspect-[4/5]",
   },
   {
     id: 2,
     title: "Central Library",
-    image: "/jct-life/library1.webp",
+    image: "/campus-life-assets/library1.webp",
     aspect: "aspect-[16/9]",
   },
   {
     id: 3,
     title: "Innovation Lab",
-    image: "/jct-life/computer-lab2.webp",
+    image: "/campus-life-assets/computer-lab2.webp",
     aspect: "aspect-square",
   },
   {
     id: 5,
     title: "Sports Complex",
-    image: "/jct-life/sports1.webp",
+    image: "/campus-life-assets/sports1.webp",
     aspect: "aspect-[16/10]",
   },
   {
     id: 6,
     title: "Smart Classrooms",
-    image: "/jct-life/classroom1.webp",
+    image: "/campus-life-assets/classroom1.webp",
     aspect: "aspect-[4/3]",
   },
   {
     id: 7,
     title: "Research Excellence",
-    image: "/jct-life/electronics-lab.webp",
+    image: "/campus-life-assets/electronics-lab.webp",
     aspect: "aspect-video",
   },
   {
     id: 8,
     title: "Student Activities",
-    image: "/jct-life/arts-club3.webp",
+    image: "/campus-life-assets/arts-club3.webp",
     aspect: "aspect-[9/16]",
   },
 ];
@@ -97,7 +97,7 @@ export default function CampusLifePage() {
       {/* 🔹 1. Hero Section: Refined Typography & Soft Gradient */}
       <section className="relative h-[85vh] w-full overflow-hidden">
         <Image
-          src="/jct-life/jct-life1.webp"
+          src="/campus-life-assets/jct-life1.webp"
           alt="JCT Campus Life"
           fill
           sizes="100vw"
@@ -188,7 +188,7 @@ export default function CampusLifePage() {
           <motion.div {...slideInRight} className="relative">
             <div className="relative aspect-[20/12] overflow-hidden rounded-[2.5rem] shadow-2xl">
               <Image
-                src="/jct-life/building1.webp"
+                src="/campus-life-assets/building1.webp"
                 alt="JCT Main Building"
                 fill
                 className="object-cover transition-transform duration-700 hover:scale-105"
@@ -261,7 +261,7 @@ export default function CampusLifePage() {
               {
                 title: "Hostel Facilities",
                 desc: "A home away from home with multi-cuisine dining, Wi-Fi, and 24/7 care.",
-                image: "/jct-life/hostel.webp",
+                image: "/campus-life-assets/hostel.webp",
                 icon: <Home className="text-navy" size={24} />,
                 points: [
                   "Separate Boys/Girls Hostels",
@@ -272,7 +272,7 @@ export default function CampusLifePage() {
               {
                 title: "Transport Network",
                 desc: "Extensive fleet connecting Coimbatore and Palakkad with real-time GPS tracking.",
-                image: "/jct-life/transport.webp",
+                image: "/campus-life-assets/transport.webp",
                 icon: <Bus className="text-navy" size={24} />,
                 points: [
                   "CCTV & GPS Enabled",
@@ -283,7 +283,7 @@ export default function CampusLifePage() {
               {
                 title: "Industry-Ready Labs",
                 desc: "Specialized research spaces equipped with the latest technology.",
-                image: "/jct-life/electronics-lab.webp",
+                image: "/campus-life-assets/electronics-lab.webp",
                 icon: <Microscope className="text-navy" size={24} />,
                 points: [
                   "NABL Standards",
@@ -343,7 +343,7 @@ export default function CampusLifePage() {
                 <div className="space-y-4">
                   <div className="group relative aspect-[4/5] overflow-hidden rounded-[2rem] shadow-xl">
                     <Image
-                      src="/jct-life/sports1.webp"
+                      src="/campus-life-assets/sports1.webp"
                       alt="Sports"
                       fill
                       sizes="(min-width: 768px) 30vw, 50vw"
@@ -352,7 +352,7 @@ export default function CampusLifePage() {
                   </div>
                   <div className="group relative aspect-square overflow-hidden rounded-[2rem] shadow-xl">
                     <Image
-                      src="/jct-life/sports4.webp"
+                      src="/campus-life-assets/sports4.webp"
                       alt="Sports"
                       fill
                       sizes="(min-width: 768px) 30vw, 50vw"
@@ -363,7 +363,7 @@ export default function CampusLifePage() {
                 <div className="mt-12 space-y-4">
                   <div className="group relative aspect-square overflow-hidden rounded-[2rem] shadow-xl">
                     <Image
-                      src="/jct-life/sports3.webp"
+                      src="/campus-life-assets/sports3.webp"
                       alt="Sports"
                       fill
                       sizes="(min-width: 768px) 30vw, 50vw"
@@ -372,7 +372,7 @@ export default function CampusLifePage() {
                   </div>
                   <div className="group relative aspect-[4/5] overflow-hidden rounded-[2rem] shadow-xl">
                     <Image
-                      src="/jct-life/sports2.webp"
+                      src="/campus-life-assets/sports2.webp"
                       alt="Sports"
                       fill
                       sizes="(min-width: 768px) 30vw, 50vw"
@@ -385,7 +385,7 @@ export default function CampusLifePage() {
 
             <motion.div {...slideInRight} className="order-1 lg:order-2">
               <div className="bg-gold/10 text-gold inline-block rounded-lg px-3 py-1 text-xs font-bold tracking-widest uppercase">
-                Athletics & Fitness
+                Athletics & Fitness/campus-life-assets/
               </div>
               <h2 className="text-navy mt-4 font-serif text-4xl font-bold md:text-5xl">
                 Unleash Your <span className="text-gold">Spirit</span>
@@ -453,7 +453,7 @@ export default function CampusLifePage() {
             >
               <div className="relative aspect-[4/3] w-full overflow-hidden md:aspect-[32/9]">
                 <Image
-                  src="/jct-life/arts-club1.webp"
+                  src="/campus-life-assets/arts-club1.webp"
                   alt="Arts Club"
                   fill
                   sizes="100vw"

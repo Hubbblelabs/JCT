@@ -53,7 +53,7 @@ function CourseCard({ course }: { course: PolytechnicCourse }) {
         {/* AICTE Badge */}
         <div className="absolute top-3 right-3 flex items-center gap-2 rounded-full bg-white/92 px-2.5 py-1 shadow-sm backdrop-blur-sm">
           <Image
-            src="/aicte.png"
+            src="/accreditations/aicte.webp"
             alt="AICTE"
             width={56}
             height={22}

@@ -122,7 +122,7 @@ export default function ResearchPage() {
 
               <div className="relative overflow-hidden rounded-3xl border border-white/10 shadow-xl">
                 <Image
-                  src="/jct-life/computer-lab2.webp"
+                  src="/campus-life-assets/computer-lab2.webp"
                   alt="Research Laboratory"
                   width={600}
                   height={350}

@@ -16,13 +16,13 @@ const photos = [
     isAll: true,
   },
   {
-    src: "/jct-life/sports3.webp",
+    src: "/campus-life-assets/sports3.webp",
     caption: "Annual Sports Day",
     category: "Sports",
     isAll: true,
   },
   {
-    src: "/jct-life/sports2.webp",
+    src: "/campus-life-assets/sports2.webp",
     caption: "Inter-College Basketball",
     category: "Sports",
     isAll: true,
@@ -64,17 +64,17 @@ const photos = [
 
   // --- Additional Sports ---
   {
-    src: "/jct-life/sports4.webp",
+    src: "/campus-life-assets/sports4.webp",
     caption: "Football Championship",
     category: "Sports",
   },
   {
-    src: "/jct-life/sports3.webp",
+    src: "/campus-life-assets/sports3.webp",
     caption: "Cricket Tournament",
     category: "Sports",
   },
   {
-    src: "/jct-life/sports1.webp",
+    src: "/campus-life-assets/sports1.webp",
     caption: "Athletics Meet",
     category: "Sports",
   },

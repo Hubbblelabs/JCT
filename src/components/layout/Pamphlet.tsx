@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
 
-export function Phamplets() {
+export function Pamphlet() {
   const [isOpen, setIsOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
 
@@ -58,7 +58,7 @@ export function Phamplets() {
               {/* Left Image - Main Brochure */}
               <div className="relative h-1/2 w-full overflow-hidden bg-white md:h-auto md:w-[45%]">
                 <Image
-                  src="/phamplets/mainleft.jpeg"
+                  src="/pamphlets/jct-pamphlet.webp"
                   alt="Main Brochure"
                   fill
                   sizes="(min-width: 768px) 45vw, 100vw"
@@ -69,7 +69,7 @@ export function Phamplets() {
               {/* Right Image - Engineering Placement */}
               <div className="relative h-1/2 w-full overflow-hidden bg-white md:h-auto md:w-[55%]">
                 <Image
-                  src="/phamplets/engineerinig-placement.jpeg"
+                  src="/pamphlets/engineering-pamphlet.webp"
                   alt="Engineering Placement"
                   fill
                   sizes="(min-width: 768px) 55vw, 100vw"

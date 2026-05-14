@@ -10,42 +10,42 @@ type AccreditationsProps = {
 
 const logos = [
   {
-    src: "/naac.png",
+    src: "/accreditations/naac.webp",
     name: "NAAC Accredited",
     note: "Quality benchmark in higher education",
   },
   {
-    src: "/nba.png",
+    src: "/accreditations/nba.webp",
     name: "NBA Accredited",
     note: "Outcome-based program excellence",
   },
   {
-    src: "/iso.png",
+    src: "/accreditations/iso.webp",
     name: "ISO 9001:2015",
     note: "Certified process quality systems",
   },
   {
-    src: "/ugc.png",
+    src: "/accreditations/ugc.webp",
     name: "UGC Recognized",
     note: "Nationally recognized institution",
   },
   {
-    src: "/aicte.png",
+    src: "/accreditations/aicte.webp",
     name: "AICTE Approved",
     note: "Technical education regulatory approval",
   },
   {
-    src: "/anna.png",
+    src: "/accreditations/anna.webp",
     name: "Anna University",
     note: "Affiliated academic framework",
   },
   {
-    src: "/dote.png",
+    src: "/accreditations/dote.webp",
     name: "DOTE Approved",
     note: "State diploma education compliance",
   },
   {
-    src: "/bharathiar_university.png",
+    src: "/accreditations/bharathiar_university.webp",
     name: "Bharathiar University",
     note: "Affiliated arts and science programs",
   },

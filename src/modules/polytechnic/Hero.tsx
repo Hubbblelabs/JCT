@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 const CAROUSEL_IMAGES = [
-  "/site_assests/polytechnic.jpeg", // Academic Campus
+  "/assets/polytechnic.webp", // Academic Campus
   "/assets/lab4.webp", // Laboratory/Engineering
   "/assets/jct-life8.webp", // Structural/Minimal
 ];

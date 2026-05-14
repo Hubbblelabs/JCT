@@ -123,7 +123,7 @@ export function EngineeringHero() {
                 {/* Accreditation Stack */}
                 <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#07111d] bg-white p-1.5 shadow-sm">
                   <Image
-                    src="/naac.png"
+                    src="/accreditations/naac.webp"
                     alt="NAAC"
                     width={32}
                     height={32}
@@ -132,7 +132,7 @@ export function EngineeringHero() {
                 </div>
                 <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#07111d] bg-white p-1.5 shadow-sm">
                   <Image
-                    src="/nba.png"
+                    src="/accreditations/nba.webp"
                     alt="NBA"
                     width={32}
                     height={32}
@@ -141,7 +141,7 @@ export function EngineeringHero() {
                 </div>
                 <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#07111d] bg-white p-1.5 shadow-sm">
                   <Image
-                    src="/aicte.png"
+                    src="/accreditations/aicte.webp"
                     alt="AICTE"
                     width={32}
                     height={32}
@@ -150,7 +150,7 @@ export function EngineeringHero() {
                 </div>
                 <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-[#07111d] bg-white p-1.5 shadow-sm">
                   <Image
-                    src="/anna.png"
+                    src="/accreditations/anna.webp"
                     alt="Anna University"
                     width={32}
                     height={32}

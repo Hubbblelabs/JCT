@@ -56,7 +56,7 @@ function CourseCard({
         {showAccreditationBadges && (
           <div className="absolute top-3 right-3 flex items-center gap-2 rounded-full bg-white/92 px-2.5 py-1 shadow-sm backdrop-blur-sm">
             <Image
-              src="/aicte.png"
+              src="/accreditations/aicte.webp"
               alt="AICTE"
               width={56}
               height={22}
@@ -65,7 +65,7 @@ function CourseCard({
             />
             {course.nbaAccredited && (
               <Image
-                src="/nba.png"
+                src="/accreditations/nba.webp"
                 alt="NBA Accredited"
                 width={56}
                 height={22}

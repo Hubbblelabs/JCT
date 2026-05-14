@@ -57,7 +57,7 @@ export function EngineeringPopup() {
               {/* Image / Graphic Side */}
               <div className="relative w-full bg-[#f8f9fa] md:w-[50%]">
                 <Image
-                  src="/phamplets/engineerinig-placement.jpeg"
+                  src="/pamphlets/engineering-pamphlet.webp"
                   alt="Engineering Placement Brochure"
                   width={800}
                   height={1131}

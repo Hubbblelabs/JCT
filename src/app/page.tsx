@@ -7,14 +7,13 @@ import { AdmissionsCTA } from "@/components/layout/AdmissionsCTA";
 import { Footer } from "@/components/layout/Footer";
 import { WhyJCT } from "@/components/layout/WhyJCT";
 import { CampusLife } from "@/components/layout/CampusLife";
-import { Phamplets } from "@/components/layout/Phamplets";
+import { Pamphlet } from "@/components/layout/Pamphlet";
 
 export default function HomePage() {
   return (
     <main className="bg-surface text-foreground min-h-screen overflow-x-hidden">
       <Navbar />
-      {/*   <HomePopup /> */}
-      <Phamplets />
+      <Pamphlet />
       <HomeHero />
       <TrustHighlightsRow />
       <WhyJCT />

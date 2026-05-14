@@ -5,11 +5,11 @@ import { motion } from "framer-motion";
 import { DragScroll } from "@/components/ui/DragScroll";
 
 const campusImages = [
-  "/site_assests/banner3.jpg.jpeg",
-  "/site_assests/banner6.jpeg",
+  "/assets/jct-life6.webp",
+  "/assets/jct-life7.webp",
   "/assets/campus1.webp",
   "/assets/jct-life12.webp",
-  "/site_assests/19.jpeg",
+  "/assets/jct-life3.webp",
 ];
 
 export function CampusLife() {

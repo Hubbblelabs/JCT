@@ -57,7 +57,7 @@ export function ArtsSciencePopup() {
               {/* Image / Graphic Side */}
               <div className="relative w-full bg-white md:w-[60%]">
                 <Image
-                  src="/phamplets/arts.jpeg"
+                  src="/pamphlets/arts-pamphlet.webp"
                   alt="Arts & Science Admission Brochure"
                   width={800}
                   height={1131}
