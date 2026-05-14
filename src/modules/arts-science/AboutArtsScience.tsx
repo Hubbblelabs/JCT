@@ -122,17 +122,17 @@ export function AboutArtsScience() {
                 </h2>
                 <div className="text-arts-science-dark/75 space-y-4 font-sans text-[17px] leading-relaxed">
                   <p>
-                    JCT College of Arts &amp; Science aims to provide an
-                    interdisciplinary and innovative learning environment that
-                    empowers students to excel in various domains of arts,
-                    commerce, and sciences. Our campus is vibrant with
-                    intellectual rigor and creativity.
+                    Shri Jagannath Educational Health and Charitable Trust was
+                    established with the objective of delivering education for
+                    all, especially students from rural and underserved
+                    communities. Under this vision, JCT College of Arts &amp;
+                    Science was established in 2024 at Pichanur, Coimbatore.
                   </p>
                   <p>
-                    We are committed to delivering contemporary programs that
-                    meet global standards. We equip our students with analytical
-                    skills, ethical values, and leadership qualities required to
-                    navigate and shape the future of society and industry.
+                    JCTCAS combines interdisciplinary learning, modern
+                    laboratories, digital access, and value-based education to
+                    help students build strong academic foundations, industry
+                    readiness, and responsible citizenship.
                   </p>
                 </div>
               </motion.div>
@@ -143,8 +143,8 @@ export function AboutArtsScience() {
                 className="relative h-112.5 w-full overflow-hidden rounded-4xl border-4 border-white shadow-2xl lg:h-137.5"
               >
                 <Image
-                  src="/site_assests/arts.jpeg"
-                  alt="JCT Arts and Science Campus"
+                  src="/about-us-assets/arts.webp"
+                  alt="Shri S. A. Subramanian, Founder"
                   fill
                   className="object-cover"
                 />
@@ -189,11 +189,10 @@ export function AboutArtsScience() {
                   </h3>
                 </div>
                 <p className="text-arts-science-dark/75 font-sans text-[17px] leading-relaxed">
-                  To be an institution of excellence in higher education by
-                  providing quality learning experiences, promoting research,
-                  and equipping students with the ethical values and
-                  intellectual competence needed to build a sustainable and
-                  harmonious society.
+                  To emerge as a premier institute for attaining global
+                  excellence in the field of education and training and produce
+                  professionals of world standards to face the global
+                  environment.
                 </p>
               </motion.div>
 
@@ -225,16 +224,32 @@ export function AboutArtsScience() {
                 </div>
                 <ul className="relative z-10 list-outside list-disc space-y-4 pl-5 font-sans text-[16px] leading-relaxed text-white/80">
                   <li>
-                    Provide holistic education integrating academic excellence
-                    with human values.
+                    To impart knowledge, values, and professional education
+                    through strong theoretical basics and hands-on training.
                   </li>
                   <li>
-                    Foster a culture of continuous learning, critical thinking,
-                    and innovation.
+                    To serve students through leadership, entrepreneurship,
+                    teamwork, quality, ethics, and mutual respect.
                   </li>
                   <li>
-                    Empower students with career readiness and entrepreneurship
-                    skills to meet global challenges.
+                    To provide opportunities for long-term interaction with
+                    academia and industry.
+                  </li>
+                  <li>
+                    To create new knowledge through innovation and research and
+                    continuously adopt meaningful technological developments.
+                  </li>
+                  <li>
+                    To foster holistic development by promoting critical
+                    thinking, creativity, and problem-solving skills.
+                  </li>
+                  <li>
+                    To nurture socially responsible citizens who contribute
+                    meaningfully to society and the nation.
+                  </li>
+                  <li>
+                    To ensure continuous improvement in academic and
+                    co-curricular programs aligned with evolving global standards.
                   </li>
                 </ul>
               </motion.div>
@@ -263,16 +278,16 @@ export function AboutArtsScience() {
                 >
                   <div className="relative mx-auto flex aspect-4/5 w-full max-w-[320px] items-center justify-center overflow-hidden rounded-3xl border-8 border-orange-50 bg-white shadow-lg">
                     <Image
-                      src="/site_assests/logo.webp"
-                      alt="Principal"
-                      width={200}
-                      height={200}
-                      className="object-contain"
+                      src="/about-us-assets/dr.s.anbarasu.webp"
+                      alt="Dr. S. Anbarasu"
+                      fill
+                      sizes="320px"
+                      className="object-cover"
                     />
                   </div>
                   <div className="mt-6 text-center">
                     <h3 className="text-arts-science-dark font-serif text-2xl font-bold">
-                      Dr. K. Senthil
+                      Dr. S. Anbarasu
                     </h3>
                     <p className="text-arts-science-accent mt-1 font-sans text-[15px] font-semibold">
                       Principal, JCT College of Arts &amp; Science
@@ -291,22 +306,23 @@ export function AboutArtsScience() {
                   </h2>
                   <div className="text-arts-science-dark/80 space-y-5 font-sans text-lg leading-relaxed italic md:text-[19px]">
                     <p>
-                      &ldquo;It gives me immense pleasure to welcome you to JCT
-                      College of Arts &amp; Science. Higher education today
-                      requires a delicate balance of academic rigor, practical
-                      knowledge, and value-based development. At JCT, we ensure
-                      our students find this balance.&rdquo;
+                      &ldquo;Education is the most powerful weapon which you can
+                      use to change the world. At JCTCAS, we continuously
+                      update our practices to match dynamic societal changes and
+                      technological progress, while staying true to our motto:
+                      Educate, Empower and Elevate.&rdquo;
                     </p>
                     <p>
-                      &ldquo;Our dedicated faculty, modern infrastructure, and
-                      industry-oriented programs ensure that every student who
-                      leaves our doors is confident, capable, and ready to make
-                      a significant impact in the world.&rdquo;
+                      &ldquo;Our dedicated faculty and state-of-the-art
+                      infrastructure create a vibrant teaching-learning
+                      environment where students are at the center of
+                      co-curricular and extra-curricular growth.&rdquo;
                     </p>
                     <p>
-                      &ldquo;I invite you to be a part of our dynamic learning
-                      community and embark on a fulfilling educational journey
-                      that will shape your career and your life.&rdquo;
+                      &ldquo;Through seminars, workshops, clubs, and sports, we
+                      help learners build leadership and professional skills,
+                      and we remain committed to providing an inspiring learning
+                      experience for every student.&rdquo;
                     </p>
                   </div>
                 </motion.div>

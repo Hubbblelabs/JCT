@@ -120,25 +120,25 @@ const leadership = [
   {
     name: "Shri S. A. Subramanian",
     role: "Founder",
-    image: "/engineering-about-us/shri.s.a.subramanian.webp",
+    image: "/about-us-assets/shri.s.a.subramanian.webp",
     bio: "Shri S. A. Subramanian hails from a renowned scholarly family and did his post graduation in English. He distinguished himself as both an academic and industrial innovator. With a rare and enriching exposure to academic research and industrial experience, Sri Subramanian established Shri Jagannath Educational Health and Charitable Trust in 2008 with the objective of providing affordable quality technical education.",
   },
   {
     name: "Mr. R. Arulselvan",
     role: "Chairman",
-    image: "/engineering-about-us/mr.r.arulselvan.webp",
+    image: "/about-us-assets/mr.r.arulselvan.webp",
     bio: "Mr. R. Arulselvan holds a B.E. (Production Engineering) from Guindy Engineering College and an MBA from De Montfort University, United Kingdom. He is also an Accredited Building Practitioner specialising in Residential and Commercial construction. Through his experience in running business enterprises in India and overseas, he plays a pivotal role in developing JCT as a leading engineering institution.",
   },
   {
     name: "Mr. R. Gautaman",
     role: "Vice Chairman",
-    image: "/engineering-about-us/mr.r.gautaman.webp",
+    image: "/about-us-assets/mr.r.gautaman.webp",
     bio: "Mr. R. Gautaman holds a B.E. (ECE) from Thiagarajar College of Engineering and an MBA from RMIT University, Melbourne. He is a Registered Building Practitioner in Victoria (Australia) and an Ex Banker with experience in Retail Banking and Financial Planning. He encourages a focus on quality in education, infrastructure, and the holistic personality development of students.",
   },
   {
     name: "Mr. R. Durga Shankar",
     role: "Secretary & Managing Trustee",
-    image: "/engineering-about-us/mr.r.durga-shankar.webp",
+    image: "/about-us-assets/mr.r.durga-shankar.webp",
     bio: 'Mr. R. Durga Shankar holds an M.Sc. Computer Science from Guindy Engineering College. He created a platform for Holistic Learning to impart value-based and quality education, committing himself to producing Industry Ready Professionals and Great Leaders. His maxim: "Technical skills with communication skills is a gateway to the globalised market of technology and engineering."',
   },
 ];
@@ -335,7 +335,7 @@ export default function EngineeringAboutPage() {
                   <div className="flex flex-col items-center gap-3 sm:w-44 sm:shrink-0">
                     <div className="relative h-48 w-36 overflow-hidden rounded-2xl border border-white/10 bg-white/5 sm:h-56 sm:w-44">
                       <Image
-                        src="/engineering-about-us/dr.s.manoharan.webp"
+                        src="/about-us-assets/dr.s.manoharan.webp"
                         alt="Dr. S. Manoharan, Principal"
                         fill
                         className="object-cover object-top"

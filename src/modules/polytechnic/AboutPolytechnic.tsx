@@ -110,19 +110,18 @@ export function AboutPolytechnic() {
                 </h2>
                 <div className="space-y-4 text-base leading-relaxed text-stone-600 md:text-lg">
                   <p>
-                    Established with a strong commitment to quality technical
-                    education, JCT Polytechnic College has been a beacon of
-                    learning, transforming aspiring youngsters into skilled
-                    technicians and engineers. We provide a robust foundation in
-                    various engineering disciplines to meet the evolving demands
-                    of the industrial sector.
+                    Shri Jagannath Educational Health and Charitable Trust was
+                    established with the objective of providing education to
+                    all, particularly students from rural and underrepresented
+                    communities. In response to the growing national demand for
+                    technical education, JCT Polytechnic College was established
+                    in Pichanur, Coimbatore in the academic year 2014-2015.
                   </p>
                   <p>
-                    Our curriculum is strictly aligned with the Directorate of
-                    Technical Education (DoTE) and approved by AICTE. We
-                    integrate hands-on workshop training from the very first
-                    semester, ensuring that our students possess not just
-                    theoretical knowledge, but real-world practical competence.
+                    The institution is committed to quality and skill-embedded
+                    diploma education, combining strong technical foundations,
+                    practical training, human values, and career readiness to
+                    prepare students for industry and higher studies.
                   </p>
                 </div>
               </motion.div>
@@ -133,8 +132,8 @@ export function AboutPolytechnic() {
                 className="relative h-100 w-full overflow-hidden rounded-3xl shadow-2xl lg:h-125"
               >
                 <Image
-                  src="/site_assests/polytechnic.jpeg"
-                  alt="JCT Polytechnic Campus"
+                  src="/about-us-assets/polytechnic.webp"
+                  alt="JCT Polytechnic management"
                   fill
                   className="object-cover"
                 />
@@ -179,10 +178,8 @@ export function AboutPolytechnic() {
                   </h3>
                 </div>
                 <p className="text-base leading-relaxed text-stone-600 md:text-lg">
-                  To emerge as a premier institute of technical education by
-                  imparting practical, industry-driven training and nurturing
-                  ethically strong, socially responsible technicians who
-                  contribute to the nation&apos;s technological growth.
+                  Emerge as a leading Institute for Quality and Skill embedded
+                  Diploma Education.
                 </p>
               </motion.div>
 
@@ -214,19 +211,23 @@ export function AboutPolytechnic() {
                 </div>
                 <ul className="list-outside list-disc space-y-3 pl-4 text-base leading-relaxed text-white/80 md:text-lg">
                   <li>
-                    To provide state-of-the-art infrastructure and skilled
-                    faculty to facilitate effective teaching and practical
+                    State-of-the-art infrastructures for conducive, quality
                     learning.
                   </li>
                   <li>
-                    To bridge the gap between academia and industry by
-                    conducting hands-on workshops and continuous industrial
-                    engagement.
+                    Skills embedded education for productive careers and higher
+                    studies.
                   </li>
                   <li>
-                    To imbibe moral values, discipline, and leadership qualities
-                    in students to prepare them for dynamic professional
-                    environments.
+                    Value and ethics integrated technical education.
+                  </li>
+                  <li>
+                    To promote industry-academia partnerships and continuous
+                    professional development.
+                  </li>
+                  <li>
+                    To develop socially responsible technicians with strong
+                    ethical values and discipline.
                   </li>
                 </ul>
               </motion.div>
@@ -263,16 +264,16 @@ export function AboutPolytechnic() {
                 >
                   <div className="relative mx-auto aspect-square w-full max-w-70 overflow-hidden rounded-full border-4 border-white shadow-xl">
                     <Image
-                      src="/site_assests/logo.webp"
-                      alt="Principal"
+                      src="/about-us-assets/dr.s.manoharan.webp"
+                      alt="Principal administration"
                       fill
                       sizes="280px"
-                      className="bg-white object-contain"
+                      className="object-cover"
                     />
                   </div>
                   <div className="mt-6 text-center">
                     <h3 className="text-polytechnic-dark font-serif text-xl font-bold">
-                      Dr. A. Jothi
+                      Prof. Rajkumar, M.E.
                     </h3>
                     <p className="text-polytechnic-accent mt-1 font-sans text-sm font-semibold">
                       Principal, JCT Polytechnic College
@@ -291,25 +292,23 @@ export function AboutPolytechnic() {
                   </h2>
                   <div className="space-y-4 text-base leading-relaxed text-stone-600 italic md:text-lg">
                     <p>
-                      &ldquo;Welcome to JCT Polytechnic College. As we stand at
-                      the threshold of a rapidly advancing technological era,
-                      our objective is to equip our youth with the exact skills
-                      the modern industry demands. At our institution, we
-                      emphasize hands-on, practical learning above all
-                      else.&rdquo;
+                      &ldquo;It is with great pleasure that I welcome you to our
+                      college website. As Principal, I am greatly impressed by
+                      the commitment of our management and staff in delivering
+                      excellent technical education through state-of-the-art
+                      facilities.&rdquo;
                     </p>
                     <p>
-                      &ldquo;Our dedicated faculty ensures that our students are
-                      not only technically proficient but also imbibe strong
-                      ethical values. We have consistently produced a high
-                      placement record because we bridge the gap between the
-                      classroom and the factory floor from day one.&rdquo;
+                      &ldquo;We promote academic achievement, celebrate
+                      co-curricular excellence, and maintain a personal approach
+                      to student development by building strong relationships
+                      with learners and parents.&rdquo;
                     </p>
                     <p>
-                      &ldquo;I invite you to explore our campus and witness the
-                      dedication to experiential learning that defines JCT
-                      Polytechnic. Let us work together to build a strong
-                      foundation for your future.&rdquo;
+                      &ldquo;Our institution focuses on individual support and
+                      opportunity access, and remains committed to helping every
+                      student pursue academic goals with confidence, pride, and
+                      enthusiasm.&rdquo;
                     </p>
                   </div>
                 </motion.div>

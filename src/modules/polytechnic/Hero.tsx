@@ -113,15 +113,6 @@ export function Hero() {
                 Apply Now <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>
-            <Link href="/admissions">
-              <Button
-                variant="outline"
-                size="lg"
-                className="hover:text-polytechnic-dark h-14 rounded-full border-white/20 bg-white/5 px-8 text-sm font-bold text-white backdrop-blur-sm transition-all hover:bg-white sm:w-auto"
-              >
-                Admission Info
-              </Button>
-            </Link>
           </motion.div>
         </div>
       </div>

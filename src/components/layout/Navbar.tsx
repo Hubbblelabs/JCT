@@ -402,6 +402,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               <Phone size={16} className="h-3.5 w-3.5 shrink-0 xl:h-4 xl:w-4" />
               <span className="truncate">{siteConfig.contact.phone}</span>
             </a>
+            {institution === "main" && (
             <Link
               href="https://admissions.jct.ac.in"
               target="_blank"
@@ -414,6 +415,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             >
               Apply Now
             </Link>
+            )}
           </div>
 
           <button
