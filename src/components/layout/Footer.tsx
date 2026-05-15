@@ -148,7 +148,7 @@ export function Footer() {
               </div>
             </div>
 
-            <p className="text-sm leading-6 text-(--footer-muted)">
+            <p className="hidden text-sm leading-6 text-(--footer-muted) lg:block">
               © {new Date().getFullYear()} {siteConfig.name}. All rights
               reserved.
             </p>
@@ -242,6 +242,12 @@ export function Footer() {
               ))}
             </nav>
           </div>
+        </div>
+
+        <div className="mt-4 lg:hidden">
+          <p className="text-sm leading-6 text-(--footer-muted)">
+            © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>

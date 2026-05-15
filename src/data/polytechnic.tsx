@@ -7,7 +7,7 @@ export const diplomaPrograms = [
     duration: "3 Years",
     icon: Cpu,
     desc: "Build a strong foundation in computer systems, software development, and networking — preparing graduates for immediate deployment in IT support and software testing roles.",
-    image: "/assets/lab1.webp",
+    image: "/programs/polytechnic/ct.webp",
     longDesc: [
       "The Diploma in Computer Technology at JCT Polytechnic College is a three-year program that equips students with both the theoretical foundations and hands-on skills demanded by today's IT industry. From programming fundamentals to network administration, the curriculum is structured to produce work-ready graduates from day one.",
       "Students work in fully networked computer labs running the latest development environments. Coursework covers operating systems, database management, web technologies, and computer hardware — supported by real-world project work in each semester.",
@@ -27,7 +27,7 @@ export const diplomaPrograms = [
     duration: "3 Years",
     icon: Leaf,
     desc: "Focused on agro-industries and rural technology transfer, preparing students for careers in modern farm mechanisation and agro-processing.",
-    image: "/assets/campus4.webp",
+    image: "/programs/polytechnic/agri.webp",
     longDesc: [
       "The Diploma in Agricultural Engineering prepares students to bridge the gap between traditional farming practices and modern engineering solutions. The curriculum covers farm machinery, irrigation systems, soil mechanics, and post-harvest processing — with a strong emphasis on field visits and hands-on equipment training.",
       "Students learn to operate, maintain, and repair agricultural machinery including tractors, threshers, and irrigation pumps. The program also addresses the growing importance of precision agriculture, introducing students to sensors, water management systems, and renewable energy applications in farming.",
@@ -47,7 +47,7 @@ export const diplomaPrograms = [
     duration: "3 Years",
     icon: FlaskConical,
     desc: "Develops technical knowledge in the petrochemical sector, covering refinery processes, chemical safety, and plant operations.",
-    image: "/assets/campus5.webp",
+    image: "/programs/polytechnic/pce.webp",
     longDesc: [
       "The Diploma in Petrochemical Engineering provides a solid technical foundation in the processing of petroleum and natural gas into useful products. Students study chemical process principles, thermodynamics, plant instrumentation, and HSE protocols specific to the petrochemical industry.",
       "Lab sessions cover chemical reaction engineering, distillation, heat exchangers, and process control systems. Industrial visits to refineries and petrochemical plants are integrated into the curriculum, giving students firsthand exposure to large-scale industrial operations.",
@@ -67,7 +67,7 @@ export const diplomaPrograms = [
     duration: "3 Years",
     icon: Cog,
     desc: "Training for mechanical engineering fundamentals and practical industry skills — from CNC machining to AutoCAD design.",
-    image: "/assets/lab3.webp",
+    image: "/programs/polytechnic/mech.webp",
     longDesc: [
       "The Diploma in Mechanical Engineering at JCT is one of the most hands-on diploma programs available, with workshop training beginning in the very first semester. Students progress from basic fitting and welding to CNC machine operation, product design using CAD, and quality control.",
       "The program covers engineering drawing, machine design, fluid mechanics, manufacturing processes, and thermal engineering — backed by dedicated labs including a fully equipped machine shop. Regular industrial visits and a structured internship complement classroom learning.",
@@ -87,7 +87,7 @@ export const diplomaPrograms = [
     duration: "3 Years",
     icon: Zap,
     desc: "Focus on power systems, PLC programming, and industrial wiring — producing technicians ready for power plants, TNEB, and electrical contracting.",
-    image: "/assets/lab4.webp",
+    image: "/programs/polytechnic/eee.webp",
     longDesc: [
       "The Diploma in Electrical & Electronics Engineering trains students in both power systems and electronics, giving them the dual competency demanded by modern industrial employers. The curriculum spans electrical machines, switchgear, power electronics, PLC programming, and embedded systems.",
       "Students receive hands-on training in the electrical lab with transformer test benches, motor driver circuits, PLC trainers, and industrial wiring panels. The program emphasises safe working practices and is aligned with the skills standards recognised by TNEB and electrical contractor boards.",
@@ -107,7 +107,7 @@ export const diplomaPrograms = [
     duration: "3 Years",
     icon: HardHat,
     desc: "Create outstanding diploma engineers using advanced teaching tools — covering site management, structural design, and AutoCAD drafting.",
-    image: "/assets/lab5.webp",
+    image: "/programs/polytechnic/civil.webp",
     longDesc: [
       "The Diploma in Civil Engineering prepares students for careers in the construction industry with a comprehensive curriculum covering surveying, structural engineering, estimation, and project management. Field training sessions at active construction sites supplement classroom instruction throughout the program.",
       "Students develop proficiency in AutoCAD for 2D drafting and structural detailing, alongside practical skills in soil testing, concrete technology, and environmental engineering. The program partners with local construction firms for supervised site visits and final-year project placements.",
@@ -129,42 +129,42 @@ export const testimonials = [
       "The practical workshop training at JCT Polytechnic gave me skills that my peers from other colleges simply didn't have. I landed my first job within two months of graduating.",
     name: "Murugan S.",
     role: "Maintenance Technician at L&T",
-    image: "/assets/avatars/male_avatar.png",
+    image: "/avatars/male_avatar.png",
   },
   {
     quote:
       "The faculty here cared about more than just classroom theory. By the time I finished my diploma, I had already completed a live project with a local electrical contractor.",
     name: "Kavitha R.",
     role: "Junior Engineer at TNEB",
-    image: "/assets/avatars/female_avatar.png",
+    image: "/avatars/female_avatar.png",
   },
   {
     quote:
       "I used my diploma as a stepping stone — I'm now in the final year of B.E. through lateral entry. JCT Polytechnic gave me the foundation I needed to compete with degree students.",
     name: "Aravind P.",
     role: "B.E. Mechanical (Lateral Entry)",
-    image: "/assets/avatars/male_avatar.png",
+    image: "/avatars/male_avatar.png",
   },
   {
     quote:
       "Our workshop sessions were highly practical. I handled real machine components and maintenance drills that directly matched shop-floor work.",
     name: "Ramesh K.",
     role: "Production Technician at Bosch",
-    image: "/assets/avatars/male_avatar.png",
+    image: "/avatars/male_avatar.png",
   },
   {
     quote:
       "I appreciated how instructors focused on discipline, safety, and documentation. Those habits helped me adapt quickly during my apprenticeship.",
     name: "Dhanalakshmi T.",
     role: "Apprentice Engineer at TVS",
-    image: "/assets/avatars/female_avatar.png",
+    image: "/avatars/female_avatar.png",
   },
   {
     quote:
       "The college encouraged us to participate in technical events and mini-projects. That exposure gave me confidence to pursue lateral entry successfully.",
     name: "Sathish M.",
     role: "B.E. EEE (Lateral Entry)",
-    image: "/assets/avatars/male_avatar.png",
+    image: "/avatars/male_avatar.png",
   },
 ];
 

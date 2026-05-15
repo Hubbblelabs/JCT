@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, ArrowRight, X } from "lucide-react";
 
@@ -274,6 +275,12 @@ export function CampusLife() {
           >
             Take a Virtual Campus Tour
           </button>
+          <Link
+            href="/campus-life"
+            className="group border-gold/30 bg-gold/10 text-gold hover:border-gold/50 hover:bg-gold/20 inline-flex h-12 items-center gap-3 rounded-full border px-8 font-sans text-sm font-semibold transition-all"
+          >
+            Explore Campus Life <ArrowRight size={16} />
+          </Link>
         </motion.div>
       </div>
     </section>

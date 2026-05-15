@@ -19,7 +19,7 @@ export const ugPrograms = [
     slug: "bsc-computer-science",
     duration: "3 Years",
     abbr: "B.Sc. CS",
-    image: "/assets/lab1.webp",
+    image: "/programs/arts-science/cs.webp",
     highlight:
       "Foundational technology for building a rich information society",
     icon: Atom,
@@ -42,7 +42,7 @@ export const ugPrograms = [
     slug: "bsc-ai-ml",
     duration: "3 Years",
     abbr: "B.Sc. AI&ML",
-    image: "/assets/lab2.webp",
+    image: "/programs/arts-science/aiml.webp",
     highlight:
       "Skills to perform intelligent data analysis for real-world applications",
     icon: Lightbulb,
@@ -65,7 +65,7 @@ export const ugPrograms = [
     slug: "bca",
     duration: "3 Years",
     abbr: "BCA",
-    image: "/assets/lab3.webp",
+    image: "/programs/arts-science/ca.webp",
     highlight: "Career in computers and its applications",
     icon: Calculator,
     desc: "A three-year undergraduate degree program for candidates wishing to start a career in computers and its applications.",
@@ -87,7 +87,7 @@ export const ugPrograms = [
     slug: "bcom-logistics-supply-chain",
     duration: "3 Years",
     abbr: "B.Com",
-    image: "/assets/campus1.webp",
+    image: "/programs/arts-science/logistics-supply-chain.webp",
     highlight: "Commerce with conceptual and practical knowledge in logistics",
     icon: BarChart3,
     desc: "Undergraduate programme focusing on quality education in commerce with conceptual and practical knowledge.",
@@ -109,7 +109,7 @@ export const ugPrograms = [
     slug: "bba-logistics",
     duration: "3 Years",
     abbr: "BBA",
-    image: "/assets/campus2.webp",
+    image: "/programs/arts-science/logistics.webp",
     highlight: "Concepts and processes involved in logistics and shipping",
     icon: Briefcase,
     desc: "Three-year full-time degree program covering concepts and processes involved in logistics and shipping.",
@@ -134,41 +134,41 @@ export const testimonials = [
       "The education here prepared me for real challenges. I walked into my first job feeling confident and capable, all thanks to the rigorous curriculum and supportive faculty.",
     name: "Rajesh Kumar",
     role: "Engineering at TCS",
-    image: "/assets/avatars/male_avatar.png",
+    image: "/avatars/male_avatar.png",
   },
   {
     quote:
       "I came here uncertain about my direction. The diverse environment and the mentorship I received helped me discover my true passion and shape my career path.",
     name: "Priya Sharma",
     role: "Management at Accenture",
-    image: "/assets/avatars/female_avatar.png",
+    image: "/avatars/female_avatar.png",
   },
   {
     quote:
       "The faculty understood that we needed more than theory. The hands-on projects and industry connections gave me the exact experience I needed to stand out.",
     name: "Arjun Patel",
     role: "Computer Science at Google",
-    image: "/assets/avatars/male_avatar.png",
+    image: "/avatars/male_avatar.png",
   },
   {
     quote:
       "The placement cell gave us structured preparation from the second year itself. That consistency helped me clear rounds at a product company.",
     name: "Kirthika M.",
     role: "Associate Analyst at Zoho",
-    image: "/assets/avatars/female_avatar.png",
+    image: "/avatars/female_avatar.png",
   },
   {
     quote:
       "I joined with stage fear and left with confidence. Presentations, seminars, and project reviews made communication one of my strengths.",
     name: "Vignesh R.",
     role: "Business Operations at Accenture",
-    image: "/assets/avatars/male_avatar.png",
+    image: "/avatars/male_avatar.png",
   },
   {
     quote:
       "The faculty mentorship and practical assignments made a real difference. I could connect theory to real business and technology use-cases quickly.",
     name: "Revathi S.",
     role: "Data Associate at TCS",
-    image: "/assets/avatars/female_avatar.png",
+    image: "/avatars/female_avatar.png",
   },
 ];

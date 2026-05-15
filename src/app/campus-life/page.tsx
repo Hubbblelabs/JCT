@@ -18,7 +18,6 @@ import {
   Star,
   Zap,
   ShieldCheck,
-  Link,
 } from "lucide-react";
 
 // --- Animation Variants ---
@@ -542,13 +541,14 @@ export default function CampusLifePage() {
           </p>
 
           <div className="relative z-10 mt-10 flex justify-center md:mt-12">
-            <Link
+            <a
               href="https://admissions.jct.ac.in/"
               target="_blank"
+              rel="noopener noreferrer"
               className="bg-navy hover:bg-navy-mid flex items-center gap-2 rounded-full px-10 py-4 text-base font-bold text-white shadow-2xl transition-all hover:scale-105 active:scale-95 md:px-12 md:py-5 md:text-lg"
             >
               Apply Now <ArrowRight size={20} />
-            </Link>
+            </a>
           </div>
         </motion.div>
       </section>

@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, type UIEvent } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { DragScroll } from "@/components/ui/DragScroll";
 
 const campusImages = [
@@ -71,6 +73,15 @@ export function CampusLife() {
               className={`h-2.5 w-2.5 rounded-full transition-colors ${i === activeIndex ? "bg-engineering" : "bg-engineering/30"}`}
             />
           ))}
+        </div>
+
+        <div className="mt-8 flex items-center justify-center">
+          <Link
+            href="/campus-life"
+            className="bg-engineering hover:bg-engineering/90 inline-flex items-center gap-2 rounded-full px-6 py-3 font-sans text-sm font-semibold text-white transition-all"
+          >
+            Explore Full Campus Life <ArrowRight size={16} />
+          </Link>
         </div>
       </div>
     </section>
