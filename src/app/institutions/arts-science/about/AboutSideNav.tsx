@@ -36,7 +36,6 @@ interface AboutSideNavProps {
 
 export function AboutSideNav({ activeId, setActiveId }: AboutSideNavProps) {
   useEffect(() => {
-    // Only run intersection observers on desktop screens where all sections are visible
     if (window.innerWidth < 1024) return;
 
     const observers: IntersectionObserver[] = [];
@@ -47,14 +46,9 @@ export function AboutSideNav({ activeId, setActiveId }: AboutSideNavProps) {
 
       const observer = new IntersectionObserver(
         ([entry]) => {
-          if (entry.isIntersecting) {
-            setActiveId(id);
-          }
+          if (entry.isIntersecting) setActiveId(id);
         },
-        {
-          rootMargin: "-25% 0px -65% 0px",
-          threshold: 0,
-        },
+        { rootMargin: "-25% 0px -65% 0px", threshold: 0 },
       );
 
       observer.observe(el);
@@ -68,18 +62,16 @@ export function AboutSideNav({ activeId, setActiveId }: AboutSideNavProps) {
     setActiveId(id);
 
     if (window.innerWidth >= 1024) {
-      // Desktop: Smooth scroll to section
       const el = document.getElementById(id);
       if (!el) return;
-      const offset = 120;
-      const top = el.getBoundingClientRect().top + window.scrollY - offset;
+      const top = el.getBoundingClientRect().top + window.scrollY - 120;
       window.scrollTo({ top, behavior: "smooth" });
     }
   };
 
   return (
     <>
-      {/* ── Mobile / Tablet: horizontal scrollable pill bar ── */}
+      {/* Mobile pill bar */}
       <div className="-mx-4 w-full overflow-x-auto px-4 pb-2 lg:hidden">
         <div className="flex w-max gap-2">
           {navSections.map(({ id, label, icon: Icon }) => {
@@ -90,7 +82,7 @@ export function AboutSideNav({ activeId, setActiveId }: AboutSideNavProps) {
                 onClick={() => handleClick(id)}
                 className={`flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all ${
                   isActive
-                    ? "border-gold bg-gold/15 text-gold"
+                    ? "border-arts-science-accent bg-arts-science-accent/15 text-arts-science-accent"
                     : "text-muted-foreground hover:text-foreground border-white/10 bg-white/5 hover:border-white/20"
                 }`}
               >
@@ -102,9 +94,8 @@ export function AboutSideNav({ activeId, setActiveId }: AboutSideNavProps) {
         </div>
       </div>
 
-      {/* ── Desktop: sticky sidebar ── */}
+      {/* Desktop sticky sidebar */}
       <div className="bg-surface border-border hidden rounded-3xl border p-6 lg:block">
-        {/* Section Navigation */}
         <h3 className="mb-5 border-b border-white/10 pb-4 text-sm font-bold tracking-wider uppercase">
           On This Page
         </h3>
@@ -118,7 +109,7 @@ export function AboutSideNav({ activeId, setActiveId }: AboutSideNavProps) {
                 onClick={() => handleClick(id)}
                 className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all ${
                   isActive
-                    ? "bg-gold/15 text-gold"
+                    ? "bg-arts-science-accent/15 text-arts-science-accent"
                     : "text-muted-foreground hover:text-foreground hover:bg-white/5"
                 }`}
               >
@@ -126,13 +117,13 @@ export function AboutSideNav({ activeId, setActiveId }: AboutSideNavProps) {
                   size={16}
                   className={`shrink-0 transition-colors ${
                     isActive
-                      ? "text-gold"
+                      ? "text-arts-science-accent"
                       : "text-muted-foreground group-hover:text-foreground"
                   }`}
                 />
                 <span>{label}</span>
                 {isActive && (
-                  <span className="bg-gold ml-auto h-1.5 w-1.5 rounded-full" />
+                  <span className="bg-arts-science-accent ml-auto h-1.5 w-1.5 rounded-full" />
                 )}
               </button>
             );
@@ -144,12 +135,11 @@ export function AboutSideNav({ activeId, setActiveId }: AboutSideNavProps) {
           <h3 className="text-sm font-bold tracking-wider uppercase">
             Quick Facts
           </h3>
-
           <div className="space-y-3">
             {[
-              { label: "Established", value: "2009" },
-              { label: "Autonomous Status", value: "Granted" },
-              { label: "Affiliation", value: "Anna University" },
+              { label: "Established", value: "2024" },
+              { label: "Programs", value: "5 UG Programs" },
+              { label: "Affiliation", value: "Bharathiar University" },
               { label: "NAAC Grade", value: '"A" Grade' },
             ].map((fact) => (
               <div key={fact.label} className="flex flex-col gap-0.5">
@@ -161,22 +151,14 @@ export function AboutSideNav({ activeId, setActiveId }: AboutSideNavProps) {
                 </span>
               </div>
             ))}
-
-            <div className="flex flex-col gap-0.5">
-              <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                Counselling Code
-              </span>
-              <span className="text-gold text-2xl font-bold">2769</span>
-            </div>
           </div>
         </div>
 
-        {/* Apply CTA */}
         <Link
           href="https://admissions.jct.ac.in/"
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-gold text-navy mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-center font-bold transition-colors hover:bg-[#e8b84a]"
+          className="bg-arts-science-accent text-white mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-center font-bold transition-colors hover:opacity-90"
         >
           Apply Now
           <ChevronRight size={16} />

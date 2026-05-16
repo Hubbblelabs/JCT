@@ -36,51 +36,45 @@ import { AboutSideNav } from "./AboutSideNav";
 
 const campusHighlights = [
   {
-    title: "Hi-Tech Classrooms",
+    title: "Modern Classrooms",
     icon: Monitor,
-    desc: "Smart, ICT-enabled classrooms with digital projectors and modern AV systems for interactive learning.",
+    desc: "ICT-enabled classrooms with digital projectors and modern AV systems for interactive and engaging learning sessions.",
   },
   {
-    title: "Modern Laboratories",
+    title: "Science Laboratories",
     icon: FlaskConical,
-    desc: "State-of-the-art labs equipped with the latest technology aligned to industry standards.",
+    desc: "Well-equipped science and computer laboratories aligned with the latest academic and industry requirements.",
   },
   {
     title: "24×7 Campus",
     icon: Clock,
-    desc: "A secure, vibrant campus alive around the clock with CCTV surveillance and on-campus support.",
+    desc: "A safe and vibrant campus with round-the-clock CCTV surveillance and on-campus support staff.",
   },
   {
-    title: "Extensive Library",
+    title: "Digital Library",
     icon: BookOpen,
-    desc: "Digital library with thousands of e-journals, books, and online learning resources including NDLI.",
+    desc: "Rich library with e-journals, digital books, and online learning resources including NDLI access for all students.",
   },
   {
-    title: "Sports Infrastructure",
+    title: "Sports Facilities",
     icon: Trophy,
-    desc: "Excellent facilities for indoor and outdoor sports nurturing holistic student development.",
+    desc: "Comprehensive indoor and outdoor sports infrastructure for holistic development of every student.",
   },
   {
-    title: "Transport Fleet",
+    title: "Transport Network",
     icon: Bus,
-    desc: "Extensive bus network covering major routes across Coimbatore, Palakkad, and surrounding areas.",
+    desc: "Extensive bus routes covering Coimbatore, Palakkad, and surrounding districts for convenient daily commuting.",
   },
 ];
 
 const accreditations = [
-  { name: "AICTE", desc: "Approved", logo: "/accreditations/aicte.webp" },
-  {
-    name: "NBA",
-    desc: "Accredited Programs",
-    logo: "/accreditations/nba.webp",
-  },
+  { name: "UGC", desc: "Recognized", logo: "/accreditations/ugc.webp" },
   { name: "NAAC", desc: '"A" Grade', logo: "/accreditations/naac.webp" },
   {
-    name: "Anna University",
+    name: "Bharathiar University",
     desc: "Affiliated",
     logo: "/accreditations/anna.webp",
   },
-  { name: "UGC", desc: "Recognized", logo: "/accreditations/ugc.webp" },
   {
     name: "ISO 9001:2015",
     desc: "Certified",
@@ -89,11 +83,12 @@ const accreditations = [
 ];
 
 const missionPoints = [
-  "To provide quality technical education that meets global standards and industry needs.",
-  "To encourage research, innovation and entrepreneurship among students and faculty.",
-  "To build strong industry-institute interaction for practical skill development.",
-  "To cultivate leadership qualities, ethical values, and social responsibility.",
-  "To promote inclusive education accessible to students from all socioeconomic backgrounds.",
+  "To impart knowledge, values, and professional education through strong theoretical basics and hands-on training.",
+  "To serve students through leadership, entrepreneurship, teamwork, quality, ethics, and mutual respect.",
+  "To provide opportunities for long-term interaction with academia and industry.",
+  "To create new knowledge through innovation and research and continuously adopt meaningful technological developments.",
+  "To foster holistic development by promoting critical thinking, creativity, and problem-solving skills.",
+  "To nurture socially responsible citizens who contribute meaningfully to society and the nation.",
 ];
 
 const coreValues = [
@@ -115,12 +110,12 @@ const coreValues = [
   {
     icon: Globe,
     title: "Global Vision",
-    desc: "Preparing graduates to compete and contribute in an interconnected, technology-driven global society.",
+    desc: "Preparing graduates to compete and contribute in an interconnected, knowledge-driven global society.",
   },
   {
     icon: Rocket,
     title: "Innovation",
-    desc: "Encouraging creative thinking, problem-solving, and the application of technology to real-world challenges.",
+    desc: "Encouraging creative thinking, problem-solving, and the application of knowledge to real-world challenges.",
   },
   {
     icon: Heart,
@@ -129,71 +124,72 @@ const coreValues = [
   },
 ];
 
-const leadership = [
+const management = [
   {
     name: "Shri S. A. Subramanian",
     role: "Founder",
     image: "/about-us-assets/shri.s.a.subramanian.webp",
-    bio: "Shri S. A. Subramanian hails from a renowned scholarly family and did his post graduation in English. He distinguished himself as both an academic and industrial innovator. With a rare and enriching exposure to academic research and industrial experience, Sri Subramanian established Shri Jagannath Educational Health and Charitable Trust in 2008 with the objective of providing affordable quality technical education.",
+    bio: "Shri S. A. Subramanian hails from a renowned scholarly family. With a rare and enriching exposure to academic research and industrial experience, he established Shri Jagannath Educational Health and Charitable Trust in 2008 with the objective of providing affordable quality education.",
   },
   {
     name: "Mr. R. Arulselvan",
     role: "Chairman",
     image: "/about-us-assets/mr.r.arulselvan.webp",
-    bio: "Mr. R. Arulselvan holds a B.E. (Production Engineering) from Guindy Engineering College and an MBA from De Montfort University, United Kingdom. He is also an Accredited Building Practitioner specialising in Residential and Commercial construction. Through his experience in running business enterprises in India and overseas, he plays a pivotal role in developing JCT as a leading engineering institution.",
+    bio: "Mr. R. Arulselvan holds a B.E. (Production Engineering) from Guindy Engineering College and an MBA from De Montfort University, United Kingdom. Through his experience in running business enterprises in India and overseas, he plays a pivotal role in developing JCT as a leading institution.",
   },
   {
     name: "Mr. R. Gautaman",
     role: "Vice Chairman",
     image: "/about-us-assets/mr.r.gautaman.webp",
-    bio: "Mr. R. Gautaman holds a B.E. (ECE) from Thiagarajar College of Engineering and an MBA from RMIT University, Melbourne. He is a Registered Building Practitioner in Victoria (Australia) and an Ex Banker with experience in Retail Banking and Financial Planning. He encourages a focus on quality in education, infrastructure, and the holistic personality development of students.",
+    bio: "Mr. R. Gautaman holds a B.E. (ECE) from Thiagarajar College of Engineering and an MBA from RMIT University, Melbourne. He encourages a focus on quality in education, infrastructure, and the holistic personality development of students.",
   },
   {
     name: "Mr. R. Durga Shankar",
     role: "Secretary & Managing Trustee",
     image: "/about-us-assets/mr.r.durga-shankar.webp",
-    bio: 'Mr. R. Durga Shankar holds an M.Sc. Computer Science from Guindy Engineering College. He created a platform for Holistic Learning to impart value-based and quality education, committing himself to producing Industry Ready Professionals and Great Leaders. His maxim: "Technical skills with communication skills is a gateway to the globalised market of technology and engineering."',
+    bio: 'Mr. R. Durga Shankar holds an M.Sc. Computer Science from Guindy Engineering College. He created a platform for Holistic Learning to impart value-based and quality education, committing himself to producing Industry Ready Professionals and Great Leaders.',
   },
 ];
 
 /* ─── Page Component ────────────────────────────────────────────────────────── */
 
-export default function EngineeringAboutPage() {
+export default function ArtsScienceAboutPage() {
   const [activeId, setActiveId] = useState<string>("about");
 
   return (
-    <main className="bg-surface text-foreground min-h-screen">
+    <main className="bg-surface text-foreground arts-science-theme min-h-screen">
       <Navbar forceSolidOnTop />
       <PageHero
-        title="About JCT Engineering"
-        subtitle="An Autonomous Institution Committed to Excellence"
+        title="About JCT Arts & Science"
+        subtitle="Fostering Creativity and Scientific Inquiry"
       />
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
         <Breadcrumb
           items={[
             { label: "Institutions", href: "/institutions" },
-            { label: "Engineering", href: "/institutions/engineering" },
+            { label: "Arts & Science", href: "/institutions/arts-science" },
             { label: "About" },
           ]}
         />
 
-        {/* ── Mobile pill nav ── */}
+        {/* Mobile pill nav */}
         <div id="mobile-nav-container" className="mt-8 lg:hidden">
           <AboutSideNav activeId={activeId} setActiveId={setActiveId} />
         </div>
 
-        {/* ── Layout Grid ── */}
+        {/* Layout Grid */}
         <div className="mt-8 lg:mt-12 lg:grid lg:grid-cols-[280px_1fr] lg:gap-12 xl:grid-cols-[300px_1fr]">
-          {/* ── LEFT: Sticky Side Nav (desktop only) ── */}
+          {/* Sticky Side Nav (desktop) */}
           <div className="hidden lg:block">
             <div className="sticky top-32">
               <AboutSideNav activeId={activeId} setActiveId={setActiveId} />
             </div>
           </div>
 
-          {/* ── RIGHT: Main Content (Filtered on mobile based on activeId) ── */}
+          {/* Main Content */}
           <div className="mt-8 min-w-0 space-y-16 lg:mt-0">
+
             {/* 1. About the Institution */}
             <section
               id="about"
@@ -206,45 +202,40 @@ export default function EngineeringAboutPage() {
               <SectionHeading icon={Landmark} title="About the Institution" />
               <div className="text-muted-foreground space-y-4 text-base leading-relaxed md:text-lg">
                 <p>
-                  JCT College of Engineering and Technology is an Autonomous
-                  Institution established by the Shri Jagannath Educational
-                  Health and Charitable Trust. The Trust was founded in 2008 by
-                  prominent philanthropists with the objective of providing
-                  affordable quality technical education — especially to
-                  students from underserved and rural communities.
+                  JCT College of Arts & Science was established in 2024 at
+                  Pichanur, Coimbatore, under the Shri Jagannath Educational
+                  Health and Charitable Trust — a Trust founded with the
+                  objective of delivering quality education especially to
+                  students from rural and underserved communities.
                 </p>
                 <p>
-                  Located in Pichanur, Coimbatore — Tamil Nadu, the institution
-                  has grown into a recognized center of excellence in
-                  engineering and technology. It offers a wide array of
-                  specialized undergraduate and postgraduate courses tailored to
-                  meet the demands of modern industry, including programs unique
-                  to the region such as Petroleum Engineering and Petrochemical
-                  Technology.
+                  JCTCAS combines interdisciplinary learning, modern
+                  laboratories, digital access, and value-based education to
+                  help students build strong academic foundations, industry
+                  readiness, and responsible citizenship.
                 </p>
                 <p>
-                  With over a decade of academic excellence, JCT Engineering has
-                  built a strong reputation for producing industry-ready
-                  graduates who lead successful careers at top organizations
-                  across India and abroad. The institution is proud of its
-                  autonomous status, which empowers continuous curriculum
-                  innovation aligned with global industry trends.
+                  Offering a range of undergraduate programs in Computer
+                  Science, Artificial Intelligence, Commerce, and Business
+                  Administration, the college is committed to producing
+                  graduates who are globally competitive, ethically grounded,
+                  and community-focused.
                 </p>
               </div>
 
               {/* Stats bar */}
               <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {[
-                  { value: "2009", label: "Established" },
-                  { value: "11+", label: "Departments" },
-                  { value: "3000+", label: "Students" },
-                  { value: "98%", label: "Placement Rate" },
+                  { value: "2024", label: "Established" },
+                  { value: "5+", label: "Programs" },
+                  { value: "2500+", label: "Students" },
+                  { value: "95%", label: "Placement Rate" },
                 ].map((s) => (
                   <div
                     key={s.label}
                     className="rounded-2xl border border-white/10 bg-white/5 p-4 text-center"
                   >
-                    <p className="text-gold text-2xl font-bold md:text-3xl">
+                    <p className="text-arts-science-accent text-2xl font-bold md:text-3xl">
                       {s.value}
                     </p>
                     <p className="text-muted-foreground mt-1 text-xs font-medium tracking-wide uppercase">
@@ -266,9 +257,8 @@ export default function EngineeringAboutPage() {
             >
               <SectionHeading icon={Target} title="Vision & Mission" />
 
-              {/* Vision card */}
               <div className="mb-4 flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
-                <div className="bg-gold/15 text-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/15 text-orange-500">
                   <Target size={20} />
                 </div>
                 <div>
@@ -276,17 +266,16 @@ export default function EngineeringAboutPage() {
                     Our Vision
                   </h3>
                   <p className="text-muted-foreground text-sm leading-relaxed md:text-base">
-                    To emerge as a premier center of excellence in engineering
-                    education and research, fostering innovation and producing
-                    globally competent professionals with strong ethical values
-                    and social commitment.
+                    To emerge as a premier institute for attaining global
+                    excellence in the field of education and training and
+                    produce professionals of world standards to face the global
+                    environment.
                   </p>
                 </div>
               </div>
 
-              {/* Mission card */}
               <div className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
-                <div className="bg-gold/15 text-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/15 text-orange-500">
                   <Lightbulb size={20} />
                 </div>
                 <div>
@@ -301,31 +290,13 @@ export default function EngineeringAboutPage() {
                       >
                         <CheckCircle
                           size={15}
-                          className="text-gold mt-0.5 shrink-0"
+                          className="mt-0.5 shrink-0 text-orange-500"
                         />
                         <span>{point}</span>
                       </li>
                     ))}
                   </ul>
                 </div>
-              </div>
-
-              {/* Quality Policy */}
-              <div className="border-gold/20 bg-gold/5 mt-4 rounded-2xl border p-5 md:p-6">
-                <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-bold">
-                  <ShieldCheck size={18} className="text-gold" />
-                  Quality Policy
-                </h3>
-                <p className="text-muted-foreground text-sm leading-relaxed md:text-base">
-                  JCT College of Engineering and Technology is committed to
-                  provide quality technical education that meets the
-                  requirements of students, industry, and society. The
-                  institution continually improves its infrastructure, teaching
-                  methodologies, and research activities through systematic
-                  review and stakeholder feedback, ensuring compliance with
-                  regulatory standards and preparing globally competitive
-                  graduates.
-                </p>
               </div>
             </section>
 
@@ -344,12 +315,11 @@ export default function EngineeringAboutPage() {
               />
               <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
                 <div className="flex flex-col gap-6 p-5 sm:flex-row sm:items-start md:p-8">
-                  {/* Photo */}
                   <div className="flex flex-col items-center gap-3 sm:w-44 sm:shrink-0">
                     <div className="relative h-48 w-36 overflow-hidden rounded-2xl border border-white/10 bg-white/5 sm:h-56 sm:w-44">
                       <Image
-                        src="/about-us-assets/dr.s.manoharan.webp"
-                        alt="Dr. S. Manoharan, Principal"
+                        src="/about-us-assets/dr.s.anbarasu.webp"
+                        alt="Dr. S. Anbarasu, Principal"
                         fill
                         className="object-cover object-top"
                         sizes="(max-width: 640px) 144px, 176px"
@@ -357,38 +327,34 @@ export default function EngineeringAboutPage() {
                     </div>
                     <div className="text-center">
                       <p className="text-foreground font-bold">
-                        Dr. S. Manoharan
+                        Dr. S. Anbarasu
                       </p>
                       <p className="text-muted-foreground text-sm">Principal</p>
                       <p className="text-muted-foreground mt-0.5 text-xs">
-                        JCT College of Engineering & Technology
+                        JCT College of Arts & Science
                       </p>
                     </div>
                   </div>
 
-                  {/* Message */}
                   <div className="flex-1 space-y-4">
-                    <blockquote className="text-foreground/90 border-gold/50 border-l-4 pl-5 text-base leading-relaxed italic md:text-lg">
-                      &quot;Welcome to JCT College of Engineering and
-                      Technology. Our institution stands as a beacon of quality
-                      technical education in the region, committed to shaping
-                      the engineers of tomorrow.&quot;
+                    <blockquote className="text-foreground/90 border-l-4 border-orange-400/50 pl-5 text-base leading-relaxed italic md:text-lg">
+                      &quot;Education is the most powerful weapon which you can
+                      use to change the world. At JCTCAS, we continuously update
+                      our practices to match dynamic societal changes and
+                      technological progress, while staying true to our motto:
+                      Educate, Empower and Elevate.&quot;
                     </blockquote>
                     <p className="text-muted-foreground text-sm leading-relaxed md:text-base">
-                      We are committed to nurturing the potential within every
-                      student, providing them with a robust academic foundation
-                      and hands-on practical experience. Our dedicated faculty
-                      continuously update the curriculum to stay aligned with
-                      the dynamic needs of the global industry.
+                      Our dedicated faculty and state-of-the-art infrastructure
+                      create a vibrant teaching-learning environment where
+                      students are at the center of co-curricular and
+                      extra-curricular growth.
                     </p>
                     <p className="text-muted-foreground text-sm leading-relaxed md:text-base">
-                      Our autonomous status empowers us to introduce
-                      industry-relevant electives, research initiatives, and
-                      interdisciplinary programs. The state-of-the-art
-                      infrastructure, experienced faculty, and strong industry
-                      linkages ensure that JCT graduates are always
-                      industry-ready. I invite you to join us in this journey of
-                      excellence.
+                      Through seminars, workshops, clubs, and sports, we help
+                      learners build leadership and professional skills, and we
+                      remain committed to providing an inspiring learning
+                      experience for every student.
                     </p>
                   </div>
                 </div>
@@ -406,12 +372,13 @@ export default function EngineeringAboutPage() {
             >
               <SectionHeading icon={Briefcase} title="Management" />
               <p className="text-muted-foreground mb-8 text-sm leading-relaxed md:text-base">
-                JCT College is run under the Shri Jagannath Educational Health
-                and Charitable Trust, guided by a visionary management team
-                committed to transforming technical education in India.
+                JCT College of Arts & Science is run under the Shri Jagannath
+                Educational Health and Charitable Trust, guided by a visionary
+                management team committed to transforming higher education in
+                India.
               </p>
               <div className="grid gap-6 sm:grid-cols-2">
-                {leadership.map((person) => (
+                {management.map((person) => (
                   <div
                     key={person.name}
                     className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6"
@@ -430,7 +397,7 @@ export default function EngineeringAboutPage() {
                         <p className="text-foreground text-sm font-bold md:text-base">
                           {person.name}
                         </p>
-                        <p className="text-gold text-xs font-medium md:text-sm">
+                        <p className="text-arts-science-accent text-xs font-medium md:text-sm">
                           {person.role}
                         </p>
                       </div>
@@ -454,30 +421,23 @@ export default function EngineeringAboutPage() {
             >
               <SectionHeading icon={BookOpen} title="Administration — HOD" />
               <p className="text-muted-foreground mb-8 text-sm leading-relaxed md:text-base">
-                The Heads of Departments at JCT College of Engineering and
-                Technology bring decades of academic excellence and industry
-                experience, ensuring each department delivers world-class
-                technical education.
+                The Heads of Departments at JCT College of Arts & Science bring
+                strong academic backgrounds and industry experience, ensuring
+                each program delivers quality, industry-relevant education.
               </p>
               <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                 {[
-                  { dept: "Computer Science & Engineering", abbr: "CSE" },
-                  { dept: "Electronics & Communication Engineering", abbr: "ECE" },
-                  { dept: "Electrical & Electronics Engineering", abbr: "EEE" },
-                  { dept: "Mechanical Engineering", abbr: "MECH" },
-                  { dept: "Civil Engineering", abbr: "CE" },
-                  { dept: "Bio-Technology & Bio-Chemical Engineering", abbr: "BT" },
-                  { dept: "Food Technology", abbr: "FT" },
-                  { dept: "Petroleum Engineering", abbr: "PE" },
-                  { dept: "Petrochemical Technology", abbr: "PCT" },
-                  { dept: "AI & Data Science", abbr: "AI&DS" },
-                  { dept: "CS & Business Systems", abbr: "CSBS" },
+                  { dept: "B.Sc Computer Science", abbr: "CS" },
+                  { dept: "B.Sc Artificial Intelligence & Machine Learning", abbr: "AI&ML" },
+                  { dept: "BCA", abbr: "BCA" },
+                  { dept: "B.Com (Computer Applications)", abbr: "B.Com" },
+                  { dept: "BBA", abbr: "BBA" },
                 ].map((d) => (
                   <div
                     key={d.abbr}
                     className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4"
                   >
-                    <div className="bg-gold/20 text-gold flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500/20 text-xs font-bold text-orange-500">
                       {d.abbr}
                     </div>
                     <div>
@@ -504,10 +464,9 @@ export default function EngineeringAboutPage() {
             >
               <SectionHeading icon={Users} title="Governing Council" />
               <p className="text-muted-foreground mb-8 text-sm leading-relaxed md:text-base">
-                The Governing Council of JCT College of Engineering and
-                Technology comprises distinguished academicians, industry
-                leaders, and government nominees who provide strategic direction
-                and governance oversight.
+                The Governing Council of JCT College of Arts & Science comprises
+                distinguished academicians, industry experts, and government
+                nominees who provide strategic direction and governance oversight.
               </p>
               <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
                 <table className="w-full text-sm">
@@ -529,13 +488,13 @@ export default function EngineeringAboutPage() {
                       { name: "Mr. R. Arulselvan", category: "Chairman / Secretary of Trust" },
                       { name: "Mr. R. Gautaman", category: "Vice Chairman / Member of Trust" },
                       { name: "Mr. R. Durga Shankar", category: "Secretary & Managing Trustee" },
-                      { name: "Dr. S. Manoharan", category: "Principal — Member Secretary" },
-                      { name: "Nominee — Anna University", category: "University Nominee" },
-                      { name: "Nominee — AICTE", category: "Government Nominee" },
+                      { name: "Dr. S. Anbarasu", category: "Principal — Member Secretary" },
+                      { name: "Nominee — Bharathiar University", category: "University Nominee" },
+                      { name: "Nominee — UGC", category: "Government Nominee" },
                       { name: "Industry Expert", category: "Industry Nominee" },
                       { name: "Senior Faculty Representative", category: "Faculty Nominee" },
                     ].map((m, i) => (
-                      <tr key={i} className="hover:bg-white/5 transition-colors">
+                      <tr key={i} className="transition-colors hover:bg-white/5">
                         <td className="text-muted-foreground px-4 py-3 text-xs">
                           {i + 1}
                         </td>
@@ -552,7 +511,7 @@ export default function EngineeringAboutPage() {
               </div>
             </section>
 
-            {/* 5. Core Values */}
+            {/* 7. Core Values */}
             <section
               id="core-values"
               className={`scroll-mt-28 transition-all duration-300 ${
@@ -566,9 +525,9 @@ export default function EngineeringAboutPage() {
                 {coreValues.map((val) => (
                   <div
                     key={val.title}
-                    className="hover:border-gold/20 hover:bg-gold/5 flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-5 transition-colors"
+                    className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-5 transition-colors hover:border-orange-400/20 hover:bg-orange-500/5"
                   >
-                    <div className="bg-gold/15 text-gold flex h-10 w-10 items-center justify-center rounded-xl">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/15 text-orange-500">
                       <val.icon size={18} />
                     </div>
                     <div>
@@ -584,7 +543,7 @@ export default function EngineeringAboutPage() {
               </div>
             </section>
 
-            {/* 6. Approvals & Accreditations */}
+            {/* 8. Approvals & Accreditations */}
             <section
               id="accreditations"
               className={`scroll-mt-28 transition-all duration-300 ${
@@ -594,7 +553,7 @@ export default function EngineeringAboutPage() {
               }`}
             >
               <SectionHeading icon={Award} title="Approvals & Accreditations" />
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-6">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {accreditations.map((acc) => (
                   <div
                     key={acc.name}
@@ -606,7 +565,7 @@ export default function EngineeringAboutPage() {
                         alt={acc.name}
                         fill
                         className="object-contain"
-                        sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 120px"
+                        sizes="(max-width: 640px) 50vw, 150px"
                       />
                     </div>
                     <div>
@@ -622,7 +581,7 @@ export default function EngineeringAboutPage() {
               </div>
             </section>
 
-            {/* 7. Campus Highlights */}
+            {/* 9. Campus Highlights */}
             <section
               id="campus"
               className={`scroll-mt-28 transition-all duration-300 ${
@@ -638,7 +597,7 @@ export default function EngineeringAboutPage() {
                     key={i}
                     className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 md:p-5"
                   >
-                    <div className="bg-gold/20 text-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/20 text-orange-500">
                       <feature.icon size={18} />
                     </div>
                     <div>
@@ -654,7 +613,7 @@ export default function EngineeringAboutPage() {
               </div>
             </section>
 
-            {/* 8. Why Choose JCT Engineering */}
+            {/* 10. Why Choose JCT Arts & Science */}
             <section
               id="why-jct"
               className={`scroll-mt-28 transition-all duration-300 ${
@@ -663,25 +622,28 @@ export default function EngineeringAboutPage() {
                   : "hidden lg:block lg:opacity-100"
               }`}
             >
-              <SectionHeading icon={Star} title="Why Choose JCT Engineering?" />
+              <SectionHeading
+                icon={Star}
+                title="Why Choose JCT Arts & Science?"
+              />
               <div className="flex flex-wrap gap-2.5">
                 {[
-                  "Only college in Coimbatore offering Petroleum & Petrochemical Engineering",
-                  "Autonomous status enabling industry-updated curriculum",
-                  "NBA-accredited programs with global quality standards",
-                  "98% placement rate with 500+ recruiting partners",
-                  "Dedicated Centre of Excellence (COE) for research",
-                  "Strong alumni network spanning global organizations",
-                  "Industry-integrated internship and live project programs",
+                  "Interdisciplinary programs combining arts, science, and technology",
+                  "Modern laboratories and digital learning infrastructure",
+                  "Strong placement cell with 95%+ placement record",
+                  "Value-based, holistic education for all-round development",
+                  "Industry-linked internship and live project programs",
                   "Merit scholarships and government financial aid available",
                   "ISO 9001:2015 certified quality management system",
-                  "Unique specializations not available at other colleges",
+                  "Dedicated clubs for arts, sports, and cultural activities",
+                  "Experienced faculty with academic and industry credentials",
+                  "Affordable quality education for all socioeconomic backgrounds",
                 ].map((point, i) => (
                   <span
                     key={i}
                     className="bg-surface flex items-center gap-2 rounded-full border border-white/10 px-3.5 py-2 text-xs font-medium md:text-sm"
                   >
-                    <CheckCircle size={13} className="text-gold shrink-0" />
+                    <CheckCircle size={13} className="shrink-0 text-orange-500" />
                     {point}
                   </span>
                 ))}
@@ -707,7 +669,7 @@ function SectionHeading({
 }) {
   return (
     <h2 className="text-foreground mb-5 flex items-center gap-3 font-serif text-2xl font-bold md:text-3xl">
-      <span className="bg-gold/20 text-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/20 text-orange-500">
         <Icon size={20} />
       </span>
       {title}

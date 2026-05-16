@@ -14,7 +14,6 @@ export const metadata: Metadata = {
   },
 };
 
-import { ArtsSciencePopup } from "@/modules/arts-science/ArtsSciencePopup";
 import { Hero } from "@/modules/arts-science/Hero";
 import { AboutArtsScience } from "@/modules/arts-science/AboutArtsScience";
 import { UgPrograms } from "@/modules/arts-science/UgPrograms";
@@ -29,7 +28,6 @@ export default function ArtsSciencePage() {
       className="bg-background text-foreground arts-science-theme min-h-screen overflow-x-hidden"
     >
       <Navbar />
-      <ArtsSciencePopup />
       <Hero />
       <UgPrograms />
       <AboutArtsScience />

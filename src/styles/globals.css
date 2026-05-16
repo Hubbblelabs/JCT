@@ -105,6 +105,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* ─── Content text justify ─── */
+p {
+  text-align: justify;
+}
+
 h1,
 h2,
 h3,

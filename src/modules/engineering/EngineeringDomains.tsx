@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { DragScroll } from "@/components/ui/DragScroll";
@@ -138,6 +138,7 @@ function CourseCarouselSection({
 }) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [showArrows, setShowArrows] = useState(false);
+  const autoScrollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const container = carouselRef.current;
@@ -155,7 +156,7 @@ function CourseCarouselSection({
     return () => observer.disconnect();
   }, [courses.length]);
 
-  const scrollCarousel = (direction: "left" | "right") => {
+  const scrollCarousel = useCallback((direction: "left" | "right") => {
     const container = carouselRef.current;
     if (!container) return;
 
@@ -164,12 +165,44 @@ function CourseCarouselSection({
     );
     const cardWidth = card?.offsetWidth ?? 300;
     const gap = 24;
+    const maxScroll = container.scrollWidth - container.clientWidth;
 
-    container.scrollBy({
-      left: direction === "left" ? -(cardWidth + gap) : cardWidth + gap,
-      behavior: "smooth",
-    });
-  };
+    if (direction === "right" && container.scrollLeft >= maxScroll - 4) {
+      container.scrollTo({ left: 0, behavior: "smooth" });
+    } else {
+      container.scrollBy({
+        left: direction === "left" ? -(cardWidth + gap) : cardWidth + gap,
+        behavior: "smooth",
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    autoScrollRef.current = setInterval(() => {
+      scrollCarousel("right");
+    }, 3500);
+
+    const container = carouselRef.current;
+    const pause = () => {
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current);
+    };
+    const resume = () => {
+      autoScrollRef.current = setInterval(() => scrollCarousel("right"), 3500);
+    };
+
+    container?.addEventListener("mouseenter", pause);
+    container?.addEventListener("mouseleave", resume);
+    container?.addEventListener("touchstart", pause, { passive: true });
+    container?.addEventListener("touchend", resume);
+
+    return () => {
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current);
+      container?.removeEventListener("mouseenter", pause);
+      container?.removeEventListener("mouseleave", resume);
+      container?.removeEventListener("touchstart", pause);
+      container?.removeEventListener("touchend", resume);
+    };
+  }, [scrollCarousel]);
 
   return (
     <div className="relative z-10 container mx-auto mt-12 px-4 md:px-6">
@@ -234,7 +267,7 @@ function CourseCarouselSection({
           </div>
         )}
 
-        <DragScroll className="snap-container scrollbar-hide flex w-full items-stretch gap-4 overflow-x-auto px-4 md:gap-6 md:px-6">
+        <DragScroll ref={carouselRef} className="snap-container scrollbar-hide flex w-full items-stretch gap-4 overflow-x-auto px-4 md:gap-6 md:px-6">
           <div className="flex w-max items-stretch gap-4 md:gap-6">
             {courses.map((course) => (
               <CourseCard
@@ -292,6 +325,12 @@ export function EngineeringDomains() {
                 One Standard.
               </span>
             </h3>
+            <Link
+              href="/institutions/engineering/courses"
+              className="text-engineering inline-flex items-center gap-2 rounded-full border border-current px-5 py-2 text-sm font-semibold transition-all hover:bg-engineering hover:text-white"
+            >
+              View All Courses <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
           <p className="max-w-sm text-base leading-relaxed text-stone-600 md:text-lg">
             4-year B.E. / B.Tech programs approved by AICTE and affiliated to

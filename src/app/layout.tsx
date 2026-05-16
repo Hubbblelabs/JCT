@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
+import Script from "next/script";
 import "@/styles/globals.css";
 import { StickyApplyButton } from "@/components/layout/StickyApplyButton";
-import { ChatbotButton } from "@/components/layout/ChatbotButton";
+import { MerittoPositioner } from "@/components/layout/MerittoPositioner";
+import { ChatbotNotification } from "@/components/layout/ChatbotNotification";
 import { RouteQuickNav } from "@/components/layout/RouteQuickNav";
 import { siteConfig } from "@/data/site";
 import { InstitutionProvider } from "@/contexts/InstitutionContext";
@@ -104,12 +106,24 @@ export default function RootLayout({
           {children}
           {/* Global sticky elements */}
           <StickyApplyButton />
-          <ChatbotButton />
+          <MerittoPositioner />
+          <ChatbotNotification />
           {process.env.NODE_ENV !== "production" && <RouteQuickNav />}
         </InstitutionProvider>
 
+        {/* Meritto Chatbot */}
+        <div
+          className="npf_chatbots"
+          data-w="77d56c9f31934de79df36d3ca503d338"
+          style={{ display: "none" }}
+        />
+        <Script
+          src="https://chatbot.in6.nopaperforms.com/en-gb/backend/bots/niaachtbtscpt.js/b4363a08fed64030ae3ab79c8be5848c/77d56c9f31934de79df36d3ca503d338"
+          strategy="lazyOnload"
+        />
+
         {/* Floating WhatsApp Button */}
-        <div className="group fixed right-4 bottom-5 z-50 md:right-6 md:bottom-6">
+        <div data-own-fixed className="group fixed right-4 bottom-5 z-50 md:right-6 md:bottom-6">
           <span className="pointer-events-none absolute top-1/2 right-14 -translate-y-1/2 rounded-md bg-[#0a1628]/92 px-2 py-1 text-xs font-semibold whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100">
             Chat on WhatsApp
           </span>
