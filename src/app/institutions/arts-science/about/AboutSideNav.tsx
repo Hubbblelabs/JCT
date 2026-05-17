@@ -158,7 +158,7 @@ export function AboutSideNav({ activeId, setActiveId }: AboutSideNavProps) {
           href="https://admissions.jct.ac.in/"
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-arts-science-accent text-white mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-center font-bold transition-colors hover:opacity-90"
+          className="bg-arts-science-accent mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-center font-bold text-white transition-colors hover:opacity-90"
         >
           Apply Now
           <ChevronRight size={16} />

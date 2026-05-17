@@ -61,7 +61,7 @@ export function ChatbotNotification() {
           exit={{ opacity: 0, x: -8, scale: 0.96 }}
           transition={{ duration: 0.22, ease: "easeOut" }}
           // Sits just to the right of the launcher icon (16px left + ~64px icon + 8px gap)
-          className="fixed bottom-5 z-[9997] pointer-events-auto"
+          className="pointer-events-auto fixed bottom-5 z-[9997]"
           style={{ left: "88px" }}
           data-own-fixed
         >
@@ -75,13 +75,13 @@ export function ChatbotNotification() {
           {/* Bubble */}
           <button
             onClick={open}
-            className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-left shadow-xl shadow-slate-900/10 transition-all hover:border-[#d4a024]/50 hover:shadow-2xl focus:outline-none max-w-[220px]"
+            className="flex max-w-[220px] items-start gap-3 rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-left shadow-xl shadow-slate-900/10 transition-all hover:border-[#d4a024]/50 hover:shadow-2xl focus:outline-none"
           >
             {/* Gold accent bar */}
             <span className="mt-0.5 h-8 w-1 shrink-0 rounded-full bg-[#d4a024]" />
 
-            <div className="flex-1 min-w-0">
-              <p className="text-[12.5px] font-bold leading-tight text-[#0a1628]">
+            <div className="min-w-0 flex-1">
+              <p className="text-[12.5px] leading-tight font-bold text-[#0a1628]">
                 Hey! I&apos;m Jagannath
               </p>
               <p className="mt-0.5 text-[11.5px] leading-snug text-slate-500">
@@ -96,7 +96,7 @@ export function ChatbotNotification() {
                 e.stopPropagation();
                 dismiss();
               }}
-              className="shrink-0 mt-0.5 rounded-full p-0.5 text-slate-300 transition-colors hover:bg-slate-100 hover:text-slate-500"
+              className="mt-0.5 shrink-0 rounded-full p-0.5 text-slate-300 transition-colors hover:bg-slate-100 hover:text-slate-500"
             >
               <X size={13} />
             </span>

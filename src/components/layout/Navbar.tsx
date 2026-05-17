@@ -68,7 +68,6 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
 
   useEffect(() => {
     if (!scrolled && !forceSolidOnTop) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDropdownSolidOverride(true);
       if (solidOverrideTimeoutRef.current) {
         clearTimeout(solidOverrideTimeoutRef.current);

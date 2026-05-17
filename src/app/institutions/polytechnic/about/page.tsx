@@ -184,7 +184,6 @@ export default function PolytechnicAboutPage() {
 
           {/* Main Content */}
           <div className="mt-8 min-w-0 space-y-16 lg:mt-0">
-
             {/* 1. About the Institution */}
             <section
               id="about"
@@ -263,8 +262,8 @@ export default function PolytechnicAboutPage() {
                   </h3>
                   <p className="text-muted-foreground text-sm leading-relaxed md:text-base">
                     Emerge as a leading Institute for Quality and Skill embedded
-                    Diploma Education that empowers students to excel in industry
-                    and higher studies.
+                    Diploma Education that empowers students to excel in
+                    industry and higher studies.
                   </p>
                 </div>
               </div>
@@ -416,9 +415,9 @@ export default function PolytechnicAboutPage() {
             >
               <SectionHeading icon={BookOpen} title="Administration — HOD" />
               <p className="text-muted-foreground mb-8 text-sm leading-relaxed md:text-base">
-                The Heads of Departments at JCT Polytechnic College bring
-                strong technical backgrounds and industry experience, guiding
-                each diploma program with a focus on practical excellence.
+                The Heads of Departments at JCT Polytechnic College bring strong
+                technical backgrounds and industry experience, guiding each
+                diploma program with a focus on practical excellence.
               </p>
               <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                 {[
@@ -437,7 +436,7 @@ export default function PolytechnicAboutPage() {
                       {d.abbr}
                     </div>
                     <div>
-                      <p className="text-foreground text-xs font-semibold leading-snug md:text-sm">
+                      <p className="text-foreground text-xs leading-snug font-semibold md:text-sm">
                         {d.dept}
                       </p>
                       <p className="text-muted-foreground mt-0.5 text-[11px]">
@@ -469,29 +468,53 @@ export default function PolytechnicAboutPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-white/10 bg-white/5">
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
                         S.No
                       </th>
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
                         Member
                       </th>
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
                         Category
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {[
-                      { name: "Mr. R. Arulselvan", category: "Chairman / Secretary of Trust" },
-                      { name: "Mr. R. Gautaman", category: "Vice Chairman / Member of Trust" },
-                      { name: "Mr. R. Durga Shankar", category: "Secretary & Managing Trustee" },
-                      { name: "Prof. Rajkumar, M.E.", category: "Principal — Member Secretary" },
-                      { name: "Nominee — DOTE", category: "Government Nominee" },
-                      { name: "Nominee — AICTE", category: "Government Nominee" },
+                      {
+                        name: "Mr. R. Arulselvan",
+                        category: "Chairman / Secretary of Trust",
+                      },
+                      {
+                        name: "Mr. R. Gautaman",
+                        category: "Vice Chairman / Member of Trust",
+                      },
+                      {
+                        name: "Mr. R. Durga Shankar",
+                        category: "Secretary & Managing Trustee",
+                      },
+                      {
+                        name: "Prof. Rajkumar, M.E.",
+                        category: "Principal — Member Secretary",
+                      },
+                      {
+                        name: "Nominee — DOTE",
+                        category: "Government Nominee",
+                      },
+                      {
+                        name: "Nominee — AICTE",
+                        category: "Government Nominee",
+                      },
                       { name: "Industry Expert", category: "Industry Nominee" },
-                      { name: "Senior Faculty Representative", category: "Faculty Nominee" },
+                      {
+                        name: "Senior Faculty Representative",
+                        category: "Faculty Nominee",
+                      },
                     ].map((m, i) => (
-                      <tr key={i} className="transition-colors hover:bg-white/5">
+                      <tr
+                        key={i}
+                        className="transition-colors hover:bg-white/5"
+                      >
                         <td className="text-muted-foreground px-4 py-3 text-xs">
                           {i + 1}
                         </td>
@@ -619,10 +642,7 @@ export default function PolytechnicAboutPage() {
                   : "hidden lg:block lg:opacity-100"
               }`}
             >
-              <SectionHeading
-                icon={Star}
-                title="Why Choose JCT Polytechnic?"
-              />
+              <SectionHeading icon={Star} title="Why Choose JCT Polytechnic?" />
               <div className="flex flex-wrap gap-2.5">
                 {[
                   "AICTE-approved 3-year diploma programs with lateral entry to B.E.",
@@ -640,7 +660,10 @@ export default function PolytechnicAboutPage() {
                     key={i}
                     className="bg-surface flex items-center gap-2 rounded-full border border-white/10 px-3.5 py-2 text-xs font-medium md:text-sm"
                   >
-                    <CheckCircle size={13} className="text-polytechnic shrink-0" />
+                    <CheckCircle
+                      size={13}
+                      className="text-polytechnic shrink-0"
+                    />
                     {point}
                   </span>
                 ))}

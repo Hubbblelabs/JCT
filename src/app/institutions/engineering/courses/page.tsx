@@ -70,7 +70,7 @@ function CourseCard({
           </div>
         )}
         {badge && (
-          <div className="absolute top-3 left-3 rounded-full bg-engineering/90 px-2.5 py-1 text-[10px] font-bold text-white uppercase tracking-wider">
+          <div className="bg-engineering/90 absolute top-3 left-3 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase">
             {badge}
           </div>
         )}
@@ -81,7 +81,7 @@ function CourseCard({
           <span className="text-engineering block text-[0.7rem] font-bold tracking-wider uppercase">
             {course.abbr}
           </span>
-          <h3 className="text-navy text-[1.1rem] font-semibold leading-snug">
+          <h3 className="text-navy text-[1.1rem] leading-snug font-semibold">
             {course.name}
           </h3>
           <p className="line-clamp-2 text-sm leading-relaxed text-slate-500">

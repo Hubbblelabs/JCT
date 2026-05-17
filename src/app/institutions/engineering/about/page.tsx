@@ -462,11 +462,17 @@ export default function EngineeringAboutPage() {
               <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
                 {[
                   { dept: "Computer Science & Engineering", abbr: "CSE" },
-                  { dept: "Electronics & Communication Engineering", abbr: "ECE" },
+                  {
+                    dept: "Electronics & Communication Engineering",
+                    abbr: "ECE",
+                  },
                   { dept: "Electrical & Electronics Engineering", abbr: "EEE" },
                   { dept: "Mechanical Engineering", abbr: "MECH" },
                   { dept: "Civil Engineering", abbr: "CE" },
-                  { dept: "Bio-Technology & Bio-Chemical Engineering", abbr: "BT" },
+                  {
+                    dept: "Bio-Technology & Bio-Chemical Engineering",
+                    abbr: "BT",
+                  },
                   { dept: "Food Technology", abbr: "FT" },
                   { dept: "Petroleum Engineering", abbr: "PE" },
                   { dept: "Petrochemical Technology", abbr: "PCT" },
@@ -481,7 +487,7 @@ export default function EngineeringAboutPage() {
                       {d.abbr}
                     </div>
                     <div>
-                      <p className="text-foreground text-xs font-semibold leading-snug md:text-sm">
+                      <p className="text-foreground text-xs leading-snug font-semibold md:text-sm">
                         {d.dept}
                       </p>
                       <p className="text-muted-foreground mt-0.5 text-[11px]">
@@ -513,29 +519,53 @@ export default function EngineeringAboutPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-white/10 bg-white/5">
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
                         S.No
                       </th>
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
                         Member
                       </th>
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold uppercase tracking-wider">
+                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
                         Category
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-white/5">
                     {[
-                      { name: "Mr. R. Arulselvan", category: "Chairman / Secretary of Trust" },
-                      { name: "Mr. R. Gautaman", category: "Vice Chairman / Member of Trust" },
-                      { name: "Mr. R. Durga Shankar", category: "Secretary & Managing Trustee" },
-                      { name: "Dr. S. Manoharan", category: "Principal — Member Secretary" },
-                      { name: "Nominee — Anna University", category: "University Nominee" },
-                      { name: "Nominee — AICTE", category: "Government Nominee" },
+                      {
+                        name: "Mr. R. Arulselvan",
+                        category: "Chairman / Secretary of Trust",
+                      },
+                      {
+                        name: "Mr. R. Gautaman",
+                        category: "Vice Chairman / Member of Trust",
+                      },
+                      {
+                        name: "Mr. R. Durga Shankar",
+                        category: "Secretary & Managing Trustee",
+                      },
+                      {
+                        name: "Dr. S. Manoharan",
+                        category: "Principal — Member Secretary",
+                      },
+                      {
+                        name: "Nominee — Anna University",
+                        category: "University Nominee",
+                      },
+                      {
+                        name: "Nominee — AICTE",
+                        category: "Government Nominee",
+                      },
                       { name: "Industry Expert", category: "Industry Nominee" },
-                      { name: "Senior Faculty Representative", category: "Faculty Nominee" },
+                      {
+                        name: "Senior Faculty Representative",
+                        category: "Faculty Nominee",
+                      },
                     ].map((m, i) => (
-                      <tr key={i} className="hover:bg-white/5 transition-colors">
+                      <tr
+                        key={i}
+                        className="transition-colors hover:bg-white/5"
+                      >
                         <td className="text-muted-foreground px-4 py-3 text-xs">
                           {i + 1}
                         </td>

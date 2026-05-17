@@ -85,9 +85,9 @@ export function MerittoPositioner() {
       attributeFilter: ["style"],
     });
 
-    const timers = [100, 300, 600, 1000, 1500, 2000, 3000, 5000, 8000, 12000].map(
-      (ms) => setTimeout(reposition, ms),
-    );
+    const timers = [
+      100, 300, 600, 1000, 1500, 2000, 3000, 5000, 8000, 12000,
+    ].map((ms) => setTimeout(reposition, ms));
     const keepAlive = setInterval(reposition, 5000);
 
     return () => {

@@ -38,6 +38,7 @@ function escapeHtml(input: string): string {
 /**
  * Safe formatter that converts markdown-style text to React elements (no dangerouslySetInnerHTML)
  */
+
 function FormattedMessage({ content }: { content: string }): React.ReactNode {
   let text = escapeHtml(content);
   text = text.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{26FF}]/gu, "");
@@ -55,14 +56,18 @@ function FormattedMessage({ content }: { content: string }): React.ReactNode {
     }
 
     // Process formatting markers
+
     line = line.replace(/\*\*\*(.+?)\*\*\*/g, "\x01BOLDITALIC\x02$1\x03");
+
     line = line.replace(/\*\*(.+?)\*\*/g, "\x01BOLD\x02$1\x03");
+
     line = line.replace(/\*(.+?)\*/g, "\x01ITALIC\x02$1\x03");
     const jagannathMatch = line.match(/^\s*Jagannath\s*:/i);
     if (jagannathMatch) {
       line = line.replace(/^\s*Jagannath\s*:/i, "\x01JAGANNATH\x02\x03");
     }
 
+    // eslint-disable-next-line no-control-regex
     const tokens = line.split(/(\x01[A-Z]+\x02.*?\x03)/);
 
     tokens.forEach((token, idx) => {
@@ -231,7 +236,6 @@ export function ChatbotButton() {
   useEffect(() => {
     let active = true;
     if (active) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMessages((prev) => {
         if (prev.length === 0 || prev[0].id !== "welcome") {
           return [
@@ -276,7 +280,6 @@ export function ChatbotButton() {
     const trimmed = text.trim();
     if (!trimmed || isLoading) return;
 
-    // eslint-disable-next-line react-hooks/purity
     const now = Date.now();
     const userMsg: Message = {
       id: String(now),

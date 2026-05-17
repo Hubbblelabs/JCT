@@ -39,7 +39,6 @@ export function InstitutionProvider({
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMounted(true);
 
     if (initialPathInst === null) {
@@ -74,7 +73,6 @@ export function InstitutionProvider({
 
     const pathInst = getPathnameInstitution(pathname);
     if (pathInst) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setInstitution(pathInst);
     }
   }, [pathname, isMounted]);

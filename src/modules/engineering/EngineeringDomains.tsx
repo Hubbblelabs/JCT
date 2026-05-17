@@ -267,7 +267,10 @@ function CourseCarouselSection({
           </div>
         )}
 
-        <DragScroll ref={carouselRef} className="snap-container scrollbar-hide flex w-full items-stretch gap-4 overflow-x-auto px-4 md:gap-6 md:px-6">
+        <DragScroll
+          ref={carouselRef}
+          className="snap-container scrollbar-hide flex w-full items-stretch gap-4 overflow-x-auto px-4 md:gap-6 md:px-6"
+        >
           <div className="flex w-max items-stretch gap-4 md:gap-6">
             {courses.map((course) => (
               <CourseCard
@@ -327,7 +330,7 @@ export function EngineeringDomains() {
             </h3>
             <Link
               href="/institutions/engineering/courses"
-              className="text-engineering inline-flex items-center gap-2 rounded-full border border-current px-5 py-2 text-sm font-semibold transition-all hover:bg-engineering hover:text-white"
+              className="text-engineering hover:bg-engineering inline-flex items-center gap-2 rounded-full border border-current px-5 py-2 text-sm font-semibold transition-all hover:text-white"
             >
               View All Courses <ArrowRight className="h-4 w-4" />
             </Link>
