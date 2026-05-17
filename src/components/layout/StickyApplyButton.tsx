@@ -42,6 +42,7 @@ export function StickyApplyButton() {
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 20, scale: 0.9 }}
           transition={{ duration: 0.3 }}
+          data-own-fixed
           className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 md:right-24 md:bottom-6 md:left-auto md:translate-x-0"
         >
           <Link

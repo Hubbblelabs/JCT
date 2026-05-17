@@ -55,7 +55,6 @@ export function CampusLife() {
               className="relative h-full max-w-[85vw] min-w-[85vw] shrink-0 snap-center overflow-hidden bg-stone-100 md:max-w-[60vw] md:min-w-[60vw]"
               draggable={false}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={src}
                 alt={`Campus Life ${index + 1}`}
