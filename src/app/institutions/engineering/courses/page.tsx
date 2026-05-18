@@ -4,11 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
-import { ugCourses, pgCourses, researchCourses } from "@/data/engineering";
+import {
+  ugCourses as fallbackUg,
+  pgCourses as fallbackPg,
+  researchCourses as fallbackResearch,
+} from "@/data/engineering";
 
 type Course = {
   name: string;
@@ -102,7 +107,69 @@ function CourseCard({
   );
 }
 
+function classify(programs: Course[], raw: Record<string, unknown>[]) {
+  const ug: Course[] = [];
+  const pg: Course[] = [];
+  const phd: Course[] = [];
+  programs.forEach((p, idx) => {
+    const item = raw[idx] ?? {};
+    const degree = typeof item.degree === "string" ? item.degree.toLowerCase() : "";
+    if (degree.includes("ph.d") || degree.includes("phd") || degree.includes("doctoral")) {
+      phd.push(p);
+    } else if (degree.includes("m.e") || degree.includes("m.tech") || degree.includes("pg")) {
+      pg.push(p);
+    } else {
+      ug.push(p);
+    }
+  });
+  return { ug, pg, phd };
+}
+
+function normalizeCourse(r: Record<string, unknown>): Course | null {
+  const name = typeof r.name === "string" ? r.name : null;
+  const slug = typeof r.slug === "string" ? r.slug : null;
+  if (!name || !slug) return null;
+  return {
+    name,
+    slug,
+    abbr: typeof r.abbr === "string" ? r.abbr : "",
+    image: typeof r.image === "string" ? r.image : "",
+    highlight: typeof r.highlight === "string" ? r.highlight : "",
+  };
+}
+
 export default function EngineeringCoursesPage() {
+  const [ugCourses, setUgCourses] = useState<Course[]>(fallbackUg as Course[]);
+  const [pgCourses, setPgCourses] = useState<Course[]>(fallbackPg as Course[]);
+  const [researchCourses, setResearchCourses] = useState<Course[]>(
+    fallbackResearch as Course[],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/programs?institution=engineering")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source !== "db") return;
+        const raw = Array.isArray(res.data)
+          ? (res.data as Record<string, unknown>[])
+          : [];
+        const normalized = raw
+          .map(normalizeCourse)
+          .filter((x): x is Course => x !== null);
+        if (normalized.length === 0) return;
+        const { ug, pg, phd } = classify(normalized, raw);
+        if (ug.length > 0) setUgCourses(ug);
+        if (pg.length > 0) setPgCourses(pg);
+        if (phd.length > 0) setResearchCourses(phd);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <main className="bg-surface text-foreground min-h-screen">
       <Navbar forceSolidOnTop />

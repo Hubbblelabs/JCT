@@ -1,11 +1,34 @@
 "use client";
 
 import { motion, useInView, useSpring, useTransform } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { Award, Users, BookOpen, ArrowRight } from "lucide-react";
-import { heroStats } from "@/data/arts-science";
+import { heroStats as fallbackHeroStats } from "@/data/arts-science";
 import { ArtsAndScienceHeroBg } from "./ArtsAndScienceHeroBg";
+
+type HeroStat = {
+  value: string;
+  label: string;
+  accent: boolean;
+};
+
+function normalizeStats(raw: unknown): HeroStat[] {
+  if (!Array.isArray(raw)) return [];
+  const out: HeroStat[] = [];
+  for (const entry of raw) {
+    const r = (entry ?? {}) as Record<string, unknown>;
+    const value = typeof r.value === "string" ? r.value : null;
+    const label = typeof r.label === "string" ? r.label : null;
+    if (!value || !label) continue;
+    out.push({
+      value,
+      label,
+      accent: Boolean(r.accent),
+    });
+  }
+  return out;
+}
 
 function AnimatedNumber({ value }: { value: string }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -36,6 +59,27 @@ function AnimatedNumber({ value }: { value: string }) {
 }
 
 export function Hero() {
+  const [heroStats, setHeroStats] = useState<HeroStat[]>(
+    fallbackHeroStats as HeroStat[],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/site-config?key=artsScienceHeroStats")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source === "db") {
+          const next = normalizeStats(res.data);
+          if (next.length > 0) setHeroStats(next);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;

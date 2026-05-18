@@ -7,7 +7,11 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { DragScroll } from "@/components/ui/DragScroll";
-import { ugCourses, pgCourses, researchCourses } from "@/data/engineering";
+import {
+  ugCourses as fallbackUg,
+  pgCourses as fallbackPg,
+  researchCourses as fallbackResearch,
+} from "@/data/engineering";
 
 type EngineeringCourse = {
   name: string;
@@ -296,8 +300,69 @@ function CourseCarouselSection({
   );
 }
 
+function normalizeDbCourses(raw: unknown): EngineeringCourse[] {
+  if (!Array.isArray(raw)) return [];
+  const out: EngineeringCourse[] = [];
+  for (const entry of raw) {
+    const r = (entry ?? {}) as Record<string, unknown>;
+    const name = typeof r.name === "string" ? r.name : null;
+    const slug = typeof r.slug === "string" ? r.slug : null;
+    const abbr = typeof r.abbr === "string" ? r.abbr : "";
+    if (!name || !slug) continue;
+    out.push({
+      name,
+      abbr,
+      slug,
+      image: typeof r.image === "string" ? r.image : "",
+      highlight: typeof r.highlight === "string" ? r.highlight : "",
+    });
+  }
+  return out;
+}
+
 export function EngineeringDomains() {
-  const postgraduateCourses = [...pgCourses, ...researchCourses];
+  const initialUg = fallbackUg as EngineeringCourse[];
+  const initialPg = [
+    ...fallbackPg,
+    ...fallbackResearch,
+  ] as EngineeringCourse[];
+
+  const [ugCourses, setUgCourses] = useState<EngineeringCourse[]>(initialUg);
+  const [postgraduateCourses, setPostgraduateCourses] =
+    useState<EngineeringCourse[]>(initialPg);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/programs?institution=engineering")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source !== "db") return;
+        const all = normalizeDbCourses(res.data);
+        if (all.length === 0) return;
+
+        const ug: EngineeringCourse[] = [];
+        const pg: EngineeringCourse[] = [];
+        const raw = Array.isArray(res.data) ? res.data : [];
+        all.forEach((course, idx) => {
+          const item = (raw[idx] ?? {}) as Record<string, unknown>;
+          const degree =
+            typeof item.degree === "string" ? item.degree.toLowerCase() : "";
+          if (degree.includes("m.e") || degree.includes("m.tech") || degree.includes("ph.d")) {
+            pg.push(course);
+          } else {
+            ug.push(course);
+          }
+        });
+
+        if (ug.length > 0) setUgCourses(ug);
+        if (pg.length > 0) setPostgraduateCourses(pg);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   return (
     <section
@@ -349,9 +414,9 @@ export function EngineeringDomains() {
 
       <CourseCarouselSection
         eyebrow="Undergraduate Programs"
-        title="11 UG Courses,"
+        title={`${ugCourses.length} UG Courses,`}
         subtitle="One Standard."
-        courses={ugCourses as EngineeringCourse[]}
+        courses={ugCourses}
         showAccreditationBadges
         showDescription={false}
         showHeader={false}
@@ -362,7 +427,7 @@ export function EngineeringDomains() {
         eyebrow="Postgraduate Programs"
         title={`${postgraduateCourses.length} PG Courses,`}
         subtitle="Advanced Learning."
-        courses={postgraduateCourses as EngineeringCourse[]}
+        courses={postgraduateCourses}
         showAccreditationBadges={false}
         showDescription={false}
         showHeader

@@ -8,7 +8,13 @@ type AccreditationsProps = {
   variant?: "default" | "hero";
 };
 
-const logos = [
+type AccreditationLogo = {
+  src: string;
+  name: string;
+  note: string;
+};
+
+const FALLBACK_LOGOS: AccreditationLogo[] = [
   {
     src: "/accreditations/naac.webp",
     name: "NAAC Accredited",
@@ -57,10 +63,49 @@ function getWrappedIndex(index: number, length: number) {
   return (index + length) % length;
 }
 
+type DbAccreditation = {
+  name?: string;
+  logo?: string;
+  description?: string;
+};
+
+function normalizeFromDb(raw: unknown): AccreditationLogo[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((item) => {
+      const obj = (item ?? {}) as DbAccreditation;
+      if (!obj.name || !obj.logo) return null;
+      return {
+        src: obj.logo,
+        name: obj.name,
+        note: obj.description ?? "",
+      } satisfies AccreditationLogo;
+    })
+    .filter((x): x is AccreditationLogo => x !== null);
+}
+
 export function Accreditations({ variant = "default" }: AccreditationsProps) {
   const isHero = variant === "hero";
+  const [logos, setLogos] = useState<AccreditationLogo[]>(FALLBACK_LOGOS);
   const [activeIndex, setActiveIndex] = useState(0);
   const [offsetBase, setOffsetBase] = useState(92);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/site-config?key=accreditations")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source === "db") {
+          const next = normalizeFromDb(res.data);
+          if (next.length > 0) setLogos(next);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const handleResize = () => setOffsetBase(window.innerWidth < 640 ? 64 : 92);
@@ -70,14 +115,17 @@ export function Accreditations({ variant = "default" }: AccreditationsProps) {
   }, []);
 
   useEffect(() => {
+    if (logos.length === 0) return;
     const timer = window.setInterval(() => {
       setActiveIndex((prev) => (prev + 1) % logos.length);
     }, 2400);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [logos.length]);
 
-  const activeLogo = logos[activeIndex];
+  if (logos.length === 0) return null;
+  const safeIndex = activeIndex % logos.length;
+  const activeLogo = logos[safeIndex];
 
   return (
     <section
@@ -113,7 +161,7 @@ export function Accreditations({ variant = "default" }: AccreditationsProps) {
         <div className="relative flex h-18 w-full items-center justify-center overflow-hidden sm:h-22">
           {VISIBLE_OFFSETS.map((offset) => {
             const wrappedIndex = getWrappedIndex(
-              activeIndex + offset,
+              safeIndex + offset,
               logos.length,
             );
             const logo = logos[wrappedIndex];
@@ -121,7 +169,7 @@ export function Accreditations({ variant = "default" }: AccreditationsProps) {
 
             return (
               <motion.div
-                key={logo.name}
+                key={`${logo.name}-${wrappedIndex}`}
                 animate={{
                   x: offset * offsetBase,
                   scale: isActive ? 1.1 : 0.92,

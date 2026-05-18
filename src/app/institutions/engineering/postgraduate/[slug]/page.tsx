@@ -4,15 +4,75 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
-import { pgCourses, researchCourses } from "@/data/engineering";
+import {
+  pgCourses as fallbackPg,
+  researchCourses as fallbackResearch,
+} from "@/data/engineering";
 import { siteConfig } from "@/data/site";
+import { connectDB } from "@/lib/mongodb";
+import { Program } from "@/lib/models";
 
-const allPostgraduateCourses = [...pgCourses, ...researchCourses];
+type PostgraduateCourse = {
+  name: string;
+  abbr: string;
+  slug: string;
+  image?: string;
+  highlight: string;
+};
 
-export const dynamicParams = false;
+const fallbackCourses: PostgraduateCourse[] = [
+  ...fallbackPg,
+  ...fallbackResearch,
+].map((c) => ({
+  name: c.name,
+  abbr: c.abbr,
+  slug: c.slug,
+  image: c.image,
+  highlight: c.highlight,
+}));
 
-export function generateStaticParams() {
-  return allPostgraduateCourses.map((course) => ({ slug: course.slug }));
+async function getPostgraduateCourses(): Promise<PostgraduateCourse[]> {
+  try {
+    await connectDB();
+    const programs = await Program.find({
+      institution: "engineering",
+      is_active: true,
+    })
+      .select("name abbr slug image highlight degree")
+      .sort({ sort_order: 1, name: 1 });
+
+    const pgList = programs
+      .filter((p) => {
+        const degree = (p.degree || "").toLowerCase();
+        return (
+          degree.includes("m.e") ||
+          degree.includes("m.tech") ||
+          degree.includes("ph.d") ||
+          degree.includes("phd") ||
+          degree.includes("doctoral") ||
+          degree.includes("pg")
+        );
+      })
+      .map((p) => ({
+        name: p.name,
+        abbr: p.abbr,
+        slug: p.slug,
+        image: p.image,
+        highlight: p.highlight,
+      }));
+
+    if (pgList.length === 0) return fallbackCourses;
+    return pgList;
+  } catch {
+    return fallbackCourses;
+  }
+}
+
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const courses = await getPostgraduateCourses();
+  return courses.map((course) => ({ slug: course.slug }));
 }
 
 export async function generateMetadata({
@@ -21,7 +81,8 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const course = allPostgraduateCourses.find((item) => item.slug === slug);
+  const courses = await getPostgraduateCourses();
+  const course = courses.find((item) => item.slug === slug);
 
   if (!course) {
     return {};
@@ -47,13 +108,12 @@ export default async function PostgraduateProgramPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const course = allPostgraduateCourses.find((item) => item.slug === slug);
+  const courses = await getPostgraduateCourses();
+  const course = courses.find((item) => item.slug === slug);
 
   if (!course) {
     notFound();
   }
-
-  const Icon = course.icon;
 
   return (
     <main className="bg-background text-foreground engineering-theme min-h-screen overflow-x-hidden">
@@ -76,20 +136,13 @@ export default async function PostgraduateProgramPage({
 
       <section className="container mx-auto px-4 py-16 md:py-24">
         <div className="max-w-3xl">
-          <div className="mb-8 flex items-start gap-4">
-            {Icon && (
-              <div className="text-engineering mt-1">
-                <Icon className="h-8 w-8" />
-              </div>
-            )}
-            <div>
-              <h2 className="text-navy mb-2 font-serif text-3xl font-bold">
-                {course.name}
-              </h2>
-              <p className="text-lg leading-relaxed text-slate-600">
-                {course.highlight}
-              </p>
-            </div>
+          <div className="mb-8">
+            <h2 className="text-navy mb-2 font-serif text-3xl font-bold">
+              {course.name}
+            </h2>
+            <p className="text-lg leading-relaxed text-slate-600">
+              {course.highlight}
+            </p>
           </div>
 
           <div className="space-y-8">
@@ -151,7 +204,7 @@ export default async function PostgraduateProgramPage({
                 Interested in this program?
               </p>
               <a
-                href="https://wa.me/9194460904?text=I%20am%20interested%20in%20${course.name}"
+                href={`https://wa.me/9194460904?text=I%20am%20interested%20in%20${encodeURIComponent(course.name)}`}
                 className="text-engineering hover:text-engineering/80 inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 font-semibold shadow-sm transition-colors"
               >
                 Inquire Now

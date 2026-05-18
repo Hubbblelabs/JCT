@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { ugPrograms } from "@/data/arts-science";
+import { ugPrograms as fallbackPrograms } from "@/data/arts-science";
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DragScroll } from "@/components/ui/DragScroll";
@@ -147,7 +147,47 @@ function CourseCarouselSection({ courses }: { courses: ArtsScienceCourse[] }) {
   );
 }
 
+function normalizeDbPrograms(raw: unknown): ArtsScienceCourse[] {
+  if (!Array.isArray(raw)) return [];
+  const out: ArtsScienceCourse[] = [];
+  for (const entry of raw) {
+    const r = (entry ?? {}) as Record<string, unknown>;
+    const name = typeof r.name === "string" ? r.name : null;
+    const slug = typeof r.slug === "string" ? r.slug : null;
+    if (!name || !slug) continue;
+    out.push({
+      name,
+      slug,
+      abbr: typeof r.abbr === "string" ? r.abbr : undefined,
+      image: typeof r.image === "string" ? r.image : undefined,
+      highlight: typeof r.highlight === "string" ? r.highlight : undefined,
+    });
+  }
+  return out;
+}
+
 export function UgPrograms() {
+  const [courses, setCourses] = useState<ArtsScienceCourse[]>(
+    fallbackPrograms as ArtsScienceCourse[],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/programs?institution=arts-science")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source === "db") {
+          const next = normalizeDbPrograms(res.data);
+          if (next.length > 0) setCourses(next);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -193,7 +233,7 @@ export function UgPrograms() {
         </div>
       </div>
 
-      <CourseCarouselSection courses={ugPrograms as ArtsScienceCourse[]} />
+      <CourseCarouselSection courses={courses} />
     </section>
   );
 }

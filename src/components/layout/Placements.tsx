@@ -48,12 +48,56 @@ const STATIC_COMPANIES = [
   { name: "Zoho", logo: "/company-logos/zoho.webp" },
 ];
 
-const placementStats = [
+type Stat = {
+  icon: typeof TrendingUp;
+  value: string;
+  label: string;
+};
+
+const DEFAULT_STATS: Stat[] = [
   { icon: TrendingUp, value: "98%", label: "Placement Rate" },
   { icon: Award, value: "₹9 LPA", label: "Average Package" },
   { icon: Award, value: "₹70 LPA", label: "Highest Package" },
   { icon: Building, value: "500+", label: "Recruiting Partners" },
 ];
+
+function buildStatsFromConfig(stats: Record<string, unknown> | null): Stat[] {
+  if (!stats || typeof stats !== "object") return DEFAULT_STATS;
+  const placementRate = stats.placementRate;
+  const averagePackage = stats.averagePackage;
+  const highestPackage = stats.highestPackage;
+  const recruiters = stats.recruiters;
+
+  return [
+    {
+      icon: TrendingUp,
+      value:
+        placementRate != null ? `${placementRate}%` : DEFAULT_STATS[0].value,
+      label: "Placement Rate",
+    },
+    {
+      icon: Award,
+      value:
+        averagePackage != null
+          ? `₹${averagePackage}`
+          : DEFAULT_STATS[1].value,
+      label: "Average Package",
+    },
+    {
+      icon: Award,
+      value:
+        highestPackage != null
+          ? `₹${highestPackage}`
+          : DEFAULT_STATS[2].value,
+      label: "Highest Package",
+    },
+    {
+      icon: Building,
+      value: recruiters != null ? `${recruiters}+` : DEFAULT_STATS[3].value,
+      label: "Recruiting Partners",
+    },
+  ];
+}
 
 function CompanyCard({ company }: { company: { name: string; logo: string } }) {
   return (
@@ -77,6 +121,7 @@ function CompanyCard({ company }: { company: { name: string; logo: string } }) {
 
 export function Placements() {
   const [companies, setCompanies] = useState(STATIC_COMPANIES);
+  const [placementStats, setPlacementStats] = useState<Stat[]>(DEFAULT_STATS);
 
   useEffect(() => {
     fetch("/api/public/recruiters")
@@ -87,6 +132,17 @@ export function Placements() {
             name: String(r.name),
             logo: String(r.logo),
           })));
+        }
+      })
+      .catch(() => {});
+
+    fetch("/api/public/site-config?key=stats")
+      .then((r) => r.json())
+      .then((res) => {
+        if (res.source === "db" && res.data) {
+          setPlacementStats(
+            buildStatsFromConfig(res.data as Record<string, unknown>),
+          );
         }
       })
       .catch(() => {});

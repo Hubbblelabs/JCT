@@ -6,7 +6,7 @@ import Image from "next/image";
 import { ArrowLeft, ArrowRight, LucideIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { diplomaPrograms } from "@/data/polytechnic";
+import { diplomaPrograms as fallbackDiplomaPrograms } from "@/data/polytechnic";
 import { DragScroll } from "@/components/ui/DragScroll";
 import { PolySection, PolySectionHeader } from "@/modules/polytechnic/PolyUI";
 
@@ -155,7 +155,45 @@ function CourseCarouselSection({ courses }: { courses: PolytechnicCourse[] }) {
   );
 }
 
+function normalizeDbPrograms(raw: unknown): PolytechnicCourse[] {
+  if (!Array.isArray(raw)) return [];
+  const out: PolytechnicCourse[] = [];
+  for (const entry of raw) {
+    const r = (entry ?? {}) as Record<string, unknown>;
+    const name = typeof r.name === "string" ? r.name : null;
+    const slug = typeof r.slug === "string" ? r.slug : null;
+    if (!name || !slug) continue;
+    out.push({
+      name,
+      slug,
+      image: typeof r.image === "string" ? r.image : undefined,
+    });
+  }
+  return out;
+}
+
 export function DiplomaPrograms() {
+  const [courses, setCourses] = useState<PolytechnicCourse[]>(
+    fallbackDiplomaPrograms as PolytechnicCourse[],
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/programs?institution=polytechnic")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source === "db") {
+          const next = normalizeDbPrograms(res.data);
+          if (next.length > 0) setCourses(next);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -205,9 +243,7 @@ export function DiplomaPrograms() {
           <PolySectionHeader title="Diploma Programs" className="mb-0" />
         </div>
 
-        <CourseCarouselSection
-          courses={diplomaPrograms as PolytechnicCourse[]}
-        />
+        <CourseCarouselSection courses={courses} />
       </div>
     </PolySection>
   );

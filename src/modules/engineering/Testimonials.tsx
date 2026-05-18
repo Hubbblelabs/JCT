@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { CollegeTestimonials } from "@/components/layout/CollegeTestimonials";
-import { testimonials as fallback } from "@/data/polytechnic";
+import { testimonials as fallback } from "@/data/engineering";
 
 type Item = {
   quote: string;
@@ -11,8 +11,6 @@ type Item = {
   image: string;
   tag?: string;
 };
-
-const CATEGORIES = ["Alumni", "Student", "INDUSTRY"] as const;
 
 function normalizeDb(raw: unknown): Item[] {
   if (!Array.isArray(raw)) return [];
@@ -41,15 +39,11 @@ function normalizeDb(raw: unknown): Item[] {
 }
 
 export function Testimonials() {
-  const initial: Item[] = fallback.map((item, index) => ({
-    ...item,
-    tag: CATEGORIES[index % CATEGORIES.length],
-  }));
-  const [items, setItems] = useState<Item[]>(initial);
+  const [items, setItems] = useState<Item[]>(fallback);
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/public/testimonials?institution=polytechnic")
+    fetch("/api/public/testimonials?institution=engineering")
       .then((r) => r.json())
       .then((res) => {
         if (cancelled) return;
@@ -65,12 +59,13 @@ export function Testimonials() {
   }, []);
 
   return (
-    <div id="testimonials">
+    <div id="life-at-jct">
       <CollegeTestimonials
         title="Testimonials"
-        subtitle="Voices from our polytechnic community on practical training, industry readiness, and career growth."
-        accentColor="#4f617b"
-        sectionBgClassName="bg-[#F3F4F6]"
+        subtitle="Stories from engineering students, alumni, and hiring partners who have experienced JCT's outcome-focused learning."
+        accentColor="#D4A024"
+        sectionBgClassName="bg-[#F8FAFC]"
+        sectionId="testimonials"
         items={items}
       />
     </div>

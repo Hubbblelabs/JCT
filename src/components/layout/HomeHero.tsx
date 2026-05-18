@@ -6,8 +6,77 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowRight, X } from "lucide-react";
-import { homeHeroContent } from "@/data/home";
+import { homeHeroContent as fallbackHero } from "@/data/home";
 import { Accreditations } from "@/components/layout/Accreditations";
+
+type HeroCta = { label: string; href: string; primary: boolean };
+type HeroCard = {
+  title: string;
+  description: string;
+  href: string;
+  icon: string;
+  ctaLabel: string;
+  highlights: string;
+};
+
+type HeroContent = {
+  backgroundImages: string[];
+  titleLines: string[];
+  ctas: HeroCta[];
+  cards: HeroCard[];
+};
+
+function normalizeHero(raw: unknown): HeroContent | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, unknown>;
+  const backgroundImages = Array.isArray(r.backgroundImages)
+    ? r.backgroundImages.filter((x): x is string => typeof x === "string")
+    : [];
+  const titleLines = Array.isArray(r.titleLines)
+    ? r.titleLines.filter((x): x is string => typeof x === "string")
+    : [];
+  const ctas = Array.isArray(r.ctas)
+    ? r.ctas
+        .map((c) => {
+          const o = (c ?? {}) as Record<string, unknown>;
+          const label = typeof o.label === "string" ? o.label : null;
+          const href = typeof o.href === "string" ? o.href : null;
+          if (!label || !href) return null;
+          return { label, href, primary: Boolean(o.primary) } satisfies HeroCta;
+        })
+        .filter((x): x is HeroCta => x !== null)
+    : [];
+  const cards = Array.isArray(r.cards)
+    ? r.cards
+        .map((c) => {
+          const o = (c ?? {}) as Record<string, unknown>;
+          const title = typeof o.title === "string" ? o.title : null;
+          if (!title) return null;
+          return {
+            title,
+            description:
+              typeof o.description === "string" ? o.description : "",
+            href: typeof o.href === "string" ? o.href : "#",
+            icon: typeof o.icon === "string" ? o.icon : "engineering",
+            ctaLabel:
+              typeof o.ctaLabel === "string" ? o.ctaLabel : "Explore",
+            highlights:
+              typeof o.highlights === "string" ? o.highlights : "",
+          } satisfies HeroCard;
+        })
+        .filter((x): x is HeroCard => x !== null)
+    : [];
+
+  if (
+    backgroundImages.length === 0 ||
+    titleLines.length === 0 ||
+    cards.length === 0
+  ) {
+    return null;
+  }
+
+  return { backgroundImages, titleLines, ctas, cards };
+}
 
 const BACKGROUND_MOTIONS = [
   {
@@ -33,6 +102,26 @@ export function HomeHero() {
   const [currentBackgroundIndex, setCurrentBackgroundIndex] = useState(0);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [homeHeroContent, setHomeHeroContent] = useState<HeroContent>(
+    fallbackHero as unknown as HeroContent,
+  );
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/site-config?key=home")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source === "db") {
+          const next = normalizeHero(res.data);
+          if (next) setHomeHeroContent(next);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     const media = window.matchMedia("(hover: none), (pointer: coarse)");
@@ -50,22 +139,21 @@ export function HomeHero() {
   }, []);
 
   useEffect(() => {
+    const len = homeHeroContent.backgroundImages.length;
+    if (len === 0) return;
     const timer = window.setInterval(() => {
-      setCurrentBackgroundIndex(
-        (currentIndex) =>
-          (currentIndex + 1) % homeHeroContent.backgroundImages.length,
-      );
+      setCurrentBackgroundIndex((currentIndex) => (currentIndex + 1) % len);
     }, 8000);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [homeHeroContent.backgroundImages.length]);
 
   useEffect(() => {
     homeHeroContent.backgroundImages.forEach((src) => {
       const image = new window.Image();
       image.src = src;
     });
-  }, []);
+  }, [homeHeroContent.backgroundImages]);
 
   function isCardExpanded(index: number) {
     return hoveredCard === index;

@@ -1,9 +1,52 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { metrics } from "@/data/engineering";
+import { useEffect, useState } from "react";
+import { metrics as fallbackMetrics } from "@/data/engineering";
+
+type Metric = {
+  value: string;
+  label: string;
+  sub: string;
+};
+
+function normalizeDbMetrics(raw: unknown): Metric[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((entry) => {
+      const r = (entry ?? {}) as Record<string, unknown>;
+      const value = typeof r.value === "string" ? r.value : null;
+      const label = typeof r.label === "string" ? r.label : null;
+      if (!value || !label) return null;
+      return {
+        value,
+        label,
+        sub: typeof r.sub === "string" ? r.sub : "",
+      } satisfies Metric;
+    })
+    .filter((x): x is Metric => x !== null);
+}
 
 export function EngineeringMetrics() {
+  const [metrics, setMetrics] = useState<Metric[]>(fallbackMetrics);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/site-config?key=engineeringMetrics")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source === "db") {
+          const next = normalizeDbMetrics(res.data);
+          if (next.length > 0) setMetrics(next);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section id="courses" className="bg-primary py-16 md:py-24">
       <div className="container mx-auto px-4 md:px-6">
