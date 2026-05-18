@@ -4,6 +4,8 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { TextInput, TextArea, Select, ImageUploadInput } from "@/components/admin/inputs";
 import { Plus, Pencil, Trash2, X, Loader2, Check } from "lucide-react";
+import { ValidationErrors } from "@/components/admin/ValidationErrors";
+import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 
 interface Testimonial {
   _id: string;
@@ -47,6 +49,7 @@ function TestimonialsPageInner() {
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
   const [filterInst, setFilterInst] = useState(() => searchParams.get("college") ?? "");
+  const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -58,13 +61,14 @@ function TestimonialsPageInner() {
 
   useEffect(() => { load(); }, [filterInst]);
 
-  const openNew = () => { setEditing({ _id: "", ...EMPTY }); setForm(EMPTY); };
-  const openEdit = (t: Testimonial) => { setEditing(t); setForm({ ...t }); };
-  const close = () => { setEditing(null); setForm(EMPTY); };
+  const openNew = () => { setEditing({ _id: "", ...EMPTY }); setForm(EMPTY); setApiError(null); };
+  const openEdit = (t: Testimonial) => { setEditing(t); setForm({ ...t }); setApiError(null); };
+  const close = () => { setEditing(null); setForm(EMPTY); setApiError(null); };
   const set = (key: string, val: unknown) => setForm((f) => ({ ...f, [key]: val }));
 
   const save = async () => {
     setSaving(true);
+    setApiError(null);
     const isNew = !editing?._id;
     const url = isNew ? "/api/admin/testimonials" : `/api/admin/testimonials/${editing!._id}`;
     const r = await fetch(url, {
@@ -72,7 +76,12 @@ function TestimonialsPageInner() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    if (r.ok) { await load(); close(); }
+    if (r.ok) {
+      await load();
+      close();
+    } else {
+      setApiError(await parseApiError(r));
+    }
     setSaving(false);
   };
 
@@ -162,6 +171,12 @@ function TestimonialsPageInner() {
               <button onClick={close} className="admin-btn admin-btn-outline admin-btn-sm"><X size={14} /></button>
             </div>
             <div className="p-6 space-y-1">
+              {apiError && (
+                <ValidationErrors
+                  error={apiError.message ?? apiError.error}
+                  details={apiError.details}
+                />
+              )}
               <div className="grid grid-cols-2 gap-4">
                 <TextInput label="Name" value={form.name} onChange={(e) => set("name", e.target.value)} required />
                 <TextInput label="Batch (year)" value={form.batch} onChange={(e) => set("batch", e.target.value)} placeholder="2024" required />

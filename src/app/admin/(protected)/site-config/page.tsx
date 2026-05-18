@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Save, Loader2, Plus, Trash2 } from "lucide-react";
 import { TextInput, NumberInput, TextArea, ImageUploadInput } from "@/components/admin/inputs";
+import { ValidationErrors } from "@/components/admin/ValidationErrors";
+import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 
 const CONFIG_KEYS = [
   { key: "contact", label: "Contact" },
@@ -529,6 +531,7 @@ export default function SiteConfigPage() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
+  const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -552,13 +555,20 @@ export default function SiteConfigPage() {
   const save = async () => {
     setSaving(true);
     setMsg("");
+    setApiError(null);
     const r = await fetch("/api/admin/site-config", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ config_key: selected, value: currentValue }),
     });
-    if (r.ok) { setMsg("Saved!"); await load(); }
-    else setMsg("Error saving");
+    if (r.ok) {
+      setMsg("Saved!");
+      await load();
+    } else {
+      const parsed = await parseApiError(r);
+      setApiError(parsed);
+      if (!parsed?.details?.length) setMsg(parsed?.message ?? parsed?.error ?? "Error saving");
+    }
     setSaving(false);
   };
 
@@ -649,7 +659,24 @@ export default function SiteConfigPage() {
         </div>
       </div>
 
-      {msg && <p className="mb-4 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">{msg}</p>}
+      {msg && !apiError && (
+        <p
+          className={`mb-4 rounded-lg px-3 py-2 text-sm ${
+            msg === "Saved!" || msg.startsWith("Seeded")
+              ? "bg-green-50 text-green-700"
+              : "bg-red-50 text-red-700"
+          }`}
+        >
+          {msg}
+        </p>
+      )}
+
+      {apiError && (
+        <ValidationErrors
+          error={apiError.message ?? apiError.error}
+          details={apiError.details}
+        />
+      )}
 
       <div className="flex gap-4">
         <div className="w-56 shrink-0">
@@ -657,7 +684,7 @@ export default function SiteConfigPage() {
             {CONFIG_KEYS.map(({ key, label }) => (
               <button
                 key={key}
-                onClick={() => { setSelected(key); setMsg(""); }}
+                onClick={() => { setSelected(key); setMsg(""); setApiError(null); }}
                 className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
                   selected === key ? "bg-[#0a1628] text-white font-semibold" : "text-gray-700 hover:bg-gray-50"
                 }`}

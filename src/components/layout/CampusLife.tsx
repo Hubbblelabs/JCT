@@ -1,14 +1,24 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, ArrowRight, X } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 
-const categories = ["All", "Labs", "Sports", "Events", "Clubs"] as const;
+const DEFAULT_CATEGORIES = ["All", "Labs", "Sports", "Events", "Clubs"] as const;
 
-const photos = [
+type Photo = {
+  src: string;
+  caption: string;
+  category: string;
+  isAll?: boolean;
+};
+
+const DEFAULT_VIDEO_URL = "https://www.youtube.com/embed/RBzA0cneWRA?autoplay=1";
+
+const DEFAULT_PHOTOS: Photo[] = [
   // --- All / Curated items (The original 5) ---
   {
     src: "/assets/lab2.webp",
@@ -125,17 +135,84 @@ const photos = [
   },
 ];
 
+type LifeAtJctConfig = {
+  categories: string[];
+  photos: Photo[];
+  videoUrl?: string;
+};
+
+function normalizeLifeAtJct(raw: unknown): LifeAtJctConfig | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, unknown>;
+  const categories = Array.isArray(r.categories)
+    ? r.categories.filter((c): c is string => typeof c === "string" && c.length > 0)
+    : [];
+  const photos: Photo[] = Array.isArray(r.photos)
+    ? r.photos
+        .map((p): Photo | null => {
+          const o = (p ?? {}) as Record<string, unknown>;
+          const src = typeof o.src === "string" ? o.src : null;
+          const caption = typeof o.caption === "string" ? o.caption : null;
+          const category = typeof o.category === "string" ? o.category : null;
+          if (!src || !caption || !category) return null;
+          return {
+            src,
+            caption,
+            category,
+            isAll: Boolean(o.isAll),
+          };
+        })
+        .filter((x): x is Photo => x !== null)
+    : [];
+  if (photos.length === 0) return null;
+  return {
+    categories: categories.length > 0 ? categories : [...DEFAULT_CATEGORIES],
+    photos,
+    videoUrl: typeof r.videoUrl === "string" && r.videoUrl ? r.videoUrl : undefined,
+  };
+}
+
 export function CampusLife() {
-  const [activeFilter, setActiveFilter] =
-    useState<(typeof categories)[number]>("All");
+  const [categories, setCategories] = useState<string[]>([
+    ...DEFAULT_CATEGORIES,
+  ]);
+  const [photos, setPhotos] = useState<Photo[]>(DEFAULT_PHOTOS);
+  const [videoUrl, setVideoUrl] = useState<string>(DEFAULT_VIDEO_URL);
+  const [activeFilter, setActiveFilter] = useState<string>("All");
   const [showAllPhotos, setShowAllPhotos] = useState(false);
-
-  const filtered =
-    activeFilter === "All"
-      ? photos.filter((p) => "isAll" in p && (p as { isAll?: boolean }).isAll)
-      : photos.filter((p) => p.category === activeFilter);
-
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/site-config?key=lifeAtJct")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source === "db") {
+          const next = normalizeLifeAtJct(res.data);
+          if (next) {
+            setCategories(next.categories);
+            setPhotos(next.photos);
+            if (next.videoUrl) setVideoUrl(next.videoUrl);
+            setActiveFilter((prev) =>
+              next.categories.includes(prev) ? prev : next.categories[0] ?? "All",
+            );
+          }
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const filtered = useMemo(
+    () =>
+      activeFilter === "All"
+        ? photos.filter((p) => p.isAll)
+        : photos.filter((p) => p.category === activeFilter),
+    [photos, activeFilter],
+  );
 
   return (
     <section
@@ -163,7 +240,7 @@ export function CampusLife() {
                 <X size={24} />
               </button>
               <iframe
-                src="https://www.youtube.com/embed/RBzA0cneWRA?autoplay=1"
+                src={videoUrl}
                 title="JCT Campus Tour"
                 className="h-full w-full border-none"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -233,7 +310,7 @@ export function CampusLife() {
               className={`group relative cursor-pointer overflow-hidden rounded-2xl ${i === 0 ? "md:col-span-2 md:row-span-2" : ""} aspect-4/3 ${!showAllPhotos && i >= 4 ? "hidden md:block" : ""}`}
             >
               <Image
-                src={photo.src}
+                src={getImageUrl(photo.src) ?? photo.src}
                 alt={photo.caption}
                 fill
                 sizes="(min-width: 768px) 50vw, 100vw"

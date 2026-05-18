@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Testimonial } from "@/lib/models";
-import { requireRole, json, notFound, serverError } from "@/lib/api-helpers";
+import { requireRole, json, notFound, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
+import { TestimonialUpdateSchema } from "@/lib/validation";
 
 export async function GET(
   req: NextRequest,
@@ -30,10 +31,13 @@ export async function PATCH(
   const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
+  const parsed = await validateBody(req, TestimonialUpdateSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   try {
     await connectDB();
     const { id } = await params;
-    const body = await req.json();
     const doc = await Testimonial.findByIdAndUpdate(
       id,
       { $set: { ...body, updated_by: session!.user?.email } },

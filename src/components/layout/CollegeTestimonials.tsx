@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useMemo, useState, useRef } from "react";
+import { getImageUrl } from "@/lib/utils";
 
 const TESTIMONIAL_CATEGORIES = ["Alumni", "Student", "INDUSTRY"] as const;
 
@@ -261,7 +262,7 @@ export function CollegeTestimonials({
                       >
                         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-gray-100">
                           <Image
-                            src={activeItem.image}
+                            src={getImageUrl(activeItem.image) ?? activeItem.image}
                             alt={activeItem.name}
                             fill
                             sizes="48px"
@@ -278,27 +279,28 @@ export function CollegeTestimonials({
                         </div>
                       </motion.div>
                     </AnimatePresence>
-                  </div>
 
-                  <div className="mt-8 flex items-center justify-center gap-2">
-                    {laneItems.length > 1 &&
-                      laneItems.map((_, dotIndex) => (
-                        <button
-                          key={dotIndex}
-                          onClick={() =>
-                            setActiveIndices((prev) => ({
-                              ...prev,
-                              [category]: dotIndex,
-                            }))
-                          }
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            dotIndex === activeIndex
-                              ? "w-6 bg-[#3b475c]"
-                              : "w-2 bg-[#d1d5db] hover:bg-[#9ca3af]"
-                          }`}
-                          aria-label={`Go to slide ${dotIndex + 1}`}
-                        />
-                      ))}
+                    {laneItems.length > 1 && (
+                      <div className="mt-auto pt-4 flex items-center justify-center gap-2">
+                        {laneItems.map((_, dotIndex) => (
+                          <button
+                            key={dotIndex}
+                            onClick={() =>
+                              setActiveIndices((prev) => ({
+                                ...prev,
+                                [category]: dotIndex,
+                              }))
+                            }
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              dotIndex === activeIndex
+                                ? "w-6 bg-[#3b475c]"
+                                : "w-2 bg-[#d1d5db] hover:bg-[#9ca3af]"
+                            }`}
+                            aria-label={`Go to slide ${dotIndex + 1}`}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </motion.article>
               );

@@ -16,6 +16,8 @@ import {
   User,
   ChevronDown,
   Wrench,
+  FileEdit,
+  Home,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Suspense } from "react";
@@ -24,18 +26,25 @@ type NavItem = { label: string; href: string; icon: React.ComponentType<{ size?:
 
 const COLLEGE_ITEMS: Record<string, NavItem[]> = {
   engineering: [
+    { label: "Page Content", href: "/admin/page-content?college=engineering", icon: FileEdit },
     { label: "Programs", href: "/admin/programs?college=engineering", icon: GraduationCap },
     { label: "Testimonials", href: "/admin/testimonials?college=engineering", icon: MessageSquare },
   ],
   "arts-science": [
+    { label: "Page Content", href: "/admin/page-content?college=arts-science", icon: FileEdit },
     { label: "Programs", href: "/admin/programs?college=arts-science", icon: GraduationCap },
     { label: "Testimonials", href: "/admin/testimonials?college=arts-science", icon: MessageSquare },
   ],
   polytechnic: [
+    { label: "Page Content", href: "/admin/page-content?college=polytechnic", icon: FileEdit },
     { label: "Programs", href: "/admin/programs?college=polytechnic", icon: GraduationCap },
     { label: "Testimonials", href: "/admin/testimonials?college=polytechnic", icon: MessageSquare },
   ],
 };
+
+const MAIN_ITEMS: NavItem[] = [
+  { label: "Page Content", href: "/admin/main/page-content", icon: FileEdit },
+];
 
 const ADMIN_ITEMS: NavItem[] = [
   { label: "Recruiters", href: "/admin/recruiters", icon: Briefcase },
@@ -88,6 +97,34 @@ function TabNavInner() {
             <LayoutDashboard size={13} />
             Dashboard
           </Link>
+
+          {/* Main (landing page) dropdown */}
+          <div className="admin-nav-item">
+            <Link
+              href={MAIN_ITEMS[0].href}
+              className={`admin-nav-trigger ${
+                MAIN_ITEMS.some((i) => pathname === i.href.split("?")[0]) ? "active" : ""
+              }`}
+            >
+              <Home size={13} />
+              Main
+              <ChevronDown size={11} />
+            </Link>
+            <div className="admin-nav-dropdown-menu">
+              {MAIN_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`admin-nav-dropdown-item ${
+                    pathname === item.href.split("?")[0] ? "active" : ""
+                  }`}
+                >
+                  <item.icon size={14} />
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
 
           {/* College dropdowns */}
           {(

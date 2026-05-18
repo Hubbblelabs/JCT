@@ -237,6 +237,7 @@ export default function EngineeringCoursesPage() {
               <CourseCard
                 key={course.slug}
                 course={course as Course}
+                href={`/institutions/engineering/departments/${course.slug}`}
                 badge="PG"
               />
             ))}
@@ -259,6 +260,7 @@ export default function EngineeringCoursesPage() {
               <CourseCard
                 key={course.slug}
                 course={course as Course}
+                href={`/institutions/engineering/departments/${course.slug}`}
                 badge="Ph.D."
               />
             ))}

@@ -5,29 +5,85 @@ import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
+import { getImageUrl } from "@/lib/utils";
+
+const DEFAULT_IMAGES = [
+  "/pamphlets/jct-pamphlet.webp",
+  "/pamphlets/engineering-pamphlet.webp",
+];
+
+type PamphletConfig = {
+  enabled: boolean;
+  images: string[];
+  delayMs?: number;
+};
+
+function normalizePamphlet(raw: unknown): PamphletConfig | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, unknown>;
+  const images = Array.isArray(r.images)
+    ? r.images.filter((s): s is string => typeof s === "string" && s.length > 0)
+    : [];
+  return {
+    enabled: r.enabled !== false,
+    images,
+    delayMs: typeof r.delayMs === "number" ? r.delayMs : undefined,
+  };
+}
 
 export function Pamphlet() {
   const [isOpen, setIsOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
+  const [enabled, setEnabled] = useState(true);
+  const [images, setImages] = useState<string[]>(DEFAULT_IMAGES);
+  const [delayMs, setDelayMs] = useState(2000);
+  const [configLoaded, setConfigLoaded] = useState(false);
 
   useEffect(() => {
-    // Show popup after 2 seconds
+    let cancelled = false;
+    fetch("/api/public/site-config?key=homePamphlet")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source === "db") {
+          const next = normalizePamphlet(res.data);
+          if (next) {
+            setEnabled(next.enabled);
+            if (next.images.length > 0) setImages(next.images);
+            if (typeof next.delayMs === "number") setDelayMs(next.delayMs);
+          }
+        }
+        setConfigLoaded(true);
+      })
+      .catch(() => {
+        setConfigLoaded(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!configLoaded || !enabled || images.length === 0) return;
     const timer = setTimeout(() => {
       setIsOpen(true);
-    }, 2000);
-
+    }, delayMs);
     return () => clearTimeout(timer);
-  }, []);
+  }, [configLoaded, enabled, images.length, delayMs]);
 
   const handleClose = () => {
     setIsOpen(false);
   };
 
+  const [leftImage, rightImage] = [
+    images[0] ?? DEFAULT_IMAGES[0],
+    images[1] ?? images[0] ?? DEFAULT_IMAGES[1],
+  ];
+
   return (
     <AnimatePresence>
-      {isOpen && (
+      {isOpen && enabled && (
         <div className="fixed inset-0 z-[999999] flex items-center justify-center px-4 sm:px-6">
-          {/* Overlay */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -36,7 +92,6 @@ export function Pamphlet() {
             className="absolute inset-0 bg-black/85 backdrop-blur-md"
           />
 
-          {/* Modal Container */}
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -44,7 +99,6 @@ export function Pamphlet() {
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
             className="relative w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)]"
           >
-            {/* Close Button */}
             <button
               onClick={handleClose}
               className="absolute top-4 right-4 z-[60] flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white shadow-lg backdrop-blur-md transition-all hover:rotate-90 hover:bg-black/80 md:h-12 md:w-12"
@@ -53,31 +107,27 @@ export function Pamphlet() {
               <X size={24} />
             </button>
 
-            {/* Split Images Container */}
             <div className="relative flex h-[75vh] min-h-[550px] flex-col overflow-hidden md:flex-row">
-              {/* Left Image - Main Brochure */}
               <div className="relative h-1/2 w-full overflow-hidden bg-white md:h-auto md:w-[45%]">
                 <Image
-                  src="/pamphlets/jct-pamphlet.webp"
-                  alt="Main Brochure"
+                  src={getImageUrl(leftImage) ?? leftImage}
+                  alt="JCT Brochure"
                   fill
                   sizes="(min-width: 768px) 45vw, 100vw"
                   className="object-cover object-top"
                 />
               </div>
 
-              {/* Right Image - Engineering Placement */}
               <div className="relative h-1/2 w-full overflow-hidden bg-white md:h-auto md:w-[55%]">
                 <Image
-                  src="/pamphlets/engineering-pamphlet.webp"
-                  alt="Engineering Placement"
+                  src={getImageUrl(rightImage) ?? rightImage}
+                  alt="JCT Programs"
                   fill
                   sizes="(min-width: 768px) 55vw, 100vw"
                   className="object-cover object-top"
                 />
               </div>
 
-              {/* Action Buttons Overlay */}
               <div className="absolute right-6 bottom-4 z-50 flex flex-wrap items-center justify-end gap-3 md:right-8 md:bottom-6">
                 <button
                   onClick={() => setIsVideoOpen(true)}
@@ -101,7 +151,6 @@ export function Pamphlet() {
               </div>
             </div>
 
-            {/* Video Player Modal */}
             <AnimatePresence>
               {isVideoOpen && (
                 <motion.div

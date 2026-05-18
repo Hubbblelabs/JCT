@@ -3,7 +3,13 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { TextInput, TextArea, Accordion, ImageUploadInput } from "@/components/admin/inputs";
-import { Save, Send, ArrowLeft, Loader2 } from "lucide-react";
+import {
+  DepartmentTabsEditor,
+  type Tab,
+} from "@/components/admin/DepartmentTabsEditor";
+import { Save, Send, ArrowLeft, Loader2, RefreshCw } from "lucide-react";
+import { ValidationErrors } from "@/components/admin/ValidationErrors";
+import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 
 export default function DepartmentEditorPage() {
   const { id } = useParams<{ id: string }>();
@@ -15,7 +21,11 @@ export default function DepartmentEditorPage() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [migrating, setMigrating] = useState(false);
   const [msg, setMsg] = useState("");
+  const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
+
+  const tabs: Tab[] = Array.isArray(content.tabs) ? (content.tabs as Tab[]) : [];
 
   useEffect(() => {
     if (!isNew) {
@@ -32,6 +42,7 @@ export default function DepartmentEditorPage() {
   const save = async () => {
     setSaving(true);
     setMsg("");
+    setApiError(null);
     try {
       if (isNew) {
         const r = await fetch("/api/admin/departments", {
@@ -39,9 +50,14 @@ export default function DepartmentEditorPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ slug: content.slug, college: content.college, content }),
         });
-        const data = await r.json();
-        if (r.ok) router.push(`/admin/departments/${data._id}`);
-        else setMsg(data.error ?? "Error creating department");
+        if (r.ok) {
+          const data = await r.json();
+          router.push(`/admin/departments/${data._id}`);
+        } else {
+          const err = await parseApiError(r);
+          setApiError(err);
+          if (!err?.details?.length) setMsg(err?.message ?? err?.error ?? "Error creating department");
+        }
       } else {
         const r = await fetch(`/api/admin/departments/${id}`, {
           method: "PATCH",
@@ -49,7 +65,11 @@ export default function DepartmentEditorPage() {
           body: JSON.stringify({ content }),
         });
         if (r.ok) setMsg("Saved successfully");
-        else setMsg("Error saving");
+        else {
+          const err = await parseApiError(r);
+          setApiError(err);
+          if (!err?.details?.length) setMsg(err?.message ?? err?.error ?? "Error saving");
+        }
       }
     } finally {
       setSaving(false);
@@ -59,16 +79,47 @@ export default function DepartmentEditorPage() {
   const publish = async () => {
     setPublishing(true);
     setMsg("");
+    setApiError(null);
     try {
       const r = await fetch(`/api/admin/departments/${id}/publish`, { method: "POST" });
       if (r.ok) setMsg("Published successfully");
-      else setMsg("Error publishing");
+      else {
+        const err = await parseApiError(r);
+        setApiError(err);
+        if (!err?.details?.length) setMsg(err?.message ?? err?.error ?? "Error publishing");
+      }
     } finally {
       setPublishing(false);
     }
   };
 
+  const migrateToTabs = async () => {
+    if (isNew) return;
+    setMigrating(true);
+    setMsg("");
+    setApiError(null);
+    try {
+      const r = await fetch(`/api/admin/departments/${id}/migrate-tabs`, {
+        method: "POST",
+      });
+      if (r.ok) {
+        const data = await r.json();
+        if (data?.content) {
+          setContent(data.content);
+          setMsg("Generated tabs from existing content. Click Save Draft to keep them.");
+        }
+      } else {
+        const err = await parseApiError(r);
+        setApiError(err);
+        if (!err?.details?.length) setMsg(err?.message ?? err?.error ?? "Error migrating to tabs");
+      }
+    } finally {
+      setMigrating(false);
+    }
+  };
+
   const set = (key: string, val: unknown) => setContent((c) => ({ ...c, [key]: val }));
+  const setTabs = (next: Tab[]) => setContent((c) => ({ ...c, tabs: next }));
 
   if (loading) {
     return (
@@ -95,6 +146,21 @@ export default function DepartmentEditorPage() {
           </div>
           <div className="flex items-center gap-2">
             {msg && <span className="text-sm text-green-600">{msg}</span>}
+            {!isNew && tabs.length === 0 && (
+              <button
+                onClick={migrateToTabs}
+                disabled={migrating}
+                className="admin-btn admin-btn-outline admin-btn-sm"
+                title="Generate the default six tabs from existing fields"
+              >
+                {migrating ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : (
+                  <RefreshCw size={15} />
+                )}
+                {migrating ? "Migrating…" : "Migrate to tabs"}
+              </button>
+            )}
             <button onClick={save} disabled={saving} className="admin-btn admin-btn-primary">
               {saving ? <Loader2 size={15} className="animate-spin" /> : <Save size={15} />}
               {saving ? "Saving…" : "Save Draft"}
@@ -107,6 +173,13 @@ export default function DepartmentEditorPage() {
             )}
           </div>
         </div>
+
+        {apiError && (
+          <ValidationErrors
+            error={apiError.message ?? apiError.error}
+            details={apiError.details}
+          />
+        )}
 
         <Accordion title="General Info" defaultOpen>
           <div className="grid grid-cols-2 gap-4">
@@ -122,7 +195,7 @@ export default function DepartmentEditorPage() {
             </div>
             <TextInput label="Department Name" value={String(content.name ?? "")} onChange={(e) => set("name", e.target.value)} placeholder="Computer Science & Engineering" />
             <TextInput label="Short Name" value={String(content.shortName ?? "")} onChange={(e) => set("shortName", e.target.value)} placeholder="CSE" />
-            <ImageUploadInput label="Hero Image" value={String(content.heroImage ?? "")} onChange={(url) => set("heroImage", url)} />
+            <ImageUploadInput label="Hero Image" value={String(content.heroImage ?? "")} onChange={(url) => set("heroImage", url)} uploadOnly />
             <TextInput label="Accent Color" value={String(content.accentColor ?? "")} onChange={(e) => set("accentColor", e.target.value)} placeholder="#0F4C81" />
           </div>
         </Accordion>
@@ -143,7 +216,7 @@ export default function DepartmentEditorPage() {
             <TextInput label="Designation" value={String(content.hodDesignation ?? "")} onChange={(e) => set("hodDesignation", e.target.value)} />
             <TextInput label="Qualification" value={String(content.hodQualification ?? "")} onChange={(e) => set("hodQualification", e.target.value)} />
             <TextInput label="Experience" value={String(content.hodExperience ?? "")} onChange={(e) => set("hodExperience", e.target.value)} placeholder="20+ years" />
-            <ImageUploadInput label="Photo" value={String(content.hodPhoto ?? "")} onChange={(url) => set("hodPhoto", url)} />
+            <ImageUploadInput label="Photo" value={String(content.hodPhoto ?? "")} onChange={(url) => set("hodPhoto", url)} uploadOnly />
           </div>
           <TextArea label="HOD Message" value={String(content.hodMessage ?? "")} onChange={(e) => set("hodMessage", e.target.value)} rows={4} />
         </Accordion>
@@ -159,6 +232,14 @@ export default function DepartmentEditorPage() {
             <TextInput label="Average Package" value={String(content.averagePackage ?? "")} onChange={(e) => set("averagePackage", e.target.value)} placeholder="9 LPA" />
             <TextInput label="Highest Package" value={String(content.highestPackage ?? "")} onChange={(e) => set("highestPackage", e.target.value)} placeholder="70 LPA" />
           </div>
+        </Accordion>
+
+        <Accordion title="Page Tabs (Sidebar Content)" defaultOpen={tabs.length > 0}>
+          <p className="mb-3 text-xs text-gray-500">
+            When tabs are defined, the public department page renders them in
+            order from the sidebar. Tabs override the legacy layout above.
+          </p>
+          <DepartmentTabsEditor tabs={tabs} onChange={setTabs} />
         </Accordion>
 
         <Accordion title="Advanced (Raw JSON)">

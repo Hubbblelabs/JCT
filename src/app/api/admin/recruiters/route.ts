@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Recruiter } from "@/lib/models";
-import { requireRole, json, badRequest, serverError } from "@/lib/api-helpers";
+import { requireRole, json, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
+import { RecruiterCreateSchema } from "@/lib/validation";
 
 export async function GET(req: NextRequest) {
   const { error } = await requireRole(req, "viewer");
@@ -22,11 +23,12 @@ export async function POST(req: NextRequest) {
   const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
+  const parsed = await validateBody(req, RecruiterCreateSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   try {
     await connectDB();
-    const body = await req.json();
-    if (!body.name) return badRequest("name is required");
-
     const doc = await Recruiter.create({ ...body, updated_by: session!.user?.email });
     await logAudit("recruiter", "created", session!.user?.email ?? "", `Created recruiter ${body.name}`);
     return json(doc, 201);

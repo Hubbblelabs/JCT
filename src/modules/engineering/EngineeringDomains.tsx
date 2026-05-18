@@ -7,6 +7,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { DragScroll } from "@/components/ui/DragScroll";
+import { getImageUrl } from "@/lib/utils";
 import {
   ugCourses as fallbackUg,
   pgCourses as fallbackPg,
@@ -48,14 +49,16 @@ function CourseCard({
       className={`border-engineering/12 group flex h-full min-h-[20rem] w-[18.5rem] shrink-0 snap-start flex-col overflow-hidden rounded-xl border bg-white pb-4 transition-all sm:w-[20rem] md:w-[21.5rem] lg:w-[22rem] ${href ? "cursor-pointer hover:shadow-md" : ""}`}
       draggable={false}
     >
-      <div className="relative aspect-[16/9] overflow-hidden">
-        <Image
-          src={course.image}
-          alt={`${course.name} course image`}
-          fill
-          sizes="(min-width: 1024px) 352px, (min-width: 640px) 320px, 296px"
-          className="object-cover transition-transform duration-500 group-hover:scale-103"
-        />
+      <div className="relative aspect-[16/9] overflow-hidden bg-gray-200">
+        {course.image && (
+          <Image
+            src={getImageUrl(course.image) ?? course.image}
+            alt={`${course.name} course image`}
+            fill
+            sizes="(min-width: 1024px) 352px, (min-width: 640px) 320px, 296px"
+            className="object-cover transition-transform duration-500 group-hover:scale-103"
+          />
+        )}
         <div className="absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent" />
         {showAccreditationBadges && (
           <div className="absolute top-3 right-3 flex items-center gap-2 rounded-full bg-white/92 px-2.5 py-1 shadow-sm backdrop-blur-sm">
@@ -283,11 +286,9 @@ function CourseCarouselSection({
                 key={course.slug}
                 course={course}
                 href={
-                  showAccreditationBadges
+                  showAccreditationBadges || pgCourses
                     ? `/institutions/engineering/departments/${course.slug}`
-                    : pgCourses
-                      ? `/institutions/engineering/postgraduate/${course.slug}`
-                      : undefined
+                    : undefined
                 }
                 showAccreditationBadges={showAccreditationBadges}
                 showDescription={showDescription}

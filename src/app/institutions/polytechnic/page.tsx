@@ -6,7 +6,7 @@ import { AboutPolytechnic } from "@/modules/polytechnic/AboutPolytechnic";
 import { DiplomaPrograms } from "@/modules/polytechnic/DiplomaPrograms";
 import { Admissions } from "@/modules/polytechnic/Admissions";
 import { Placements } from "@/components/layout/Placements";
-import { NewsEvents } from "@/components/layout/NewsEvents";
+import { CampusLife } from "@/modules/polytechnic/CampusLife";
 import { Testimonials } from "@/modules/polytechnic/Testimonials";
 
 export const metadata: Metadata = {
@@ -33,7 +33,7 @@ export default function PolytechnicPage() {
       <AboutPolytechnic />
       {/* <Distinction /> */}
       <Placements />
-      <NewsEvents />
+      <CampusLife />
       <Testimonials />
       <Admissions />
       <Footer />

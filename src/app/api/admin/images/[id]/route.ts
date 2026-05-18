@@ -2,8 +2,9 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { ImageAsset } from "@/lib/models";
 import { deleteFromR2 } from "@/lib/r2";
-import { requireRole, json, notFound, serverError } from "@/lib/api-helpers";
+import { requireRole, json, notFound, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
+import { ImageAssetPatchSchema } from "@/lib/validation";
 
 export async function DELETE(
   req: NextRequest,
@@ -38,10 +39,13 @@ export async function PATCH(
   const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
+  const parsed = await validateBody(req, ImageAssetPatchSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   try {
     await connectDB();
     const { id } = await params;
-    const body = await req.json();
     const update: Record<string, unknown> = {};
     if (body.alt_text !== undefined) update.alt_text = body.alt_text;
     if (body.category !== undefined) update.category = body.category;

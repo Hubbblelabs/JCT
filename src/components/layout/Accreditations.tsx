@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
+import { getImageUrl } from "@/lib/utils";
 
 type AccreditationsProps = {
   variant?: "default" | "hero";
@@ -198,7 +199,7 @@ export function Accreditations({ variant = "default" }: AccreditationsProps) {
                 >
                   <div className="relative h-[70%] w-[70%]">
                     <Image
-                      src={logo.src}
+                      src={getImageUrl(logo.src) ?? logo.src}
                       alt={logo.name}
                       fill
                       sizes="72px"

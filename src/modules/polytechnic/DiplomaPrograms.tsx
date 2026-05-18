@@ -6,6 +6,7 @@ import Image from "next/image";
 import { ArrowLeft, ArrowRight, LucideIcon } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { getImageUrl } from "@/lib/utils";
 import { diplomaPrograms as fallbackDiplomaPrograms } from "@/data/polytechnic";
 import { DragScroll } from "@/components/ui/DragScroll";
 import { PolySection, PolySectionHeader } from "@/modules/polytechnic/PolyUI";
@@ -35,7 +36,7 @@ function CourseCard({ course }: { course: PolytechnicCourse }) {
       <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
         {course.image ? (
           <Image
-            src={course.image}
+            src={getImageUrl(course.image) ?? course.image}
             alt={`${course.name} course image`}
             fill
             sizes="(min-width: 1024px) 352px, (min-width: 640px) 320px, 296px"

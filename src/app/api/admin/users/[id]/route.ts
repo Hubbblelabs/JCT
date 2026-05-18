@@ -2,8 +2,9 @@ import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/lib/models";
-import { requireRole, json, notFound, serverError } from "@/lib/api-helpers";
+import { requireRole, json, notFound, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
+import { UserUpdateSchema } from "@/lib/validation";
 
 export async function PATCH(
   req: NextRequest,
@@ -12,10 +13,13 @@ export async function PATCH(
   const { session, error } = await requireRole(req, "super_admin");
   if (error) return error;
 
+  const parsed = await validateBody(req, UserUpdateSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   try {
     await connectDB();
     const { id } = await params;
-    const body = await req.json();
     const update: Record<string, unknown> = {};
 
     if (body.role) update.role = body.role;

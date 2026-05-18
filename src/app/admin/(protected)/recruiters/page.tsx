@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { TextInput, ImageUploadInput } from "@/components/admin/inputs";
 import { Plus, Pencil, Trash2, X, Loader2, Check } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
+import { ValidationErrors } from "@/components/admin/ValidationErrors";
+import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 
 interface Recruiter {
   _id: string;
@@ -25,6 +27,7 @@ export default function RecruitersPage() {
   const [form, setForm] = useState<Omit<Recruiter, "_id">>(EMPTY);
   const [saving, setSaving] = useState(false);
   const [seeding, setSeeding] = useState(false);
+  const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -35,13 +38,14 @@ export default function RecruitersPage() {
 
   useEffect(() => { load(); }, []);
 
-  const openNew = () => { setEditing({ _id: "", ...EMPTY }); setForm(EMPTY); };
-  const openEdit = (r: Recruiter) => { setEditing(r); setForm({ ...r }); };
-  const close = () => { setEditing(null); setForm(EMPTY); };
+  const openNew = () => { setEditing({ _id: "", ...EMPTY }); setForm(EMPTY); setApiError(null); };
+  const openEdit = (r: Recruiter) => { setEditing(r); setForm({ ...r }); setApiError(null); };
+  const close = () => { setEditing(null); setForm(EMPTY); setApiError(null); };
   const set = (key: string, val: unknown) => setForm((f) => ({ ...f, [key]: val }));
 
   const save = async () => {
     setSaving(true);
+    setApiError(null);
     const isNew = !editing?._id;
     const url = isNew ? "/api/admin/recruiters" : `/api/admin/recruiters/${editing!._id}`;
     const r = await fetch(url, {
@@ -49,7 +53,12 @@ export default function RecruitersPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
     });
-    if (r.ok) { await load(); close(); }
+    if (r.ok) {
+      await load();
+      close();
+    } else {
+      setApiError(await parseApiError(r));
+    }
     setSaving(false);
   };
 
@@ -145,6 +154,12 @@ export default function RecruitersPage() {
               <button onClick={close} className="admin-btn admin-btn-outline admin-btn-sm"><X size={14} /></button>
             </div>
             <div className="p-6 space-y-1">
+              {apiError && (
+                <ValidationErrors
+                  error={apiError.message ?? apiError.error}
+                  details={apiError.details}
+                />
+              )}
               <TextInput label="Company Name" value={form.name} onChange={(e) => set("name", e.target.value)} required />
               <ImageUploadInput label="Logo" value={form.logo} onChange={(url) => set("logo", url)} uploadOnly />
               <TextInput label="Website" value={form.website} onChange={(e) => set("website", e.target.value)} placeholder="https://tcs.com" />

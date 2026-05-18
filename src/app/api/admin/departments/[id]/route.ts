@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Department } from "@/lib/models";
-import { requireRole, json, notFound, serverError } from "@/lib/api-helpers";
+import { requireRole, json, notFound, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
+import { DepartmentUpdateSchema } from "@/lib/validation";
 
 export async function GET(
   req: NextRequest,
@@ -30,14 +31,22 @@ export async function PATCH(
   const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
+  const parsed = await validateBody(req, DepartmentUpdateSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   try {
     await connectDB();
     const { id } = await params;
-    const body = await req.json();
+
+    const update: Record<string, unknown> = { updated_by: session!.user?.email };
+    if (body.content !== undefined) update.content = body.content;
+    if (body.slug !== undefined) update.slug = body.slug;
+    if (body.college !== undefined) update.college = body.college;
 
     const doc = await Department.findByIdAndUpdate(
       id,
-      { $set: { content: body.content, updated_by: session!.user?.email } },
+      { $set: update },
       { new: true },
     );
     if (!doc) return notFound("Department not found");

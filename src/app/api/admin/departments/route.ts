@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Department } from "@/lib/models";
-import { requireRole, json, badRequest, serverError } from "@/lib/api-helpers";
+import { requireRole, json, badRequest, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
+import { DepartmentCreateSchema } from "@/lib/validation";
 
 export async function GET(req: NextRequest) {
   const { session, error } = await requireRole(req, "viewer");
@@ -33,10 +34,12 @@ export async function POST(req: NextRequest) {
   const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
+  const parsed = await validateBody(req, DepartmentCreateSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   try {
     await connectDB();
-    const body = await req.json();
-    if (!body.slug || !body.college) return badRequest("slug and college are required");
 
     const existing = await Department.findOne({ slug: body.slug });
     if (existing) return badRequest("Department with this slug already exists");

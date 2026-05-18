@@ -13,6 +13,31 @@ type HeroStat = {
   accent: boolean;
 };
 
+type HeroCta = { label: string; href: string; primary: boolean };
+
+type HeroContent = {
+  titleLine1: string;
+  titleHighlight: string;
+  titleLine2: string;
+  subtitle: string;
+  ctas: HeroCta[];
+};
+
+const DEFAULT_HERO: HeroContent = {
+  titleLine1: "Good Education",
+  titleHighlight: "for",
+  titleLine2: "A Better Future",
+  subtitle:
+    "We offer a quality education that provides not only lessons but also real experience in every field. Embrace the future with our immersive, industry-aligned programs.",
+  ctas: [
+    {
+      label: "Apply Now",
+      href: "https://admissions.jct.ac.in/",
+      primary: true,
+    },
+  ],
+};
+
 function normalizeStats(raw: unknown): HeroStat[] {
   if (!Array.isArray(raw)) return [];
   const out: HeroStat[] = [];
@@ -28,6 +53,32 @@ function normalizeStats(raw: unknown): HeroStat[] {
     });
   }
   return out;
+}
+
+function normalizeHero(raw: unknown): HeroContent | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, unknown>;
+  const titleLine1 = typeof r.titleLine1 === "string" ? r.titleLine1 : null;
+  if (!titleLine1) return null;
+  const ctas = Array.isArray(r.ctas)
+    ? r.ctas
+        .map((c) => {
+          const o = (c ?? {}) as Record<string, unknown>;
+          const label = typeof o.label === "string" ? o.label : null;
+          const href = typeof o.href === "string" ? o.href : null;
+          if (!label || !href) return null;
+          return { label, href, primary: Boolean(o.primary) } satisfies HeroCta;
+        })
+        .filter((x): x is HeroCta => x !== null)
+    : [];
+  return {
+    titleLine1,
+    titleHighlight:
+      typeof r.titleHighlight === "string" ? r.titleHighlight : "",
+    titleLine2: typeof r.titleLine2 === "string" ? r.titleLine2 : "",
+    subtitle: typeof r.subtitle === "string" ? r.subtitle : "",
+    ctas: ctas.length > 0 ? ctas : DEFAULT_HERO.ctas,
+  };
 }
 
 function AnimatedNumber({ value }: { value: string }) {
@@ -62,6 +113,7 @@ export function Hero() {
   const [heroStats, setHeroStats] = useState<HeroStat[]>(
     fallbackHeroStats as HeroStat[],
   );
+  const [hero, setHero] = useState<HeroContent>(DEFAULT_HERO);
 
   useEffect(() => {
     let cancelled = false;
@@ -72,6 +124,16 @@ export function Hero() {
         if (res?.source === "db") {
           const next = normalizeStats(res.data);
           if (next.length > 0) setHeroStats(next);
+        }
+      })
+      .catch(() => {});
+    fetch("/api/public/site-config?key=artsScienceHero")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source === "db") {
+          const next = normalizeHero(res.data);
+          if (next) setHero(next);
         }
       })
       .catch(() => {});
@@ -139,22 +201,30 @@ export function Hero() {
             transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             className="mb-2 font-sans text-4xl leading-[0.98] font-extrabold tracking-[-0.03em] text-white drop-shadow-[0_12px_24px_rgba(2,10,24,0.55)] sm:mb-4 sm:text-5xl md:text-6xl lg:text-7xl"
           >
-            Good Education
-            <br />
-            <span className="font-extrabold text-[#ff8a1f]">for </span>A Better
-            Future
+            {hero.titleLine1}
+            {(hero.titleHighlight || hero.titleLine2) && (
+              <>
+                <br />
+                {hero.titleHighlight && (
+                  <span className="font-extrabold text-[#ff8a1f]">
+                    {hero.titleHighlight}{" "}
+                  </span>
+                )}
+                {hero.titleLine2}
+              </>
+            )}
           </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.75, delay: 0.12, ease: "easeOut" }}
-            className="mb-4 max-w-2xl text-sm leading-relaxed font-medium text-white/78 drop-shadow-[0_8px_20px_rgba(2,10,24,0.42)] sm:mb-6 sm:text-base md:text-lg"
-          >
-            We offer a quality education that provides not only lessons but also
-            real experience in every field. Embrace the future with our
-            immersive, industry-aligned programs.
-          </motion.p>
+          {hero.subtitle && (
+            <motion.p
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.75, delay: 0.12, ease: "easeOut" }}
+              className="mb-4 max-w-2xl text-sm leading-relaxed font-medium text-white/78 drop-shadow-[0_8px_20px_rgba(2,10,24,0.42)] sm:mb-6 sm:text-base md:text-lg"
+            >
+              {hero.subtitle}
+            </motion.p>
+          )}
 
           {/* CTA Buttons */}
           <motion.div
@@ -171,26 +241,38 @@ export function Hero() {
             }}
             className="mb-6 flex w-full max-w-md flex-col gap-2.5 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4 md:mb-10"
           >
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 18 },
-                show: { opacity: 1, y: 0 },
-              }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-            >
-              <Link
-                href="https://admissions.jct.ac.in/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#f07b1a] px-5 font-sans text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#e06b0a] hover:shadow-xl active:translate-y-0 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
-              >
-                Apply Now
-                <ArrowRight
-                  size={16}
-                  className="transition-transform duration-300 group-hover:translate-x-1"
-                />
-              </Link>
-            </motion.div>
+            {hero.ctas.map((cta) => {
+              const isExternal = cta.href.startsWith("http");
+              return (
+                <motion.div
+                  key={cta.label}
+                  variants={{
+                    hidden: { opacity: 0, y: 18 },
+                    show: { opacity: 1, y: 0 },
+                  }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  <Link
+                    href={cta.href}
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
+                    className={
+                      cta.primary
+                        ? "group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#f07b1a] px-5 font-sans text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#e06b0a] hover:shadow-xl active:translate-y-0 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
+                        : "group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-white/30 bg-transparent px-5 font-sans text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/10 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
+                    }
+                  >
+                    {cta.label}
+                    {cta.primary && (
+                      <ArrowRight
+                        size={16}
+                        className="transition-transform duration-300 group-hover:translate-x-1"
+                      />
+                    )}
+                  </Link>
+                </motion.div>
+              );
+            })}
           </motion.div>
 
           {/* Stats Row */}

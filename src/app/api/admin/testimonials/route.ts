@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Testimonial } from "@/lib/models";
-import { requireRole, json, badRequest, serverError } from "@/lib/api-helpers";
+import { requireRole, json, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
+import { TestimonialCreateSchema } from "@/lib/validation";
 
 export async function GET(req: NextRequest) {
   const { error } = await requireRole(req, "viewer");
@@ -27,13 +28,12 @@ export async function POST(req: NextRequest) {
   const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
+  const parsed = await validateBody(req, TestimonialCreateSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   try {
     await connectDB();
-    const body = await req.json();
-    if (!body.name || !body.batch || !body.quote) {
-      return badRequest("name, batch, and quote are required");
-    }
-
     const doc = await Testimonial.create({ ...body, updated_by: session!.user?.email });
     await logAudit("testimonial", "created", session!.user?.email ?? "", `Created testimonial for ${body.name}`);
     return json(doc, 201);

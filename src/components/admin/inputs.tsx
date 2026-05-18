@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef, useEffect, type ReactNode } from "react";
-import { ChevronDown, ChevronRight, Plus, Trash2, Upload, Loader2 } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Trash2, Upload, Loader2, AlertCircle } from "lucide-react";
+import { parseApiError } from "@/lib/validation-helpers";
 
 interface FieldProps {
   label: string;
@@ -161,6 +162,7 @@ interface ImageUploadInputProps {
 export function ImageUploadInput({ label, value, onChange, hint, uploadOnly }: ImageUploadInputProps) {
   const [uploading, setUploading] = useState(false);
   const [imgError, setImgError] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { setImgError(false); }, [value]);
@@ -169,6 +171,7 @@ export function ImageUploadInput({ label, value, onChange, hint, uploadOnly }: I
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
+    setUploadError(null);
     const fd = new FormData();
     fd.append("file", file);
     fd.append("category", "other");
@@ -178,6 +181,10 @@ export function ImageUploadInput({ label, value, onChange, hint, uploadOnly }: I
       const data = await r.json();
       // Store only the storage key/relative path
       onChange(data.url || data.storage_key);
+    } else {
+      const err = await parseApiError(r);
+      const detailMsg = err?.details?.[0]?.message;
+      setUploadError(detailMsg ?? err?.message ?? err?.error ?? "Upload failed");
     }
     setUploading(false);
     if (fileRef.current) fileRef.current.value = "";
@@ -248,6 +255,12 @@ export function ImageUploadInput({ label, value, onChange, hint, uploadOnly }: I
             </button>
           </div>
         )}
+        {uploadError && (
+          <p className="mt-1 flex items-start gap-1 text-xs text-red-600">
+            <AlertCircle size={12} className="mt-0.5 shrink-0" />
+            <span>{uploadError}</span>
+          </p>
+        )}
       </div>
     </Field>
   );
@@ -294,6 +307,77 @@ export function TextAreaList({ label, values, onChange, placeholder, rows = 3 }:
         >
           <Plus size={14} /> Add paragraph
         </button>
+      </div>
+    </Field>
+  );
+}
+
+interface DocumentUploadInputProps {
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+  hint?: string;
+}
+
+export function DocumentUploadInput({ label, value, onChange, hint }: DocumentUploadInputProps) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [filename, setFilename] = useState<string>("");
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+    const fd = new FormData();
+    fd.append("file", file);
+    const r = await fetch("/api/admin/documents/upload", { method: "POST", body: fd });
+    if (r.ok) {
+      const data = await r.json();
+      onChange(data.url);
+      setFilename(data.filename ?? file.name);
+    } else {
+      const err = await parseApiError(r);
+      setUploadError(err?.message ?? err?.error ?? "Upload failed");
+    }
+    setUploading(false);
+    if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const displayName = filename || (value ? value.split("/").pop() : "");
+
+  return (
+    <Field label={label} hint={hint}>
+      <div className="space-y-2">
+        {value && (
+          <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+            <span className="flex-1 truncate text-sm text-gray-700">{displayName || value}</span>
+            <button
+              type="button"
+              onClick={() => { onChange(""); setFilename(""); }}
+              className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+            >
+              <Trash2 size={12} />
+            </button>
+          </div>
+        )}
+        <input type="file" ref={fileRef} accept="application/pdf" className="hidden" onChange={handleUpload} />
+        <button
+          type="button"
+          onClick={() => fileRef.current?.click()}
+          disabled={uploading}
+          className="admin-btn admin-btn-outline admin-btn-sm"
+        >
+          {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+          {uploading ? "Uploading…" : value ? "Replace PDF" : "Upload PDF"}
+        </button>
+        {uploadError && (
+          <p className="mt-1 flex items-start gap-1 text-xs text-red-600">
+            <AlertCircle size={12} className="mt-0.5 shrink-0" />
+            <span>{uploadError}</span>
+          </p>
+        )}
       </div>
     </Field>
   );

@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { getImageUrl } from "@/lib/utils";
 import { ugPrograms as fallbackPrograms } from "@/data/arts-science";
 import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -34,7 +35,7 @@ function CourseCard({ course }: { course: ArtsScienceCourse }) {
       <div className="relative aspect-[16/9] overflow-hidden bg-slate-100">
         {course.image && (
           <Image
-            src={course.image}
+            src={getImageUrl(course.image) ?? course.image}
             alt={`${course.name} course image`}
             fill
             sizes="(min-width: 1024px) 352px, (min-width: 640px) 320px, 296px"

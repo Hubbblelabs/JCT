@@ -12,6 +12,8 @@ import {
   ImageUploadInput,
 } from "@/components/admin/inputs";
 import { Save, Trash2, ArrowLeft, Loader2, Check, Plus } from "lucide-react";
+import { ValidationErrors } from "@/components/admin/ValidationErrors";
+import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 
 // ── Generic items editor ────────────────────────────────────────────────────
 
@@ -257,6 +259,7 @@ function ProgramDetailInner() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
+  const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
 
   // ── Load ──────────────────────────────────────────────────────────────────
   useEffect(() => {
@@ -309,6 +312,7 @@ function ProgramDetailInner() {
   const save = async () => {
     setSaving(true);
     setMsg(null);
+    setApiError(null);
 
     try {
       let programSlug = prog.slug;
@@ -319,30 +323,53 @@ function ProgramDetailInner() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(prog),
         });
+        if (!r.ok) {
+          const err = await parseApiError(r);
+          setApiError(err);
+          setMsg({ text: err?.message ?? err?.error ?? "Error creating program", ok: false });
+          return;
+        }
         const data = await r.json();
-        if (!r.ok) { setMsg({ text: data.error ?? "Error creating program", ok: false }); return; }
         programSlug = data.slug as string;
-        await fetch("/api/admin/departments", {
+        const dRes = await fetch("/api/admin/departments", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ slug: programSlug, college: prog.institution, content: dept }),
         });
+        if (!dRes.ok) {
+          const err = await parseApiError(dRes);
+          setApiError(err);
+          setMsg({ text: err?.message ?? err?.error ?? "Program saved but department content failed", ok: false });
+          return;
+        }
         router.replace(`/admin/programs/${data._id}?college=${prog.institution}`);
         return;
       }
 
-      await fetch(`/api/admin/programs/${id}`, {
+      const pRes = await fetch(`/api/admin/programs/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(prog),
       });
+      if (!pRes.ok) {
+        const err = await parseApiError(pRes);
+        setApiError(err);
+        setMsg({ text: err?.message ?? err?.error ?? "Error saving program", ok: false });
+        return;
+      }
 
       if (deptId) {
-        await fetch(`/api/admin/departments/${deptId}`, {
+        const dRes = await fetch(`/api/admin/departments/${deptId}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ content: dept }),
         });
+        if (!dRes.ok) {
+          const err = await parseApiError(dRes);
+          setApiError(err);
+          setMsg({ text: err?.message ?? err?.error ?? "Error saving department", ok: false });
+          return;
+        }
       } else {
         const r = await fetch("/api/admin/departments", {
           method: "POST",
@@ -352,6 +379,11 @@ function ProgramDetailInner() {
         if (r.ok) {
           const d = await r.json();
           setDeptId(String((d as Record<string, unknown>)._id));
+        } else {
+          const err = await parseApiError(r);
+          setApiError(err);
+          setMsg({ text: err?.message ?? err?.error ?? "Error creating department", ok: false });
+          return;
         }
       }
 
@@ -409,6 +441,13 @@ function ProgramDetailInner() {
           </button>
         </div>
       </div>
+
+      {apiError && (
+        <ValidationErrors
+          error={apiError.message ?? apiError.error}
+          details={apiError.details}
+        />
+      )}
 
       {/* ── 1. Basic Info ─────────────────────────────────────────────── */}
       <Accordion title="Basic Info" defaultOpen>

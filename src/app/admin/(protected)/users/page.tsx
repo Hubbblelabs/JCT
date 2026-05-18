@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { TextInput, Select } from "@/components/admin/inputs";
 import { Plus, Pencil, Trash2, X, Loader2, Check, Shield } from "lucide-react";
+import { ValidationErrors } from "@/components/admin/ValidationErrors";
+import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 
 interface User {
   _id: string;
@@ -42,6 +44,8 @@ export default function UsersPage() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
   const [editMsg, setEditMsg] = useState("");
+  const [newApiError, setNewApiError] = useState<ApiErrorPayload | null>(null);
+  const [editApiError, setEditApiError] = useState<ApiErrorPayload | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -59,23 +63,26 @@ export default function UsersPage() {
     setEditingUser(u);
     setEditForm({ full_name: u.full_name, role: u.role, institution: u.institution, is_active: u.is_active, password: "" });
     setEditMsg("");
+    setEditApiError(null);
   };
 
   const createUser = async () => {
     setSaving(true);
     setMsg("");
+    setNewApiError(null);
     const r = await fetch("/api/admin/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(newForm),
     });
-    const data = await r.json();
     if (r.ok) {
       setShowNew(false);
       setNewForm(EMPTY_NEW);
       await load();
     } else {
-      setMsg(data.error ?? "Error creating user");
+      const err = await parseApiError(r);
+      setNewApiError(err);
+      if (!err?.details?.length) setMsg(err?.message ?? err?.error ?? "Error creating user");
     }
     setSaving(false);
   };
@@ -84,6 +91,7 @@ export default function UsersPage() {
     if (!editingUser) return;
     setSaving(true);
     setEditMsg("");
+    setEditApiError(null);
     const body: Record<string, unknown> = {
       full_name: editForm.full_name,
       role: editForm.role,
@@ -96,12 +104,13 @@ export default function UsersPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    const data = await r.json();
     if (r.ok) {
       setEditingUser(null);
       await load();
     } else {
-      setEditMsg(data.error ?? "Error updating user");
+      const err = await parseApiError(r);
+      setEditApiError(err);
+      if (!err?.details?.length) setEditMsg(err?.message ?? err?.error ?? "Error updating user");
     }
     setSaving(false);
   };
@@ -190,12 +199,18 @@ export default function UsersPage() {
               <button onClick={() => { setShowNew(false); setMsg(""); }} className="admin-btn admin-btn-outline admin-btn-sm"><X size={14} /></button>
             </div>
             <div className="p-6 space-y-1">
+              {newApiError && (
+                <ValidationErrors
+                  error={newApiError.message ?? newApiError.error}
+                  details={newApiError.details}
+                />
+              )}
               <TextInput label="Full Name" value={newForm.full_name} onChange={(e) => setN("full_name", e.target.value)} required />
               <TextInput label="Email" type="email" value={newForm.email} onChange={(e) => setN("email", e.target.value)} required />
               <TextInput label="Password" type="password" value={newForm.password} onChange={(e) => setN("password", e.target.value)} required hint="Min 8 characters" />
               <Select label="Role" value={newForm.role} options={ROLES} onChange={(e) => setN("role", e.target.value)} />
               <Select label="College Access" value={newForm.institution} options={INSTITUTIONS} onChange={(e) => setN("institution", e.target.value)} />
-              {msg && <p className="text-sm text-red-600">{msg}</p>}
+              {msg && !newApiError?.details?.length && <p className="text-sm text-red-600">{msg}</p>}
             </div>
             <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
               <button onClick={() => { setShowNew(false); setMsg(""); }} className="admin-btn admin-btn-outline">Cancel</button>
@@ -217,6 +232,12 @@ export default function UsersPage() {
               <button onClick={() => setEditingUser(null)} className="admin-btn admin-btn-outline admin-btn-sm"><X size={14} /></button>
             </div>
             <div className="p-6 space-y-1">
+              {editApiError && (
+                <ValidationErrors
+                  error={editApiError.message ?? editApiError.error}
+                  details={editApiError.details}
+                />
+              )}
               <TextInput label="Full Name" value={editForm.full_name} onChange={(e) => setE("full_name", e.target.value)} required />
               <Select label="Role" value={editForm.role} options={ROLES} onChange={(e) => setE("role", e.target.value)} />
               <Select label="College Access" value={editForm.institution} options={INSTITUTIONS} onChange={(e) => setE("institution", e.target.value)} />
@@ -225,7 +246,7 @@ export default function UsersPage() {
                 <input type="checkbox" id="edit_active" checked={editForm.is_active} onChange={(e) => setE("is_active", e.target.checked)} />
                 <label htmlFor="edit_active" className="text-sm text-gray-700">Active</label>
               </div>
-              {editMsg && <p className="text-sm text-red-600">{editMsg}</p>}
+              {editMsg && !editApiError?.details?.length && <p className="text-sm text-red-600">{editMsg}</p>}
             </div>
             <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
               <button onClick={() => setEditingUser(null)} className="admin-btn admin-btn-outline">Cancel</button>

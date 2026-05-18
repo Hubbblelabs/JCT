@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { ArrowRight, X } from "lucide-react";
 import { homeHeroContent as fallbackHero } from "@/data/home";
 import { Accreditations } from "@/components/layout/Accreditations";
+import { getImageUrl } from "@/lib/utils";
 
 type HeroCta = { label: string; href: string; primary: boolean };
 type HeroCard = {
@@ -24,16 +25,21 @@ type HeroContent = {
   titleLines: string[];
   ctas: HeroCta[];
   cards: HeroCard[];
+  tourVideoUrl?: string;
 };
 
 function normalizeHero(raw: unknown): HeroContent | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
   const backgroundImages = Array.isArray(r.backgroundImages)
-    ? r.backgroundImages.filter((x): x is string => typeof x === "string")
+    ? r.backgroundImages.filter(
+        (x): x is string => typeof x === "string" && x.trim().length > 0,
+      )
     : [];
   const titleLines = Array.isArray(r.titleLines)
-    ? r.titleLines.filter((x): x is string => typeof x === "string")
+    ? r.titleLines.filter(
+        (x): x is string => typeof x === "string" && x.trim().length > 0,
+      )
     : [];
   const ctas = Array.isArray(r.ctas)
     ? r.ctas
@@ -75,7 +81,12 @@ function normalizeHero(raw: unknown): HeroContent | null {
     return null;
   }
 
-  return { backgroundImages, titleLines, ctas, cards };
+  const tourVideoUrl =
+    typeof r.tourVideoUrl === "string" && r.tourVideoUrl.trim()
+      ? r.tourVideoUrl.trim()
+      : undefined;
+
+  return { backgroundImages, titleLines, ctas, cards, tourVideoUrl };
 }
 
 const BACKGROUND_MOTIONS = [
@@ -105,6 +116,7 @@ export function HomeHero() {
   const [homeHeroContent, setHomeHeroContent] = useState<HeroContent>(
     fallbackHero as unknown as HeroContent,
   );
+  const [prospectusUrl, setProspectusUrl] = useState<string>("");
 
   useEffect(() => {
     let cancelled = false;
@@ -115,6 +127,15 @@ export function HomeHero() {
         if (res?.source === "db") {
           const next = normalizeHero(res.data);
           if (next) setHomeHeroContent(next);
+        }
+      })
+      .catch(() => {});
+    fetch("/api/public/site-config?key=homeProspectus")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source === "db" && typeof res.data?.url === "string") {
+          setProspectusUrl(res.data.url.trim());
         }
       })
       .catch(() => {});
@@ -159,47 +180,52 @@ export function HomeHero() {
     return hoveredCard === index;
   }
 
+  const rawImageSrc = homeHeroContent.backgroundImages[currentBackgroundIndex]?.trim() || null;
+  const currentImageSrc = rawImageSrc ? getImageUrl(rawImageSrc) : null;
+
   return (
     <section className="relative flex min-h-[102svh] w-full flex-col justify-center overflow-hidden pt-28 pb-40 lg:pt-32 lg:pb-24">
       <div className="absolute inset-0">
         <AnimatePresence mode="sync">
-          <motion.div
-            key={homeHeroContent.backgroundImages[currentBackgroundIndex]}
-            className="absolute inset-0"
-            initial={{
-              ...BACKGROUND_MOTIONS[
-                currentBackgroundIndex % BACKGROUND_MOTIONS.length
-              ].initial,
-              filter: "blur(10px)",
-            }}
-            animate={{
-              ...BACKGROUND_MOTIONS[
-                currentBackgroundIndex % BACKGROUND_MOTIONS.length
-              ].animate,
-              filter: "blur(0px)",
-            }}
-            exit={{
-              ...BACKGROUND_MOTIONS[
-                currentBackgroundIndex % BACKGROUND_MOTIONS.length
-              ].exit,
-              filter: "blur(5px)",
-            }}
-            transition={{
-              duration: 1.05,
-              ease: [0.22, 1, 0.36, 1],
-              opacity: { duration: 0.85, ease: "easeInOut" },
-            }}
-          >
-            <Image
-              src={homeHeroContent.backgroundImages[currentBackgroundIndex]}
-              alt="JCT campus"
-              fill
-              priority={currentBackgroundIndex === 0}
-              className="object-cover"
-              sizes="100vw"
-              quality={90}
-            />
-          </motion.div>
+          {currentImageSrc && (
+            <motion.div
+              key={currentImageSrc}
+              className="absolute inset-0"
+              initial={{
+                ...BACKGROUND_MOTIONS[
+                  currentBackgroundIndex % BACKGROUND_MOTIONS.length
+                ].initial,
+                filter: "blur(10px)",
+              }}
+              animate={{
+                ...BACKGROUND_MOTIONS[
+                  currentBackgroundIndex % BACKGROUND_MOTIONS.length
+                ].animate,
+                filter: "blur(0px)",
+              }}
+              exit={{
+                ...BACKGROUND_MOTIONS[
+                  currentBackgroundIndex % BACKGROUND_MOTIONS.length
+                ].exit,
+                filter: "blur(5px)",
+              }}
+              transition={{
+                duration: 1.05,
+                ease: [0.22, 1, 0.36, 1],
+                opacity: { duration: 0.85, ease: "easeInOut" },
+              }}
+            >
+              <Image
+                src={currentImageSrc}
+                alt="JCT campus"
+                fill
+                priority={currentBackgroundIndex === 0}
+                className="object-cover"
+                sizes="100vw"
+                quality={90}
+              />
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
 
@@ -224,7 +250,7 @@ export function HomeHero() {
                 <X size={24} />
               </button>
               <iframe
-                src="https://www.youtube.com/embed/RBzA0cneWRA?autoplay=1"
+                src={`${homeHeroContent.tourVideoUrl || "https://www.youtube.com/embed/RBzA0cneWRA"}?autoplay=1`}
                 title="JCT Campus Tour"
                 className="h-full w-full border-none"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -292,6 +318,30 @@ export function HomeHero() {
                   >
                     {cta.label}
                   </button>
+                );
+              }
+              const isProspectus =
+                prospectusUrl &&
+                cta.label.toLowerCase().includes("prospectus");
+              if (isProspectus) {
+                return (
+                  <a
+                    key={cta.label}
+                    href={prospectusUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    download
+                    className={`inline-flex h-12 items-center justify-center gap-2 rounded-full px-7 text-sm font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 sm:text-base ${
+                      cta.primary
+                        ? "bg-gold text-navy hover:bg-gold-light shadow-black/20"
+                        : "border border-white/30 bg-transparent text-white backdrop-blur-sm hover:bg-white/10"
+                    }`}
+                  >
+                    {cta.label}
+                    {cta.primary && (
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    )}
+                  </a>
                 );
               }
               return (

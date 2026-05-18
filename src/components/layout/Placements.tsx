@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { TrendingUp, Award, Building } from "lucide-react";
 import { useEffect, useState } from "react";
+import { getImageUrl } from "@/lib/utils";
 
 const STATIC_COMPANIES = [
   { name: "Abiba", logo: "/company-logos/abiba.webp" },
@@ -104,7 +105,7 @@ function CompanyCard({ company }: { company: { name: string; logo: string } }) {
     <div className="border-border hover:border-accent/30 flex h-16 w-36 flex-col items-center justify-center rounded-xl border bg-white px-3 py-2 transition-all duration-300 hover:scale-105 hover:shadow-md sm:h-18 sm:w-40 md:h-20 md:w-44">
       <div className="relative h-8 w-full sm:h-9">
         <Image
-          src={company.logo}
+          src={getImageUrl(company.logo) ?? company.logo}
           alt={company.name}
           fill
           sizes="180px"

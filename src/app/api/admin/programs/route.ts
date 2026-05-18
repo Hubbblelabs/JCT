@@ -1,8 +1,9 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Program } from "@/lib/models";
-import { requireRole, json, badRequest, serverError } from "@/lib/api-helpers";
+import { requireRole, json, badRequest, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
+import { ProgramCreateSchema } from "@/lib/validation";
 
 export async function GET(req: NextRequest) {
   const { error } = await requireRole(req, "viewer");
@@ -27,13 +28,12 @@ export async function POST(req: NextRequest) {
   const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
+  const parsed = await validateBody(req, ProgramCreateSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   try {
     await connectDB();
-    const body = await req.json();
-    if (!body.name || !body.abbr || !body.slug || !body.institution) {
-      return badRequest("name, abbr, slug, and institution are required");
-    }
-
     const existing = await Program.findOne({ slug: body.slug });
     if (existing) return badRequest("Program with this slug already exists");
 

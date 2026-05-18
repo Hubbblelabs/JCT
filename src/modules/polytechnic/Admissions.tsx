@@ -1,15 +1,92 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Phone, Mail, MapPin, CheckCircle2, ArrowRight } from "lucide-react";
-import { admissionsCriteria } from "@/data/polytechnic";
+import { CheckCircle2, ArrowRight } from "lucide-react";
+import { admissionsCriteria as fallbackCriteria } from "@/data/polytechnic";
 import {
   PolyButtonLink,
   PolySection,
   PolySectionHeader,
 } from "@/modules/polytechnic/PolyUI";
 
+type Criterion = { title: string; items: string[] };
+
+type AdmissionsConfig = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  ctaLabel: string;
+  ctaHref: string;
+  criteria: Criterion[];
+};
+
+const DEFAULTS: AdmissionsConfig = {
+  eyebrow: "Admissions",
+  title: "Admission Process",
+  description:
+    "Simple and transparent admissions aligned with current DOTE and Tamil Nadu polytechnic guidelines.",
+  ctaLabel: "Apply Now",
+  ctaHref: "https://admissions.jct.ac.in",
+  criteria: fallbackCriteria as Criterion[],
+};
+
+function normalize(raw: unknown): AdmissionsConfig | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, unknown>;
+  const criteria = Array.isArray(r.criteria)
+    ? r.criteria
+        .map((c) => {
+          const o = (c ?? {}) as Record<string, unknown>;
+          const title = typeof o.title === "string" ? o.title : null;
+          const items = Array.isArray(o.items)
+            ? o.items.filter(
+                (s): s is string => typeof s === "string" && s.length > 0,
+              )
+            : [];
+          if (!title || items.length === 0) return null;
+          return { title, items } satisfies Criterion;
+        })
+        .filter((x): x is Criterion => x !== null)
+    : [];
+  return {
+    eyebrow:
+      typeof r.eyebrow === "string" && r.eyebrow ? r.eyebrow : DEFAULTS.eyebrow,
+    title: typeof r.title === "string" && r.title ? r.title : DEFAULTS.title,
+    description:
+      typeof r.description === "string" ? r.description : DEFAULTS.description,
+    ctaLabel:
+      typeof r.ctaLabel === "string" && r.ctaLabel
+        ? r.ctaLabel
+        : DEFAULTS.ctaLabel,
+    ctaHref:
+      typeof r.ctaHref === "string" && r.ctaHref ? r.ctaHref : DEFAULTS.ctaHref,
+    criteria: criteria.length > 0 ? criteria : DEFAULTS.criteria,
+  };
+}
+
 export function Admissions() {
+  const [config, setConfig] = useState<AdmissionsConfig>(DEFAULTS);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/site-config?key=polytechnicAdmissions")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source === "db") {
+          const next = normalize(res.data);
+          if (next) setConfig(next);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const isExternal = config.ctaHref.startsWith("http");
+
   return (
     <PolySection
       id="admissions"
@@ -19,24 +96,24 @@ export function Admissions() {
       <div className="rounded-2xl border border-slate-200 bg-white p-6 md:p-8">
         <div className="flex flex-col gap-6 border-b border-slate-200 pb-8 md:flex-row md:items-end md:justify-between">
           <PolySectionHeader
-            eyebrow="Admissions"
-            title="Admission Process"
-            description="Simple and transparent admissions aligned with current DOTE and Tamil Nadu polytechnic guidelines."
+            eyebrow={config.eyebrow}
+            title={config.title}
+            description={config.description}
             className="mb-0"
           />
           <PolyButtonLink
-            href="https://admissions.jct.ac.in"
-            target="_blank"
-            rel="noopener noreferrer"
+            href={config.ctaHref}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
             className="shrink-0"
           >
-            Apply Now
+            {config.ctaLabel}
             <ArrowRight className="ml-2 h-4 w-4" />
           </PolyButtonLink>
         </div>
 
         <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
-          {admissionsCriteria.map((block, index) => (
+          {config.criteria.map((block, index) => (
             <motion.article
               key={block.title}
               initial={{ opacity: 0, y: 20 }}
@@ -64,28 +141,6 @@ export function Admissions() {
               </ul>
             </motion.article>
           ))}
-        </div>
-
-        <div
-          id="contact"
-          className="mt-8 grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-4 text-sm md:grid-cols-3 md:gap-4"
-        >
-          <a
-            href="tel:+919361422201"
-            className="text-polytechnic-dark hover:text-polytechnic flex items-center gap-2"
-          >
-            <Phone size={15} className="text-polytechnic" /> +91 93614 22201
-          </a>
-          <a
-            href="mailto:info@jct.ac.in"
-            className="text-polytechnic-dark hover:text-polytechnic flex items-center gap-2"
-          >
-            <Mail size={15} className="text-polytechnic" /> info@jct.ac.in
-          </a>
-          <div className="text-polytechnic-dark flex items-start gap-2">
-            <MapPin size={15} className="text-polytechnic mt-0.5 shrink-0" />
-            <span>Knowledge Park, Pichanur, Coimbatore - 641105</span>
-          </div>
         </div>
       </div>
     </PolySection>

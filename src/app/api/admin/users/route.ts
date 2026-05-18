@@ -2,8 +2,9 @@ import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/lib/models";
-import { requireRole, json, badRequest, serverError } from "@/lib/api-helpers";
+import { requireRole, json, badRequest, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
+import { UserCreateSchema } from "@/lib/validation";
 
 export async function GET(req: NextRequest) {
   const { error } = await requireRole(req, "super_admin");
@@ -23,13 +24,12 @@ export async function POST(req: NextRequest) {
   const { session, error } = await requireRole(req, "super_admin");
   if (error) return error;
 
+  const parsed = await validateBody(req, UserCreateSchema);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.data;
+
   try {
     await connectDB();
-    const body = await req.json();
-    if (!body.email || !body.password || !body.full_name) {
-      return badRequest("email, password, and full_name are required");
-    }
-
     const existing = await User.findOne({ email: body.email.toLowerCase() });
     if (existing) return badRequest("User already exists");
 
@@ -38,9 +38,9 @@ export async function POST(req: NextRequest) {
       email: body.email.toLowerCase(),
       password_hash,
       full_name: body.full_name,
-      role: body.role ?? "editor",
-      institution: body.institution ?? "all",
-      departments: body.departments ?? [],
+      role: body.role,
+      institution: body.institution,
+      departments: body.departments,
     });
 
     await logAudit("user", "created", session!.user?.email ?? "", `Created user ${body.email}`);
