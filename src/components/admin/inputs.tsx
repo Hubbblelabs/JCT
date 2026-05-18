@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, type ReactNode } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 import { ChevronDown, ChevronRight, Plus, Trash2, Upload, Loader2 } from "lucide-react";
 
 interface FieldProps {
@@ -154,11 +154,16 @@ interface ImageUploadInputProps {
   value: string;
   onChange: (url: string) => void;
   hint?: string;
+  /** Hide the URL text field — show only the upload button + preview */
+  uploadOnly?: boolean;
 }
 
-export function ImageUploadInput({ label, value, onChange, hint }: ImageUploadInputProps) {
+export function ImageUploadInput({ label, value, onChange, hint, uploadOnly }: ImageUploadInputProps) {
   const [uploading, setUploading] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => { setImgError(false); }, [value]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -171,38 +176,124 @@ export function ImageUploadInput({ label, value, onChange, hint }: ImageUploadIn
     const r = await fetch("/api/admin/images/upload", { method: "POST", body: fd });
     if (r.ok) {
       const data = await r.json();
-      onChange(data.url);
+      // Store only the storage key/relative path
+      onChange(data.url || data.storage_key);
     }
     setUploading(false);
     if (fileRef.current) fileRef.current.value = "";
+  };
+
+  // Helper to get full URL for preview
+  const getPreviewUrl = (url: string): string => {
+    if (!url) return "";
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      return url;
+    }
+    const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+    if (publicUrl) {
+      return `${publicUrl}/${url}`;
+    }
+    return `/api/admin/images/serve/${url}`;
   };
 
   return (
     <Field label={label} hint={hint}>
       <div className="space-y-2">
         {value && (
-          <div className="h-16 w-32 overflow-hidden rounded-lg border border-gray-200 bg-gray-50 p-1">
-            <img src={value} alt="" className="h-full w-full object-contain" />
+          <div className="relative h-28 w-48 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
+            {imgError ? (
+              <span className="flex h-full w-full items-center justify-center text-xs text-gray-400">No preview</span>
+            ) : (
+              <img src={getPreviewUrl(value)} alt="" className="h-full w-full object-contain" onError={() => setImgError(true)} />
+            )}
+            {uploadOnly && (
+              <button
+                type="button"
+                onClick={() => onChange("")}
+                className="absolute top-1 right-1 admin-btn admin-btn-danger admin-btn-sm"
+                style={{ padding: "0.2rem 0.4rem" }}
+              >
+                <Trash2 size={12} />
+              </button>
+            )}
           </div>
         )}
-        <div className="flex gap-2">
-          <input
-            className="admin-input flex-1 min-w-0"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder="Enter URL or upload file"
-          />
-          <input type="file" ref={fileRef} accept="image/*" className="hidden" onChange={handleUpload} />
+        <input type="file" ref={fileRef} accept="image/*" className="hidden" onChange={handleUpload} />
+        {uploadOnly ? (
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
             disabled={uploading}
-            className="admin-btn admin-btn-outline admin-btn-sm shrink-0"
+            className="admin-btn admin-btn-outline admin-btn-sm"
           >
             {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
-            {uploading ? "…" : "Upload"}
+            {uploading ? "Uploading…" : value ? "Replace Image" : "Upload Image"}
           </button>
-        </div>
+        ) : (
+          <div className="flex gap-2">
+            <input
+              className="admin-input flex-1 min-w-0"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              placeholder="Paste URL or upload a file"
+            />
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              disabled={uploading}
+              className="admin-btn admin-btn-outline admin-btn-sm shrink-0"
+            >
+              {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+              {uploading ? "…" : "Upload"}
+            </button>
+          </div>
+        )}
+      </div>
+    </Field>
+  );
+}
+
+interface TextAreaListProps {
+  label: string;
+  values: string[];
+  onChange: (values: string[]) => void;
+  placeholder?: string;
+  rows?: number;
+}
+
+export function TextAreaList({ label, values, onChange, placeholder, rows = 3 }: TextAreaListProps) {
+  return (
+    <Field label={label}>
+      <div className="space-y-2">
+        {values.map((v, i) => (
+          <div key={i} className="flex gap-2 items-start">
+            <textarea
+              className="admin-textarea flex-1"
+              rows={rows}
+              value={v}
+              placeholder={placeholder}
+              onChange={(e) => {
+                const next = [...values];
+                next[i] = e.target.value;
+                onChange(next);
+              }}
+            />
+            <button
+              type="button"
+              onClick={() => onChange(values.filter((_, j) => j !== i))}
+              className="admin-btn admin-btn-danger admin-btn-sm shrink-0 mt-1"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() => onChange([...values, ""])}
+          className="admin-btn admin-btn-outline admin-btn-sm"
+        >
+          <Plus size={14} /> Add paragraph
+        </button>
       </div>
     </Field>
   );

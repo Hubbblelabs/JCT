@@ -19,14 +19,6 @@ declare module "next-auth" {
   }
 }
 
-declare module "next-auth/jwt" {
-  interface JWT {
-    role?: string;
-    institution?: string;
-    departments?: string[];
-  }
-}
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({

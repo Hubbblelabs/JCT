@@ -53,6 +53,7 @@ function createArtsDepartment(config: {
   name: string;
   shortName: string;
   intake: number;
+  duration: string;
   focusAreas: string[];
 }): DepartmentData {
   return {
@@ -73,6 +74,7 @@ function createArtsDepartment(config: {
       accreditation: "NAAC Quality Framework",
       intake: config.intake,
       affiliation: "Affiliated to Bharathiar University",
+      duration: config.duration,
     },
     hod: {
       name: "Dr. R. Lakshmi",
@@ -426,6 +428,7 @@ export const artsDepartments: DepartmentData[] = [
     name: "B.Sc. Computer Science",
     shortName: "BCS",
     intake: 60,
+    duration: "3 Years",
     focusAreas: ["Programming", "Data Analytics", "Web Development"],
   }),
   createArtsDepartment({
@@ -433,6 +436,7 @@ export const artsDepartments: DepartmentData[] = [
     name: "B.Sc. Artificial Intelligence & Machine Learning",
     shortName: "AIM",
     intake: 60,
+    duration: "3 Years",
     focusAreas: ["Machine Learning", "Data Science", "AI Applications"],
   }),
   createArtsDepartment({
@@ -440,6 +444,7 @@ export const artsDepartments: DepartmentData[] = [
     name: "Bachelor of Computer Applications",
     shortName: "BCA",
     intake: 60,
+    duration: "3 Years",
     focusAreas: ["Application Development", "Cloud Basics", "UI/UX"],
   }),
   createArtsDepartment({
@@ -447,6 +452,7 @@ export const artsDepartments: DepartmentData[] = [
     name: "B.Com. Logistics & Supply Chain Management",
     shortName: "BCL",
     intake: 60,
+    duration: "3 Years",
     focusAreas: [
       "Logistics Operations",
       "Supply Chain Analytics",
@@ -458,6 +464,7 @@ export const artsDepartments: DepartmentData[] = [
     name: "BBA Logistics",
     shortName: "BBL",
     intake: 60,
+    duration: "3 Years",
     focusAreas: ["Business Management", "Freight Operations", "Leadership"],
   }),
 ];

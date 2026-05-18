@@ -23,7 +23,6 @@ function ContactForm({ value, onChange }: { value: ContactVal; onChange: (v: Con
   return (
     <div className="grid grid-cols-2 gap-4">
       <TextInput label="Phone" value={value.phone ?? ""} onChange={(e) => set("phone", e.target.value)} />
-      <TextInput label="Alt Phone" value={value.phoneAlt ?? ""} onChange={(e) => set("phoneAlt", e.target.value)} />
       <TextInput label="Email" value={value.email ?? ""} onChange={(e) => set("email", e.target.value)} />
       <TextInput label="Admissions Email" value={value.admissionsEmail ?? ""} onChange={(e) => set("admissionsEmail", e.target.value)} />
       <TextInput label="WhatsApp Number" value={value.whatsapp ?? ""} onChange={(e) => set("whatsapp", e.target.value)} hint="Include country code, no + sign: 919361..." />
@@ -103,7 +102,7 @@ function AccreditationsForm({ value, onChange }: { value: Accreditation[]; onCha
             <TextInput label="Name" value={item.name} onChange={(e) => setItem(i, "name", e.target.value)} />
             <TextInput label="Description" value={item.description} onChange={(e) => setItem(i, "description", e.target.value)} />
           </div>
-          <ImageUploadInput label="Logo" value={item.logo} onChange={(url) => setItem(i, "logo", url)} />
+          <ImageUploadInput label="Logo" value={item.logo} onChange={(url) => setItem(i, "logo", url)} uploadOnly />
         </div>
       ))}
       <button

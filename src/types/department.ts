@@ -56,6 +56,7 @@ export type DepartmentData = {
     accreditation: string;
     intake: number;
     affiliation: string;
+    duration: string;
   };
 
   hod: {

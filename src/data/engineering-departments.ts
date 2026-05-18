@@ -185,6 +185,7 @@ function createEngineeringDepartment(config: {
   name: string;
   shortName: string;
   intake: number;
+  duration: string;
   focusAreas: string[];
   topRecruiters: string[];
 }): DepartmentData {
@@ -206,6 +207,7 @@ function createEngineeringDepartment(config: {
       accreditation: "AICTE / NAAC / NBA / ISO 9001:2015",
       intake: config.intake,
       affiliation: "Affiliated to Anna University",
+      duration: config.duration,
     },
     hod: {
       name: "Head of Department",
@@ -550,6 +552,7 @@ export const engineeringDepartments: DepartmentData[] = [
     name: "Computer Science & Engineering",
     shortName: "CSE",
     intake: 120,
+    duration: "4 Years",
     focusAreas: ["AI & Machine Learning", "Cloud Computing", "Cyber Security"],
     topRecruiters: ["TCS", "Infosys", "Cognizant", "Zoho", "Wipro"],
   }),
@@ -558,6 +561,7 @@ export const engineeringDepartments: DepartmentData[] = [
     name: "Mechanical Engineering",
     shortName: "MECH",
     intake: 60,
+    duration: "4 Years",
     focusAreas: ["CAD / CAM", "Thermal Engineering", "Robotics"],
     topRecruiters: ["L&T", "Ashok Leyland", "Bosch", "Caterpillar", "TVS"],
   }),
@@ -566,6 +570,7 @@ export const engineeringDepartments: DepartmentData[] = [
     name: "Electrical & Electronics Engineering",
     shortName: "EEE",
     intake: 60,
+    duration: "4 Years",
     focusAreas: ["Power Systems", "Control Engineering", "Electric Vehicles"],
     topRecruiters: ["Schneider Electric", "Siemens", "ABB", "TCS", "L&T"],
   }),
@@ -574,6 +579,7 @@ export const engineeringDepartments: DepartmentData[] = [
     name: "Electronics & Communication Engineering",
     shortName: "ECE",
     intake: 60,
+    duration: "4 Years",
     focusAreas: ["VLSI", "Embedded Systems", "Signal Processing"],
     topRecruiters: ["Qualcomm", "HCL", "Tech Mahindra", "Foxconn", "Infosys"],
   }),
@@ -582,6 +588,7 @@ export const engineeringDepartments: DepartmentData[] = [
     name: "Civil Engineering",
     shortName: "CE",
     intake: 60,
+    duration: "4 Years",
     focusAreas: [
       "Structural Engineering",
       "Construction Management",
@@ -600,6 +607,7 @@ export const engineeringDepartments: DepartmentData[] = [
     name: "Artificial Intelligence & Data Science",
     shortName: "AI&DS",
     intake: 60,
+    duration: "4 Years",
     focusAreas: ["Machine Learning", "Deep Learning", "Data Analytics"],
     topRecruiters: ["TCS", "Infosys", "Cognizant", "Zoho", "Wipro"],
   }),
@@ -608,6 +616,7 @@ export const engineeringDepartments: DepartmentData[] = [
     name: "Computer Science & Business Systems",
     shortName: "CSBS",
     intake: 60,
+    duration: "4 Years",
     focusAreas: ["Business Analytics", "ERP Systems", "Data-Driven Decisions"],
     topRecruiters: ["TCS", "Infosys", "Cognizant", "Zoho", "Wipro"],
   }),
@@ -616,6 +625,7 @@ export const engineeringDepartments: DepartmentData[] = [
     name: "Bio-Technology and Bio-Chemical Engineering",
     shortName: "BT",
     intake: 60,
+    duration: "4 Years",
     focusAreas: ["Genetic Engineering", "Bioprocessing", "Pharma"],
     topRecruiters: ["Biocon", "Dr. Reddy's", "Sun Pharma", "Cipla", "Novartis"],
   }),
@@ -624,6 +634,7 @@ export const engineeringDepartments: DepartmentData[] = [
     name: "Food Technology",
     shortName: "FT",
     intake: 60,
+    duration: "4 Years",
     focusAreas: ["Food Processing", "Quality Control", "Nutrition Science"],
     topRecruiters: ["Britannia", "Nestle", "ITC", "HUL", "Parle"],
   }),
@@ -632,6 +643,7 @@ export const engineeringDepartments: DepartmentData[] = [
     name: "Petroleum Engineering",
     shortName: "PE",
     intake: 60,
+    duration: "4 Years",
     focusAreas: [
       "Reservoir Engineering",
       "Drilling Technology",
@@ -644,6 +656,7 @@ export const engineeringDepartments: DepartmentData[] = [
     name: "Petrochemical Technology",
     shortName: "PCT",
     intake: 60,
+    duration: "4 Years",
     focusAreas: [
       "Polymer Technology",
       "Chemical Processes",

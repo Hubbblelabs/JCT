@@ -4,6 +4,28 @@ import { Testimonial } from "@/lib/models";
 
 export const revalidate = 3600;
 
+// Helper to convert storage key to full URL
+function getImageUrl(imageUrl: string | null | undefined): string | null {
+  if (!imageUrl) return null;
+  
+  // If it's already a full URL, return as-is
+  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+    return imageUrl;
+  }
+
+  // If it's a storage key, construct the full URL
+  if (imageUrl.includes("/") || imageUrl.startsWith("uploads/")) {
+    const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+    if (publicUrl) {
+      return `${publicUrl}/${imageUrl}`;
+    }
+    // Fallback to API serve endpoint if no public URL is configured
+    return `/api/admin/images/serve/${imageUrl}`;
+  }
+
+  return imageUrl;
+}
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const institution = searchParams.get("institution") ?? "all";
@@ -23,7 +45,13 @@ export async function GET(req: Request) {
       return NextResponse.json({ source: "empty", data: [] });
     }
 
-    return NextResponse.json({ source: "db", data: testimonials });
+    // Transform avatars to full URLs
+    const transformedTestimonials = testimonials.map((t) => ({
+      ...t.toObject(),
+      avatar: getImageUrl(t.avatar),
+    }));
+
+    return NextResponse.json({ source: "db", data: transformedTestimonials });
   } catch {
     return NextResponse.json({ source: "error", data: [] });
   }

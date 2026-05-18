@@ -37,19 +37,13 @@ export async function POST(req: NextRequest) {
     const filename = `${Date.now()}-${file.name.replace(/\.[^.]+$/, "")}.webp`;
     const storageKey = `uploads/${institution}/${category}/${filename}`;
 
-    let url: string;
-    try {
-      url = await uploadToR2(storageKey, webpBuffer, "image/webp");
-    } catch {
-      // Fallback: store locally for dev
-      url = `/uploads/${filename}`;
-    }
+    await uploadToR2(storageKey, webpBuffer, "image/webp");
 
     await connectDB();
     const doc = await ImageAsset.create({
       filename,
       storage_key: storageKey,
-      url,
+      url: storageKey, // Store only the storage key, not the full URL
       alt_text: altText,
       category,
       institution,
@@ -61,7 +55,7 @@ export async function POST(req: NextRequest) {
     });
 
     await logAudit("image", "uploaded", session!.user?.email ?? "", `Uploaded ${filename}`);
-    return json(doc, 201);
+    return json({ ...doc.toObject(), url: storageKey }, 201);
   } catch (e) {
     console.error(e);
     return serverError();

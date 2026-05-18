@@ -5,7 +5,6 @@ import { usePathname, useSearchParams } from "next/navigation";
 import {
   BookOpen,
   LayoutDashboard,
-  Building2,
   GraduationCap,
   Briefcase,
   MessageSquare,
@@ -15,60 +14,47 @@ import {
   Users,
   LogOut,
   User,
+  ChevronDown,
+  Wrench,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Suspense } from "react";
 
-type TabId = "home" | "engineering" | "arts-science" | "polytechnic";
+type NavItem = { label: string; href: string; icon: React.ComponentType<{ size?: number }> };
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: "home", label: "Home" },
-  { id: "engineering", label: "Engineering" },
-  { id: "arts-science", label: "Arts & Science" },
-  { id: "polytechnic", label: "Polytechnic" },
-];
-
-type SubNavItem = { label: string; href: string; icon: React.ComponentType<{ size?: number }> };
-
-const SUB_NAV: Record<TabId, SubNavItem[]> = {
-  home: [
-    { label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-    { label: "Recruiters", href: "/admin/recruiters", icon: Briefcase },
-    { label: "Site Config", href: "/admin/site-config", icon: Settings },
-    { label: "Images", href: "/admin/images", icon: Image },
-    { label: "Users", href: "/admin/users", icon: Users },
-    { label: "Audit Log", href: "/admin/audit", icon: ClipboardList },
-  ],
+const COLLEGE_ITEMS: Record<string, NavItem[]> = {
   engineering: [
-    { label: "Departments", href: "/admin/departments?college=engineering", icon: Building2 },
     { label: "Programs", href: "/admin/programs?college=engineering", icon: GraduationCap },
     { label: "Testimonials", href: "/admin/testimonials?college=engineering", icon: MessageSquare },
   ],
   "arts-science": [
-    { label: "Departments", href: "/admin/departments?college=arts-science", icon: Building2 },
     { label: "Programs", href: "/admin/programs?college=arts-science", icon: GraduationCap },
     { label: "Testimonials", href: "/admin/testimonials?college=arts-science", icon: MessageSquare },
   ],
   polytechnic: [
-    { label: "Departments", href: "/admin/departments?college=polytechnic", icon: Building2 },
     { label: "Programs", href: "/admin/programs?college=polytechnic", icon: GraduationCap },
     { label: "Testimonials", href: "/admin/testimonials?college=polytechnic", icon: MessageSquare },
   ],
 };
 
-function getActiveTab(pathname: string, college: string | null): TabId {
-  if (college === "engineering") return "engineering";
-  if (college === "arts-science") return "arts-science";
-  if (college === "polytechnic") return "polytechnic";
-  return "home";
+const ADMIN_ITEMS: NavItem[] = [
+  { label: "Recruiters", href: "/admin/recruiters", icon: Briefcase },
+  { label: "Site Config", href: "/admin/site-config", icon: Settings },
+  { label: "Images", href: "/admin/images", icon: Image },
+  { label: "Users", href: "/admin/users", icon: Users },
+  { label: "Audit Log", href: "/admin/audit", icon: ClipboardList },
+];
+
+function isItemActive(href: string, pathname: string, college: string | null): boolean {
+  const [itemPath, itemQuery] = href.split("?");
+  const pathMatch = pathname === itemPath || pathname.startsWith(itemPath + "/");
+  if (!pathMatch) return false;
+  if (!itemQuery) return true;
+  return new URLSearchParams(itemQuery).get("college") === college;
 }
 
-function isSubNavActive(item: SubNavItem, pathname: string, college: string | null): boolean {
-  const [itemPath, itemQuery] = item.href.split("?");
-  if (pathname !== itemPath) return false;
-  if (!itemQuery) return !college;
-  const itemCollege = new URLSearchParams(itemQuery).get("college");
-  return college === itemCollege;
+function isDropdownActive(items: NavItem[], pathname: string, college: string | null): boolean {
+  return items.some((item) => isItemActive(item.href, pathname, college));
 }
 
 function TabNavInner() {
@@ -76,13 +62,15 @@ function TabNavInner() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
   const college = searchParams.get("college");
-  const activeTab = getActiveTab(pathname, college);
+
+  const dashActive = pathname === "/admin/dashboard" || pathname === "/admin";
+  const adminMenuActive = ADMIN_ITEMS.some((i) => pathname === i.href);
 
   return (
     <div className="admin-top-nav">
-      {/* Brand bar: logo left | tabs center | user right */}
       <div className="admin-brand-bar">
-        <div className="flex items-center gap-2">
+        {/* Brand */}
+        <div className="flex items-center gap-2 shrink-0">
           <BookOpen size={18} color="#c9a84c" />
           <div>
             <p className="text-sm font-bold text-white leading-tight">JCT Admin</p>
@@ -90,22 +78,77 @@ function TabNavInner() {
           </div>
         </div>
 
-        {/* Tab buttons */}
-        <div className="flex items-center gap-1">
-          {TABS.map((tab) => (
-            <Link
-              key={tab.id}
-              href={SUB_NAV[tab.id][0].href}
-              className={`admin-tab ${activeTab === tab.id ? "active" : ""}`}
-            >
-              {tab.label}
-            </Link>
-          ))}
-        </div>
+        {/* Nav items */}
+        <nav className="flex items-center gap-0.5">
+          {/* Dashboard — direct link */}
+          <Link
+            href="/admin/dashboard"
+            className={`admin-nav-trigger ${dashActive ? "active" : ""}`}
+          >
+            <LayoutDashboard size={13} />
+            Dashboard
+          </Link>
 
-        {/* User info + logout */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 text-sm text-white/70">
+          {/* College dropdowns */}
+          {(
+            [
+              { id: "engineering", label: "Engineering" },
+              { id: "arts-science", label: "Arts & Science" },
+              { id: "polytechnic", label: "Polytechnic" },
+            ] as const
+          ).map(({ id, label }) => {
+            const items = COLLEGE_ITEMS[id];
+            const active = isDropdownActive(items, pathname, college);
+            return (
+              <div key={id} className="admin-nav-item">
+                <Link
+                  href={`/admin/programs?college=${id}`}
+                  className={`admin-nav-trigger ${active ? "active" : ""}`}
+                >
+                  {label}
+                  <ChevronDown size={11} />
+                </Link>
+                <div className="admin-nav-dropdown-menu">
+                  {items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={`admin-nav-dropdown-item ${isItemActive(item.href, pathname, college) ? "active" : ""}`}
+                    >
+                      <item.icon size={14} />
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Admin tools dropdown */}
+          <div className="admin-nav-item">
+            <button className={`admin-nav-trigger ${adminMenuActive ? "active" : ""}`}>
+              <Wrench size={13} />
+              Admin
+              <ChevronDown size={11} />
+            </button>
+            <div className="admin-nav-dropdown-menu">
+              {ADMIN_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`admin-nav-dropdown-item ${pathname === item.href ? "active" : ""}`}
+                >
+                  <item.icon size={14} />
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </nav>
+
+        {/* User info + sign out */}
+        <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 text-sm text-white/75">
             <User size={14} />
             <span className="hidden md:inline">{session?.user?.name ?? session?.user?.email}</span>
             <span className="admin-badge admin-badge-blue capitalize text-[11px]">
@@ -115,26 +158,16 @@ function TabNavInner() {
           <button
             onClick={() => signOut({ callbackUrl: "/admin/login" })}
             className="admin-btn admin-btn-sm"
-            style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.7)" }}
+            style={{
+              background: "transparent",
+              border: "1px solid rgba(255,255,255,0.25)",
+              color: "rgba(255,255,255,0.78)",
+            }}
           >
             <LogOut size={13} />
             <span className="hidden sm:inline">Sign out</span>
           </button>
         </div>
-      </div>
-
-      {/* Sub-nav */}
-      <div className="admin-sub-nav">
-        {SUB_NAV[activeTab].map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`admin-sub-nav-item ${isSubNavActive(item, pathname, college) ? "active" : ""}`}
-          >
-            <item.icon size={13} />
-            {item.label}
-          </Link>
-        ))}
       </div>
     </div>
   );
@@ -142,7 +175,7 @@ function TabNavInner() {
 
 export function AdminTabNav() {
   return (
-    <Suspense fallback={<div className="admin-top-nav" style={{ height: 96 }} />}>
+    <Suspense fallback={<div className="admin-top-nav" style={{ height: 56 }} />}>
       <TabNavInner />
     </Suspense>
   );

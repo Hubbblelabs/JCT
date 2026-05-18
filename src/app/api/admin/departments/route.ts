@@ -12,12 +12,16 @@ export async function GET(req: NextRequest) {
     await connectDB();
     const { searchParams } = new URL(req.url);
     const college = searchParams.get("college");
+    const slug = searchParams.get("slug");
     const filter: Record<string, unknown> = {};
     if (college) filter.college = college;
+    if (slug) filter.slug = slug;
 
-    const docs = await Department.find(filter)
-      .select("slug college status version published_at updated_at")
-      .sort({ college: 1, slug: 1 });
+    // Return full document when querying by slug (for program editor)
+    // otherwise return lightweight list fields only
+    const query = Department.find(filter).sort({ college: 1, slug: 1 });
+    if (!slug) query.select("slug college status version published_at updated_at");
+    const docs = await query;
     return json(docs);
   } catch (e) {
     console.error(e);

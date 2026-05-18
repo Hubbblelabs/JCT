@@ -58,6 +58,7 @@ function createPolyDepartment(config: {
   name: string;
   shortName: string;
   intake: number;
+  duration: string;
   focusAreas: string[];
 }): DepartmentData {
   return {
@@ -78,6 +79,7 @@ function createPolyDepartment(config: {
       accreditation: "AICTE / DOTE Compliant",
       intake: config.intake,
       affiliation: "Affiliated to DOTE, Tamil Nadu",
+      duration: config.duration,
     },
     hod: {
       name: "Mr. P. Balasubramaniam",
@@ -420,6 +422,7 @@ export const polytechnicDepartments: DepartmentData[] = [
     name: "Diploma in Computer Technology",
     shortName: "CT",
     intake: 60,
+    duration: "3 Years",
     focusAreas: ["Programming", "Networking", "Database Systems"],
   }),
   createPolyDepartment({
@@ -427,6 +430,7 @@ export const polytechnicDepartments: DepartmentData[] = [
     name: "Diploma in Agricultural Engineering",
     shortName: "AG",
     intake: 60,
+    duration: "3 Years",
     focusAreas: ["Farm Machinery", "Irrigation", "Agri Technology"],
   }),
   createPolyDepartment({
@@ -434,6 +438,7 @@ export const polytechnicDepartments: DepartmentData[] = [
     name: "Diploma in Petrochemical Engineering",
     shortName: "PC",
     intake: 60,
+    duration: "3 Years",
     focusAreas: ["Process Engineering", "Refinery Basics", "Industrial Safety"],
   }),
   createPolyDepartment({
@@ -441,6 +446,7 @@ export const polytechnicDepartments: DepartmentData[] = [
     name: "Diploma in Mechanical Engineering",
     shortName: "ME",
     intake: 60,
+    duration: "3 Years",
     focusAreas: ["Machining", "CAD", "Production"],
   }),
   createPolyDepartment({
@@ -448,6 +454,7 @@ export const polytechnicDepartments: DepartmentData[] = [
     name: "Diploma in Electrical and Electronics Engineering",
     shortName: "EE",
     intake: 60,
+    duration: "3 Years",
     focusAreas: ["Electrical Machines", "Power Systems", "Control Panels"],
   }),
   createPolyDepartment({
@@ -455,6 +462,7 @@ export const polytechnicDepartments: DepartmentData[] = [
     name: "Diploma in Civil Engineering",
     shortName: "CE",
     intake: 60,
+    duration: "3 Years",
     focusAreas: ["Surveying", "Construction", "Quantity Estimation"],
   }),
 ];

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { TextInput, ImageUploadInput } from "@/components/admin/inputs";
 import { Plus, Pencil, Trash2, X, Loader2, Check } from "lucide-react";
+import { getImageUrl } from "@/lib/utils";
 
 interface Recruiter {
   _id: string;
@@ -108,7 +109,7 @@ export default function RecruitersPage() {
                     <td>
                       {r.logo ? (
                         <div className="h-8 w-20">
-                          <img src={r.logo} alt={r.name} className="h-full w-full object-contain" />
+                          <img src={getImageUrl(r.logo) || ""} alt={r.name} className="h-full w-full object-contain" />
                         </div>
                       ) : (
                         <span className="text-gray-300 text-xs">No logo</span>
@@ -145,7 +146,7 @@ export default function RecruitersPage() {
             </div>
             <div className="p-6 space-y-1">
               <TextInput label="Company Name" value={form.name} onChange={(e) => set("name", e.target.value)} required />
-              <ImageUploadInput label="Logo" value={form.logo} onChange={(url) => set("logo", url)} />
+              <ImageUploadInput label="Logo" value={form.logo} onChange={(url) => set("logo", url)} uploadOnly />
               <TextInput label="Website" value={form.website} onChange={(e) => set("website", e.target.value)} placeholder="https://tcs.com" />
               <TextInput label="Industry" value={form.industry} onChange={(e) => set("industry", e.target.value)} placeholder="IT Services" />
               <div className="flex items-center gap-2 pt-1">

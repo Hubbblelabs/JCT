@@ -10,14 +10,14 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.1046.0",
-    "@aws-sdk/s3-request-presigner": "^3.1046.0",
+    "@aws-sdk/client-s3": "^3.1048.0",
+    "@aws-sdk/s3-request-presigner": "^3.1048.0",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.38.0",
-    "lucide-react": "^1.14.0",
-    "mongoose": "^8.23.1",
+    "lucide-react": "^1.16.0",
+    "mongoose": "^9.6.2",
     "next": "16.2.6",
     "next-auth": "5.0.0-beta.31",
     "react": "^19.2.6",
@@ -25,13 +25,12 @@
     "react-icons": "^5.6.0",
     "sharp": "^0.34.5",
     "tailwind-merge": "^3.6.0",
-    "zod": "^3.25.76"
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@tailwindcss/postcss": "^4.3.0",
-    "@types/bcryptjs": "^2.4.6",
-    "@types/node": "^25.7.0",
+    "@types/node": "^25.8.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "eslint": "^10.4.0",
@@ -46,5 +45,5 @@
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.3"
   },
-  "packageManager": "pnpm@11.1.1+sha512.d1fdf5f73c617b64fa1a56a81c3c8dfe0e966e33a6010aa256b517ae77be21d93e05affc0de1a83b0e4f29d569f68b446ae8f068cd7247c0bb3df0fb4d7bdf9a"
+  "packageManager": "pnpm@11.1.2+sha512.415a1cc25974731e75455c1468371be74c5aa5fb7621b50d4056d222451609f11412f23fd602e6169f1e060466641f798597e1be961a10688836a67b16569499"
 }

@@ -1389,13 +1389,6 @@ export function DepartmentPageLayout({
     };
   }, [dept.college]);
 
-  const collegeLabel =
-    dept.college === "engineering"
-      ? "B.E. Department"
-      : dept.college === "arts-science"
-        ? "UG Program"
-        : "Diploma Program";
-
   const renderTabContent = () => {
     switch (activeTab) {
       case "overview":
@@ -1467,25 +1460,6 @@ export function DepartmentPageLayout({
           </motion.div>
 
           <div className="max-w-4xl">
-            {/* Badge */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.1 }}
-            >
-              <span
-                className="mb-5 inline-flex items-center gap-2 rounded-full border px-3.5 py-1.5 text-[11px] font-black tracking-[0.12em] uppercase backdrop-blur-sm"
-                style={{
-                  backgroundColor: `${ac}35`,
-                  color: "#fff",
-                  borderColor: `${ac}55`,
-                }}
-              >
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
-                {collegeLabel} · {dept.about.intake} Seats
-              </span>
-            </motion.div>
-
             {/* Title */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
@@ -1497,6 +1471,7 @@ export function DepartmentPageLayout({
               }}
               className="mb-6 text-4xl leading-[1.1] font-black tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl"
             >
+              {dept.college === "engineering" && "B.E/B.Tech "}
               {dept.name}
             </motion.h1>
 
@@ -1508,7 +1483,7 @@ export function DepartmentPageLayout({
               className="flex flex-wrap items-center gap-x-5 gap-y-2.5 text-sm text-white/70"
             >
               {[
-                { label: "Est.", value: dept.about.established },
+                { label: "Duration", value: dept.about.duration },
                 { label: "Affiliation", value: dept.about.affiliation },
                 { label: "Accreditation", value: dept.about.accreditation },
               ].map((item, i) =>

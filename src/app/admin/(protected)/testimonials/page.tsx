@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { TextInput, TextArea, Select, NumberInput, ImageUploadInput } from "@/components/admin/inputs";
+import { TextInput, TextArea, Select, ImageUploadInput } from "@/components/admin/inputs";
 import { Plus, Pencil, Trash2, X, Loader2, Check } from "lucide-react";
 
 interface Testimonial {
@@ -168,9 +168,7 @@ function TestimonialsPageInner() {
                 <TextInput label="Course" value={form.course} onChange={(e) => set("course", e.target.value)} placeholder="B.E. CSE" />
                 <TextInput label="Company" value={form.company} onChange={(e) => set("company", e.target.value)} placeholder="Infosys" />
                 <Select label="Category" value={form.category} options={CATEGORIES} onChange={(e) => set("category", e.target.value)} />
-                <Select label="College" value={form.institution} options={INSTITUTIONS} onChange={(e) => set("institution", e.target.value)} />
-                <ImageUploadInput label="Avatar" value={form.avatar} onChange={(url) => set("avatar", url)} />
-                <NumberInput label="Sort Order" value={form.sort_order} onChange={(e) => set("sort_order", parseInt(e.target.value))} />
+                <ImageUploadInput label="Avatar" value={form.avatar} onChange={(url) => set("avatar", url)} uploadOnly />
               </div>
               <TextArea label="Quote" value={form.quote} onChange={(e) => set("quote", e.target.value)} required rows={4} />
               <div className="flex items-center gap-2 pt-2">

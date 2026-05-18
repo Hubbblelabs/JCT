@@ -126,6 +126,7 @@ function CourseCarouselSection({
   showDescription,
   showHeader = true,
   controlsPlacement = "top",
+  pgCourses = false,
 }: {
   eyebrow: string;
   title: string;
@@ -135,6 +136,7 @@ function CourseCarouselSection({
   showDescription: boolean;
   showHeader?: boolean;
   controlsPlacement?: "top" | "header";
+  pgCourses?: boolean;
 }) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [showArrows, setShowArrows] = useState(false);
@@ -279,7 +281,9 @@ function CourseCarouselSection({
                 href={
                   showAccreditationBadges
                     ? `/institutions/engineering/departments/${course.slug}`
-                    : undefined
+                    : pgCourses
+                      ? `/institutions/engineering/postgraduate/${course.slug}`
+                      : undefined
                 }
                 showAccreditationBadges={showAccreditationBadges}
                 showDescription={showDescription}
@@ -363,6 +367,7 @@ export function EngineeringDomains() {
         showDescription={false}
         showHeader
         controlsPlacement="header"
+        pgCourses={true}
       />
     </section>
   );
