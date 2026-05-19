@@ -74,13 +74,13 @@ export function Admissions() {
             href="tel:+919361422201"
             className="text-polytechnic-dark hover:text-polytechnic flex items-center gap-2"
           >
-            <Phone size={15} className="text-polytechnic" /> +91 93614 22201
+            <Phone size={15} className="text-polytechnic" /> +91 93614 88801
           </a>
           <a
-            href="mailto:info@jct.ac.in"
+            href="mailto:admissions@jct.ac.in"
             className="text-polytechnic-dark hover:text-polytechnic flex items-center gap-2"
           >
-            <Mail size={15} className="text-polytechnic" /> info@jct.ac.in
+            <Mail size={15} className="text-polytechnic" /> admissions@jct.ac.in
           </a>
           <div className="text-polytechnic-dark flex items-start gap-2">
             <MapPin size={15} className="text-polytechnic mt-0.5 shrink-0" />

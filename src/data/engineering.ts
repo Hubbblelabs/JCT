@@ -245,3 +245,35 @@ export const testimonials = [
     tag: "INDUSTRY",
   },
 ];
+
+export const admissionsCriteria = [
+  {
+    title: "Eligible Programs",
+    items: [
+      "B.E. Computer Science & Engineering (4 Years)",
+      "B.Tech. AI & Data Science (4 Years)",
+      "B.E. CS & Business Systems (4 Years)",
+      "B.E. Electronics & Communication (4 Years)",
+      "B.E. Electrical & Electronics (4 Years)",
+      "B.E. Mechanical / Civil / Biotech (4 Years)",
+    ],
+  },
+  {
+    title: "Eligibility Criteria",
+    items: [
+      "First Year: Pass in HSC/12th standard with Mathematics, Physics, and Chemistry as compulsory subjects.",
+      "Minimum average marks: 45% (General Category), 40% (BC, MBC, SC, ST).",
+      "Lateral Entry (2nd Year): Pass in Diploma/B.Sc. with Mathematics, with at least 45% average marks (40% for reserved categories).",
+    ],
+  },
+  {
+    title: "Required Documents",
+    items: [
+      "TNEA Counselling / Joint Admission Allocation Letter",
+      "HSC / 12th Marks Sheet & Transfer Certificate (TC)",
+      "SSLC / 10th Marks Sheet",
+      "Permanent Community Certificate (for reserved categories)",
+      "First Graduate Certificate & Joint Declaration (if applicable)",
+    ],
+  },
+];

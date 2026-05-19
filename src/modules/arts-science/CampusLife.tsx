@@ -69,7 +69,7 @@ export function CampusLife() {
           {campusImages.map((_, i) => (
             <div
               key={i}
-              className={`h-2.5 w-2.5 rounded-full transition-colors ${i === activeIndex ? "bg-arts-science-accent" : "bg-orange-200"}`}
+              className={`h-2.5 w-2.5 rounded-full transition-colors ${i === activeIndex ? "bg-arts-science-accent" : "bg-arts-science-accent/15"}`}
             />
           ))}
         </div>

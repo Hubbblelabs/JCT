@@ -79,6 +79,10 @@ export const engineeringNavigation: NavItem[] = [
     href: "/institutions/engineering/about",
   },
   {
+    name: "Admissions",
+    href: "/institutions/engineering#admissions",
+  },
+  {
     name: "Courses",
     href: "/institutions/engineering#programs",
   },
@@ -125,6 +129,10 @@ export const artsNavigation: NavItem[] = [
     href: "/institutions/arts-science/about",
   },
   {
+    name: "Admissions",
+    href: "/institutions/arts-science#admissions",
+  },
+  {
     name: "Courses",
     href: "/institutions/arts-science#programs",
   },
@@ -166,6 +174,10 @@ export const polytechnicNavigation: NavItem[] = [
   {
     name: "About Us",
     href: "/institutions/polytechnic/about",
+  },
+  {
+    name: "Admissions",
+    href: "/institutions/polytechnic#admissions",
   },
   {
     name: "Courses",

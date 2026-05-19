@@ -61,7 +61,7 @@ export function AboutArtsScience() {
       onMouseMove={handleMouseMove}
     >
       <div className="pointer-events-none absolute inset-0 z-0 mask-[radial-gradient(ellipse_at_center,black_60%,transparent_100%)]">
-        <div className="absolute inset-0 bg-orange-200 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px]" />
+        <div className="absolute inset-0 bg-arts-science-accent/20 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px]" />
 
         <div
           className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover/section:opacity-100"
@@ -81,7 +81,7 @@ export function AboutArtsScience() {
       <ArtsSection tone="transparent" className="relative pt-0 md:pt-2">
         {/* Tab Navigation */}
         <div className="relative z-10 mb-10 flex justify-center px-4">
-          <div className="no-scrollbar flex max-w-full flex-col overflow-x-auto rounded-3xl border border-orange-100 bg-white/80 p-1 shadow-sm backdrop-blur-sm md:flex-row md:rounded-full">
+          <div className="no-scrollbar flex max-w-full flex-col overflow-x-auto rounded-3xl border border-arts-science-accent/20 bg-white/80 p-1 shadow-sm backdrop-blur-sm md:flex-row md:rounded-full">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
@@ -167,10 +167,10 @@ export function AboutArtsScience() {
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
-                className="rounded-4xl border border-orange-100 bg-white p-10 shadow-sm"
+                className="rounded-4xl border border-arts-science-accent/20 bg-white p-10 shadow-sm"
               >
                 <div className="mb-6 flex items-center gap-4">
-                  <div className="rounded-2xl bg-orange-50 p-4">
+                  <div className="rounded-2xl bg-arts-science-accent/5 p-4">
                     <svg
                       width="28"
                       height="28"
@@ -180,7 +180,7 @@ export function AboutArtsScience() {
                     >
                       <path
                         d="M12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM11 7H13V13H11V7ZM11 15H13V17H11V15Z"
-                        fill="#f97316"
+                        fill="var(--color-arts-science-accent)"
                       />
                     </svg>
                   </div>
@@ -202,7 +202,7 @@ export function AboutArtsScience() {
                 viewport={{ once: true }}
                 className="bg-arts-science-dark relative overflow-hidden rounded-4xl p-10 text-white shadow-lg"
               >
-                <div className="pointer-events-none absolute top-0 right-0 h-32 w-32 rounded-full bg-orange-500/10 blur-2xl" />
+                <div className="pointer-events-none absolute top-0 right-0 h-32 w-32 rounded-full bg-arts-science-accent/10 blur-2xl" />
                 <div className="relative z-10 mb-6 flex items-center gap-4">
                   <div className="rounded-2xl bg-white/10 p-4 backdrop-blur-sm">
                     <svg
@@ -214,7 +214,7 @@ export function AboutArtsScience() {
                     >
                       <path
                         d="M12 2L2 12H5V22H19V12H22L12 2ZM17 20H7V10H17V20Z"
-                        fill="#f97316"
+                        fill="var(--color-arts-science-accent)"
                       />
                     </svg>
                   </div>
@@ -267,8 +267,8 @@ export function AboutArtsScience() {
             transition={{ duration: 0.3 }}
             className="relative z-10"
           >
-            <div className="relative overflow-hidden rounded-[2.5rem] border border-orange-100 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:p-14">
-              <Quote className="absolute top-8 left-8 h-32 w-32 -rotate-6 text-orange-500/5" />
+            <div className="relative overflow-hidden rounded-[2.5rem] border border-arts-science-accent/20 bg-white p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] md:p-14">
+              <Quote className="absolute top-8 left-8 h-32 w-32 -rotate-6 text-arts-science-accent/5" />
 
               <div className="relative z-10 grid grid-cols-1 items-center gap-10 md:grid-cols-12 md:gap-16">
                 <motion.div
@@ -277,7 +277,7 @@ export function AboutArtsScience() {
                   viewport={{ once: true }}
                   className="md:col-span-4"
                 >
-                  <div className="relative mx-auto flex aspect-4/5 w-full max-w-[320px] items-center justify-center overflow-hidden rounded-3xl border-8 border-orange-50 bg-white shadow-lg">
+                  <div className="relative mx-auto flex aspect-4/5 w-full max-w-[320px] items-center justify-center overflow-hidden rounded-3xl border-8 border-arts-science-accent/20 bg-white shadow-lg">
                     <Image
                       src="/about-us-assets/dr.s.anbarasu.webp"
                       alt="Dr. S. Anbarasu"

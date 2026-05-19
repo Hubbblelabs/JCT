@@ -54,9 +54,9 @@ export function MerittoPositioner() {
         const isNotification = !isLauncher && rect.height <= 140;
 
         if (isLauncher) {
-          // Move launcher to the bottom-left
-          el.style.setProperty("left", "16px", "important");
-          el.style.setProperty("right", "auto", "important");
+          // Move launcher to the bottom-right
+          el.style.setProperty("right", "16px", "important");
+          el.style.setProperty("left", "auto", "important");
         } else if (isNotification) {
           // Suppress Meritto's native notification — we show our own
           suppressed.add(el);
@@ -64,9 +64,9 @@ export function MerittoPositioner() {
           el.style.setProperty("pointer-events", "none", "important");
           el.style.setProperty("visibility", "hidden", "important");
         } else {
-          // Chat modal — move to bottom-left
-          el.style.setProperty("left", "16px", "important");
-          el.style.setProperty("right", "auto", "important");
+          // Chat modal — move to bottom-right
+          el.style.setProperty("right", "16px", "important");
+          el.style.setProperty("left", "auto", "important");
         }
       });
     };

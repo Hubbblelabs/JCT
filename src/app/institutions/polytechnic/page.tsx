@@ -30,12 +30,12 @@ export default function PolytechnicPage() {
       <Navbar />
       <Hero />
       <DiplomaPrograms />
-      <AboutPolytechnic />
+      <Admissions />
+      {/* <AboutPolytechnic /> */}
       {/* <Distinction /> */}
       <Placements />
       <NewsEvents />
       <Testimonials />
-      <Admissions />
       <Footer />
     </main>
   );

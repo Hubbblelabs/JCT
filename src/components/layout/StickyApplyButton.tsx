@@ -12,7 +12,7 @@ export function StickyApplyButton() {
 
   let themeClasses = "bg-gold text-navy hover:bg-[#e8b84a]";
   if (institution === "arts-science") {
-    themeClasses = "bg-orange-500 text-white hover:bg-orange-600";
+    themeClasses = "bg-arts-science-accent text-white hover:bg-arts-science-accent-dark";
   } else if (institution === "polytechnic") {
     themeClasses = "bg-slate-500 text-white hover:bg-slate-600";
   }
@@ -43,7 +43,7 @@ export function StickyApplyButton() {
           exit={{ opacity: 0, y: 20, scale: 0.9 }}
           transition={{ duration: 0.3 }}
           data-own-fixed
-          className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 md:right-24 md:bottom-6 md:left-auto md:translate-x-0"
+          className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 md:bottom-6 md:left-24 md:translate-x-0"
         >
           <Link
             href="https://admissions.jct.ac.in"

@@ -55,7 +55,7 @@ export function Hero() {
       </div>
 
       <div className="pointer-events-none absolute inset-0 z-0 mask-[radial-gradient(ellipse_at_center,black_60%,transparent_100%)]">
-        <div className="absolute inset-0 bg-orange-300 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px] opacity-14 mix-blend-soft-light" />
+        <div className="absolute inset-0 bg-arts-science-accent/20 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px] opacity-14 mix-blend-soft-light" />
 
         {/* Spotlight dots layer tracking the mouse */}
         <div
@@ -97,7 +97,7 @@ export function Hero() {
           >
             Good Education
             <br />
-            <span className="font-extrabold text-[#ff8a1f]">for </span>A Better
+            <span className="font-extrabold text-arts-science-accent">for </span>A Better
             Future
           </motion.h1>
 
@@ -138,7 +138,7 @@ export function Hero() {
                 href="https://admissions.jct.ac.in/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#f07b1a] px-5 font-sans text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#e06b0a] hover:shadow-xl active:translate-y-0 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
+                className="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-arts-science-accent px-5 font-sans text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-arts-science-accent-dark hover:shadow-xl active:translate-y-0 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
               >
                 Apply Now
                 <ArrowRight
@@ -180,7 +180,7 @@ export function Hero() {
               >
                 <span
                   className={`text-2xl font-extrabold tracking-tight drop-shadow-[0_8px_18px_rgba(2,10,24,0.5)] sm:text-3xl md:text-4xl ${
-                    stat.accent ? "text-[#ff8a1f]" : "text-white"
+                    stat.accent ? "text-arts-science-accent" : "text-white"
                   }`}
                 >
                   <AnimatedNumber value={stat.value} />
@@ -205,7 +205,7 @@ export function Hero() {
           <div className="grid grid-cols-1 gap-6 divide-y divide-white/10 sm:gap-8 md:grid-cols-3 md:gap-4 md:divide-x md:divide-y-0">
             <div className="flex flex-col items-center px-3 py-4 text-center sm:px-4 md:px-6 md:py-0 lg:px-8">
               <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3">
-                <Award size={18} className="text-[#f07b1a] sm:h-5 sm:w-5" />
+                <Award size={18} className="text-arts-science-accent sm:h-5 sm:w-5" />
                 <h3 className="font-sans text-base font-bold tracking-tight text-white sm:text-lg md:text-xl">
                   Quality
                 </h3>
@@ -218,7 +218,7 @@ export function Hero() {
 
             <div className="flex flex-col items-center px-3 py-4 text-center sm:px-4 md:px-6 md:py-0 lg:px-8">
               <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3">
-                <Users size={18} className="text-[#f07b1a] sm:h-5 sm:w-5" />
+                <Users size={18} className="text-arts-science-accent sm:h-5 sm:w-5" />
                 <h3 className="font-sans text-base font-bold tracking-tight text-white sm:text-lg md:text-xl">
                   Leadership
                 </h3>
@@ -231,7 +231,7 @@ export function Hero() {
 
             <div className="flex flex-col items-center px-3 py-4 text-center sm:px-4 md:px-6 md:py-0 lg:px-8">
               <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3">
-                <BookOpen size={18} className="text-[#f07b1a] sm:h-5 sm:w-5" />
+                <BookOpen size={18} className="text-arts-science-accent sm:h-5 sm:w-5" />
                 <h3 className="font-sans text-base font-bold tracking-tight text-white sm:text-lg md:text-xl">
                   Experience
                 </h3>

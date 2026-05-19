@@ -22,7 +22,8 @@
   --color-arts-science-light: #374151;
   --color-arts-science-muted: #f9fafb;
   --color-arts-science-dark: #000000;
-  --color-arts-science-accent: #f97316;
+  --color-arts-science-accent: #780e42;
+  --color-arts-science-accent-dark: #5a0930;
 
   /* ─── Institution: Polytechnic ─── */
   --color-polytechnic: #3a4354;
@@ -67,6 +68,7 @@
   --color-arts-science-muted: var(--color-arts-science-muted);
   --color-arts-science-dark: var(--color-arts-science-dark);
   --color-arts-science-accent: var(--color-arts-science-accent);
+  --color-arts-science-accent-dark: var(--color-arts-science-accent-dark);
   --color-polytechnic: var(--color-polytechnic);
   --color-polytechnic-light: var(--color-polytechnic-light);
   --color-polytechnic-muted: var(--color-polytechnic-muted);

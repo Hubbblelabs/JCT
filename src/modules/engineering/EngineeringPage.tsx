@@ -6,6 +6,7 @@ import { CollegeTestimonials } from "@/components/layout/CollegeTestimonials";
 import { EngineeringHero } from "./EngineeringHero";
 import { EngineeringDomains } from "./EngineeringDomains";
 import { EngineeringMetrics } from "./EngineeringMetrics";
+import { Admissions } from "./Admissions";
 import { EngineeringResearch } from "./EngineeringResearch";
 import { CampusLife } from "./CampusLife";
 import { testimonials } from "@/data/engineering";
@@ -20,7 +21,8 @@ export default function EngineeringPage() {
       <EngineeringHero />
       <EngineeringDomains />
       <EngineeringMetrics />
-      <EngineeringResearch />
+      <Admissions />
+      {/* <EngineeringResearch /> */}
 
       <Placements />
       <div id="campus-life">
