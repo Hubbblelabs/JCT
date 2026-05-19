@@ -419,28 +419,73 @@ export default function PolytechnicAboutPage() {
                 technical backgrounds and industry experience, guiding each
                 diploma program with a focus on practical excellence.
               </p>
-              <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[
-                  { dept: "Computer Technology", abbr: "CT" },
-                  { dept: "Mechanical Engineering", abbr: "MECH" },
-                  { dept: "Civil Engineering", abbr: "CIVIL" },
-                  { dept: "Electrical & Electronics Engineering", abbr: "EEE" },
-                  { dept: "Agricultural Engineering", abbr: "AGRI" },
-                  { dept: "Petrochemical Engineering", abbr: "PCE" },
+                  {
+                    name: "Prof. T. Hariharan",
+                    designation: "Assistant Professor & Head",
+                    dept: "Computer Technology",
+                    abbr: "CT",
+                    avatar: "/avatars/male_avatar.png",
+                  },
+                  {
+                    name: "Prof. A. Balaji",
+                    designation: "Assistant Professor & Head",
+                    dept: "Mechanical Engineering",
+                    abbr: "MECH",
+                    avatar: "/avatars/male_avatar.png",
+                  },
+                  {
+                    name: "Prof. G. Selvi",
+                    designation: "Assistant Professor & Head",
+                    dept: "Civil Engineering",
+                    abbr: "CIVIL",
+                    avatar: "/avatars/female_avatar.png",
+                  },
+                  {
+                    name: "Prof. M. Chandran",
+                    designation: "Assistant Professor & Head",
+                    dept: "Electrical & Electronics Eng.",
+                    abbr: "EEE",
+                    avatar: "/avatars/male_avatar.png",
+                  },
+                  {
+                    name: "Prof. R. Deepa",
+                    designation: "Assistant Professor & Head",
+                    dept: "Agricultural Engineering",
+                    abbr: "AGRI",
+                    avatar: "/avatars/female_avatar.png",
+                  },
+                  {
+                    name: "Prof. K. Saravanan",
+                    designation: "Assistant Professor & Head",
+                    dept: "Petrochemical Engineering",
+                    abbr: "PCE",
+                    avatar: "/avatars/male_avatar.png",
+                  },
                 ].map((d) => (
                   <div
                     key={d.abbr}
-                    className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4"
+                    className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition-all hover:bg-white/10"
                   >
-                    <div className="bg-polytechnic/20 text-polytechnic flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold">
-                      {d.abbr}
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/10">
+                      <Image
+                        src={d.avatar}
+                        alt={d.name}
+                        fill
+                        className="object-cover"
+                        sizes="56px"
+                      />
                     </div>
                     <div>
-                      <p className="text-foreground text-xs leading-snug font-semibold md:text-sm">
-                        {d.dept}
+                      <h4 className="text-foreground text-sm font-bold leading-tight">
+                        {d.name}
+                      </h4>
+                      <p className="text-[11px] font-medium text-polytechnic mt-0.5">
+                        {d.designation}
                       </p>
-                      <p className="text-muted-foreground mt-0.5 text-[11px]">
-                        Head of Department
+                      <p className="text-muted-foreground mt-1 text-[11px] font-medium leading-tight">
+                        {d.dept}
                       </p>
                     </div>
                   </div>

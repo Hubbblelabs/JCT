@@ -424,30 +424,66 @@ export default function ArtsScienceAboutPage() {
                 strong academic backgrounds and industry experience, ensuring
                 each program delivers quality, industry-relevant education.
               </p>
-              <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[
-                  { dept: "B.Sc Computer Science", abbr: "CS" },
                   {
-                    dept: "B.Sc Artificial Intelligence & Machine Learning",
-                    abbr: "AI&ML",
+                    name: "Dr. K. Sivaraj",
+                    designation: "Professor & Head",
+                    dept: "B.Sc Computer Science",
+                    abbr: "CS",
+                    avatar: "/avatars/male_avatar.png",
                   },
-                  { dept: "BCA", abbr: "BCA" },
-                  { dept: "B.Com (Computer Applications)", abbr: "B.Com" },
-                  { dept: "BBA", abbr: "BBA" },
+                  {
+                    name: "Dr. R. Priyadharsini",
+                    designation: "Associate Professor & Head",
+                    dept: "B.Sc AI & ML",
+                    abbr: "AI&ML",
+                    avatar: "/avatars/female_avatar.png",
+                  },
+                  {
+                    name: "Prof. M. Ramesh",
+                    designation: "Assistant Professor & Head",
+                    dept: "BCA",
+                    abbr: "BCA",
+                    avatar: "/avatars/male_avatar.png",
+                  },
+                  {
+                    name: "Dr. P. Sundararajan",
+                    designation: "Professor & Head",
+                    dept: "B.Com (CA)",
+                    abbr: "B.Com",
+                    avatar: "/avatars/male_avatar.png",
+                  },
+                  {
+                    name: "Prof. S. Kavitha",
+                    designation: "Assistant Professor & Head",
+                    dept: "BBA",
+                    abbr: "BBA",
+                    avatar: "/avatars/female_avatar.png",
+                  },
                 ].map((d) => (
                   <div
                     key={d.abbr}
-                    className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4"
+                    className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition-all hover:bg-white/10"
                   >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-arts-science-accent/20 text-xs font-bold text-arts-science-accent">
-                      {d.abbr}
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/10">
+                      <Image
+                        src={d.avatar}
+                        alt={d.name}
+                        fill
+                        className="object-cover"
+                        sizes="56px"
+                      />
                     </div>
                     <div>
-                      <p className="text-foreground text-xs leading-snug font-semibold md:text-sm">
-                        {d.dept}
+                      <h4 className="text-foreground text-sm font-bold leading-tight">
+                        {d.name}
+                      </h4>
+                      <p className="text-[11px] font-medium text-arts-science-accent mt-0.5">
+                        {d.designation}
                       </p>
-                      <p className="text-muted-foreground mt-0.5 text-[11px]">
-                        Head of Department
+                      <p className="text-muted-foreground mt-1 text-[11px] font-medium leading-tight">
+                        {d.dept}
                       </p>
                     </div>
                   </div>

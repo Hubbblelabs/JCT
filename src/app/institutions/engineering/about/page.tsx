@@ -459,39 +459,108 @@ export default function EngineeringAboutPage() {
                 experience, ensuring each department delivers world-class
                 technical education.
               </p>
-              <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[
-                  { dept: "Computer Science & Engineering", abbr: "CSE" },
                   {
-                    dept: "Electronics & Communication Engineering",
+                    name: "Dr. G. Rajiv",
+                    designation: "Professor & Head",
+                    dept: "Computer Science & Engineering",
+                    abbr: "CSE",
+                    avatar: "/avatars/male_avatar.png",
+                  },
+                  {
+                    name: "Dr. S. Kavitha",
+                    designation: "Associate Professor & Head",
+                    dept: "Electronics & Communication Eng.",
                     abbr: "ECE",
+                    avatar: "/avatars/female_avatar.png",
                   },
-                  { dept: "Electrical & Electronics Engineering", abbr: "EEE" },
-                  { dept: "Mechanical Engineering", abbr: "MECH" },
-                  { dept: "Civil Engineering", abbr: "CE" },
                   {
-                    dept: "Bio-Technology & Bio-Chemical Engineering",
-                    abbr: "BT",
+                    name: "Dr. P. Mohan",
+                    designation: "Professor & Head",
+                    dept: "Electrical & Electronics Eng.",
+                    abbr: "EEE",
+                    avatar: "/avatars/male_avatar.png",
                   },
-                  { dept: "Food Technology", abbr: "FT" },
-                  { dept: "Petroleum Engineering", abbr: "PE" },
-                  { dept: "Petrochemical Technology", abbr: "PCT" },
-                  { dept: "AI & Data Science", abbr: "AI&DS" },
-                  { dept: "CS & Business Systems", abbr: "CSBS" },
+                  {
+                    name: "Dr. K. Venkat",
+                    designation: "Professor & Head",
+                    dept: "Mechanical Engineering",
+                    abbr: "MECH",
+                    avatar: "/avatars/male_avatar.png",
+                  },
+                  {
+                    name: "Dr. M. Suresh",
+                    designation: "Professor & Head",
+                    dept: "Civil Engineering",
+                    abbr: "CE",
+                    avatar: "/avatars/male_avatar.png",
+                  },
+                  {
+                    name: "Dr. R. Anitha",
+                    designation: "Associate Professor & Head",
+                    dept: "Bio-Tech & Bio-Chemical Eng.",
+                    abbr: "BT",
+                    avatar: "/avatars/female_avatar.png",
+                  },
+                  {
+                    name: "Dr. S. Praveen",
+                    designation: "Assistant Professor & Head",
+                    dept: "Food Technology",
+                    abbr: "FT",
+                    avatar: "/avatars/male_avatar.png",
+                  },
+                  {
+                    name: "Dr. L. Albert",
+                    designation: "Professor & Head",
+                    dept: "Petroleum Engineering",
+                    abbr: "PE",
+                    avatar: "/avatars/male_avatar.png",
+                  },
+                  {
+                    name: "Dr. J. Jerome",
+                    designation: "Professor & Head",
+                    dept: "Petrochemical Technology",
+                    abbr: "PCT",
+                    avatar: "/avatars/male_avatar.png",
+                  },
+                  {
+                    name: "Dr. T. Sandhya",
+                    designation: "Associate Professor & Head",
+                    dept: "AI & Data Science",
+                    abbr: "AI&DS",
+                    avatar: "/avatars/female_avatar.png",
+                  },
+                  {
+                    name: "Dr. V. Rajesh",
+                    designation: "Associate Professor & Head",
+                    dept: "CS & Business Systems",
+                    abbr: "CSBS",
+                    avatar: "/avatars/male_avatar.png",
+                  },
                 ].map((d) => (
                   <div
                     key={d.abbr}
-                    className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4"
+                    className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition-all hover:bg-white/10"
                   >
-                    <div className="bg-gold/20 text-gold flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-bold">
-                      {d.abbr}
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/10">
+                      <Image
+                        src={d.avatar}
+                        alt={d.name}
+                        fill
+                        className="object-cover"
+                        sizes="56px"
+                      />
                     </div>
                     <div>
-                      <p className="text-foreground text-xs leading-snug font-semibold md:text-sm">
-                        {d.dept}
+                      <h4 className="text-foreground text-sm font-bold leading-tight">
+                        {d.name}
+                      </h4>
+                      <p className="text-[11px] font-medium text-gold mt-0.5">
+                        {d.designation}
                       </p>
-                      <p className="text-muted-foreground mt-0.5 text-[11px]">
-                        Head of Department
+                      <p className="text-muted-foreground mt-1 text-[11px] font-medium leading-tight">
+                        {d.dept}
                       </p>
                     </div>
                   </div>
