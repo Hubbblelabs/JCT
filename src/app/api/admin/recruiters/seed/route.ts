@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Recruiter } from "@/lib/models";
 import { requireRole, json, serverError } from "@/lib/api-helpers";
+import { revalidateTargets } from "@/lib/revalidate";
 
 const COMPANIES = [
   { name: "Abiba", logo: "/company-logos/abiba.webp" },
@@ -64,6 +65,7 @@ export async function POST(req: NextRequest) {
       seeded++;
     }
 
+    revalidateTargets("home");
     return json({ message: `Seeded ${seeded} recruiters` });
   } catch (e) {
     console.error(e);

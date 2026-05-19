@@ -57,6 +57,7 @@ export async function PATCH(
       { new: true },
     );
     if (!doc) return notFound();
+    await logAudit("image", "updated", session!.user?.email ?? "", `Updated image metadata ${doc.filename}`);
     return json(doc);
   } catch (e) {
     console.error(e);

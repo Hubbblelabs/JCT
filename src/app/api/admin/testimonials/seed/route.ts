@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Testimonial } from "@/lib/models";
 import { requireRole, json, serverError } from "@/lib/api-helpers";
+import { revalidateTargets } from "@/lib/revalidate";
 
 const TESTIMONIALS = [
   {
@@ -84,6 +85,7 @@ export async function POST(req: NextRequest) {
       seeded++;
     }
 
+    revalidateTargets("home", "all-institutions");
     return json({ message: `Seeded ${seeded} testimonials` });
   } catch (e) {
     console.error(e);

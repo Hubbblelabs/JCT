@@ -4,6 +4,7 @@ import { Recruiter } from "@/lib/models";
 import { requireRole, json, notFound, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { RecruiterUpdateSchema } from "@/lib/validation";
+import { revalidateTargets } from "@/lib/revalidate";
 
 export async function GET(
   req: NextRequest,
@@ -45,6 +46,7 @@ export async function PATCH(
     );
     if (!doc) return notFound();
 
+    revalidateTargets("home");
     await logAudit("recruiter", "updated", session!.user?.email ?? "", `Updated recruiter ${doc.name}`);
     return json(doc);
   } catch (e) {
@@ -66,6 +68,7 @@ export async function DELETE(
     const doc = await Recruiter.findByIdAndDelete(id);
     if (!doc) return notFound();
 
+    revalidateTargets("home");
     await logAudit("recruiter", "deleted", session!.user?.email ?? "", `Deleted recruiter ${doc.name}`);
     return json({ message: "Deleted" });
   } catch (e) {

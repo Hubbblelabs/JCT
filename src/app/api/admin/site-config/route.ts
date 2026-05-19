@@ -4,6 +4,7 @@ import { SiteConfig } from "@/lib/models";
 import { requireRole, json, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { SiteConfigPutSchema } from "@/lib/validation";
+import { revalidateForConfigKey } from "@/lib/revalidate";
 
 export async function GET(req: NextRequest) {
   const { error } = await requireRole(req, "viewer");
@@ -36,6 +37,7 @@ export async function PUT(req: NextRequest) {
       { upsert: true, new: true },
     );
 
+    revalidateForConfigKey(config_key);
     await logAudit("site-config", "updated", session!.user?.email ?? "", `Updated config: ${config_key}`);
     return json(doc);
   } catch (e) {

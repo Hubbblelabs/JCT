@@ -4,6 +4,13 @@ import { Testimonial } from "@/lib/models";
 import { requireRole, json, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { TestimonialCreateSchema } from "@/lib/validation";
+import { revalidateTargets, type RevalidateTarget } from "@/lib/revalidate";
+
+function targetsForInstitution(inst?: string): RevalidateTarget[] {
+  const targets: RevalidateTarget[] = ["home"];
+  if (inst === "engineering" || inst === "arts-science" || inst === "polytechnic") targets.push(inst);
+  return targets;
+}
 
 export async function GET(req: NextRequest) {
   const { error } = await requireRole(req, "viewer");
@@ -35,6 +42,7 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const doc = await Testimonial.create({ ...body, updated_by: session!.user?.email });
+    revalidateTargets(...targetsForInstitution(body.institution));
     await logAudit("testimonial", "created", session!.user?.email ?? "", `Created testimonial for ${body.name}`);
     return json(doc, 201);
   } catch (e) {

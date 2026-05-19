@@ -4,6 +4,7 @@ import { Department } from "@/lib/models";
 import { requireRole, json, notFound, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { DepartmentUpdateSchema } from "@/lib/validation";
+import { revalidatePaths } from "@/lib/revalidate";
 
 export async function GET(
   req: NextRequest,
@@ -76,6 +77,11 @@ export async function DELETE(
     );
     if (!doc) return notFound("Department not found");
 
+    revalidatePaths(
+      `/institutions/${doc.college}`,
+      `/institutions/${doc.college}/departments`,
+      `/institutions/${doc.college}/departments/${doc.slug}`,
+    );
     await logAudit("department", "archived", session!.user?.email ?? "", `Archived department ${doc.slug}`);
     return json({ message: "Archived" });
   } catch (e) {

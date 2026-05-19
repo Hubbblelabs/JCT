@@ -107,6 +107,28 @@ export {
 export type { CategoryRule, ImageUploadFields } from "./imageAsset";
 
 export {
+  ContactSchema,
+  SocialSchema,
+  AddressSchema,
+  StatsSchema,
+  AccreditationsSchema,
+  HeroStatsListSchema,
+  CONTACT_LIMITS,
+  ADDRESS_LIMITS,
+  STATS_LIMITS,
+  ACCREDITATIONS_LIMITS,
+  HERO_STATS_LIMITS,
+} from "./siteInfo";
+export type {
+  ContactValue,
+  SocialValue,
+  AddressValue,
+  StatsValue,
+  AccreditationsValue,
+  HeroStatsListValue,
+} from "./siteInfo";
+
+export {
   SITE_CONFIG_SCHEMAS,
   SiteConfigPutSchema,
   isKnownSiteConfigKey,

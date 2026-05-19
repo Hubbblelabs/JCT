@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Program } from "@/lib/models";
 import { requireRole, json, serverError } from "@/lib/api-helpers";
+import { revalidateTargets } from "@/lib/revalidate";
 
 export async function POST(req: NextRequest) {
   const { error } = await requireRole(req, "super_admin");
@@ -82,6 +83,7 @@ export async function POST(req: NextRequest) {
       seeded++;
     }
 
+    revalidateTargets("all-institutions");
     return json({ message: `Seeded ${seeded} programs` });
   } catch (e) {
     console.error(e);

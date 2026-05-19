@@ -4,6 +4,7 @@ import { SiteConfig } from "@/lib/models";
 import { requireRole, json, serverError } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { homeHeroContent } from "@/data/home";
+import { revalidateForConfigKey } from "@/lib/revalidate";
 
 const SEEDS: { config_key: string; value: Record<string, unknown> }[] = [
   {
@@ -52,6 +53,7 @@ export async function POST(req: NextRequest) {
         },
         { upsert: true, new: true },
       );
+      revalidateForConfigKey(seed.config_key);
     }
 
     await logAudit(

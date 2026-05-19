@@ -4,6 +4,12 @@ import { Program } from "@/lib/models";
 import { requireRole, json, notFound, serverError, validateBody } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { ProgramUpdateSchema } from "@/lib/validation";
+import { revalidateTargets, type RevalidateTarget } from "@/lib/revalidate";
+
+function institutionTarget(inst: string): RevalidateTarget | null {
+  if (inst === "engineering" || inst === "arts-science" || inst === "polytechnic") return inst;
+  return null;
+}
 
 export async function GET(
   req: NextRequest,
@@ -45,6 +51,8 @@ export async function PATCH(
     );
     if (!doc) return notFound();
 
+    const target = institutionTarget(doc.institution);
+    if (target) revalidateTargets(target);
     await logAudit("program", "updated", session!.user?.email ?? "", `Updated program ${doc.name}`);
     return json(doc);
   } catch (e) {
@@ -66,6 +74,8 @@ export async function DELETE(
     const doc = await Program.findByIdAndUpdate(id, { is_active: false }, { new: true });
     if (!doc) return notFound();
 
+    const target = institutionTarget(doc.institution);
+    if (target) revalidateTargets(target);
     await logAudit("program", "deactivated", session!.user?.email ?? "", `Deactivated program ${doc.name}`);
     return json({ message: "Deactivated" });
   } catch (e) {

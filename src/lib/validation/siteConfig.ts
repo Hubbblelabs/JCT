@@ -17,10 +17,23 @@ import {
   FacilitiesSchema,
   ResearchHighlightsSchema,
 } from "./engineeringSections";
+import {
+  ContactSchema,
+  SocialSchema,
+  AddressSchema,
+  StatsSchema,
+  AccreditationsSchema,
+  HeroStatsListSchema,
+} from "./siteInfo";
 
 // Every site-config key the admin UI writes must have an entry below.
 // Keys in this map are validated strictly; unknown keys are rejected.
 export const SITE_CONFIG_SCHEMAS = {
+  contact: ContactSchema,
+  social: SocialSchema,
+  address: AddressSchema,
+  stats: StatsSchema,
+  accreditations: AccreditationsSchema,
   home: HomeHeroSchema,
   homeStats: HomeStatsSchema,
   homeProspectus: HomeProspectusSchema,
@@ -32,6 +45,7 @@ export const SITE_CONFIG_SCHEMAS = {
   engineeringFacilities: FacilitiesSchema,
   engineeringResearchHighlights: ResearchHighlightsSchema,
   artsScienceHero: ArtsScienceHeroSchema,
+  artsScienceHeroStats: HeroStatsListSchema,
   artsScienceCampusLife: CampusLifeCarouselSchema,
   polytechnicHero: PolytechnicHeroSchema,
   polytechnicCampusLife: CampusLifeCarouselSchema,

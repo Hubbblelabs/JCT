@@ -25,10 +25,10 @@ export async function POST(req: NextRequest) {
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
     const storageKey = `documents/all/${Date.now()}-${safeName}`;
 
-    await uploadToR2(storageKey, buffer, "application/pdf");
+    const publicUrl = await uploadToR2(storageKey, buffer, "application/pdf");
     await logAudit("document", "uploaded", session!.user?.email ?? "", `Uploaded ${safeName}`);
 
-    return json({ url: storageKey, filename: safeName }, 201);
+    return json({ url: publicUrl, storage_key: storageKey, filename: safeName, size: file.size, mime_type: file.type }, 201);
   } catch (e) {
     console.error(e);
     return serverError();
