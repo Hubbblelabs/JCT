@@ -30,7 +30,17 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const [showBanner, setShowBanner] = useState(true);
-  const bannerVisible = isEngineeringPage && showBanner;
+  const [announcementConfig, setAnnouncementConfig] = useState<{
+    enabled?: boolean;
+    text?: string;
+    ctaLabel?: string;
+    ctaHref?: string;
+  } | null>(null);
+  const bannerVisible =
+    isEngineeringPage &&
+    showBanner &&
+    !!announcementConfig?.enabled &&
+    !!announcementConfig?.text;
 
   const [desktopExpanded, setDesktopExpanded] = useState<string | null>(null);
   const [dropdownSolidOverride, setDropdownSolidOverride] = useState(false);
@@ -65,6 +75,22 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
       document.body.style.overflow = "unset";
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isEngineeringPage) return;
+    let cancelled = false;
+    fetch("/api/public/site-config?key=engineeringAnnouncement")
+      .then((r) => r.json())
+      .then((res) => {
+        if (!cancelled && res?.source === "db" && res.data) {
+          setAnnouncementConfig(res.data);
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [isEngineeringPage]);
 
   useEffect(() => {
     if (!scrolled && !forceSolidOnTop) {
@@ -177,19 +203,18 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
       {bannerVisible && (
         <div className="bg-gold text-navy fixed top-0 right-0 left-0 z-60 px-3 py-2 text-center font-sans text-[11px] font-bold tracking-wide sm:px-4 sm:text-xs">
           <div className="flex items-center justify-center gap-2 overflow-hidden whitespace-nowrap">
-            <span className="truncate">
-              🎓 Admissions Open 2026-27 | Counselling Code:{" "}
-              {siteConfig.counsellingCode}
-            </span>
+            <span className="truncate">{announcementConfig?.text}</span>
 
-            <Link
-              href="https://admissions.jct.ac.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden shrink-0 underline underline-offset-2 hover:no-underline sm:inline"
-            >
-              Apply Now
-            </Link>
+            {announcementConfig?.ctaLabel && announcementConfig?.ctaHref && (
+              <Link
+                href={announcementConfig.ctaHref}
+                target={announcementConfig.ctaHref.startsWith("http") ? "_blank" : undefined}
+                rel={announcementConfig.ctaHref.startsWith("http") ? "noopener noreferrer" : undefined}
+                className="hidden shrink-0 underline underline-offset-2 hover:no-underline sm:inline"
+              >
+                {announcementConfig.ctaLabel}
+              </Link>
+            )}
 
             <button
               onClick={() => setShowBanner(false)}

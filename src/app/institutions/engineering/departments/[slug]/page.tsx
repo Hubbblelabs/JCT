@@ -4,14 +4,8 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
-import { DepartmentPageLayout } from "@/components/layout/DepartmentPageLayout";
 import { TabsDepartmentLayout } from "@/components/layout/TabsDepartmentLayout";
 import { normalizeTabsContent } from "@/lib/department-tabs";
-import { engineeringDepartments } from "@/data/engineering-departments";
-import {
-  pgCourses as fallbackPg,
-  researchCourses as fallbackResearch,
-} from "@/data/engineering";
 import { siteConfig } from "@/data/site";
 import { connectDB } from "@/lib/mongodb";
 import { Program, Department } from "@/lib/models";
@@ -25,17 +19,6 @@ type ProgramSlim = {
   degree?: string;
 };
 
-const FALLBACK_NON_UG: ProgramSlim[] = [
-  ...fallbackPg,
-  ...fallbackResearch,
-].map((c) => ({
-  name: c.name,
-  abbr: c.abbr,
-  slug: c.slug,
-  image: c.image,
-  highlight: c.highlight,
-}));
-
 async function getAllEngineeringPrograms(): Promise<ProgramSlim[]> {
   try {
     await connectDB();
@@ -46,8 +29,6 @@ async function getAllEngineeringPrograms(): Promise<ProgramSlim[]> {
       .select("name abbr slug image highlight degree")
       .sort({ sort_order: 1, name: 1 });
 
-    if (programs.length === 0) return FALLBACK_NON_UG;
-
     return programs.map((p) => ({
       name: p.name,
       abbr: p.abbr,
@@ -57,22 +38,15 @@ async function getAllEngineeringPrograms(): Promise<ProgramSlim[]> {
       degree: p.degree,
     }));
   } catch {
-    return FALLBACK_NON_UG;
+    return [];
   }
 }
 
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
-  const legacy = engineeringDepartments.map((dept) => ({ slug: dept.slug }));
   const programs = await getAllEngineeringPrograms();
-  const programSlugs = programs.map((p) => ({ slug: p.slug }));
-  const seen = new Set<string>();
-  return [...legacy, ...programSlugs].filter((p) => {
-    if (seen.has(p.slug)) return false;
-    seen.add(p.slug);
-    return true;
-  });
+  return programs.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({
@@ -81,23 +55,6 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const dept = engineeringDepartments.find((item) => item.slug === slug);
-
-  if (dept) {
-    return {
-      title: `${dept.name} | JCT College of Engineering & Technology`,
-      description: dept.about.paragraphs[0],
-      alternates: {
-        canonical: `${siteConfig.url}/institutions/engineering/departments/${dept.slug}`,
-      },
-      openGraph: {
-        title: `${dept.name} | JCT College of Engineering & Technology`,
-        description: dept.about.paragraphs[0],
-        type: "website",
-      },
-    };
-  }
-
   const programs = await getAllEngineeringPrograms();
   const course = programs.find((c) => c.slug === slug);
   if (!course) return {};
@@ -241,17 +198,6 @@ export default async function EngineeringDepartmentPage({
     return (
       <TabsDepartmentLayout
         dept={tabsDept}
-        backHref="/institutions/engineering"
-        backLabel="Back to Engineering"
-      />
-    );
-  }
-
-  const dept = engineeringDepartments.find((item) => item.slug === slug);
-  if (dept) {
-    return (
-      <DepartmentPageLayout
-        dept={dept}
         backHref="/institutions/engineering"
         backLabel="Back to Engineering"
       />

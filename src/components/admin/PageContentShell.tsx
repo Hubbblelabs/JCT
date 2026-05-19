@@ -164,33 +164,6 @@ export function PageContentShell({ pageTitle, pageSubtitle, sections }: Props) {
       )}
 
       <div className="flex gap-4">
-        <div className="w-60 shrink-0">
-          <div className="admin-card p-2">
-            {sections.map((s) => (
-              <button
-                key={s.id}
-                onClick={() => {
-                  setSelected(s.id);
-                  setMsg(null);
-                  setApiError(null);
-                }}
-                className={`w-full rounded-lg px-3 py-2 text-left text-sm transition-colors ${
-                  selected === s.id
-                    ? "bg-[#0a1628] text-white font-semibold"
-                    : "text-gray-700 hover:bg-gray-50"
-                }`}
-              >
-                <span className="inline-flex items-center gap-2">
-                  {s.label}
-                  {s.kind === "link" && (
-                    <ExternalLink size={12} className="opacity-60" />
-                  )}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-
         <div className="flex-1 min-w-0">
           <div className="admin-card">
             {loading && (

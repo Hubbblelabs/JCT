@@ -1,7 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Placements } from "@/components/layout/Placements";
 import { Footer } from "@/components/layout/Footer";
-import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
 
 import { EngineeringHero } from "./EngineeringHero";
 import { EngineeringDomains } from "./EngineeringDomains";
@@ -16,7 +15,6 @@ export default function EngineeringPage() {
       id="top"
       className="bg-background text-foreground engineering-theme min-h-screen overflow-x-hidden"
     >
-      <AnnouncementBar configKey="engineeringAnnouncement" />
       <Navbar />
       <EngineeringHero />
       <EngineeringDomains />
