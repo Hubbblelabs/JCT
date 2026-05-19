@@ -257,7 +257,7 @@ export default function ArtsScienceAboutPage() {
               <SectionHeading icon={Target} title="Vision & Mission" />
 
               <div className="mb-4 flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/15 text-orange-500">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-arts-science-accent/15 text-arts-science-accent">
                   <Target size={20} />
                 </div>
                 <div>
@@ -274,7 +274,7 @@ export default function ArtsScienceAboutPage() {
               </div>
 
               <div className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/15 text-orange-500">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-arts-science-accent/15 text-arts-science-accent">
                   <Lightbulb size={20} />
                 </div>
                 <div>
@@ -289,7 +289,7 @@ export default function ArtsScienceAboutPage() {
                       >
                         <CheckCircle
                           size={15}
-                          className="mt-0.5 shrink-0 text-orange-500"
+                          className="mt-0.5 shrink-0 text-arts-science-accent"
                         />
                         <span>{point}</span>
                       </li>
@@ -336,7 +336,7 @@ export default function ArtsScienceAboutPage() {
                   </div>
 
                   <div className="flex-1 space-y-4">
-                    <blockquote className="text-foreground/90 border-l-4 border-orange-400/50 pl-5 text-base leading-relaxed italic md:text-lg">
+                    <blockquote className="text-foreground/90 border-l-4 border-arts-science-accent/50 pl-5 text-base leading-relaxed italic md:text-lg">
                       &quot;Education is the most powerful weapon which you can
                       use to change the world. At JCTCAS, we continuously update
                       our practices to match dynamic societal changes and
@@ -424,30 +424,66 @@ export default function ArtsScienceAboutPage() {
                 strong academic backgrounds and industry experience, ensuring
                 each program delivers quality, industry-relevant education.
               </p>
-              <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[
-                  { dept: "B.Sc Computer Science", abbr: "CS" },
                   {
-                    dept: "B.Sc Artificial Intelligence & Machine Learning",
-                    abbr: "AI&ML",
+                    name: "Dr. K. Sivaraj",
+                    designation: "Professor & Head",
+                    dept: "B.Sc Computer Science",
+                    abbr: "CS",
+                    avatar: "/avatars/male_avatar.png",
                   },
-                  { dept: "BCA", abbr: "BCA" },
-                  { dept: "B.Com (Computer Applications)", abbr: "B.Com" },
-                  { dept: "BBA", abbr: "BBA" },
+                  {
+                    name: "Dr. R. Priyadharsini",
+                    designation: "Associate Professor & Head",
+                    dept: "B.Sc AI & ML",
+                    abbr: "AI&ML",
+                    avatar: "/avatars/female_avatar.png",
+                  },
+                  {
+                    name: "Prof. M. Ramesh",
+                    designation: "Assistant Professor & Head",
+                    dept: "BCA",
+                    abbr: "BCA",
+                    avatar: "/avatars/male_avatar.png",
+                  },
+                  {
+                    name: "Dr. P. Sundararajan",
+                    designation: "Professor & Head",
+                    dept: "B.Com (CA)",
+                    abbr: "B.Com",
+                    avatar: "/avatars/male_avatar.png",
+                  },
+                  {
+                    name: "Prof. S. Kavitha",
+                    designation: "Assistant Professor & Head",
+                    dept: "BBA",
+                    abbr: "BBA",
+                    avatar: "/avatars/female_avatar.png",
+                  },
                 ].map((d) => (
                   <div
                     key={d.abbr}
-                    className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4"
+                    className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition-all hover:bg-white/10"
                   >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-orange-500/20 text-xs font-bold text-orange-500">
-                      {d.abbr}
+                    <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/10">
+                      <Image
+                        src={d.avatar}
+                        alt={d.name}
+                        fill
+                        className="object-cover"
+                        sizes="56px"
+                      />
                     </div>
                     <div>
-                      <p className="text-foreground text-xs leading-snug font-semibold md:text-sm">
-                        {d.dept}
+                      <h4 className="text-foreground text-sm font-bold leading-tight">
+                        {d.name}
+                      </h4>
+                      <p className="text-[11px] font-medium text-arts-science-accent mt-0.5">
+                        {d.designation}
                       </p>
-                      <p className="text-muted-foreground mt-0.5 text-[11px]">
-                        Head of Department
+                      <p className="text-muted-foreground mt-1 text-[11px] font-medium leading-tight">
+                        {d.dept}
                       </p>
                     </div>
                   </div>
@@ -549,9 +585,9 @@ export default function ArtsScienceAboutPage() {
                 {coreValues.map((val) => (
                   <div
                     key={val.title}
-                    className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-5 transition-colors hover:border-orange-400/20 hover:bg-orange-500/5"
+                    className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-5 transition-colors hover:border-arts-science-accent/20 hover:bg-arts-science-accent/5"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/15 text-orange-500">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-arts-science-accent/15 text-arts-science-accent">
                       <val.icon size={18} />
                     </div>
                     <div>
@@ -621,7 +657,7 @@ export default function ArtsScienceAboutPage() {
                     key={i}
                     className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 md:p-5"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/20 text-orange-500">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-arts-science-accent/20 text-arts-science-accent">
                       <feature.icon size={18} />
                     </div>
                     <div>
@@ -669,7 +705,7 @@ export default function ArtsScienceAboutPage() {
                   >
                     <CheckCircle
                       size={13}
-                      className="shrink-0 text-orange-500"
+                      className="shrink-0 text-arts-science-accent"
                     />
                     {point}
                   </span>
@@ -696,7 +732,7 @@ function SectionHeading({
 }) {
   return (
     <h2 className="text-foreground mb-5 flex items-center gap-3 font-serif text-2xl font-bold md:text-3xl">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-500/20 text-orange-500">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-arts-science-accent/20 text-arts-science-accent">
         <Icon size={20} />
       </span>
       {title}

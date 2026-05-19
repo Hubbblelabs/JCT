@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, ArrowRight, LucideIcon } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getImageUrl } from "@/lib/utils";
 import { diplomaPrograms as fallbackDiplomaPrograms } from "@/data/polytechnic";
@@ -89,6 +89,7 @@ function CourseCard({ course }: { course: PolytechnicCourse }) {
 function CourseCarouselSection({ courses }: { courses: PolytechnicCourse[] }) {
   const carouselRef = useRef<HTMLDivElement>(null);
   const [showArrows, setShowArrows] = useState(false);
+  const autoScrollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const container = carouselRef.current;
@@ -106,21 +107,103 @@ function CourseCarouselSection({ courses }: { courses: PolytechnicCourse[] }) {
     return () => observer.disconnect();
   }, [courses.length]);
 
-  const scrollCarousel = (direction: "left" | "right") => {
+  const handleScroll = useCallback(() => {
+    const container = carouselRef.current;
+    if (!container || courses.length === 0) return;
+
+    const cards = container.querySelectorAll<HTMLElement>(
+      '[data-course-card="true"]',
+    );
+    const n = courses.length;
+    if (cards.length < 3 * n) return;
+
+    const singleSetWidth = cards[n].offsetLeft - cards[0].offsetLeft;
+    if (singleSetWidth <= 0) return;
+
+    const scrollLeft = container.scrollLeft;
+
+    if (scrollLeft < singleSetWidth - 4) {
+      container.scrollLeft = scrollLeft + singleSetWidth;
+    } else if (scrollLeft >= singleSetWidth * 2 - 4) {
+      container.scrollLeft = scrollLeft - singleSetWidth;
+    }
+  }, [courses.length]);
+
+  useEffect(() => {
+    const container = carouselRef.current;
+    if (!container || courses.length === 0) return;
+
+    const initializeScroll = () => {
+      const cards = container.querySelectorAll<HTMLElement>(
+        '[data-course-card="true"]',
+      );
+      const n = courses.length;
+      if (cards.length < 3 * n) return;
+
+      const singleSetWidth = cards[n].offsetLeft - cards[0].offsetLeft;
+      if (singleSetWidth > 0) {
+        container.scrollLeft = singleSetWidth;
+      }
+    };
+
+    const timer = setTimeout(initializeScroll, 100);
+
+    const observer = new ResizeObserver(initializeScroll);
+    observer.observe(container);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [courses.length]);
+
+  const scrollCarousel = useCallback((direction: "left" | "right") => {
     const container = carouselRef.current;
     if (!container) return;
 
-    const card = container.querySelector<HTMLElement>(
+    const cards = container.querySelectorAll<HTMLElement>(
       '[data-course-card="true"]',
     );
-    const cardWidth = card?.offsetWidth ?? 300;
-    const gap = 24;
+    if (cards.length === 0) return;
+
+    const cardWidth = cards[0].offsetWidth;
+    let step = cardWidth + 24;
+    if (cards.length > 1) {
+      step = cards[1].offsetLeft - cards[0].offsetLeft;
+    }
 
     container.scrollBy({
-      left: direction === "left" ? -(cardWidth + gap) : cardWidth + gap,
+      left: direction === "left" ? -step : step,
       behavior: "smooth",
     });
-  };
+  }, []);
+
+  useEffect(() => {
+    autoScrollRef.current = setInterval(() => {
+      scrollCarousel("right");
+    }, 1500);
+
+    const container = carouselRef.current;
+    const pause = () => {
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current);
+    };
+    const resume = () => {
+      autoScrollRef.current = setInterval(() => scrollCarousel("right"), 1500);
+    };
+
+    container?.addEventListener("mouseenter", pause);
+    container?.addEventListener("mouseleave", resume);
+    container?.addEventListener("touchstart", pause, { passive: true });
+    container?.addEventListener("touchend", resume);
+
+    return () => {
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current);
+      container?.removeEventListener("mouseenter", pause);
+      container?.removeEventListener("mouseleave", resume);
+      container?.removeEventListener("touchstart", pause);
+      container?.removeEventListener("touchend", resume);
+    };
+  }, [scrollCarousel]);
 
   return (
     <div className="relative z-10 w-full pb-8">
@@ -145,10 +228,14 @@ function CourseCarouselSection({ courses }: { courses: PolytechnicCourse[] }) {
         </div>
       )}
 
-      <DragScroll className="snap-container scrollbar-hide flex w-full items-stretch gap-4 overflow-x-auto px-4 pb-4 md:gap-6 md:px-0">
+      <DragScroll
+        ref={carouselRef}
+        onScroll={handleScroll}
+        className="snap-container scrollbar-hide flex w-full items-stretch gap-4 overflow-x-auto px-4 pb-4 md:gap-6 md:px-0"
+      >
         <div className="flex w-max items-stretch gap-4 md:gap-6">
-          {courses.map((course) => (
-            <CourseCard key={course.slug} course={course} />
+          {[...courses, ...courses, ...courses].map((course, index) => (
+            <CourseCard key={`${course.slug}-${index}`} course={course} />
           ))}
         </div>
       </DragScroll>

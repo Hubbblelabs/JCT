@@ -129,21 +129,21 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
     navigationLinks = engineeringNavigation;
     logoText = "JCT College of";
     logoSubText = "Engineering & Technology";
-    logoLink = "/institutions/engineering";
+    logoLink = "/";
   } else if (institution === "arts-science") {
     navigationLinks = artsNavigation;
     logoText = "JCT College of";
     logoSubText = "Arts and Science";
-    logoLink = "/institutions/arts-science";
-    highlightColor = "text-orange-500";
-    highlightBgColor = "bg-orange-500";
-    highlightHoverBgColor = "hover:bg-orange-600";
-    highlightShadowColor = "shadow-orange-500/10";
+    logoLink = "/";
+    highlightColor = "text-arts-science-accent";
+    highlightBgColor = "bg-arts-science-accent";
+    highlightHoverBgColor = "hover:bg-arts-science-accent-dark";
+    highlightShadowColor = "shadow-arts-science-accent/10";
   } else if (institution === "polytechnic") {
     navigationLinks = polytechnicNavigation;
     logoText = "JCT Polytechnic College";
     logoSubText = "Est. 2009";
-    logoLink = "/institutions/polytechnic";
+    logoLink = "/";
     highlightColor = "text-slate-400";
     highlightBgColor = "bg-slate-500";
     highlightHoverBgColor = "hover:bg-slate-600";
@@ -428,7 +428,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             </a>
             {institution === "main" && (
               <Link
-                href="https://admissions.jct.ac.in"
+                href="http://erp.jct.ac.in/impres/students/default.aspx"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`inline-flex h-9 items-center justify-center rounded-full px-4 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10 xl:px-5 xl:text-[14px] 2xl:text-[15px] ${
@@ -437,7 +437,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                     : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
                 }`}
               >
-                Apply Now
+                Student Login
               </Link>
             )}
           </div>

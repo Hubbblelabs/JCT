@@ -142,6 +142,28 @@ export function Admissions() {
             </motion.article>
           ))}
         </div>
+
+        <div
+          id="contact"
+          className="mt-8 grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-4 text-sm md:grid-cols-3 md:gap-4"
+        >
+          <a
+            href="tel:+919361422201"
+            className="text-polytechnic-dark hover:text-polytechnic flex items-center gap-2"
+          >
+            <Phone size={15} className="text-polytechnic" /> +91 93614 88801
+          </a>
+          <a
+            href="mailto:admissions@jct.ac.in"
+            className="text-polytechnic-dark hover:text-polytechnic flex items-center gap-2"
+          >
+            <Mail size={15} className="text-polytechnic" /> admissions@jct.ac.in
+          </a>
+          <div className="text-polytechnic-dark flex items-start gap-2">
+            <MapPin size={15} className="text-polytechnic mt-0.5 shrink-0" />
+            <span>Knowledge Park, Pichanur, Coimbatore - 641105</span>
+          </div>
+        </div>
       </div>
     </PolySection>
   );

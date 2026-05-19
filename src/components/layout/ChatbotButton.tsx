@@ -213,9 +213,9 @@ export function ChatbotButton() {
   let botBubbleBg = "bg-[#0D3B66]";
 
   if (institution === "arts-science") {
-    themeBg = "bg-orange-500 hover:bg-orange-600";
-    headerBg = "bg-orange-500";
-    botBubbleBg = "bg-orange-600";
+    themeBg = "bg-arts-science-accent hover:bg-arts-science-accent-dark";
+    headerBg = "bg-arts-science-accent";
+    botBubbleBg = "bg-arts-science-accent-dark";
   } else if (institution === "polytechnic") {
     themeBg = "bg-slate-500 hover:bg-slate-600";
     headerBg = "bg-slate-500";

@@ -165,38 +165,88 @@ function CourseCarouselSection({
     return () => observer.disconnect();
   }, [courses.length]);
 
+  const handleScroll = useCallback(() => {
+    const container = carouselRef.current;
+    if (!container || courses.length === 0) return;
+
+    const cards = container.querySelectorAll<HTMLElement>(
+      '[data-course-card="true"]',
+    );
+    const n = courses.length;
+    if (cards.length < 3 * n) return;
+
+    const singleSetWidth = cards[n].offsetLeft - cards[0].offsetLeft;
+    if (singleSetWidth <= 0) return;
+
+    const scrollLeft = container.scrollLeft;
+
+    if (scrollLeft < singleSetWidth - 4) {
+      container.scrollLeft = scrollLeft + singleSetWidth;
+    } else if (scrollLeft >= singleSetWidth * 2 - 4) {
+      container.scrollLeft = scrollLeft - singleSetWidth;
+    }
+  }, [courses.length]);
+
+  useEffect(() => {
+    const container = carouselRef.current;
+    if (!container || courses.length === 0) return;
+
+    const initializeScroll = () => {
+      const cards = container.querySelectorAll<HTMLElement>(
+        '[data-course-card="true"]',
+      );
+      const n = courses.length;
+      if (cards.length < 3 * n) return;
+
+      const singleSetWidth = cards[n].offsetLeft - cards[0].offsetLeft;
+      if (singleSetWidth > 0) {
+        container.scrollLeft = singleSetWidth;
+      }
+    };
+
+    const timer = setTimeout(initializeScroll, 100);
+
+    const observer = new ResizeObserver(initializeScroll);
+    observer.observe(container);
+
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [courses.length]);
+
   const scrollCarousel = useCallback((direction: "left" | "right") => {
     const container = carouselRef.current;
     if (!container) return;
 
-    const card = container.querySelector<HTMLElement>(
+    const cards = container.querySelectorAll<HTMLElement>(
       '[data-course-card="true"]',
     );
-    const cardWidth = card?.offsetWidth ?? 300;
-    const gap = 24;
-    const maxScroll = container.scrollWidth - container.clientWidth;
+    if (cards.length === 0) return;
 
-    if (direction === "right" && container.scrollLeft >= maxScroll - 4) {
-      container.scrollTo({ left: 0, behavior: "smooth" });
-    } else {
-      container.scrollBy({
-        left: direction === "left" ? -(cardWidth + gap) : cardWidth + gap,
-        behavior: "smooth",
-      });
+    const cardWidth = cards[0].offsetWidth;
+    let step = cardWidth + 24;
+    if (cards.length > 1) {
+      step = cards[1].offsetLeft - cards[0].offsetLeft;
     }
+
+    container.scrollBy({
+      left: direction === "left" ? -step : step,
+      behavior: "smooth",
+    });
   }, []);
 
   useEffect(() => {
     autoScrollRef.current = setInterval(() => {
       scrollCarousel("right");
-    }, 3500);
+    }, 1500);
 
     const container = carouselRef.current;
     const pause = () => {
       if (autoScrollRef.current) clearInterval(autoScrollRef.current);
     };
     const resume = () => {
-      autoScrollRef.current = setInterval(() => scrollCarousel("right"), 3500);
+      autoScrollRef.current = setInterval(() => scrollCarousel("right"), 1500);
     };
 
     container?.addEventListener("mouseenter", pause);
@@ -278,12 +328,13 @@ function CourseCarouselSection({
 
         <DragScroll
           ref={carouselRef}
+          onScroll={handleScroll}
           className="snap-container scrollbar-hide flex w-full items-stretch gap-4 overflow-x-auto px-4 md:gap-6 md:px-6"
         >
           <div className="flex w-max items-stretch gap-4 md:gap-6">
-            {courses.map((course) => (
+            {[...courses, ...courses, ...courses].map((course, index) => (
               <CourseCard
-                key={course.slug}
+                key={`${course.slug}-${index}`}
                 course={course}
                 href={
                   showAccreditationBadges || pgCourses

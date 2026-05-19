@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { EngineeringHero } from "./EngineeringHero";
 import { EngineeringDomains } from "./EngineeringDomains";
 import { EngineeringMetrics } from "./EngineeringMetrics";
+import { Admissions } from "./Admissions";
 import { EngineeringResearch } from "./EngineeringResearch";
 import { CampusLife } from "@/components/layout/CampusLife";
 import { Testimonials } from "./Testimonials";
@@ -19,7 +20,8 @@ export default function EngineeringPage() {
       <EngineeringHero />
       <EngineeringDomains />
       <EngineeringMetrics />
-      <EngineeringResearch />
+      <Admissions />
+      {/* <EngineeringResearch /> */}
 
       <Placements />
       <CampusLife />

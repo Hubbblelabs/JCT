@@ -161,7 +161,7 @@ export function Hero() {
       </div>
 
       <div className="pointer-events-none absolute inset-0 z-0 mask-[radial-gradient(ellipse_at_center,black_60%,transparent_100%)]">
-        <div className="absolute inset-0 bg-orange-300 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px] opacity-14 mix-blend-soft-light" />
+        <div className="absolute inset-0 bg-arts-science-accent/20 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px] opacity-14 mix-blend-soft-light" />
 
         {/* Spotlight dots layer tracking the mouse */}
         <div
@@ -201,18 +201,10 @@ export function Hero() {
             transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             className="mb-2 font-sans text-4xl leading-[0.98] font-extrabold tracking-[-0.03em] text-white drop-shadow-[0_12px_24px_rgba(2,10,24,0.55)] sm:mb-4 sm:text-5xl md:text-6xl lg:text-7xl"
           >
-            {hero.titleLine1}
-            {(hero.titleHighlight || hero.titleLine2) && (
-              <>
-                <br />
-                {hero.titleHighlight && (
-                  <span className="font-extrabold text-[#ff8a1f]">
-                    {hero.titleHighlight}{" "}
-                  </span>
-                )}
-                {hero.titleLine2}
-              </>
-            )}
+            Good Education
+            <br />
+            <span className="font-extrabold text-arts-science-accent">for </span>A Better
+            Future
           </motion.h1>
 
           {hero.subtitle && (
@@ -241,38 +233,26 @@ export function Hero() {
             }}
             className="mb-6 flex w-full max-w-md flex-col gap-2.5 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4 md:mb-10"
           >
-            {hero.ctas.map((cta) => {
-              const isExternal = cta.href.startsWith("http");
-              return (
-                <motion.div
-                  key={cta.label}
-                  variants={{
-                    hidden: { opacity: 0, y: 18 },
-                    show: { opacity: 1, y: 0 },
-                  }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                >
-                  <Link
-                    href={cta.href}
-                    target={isExternal ? "_blank" : undefined}
-                    rel={isExternal ? "noopener noreferrer" : undefined}
-                    className={
-                      cta.primary
-                        ? "group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-[#f07b1a] px-5 font-sans text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#e06b0a] hover:shadow-xl active:translate-y-0 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
-                        : "group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-white/30 bg-transparent px-5 font-sans text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:bg-white/10 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
-                    }
-                  >
-                    {cta.label}
-                    {cta.primary && (
-                      <ArrowRight
-                        size={16}
-                        className="transition-transform duration-300 group-hover:translate-x-1"
-                      />
-                    )}
-                  </Link>
-                </motion.div>
-              );
-            })}
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, y: 18 },
+                show: { opacity: 1, y: 0 },
+              }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+            >
+              <Link
+                href="https://admissions.jct.ac.in/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full bg-arts-science-accent px-5 font-sans text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-arts-science-accent-dark hover:shadow-xl active:translate-y-0 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
+              >
+                Apply Now
+                <ArrowRight
+                  size={16}
+                  className="transition-transform duration-300 group-hover:translate-x-1"
+                />
+              </Link>
+            </motion.div>
           </motion.div>
 
           {/* Stats Row */}
@@ -306,7 +286,7 @@ export function Hero() {
               >
                 <span
                   className={`text-2xl font-extrabold tracking-tight drop-shadow-[0_8px_18px_rgba(2,10,24,0.5)] sm:text-3xl md:text-4xl ${
-                    stat.accent ? "text-[#ff8a1f]" : "text-white"
+                    stat.accent ? "text-arts-science-accent" : "text-white"
                   }`}
                 >
                   <AnimatedNumber value={stat.value} />
@@ -331,7 +311,7 @@ export function Hero() {
           <div className="grid grid-cols-1 gap-6 divide-y divide-white/10 sm:gap-8 md:grid-cols-3 md:gap-4 md:divide-x md:divide-y-0">
             <div className="flex flex-col items-center px-3 py-4 text-center sm:px-4 md:px-6 md:py-0 lg:px-8">
               <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3">
-                <Award size={18} className="text-[#f07b1a] sm:h-5 sm:w-5" />
+                <Award size={18} className="text-arts-science-accent sm:h-5 sm:w-5" />
                 <h3 className="font-sans text-base font-bold tracking-tight text-white sm:text-lg md:text-xl">
                   Quality
                 </h3>
@@ -344,7 +324,7 @@ export function Hero() {
 
             <div className="flex flex-col items-center px-3 py-4 text-center sm:px-4 md:px-6 md:py-0 lg:px-8">
               <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3">
-                <Users size={18} className="text-[#f07b1a] sm:h-5 sm:w-5" />
+                <Users size={18} className="text-arts-science-accent sm:h-5 sm:w-5" />
                 <h3 className="font-sans text-base font-bold tracking-tight text-white sm:text-lg md:text-xl">
                   Leadership
                 </h3>
@@ -357,7 +337,7 @@ export function Hero() {
 
             <div className="flex flex-col items-center px-3 py-4 text-center sm:px-4 md:px-6 md:py-0 lg:px-8">
               <div className="mb-2 flex items-center justify-center gap-2 sm:mb-3">
-                <BookOpen size={18} className="text-[#f07b1a] sm:h-5 sm:w-5" />
+                <BookOpen size={18} className="text-arts-science-accent sm:h-5 sm:w-5" />
                 <h3 className="font-sans text-base font-bold tracking-tight text-white sm:text-lg md:text-xl">
                   Experience
                 </h3>

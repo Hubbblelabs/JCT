@@ -172,3 +172,34 @@ export const testimonials = [
     image: "/avatars/female_avatar.png",
   },
 ];
+
+export const admissionsCriteria = [
+  {
+    title: "Eligible Programs",
+    items: [
+      "B.Sc Computer Science (3 Years)",
+      "B.Sc AI & ML (3 Years)",
+      "BCA (Computer Applications) (3 Years)",
+      "B.Com Logistics & SCM (3 Years)",
+      "BBA Logistics (3 Years)",
+    ],
+  },
+  {
+    title: "Eligibility Criteria",
+    items: [
+      "B.Sc CS & BCA: Pass in HSC/12th standard with Mathematics / Computer Science / Statistics / Business Mathematics.",
+      "B.Sc AI&ML: Pass in HSC/12th standard with Mathematics or Computer Science as one of the subjects.",
+      "B.Com & BBA: Pass in HSC/12th standard in any stream from a recognised board.",
+    ],
+  },
+  {
+    title: "Required Documents",
+    items: [
+      "HSC / 12th Marks Sheet & Transfer Certificate (TC)",
+      "SSLC / 10th Marks Sheet",
+      "Community Certificate (if applicable)",
+      "Aadhar Card Copy",
+      "Passport Size Photographs (3 copies)",
+    ],
+  },
+];

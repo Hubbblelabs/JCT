@@ -15,7 +15,7 @@ function clickMerittoLauncher() {
       rect.width > 0 &&
       rect.width <= 90 &&
       rect.height <= 90 &&
-      rect.left < 120 &&
+      rect.right > window.innerWidth - 120 &&
       rect.bottom > window.innerHeight * 0.5
     ) {
       el.click();
@@ -60,16 +60,16 @@ export function ChatbotNotification() {
           animate={{ opacity: 1, x: 0, scale: 1 }}
           exit={{ opacity: 0, x: -8, scale: 0.96 }}
           transition={{ duration: 0.22, ease: "easeOut" }}
-          // Sits just to the right of the launcher icon (16px left + ~64px icon + 8px gap)
+          // Sits just to the left of the launcher icon (16px right + ~64px icon + 8px gap)
           className="pointer-events-auto fixed bottom-5 z-[9997]"
-          style={{ left: "88px" }}
+          style={{ right: "88px" }}
           data-own-fixed
         >
-          {/* Tail pointing left toward the launcher */}
+          {/* Tail pointing right toward the launcher */}
           <span
             aria-hidden
-            className="absolute top-4 -left-[7px] h-3.5 w-3.5 rotate-45 rounded-[2px] border-b border-l border-slate-200 bg-white"
-            style={{ boxShadow: "-2px 2px 3px rgba(0,0,0,0.04)" }}
+            className="absolute top-4 -right-1.75 h-3.5 w-3.5 rotate-45 rounded-xs border-t border-r border-slate-200 bg-white"
+            style={{ boxShadow: "2px -2px 3px rgba(0,0,0,0.04)" }}
           />
 
           {/* Bubble */}
