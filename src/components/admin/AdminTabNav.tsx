@@ -18,6 +18,11 @@ import {
   Wrench,
   FileEdit,
   Home,
+  Bell,
+  BarChart3,
+  Camera,
+  FileDown,
+  Layers,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Suspense } from "react";
@@ -26,24 +31,34 @@ type NavItem = { label: string; href: string; icon: React.ComponentType<{ size?:
 
 const COLLEGE_ITEMS: Record<string, NavItem[]> = {
   engineering: [
-    { label: "Page Content", href: "/admin/page-content?college=engineering", icon: FileEdit },
+    { label: "Announcement Bar", href: "/admin/page-content?college=engineering&section=announcement", icon: Bell },
+    { label: "Hero", href: "/admin/page-content?college=engineering&section=hero", icon: Image },
+    { label: "Performance Metrics", href: "/admin/page-content?college=engineering&section=metrics", icon: BarChart3 },
+    { label: "Life at JCT", href: "/admin/page-content?college=engineering&section=lifeAtJct", icon: Camera },
     { label: "Programs", href: "/admin/programs?college=engineering", icon: GraduationCap },
-    { label: "Testimonials", href: "/admin/testimonials?college=engineering", icon: MessageSquare },
   ],
   "arts-science": [
-    { label: "Page Content", href: "/admin/page-content?college=arts-science", icon: FileEdit },
-    { label: "Programs", href: "/admin/programs?college=arts-science", icon: GraduationCap },
+    { label: "Hero", href: "/admin/page-content?college=arts-science&section=hero", icon: FileEdit },
+    { label: "Campus Life", href: "/admin/page-content?college=arts-science&section=campusLife", icon: Camera },
     { label: "Testimonials", href: "/admin/testimonials?college=arts-science", icon: MessageSquare },
+    { label: "Programs", href: "/admin/programs?college=arts-science", icon: GraduationCap },
   ],
   polytechnic: [
-    { label: "Page Content", href: "/admin/page-content?college=polytechnic", icon: FileEdit },
-    { label: "Programs", href: "/admin/programs?college=polytechnic", icon: GraduationCap },
+    { label: "Hero", href: "/admin/page-content?college=polytechnic&section=hero", icon: FileEdit },
+    { label: "Campus Life", href: "/admin/page-content?college=polytechnic&section=campusLife", icon: Camera },
+    { label: "Admissions", href: "/admin/page-content?college=polytechnic&section=admissions", icon: ClipboardList },
     { label: "Testimonials", href: "/admin/testimonials?college=polytechnic", icon: MessageSquare },
+    { label: "Programs", href: "/admin/programs?college=polytechnic", icon: GraduationCap },
   ],
 };
 
 const MAIN_ITEMS: NavItem[] = [
-  { label: "Page Content", href: "/admin/main/page-content", icon: FileEdit },
+  { label: "Hero", href: "/admin/main/page-content?section=hero", icon: FileEdit },
+  { label: "Card", href: "/admin/main/page-content?section=card", icon: BarChart3 },
+  { label: "Life at JCT", href: "/admin/main/page-content?section=lifeAtJct", icon: Camera },
+  { label: "Testimonials", href: "/admin/main/page-content?section=testimonials", icon: MessageSquare },
+  { label: "Prospectus", href: "/admin/main/page-content?section=prospectus", icon: FileDown },
+  { label: "Pamphlet Popup", href: "/admin/main/page-content?section=pamphlet", icon: Layers },
 ];
 
 const ADMIN_ITEMS: NavItem[] = [
@@ -54,16 +69,44 @@ const ADMIN_ITEMS: NavItem[] = [
   { label: "Audit Log", href: "/admin/audit", icon: ClipboardList },
 ];
 
-function isItemActive(href: string, pathname: string, college: string | null): boolean {
-  const [itemPath, itemQuery] = href.split("?");
+function isItemActive(
+  href: string,
+  pathname: string,
+  college: string | null,
+  section: string | null,
+): boolean {
+  const qIdx = href.indexOf("?");
+  const itemPath = qIdx >= 0 ? href.slice(0, qIdx) : href;
+  const itemQuery = qIdx >= 0 ? href.slice(qIdx + 1) : "";
+
   const pathMatch = pathname === itemPath || pathname.startsWith(itemPath + "/");
   if (!pathMatch) return false;
   if (!itemQuery) return true;
-  return new URLSearchParams(itemQuery).get("college") === college;
+
+  const params = new URLSearchParams(itemQuery);
+  const wantedCollege = params.get("college");
+  const wantedSection = params.get("section");
+
+  if (wantedCollege && wantedCollege !== college) return false;
+  if (wantedSection && wantedSection !== section) return false;
+  return true;
 }
 
-function isDropdownActive(items: NavItem[], pathname: string, college: string | null): boolean {
-  return items.some((item) => isItemActive(item.href, pathname, college));
+function isDropdownActive(
+  items: NavItem[],
+  pathname: string,
+  college: string | null,
+): boolean {
+  return items.some((item) => {
+    const qIdx = item.href.indexOf("?");
+    const itemPath = qIdx >= 0 ? item.href.slice(0, qIdx) : item.href;
+    const itemQuery = qIdx >= 0 ? item.href.slice(qIdx + 1) : "";
+    const pathMatch = pathname === itemPath || pathname.startsWith(itemPath + "/");
+    if (!pathMatch) return false;
+    if (!itemQuery) return true;
+    const wantedCollege = new URLSearchParams(itemQuery).get("college");
+    return !wantedCollege || wantedCollege === college;
+  });
 }
 
 function TabNavInner() {
@@ -71,9 +114,11 @@ function TabNavInner() {
   const searchParams = useSearchParams();
   const { data: session } = useSession();
   const college = searchParams.get("college");
+  const section = searchParams.get("section");
 
   const dashActive = pathname === "/admin/dashboard" || pathname === "/admin";
   const adminMenuActive = ADMIN_ITEMS.some((i) => pathname === i.href);
+  const mainActive = isDropdownActive(MAIN_ITEMS, pathname, null);
 
   return (
     <div className="admin-top-nav">
@@ -101,10 +146,8 @@ function TabNavInner() {
           {/* Main (landing page) dropdown */}
           <div className="admin-nav-item">
             <Link
-              href={MAIN_ITEMS[0].href}
-              className={`admin-nav-trigger ${
-                MAIN_ITEMS.some((i) => pathname === i.href.split("?")[0]) ? "active" : ""
-              }`}
+              href="/admin/main/page-content"
+              className={`admin-nav-trigger ${mainActive ? "active" : ""}`}
             >
               <Home size={13} />
               Main
@@ -116,7 +159,7 @@ function TabNavInner() {
                   key={item.href}
                   href={item.href}
                   className={`admin-nav-dropdown-item ${
-                    pathname === item.href.split("?")[0] ? "active" : ""
+                    isItemActive(item.href, pathname, null, section) ? "active" : ""
                   }`}
                 >
                   <item.icon size={14} />
@@ -139,7 +182,7 @@ function TabNavInner() {
             return (
               <div key={id} className="admin-nav-item">
                 <Link
-                  href={`/admin/programs?college=${id}`}
+                  href={`/admin/page-content?college=${id}`}
                   className={`admin-nav-trigger ${active ? "active" : ""}`}
                 >
                   {label}
@@ -150,7 +193,9 @@ function TabNavInner() {
                     <Link
                       key={item.href}
                       href={item.href}
-                      className={`admin-nav-dropdown-item ${isItemActive(item.href, pathname, college) ? "active" : ""}`}
+                      className={`admin-nav-dropdown-item ${
+                        isItemActive(item.href, pathname, college, section) ? "active" : ""
+                      }`}
                     >
                       <item.icon size={14} />
                       {item.label}

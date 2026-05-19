@@ -13,7 +13,6 @@ import {
   ENG_HERO_LIMITS,
   ARTS_HERO_LIMITS,
   POLY_HERO_LIMITS,
-  LIMITS_announcement,
   LIMITS_lifeAtJct,
   LIMITS_campusLifeCarousel,
   LIMITS_polytechnicAdmissions,
@@ -190,11 +189,6 @@ function CtaList({
 
 export type EngHeroVal = {
   backgroundImages?: string[];
-  title?: string;
-  subtitle?: string;
-  ctas?: Cta[];
-  badgeText?: string;
-  counsellingCode?: string;
 };
 
 export function EngineeringHeroForm({
@@ -204,50 +198,29 @@ export function EngineeringHeroForm({
   value: EngHeroVal;
   onChange: (v: EngHeroVal) => void;
 }) {
+  const bg = value.backgroundImages ?? [];
   return (
     <div className="space-y-4">
-      <ImageList
-        label="Background Image"
-        hint="Engineering hero renders only the first image. Additional ones will be saved but never displayed."
-        max={ENG_HERO_LIMITS.backgroundImages}
-        value={value.backgroundImages ?? []}
-        onChange={(next) => onChange({ ...value, backgroundImages: next })}
-      />
-      <TextInput
-        label="Title"
-        value={value.title ?? ""}
-        maxLength={ENG_HERO_LIMITS.titleMax}
-        onChange={(e) => onChange({ ...value, title: e.target.value })}
-      />
-      <TextArea
-        label="Subtitle"
-        value={value.subtitle ?? ""}
-        rows={2}
-        maxLength={ENG_HERO_LIMITS.subtitleMax}
-        onChange={(e) => onChange({ ...value, subtitle: e.target.value })}
-      />
-      <CtaList
-        value={value.ctas ?? []}
-        max={ENG_HERO_LIMITS.ctas}
-        onChange={(next) => onChange({ ...value, ctas: next })}
-      />
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Badge Text"
-          value={value.badgeText ?? ""}
-          maxLength={ENG_HERO_LIMITS.badgeTextMax}
-          onChange={(e) => onChange({ ...value, badgeText: e.target.value })}
-          hint="e.g. An Autonomous Institution"
-        />
-        <TextInput
-          label="Counselling Code"
-          value={value.counsellingCode ?? ""}
-          maxLength={ENG_HERO_LIMITS.counsellingCodeMax}
-          onChange={(e) =>
-            onChange({ ...value, counsellingCode: e.target.value })
-          }
-        />
-      </div>
+      <Field label="Background Images" hint="3 fixed image slots. Upload or replace each one.">
+        <div className="space-y-2">
+          {Array.from({ length: ENG_HERO_LIMITS.backgroundImages }, (_, i) => (
+            <ImageUploadInput
+              key={i}
+              label={`Image ${i + 1}`}
+              value={bg[i] ?? ""}
+              onChange={(url) => {
+                const next = Array.from(
+                  { length: ENG_HERO_LIMITS.backgroundImages },
+                  (__, j) => bg[j] ?? "",
+                );
+                next[i] = url;
+                onChange({ ...value, backgroundImages: next });
+              }}
+              uploadOnly
+            />
+          ))}
+        </div>
+      </Field>
     </div>
   );
 }
@@ -703,26 +676,27 @@ export function AnnouncementForm({
         />
         Show the announcement bar
       </label>
-      <TextArea
+      <TextInput
         label="Announcement Text"
         value={value.text ?? ""}
-        rows={2}
-        maxLength={LIMITS_announcement.textMax}
+        maxLength={120}
         onChange={(e) => onChange({ ...value, text: e.target.value })}
-        hint={`Renders on a single line — keep under ${LIMITS_announcement.textMax} characters.`}
+        placeholder="e.g. Admissions open for 2025–26 batch"
       />
       <div className="grid grid-cols-2 gap-3">
         <TextInput
           label="CTA Label (optional)"
           value={value.ctaLabel ?? ""}
-          maxLength={LIMITS_announcement.ctaLabelMax}
+          maxLength={24}
           onChange={(e) => onChange({ ...value, ctaLabel: e.target.value })}
+          placeholder="e.g. Apply Now"
         />
         <TextInput
-          label="CTA Href (optional)"
+          label="CTA Link (optional)"
           value={value.ctaHref ?? ""}
           maxLength={500}
           onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
+          placeholder="https://..."
         />
       </div>
     </div>

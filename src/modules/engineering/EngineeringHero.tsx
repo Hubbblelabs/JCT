@@ -43,32 +43,14 @@ function normalizeHero(raw: unknown): HeroConfig | null {
         (s): s is string => typeof s === "string" && s.length > 0,
       )
     : [];
-  const ctas = Array.isArray(r.ctas)
-    ? r.ctas
-        .map((c) => {
-          const o = (c ?? {}) as Record<string, unknown>;
-          const label = typeof o.label === "string" ? o.label : null;
-          const href = typeof o.href === "string" ? o.href : null;
-          if (!label || !href) return null;
-          return { label, href, primary: Boolean(o.primary) } satisfies HeroCta;
-        })
-        .filter((x): x is HeroCta => x !== null)
-    : [];
-  const title = typeof r.title === "string" && r.title ? r.title : null;
-  if (!title || backgroundImages.length === 0) return null;
+  if (backgroundImages.length === 0) return null;
   return {
     backgroundImages,
-    title,
-    subtitle: typeof r.subtitle === "string" ? r.subtitle : "",
-    ctas: ctas.length > 0 ? ctas : DEFAULT_HERO.ctas,
-    badgeText:
-      typeof r.badgeText === "string" && r.badgeText
-        ? r.badgeText
-        : DEFAULT_HERO.badgeText,
-    counsellingCode:
-      typeof r.counsellingCode === "string" && r.counsellingCode
-        ? r.counsellingCode
-        : DEFAULT_HERO.counsellingCode,
+    title: DEFAULT_HERO.title,
+    subtitle: DEFAULT_HERO.subtitle,
+    ctas: DEFAULT_HERO.ctas,
+    badgeText: DEFAULT_HERO.badgeText,
+    counsellingCode: DEFAULT_HERO.counsellingCode,
   };
 }
 

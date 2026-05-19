@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Save, Loader2, ExternalLink } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
+import { useSearchParams } from "next/navigation";
 
 export type SectionDef = {
   /** Unique id for sidebar nav */
@@ -35,7 +36,23 @@ type Props = {
 };
 
 export function PageContentShell({ pageTitle, pageSubtitle, sections }: Props) {
-  const [selected, setSelected] = useState<string>(sections[0]?.id ?? "");
+  const searchParams = useSearchParams();
+  const sectionParam = searchParams.get("section");
+  const resolveInitial = () => {
+    if (sectionParam && sections.some((s) => s.id === sectionParam)) return sectionParam;
+    return sections[0]?.id ?? "";
+  };
+  const [selected, setSelected] = useState<string>(resolveInitial);
+
+  useEffect(() => {
+    const valid = sectionParam && sections.some((s) => s.id === sectionParam)
+      ? sectionParam
+      : null;
+    if (valid && valid !== selected) setSelected(valid);
+    // Only re-run when the URL section param changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sectionParam]);
+
   const [values, setValues] = useState<Record<string, unknown>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);

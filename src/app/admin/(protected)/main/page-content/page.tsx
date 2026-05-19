@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Plus, Trash2, Loader2, Pencil, X, Check } from "lucide-react";
 import {
   PageContentShell,
@@ -666,7 +666,7 @@ function SeedBanner() {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
-export default function MainPageContentPage() {
+function Inner() {
   const sections: SectionDef[] = [
     {
       id: "hero",
@@ -704,10 +704,15 @@ export default function MainPageContentPage() {
         photos: [],
       } as LifeAtJctVal,
       render: (v, onChange) => (
-        <LifeAtJctForm
-          value={(v as LifeAtJctVal) ?? {}}
-          onChange={(next) => onChange(next)}
-        />
+        <>
+          <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
+            Changes here also update the Engineering college page, and vice versa.
+          </p>
+          <LifeAtJctForm
+            value={(v as LifeAtJctVal) ?? {}}
+            onChange={(next) => onChange(next)}
+          />
+        </>
       ),
     },
     {
@@ -753,5 +758,13 @@ export default function MainPageContentPage() {
         sections={sections}
       />
     </div>
+  );
+}
+
+export default function MainPageContentPage() {
+  return (
+    <Suspense fallback={<div className="admin-content">Loading…</div>}>
+      <Inner />
+    </Suspense>
   );
 }

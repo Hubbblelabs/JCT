@@ -66,7 +66,6 @@ export const HomeProspectusSchema = z.object({
   url: zOptionalString(500).default(""),
 });
 
-// EngineeringHero — only backgroundImages[0] is rendered (Hero.tsx:103).
 export const ENG_HERO_LIMITS = {
   backgroundImages: 1,
   titleMax: 120,
@@ -79,10 +78,7 @@ export const ENG_HERO_LIMITS = {
 export const EngineeringHeroSchema = z.object({
   backgroundImages: z
     .array(zUrl)
-    .max(
-      ENG_HERO_LIMITS.backgroundImages,
-      `Engineering Hero renders only ${ENG_HERO_LIMITS.backgroundImages} background image; remove the extras`,
-    )
+    .max(ENG_HERO_LIMITS.backgroundImages)
     .optional()
     .default([]),
   title: zOptionalString(ENG_HERO_LIMITS.titleMax).default(""),
