@@ -38,7 +38,7 @@ const testimonials = [
   {
     name: "Anjali Devi",
     batch: "B.Com (CA), 2024",
-    company: "Zoho Corp",
+    company: "",
     quote:
       "The faculty at JCT go beyond textbooks. They helped me prepare for competitive exams, interviews, and real-world business scenarios.",
     avatar: "/avatars/female_avatar.png",
