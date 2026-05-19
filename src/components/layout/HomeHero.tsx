@@ -28,9 +28,12 @@ type HeroContent = {
   tourVideoUrl?: string;
 };
 
-function normalizeHero(raw: unknown): HeroContent | null {
+// Returns only the fields that are present in the DB config so callers can
+// merge them into the fallback instead of replacing it wholesale.
+function normalizeHero(raw: unknown): Partial<HeroContent> | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
+
   const backgroundImages = Array.isArray(r.backgroundImages)
     ? r.backgroundImages.filter(
         (x): x is string => typeof x === "string" && x.trim().length > 0,
@@ -73,20 +76,22 @@ function normalizeHero(raw: unknown): HeroContent | null {
         .filter((x): x is HeroCard => x !== null)
     : [];
 
-  if (
-    backgroundImages.length === 0 ||
-    titleLines.length === 0 ||
-    cards.length === 0
-  ) {
-    return null;
-  }
-
   const tourVideoUrl =
     typeof r.tourVideoUrl === "string" && r.tourVideoUrl.trim()
       ? r.tourVideoUrl.trim()
       : undefined;
 
-  return { backgroundImages, titleLines, ctas, cards, tourVideoUrl };
+  // Only override each field if the DB actually has data for it.
+  // This allows partially-configured heroes (e.g. only title lines changed)
+  // to still show fallback backgrounds/cards for the rest.
+  const partial: Partial<HeroContent> = {};
+  if (backgroundImages.length > 0) partial.backgroundImages = backgroundImages;
+  if (titleLines.length > 0) partial.titleLines = titleLines;
+  if (ctas.length > 0) partial.ctas = ctas;
+  if (cards.length > 0) partial.cards = cards;
+  if (tourVideoUrl) partial.tourVideoUrl = tourVideoUrl;
+
+  return Object.keys(partial).length > 0 ? partial : null;
 }
 
 const BACKGROUND_MOTIONS = [
@@ -125,8 +130,9 @@ export function HomeHero() {
       .then((res) => {
         if (cancelled) return;
         if (res?.source === "db") {
-          const next = normalizeHero(res.data);
-          if (next) setHomeHeroContent(next);
+          const partial = normalizeHero(res.data);
+          // Merge only the fields present in DB; keep fallback for the rest
+          if (partial) setHomeHeroContent((prev) => ({ ...prev, ...partial }));
         }
       })
       .catch(() => {});
@@ -135,7 +141,15 @@ export function HomeHero() {
       .then((res) => {
         if (cancelled) return;
         if (res?.source === "db" && typeof res.data?.url === "string") {
-          setProspectusUrl(res.data.url.trim());
+          const raw = res.data.url.trim();
+          if (raw) {
+            // Resolve storage keys via the public image proxy
+            const resolved =
+              raw.startsWith("http://") || raw.startsWith("https://") || raw.startsWith("/")
+                ? raw
+                : `/api/public/images/${raw}`;
+            setProspectusUrl(resolved);
+          }
         }
       })
       .catch(() => {});
@@ -330,7 +344,6 @@ export function HomeHero() {
                     href={prospectusUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    download
                     className={`inline-flex h-12 items-center justify-center gap-2 rounded-full px-7 text-sm font-bold shadow-lg transition-transform hover:scale-105 active:scale-95 sm:text-base ${
                       cta.primary
                         ? "bg-gold text-navy hover:bg-gold-light shadow-black/20"

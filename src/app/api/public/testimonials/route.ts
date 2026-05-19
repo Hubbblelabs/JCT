@@ -32,9 +32,12 @@ export async function GET(req: Request) {
 
   try {
     await connectDB();
-    const query = institution === "all"
-      ? { is_active: true }
-      : { is_active: true, $or: [{ institution }, { institution: "all" }] };
+    // "all" = main landing page testimonials only (institution field = "all").
+    // Institution-specific pages receive their own + "all" testimonials.
+    const query =
+      institution === "all"
+        ? { is_active: true, institution: "all" }
+        : { is_active: true, $or: [{ institution }, { institution: "all" }] };
 
     const testimonials = await Testimonial.find(query)
       .select("name batch course company quote avatar category institution sort_order")

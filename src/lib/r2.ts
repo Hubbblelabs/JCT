@@ -40,7 +40,7 @@ export async function uploadToR2(
   );
 
   const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
-  return publicUrl ? `${publicUrl}/${key}` : `/api/admin/images/serve/${key}`;
+  return publicUrl ? `${publicUrl}/${key}` : `/api/public/images/${key}`;
 }
 
 export async function deleteFromR2(key: string): Promise<void> {

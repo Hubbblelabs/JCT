@@ -4,6 +4,29 @@ import { SiteConfig } from "@/lib/models";
 
 export const revalidate = 3600;
 
+function resolveProspectusUrl(value: unknown): unknown {
+  if (!value || typeof value !== "object") return value;
+  const v = value as Record<string, unknown>;
+  
+  // If there's a URL field, construct full URL if it's just a path
+  if (typeof v.url === "string") {
+    const url = v.url.trim();
+    // If it's already a full URL or relative path, use as-is
+    if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/")) {
+      return v;
+    }
+    // Otherwise, it's a path in R2 storage - construct full URL
+    const baseUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+    if (baseUrl) {
+      return {
+        ...v,
+        url: `${baseUrl}/${url}`,
+      };
+    }
+  }
+  return v;
+}
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const key = searchParams.get("key");
@@ -14,10 +37,16 @@ export async function GET(req: Request) {
     if (key) {
       const doc = await SiteConfig.findOne({ config_key: key });
       if (!doc) return NextResponse.json({ source: "empty", data: null });
-      const value =
+      let value =
         doc.status === "published" && doc.published_value
           ? doc.published_value
           : doc.value;
+      
+      // Special handling for homeProspectus to construct full URL
+      if (key === "homeProspectus") {
+        value = resolveProspectusUrl(value);
+      }
+      
       return NextResponse.json({ source: "db", data: value });
     }
 
@@ -28,10 +57,17 @@ export async function GET(req: Request) {
 
     const data: Record<string, unknown> = {};
     for (const doc of docs) {
-      data[doc.config_key] =
+      let value =
         doc.status === "published" && doc.published_value
           ? doc.published_value
           : doc.value;
+      
+      // Special handling for homeProspectus
+      if (doc.config_key === "homeProspectus") {
+        value = resolveProspectusUrl(value);
+      }
+      
+      data[doc.config_key] = value;
     }
 
     return NextResponse.json({ source: "db", data });

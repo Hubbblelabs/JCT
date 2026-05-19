@@ -42,7 +42,7 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   homeStats: ["home"],
   homeProspectus: ["home"],
   homePamphlet: ["home"],
-  lifeAtJct: ["engineering"],
+  lifeAtJct: ["home", "engineering"],
   engineeringAnnouncement: ["engineering"],
   engineeringHero: ["engineering"],
   engineeringMetrics: ["engineering"],
@@ -79,4 +79,8 @@ export function revalidatePaths(...paths: string[]): void {
 export function revalidateForConfigKey(key: string): void {
   const targets = SITE_CONFIG_KEY_TARGETS[key];
   if (targets?.length) revalidateTargets(...targets);
+  // Also clear the public API route cache so client-side fetches get fresh data
+  try {
+    revalidatePath("/api/public/site-config");
+  } catch {}
 }

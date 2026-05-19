@@ -20,9 +20,9 @@ type TestimonialCategory = (typeof TESTIMONIAL_CATEGORIES)[number];
 
 function normalizeCategory(tag?: string): TestimonialCategory {
   if (!tag) return "Alumni";
-  const value = tag.toLowerCase();
-  if (value === "student") return "Student";
-  if (value === "INDUSTRY") return "INDUSTRY";
+  const lower = tag.toLowerCase();
+  if (lower === "student") return "Student";
+  if (lower === "industry") return "INDUSTRY";
   return "Alumni";
 }
 

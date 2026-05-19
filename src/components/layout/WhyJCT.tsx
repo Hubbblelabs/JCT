@@ -90,10 +90,34 @@ function AnimatedNumber({
   );
 }
 
+type HomeStats = {
+  yearsOfExcellence?: string;
+  alumni?: string;
+  studentsPlaced?: string;
+  industryAwards?: string;
+};
+
+const COUNTER_STAT_KEYS: (keyof HomeStats)[] = [
+  "yearsOfExcellence",
+  "alumni",
+  "studentsPlaced",
+  "industryAwards",
+];
+
 export function WhyJCT() {
   const ref = useRef<HTMLDivElement>(null);
   const [inView, setInView] = useState(false);
   const [showAllFeatures, setShowAllFeatures] = useState(false);
+  const [homeStats, setHomeStats] = useState<HomeStats | null>(null);
+
+  useEffect(() => {
+    fetch("/api/public/site-config?key=homeStats")
+      .then((r) => r.json())
+      .then((res) => {
+        if (res?.source === "db" && res.data) setHomeStats(res.data as HomeStats);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -195,27 +219,34 @@ export function WhyJCT() {
         >
           <div className="bg-gold/5 pointer-events-none absolute top-0 right-0 h-125 w-125 rounded-full blur-[150px]" />
           <div className="relative z-10 grid grid-cols-2 gap-6 md:grid-cols-4 md:gap-8">
-            {counters.map((item, i) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 + i * 0.1 }}
-                className="text-center"
-              >
-                <div className="mb-2 font-sans text-3xl font-black tracking-tight text-white md:text-4xl lg:text-5xl">
-                  <AnimatedNumber
-                    value={item.value}
-                    suffix={item.suffix}
-                    inView={inView}
-                  />
-                </div>
-                <div className="font-sans text-xs font-medium text-white/50 md:text-sm">
-                  {item.label}
-                </div>
-              </motion.div>
-            ))}
+            {counters.map((item, i) => {
+              const overrideVal = homeStats?.[COUNTER_STAT_KEYS[i]];
+              return (
+                <motion.div
+                  key={item.label}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.1 + i * 0.1 }}
+                  className="text-center"
+                >
+                  <div className="mb-2 font-sans text-3xl font-black tracking-tight text-white md:text-4xl lg:text-5xl">
+                    {overrideVal ? (
+                      overrideVal
+                    ) : (
+                      <AnimatedNumber
+                        value={item.value}
+                        suffix={item.suffix}
+                        inView={inView}
+                      />
+                    )}
+                  </div>
+                  <div className="font-sans text-xs font-medium text-white/50 md:text-sm">
+                    {item.label}
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       </div>

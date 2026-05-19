@@ -12,10 +12,13 @@ const DEFAULT_IMAGES = [
   "/pamphlets/engineering-pamphlet.webp",
 ];
 
+const DEFAULT_VIDEO_URL = "https://www.youtube.com/embed/RBzA0cneWRA";
+
 type PamphletConfig = {
   enabled: boolean;
   images: string[];
   delayMs?: number;
+  videoUrl?: string;
 };
 
 function normalizePamphlet(raw: unknown): PamphletConfig | null {
@@ -28,6 +31,10 @@ function normalizePamphlet(raw: unknown): PamphletConfig | null {
     enabled: r.enabled !== false,
     images,
     delayMs: typeof r.delayMs === "number" ? r.delayMs : undefined,
+    videoUrl:
+      typeof r.videoUrl === "string" && r.videoUrl.trim()
+        ? r.videoUrl.trim()
+        : undefined,
   };
 }
 
@@ -37,6 +44,7 @@ export function Pamphlet() {
   const [enabled, setEnabled] = useState(true);
   const [images, setImages] = useState<string[]>(DEFAULT_IMAGES);
   const [delayMs, setDelayMs] = useState(2000);
+  const [videoUrl, setVideoUrl] = useState(DEFAULT_VIDEO_URL);
   const [configLoaded, setConfigLoaded] = useState(false);
 
   useEffect(() => {
@@ -51,6 +59,7 @@ export function Pamphlet() {
             setEnabled(next.enabled);
             if (next.images.length > 0) setImages(next.images);
             if (typeof next.delayMs === "number") setDelayMs(next.delayMs);
+            if (next.videoUrl) setVideoUrl(next.videoUrl);
           }
         }
         setConfigLoaded(true);
@@ -172,7 +181,7 @@ export function Pamphlet() {
                       <X size={24} />
                     </button>
                     <iframe
-                      src="https://www.youtube.com/embed/RBzA0cneWRA?autoplay=1"
+                      src={`${videoUrl}${videoUrl.includes("?") ? "&" : "?"}autoplay=1`}
                       title="JCT Campus Tour"
                       className="h-full w-full border-none"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import {
   FileText,
   CalendarCheck,
@@ -40,6 +41,32 @@ const pathways = [
 ];
 
 export function AdmissionsCTA() {
+  const [prospectusUrl, setProspectusUrl] = useState<string>("");
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/site-config?key=homeProspectus")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source === "db" && typeof res.data?.url === "string") {
+          const raw = res.data.url.trim();
+          if (raw) {
+            // Resolve storage keys via the public image proxy or use as-is if already a full URL
+            const resolved =
+              raw.startsWith("http://") || raw.startsWith("https://") || raw.startsWith("/")
+                ? raw
+                : `/api/public/images/${raw}`;
+            setProspectusUrl(resolved);
+          }
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <section id="admissions" className="bg-surface pb-10 md:pb-16">
       <div className="container mx-auto px-4 md:px-6">
@@ -135,11 +162,15 @@ export function AdmissionsCTA() {
               Apply Online <ArrowRight size={16} />
             </Link>
             <a
-              href="/documents/JCT.pdf"
-              download
+              href={prospectusUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="border-border text-navy hover:bg-muted inline-flex h-14 items-center justify-center rounded-full border-2 px-8 font-sans text-base font-semibold transition-all"
+              className="border-border text-navy hover:bg-muted inline-flex h-14 items-center justify-center rounded-full border-2 px-8 font-sans text-base font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={(e) => {
+                if (!prospectusUrl) {
+                  e.preventDefault();
+                }
+              }}
             >
               Download Prospectus
             </a>

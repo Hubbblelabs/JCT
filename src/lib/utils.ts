@@ -20,14 +20,13 @@ export function getImageUrl(imageUrl: string | null | undefined): string | null 
   // If it's a storage key, construct the full URL
   if (imageUrl.includes("/") || imageUrl.startsWith("uploads/")) {
     const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+    // Remove leading slash from imageUrl if present to avoid double slashes
+    const normalizedKey = imageUrl.startsWith("/") ? imageUrl.slice(1) : imageUrl;
     if (publicUrl) {
-      // Remove leading slash from imageUrl if present to avoid double slashes
-      const normalizedUrl = imageUrl.startsWith("/") ? imageUrl.slice(1) : imageUrl;
-      return `${publicUrl}/${normalizedUrl}`;
+      return `${publicUrl}/${normalizedKey}`;
     }
-    // Fallback to API serve endpoint if no public URL is configured
-    const normalizedUrl = imageUrl.startsWith("/") ? imageUrl : `/${imageUrl}`;
-    return `/api/admin/images/serve${normalizedUrl}`;
+    // Fallback: public proxy route that fetches from R2 server-side (no auth required)
+    return `/api/public/images/${normalizedKey}`;
   }
 
   return imageUrl;

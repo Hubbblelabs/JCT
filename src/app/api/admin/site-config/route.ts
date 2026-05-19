@@ -33,7 +33,15 @@ export async function PUT(req: NextRequest) {
 
     const doc = await SiteConfig.findOneAndUpdate(
       { config_key },
-      { $set: { value, updated_by: session!.user?.email }, $inc: { version: 1 } },
+      {
+        $set: {
+          value,
+          published_value: value,
+          status: "published",
+          updated_by: session!.user?.email,
+        },
+        $inc: { version: 1 },
+      },
       { upsert: true, new: true },
     );
 

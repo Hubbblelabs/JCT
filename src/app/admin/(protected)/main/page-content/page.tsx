@@ -101,53 +101,33 @@ function HomeHeroForm({
         />
       </div>
 
-      {/* Background Images (max 3) */}
+      {/* Background Images (3 fixed slots — replace or remove only) */}
       <div>
-        <h3 className="mb-2 text-sm font-semibold text-gray-700">
+        <h3 className="mb-1 text-sm font-semibold text-gray-700">
           Background Images{" "}
-          <span className="font-normal text-gray-400">(max {BG_LIMIT})</span>
+          <span className="font-normal text-gray-400">(3 fixed slots)</span>
         </h3>
+        <p className="mb-3 text-xs text-gray-400">
+          Upload or replace each slide image. Use the ✕ on the preview to
+          clear a slot.
+        </p>
         <div className="space-y-2">
-          {bg.map((src, i) => (
-            <div key={i} className="flex items-start gap-2">
-              <div className="flex-1">
-                <ImageUploadInput
-                  label=""
-                  value={src}
-                  onChange={(url) =>
-                    onChange({
-                      ...value,
-                      backgroundImages: bg.map((s, j) => (j === i ? url : s)),
-                    })
-                  }
-                  uploadOnly
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() =>
-                  onChange({
-                    ...value,
-                    backgroundImages: bg.filter((_, j) => j !== i),
-                  })
-                }
-                className="admin-btn admin-btn-danger admin-btn-sm"
-              >
-                <Trash2 size={13} />
-              </button>
-            </div>
+          {Array.from({ length: BG_LIMIT }, (_, i) => (
+            <ImageUploadInput
+              key={i}
+              label={`Slide ${i + 1}`}
+              value={bg[i] ?? ""}
+              onChange={(url) => {
+                const next = Array.from(
+                  { length: BG_LIMIT },
+                  (__, j) => bg[j] ?? "",
+                );
+                next[i] = url;
+                onChange({ ...value, backgroundImages: next });
+              }}
+              uploadOnly
+            />
           ))}
-          {bg.length < BG_LIMIT && (
-            <button
-              type="button"
-              onClick={() =>
-                onChange({ ...value, backgroundImages: [...bg, ""] })
-              }
-              className="admin-btn admin-btn-outline admin-btn-sm"
-            >
-              <Plus size={14} /> Add Background Image
-            </button>
-          )}
         </div>
       </div>
 

@@ -390,6 +390,7 @@ export type PamphletVal = {
   enabled?: boolean;
   images?: string[];
   delayMs?: number;
+  videoUrl?: string;
 };
 
 export function PamphletForm({
@@ -426,6 +427,13 @@ export function PamphletForm({
         hint="The pamphlet popup renders exactly two image slots — left and right. Extra images are not displayed."
         value={value.images ?? []}
         onChange={(next) => onChange({ ...value, images: next })}
+      />
+      <TextInput
+        label="Virtual Tour Video URL"
+        value={value.videoUrl ?? ""}
+        onChange={(e) => onChange({ ...value, videoUrl: e.target.value })}
+        placeholder="https://www.youtube.com/embed/VIDEO_ID"
+        hint="YouTube embed URL — used for the Virtual Tour button inside the popup."
       />
     </div>
   );
