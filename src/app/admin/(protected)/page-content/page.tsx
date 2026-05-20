@@ -81,7 +81,7 @@ function TestimonialForm({
   saving: boolean;
 }) {
   return (
-    <div className="rounded-lg border border-blue-100 bg-blue-50/40 p-4 space-y-3">
+    <div className="space-y-3 rounded-lg border border-blue-100 bg-blue-50/40 p-4">
       <div className="grid grid-cols-2 gap-3">
         <TextInput
           label="Name"
@@ -120,7 +120,10 @@ function TestimonialForm({
         options={CATEGORY_OPTIONS}
         value={draft.category}
         onChange={(e) =>
-          onChange({ ...draft, category: e.target.value as TestimonialDraft["category"] })
+          onChange({
+            ...draft,
+            category: e.target.value as TestimonialDraft["category"],
+          })
         }
       />
       <ImageUploadInput
@@ -144,10 +147,18 @@ function TestimonialForm({
           disabled={saving}
           className="admin-btn admin-btn-gold admin-btn-sm"
         >
-          {saving ? <Loader2 size={13} className="animate-spin" /> : <Check size={13} />}
+          {saving ? (
+            <Loader2 size={13} className="animate-spin" />
+          ) : (
+            <Check size={13} />
+          )}
           {saving ? "Saving…" : "Save"}
         </button>
-        <button type="button" onClick={onCancel} className="admin-btn admin-btn-outline admin-btn-sm">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="admin-btn admin-btn-outline admin-btn-sm"
+        >
           <X size={13} /> Cancel
         </button>
       </div>
@@ -170,7 +181,9 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
     setLoading(true);
     setError(null);
     try {
-      const r = await fetch(`/api/admin/testimonials?institution=${institution}`);
+      const r = await fetch(
+        `/api/admin/testimonials?institution=${institution}`,
+      );
       if (!r.ok) throw new Error("Failed to load");
       setItems(await r.json());
     } catch {
@@ -180,7 +193,9 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
     }
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const handleAdd = async () => {
     if (!draft.name.trim() || !draft.quote.trim()) return;
@@ -225,7 +240,9 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
     if (!confirm("Delete this testimonial?")) return;
     setDeletingId(id);
     try {
-      const r = await fetch(`/api/admin/testimonials/${id}`, { method: "DELETE" });
+      const r = await fetch(`/api/admin/testimonials/${id}`, {
+        method: "DELETE",
+      });
       if (!r.ok) throw new Error();
       await load();
     } catch {
@@ -246,7 +263,9 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
   return (
     <div className="space-y-4">
       {error && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </p>
       )}
 
       {addingNew ? (
@@ -254,7 +273,10 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
           draft={draft}
           onChange={setDraft}
           onSave={handleAdd}
-          onCancel={() => { setAddingNew(false); setDraft(EMPTY_DRAFT); }}
+          onCancel={() => {
+            setAddingNew(false);
+            setDraft(EMPTY_DRAFT);
+          }}
           saving={saving}
         />
       ) : (
@@ -268,7 +290,9 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
       )}
 
       {items.length === 0 && !addingNew && (
-        <p className="text-sm text-gray-400">No testimonials yet for this college.</p>
+        <p className="text-sm text-gray-400">
+          No testimonials yet for this college.
+        </p>
       )}
 
       <div className="space-y-2">
@@ -287,22 +311,26 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
               key={item._id}
               className="flex items-start gap-3 rounded-lg border border-gray-100 bg-white p-3"
             >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-sm text-gray-800">{item.name}</span>
-                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-gray-500">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-semibold text-gray-800">
+                    {item.name}
+                  </span>
+                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-gray-500 uppercase">
                     {item.category}
                   </span>
                   {!item.is_active && (
-                    <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-red-400">
+                    <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold tracking-wide text-red-400 uppercase">
                       Inactive
                     </span>
                   )}
                   <span className="text-xs text-gray-400">
-                    {[item.batch, item.course, item.company].filter(Boolean).join(" · ")}
+                    {[item.batch, item.course, item.company]
+                      .filter(Boolean)
+                      .join(" · ")}
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-gray-500 line-clamp-2 italic">
+                <p className="mt-1 line-clamp-2 text-xs text-gray-500 italic">
                   &ldquo;{item.quote}&rdquo;
                 </p>
               </div>
@@ -400,7 +428,10 @@ function sectionsFor(college: College): SectionDef[] {
             <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
               Changes here also update the main landing page, and vice versa.
             </p>
-            <LifeAtJctForm value={(v as LifeAtJctVal) ?? {}} onChange={onChange} />
+            <LifeAtJctForm
+              value={(v as LifeAtJctVal) ?? {}}
+              onChange={onChange}
+            />
           </>
         ),
       },
@@ -408,7 +439,9 @@ function sectionsFor(college: College): SectionDef[] {
         id: "testimonials",
         label: "Voices / Testimonials",
         kind: "custom",
-        customRender: () => <CollegeTestimonialsManager institution="engineering" />,
+        customRender: () => (
+          <CollegeTestimonialsManager institution="engineering" />
+        ),
       },
     ];
   }
@@ -523,9 +556,7 @@ function Inner() {
 
 export default function PageContentPage() {
   return (
-    <Suspense
-      fallback={<div className="admin-content">Loading…</div>}
-    >
+    <Suspense fallback={<div className="admin-content">Loading…</div>}>
       <Inner />
     </Suspense>
   );

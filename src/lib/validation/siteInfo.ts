@@ -59,7 +59,10 @@ export const AddressSchema = z.object({
   mapUrl: zUrl.optional().or(z.literal("")).default(""),
   mapEmbedUrl: z
     .string()
-    .max(ADDRESS_LIMITS.mapEmbedUrlMax, `Map embed URL must be at most ${ADDRESS_LIMITS.mapEmbedUrlMax} characters`)
+    .max(
+      ADDRESS_LIMITS.mapEmbedUrlMax,
+      `Map embed URL must be at most ${ADDRESS_LIMITS.mapEmbedUrlMax} characters`,
+    )
     .optional()
     .or(z.literal(""))
     .default(""),
@@ -96,9 +99,14 @@ export const ACCREDITATIONS_LIMITS = {
 export const AccreditationsSchema = z
   .array(
     z.object({
-      name: zRequiredString("Accreditation name", ACCREDITATIONS_LIMITS.nameMax),
+      name: zRequiredString(
+        "Accreditation name",
+        ACCREDITATIONS_LIMITS.nameMax,
+      ),
       logo: zUrl,
-      description: zOptionalString(ACCREDITATIONS_LIMITS.descriptionMax).default(""),
+      description: zOptionalString(
+        ACCREDITATIONS_LIMITS.descriptionMax,
+      ).default(""),
     }),
   )
   .max(

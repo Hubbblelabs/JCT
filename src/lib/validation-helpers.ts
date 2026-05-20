@@ -18,7 +18,9 @@ export type ApiErrorPayload = {
  * Attempt to parse a fetch Response as an API error. Returns `null` for
  * success-shaped bodies; otherwise returns the structured error.
  */
-export async function parseApiError(res: Response): Promise<ApiErrorPayload | null> {
+export async function parseApiError(
+  res: Response,
+): Promise<ApiErrorPayload | null> {
   if (res.ok) return null;
   try {
     const body = await res.clone().json();

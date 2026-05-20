@@ -93,10 +93,16 @@ export default function LoginPage() {
             </div>
           </div>
           <h1 className="text-xl font-bold text-gray-900">JCT Admin</h1>
-          <p className="mt-1 text-sm text-gray-500">Sign in to manage content</p>
+          <p className="mt-1 text-sm text-gray-500">
+            Sign in to manage content
+          </p>
         </div>
 
-        <Suspense fallback={<div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm h-52 animate-pulse" />}>
+        <Suspense
+          fallback={
+            <div className="h-52 animate-pulse rounded-xl border border-gray-200 bg-white p-6 shadow-sm" />
+          }
+        >
           <LoginForm />
         </Suspense>
       </div>

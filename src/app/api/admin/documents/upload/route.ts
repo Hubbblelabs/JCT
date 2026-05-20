@@ -15,10 +15,14 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File | null;
     if (!file) return badRequest("No file provided");
     if (!ALLOWED_MIME.includes(file.type as (typeof ALLOWED_MIME)[number])) {
-      return badRequest(`Invalid file type "${file.type}". Only PDF files are accepted.`);
+      return badRequest(
+        `Invalid file type "${file.type}". Only PDF files are accepted.`,
+      );
     }
     if (file.size > MAX_SIZE) {
-      return badRequest(`File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max is 20 MB.`);
+      return badRequest(
+        `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max is 20 MB.`,
+      );
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -26,9 +30,23 @@ export async function POST(req: NextRequest) {
     const storageKey = `documents/all/${Date.now()}-${safeName}`;
 
     const publicUrl = await uploadToR2(storageKey, buffer, "application/pdf");
-    await logAudit("document", "uploaded", session!.user?.email ?? "", `Uploaded ${safeName}`);
+    await logAudit(
+      "document",
+      "uploaded",
+      session!.user?.email ?? "",
+      `Uploaded ${safeName}`,
+    );
 
-    return json({ url: publicUrl, storage_key: storageKey, filename: safeName, size: file.size, mime_type: file.type }, 201);
+    return json(
+      {
+        url: publicUrl,
+        storage_key: storageKey,
+        filename: safeName,
+        size: file.size,
+        mime_type: file.type,
+      },
+      201,
+    );
   } catch (e) {
     console.error(e);
     return serverError();

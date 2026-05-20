@@ -63,14 +63,11 @@ function normalizeHero(raw: unknown): Partial<HeroContent> | null {
           if (!title) return null;
           return {
             title,
-            description:
-              typeof o.description === "string" ? o.description : "",
+            description: typeof o.description === "string" ? o.description : "",
             href: typeof o.href === "string" ? o.href : "#",
             icon: typeof o.icon === "string" ? o.icon : "engineering",
-            ctaLabel:
-              typeof o.ctaLabel === "string" ? o.ctaLabel : "Explore",
-            highlights:
-              typeof o.highlights === "string" ? o.highlights : "",
+            ctaLabel: typeof o.ctaLabel === "string" ? o.ctaLabel : "Explore",
+            highlights: typeof o.highlights === "string" ? o.highlights : "",
           } satisfies HeroCard;
         })
         .filter((x): x is HeroCard => x !== null)
@@ -145,7 +142,9 @@ export function HomeHero() {
           if (raw) {
             // Resolve storage keys via the public image proxy
             const resolved =
-              raw.startsWith("http://") || raw.startsWith("https://") || raw.startsWith("/")
+              raw.startsWith("http://") ||
+              raw.startsWith("https://") ||
+              raw.startsWith("/")
                 ? raw
                 : `/api/public/images/${raw}`;
             setProspectusUrl(resolved);
@@ -194,7 +193,8 @@ export function HomeHero() {
     return hoveredCard === index;
   }
 
-  const rawImageSrc = homeHeroContent.backgroundImages[currentBackgroundIndex]?.trim() || null;
+  const rawImageSrc =
+    homeHeroContent.backgroundImages[currentBackgroundIndex]?.trim() || null;
   const currentImageSrc = rawImageSrc ? getImageUrl(rawImageSrc) : null;
 
   return (
@@ -335,8 +335,7 @@ export function HomeHero() {
                 );
               }
               const isProspectus =
-                prospectusUrl &&
-                cta.label.toLowerCase().includes("prospectus");
+                prospectusUrl && cta.label.toLowerCase().includes("prospectus");
               if (isProspectus) {
                 return (
                   <a

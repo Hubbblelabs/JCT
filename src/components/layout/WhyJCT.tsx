@@ -114,7 +114,8 @@ export function WhyJCT() {
     fetch("/api/public/site-config?key=homeStats")
       .then((r) => r.json())
       .then((res) => {
-        if (res?.source === "db" && res.data) setHomeStats(res.data as HomeStats);
+        if (res?.source === "db" && res.data)
+          setHomeStats(res.data as HomeStats);
       })
       .catch(() => {});
   }, []);

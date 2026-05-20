@@ -9,9 +9,11 @@ export function cn(...inputs: ClassValue[]) {
  * Converts a storage key to a full image URL
  * Handles both storage keys and full URLs
  */
-export function getImageUrl(imageUrl: string | null | undefined): string | null {
+export function getImageUrl(
+  imageUrl: string | null | undefined,
+): string | null {
   if (!imageUrl) return null;
-  
+
   // If it's already a full URL, return as-is
   if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
     return imageUrl;
@@ -21,7 +23,9 @@ export function getImageUrl(imageUrl: string | null | undefined): string | null 
   if (imageUrl.includes("/") || imageUrl.startsWith("uploads/")) {
     const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
     // Remove leading slash from imageUrl if present to avoid double slashes
-    const normalizedKey = imageUrl.startsWith("/") ? imageUrl.slice(1) : imageUrl;
+    const normalizedKey = imageUrl.startsWith("/")
+      ? imageUrl.slice(1)
+      : imageUrl;
     if (publicUrl) {
       return `${publicUrl}/${normalizedKey}`;
     }

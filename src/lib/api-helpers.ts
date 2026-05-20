@@ -33,10 +33,7 @@ export function validationError(issues: ZodIssue[]) {
   const summary = first
     ? `${first.path.length ? first.path.join(".") + ": " : ""}${first.message}`
     : "Validation failed";
-  return json(
-    { error: "Validation failed", message: summary, details },
-    422,
-  );
+  return json({ error: "Validation failed", message: summary, details }, 422);
 }
 
 /**
@@ -108,7 +105,8 @@ export async function requireAuth(req: NextRequest) {
 
 export async function requireRole(req: NextRequest, minRole: Role) {
   const { session, error } = await requireAuth(req);
-  if (error || !session) return { session: null, error: error ?? unauthorized() };
+  if (error || !session)
+    return { session: null, error: error ?? unauthorized() };
 
   const role = (session.user as Record<string, unknown>).role as string;
   if (!hasMinRole(role, minRole)) {

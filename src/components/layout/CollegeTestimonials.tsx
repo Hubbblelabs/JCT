@@ -262,7 +262,9 @@ export function CollegeTestimonials({
                       >
                         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-gray-100">
                           <Image
-                            src={getImageUrl(activeItem.image) ?? activeItem.image}
+                            src={
+                              getImageUrl(activeItem.image) ?? activeItem.image
+                            }
                             alt={activeItem.name}
                             fill
                             sizes="48px"
@@ -281,7 +283,7 @@ export function CollegeTestimonials({
                     </AnimatePresence>
 
                     {laneItems.length > 1 && (
-                      <div className="mt-auto pt-4 flex items-center justify-center gap-2">
+                      <div className="mt-auto flex items-center justify-center gap-2 pt-4">
                         {laneItems.map((_, dotIndex) => (
                           <button
                             key={dotIndex}

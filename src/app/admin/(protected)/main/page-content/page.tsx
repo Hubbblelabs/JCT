@@ -108,8 +108,8 @@ function HomeHeroForm({
           <span className="font-normal text-gray-400">(3 fixed slots)</span>
         </h3>
         <p className="mb-3 text-xs text-gray-400">
-          Upload or replace each slide image. Use the ✕ on the preview to
-          clear a slot.
+          Upload or replace each slide image. Use the ✕ on the preview to clear
+          a slot.
         </p>
         <div className="space-y-2">
           {Array.from({ length: BG_LIMIT }, (_, i) => (
@@ -165,7 +165,7 @@ function HomeHeroForm({
         <div className="space-y-3">
           {cards.map((card, i) => (
             <div key={i} className="rounded-lg border border-gray-200 p-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">
+              <p className="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
                 Card {i + 1}
               </p>
               <TextInput
@@ -251,8 +251,8 @@ function HomeProspectusForm({
   return (
     <div className="space-y-3">
       <p className="text-xs text-gray-400">
-        Upload the prospectus PDF. The Download Prospectus button on the homepage
-        will link to this file.
+        Upload the prospectus PDF. The Download Prospectus button on the
+        homepage will link to this file.
       </p>
       <DocumentUploadInput
         label="Prospectus PDF"
@@ -310,7 +310,7 @@ function TestimonialForm({
   saving: boolean;
 }) {
   return (
-    <div className="rounded-lg border border-blue-100 bg-blue-50/40 p-4 space-y-3">
+    <div className="space-y-3 rounded-lg border border-blue-100 bg-blue-50/40 p-4">
       <div className="grid grid-cols-2 gap-3">
         <TextInput
           label="Name"
@@ -551,16 +551,16 @@ function VoicesInlineManager() {
               key={item._id}
               className="flex items-start gap-3 rounded-lg border border-gray-100 bg-white p-3"
             >
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="font-semibold text-sm text-gray-800">
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-sm font-semibold text-gray-800">
                     {item.name}
                   </span>
-                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-gray-500">
+                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-gray-500 uppercase">
                     {item.category}
                   </span>
                   {!item.is_active && (
-                    <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-red-400">
+                    <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold tracking-wide text-red-400 uppercase">
                       Inactive
                     </span>
                   )}
@@ -570,7 +570,7 @@ function VoicesInlineManager() {
                       .join(" · ")}
                   </span>
                 </div>
-                <p className="mt-1 text-xs text-gray-500 line-clamp-2 italic">
+                <p className="mt-1 line-clamp-2 text-xs text-gray-500 italic">
                   &ldquo;{item.quote}&rdquo;
                 </p>
               </div>
@@ -655,9 +655,7 @@ function SeedBanner() {
         disabled={seeding}
         className="admin-btn admin-btn-outline admin-btn-sm shrink-0"
       >
-        {seeding ? (
-          <Loader2 size={13} className="animate-spin" />
-        ) : null}
+        {seeding ? <Loader2 size={13} className="animate-spin" /> : null}
         {seeding ? "Seeding…" : "Seed Defaults"}
       </button>
     </div>
@@ -706,7 +704,8 @@ function Inner() {
       render: (v, onChange) => (
         <>
           <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
-            Changes here also update the Engineering college page, and vice versa.
+            Changes here also update the Engineering college page, and vice
+            versa.
           </p>
           <LifeAtJctForm
             value={(v as LifeAtJctVal) ?? {}}

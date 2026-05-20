@@ -29,7 +29,7 @@ export type Tab = {
   sections: Section[];
 };
 
-export type TabsDept = {
+export type TabsProgram = {
   name: string;
   shortName?: string;
   heroImage?: string;
@@ -37,22 +37,21 @@ export type TabsDept = {
   tabs: Tab[];
 };
 
-export function isTabsContent(content: unknown): content is TabsDept {
+export function isTabsContent(content: unknown): content is TabsProgram {
   if (!content || typeof content !== "object") return false;
   const c = content as Record<string, unknown>;
   if (!Array.isArray(c.tabs)) return false;
   return c.tabs.length > 0;
 }
 
-export function normalizeTabsContent(content: unknown): TabsDept | null {
+export function normalizeTabsContent(content: unknown): TabsProgram | null {
   if (!isTabsContent(content)) return null;
   const c = content as Record<string, unknown>;
   return {
     name: typeof c.name === "string" ? c.name : "",
     shortName: typeof c.shortName === "string" ? c.shortName : undefined,
     heroImage: typeof c.heroImage === "string" ? c.heroImage : undefined,
-    accentColor:
-      typeof c.accentColor === "string" ? c.accentColor : undefined,
+    accentColor: typeof c.accentColor === "string" ? c.accentColor : undefined,
     tabs: c.tabs as Tab[],
   };
 }

@@ -8,7 +8,10 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "upload.wikimedia.org" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "i.pravatar.cc" },
-      { protocol: "https", hostname: "pub-f5f4af227edc4d43923310ac626e1479.r2.dev" },
+      {
+        protocol: "https",
+        hostname: "pub-f5f4af227edc4d43923310ac626e1479.r2.dev",
+      },
     ],
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",
@@ -19,7 +22,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/institutions/engineering/postgraduate/:slug",
-        destination: "/institutions/engineering/departments/:slug",
+        destination: "/institutions/engineering/programs/:slug",
         permanent: true,
       },
     ];

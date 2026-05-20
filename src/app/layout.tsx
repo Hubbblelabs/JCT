@@ -115,7 +115,7 @@ export default function RootLayout({
         {/* Floating WhatsApp Button */}
         <div
           data-own-fixed
-          className="group fixed left-4 bottom-5 z-50 md:left-6 md:bottom-6"
+          className="group fixed bottom-5 left-4 z-50 md:bottom-6 md:left-6"
         >
           <span className="pointer-events-none absolute top-1/2 left-14 -translate-y-1/2 rounded-md bg-[#0a1628]/92 px-2 py-1 text-xs font-semibold whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100">
             Chat on WhatsApp

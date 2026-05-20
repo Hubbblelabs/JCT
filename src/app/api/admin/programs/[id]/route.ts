@@ -1,13 +1,28 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Program } from "@/lib/models";
-import { requireRole, json, notFound, serverError, validateBody } from "@/lib/api-helpers";
+import {
+  requireRole,
+  json,
+  notFound,
+  serverError,
+  validateBody,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
-import { ProgramUpdateSchema } from "@/lib/validation";
-import { revalidateTargets, type RevalidateTarget } from "@/lib/revalidate";
+import { ProgramFullUpdateSchema } from "@/lib/validation";
+import {
+  revalidateTargets,
+  revalidatePaths,
+  type RevalidateTarget,
+} from "@/lib/revalidate";
 
 function institutionTarget(inst: string): RevalidateTarget | null {
-  if (inst === "engineering" || inst === "arts-science" || inst === "polytechnic") return inst;
+  if (
+    inst === "engineering" ||
+    inst === "arts-science" ||
+    inst === "polytechnic"
+  )
+    return inst;
   return null;
 }
 
@@ -37,7 +52,7 @@ export async function PATCH(
   const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
-  const parsed = await validateBody(req, ProgramUpdateSchema);
+  const parsed = await validateBody(req, ProgramFullUpdateSchema);
   if (!parsed.ok) return parsed.response;
   const body = parsed.data;
 
@@ -52,8 +67,16 @@ export async function PATCH(
     if (!doc) return notFound();
 
     const target = institutionTarget(doc.institution);
-    if (target) revalidateTargets(target);
-    await logAudit("program", "updated", session!.user?.email ?? "", `Updated program ${doc.name}`);
+    if (target) {
+      revalidateTargets(target);
+      revalidatePaths(`/institutions/${doc.institution}/programs/${doc.slug}`);
+    }
+    await logAudit(
+      "program",
+      "updated",
+      session!.user?.email ?? "",
+      `Updated program ${doc.name}`,
+    );
     return json(doc);
   } catch (e) {
     console.error(e);
@@ -71,12 +94,21 @@ export async function DELETE(
   try {
     await connectDB();
     const { id } = await params;
-    const doc = await Program.findByIdAndUpdate(id, { is_active: false }, { new: true });
+    const doc = await Program.findByIdAndUpdate(
+      id,
+      { is_active: false },
+      { new: true },
+    );
     if (!doc) return notFound();
 
     const target = institutionTarget(doc.institution);
     if (target) revalidateTargets(target);
-    await logAudit("program", "deactivated", session!.user?.email ?? "", `Deactivated program ${doc.name}`);
+    await logAudit(
+      "program",
+      "deactivated",
+      session!.user?.email ?? "",
+      `Deactivated program ${doc.name}`,
+    );
     return json({ message: "Deactivated" });
   } catch (e) {
     console.error(e);

@@ -5,8 +5,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { getImageUrl } from "@/lib/utils";
-import { ugPrograms as fallbackPrograms } from "@/data/arts-science";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DragScroll } from "@/components/ui/DragScroll";
 
@@ -20,7 +19,7 @@ type ArtsScienceCourse = {
 
 function CourseCard({ course }: { course: ArtsScienceCourse }) {
   const router = useRouter();
-  const href = `/institutions/arts-science/departments/${course.slug}`;
+  const href = `/institutions/arts-science/programs/${course.slug}`;
   return (
     <motion.article
       initial={{ opacity: 0, x: 20 }}
@@ -284,9 +283,8 @@ function normalizeDbPrograms(raw: unknown): ArtsScienceCourse[] {
 }
 
 export function UgPrograms() {
-  const [courses, setCourses] = useState<ArtsScienceCourse[]>(
-    fallbackPrograms as ArtsScienceCourse[],
-  );
+  const [courses, setCourses] = useState<ArtsScienceCourse[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -294,12 +292,12 @@ export function UgPrograms() {
       .then((r) => r.json())
       .then((res) => {
         if (cancelled) return;
-        if (res?.source === "db") {
-          const next = normalizeDbPrograms(res.data);
-          if (next.length > 0) setCourses(next);
-        }
+        setCourses(normalizeDbPrograms(res?.data));
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -321,7 +319,7 @@ export function UgPrograms() {
     >
       {/* Background Textures & Gradients */}
       <div className="pointer-events-none absolute inset-0 z-0 mask-[radial-gradient(ellipse_at_center,black_60%,transparent_100%)]">
-        <div className="absolute inset-0 bg-arts-science-accent/20 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px]" />
+        <div className="bg-arts-science-accent/20 absolute inset-0 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px]" />
 
         {/* Spotlight dots layer tracking the mouse */}
         <div
@@ -350,7 +348,17 @@ export function UgPrograms() {
         </div>
       </div>
 
-      <CourseCarouselSection courses={courses} />
+      {loading ? (
+        <div className="relative z-10 container mx-auto mt-12 px-4 py-12 text-center text-sm text-slate-400 md:px-6">
+          Loading programs…
+        </div>
+      ) : courses.length === 0 ? (
+        <div className="relative z-10 container mx-auto mt-12 px-4 py-12 text-center text-sm text-slate-400 md:px-6">
+          No programs published yet.
+        </div>
+      ) : (
+        <CourseCarouselSection courses={courses} />
+      )}
     </section>
   );
 }

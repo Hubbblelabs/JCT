@@ -478,13 +478,13 @@ export default function PolytechnicAboutPage() {
                       />
                     </div>
                     <div>
-                      <h4 className="text-foreground text-sm font-bold leading-tight">
+                      <h4 className="text-foreground text-sm leading-tight font-bold">
                         {d.name}
                       </h4>
-                      <p className="text-[11px] font-medium text-polytechnic mt-0.5">
+                      <p className="text-polytechnic mt-0.5 text-[11px] font-medium">
                         {d.designation}
                       </p>
-                      <p className="text-muted-foreground mt-1 text-[11px] font-medium leading-tight">
+                      <p className="text-muted-foreground mt-1 text-[11px] leading-tight font-medium">
                         {d.dept}
                       </p>
                     </div>

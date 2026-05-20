@@ -4,7 +4,11 @@ import { SessionProvider } from "next-auth/react";
 import { AdminTabNav } from "@/components/admin/AdminTabNav";
 import "@/styles/admin.css";
 
-export default async function ProtectedLayout({ children }: { children: React.ReactNode }) {
+export default async function ProtectedLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const session = await auth();
   if (!session?.user) redirect("/admin/login");
 

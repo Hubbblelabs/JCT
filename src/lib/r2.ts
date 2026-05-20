@@ -51,11 +51,18 @@ export async function deleteFromR2(key: string): Promise<void> {
   await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
 }
 
-export async function getFromR2(key: string): Promise<{ body: ReadableStream; contentType: string }> {
+export async function getFromR2(
+  key: string,
+): Promise<{ body: ReadableStream; contentType: string }> {
   const client = getR2Client();
   const bucket = process.env.R2_BUCKET_NAME;
   if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
 
-  const res = await client.send(new GetObjectCommand({ Bucket: bucket, Key: key }));
-  return { body: res.Body as ReadableStream, contentType: res.ContentType ?? "image/webp" };
+  const res = await client.send(
+    new GetObjectCommand({ Bucket: bucket, Key: key }),
+  );
+  return {
+    body: res.Body as ReadableStream,
+    contentType: res.ContentType ?? "image/webp",
+  };
 }

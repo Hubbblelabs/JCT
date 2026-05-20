@@ -21,7 +21,9 @@ export default async function AuditPage() {
         <div className="admin-page-header">
           <div>
             <h1 className="admin-page-title">Audit Log</h1>
-            <p className="admin-page-subtitle">Last {logs.length} actions across the admin system</p>
+            <p className="admin-page-subtitle">
+              Last {logs.length} actions across the admin system
+            </p>
           </div>
         </div>
 
@@ -38,15 +40,27 @@ export default async function AuditPage() {
             </thead>
             <tbody>
               {logs.length === 0 && (
-                <tr><td colSpan={5} className="py-10 text-center text-gray-400">No activity yet.</td></tr>
+                <tr>
+                  <td colSpan={5} className="py-10 text-center text-gray-400">
+                    No activity yet.
+                  </td>
+                </tr>
               )}
               {logs.map((log: Record<string, unknown>) => (
                 <tr key={String(log._id)}>
-                  <td><span className="admin-badge admin-badge-gray capitalize">{String(log.entity_type)}</span></td>
-                  <td className="capitalize text-sm">{String(log.action)}</td>
-                  <td className="text-gray-500 text-sm">{String(log.user_email)}</td>
-                  <td className="text-gray-600 text-sm">{String(log.summary)}</td>
-                  <td className="text-xs text-gray-400 whitespace-nowrap">
+                  <td>
+                    <span className="admin-badge admin-badge-gray capitalize">
+                      {String(log.entity_type)}
+                    </span>
+                  </td>
+                  <td className="text-sm capitalize">{String(log.action)}</td>
+                  <td className="text-sm text-gray-500">
+                    {String(log.user_email)}
+                  </td>
+                  <td className="text-sm text-gray-600">
+                    {String(log.summary)}
+                  </td>
+                  <td className="text-xs whitespace-nowrap text-gray-400">
                     {new Date(log.created_at as string).toLocaleString("en-IN")}
                   </td>
                 </tr>

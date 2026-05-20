@@ -37,8 +37,12 @@ function ProgramsPageInner() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
-  useEffect(() => { setFilter(searchParams.get("college") ?? ""); }, [searchParams]);
+  useEffect(() => {
+    load();
+  }, []);
+  useEffect(() => {
+    setFilter(searchParams.get("college") ?? "");
+  }, [searchParams]);
 
   const seed = async () => {
     setSeeding(true);
@@ -49,10 +53,14 @@ function ProgramsPageInner() {
 
   const filtered = programs.filter((p) => !filter || p.institution === filter);
 
-  const collegeLabel = filter === "engineering" ? "Engineering"
-    : filter === "arts-science" ? "Arts & Science"
-    : filter === "polytechnic" ? "Polytechnic"
-    : "All";
+  const collegeLabel =
+    filter === "engineering"
+      ? "Engineering"
+      : filter === "arts-science"
+        ? "Arts & Science"
+        : filter === "polytechnic"
+          ? "Polytechnic"
+          : "All";
 
   return (
     <div className="admin-content">
@@ -64,12 +72,20 @@ function ProgramsPageInner() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button onClick={seed} disabled={seeding} className="admin-btn admin-btn-outline admin-btn-sm">
+          <button
+            onClick={seed}
+            disabled={seeding}
+            className="admin-btn admin-btn-outline admin-btn-sm"
+          >
             {seeding ? <Loader2 size={14} className="animate-spin" /> : null}
             Seed from data files
           </button>
           <button
-            onClick={() => router.push(`/admin/programs/new${filter ? `?college=${filter}` : ""}`)}
+            onClick={() =>
+              router.push(
+                `/admin/programs/new${filter ? `?college=${filter}` : ""}`,
+              )
+            }
             className="admin-btn admin-btn-primary"
           >
             <Plus size={16} /> New Program
@@ -106,21 +122,29 @@ function ProgramsPageInner() {
               {filtered.map((p) => (
                 <tr
                   key={p._id}
-                  className="cursor-pointer hover:bg-gray-50 transition-colors"
-                  onClick={() => router.push(`/admin/programs/${p._id}?college=${p.institution}`)}
+                  className="cursor-pointer transition-colors hover:bg-gray-50"
+                  onClick={() =>
+                    router.push(
+                      `/admin/programs/${p._id}?college=${p.institution}`,
+                    )
+                  }
                 >
                   <td>
                     <div className="font-medium text-gray-900">{p.name}</div>
                     {p.highlight && (
-                      <div className="text-xs text-gray-400 mt-0.5 truncate max-w-xs">{p.highlight}</div>
+                      <div className="mt-0.5 max-w-xs truncate text-xs text-gray-400">
+                        {p.highlight}
+                      </div>
                     )}
                   </td>
                   <td className="font-mono text-sm text-gray-600">{p.abbr}</td>
-                  <td className="text-gray-600 text-sm">{p.degree}</td>
-                  <td className="text-gray-500 text-sm">{p.duration}</td>
-                  <td className="text-gray-500 text-sm">{p.seats}</td>
+                  <td className="text-sm text-gray-600">{p.degree}</td>
+                  <td className="text-sm text-gray-500">{p.duration}</td>
+                  <td className="text-sm text-gray-500">{p.seats}</td>
                   <td>
-                    <span className={`admin-badge ${p.is_active ? "admin-badge-green" : "admin-badge-red"}`}>
+                    <span
+                      className={`admin-badge ${p.is_active ? "admin-badge-green" : "admin-badge-red"}`}
+                    >
                       {p.is_active ? "Active" : "Inactive"}
                     </span>
                   </td>

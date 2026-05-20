@@ -28,11 +28,12 @@ function normalizeDb(raw: unknown): Item[] {
     const role =
       course && company
         ? `${course} at ${company}`
-        : company || course || (typeof r.batch === "string" ? `Batch ${r.batch}` : "");
+        : company ||
+          course ||
+          (typeof r.batch === "string" ? `Batch ${r.batch}` : "");
 
     const image =
-      (typeof r.avatar === "string" && r.avatar) ||
-      "/avatars/male_avatar.png";
+      (typeof r.avatar === "string" && r.avatar) || "/avatars/male_avatar.png";
     const tag = typeof r.category === "string" ? r.category : "Alumni";
 
     out.push({ quote, name, role, image, tag });

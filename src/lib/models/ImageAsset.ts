@@ -5,7 +5,15 @@ export interface IImageAsset extends Document {
   storage_key: string;
   url: string;
   alt_text: string;
-  category: "department" | "faculty" | "hero" | "campus" | "program" | "recruiter" | "testimonial" | "other";
+  category:
+    | "department"
+    | "faculty"
+    | "hero"
+    | "campus"
+    | "program"
+    | "recruiter"
+    | "testimonial"
+    | "other";
   institution: string;
   file_size: number;
   mime_type: string;
@@ -23,7 +31,16 @@ const ImageAssetSchema = new Schema<IImageAsset>(
     alt_text: { type: String, default: "" },
     category: {
       type: String,
-      enum: ["department", "faculty", "hero", "campus", "program", "recruiter", "testimonial", "other"],
+      enum: [
+        "department",
+        "faculty",
+        "hero",
+        "campus",
+        "program",
+        "recruiter",
+        "testimonial",
+        "other",
+      ],
       default: "other",
     },
     institution: { type: String, default: "all" },

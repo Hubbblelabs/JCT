@@ -9,11 +9,6 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
-import {
-  ugCourses as fallbackUg,
-  pgCourses as fallbackPg,
-  researchCourses as fallbackResearch,
-} from "@/data/engineering";
 
 type Course = {
   name: string;
@@ -113,10 +108,19 @@ function classify(programs: Course[], raw: Record<string, unknown>[]) {
   const phd: Course[] = [];
   programs.forEach((p, idx) => {
     const item = raw[idx] ?? {};
-    const degree = typeof item.degree === "string" ? item.degree.toLowerCase() : "";
-    if (degree.includes("ph.d") || degree.includes("phd") || degree.includes("doctoral")) {
+    const degree =
+      typeof item.degree === "string" ? item.degree.toLowerCase() : "";
+    if (
+      degree.includes("ph.d") ||
+      degree.includes("phd") ||
+      degree.includes("doctoral")
+    ) {
       phd.push(p);
-    } else if (degree.includes("m.e") || degree.includes("m.tech") || degree.includes("pg")) {
+    } else if (
+      degree.includes("m.e") ||
+      degree.includes("m.tech") ||
+      degree.includes("pg")
+    ) {
       pg.push(p);
     } else {
       ug.push(p);
@@ -139,32 +143,32 @@ function normalizeCourse(r: Record<string, unknown>): Course | null {
 }
 
 export default function EngineeringCoursesPage() {
-  const [ugCourses, setUgCourses] = useState<Course[]>(fallbackUg as Course[]);
-  const [pgCourses, setPgCourses] = useState<Course[]>(fallbackPg as Course[]);
-  const [researchCourses, setResearchCourses] = useState<Course[]>(
-    fallbackResearch as Course[],
-  );
+  const [ugCourses, setUgCourses] = useState<Course[]>([]);
+  const [pgCourses, setPgCourses] = useState<Course[]>([]);
+  const [researchCourses, setResearchCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/public/programs?institution=engineering")
+    fetch("/api/public/programs?institution=engineering&published=true")
       .then((r) => r.json())
       .then((res) => {
         if (cancelled) return;
-        if (res?.source !== "db") return;
-        const raw = Array.isArray(res.data)
+        const raw = Array.isArray(res?.data)
           ? (res.data as Record<string, unknown>[])
           : [];
         const normalized = raw
           .map(normalizeCourse)
           .filter((x): x is Course => x !== null);
-        if (normalized.length === 0) return;
         const { ug, pg, phd } = classify(normalized, raw);
-        if (ug.length > 0) setUgCourses(ug);
-        if (pg.length > 0) setPgCourses(pg);
-        if (phd.length > 0) setResearchCourses(phd);
+        setUgCourses(ug);
+        setPgCourses(pg);
+        setResearchCourses(phd);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -187,85 +191,106 @@ export default function EngineeringCoursesPage() {
           ]}
         />
 
-        {/* UG Courses */}
-        <section className="mt-12">
-          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <span className="text-engineering-light mb-2 block text-xs font-bold tracking-[0.2em] uppercase">
-                Undergraduate Programs
-              </span>
-              <h2 className="text-navy font-serif text-3xl font-bold md:text-4xl">
-                B.E. / B.Tech Courses
-              </h2>
-            </div>
-            <p className="max-w-xs text-sm text-slate-500">
-              4-year programs approved by AICTE & affiliated to Anna University
-            </p>
+        {loading ? (
+          <div className="py-24 text-center text-sm text-slate-400">
+            Loading courses…
           </div>
+        ) : ugCourses.length === 0 &&
+          pgCourses.length === 0 &&
+          researchCourses.length === 0 ? (
+          <div className="py-24 text-center text-sm text-slate-400">
+            No courses published yet.
+          </div>
+        ) : (
+          <>
+            {/* UG Courses */}
+            {ugCourses.length > 0 && (
+              <section className="mt-12">
+                <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <span className="text-engineering-light mb-2 block text-xs font-bold tracking-[0.2em] uppercase">
+                      Undergraduate Programs
+                    </span>
+                    <h2 className="text-navy font-serif text-3xl font-bold md:text-4xl">
+                      B.E. / B.Tech Courses
+                    </h2>
+                  </div>
+                  <p className="max-w-xs text-sm text-slate-500">
+                    4-year programs approved by AICTE & affiliated to Anna
+                    University
+                  </p>
+                </div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {ugCourses.map((course) => (
-              <CourseCard
-                key={course.slug}
-                course={course as Course}
-                href={`/institutions/engineering/departments/${course.slug}`}
-                showBadges
-                badge="UG"
-              />
-            ))}
-          </div>
-        </section>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {ugCourses.map((course) => (
+                    <CourseCard
+                      key={course.slug}
+                      course={course as Course}
+                      href={`/institutions/engineering/programs/${course.slug}`}
+                      showBadges
+                      badge="UG"
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
 
-        {/* PG Courses */}
-        <section className="mt-16">
-          <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <span className="text-engineering-light mb-2 block text-xs font-bold tracking-[0.2em] uppercase">
-                Postgraduate Programs
-              </span>
-              <h2 className="text-navy font-serif text-3xl font-bold md:text-4xl">
-                M.E. Courses
-              </h2>
-            </div>
-            <p className="max-w-xs text-sm text-slate-500">
-              Advanced specialization for engineering graduates
-            </p>
-          </div>
+            {/* PG Courses */}
+            {pgCourses.length > 0 && (
+              <section className="mt-16">
+                <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <span className="text-engineering-light mb-2 block text-xs font-bold tracking-[0.2em] uppercase">
+                      Postgraduate Programs
+                    </span>
+                    <h2 className="text-navy font-serif text-3xl font-bold md:text-4xl">
+                      M.E. Courses
+                    </h2>
+                  </div>
+                  <p className="max-w-xs text-sm text-slate-500">
+                    Advanced specialization for engineering graduates
+                  </p>
+                </div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {pgCourses.map((course) => (
-              <CourseCard
-                key={course.slug}
-                course={course as Course}
-                href={`/institutions/engineering/departments/${course.slug}`}
-                badge="PG"
-              />
-            ))}
-          </div>
-        </section>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {pgCourses.map((course) => (
+                    <CourseCard
+                      key={course.slug}
+                      course={course as Course}
+                      href={`/institutions/engineering/programs/${course.slug}`}
+                      badge="PG"
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
 
-        {/* Research / PhD */}
-        <section className="mt-16 mb-12">
-          <div className="mb-6">
-            <span className="text-engineering-light mb-2 block text-xs font-bold tracking-[0.2em] uppercase">
-              Research Programs
-            </span>
-            <h2 className="text-navy font-serif text-3xl font-bold md:text-4xl">
-              Doctoral Programme
-            </h2>
-          </div>
+            {/* Research / PhD */}
+            {researchCourses.length > 0 && (
+              <section className="mt-16 mb-12">
+                <div className="mb-6">
+                  <span className="text-engineering-light mb-2 block text-xs font-bold tracking-[0.2em] uppercase">
+                    Research Programs
+                  </span>
+                  <h2 className="text-navy font-serif text-3xl font-bold md:text-4xl">
+                    Doctoral Programme
+                  </h2>
+                </div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {researchCourses.map((course) => (
-              <CourseCard
-                key={course.slug}
-                course={course as Course}
-                href={`/institutions/engineering/departments/${course.slug}`}
-                badge="Ph.D."
-              />
-            ))}
-          </div>
-        </section>
+                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {researchCourses.map((course) => (
+                    <CourseCard
+                      key={course.slug}
+                      course={course as Course}
+                      href={`/institutions/engineering/programs/${course.slug}`}
+                      badge="Ph.D."
+                    />
+                  ))}
+                </div>
+              </section>
+            )}
+          </>
+        )}
       </div>
 
       <Footer />

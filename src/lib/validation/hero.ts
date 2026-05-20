@@ -19,7 +19,11 @@ export const HOME_LIMITS = {
 } as const;
 
 export const HomeHeroSchema = z.object({
-  backgroundImages: z.array(zUrl).max(HOME_LIMITS.backgroundImages).optional().default([]),
+  backgroundImages: z
+    .array(zUrl)
+    .max(HOME_LIMITS.backgroundImages)
+    .optional()
+    .default([]),
   titleLines: z
     .array(zClampedString(0, HOME_LIMITS.titleLineMax, "Title line"))
     .max(HOME_LIMITS.titleLines)
@@ -40,7 +44,9 @@ export const HomeHeroSchema = z.object({
     .array(
       z.object({
         title: zClampedString(0, HOME_LIMITS.cardTitleMax, "Card title"),
-        description: zOptionalString(HOME_LIMITS.cardDescriptionMax).default(""),
+        description: zOptionalString(HOME_LIMITS.cardDescriptionMax).default(
+          "",
+        ),
         href: zUrl,
         icon: zClampedString(0, 40, "Icon"),
         ctaLabel: zClampedString(0, 40, "CTA label"),
@@ -85,7 +91,9 @@ export const EngineeringHeroSchema = z.object({
   subtitle: zOptionalString(ENG_HERO_LIMITS.subtitleMax).default(""),
   ctas: z.array(zCta).max(ENG_HERO_LIMITS.ctas).optional().default([]),
   badgeText: zOptionalString(ENG_HERO_LIMITS.badgeTextMax).default(""),
-  counsellingCode: zOptionalString(ENG_HERO_LIMITS.counsellingCodeMax).default(""),
+  counsellingCode: zOptionalString(ENG_HERO_LIMITS.counsellingCodeMax).default(
+    "",
+  ),
 });
 
 // Arts & Science Hero — split title into 3 parts (line1 + highlight + line2).

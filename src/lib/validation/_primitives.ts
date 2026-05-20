@@ -5,7 +5,10 @@ export function zClampedString(min: number, max: number, label?: string) {
   const fieldName = label ?? "Field";
   return z
     .string()
-    .min(min, `${fieldName} must be at least ${min} character${min === 1 ? "" : "s"}`)
+    .min(
+      min,
+      `${fieldName} must be at least ${min} character${min === 1 ? "" : "s"}`,
+    )
     .max(max, `${fieldName} must be at most ${max} characters`);
 }
 
@@ -13,14 +16,21 @@ export const zRequiredString = (label?: string, max = 200) =>
   zClampedString(1, max, label);
 
 export const zOptionalString = (max: number) =>
-  z.string().max(max, `Must be at most ${max} characters`).optional().or(z.literal(""));
+  z
+    .string()
+    .max(max, `Must be at most ${max} characters`)
+    .optional()
+    .or(z.literal(""));
 
 // Identifiers ───────────────────────────────────────────────────────────────
 export const zSlug = z
   .string()
   .min(1, "Slug is required")
   .max(80, "Slug must be at most 80 characters")
-  .regex(/^[a-z0-9-]+$/, "Slug may contain lowercase letters, numbers, and dashes only");
+  .regex(
+    /^[a-z0-9-]+$/,
+    "Slug may contain lowercase letters, numbers, and dashes only",
+  );
 
 export const zEmail = z
   .string()
@@ -80,7 +90,9 @@ export const zImageRef = z.object({
 
 // Generic Enum helper that preserves literal types and yields a friendly
 // error message on failure.
-export function zEnum<const T extends readonly [string, ...string[]]>(values: T) {
+export function zEnum<const T extends readonly [string, ...string[]]>(
+  values: T,
+) {
   return z.enum(values, {
     error: () => `Must be one of: ${values.join(", ")}`,
   });

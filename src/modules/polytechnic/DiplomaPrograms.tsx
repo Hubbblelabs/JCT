@@ -7,7 +7,6 @@ import { ArrowLeft, ArrowRight, LucideIcon } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { getImageUrl } from "@/lib/utils";
-import { diplomaPrograms as fallbackDiplomaPrograms } from "@/data/polytechnic";
 import { DragScroll } from "@/components/ui/DragScroll";
 import { PolySection, PolySectionHeader } from "@/modules/polytechnic/PolyUI";
 
@@ -20,7 +19,7 @@ type PolytechnicCourse = {
 
 function CourseCard({ course }: { course: PolytechnicCourse }) {
   const router = useRouter();
-  const href = `/institutions/polytechnic/departments/${course.slug}`;
+  const href = `/institutions/polytechnic/programs/${course.slug}`;
 
   return (
     <motion.article
@@ -261,9 +260,8 @@ function normalizeDbPrograms(raw: unknown): PolytechnicCourse[] {
 }
 
 export function DiplomaPrograms() {
-  const [courses, setCourses] = useState<PolytechnicCourse[]>(
-    fallbackDiplomaPrograms as PolytechnicCourse[],
-  );
+  const [courses, setCourses] = useState<PolytechnicCourse[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -271,12 +269,12 @@ export function DiplomaPrograms() {
       .then((r) => r.json())
       .then((res) => {
         if (cancelled) return;
-        if (res?.source === "db") {
-          const next = normalizeDbPrograms(res.data);
-          if (next.length > 0) setCourses(next);
-        }
+        setCourses(normalizeDbPrograms(res?.data));
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -331,7 +329,17 @@ export function DiplomaPrograms() {
           <PolySectionHeader title="Diploma Programs" className="mb-0" />
         </div>
 
-        <CourseCarouselSection courses={courses} />
+        {loading ? (
+          <div className="py-12 text-center text-sm text-slate-400">
+            Loading programs…
+          </div>
+        ) : courses.length === 0 ? (
+          <div className="py-12 text-center text-sm text-slate-400">
+            No programs published yet.
+          </div>
+        ) : (
+          <CourseCarouselSection courses={courses} />
+        )}
       </div>
     </PolySection>
   );

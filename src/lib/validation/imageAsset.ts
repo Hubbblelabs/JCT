@@ -43,7 +43,10 @@ export type CategoryRule = {
   aspect?: { value: number; tolerance: number; label: string };
 };
 
-export const CATEGORY_RULES: Record<(typeof IMAGE_CATEGORIES)[number], CategoryRule> = {
+export const CATEGORY_RULES: Record<
+  (typeof IMAGE_CATEGORIES)[number],
+  CategoryRule
+> = {
   hero: {
     targetWidth: 1920,
     minWidth: 1280,

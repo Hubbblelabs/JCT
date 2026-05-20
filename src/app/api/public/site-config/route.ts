@@ -7,12 +7,16 @@ export const dynamic = "force-dynamic";
 function resolveProspectusUrl(value: unknown): unknown {
   if (!value || typeof value !== "object") return value;
   const v = value as Record<string, unknown>;
-  
+
   // If there's a URL field, construct full URL if it's just a path
   if (typeof v.url === "string") {
     const url = v.url.trim();
     // If it's already a full URL or relative path, use as-is
-    if (url.startsWith("http://") || url.startsWith("https://") || url.startsWith("/")) {
+    if (
+      url.startsWith("http://") ||
+      url.startsWith("https://") ||
+      url.startsWith("/")
+    ) {
       return v;
     }
     // Otherwise, it's a path in R2 storage - construct full URL
@@ -41,12 +45,12 @@ export async function GET(req: Request) {
         doc.status === "published" && doc.published_value
           ? doc.published_value
           : doc.value;
-      
+
       // Special handling for homeProspectus to construct full URL
       if (key === "homeProspectus") {
         value = resolveProspectusUrl(value);
       }
-      
+
       return NextResponse.json({ source: "db", data: value });
     }
 
@@ -61,12 +65,12 @@ export async function GET(req: Request) {
         doc.status === "published" && doc.published_value
           ? doc.published_value
           : doc.value;
-      
+
       // Special handling for homeProspectus
       if (doc.config_key === "homeProspectus") {
         value = resolveProspectusUrl(value);
       }
-      
+
       data[doc.config_key] = value;
     }
 

@@ -8,9 +8,9 @@ import {
   TextArea,
   TextInput,
 } from "@/components/admin/inputs";
-import type { Section, Tab } from "@/lib/department-tabs";
+import type { Section, Tab } from "@/lib/program-tabs";
 
-export type { Section, Tab } from "@/lib/department-tabs";
+export type { Section, Tab } from "@/lib/program-tabs";
 
 const ICON_OPTIONS = [
   { value: "overview", label: "Overview (book)" },
@@ -380,7 +380,13 @@ function PeopleSectionEditor({
               ...section,
               items: [
                 ...section.items,
-                { name: "", title: "", image: "", email: "", qualifications: "" },
+                {
+                  name: "",
+                  title: "",
+                  image: "",
+                  email: "",
+                  qualifications: "",
+                },
               ],
             })
           }
@@ -483,7 +489,7 @@ type Props = {
   onChange: (next: Tab[]) => void;
 };
 
-export function DepartmentTabsEditor({ tabs, onChange }: Props) {
+export function ProgramTabsEditor({ tabs, onChange }: Props) {
   return (
     <div className="space-y-3">
       {tabs.length === 0 && (
@@ -494,9 +500,12 @@ export function DepartmentTabsEditor({ tabs, onChange }: Props) {
         </p>
       )}
       {tabs.map((tab, i) => (
-        <div key={i} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <div
+          key={i}
+          className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+        >
           <div className="mb-3 flex flex-wrap items-end gap-3">
-            <div className="flex-1 min-w-48">
+            <div className="min-w-48 flex-1">
               <TextInput
                 label="Tab Label"
                 value={tab.label}
@@ -620,14 +629,7 @@ export function DepartmentTabsEditor({ tabs, onChange }: Props) {
 
           <div className="mt-3 flex flex-wrap gap-2">
             {(
-              [
-                "richText",
-                "stats",
-                "list",
-                "cards",
-                "image",
-                "people",
-              ] as const
+              ["richText", "stats", "list", "cards", "image", "people"] as const
             ).map((kind) => (
               <button
                 key={kind}
@@ -636,7 +638,10 @@ export function DepartmentTabsEditor({ tabs, onChange }: Props) {
                   onChange(
                     tabs.map((t, j) =>
                       j === i
-                        ? { ...t, sections: [...t.sections, emptySection(kind)] }
+                        ? {
+                            ...t,
+                            sections: [...t.sections, emptySection(kind)],
+                          }
                         : t,
                     ),
                   )

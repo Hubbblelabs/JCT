@@ -1,7 +1,13 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Recruiter } from "@/lib/models";
-import { requireRole, json, notFound, serverError, validateBody } from "@/lib/api-helpers";
+import {
+  requireRole,
+  json,
+  notFound,
+  serverError,
+  validateBody,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { RecruiterUpdateSchema } from "@/lib/validation";
 import { revalidateTargets } from "@/lib/revalidate";
@@ -47,7 +53,12 @@ export async function PATCH(
     if (!doc) return notFound();
 
     revalidateTargets("home");
-    await logAudit("recruiter", "updated", session!.user?.email ?? "", `Updated recruiter ${doc.name}`);
+    await logAudit(
+      "recruiter",
+      "updated",
+      session!.user?.email ?? "",
+      `Updated recruiter ${doc.name}`,
+    );
     return json(doc);
   } catch (e) {
     console.error(e);
@@ -69,7 +80,12 @@ export async function DELETE(
     if (!doc) return notFound();
 
     revalidateTargets("home");
-    await logAudit("recruiter", "deleted", session!.user?.email ?? "", `Deleted recruiter ${doc.name}`);
+    await logAudit(
+      "recruiter",
+      "deleted",
+      session!.user?.email ?? "",
+      `Deleted recruiter ${doc.name}`,
+    );
     return json({ message: "Deleted" });
   } catch (e) {
     console.error(e);

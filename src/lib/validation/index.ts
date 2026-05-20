@@ -23,7 +23,10 @@ export type {
   PolytechnicHeroValue,
 } from "./hero";
 
-export { AnnouncementSchema, LIMITS as LIMITS_announcement } from "./announcement";
+export {
+  AnnouncementSchema,
+  LIMITS as LIMITS_announcement,
+} from "./announcement";
 export type { AnnouncementValue } from "./announcement";
 
 export { LifeAtJctSchema, LIMITS as LIMITS_lifeAtJct } from "./lifeAtJct";
@@ -72,19 +75,17 @@ export {
   ProgramSchema,
   ProgramCreateSchema,
   ProgramUpdateSchema,
+  ProgramFullUpdateSchema,
+  ProgramContentSchema,
   INSTITUTIONS as PROGRAM_INSTITUTIONS,
   LIMITS as LIMITS_program,
 } from "./programs";
-export type { ProgramValue } from "./programs";
-
-export {
-  DepartmentCreateSchema,
-  DepartmentUpdateSchema,
-  DepartmentContentSchema,
-  COLLEGES as DEPARTMENT_COLLEGES,
-  LIMITS as LIMITS_department,
-} from "./departments";
-export type { DepartmentContentValue, SectionValue, TabValue } from "./departments";
+export type {
+  ProgramValue,
+  ProgramContentValue,
+  SectionValue,
+  TabValue,
+} from "./programs";
 
 export {
   UserCreateSchema,

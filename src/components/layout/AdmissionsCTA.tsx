@@ -54,7 +54,9 @@ export function AdmissionsCTA() {
           if (raw) {
             // Resolve storage keys via the public image proxy or use as-is if already a full URL
             const resolved =
-              raw.startsWith("http://") || raw.startsWith("https://") || raw.startsWith("/")
+              raw.startsWith("http://") ||
+              raw.startsWith("https://") ||
+              raw.startsWith("/")
                 ? raw
                 : `/api/public/images/${raw}`;
             setProspectusUrl(resolved);
@@ -165,7 +167,7 @@ export function AdmissionsCTA() {
               href={prospectusUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="border-border text-navy hover:bg-muted inline-flex h-14 items-center justify-center rounded-full border-2 px-8 font-sans text-base font-semibold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="border-border text-navy hover:bg-muted inline-flex h-14 items-center justify-center rounded-full border-2 px-8 font-sans text-base font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50"
               onClick={(e) => {
                 if (!prospectusUrl) {
                   e.preventDefault();

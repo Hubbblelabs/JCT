@@ -54,7 +54,10 @@ export const SITE_CONFIG_SCHEMAS = {
 
 export type SiteConfigKey = keyof typeof SITE_CONFIG_SCHEMAS;
 
-const allKeys = Object.keys(SITE_CONFIG_SCHEMAS) as [SiteConfigKey, ...SiteConfigKey[]];
+const allKeys = Object.keys(SITE_CONFIG_SCHEMAS) as [
+  SiteConfigKey,
+  ...SiteConfigKey[],
+];
 
 export const SiteConfigPutSchema = z
   .object({

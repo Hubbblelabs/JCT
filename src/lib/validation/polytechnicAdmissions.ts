@@ -28,7 +28,13 @@ export const PolytechnicAdmissionsSchema = z.object({
   description: zOptionalString(LIMITS.descriptionMax).default(""),
   ctaLabel: zOptionalString(LIMITS.ctaLabelMax).default(""),
   ctaHref: zUrl.optional().or(z.literal("")),
-  criteria: z.array(CriterionSchema).max(LIMITS.criteriaMax).optional().default([]),
+  criteria: z
+    .array(CriterionSchema)
+    .max(LIMITS.criteriaMax)
+    .optional()
+    .default([]),
 });
 
-export type PolytechnicAdmissionsValue = z.infer<typeof PolytechnicAdmissionsSchema>;
+export type PolytechnicAdmissionsValue = z.infer<
+  typeof PolytechnicAdmissionsSchema
+>;

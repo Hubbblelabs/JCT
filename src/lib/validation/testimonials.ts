@@ -1,9 +1,20 @@
 import { z } from "zod";
-import { zEnum, zUrl, zClampedString, zOptionalString, zNonNegativeInt } from "./_primitives";
+import {
+  zEnum,
+  zUrl,
+  zClampedString,
+  zOptionalString,
+  zNonNegativeInt,
+} from "./_primitives";
 
 // Must match the Testimonial model enums.
 export const CATEGORIES = ["Alumni", "Student", "Industry"] as const;
-export const INSTITUTIONS = ["engineering", "arts-science", "polytechnic", "all"] as const;
+export const INSTITUTIONS = [
+  "engineering",
+  "arts-science",
+  "polytechnic",
+  "all",
+] as const;
 
 export const LIMITS = {
   nameMax: 80,

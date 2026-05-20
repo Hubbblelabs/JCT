@@ -17,7 +17,9 @@ export async function GET(req: NextRequest) {
     if (category) filter.category = category;
     if (institution) filter.institution = institution;
 
-    const docs = await ImageAsset.find(filter).sort({ created_at: -1 }).limit(500);
+    const docs = await ImageAsset.find(filter)
+      .sort({ created_at: -1 })
+      .limit(500);
     return json(docs);
   } catch (e) {
     console.error(e);

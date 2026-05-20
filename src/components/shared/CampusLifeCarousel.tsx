@@ -104,9 +104,7 @@ export function CampusLifeCarousel({ theme, configKey, defaultCta }: Props) {
     const maxScroll = container.scrollWidth - container.clientWidth;
     if (maxScroll <= 0) return;
 
-    const index = Math.round(
-      (scrollLeft / maxScroll) * (photos.length - 1),
-    );
+    const index = Math.round((scrollLeft / maxScroll) * (photos.length - 1));
     setActiveIndex(Math.min(Math.max(index, 0), photos.length - 1));
   };
 

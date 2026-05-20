@@ -65,13 +65,9 @@ function normalizeHero(raw: unknown): HeroContent | null {
     backgroundImages,
     eyebrow: typeof r.eyebrow === "string" ? r.eyebrow : DEFAULT_HERO.eyebrow,
     titleLine1:
-      typeof r.titleLine1 === "string"
-        ? r.titleLine1
-        : DEFAULT_HERO.titleLine1,
+      typeof r.titleLine1 === "string" ? r.titleLine1 : DEFAULT_HERO.titleLine1,
     titleLine2:
-      typeof r.titleLine2 === "string"
-        ? r.titleLine2
-        : DEFAULT_HERO.titleLine2,
+      typeof r.titleLine2 === "string" ? r.titleLine2 : DEFAULT_HERO.titleLine2,
     subtitle:
       typeof r.subtitle === "string" ? r.subtitle : DEFAULT_HERO.subtitle,
     ctas: ctas.length > 0 ? ctas : DEFAULT_HERO.ctas,

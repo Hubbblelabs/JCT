@@ -7,7 +7,7 @@ export const revalidate = 3600; // 1 hour
 // Helper to convert storage key to full URL
 function getImageUrl(imageUrl: string | null | undefined): string | null {
   if (!imageUrl) return null;
-  
+
   // If it's already a full URL, return as-is
   if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
     return imageUrl;

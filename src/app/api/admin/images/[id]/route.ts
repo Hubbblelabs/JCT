@@ -2,7 +2,13 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { ImageAsset } from "@/lib/models";
 import { deleteFromR2 } from "@/lib/r2";
-import { requireRole, json, notFound, serverError, validateBody } from "@/lib/api-helpers";
+import {
+  requireRole,
+  json,
+  notFound,
+  serverError,
+  validateBody,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { ImageAssetPatchSchema } from "@/lib/validation";
 
@@ -21,10 +27,17 @@ export async function DELETE(
 
     try {
       await deleteFromR2(doc.storage_key);
-    } catch {}
+    } catch {
+      /* non-fatal */
+    }
 
     await doc.deleteOne();
-    await logAudit("image", "deleted", session!.user?.email ?? "", `Deleted ${doc.filename}`);
+    await logAudit(
+      "image",
+      "deleted",
+      session!.user?.email ?? "",
+      `Deleted ${doc.filename}`,
+    );
     return json({ message: "Deleted" });
   } catch (e) {
     console.error(e);
@@ -57,7 +70,12 @@ export async function PATCH(
       { new: true },
     );
     if (!doc) return notFound();
-    await logAudit("image", "updated", session!.user?.email ?? "", `Updated image metadata ${doc.filename}`);
+    await logAudit(
+      "image",
+      "updated",
+      session!.user?.email ?? "",
+      `Updated image metadata ${doc.filename}`,
+    );
     return json(doc);
   } catch (e) {
     console.error(e);

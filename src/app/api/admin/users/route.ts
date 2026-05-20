@@ -2,7 +2,13 @@ import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/lib/models";
-import { requireRole, json, badRequest, serverError, validateBody } from "@/lib/api-helpers";
+import {
+  requireRole,
+  json,
+  badRequest,
+  serverError,
+  validateBody,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { UserCreateSchema } from "@/lib/validation";
 
@@ -12,7 +18,9 @@ export async function GET(req: NextRequest) {
 
   try {
     await connectDB();
-    const users = await User.find().select("-password_hash").sort({ created_at: -1 });
+    const users = await User.find()
+      .select("-password_hash")
+      .sort({ created_at: -1 });
     return json(users);
   } catch (e) {
     console.error(e);
@@ -40,10 +48,15 @@ export async function POST(req: NextRequest) {
       full_name: body.full_name,
       role: body.role,
       institution: body.institution,
-      departments: body.departments,
+      programs: body.programs,
     });
 
-    await logAudit("user", "created", session!.user?.email ?? "", `Created user ${body.email}`);
+    await logAudit(
+      "user",
+      "created",
+      session!.user?.email ?? "",
+      `Created user ${body.email}`,
+    );
     const { password_hash: _, ...userObj } = user.toObject();
     return json(userObj, 201);
   } catch (e) {

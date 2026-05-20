@@ -128,7 +128,7 @@ public/                          # Static assets (logos, favicons)
 - **Password Hashing**: bcryptjs (async, cost 12)
 - **Session Strategy**: JWT with 24-hour max age
 - **Role Hierarchy**: `viewer` (0) → `editor` (1) → `admin` (2) → `super_admin` (3)
-- **Scope Enforcement**: 
+- **Scope Enforcement**:
   - **super_admin**: All users, can manage all users
   - **admin**: Can publish, access all departments
   - **editor**: Can edit only assigned institution/departments
@@ -157,7 +157,7 @@ public/                          # Static assets (logos, favicons)
 - **Draft/Publish Model**: Departments and SiteConfig use `status: "draft" | "published"` with separate `content` and `published_content` fields
 - **Versioning**: All content entities have `version` field for tracking changes
 - **Department Tabs**: Departments store content as JSON object with tab structure (can have multiple tabs per department)
-- **Image Upload**: 
+- **Image Upload**:
   - Images stored in Cloudflare R2 via AWS SDK
   - Metadata (url, alt_text, category, institution) stored in MongoDB
   - Categories: department, faculty, hero, campus, program, recruiter, testimonial, other
@@ -210,13 +210,12 @@ Zod schemas define all entity shapes. Key locations:
 - API routes validate incoming JSON with `validateBody()` returning structured 422 errors
 
 Example validation error response:
+
 ```json
 {
   "error": "Validation failed",
   "message": "name: String must contain at least 1 character",
-  "details": [
-    { "path": ["name"], "message": "...", "code": "too_small" }
-  ]
+  "details": [{ "path": ["name"], "message": "...", "code": "too_small" }]
 }
 ```
 

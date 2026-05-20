@@ -27,38 +27,122 @@ import {
 import { useSession, signOut } from "next-auth/react";
 import { Suspense } from "react";
 
-type NavItem = { label: string; href: string; icon: React.ComponentType<{ size?: number }> };
+type NavItem = {
+  label: string;
+  href: string;
+  icon: React.ComponentType<{ size?: number }>;
+};
 
 const COLLEGE_ITEMS: Record<string, NavItem[]> = {
   engineering: [
-    { label: "Announcement Bar", href: "/admin/page-content?college=engineering&section=announcement", icon: Bell },
-    { label: "Hero", href: "/admin/page-content?college=engineering&section=hero", icon: Image },
-    { label: "Performance Metrics", href: "/admin/page-content?college=engineering&section=metrics", icon: BarChart3 },
-    { label: "Life at JCT", href: "/admin/page-content?college=engineering&section=lifeAtJct", icon: Camera },
-    { label: "Programs", href: "/admin/programs?college=engineering", icon: GraduationCap },
+    {
+      label: "Announcement Bar",
+      href: "/admin/page-content?college=engineering&section=announcement",
+      icon: Bell,
+    },
+    {
+      label: "Hero",
+      href: "/admin/page-content?college=engineering&section=hero",
+      icon: Image,
+    },
+    {
+      label: "Performance Metrics",
+      href: "/admin/page-content?college=engineering&section=metrics",
+      icon: BarChart3,
+    },
+    {
+      label: "Life at JCT",
+      href: "/admin/page-content?college=engineering&section=lifeAtJct",
+      icon: Camera,
+    },
+    {
+      label: "Programs",
+      href: "/admin/programs?college=engineering",
+      icon: GraduationCap,
+    },
   ],
   "arts-science": [
-    { label: "Hero", href: "/admin/page-content?college=arts-science&section=hero", icon: FileEdit },
-    { label: "Campus Life", href: "/admin/page-content?college=arts-science&section=campusLife", icon: Camera },
-    { label: "Testimonials", href: "/admin/testimonials?college=arts-science", icon: MessageSquare },
-    { label: "Programs", href: "/admin/programs?college=arts-science", icon: GraduationCap },
+    {
+      label: "Hero",
+      href: "/admin/page-content?college=arts-science&section=hero",
+      icon: FileEdit,
+    },
+    {
+      label: "Campus Life",
+      href: "/admin/page-content?college=arts-science&section=campusLife",
+      icon: Camera,
+    },
+    {
+      label: "Testimonials",
+      href: "/admin/testimonials?college=arts-science",
+      icon: MessageSquare,
+    },
+    {
+      label: "Programs",
+      href: "/admin/programs?college=arts-science",
+      icon: GraduationCap,
+    },
   ],
   polytechnic: [
-    { label: "Hero", href: "/admin/page-content?college=polytechnic&section=hero", icon: FileEdit },
-    { label: "Campus Life", href: "/admin/page-content?college=polytechnic&section=campusLife", icon: Camera },
-    { label: "Admissions", href: "/admin/page-content?college=polytechnic&section=admissions", icon: ClipboardList },
-    { label: "Testimonials", href: "/admin/testimonials?college=polytechnic", icon: MessageSquare },
-    { label: "Programs", href: "/admin/programs?college=polytechnic", icon: GraduationCap },
+    {
+      label: "Hero",
+      href: "/admin/page-content?college=polytechnic&section=hero",
+      icon: FileEdit,
+    },
+    {
+      label: "Campus Life",
+      href: "/admin/page-content?college=polytechnic&section=campusLife",
+      icon: Camera,
+    },
+    {
+      label: "Admissions",
+      href: "/admin/page-content?college=polytechnic&section=admissions",
+      icon: ClipboardList,
+    },
+    {
+      label: "Testimonials",
+      href: "/admin/testimonials?college=polytechnic",
+      icon: MessageSquare,
+    },
+    {
+      label: "Programs",
+      href: "/admin/programs?college=polytechnic",
+      icon: GraduationCap,
+    },
   ],
 };
 
 const MAIN_ITEMS: NavItem[] = [
-  { label: "Hero", href: "/admin/main/page-content?section=hero", icon: FileEdit },
-  { label: "Card", href: "/admin/main/page-content?section=card", icon: BarChart3 },
-  { label: "Life at JCT", href: "/admin/main/page-content?section=lifeAtJct", icon: Camera },
-  { label: "Testimonials", href: "/admin/main/page-content?section=testimonials", icon: MessageSquare },
-  { label: "Prospectus", href: "/admin/main/page-content?section=prospectus", icon: FileDown },
-  { label: "Pamphlet Popup", href: "/admin/main/page-content?section=pamphlet", icon: Layers },
+  {
+    label: "Hero",
+    href: "/admin/main/page-content?section=hero",
+    icon: FileEdit,
+  },
+  {
+    label: "Card",
+    href: "/admin/main/page-content?section=card",
+    icon: BarChart3,
+  },
+  {
+    label: "Life at JCT",
+    href: "/admin/main/page-content?section=lifeAtJct",
+    icon: Camera,
+  },
+  {
+    label: "Testimonials",
+    href: "/admin/main/page-content?section=testimonials",
+    icon: MessageSquare,
+  },
+  {
+    label: "Prospectus",
+    href: "/admin/main/page-content?section=prospectus",
+    icon: FileDown,
+  },
+  {
+    label: "Pamphlet Popup",
+    href: "/admin/main/page-content?section=pamphlet",
+    icon: Layers,
+  },
 ];
 
 const ADMIN_ITEMS: NavItem[] = [
@@ -79,7 +163,8 @@ function isItemActive(
   const itemPath = qIdx >= 0 ? href.slice(0, qIdx) : href;
   const itemQuery = qIdx >= 0 ? href.slice(qIdx + 1) : "";
 
-  const pathMatch = pathname === itemPath || pathname.startsWith(itemPath + "/");
+  const pathMatch =
+    pathname === itemPath || pathname.startsWith(itemPath + "/");
   if (!pathMatch) return false;
   if (!itemQuery) return true;
 
@@ -101,7 +186,8 @@ function isDropdownActive(
     const qIdx = item.href.indexOf("?");
     const itemPath = qIdx >= 0 ? item.href.slice(0, qIdx) : item.href;
     const itemQuery = qIdx >= 0 ? item.href.slice(qIdx + 1) : "";
-    const pathMatch = pathname === itemPath || pathname.startsWith(itemPath + "/");
+    const pathMatch =
+      pathname === itemPath || pathname.startsWith(itemPath + "/");
     if (!pathMatch) return false;
     if (!itemQuery) return true;
     const wantedCollege = new URLSearchParams(itemQuery).get("college");
@@ -124,11 +210,15 @@ function TabNavInner() {
     <div className="admin-top-nav">
       <div className="admin-brand-bar">
         {/* Brand */}
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex shrink-0 items-center gap-2">
           <BookOpen size={18} color="#c9a84c" />
           <div>
-            <p className="text-sm font-bold text-white leading-tight">JCT Admin</p>
-            <p className="text-[10px] text-white/40 leading-tight">Content Management</p>
+            <p className="text-sm leading-tight font-bold text-white">
+              JCT Admin
+            </p>
+            <p className="text-[10px] leading-tight text-white/40">
+              Content Management
+            </p>
           </div>
         </div>
 
@@ -159,7 +249,9 @@ function TabNavInner() {
                   key={item.href}
                   href={item.href}
                   className={`admin-nav-dropdown-item ${
-                    isItemActive(item.href, pathname, null, section) ? "active" : ""
+                    isItemActive(item.href, pathname, null, section)
+                      ? "active"
+                      : ""
                   }`}
                 >
                   <item.icon size={14} />
@@ -194,7 +286,9 @@ function TabNavInner() {
                       key={item.href}
                       href={item.href}
                       className={`admin-nav-dropdown-item ${
-                        isItemActive(item.href, pathname, college, section) ? "active" : ""
+                        isItemActive(item.href, pathname, college, section)
+                          ? "active"
+                          : ""
                       }`}
                     >
                       <item.icon size={14} />
@@ -208,7 +302,9 @@ function TabNavInner() {
 
           {/* Admin tools dropdown */}
           <div className="admin-nav-item">
-            <button className={`admin-nav-trigger ${adminMenuActive ? "active" : ""}`}>
+            <button
+              className={`admin-nav-trigger ${adminMenuActive ? "active" : ""}`}
+            >
               <Wrench size={13} />
               Admin
               <ChevronDown size={11} />
@@ -229,12 +325,15 @@ function TabNavInner() {
         </nav>
 
         {/* User info + sign out */}
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex shrink-0 items-center gap-3">
           <div className="flex items-center gap-2 text-sm text-white/75">
             <User size={14} />
-            <span className="hidden md:inline">{session?.user?.name ?? session?.user?.email}</span>
-            <span className="admin-badge admin-badge-blue capitalize text-[11px]">
-              {(session?.user as Record<string, unknown>)?.role as string ?? "admin"}
+            <span className="hidden md:inline">
+              {session?.user?.name ?? session?.user?.email}
+            </span>
+            <span className="admin-badge admin-badge-blue text-[11px] capitalize">
+              {((session?.user as Record<string, unknown>)?.role as string) ??
+                "admin"}
             </span>
           </div>
           <button
@@ -257,7 +356,9 @@ function TabNavInner() {
 
 export function AdminTabNav() {
   return (
-    <Suspense fallback={<div className="admin-top-nav" style={{ height: 56 }} />}>
+    <Suspense
+      fallback={<div className="admin-top-nav" style={{ height: 56 }} />}
+    >
       <TabNavInner />
     </Suspense>
   );

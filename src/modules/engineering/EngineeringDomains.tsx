@@ -8,11 +8,6 @@ import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { DragScroll } from "@/components/ui/DragScroll";
 import { getImageUrl } from "@/lib/utils";
-import {
-  ugCourses as fallbackUg,
-  pgCourses as fallbackPg,
-  researchCourses as fallbackResearch,
-} from "@/data/engineering";
 
 type EngineeringCourse = {
   name: string;
@@ -338,7 +333,7 @@ function CourseCarouselSection({
                 course={course}
                 href={
                   showAccreditationBadges || pgCourses
-                    ? `/institutions/engineering/departments/${course.slug}`
+                    ? `/institutions/engineering/programs/${course.slug}`
                     : undefined
                 }
                 showAccreditationBadges={showAccreditationBadges}
@@ -373,44 +368,47 @@ function normalizeDbCourses(raw: unknown): EngineeringCourse[] {
 }
 
 export function EngineeringDomains() {
-  const initialUg = fallbackUg as EngineeringCourse[];
-  const initialPg = [
-    ...fallbackPg,
-    ...fallbackResearch,
-  ] as EngineeringCourse[];
-
-  const [ugCourses, setUgCourses] = useState<EngineeringCourse[]>(initialUg);
-  const [postgraduateCourses, setPostgraduateCourses] =
-    useState<EngineeringCourse[]>(initialPg);
+  const [ugCourses, setUgCourses] = useState<EngineeringCourse[]>([]);
+  const [postgraduateCourses, setPostgraduateCourses] = useState<
+    EngineeringCourse[]
+  >([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/public/programs?institution=engineering")
+    fetch("/api/public/programs?institution=engineering&published=true")
       .then((r) => r.json())
       .then((res) => {
         if (cancelled) return;
-        if (res?.source !== "db") return;
-        const all = normalizeDbCourses(res.data);
-        if (all.length === 0) return;
+        const raw = Array.isArray(res?.data)
+          ? (res.data as Record<string, unknown>[])
+          : [];
+        const all = normalizeDbCourses(raw);
 
         const ug: EngineeringCourse[] = [];
         const pg: EngineeringCourse[] = [];
-        const raw = Array.isArray(res.data) ? res.data : [];
         all.forEach((course, idx) => {
-          const item = (raw[idx] ?? {}) as Record<string, unknown>;
+          const item = raw[idx] ?? {};
           const degree =
             typeof item.degree === "string" ? item.degree.toLowerCase() : "";
-          if (degree.includes("m.e") || degree.includes("m.tech") || degree.includes("ph.d")) {
+          if (
+            degree.includes("m.e") ||
+            degree.includes("m.tech") ||
+            degree.includes("ph.d")
+          ) {
             pg.push(course);
           } else {
             ug.push(course);
           }
         });
 
-        if (ug.length > 0) setUgCourses(ug);
-        if (pg.length > 0) setPostgraduateCourses(pg);
+        setUgCourses(ug);
+        setPostgraduateCourses(pg);
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -444,7 +442,9 @@ export function EngineeringDomains() {
               Undergraduate Programs
             </h2>
             <h3 className="text-navy mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl">
-              11 UG Courses,{" "}
+              {ugCourses.length > 0
+                ? `${ugCourses.length} UG Courses,`
+                : "UG Courses,"}{" "}
               <span className="font-normal text-stone-300 italic">
                 One Standard.
               </span>
@@ -464,28 +464,44 @@ export function EngineeringDomains() {
         </div>
       </div>
 
-      <CourseCarouselSection
-        eyebrow="Undergraduate Programs"
-        title={`${ugCourses.length} UG Courses,`}
-        subtitle="One Standard."
-        courses={ugCourses}
-        showAccreditationBadges
-        showDescription={false}
-        showHeader={false}
-        controlsPlacement="top"
-      />
+      {loading ? (
+        <div className="container mx-auto px-4 py-16 text-center text-sm text-stone-400 md:px-6">
+          Loading programs…
+        </div>
+      ) : ugCourses.length === 0 && postgraduateCourses.length === 0 ? (
+        <div className="container mx-auto px-4 py-16 text-center text-sm text-stone-400 md:px-6">
+          No programs published yet.
+        </div>
+      ) : (
+        <>
+          {ugCourses.length > 0 && (
+            <CourseCarouselSection
+              eyebrow="Undergraduate Programs"
+              title={`${ugCourses.length} UG Courses,`}
+              subtitle="One Standard."
+              courses={ugCourses}
+              showAccreditationBadges
+              showDescription={false}
+              showHeader={false}
+              controlsPlacement="top"
+            />
+          )}
 
-      <CourseCarouselSection
-        eyebrow="Postgraduate Programs"
-        title={`${postgraduateCourses.length} PG Courses,`}
-        subtitle="Advanced Learning."
-        courses={postgraduateCourses}
-        showAccreditationBadges={false}
-        showDescription={false}
-        showHeader
-        controlsPlacement="header"
-        pgCourses={true}
-      />
+          {postgraduateCourses.length > 0 && (
+            <CourseCarouselSection
+              eyebrow="Postgraduate Programs"
+              title={`${postgraduateCourses.length} PG Courses,`}
+              subtitle="Advanced Learning."
+              courses={postgraduateCourses}
+              showAccreditationBadges={false}
+              showDescription={false}
+              showHeader
+              controlsPlacement="header"
+              pgCourses={true}
+            />
+          )}
+        </>
+      )}
     </section>
   );
 }

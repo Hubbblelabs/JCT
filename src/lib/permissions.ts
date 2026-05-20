@@ -23,20 +23,18 @@ export function canManageUsers(userRole: string): boolean {
   return hasMinRole(userRole, "super_admin");
 }
 
-export function canAccessDepartment(
+export function canAccessProgram(
   userRole: string,
   userInstitution: string,
-  userDepartments: string[],
-  targetDept: string,
-  targetCollege: string,
+  userPrograms: string[],
+  targetProgram: string,
+  targetInstitution: string,
 ): boolean {
   if (hasMinRole(userRole, "admin")) return true;
   if (userRole === "editor") {
-    if (userInstitution !== "all" && userInstitution !== targetCollege)
+    if (userInstitution !== "all" && userInstitution !== targetInstitution)
       return false;
-    return (
-      userDepartments.length === 0 || userDepartments.includes(targetDept)
-    );
+    return userPrograms.length === 0 || userPrograms.includes(targetProgram);
   }
   return false;
 }

@@ -12,7 +12,8 @@ export function StickyApplyButton() {
 
   let themeClasses = "bg-gold text-navy hover:bg-[#e8b84a]";
   if (institution === "arts-science") {
-    themeClasses = "bg-arts-science-accent text-white hover:bg-arts-science-accent-dark";
+    themeClasses =
+      "bg-arts-science-accent text-white hover:bg-arts-science-accent-dark";
   } else if (institution === "polytechnic") {
     themeClasses = "bg-slate-500 text-white hover:bg-slate-600";
   }

@@ -2,23 +2,28 @@ import { z } from "zod";
 import { zEmail, zEnum, zPasswordMin8, zClampedString } from "./_primitives";
 
 export const ROLES = ["viewer", "editor", "admin", "super_admin"] as const;
-export const INSTITUTIONS = ["all", "engineering", "arts-science", "polytechnic"] as const;
+export const INSTITUTIONS = [
+  "all",
+  "engineering",
+  "arts-science",
+  "polytechnic",
+] as const;
 
 export const LIMITS = {
   fullNameMax: 120,
-  departmentsMax: 30,
-  departmentSlugMax: 60,
+  programsMax: 30,
+  programSlugMax: 60,
 } as const;
 
-const departmentsArray = z
+const programsArray = z
   .array(
     z
       .string()
       .min(1)
-      .max(LIMITS.departmentSlugMax)
-      .regex(/^[a-z0-9-]+$/i, "Department slug must be letters/numbers/dashes"),
+      .max(LIMITS.programSlugMax)
+      .regex(/^[a-z0-9-]+$/i, "Program slug must be letters/numbers/dashes"),
   )
-  .max(LIMITS.departmentsMax);
+  .max(LIMITS.programsMax);
 
 export const UserCreateSchema = z.object({
   email: zEmail,
@@ -26,7 +31,7 @@ export const UserCreateSchema = z.object({
   full_name: zClampedString(1, LIMITS.fullNameMax, "Full name"),
   role: zEnum(ROLES).optional().default("editor"),
   institution: zEnum(INSTITUTIONS).optional().default("all"),
-  departments: departmentsArray.optional().default([]),
+  programs: programsArray.optional().default([]),
 });
 
 export const UserUpdateSchema = z
@@ -34,7 +39,7 @@ export const UserUpdateSchema = z
     full_name: zClampedString(1, LIMITS.fullNameMax, "Full name").optional(),
     role: zEnum(ROLES).optional(),
     institution: zEnum(INSTITUTIONS).optional(),
-    departments: departmentsArray.optional(),
+    programs: programsArray.optional(),
     is_active: z.boolean().optional(),
     password: zPasswordMin8.optional(),
   })

@@ -6,7 +6,7 @@ export interface IUser extends Document {
   full_name: string;
   role: "viewer" | "editor" | "admin" | "super_admin";
   institution: string;
-  departments: string[];
+  programs: string[];
   is_active: boolean;
   last_login?: Date;
   created_at: Date;
@@ -24,7 +24,7 @@ const UserSchema = new Schema<IUser>(
       default: "editor",
     },
     institution: { type: String, default: "all" },
-    departments: { type: [String], default: [] },
+    programs: { type: [String], default: [] },
     is_active: { type: Boolean, default: true },
     last_login: Date,
   },

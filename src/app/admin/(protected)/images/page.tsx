@@ -35,7 +35,9 @@ export default function ImagesPage() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
@@ -62,7 +64,11 @@ export default function ImagesPage() {
   };
 
   const openEdit = (img: ImageAsset) => {
-    setEditState({ id: img._id, filename: img.filename, alt_text: img.alt_text });
+    setEditState({
+      id: img._id,
+      filename: img.filename,
+      alt_text: img.alt_text,
+    });
   };
 
   const saveEdit = async () => {
@@ -71,7 +77,10 @@ export default function ImagesPage() {
     await fetch(`/api/admin/images/${editState.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ filename: editState.filename, alt_text: editState.alt_text }),
+      body: JSON.stringify({
+        filename: editState.filename,
+        alt_text: editState.alt_text,
+      }),
     });
     setSavingEdit(false);
     setEditState(null);
@@ -79,7 +88,9 @@ export default function ImagesPage() {
   };
 
   const fmt = (bytes: number) =>
-    bytes > 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.round(bytes / 1024)} KB`;
+    bytes > 1024 * 1024
+      ? `${(bytes / 1024 / 1024).toFixed(1)} MB`
+      : `${Math.round(bytes / 1024)} KB`;
 
   return (
     <>
@@ -103,7 +114,11 @@ export default function ImagesPage() {
               disabled={uploading}
               className="admin-btn admin-btn-primary"
             >
-              {uploading ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+              {uploading ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Upload size={16} />
+              )}
               {uploading ? "Uploading…" : "Upload Images"}
             </button>
           </div>
@@ -121,7 +136,10 @@ export default function ImagesPage() {
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {images.map((img) => (
-              <div key={img._id} className="admin-card group relative overflow-hidden p-2">
+              <div
+                key={img._id}
+                className="admin-card group relative overflow-hidden p-2"
+              >
                 <div className="relative mb-2 aspect-square overflow-hidden rounded-lg bg-gray-100">
                   {/* Use regular img tag to avoid Next.js domain restrictions for R2 URLs */}
                   <img
@@ -144,7 +162,12 @@ export default function ImagesPage() {
                     </button>
                   </div>
                 </div>
-                <p className="truncate text-xs font-medium text-gray-700" title={img.filename}>{img.filename}</p>
+                <p
+                  className="truncate text-xs font-medium text-gray-700"
+                  title={img.filename}
+                >
+                  {img.filename}
+                </p>
                 <p className="text-xs text-gray-400">{fmt(img.file_size)}</p>
               </div>
             ))}
@@ -158,17 +181,22 @@ export default function ImagesPage() {
           <div className="w-full max-w-sm rounded-xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
               <h2 className="font-semibold text-gray-900">Edit Image</h2>
-              <button onClick={() => setEditState(null)} className="admin-btn admin-btn-outline admin-btn-sm">
+              <button
+                onClick={() => setEditState(null)}
+                className="admin-btn admin-btn-outline admin-btn-sm"
+              >
                 <X size={14} />
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="space-y-4 p-6">
               <div>
                 <label className="admin-label">File Name</label>
                 <input
                   className="admin-input"
                   value={editState.filename}
-                  onChange={(e) => setEditState({ ...editState, filename: e.target.value })}
+                  onChange={(e) =>
+                    setEditState({ ...editState, filename: e.target.value })
+                  }
                 />
               </div>
               <div>
@@ -176,15 +204,30 @@ export default function ImagesPage() {
                 <input
                   className="admin-input"
                   value={editState.alt_text}
-                  onChange={(e) => setEditState({ ...editState, alt_text: e.target.value })}
+                  onChange={(e) =>
+                    setEditState({ ...editState, alt_text: e.target.value })
+                  }
                   placeholder="Describe this image"
                 />
               </div>
             </div>
             <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
-              <button onClick={() => setEditState(null)} className="admin-btn admin-btn-outline">Cancel</button>
-              <button onClick={saveEdit} disabled={savingEdit} className="admin-btn admin-btn-gold">
-                {savingEdit ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+              <button
+                onClick={() => setEditState(null)}
+                className="admin-btn admin-btn-outline"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveEdit}
+                disabled={savingEdit}
+                className="admin-btn admin-btn-gold"
+              >
+                {savingEdit ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : (
+                  <Check size={15} />
+                )}
                 {savingEdit ? "Saving…" : "Save"}
               </button>
             </div>

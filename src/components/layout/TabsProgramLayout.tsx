@@ -21,13 +21,10 @@ import {
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { getImageUrl } from "@/lib/utils";
-import type { Section, TabsDept } from "@/lib/department-tabs";
+import type { Section, TabsProgram } from "@/lib/program-tabs";
 
-export type { Section, Tab, TabsDept } from "@/lib/department-tabs";
-export {
-  isTabsContent,
-  normalizeTabsContent,
-} from "@/lib/department-tabs";
+export type { Section, Tab, TabsProgram } from "@/lib/program-tabs";
+export { isTabsContent, normalizeTabsContent } from "@/lib/program-tabs";
 
 const ICONS: Record<string, ElementType> = {
   overview: BookOpen,
@@ -49,12 +46,12 @@ const ICONS: Record<string, ElementType> = {
 };
 
 type Props = {
-  dept: TabsDept;
+  dept: TabsProgram;
   backHref: string;
   backLabel: string;
 };
 
-export function TabsDepartmentLayout({ dept, backHref, backLabel }: Props) {
+export function TabsProgramLayout({ dept, backHref, backLabel }: Props) {
   const tabs = Array.isArray(dept.tabs) ? dept.tabs : [];
   const [active, setActive] = useState<string>(tabs[0]?.id ?? "");
   const accent = dept.accentColor ?? "#0F4C81";
@@ -330,4 +327,3 @@ function SectionRenderer({
 
   return null;
 }
-

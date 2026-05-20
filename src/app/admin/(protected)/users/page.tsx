@@ -17,8 +17,20 @@ interface User {
   created_at: string;
 }
 
-const EMPTY_NEW = { email: "", full_name: "", password: "", role: "editor", institution: "all" };
-const EMPTY_EDIT = { full_name: "", role: "editor", institution: "all", is_active: true, password: "" };
+const EMPTY_NEW = {
+  email: "",
+  full_name: "",
+  password: "",
+  role: "editor",
+  institution: "all",
+};
+const EMPTY_EDIT = {
+  full_name: "",
+  role: "editor",
+  institution: "all",
+  is_active: true,
+  password: "",
+};
 
 const ROLES = [
   { value: "viewer", label: "Viewer (read-only)" },
@@ -45,7 +57,9 @@ export default function UsersPage() {
   const [msg, setMsg] = useState("");
   const [editMsg, setEditMsg] = useState("");
   const [newApiError, setNewApiError] = useState<ApiErrorPayload | null>(null);
-  const [editApiError, setEditApiError] = useState<ApiErrorPayload | null>(null);
+  const [editApiError, setEditApiError] = useState<ApiErrorPayload | null>(
+    null,
+  );
 
   const load = async () => {
     setLoading(true);
@@ -54,14 +68,24 @@ export default function UsersPage() {
     setLoading(false);
   };
 
-  useEffect(() => { load(); }, []);
+  useEffect(() => {
+    load();
+  }, []);
 
-  const setN = (key: string, val: unknown) => setNewForm((f) => ({ ...f, [key]: val }));
-  const setE = (key: string, val: unknown) => setEditForm((f) => ({ ...f, [key]: val }));
+  const setN = (key: string, val: unknown) =>
+    setNewForm((f) => ({ ...f, [key]: val }));
+  const setE = (key: string, val: unknown) =>
+    setEditForm((f) => ({ ...f, [key]: val }));
 
   const openEdit = (u: User) => {
     setEditingUser(u);
-    setEditForm({ full_name: u.full_name, role: u.role, institution: u.institution, is_active: u.is_active, password: "" });
+    setEditForm({
+      full_name: u.full_name,
+      role: u.role,
+      institution: u.institution,
+      is_active: u.is_active,
+      password: "",
+    });
     setEditMsg("");
     setEditApiError(null);
   };
@@ -82,7 +106,8 @@ export default function UsersPage() {
     } else {
       const err = await parseApiError(r);
       setNewApiError(err);
-      if (!err?.details?.length) setMsg(err?.message ?? err?.error ?? "Error creating user");
+      if (!err?.details?.length)
+        setMsg(err?.message ?? err?.error ?? "Error creating user");
     }
     setSaving(false);
   };
@@ -110,7 +135,8 @@ export default function UsersPage() {
     } else {
       const err = await parseApiError(r);
       setEditApiError(err);
-      if (!err?.details?.length) setEditMsg(err?.message ?? err?.error ?? "Error updating user");
+      if (!err?.details?.length)
+        setEditMsg(err?.message ?? err?.error ?? "Error updating user");
     }
     setSaving(false);
   };
@@ -127,18 +153,29 @@ export default function UsersPage() {
         <div className="admin-page-header">
           <div>
             <h1 className="admin-page-title">Admin Users</h1>
-            <p className="admin-page-subtitle">{users.filter((u) => u.is_active).length} active users</p>
+            <p className="admin-page-subtitle">
+              {users.filter((u) => u.is_active).length} active users
+            </p>
           </div>
-          <button onClick={() => setShowNew(true)} className="admin-btn admin-btn-primary">
+          <button
+            onClick={() => setShowNew(true)}
+            className="admin-btn admin-btn-primary"
+          >
             <Plus size={16} /> New User
           </button>
         </div>
 
-        {msg && <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{msg}</p>}
+        {msg && (
+          <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+            {msg}
+          </p>
+        )}
 
         <div className="admin-card overflow-hidden p-0">
           {loading ? (
-            <div className="flex justify-center py-12"><Loader2 size={24} className="animate-spin text-gray-400" /></div>
+            <div className="flex justify-center py-12">
+              <Loader2 size={24} className="animate-spin text-gray-400" />
+            </div>
           ) : (
             <table className="admin-table">
               <thead>
@@ -158,26 +195,38 @@ export default function UsersPage() {
                     <td className="font-medium">{u.full_name}</td>
                     <td className="text-gray-600">{u.email}</td>
                     <td>
-                      <span className="admin-badge admin-badge-blue capitalize flex items-center gap-1 w-fit">
+                      <span className="admin-badge admin-badge-blue flex w-fit items-center gap-1 capitalize">
                         <Shield size={10} />
                         {u.role.replace("_", " ")}
                       </span>
                     </td>
-                    <td className="capitalize text-gray-500 text-sm">{u.institution}</td>
+                    <td className="text-sm text-gray-500 capitalize">
+                      {u.institution}
+                    </td>
                     <td>
-                      <span className={`admin-badge ${u.is_active ? "admin-badge-green" : "admin-badge-red"}`}>
+                      <span
+                        className={`admin-badge ${u.is_active ? "admin-badge-green" : "admin-badge-red"}`}
+                      >
                         {u.is_active ? "Active" : "Inactive"}
                       </span>
                     </td>
                     <td className="text-xs text-gray-400">
-                      {u.last_login ? new Date(u.last_login).toLocaleDateString("en-IN") : "Never"}
+                      {u.last_login
+                        ? new Date(u.last_login).toLocaleDateString("en-IN")
+                        : "Never"}
                     </td>
                     <td>
                       <div className="flex gap-1">
-                        <button onClick={() => openEdit(u)} className="admin-btn admin-btn-outline admin-btn-sm">
+                        <button
+                          onClick={() => openEdit(u)}
+                          className="admin-btn admin-btn-outline admin-btn-sm"
+                        >
                           <Pencil size={13} />
                         </button>
-                        <button onClick={() => deactivate(u._id)} className="admin-btn admin-btn-danger admin-btn-sm">
+                        <button
+                          onClick={() => deactivate(u._id)}
+                          className="admin-btn admin-btn-danger admin-btn-sm"
+                        >
                           <Trash2 size={13} />
                         </button>
                       </div>
@@ -196,26 +245,80 @@ export default function UsersPage() {
           <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
               <h2 className="font-semibold text-gray-900">New Admin User</h2>
-              <button onClick={() => { setShowNew(false); setMsg(""); }} className="admin-btn admin-btn-outline admin-btn-sm"><X size={14} /></button>
+              <button
+                onClick={() => {
+                  setShowNew(false);
+                  setMsg("");
+                }}
+                className="admin-btn admin-btn-outline admin-btn-sm"
+              >
+                <X size={14} />
+              </button>
             </div>
-            <div className="p-6 space-y-1">
+            <div className="space-y-1 p-6">
               {newApiError && (
                 <ValidationErrors
                   error={newApiError.message ?? newApiError.error}
                   details={newApiError.details}
                 />
               )}
-              <TextInput label="Full Name" value={newForm.full_name} onChange={(e) => setN("full_name", e.target.value)} required />
-              <TextInput label="Email" type="email" value={newForm.email} onChange={(e) => setN("email", e.target.value)} required />
-              <TextInput label="Password" type="password" value={newForm.password} onChange={(e) => setN("password", e.target.value)} required hint="Min 8 characters" />
-              <Select label="Role" value={newForm.role} options={ROLES} onChange={(e) => setN("role", e.target.value)} />
-              <Select label="College Access" value={newForm.institution} options={INSTITUTIONS} onChange={(e) => setN("institution", e.target.value)} />
-              {msg && !newApiError?.details?.length && <p className="text-sm text-red-600">{msg}</p>}
+              <TextInput
+                label="Full Name"
+                value={newForm.full_name}
+                onChange={(e) => setN("full_name", e.target.value)}
+                required
+              />
+              <TextInput
+                label="Email"
+                type="email"
+                value={newForm.email}
+                onChange={(e) => setN("email", e.target.value)}
+                required
+              />
+              <TextInput
+                label="Password"
+                type="password"
+                value={newForm.password}
+                onChange={(e) => setN("password", e.target.value)}
+                required
+                hint="Min 8 characters"
+              />
+              <Select
+                label="Role"
+                value={newForm.role}
+                options={ROLES}
+                onChange={(e) => setN("role", e.target.value)}
+              />
+              <Select
+                label="College Access"
+                value={newForm.institution}
+                options={INSTITUTIONS}
+                onChange={(e) => setN("institution", e.target.value)}
+              />
+              {msg && !newApiError?.details?.length && (
+                <p className="text-sm text-red-600">{msg}</p>
+              )}
             </div>
             <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
-              <button onClick={() => { setShowNew(false); setMsg(""); }} className="admin-btn admin-btn-outline">Cancel</button>
-              <button onClick={createUser} disabled={saving} className="admin-btn admin-btn-gold">
-                {saving ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+              <button
+                onClick={() => {
+                  setShowNew(false);
+                  setMsg("");
+                }}
+                className="admin-btn admin-btn-outline"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={createUser}
+                disabled={saving}
+                className="admin-btn admin-btn-gold"
+              >
+                {saving ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : (
+                  <Check size={15} />
+                )}
                 {saving ? "Creating…" : "Create User"}
               </button>
             </div>
@@ -228,30 +331,80 @@ export default function UsersPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <h2 className="font-semibold text-gray-900">Edit User — {editingUser.email}</h2>
-              <button onClick={() => setEditingUser(null)} className="admin-btn admin-btn-outline admin-btn-sm"><X size={14} /></button>
+              <h2 className="font-semibold text-gray-900">
+                Edit User — {editingUser.email}
+              </h2>
+              <button
+                onClick={() => setEditingUser(null)}
+                className="admin-btn admin-btn-outline admin-btn-sm"
+              >
+                <X size={14} />
+              </button>
             </div>
-            <div className="p-6 space-y-1">
+            <div className="space-y-1 p-6">
               {editApiError && (
                 <ValidationErrors
                   error={editApiError.message ?? editApiError.error}
                   details={editApiError.details}
                 />
               )}
-              <TextInput label="Full Name" value={editForm.full_name} onChange={(e) => setE("full_name", e.target.value)} required />
-              <Select label="Role" value={editForm.role} options={ROLES} onChange={(e) => setE("role", e.target.value)} />
-              <Select label="College Access" value={editForm.institution} options={INSTITUTIONS} onChange={(e) => setE("institution", e.target.value)} />
-              <TextInput label="New Password" type="password" value={editForm.password} onChange={(e) => setE("password", e.target.value)} hint="Leave blank to keep current password" />
+              <TextInput
+                label="Full Name"
+                value={editForm.full_name}
+                onChange={(e) => setE("full_name", e.target.value)}
+                required
+              />
+              <Select
+                label="Role"
+                value={editForm.role}
+                options={ROLES}
+                onChange={(e) => setE("role", e.target.value)}
+              />
+              <Select
+                label="College Access"
+                value={editForm.institution}
+                options={INSTITUTIONS}
+                onChange={(e) => setE("institution", e.target.value)}
+              />
+              <TextInput
+                label="New Password"
+                type="password"
+                value={editForm.password}
+                onChange={(e) => setE("password", e.target.value)}
+                hint="Leave blank to keep current password"
+              />
               <div className="flex items-center gap-2 pt-1">
-                <input type="checkbox" id="edit_active" checked={editForm.is_active} onChange={(e) => setE("is_active", e.target.checked)} />
-                <label htmlFor="edit_active" className="text-sm text-gray-700">Active</label>
+                <input
+                  type="checkbox"
+                  id="edit_active"
+                  checked={editForm.is_active}
+                  onChange={(e) => setE("is_active", e.target.checked)}
+                />
+                <label htmlFor="edit_active" className="text-sm text-gray-700">
+                  Active
+                </label>
               </div>
-              {editMsg && !editApiError?.details?.length && <p className="text-sm text-red-600">{editMsg}</p>}
+              {editMsg && !editApiError?.details?.length && (
+                <p className="text-sm text-red-600">{editMsg}</p>
+              )}
             </div>
             <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
-              <button onClick={() => setEditingUser(null)} className="admin-btn admin-btn-outline">Cancel</button>
-              <button onClick={updateUser} disabled={saving} className="admin-btn admin-btn-gold">
-                {saving ? <Loader2 size={15} className="animate-spin" /> : <Check size={15} />}
+              <button
+                onClick={() => setEditingUser(null)}
+                className="admin-btn admin-btn-outline"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={updateUser}
+                disabled={saving}
+                className="admin-btn admin-btn-gold"
+              >
+                {saving ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : (
+                  <Check size={15} />
+                )}
                 {saving ? "Saving…" : "Save Changes"}
               </button>
             </div>

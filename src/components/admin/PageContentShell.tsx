@@ -19,10 +19,7 @@ export type SectionDef = {
   /** When kind === 'link', the href to navigate to */
   href?: string;
   /** Render the editor for this section. Receives the current value + an updater. */
-  render?: (
-    value: unknown,
-    onChange: (next: unknown) => void,
-  ) => ReactNode;
+  render?: (value: unknown, onChange: (next: unknown) => void) => ReactNode;
   /** When kind === 'custom', renders self-contained content with its own save logic */
   customRender?: () => ReactNode;
   /** Default value when no SiteConfig exists yet */
@@ -39,15 +36,17 @@ export function PageContentShell({ pageTitle, pageSubtitle, sections }: Props) {
   const searchParams = useSearchParams();
   const sectionParam = searchParams.get("section");
   const resolveInitial = () => {
-    if (sectionParam && sections.some((s) => s.id === sectionParam)) return sectionParam;
+    if (sectionParam && sections.some((s) => s.id === sectionParam))
+      return sectionParam;
     return sections[0]?.id ?? "";
   };
   const [selected, setSelected] = useState<string>(resolveInitial);
 
   useEffect(() => {
-    const valid = sectionParam && sections.some((s) => s.id === sectionParam)
-      ? sectionParam
-      : null;
+    const valid =
+      sectionParam && sections.some((s) => s.id === sectionParam)
+        ? sectionParam
+        : null;
     if (valid && valid !== selected) setSelected(valid);
     // Only re-run when the URL section param changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -164,7 +163,7 @@ export function PageContentShell({ pageTitle, pageSubtitle, sections }: Props) {
       )}
 
       <div className="flex gap-4">
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0 flex-1">
           <div className="admin-card">
             {loading && (
               <div className="flex justify-center py-12">
@@ -176,8 +175,8 @@ export function PageContentShell({ pageTitle, pageSubtitle, sections }: Props) {
               <div className="space-y-3 py-2">
                 <h2 className="font-semibold text-gray-800">{section.label}</h2>
                 <p className="text-sm text-gray-600">
-                  This section is managed in the dedicated admin page. Click below
-                  to continue there.
+                  This section is managed in the dedicated admin page. Click
+                  below to continue there.
                 </p>
                 <Link
                   href={section.href}

@@ -257,7 +257,7 @@ export default function ArtsScienceAboutPage() {
               <SectionHeading icon={Target} title="Vision & Mission" />
 
               <div className="mb-4 flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-arts-science-accent/15 text-arts-science-accent">
+                <div className="bg-arts-science-accent/15 text-arts-science-accent flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
                   <Target size={20} />
                 </div>
                 <div>
@@ -274,7 +274,7 @@ export default function ArtsScienceAboutPage() {
               </div>
 
               <div className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-arts-science-accent/15 text-arts-science-accent">
+                <div className="bg-arts-science-accent/15 text-arts-science-accent flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
                   <Lightbulb size={20} />
                 </div>
                 <div>
@@ -289,7 +289,7 @@ export default function ArtsScienceAboutPage() {
                       >
                         <CheckCircle
                           size={15}
-                          className="mt-0.5 shrink-0 text-arts-science-accent"
+                          className="text-arts-science-accent mt-0.5 shrink-0"
                         />
                         <span>{point}</span>
                       </li>
@@ -336,7 +336,7 @@ export default function ArtsScienceAboutPage() {
                   </div>
 
                   <div className="flex-1 space-y-4">
-                    <blockquote className="text-foreground/90 border-l-4 border-arts-science-accent/50 pl-5 text-base leading-relaxed italic md:text-lg">
+                    <blockquote className="text-foreground/90 border-arts-science-accent/50 border-l-4 pl-5 text-base leading-relaxed italic md:text-lg">
                       &quot;Education is the most powerful weapon which you can
                       use to change the world. At JCTCAS, we continuously update
                       our practices to match dynamic societal changes and
@@ -476,13 +476,13 @@ export default function ArtsScienceAboutPage() {
                       />
                     </div>
                     <div>
-                      <h4 className="text-foreground text-sm font-bold leading-tight">
+                      <h4 className="text-foreground text-sm leading-tight font-bold">
                         {d.name}
                       </h4>
-                      <p className="text-[11px] font-medium text-arts-science-accent mt-0.5">
+                      <p className="text-arts-science-accent mt-0.5 text-[11px] font-medium">
                         {d.designation}
                       </p>
-                      <p className="text-muted-foreground mt-1 text-[11px] font-medium leading-tight">
+                      <p className="text-muted-foreground mt-1 text-[11px] leading-tight font-medium">
                         {d.dept}
                       </p>
                     </div>
@@ -585,9 +585,9 @@ export default function ArtsScienceAboutPage() {
                 {coreValues.map((val) => (
                   <div
                     key={val.title}
-                    className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-5 transition-colors hover:border-arts-science-accent/20 hover:bg-arts-science-accent/5"
+                    className="hover:border-arts-science-accent/20 hover:bg-arts-science-accent/5 flex flex-col gap-3 rounded-2xl border border-white/10 bg-white/5 p-5 transition-colors"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-arts-science-accent/15 text-arts-science-accent">
+                    <div className="bg-arts-science-accent/15 text-arts-science-accent flex h-10 w-10 items-center justify-center rounded-xl">
                       <val.icon size={18} />
                     </div>
                     <div>
@@ -657,7 +657,7 @@ export default function ArtsScienceAboutPage() {
                     key={i}
                     className="flex items-start gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 md:p-5"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-arts-science-accent/20 text-arts-science-accent">
+                    <div className="bg-arts-science-accent/20 text-arts-science-accent flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
                       <feature.icon size={18} />
                     </div>
                     <div>
@@ -705,7 +705,7 @@ export default function ArtsScienceAboutPage() {
                   >
                     <CheckCircle
                       size={13}
-                      className="shrink-0 text-arts-science-accent"
+                      className="text-arts-science-accent shrink-0"
                     />
                     {point}
                   </span>
@@ -732,7 +732,7 @@ function SectionHeading({
 }) {
   return (
     <h2 className="text-foreground mb-5 flex items-center gap-3 font-serif text-2xl font-bold md:text-3xl">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-arts-science-accent/20 text-arts-science-accent">
+      <span className="bg-arts-science-accent/20 text-arts-science-accent flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
         <Icon size={20} />
       </span>
       {title}

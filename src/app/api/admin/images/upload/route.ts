@@ -55,13 +55,19 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File | null;
 
     if (!file) return badRequest("No file provided");
-    if (!ALLOWED_MIME_TYPES.includes(file.type as (typeof ALLOWED_MIME_TYPES)[number])) {
+    if (
+      !ALLOWED_MIME_TYPES.includes(
+        file.type as (typeof ALLOWED_MIME_TYPES)[number],
+      )
+    ) {
       return badRequest(
         `Invalid file type "${file.type}". Allowed: ${ALLOWED_MIME_TYPES.join(", ")}`,
       );
     }
     if (file.size > MAX_FILE_SIZE) {
-      return badRequest(`File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Max is ${MAX_FILE_SIZE / 1024 / 1024}MB.`);
+      return badRequest(
+        `File too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Max is ${MAX_FILE_SIZE / 1024 / 1024}MB.`,
+      );
     }
 
     // Validate non-file fields against the schema so unknown categories
@@ -86,7 +92,9 @@ export async function POST(req: NextRequest) {
     const origWidth = metadata.width ?? 0;
     const origHeight = metadata.height ?? 0;
     if (origWidth === 0 || origHeight === 0) {
-      return badRequest("Could not read image dimensions. Try a different file.");
+      return badRequest(
+        "Could not read image dimensions. Try a different file.",
+      );
     }
 
     const dimError = checkDimensions(category, origWidth, origHeight);
@@ -127,7 +135,12 @@ export async function POST(req: NextRequest) {
         uploaded_by: session!.user?.email ?? "",
       });
 
-      await logAudit("image", "uploaded", session!.user?.email ?? "", `Uploaded ${filename}`);
+      await logAudit(
+        "image",
+        "uploaded",
+        session!.user?.email ?? "",
+        `Uploaded ${filename}`,
+      );
       return json({ ...doc.toObject(), url: storageKey }, 201);
     } catch (dbErr) {
       // R2 succeeded but DB failed — clean up the orphaned blob so we
@@ -135,7 +148,9 @@ export async function POST(req: NextRequest) {
       console.error(dbErr);
       try {
         await deleteFromR2(storageKey);
-      } catch {}
+      } catch {
+        /* non-fatal */
+      }
       return serverError();
     }
   } catch (e) {

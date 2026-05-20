@@ -1,7 +1,12 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Recruiter } from "@/lib/models";
-import { requireRole, json, serverError, validateBody } from "@/lib/api-helpers";
+import {
+  requireRole,
+  json,
+  serverError,
+  validateBody,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { RecruiterCreateSchema } from "@/lib/validation";
 import { revalidateTargets } from "@/lib/revalidate";
@@ -30,9 +35,17 @@ export async function POST(req: NextRequest) {
 
   try {
     await connectDB();
-    const doc = await Recruiter.create({ ...body, updated_by: session!.user?.email });
+    const doc = await Recruiter.create({
+      ...body,
+      updated_by: session!.user?.email,
+    });
     revalidateTargets("home");
-    await logAudit("recruiter", "created", session!.user?.email ?? "", `Created recruiter ${body.name}`);
+    await logAudit(
+      "recruiter",
+      "created",
+      session!.user?.email ?? "",
+      `Created recruiter ${body.name}`,
+    );
     return json(doc, 201);
   } catch (e) {
     console.error(e);

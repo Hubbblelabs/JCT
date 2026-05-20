@@ -1,7 +1,12 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { SiteConfig } from "@/lib/models";
-import { requireRole, json, serverError, validateBody } from "@/lib/api-helpers";
+import {
+  requireRole,
+  json,
+  serverError,
+  validateBody,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { SiteConfigPutSchema } from "@/lib/validation";
 import { revalidateForConfigKey } from "@/lib/revalidate";
@@ -46,7 +51,12 @@ export async function PUT(req: NextRequest) {
     );
 
     revalidateForConfigKey(config_key);
-    await logAudit("site-config", "updated", session!.user?.email ?? "", `Updated config: ${config_key}`);
+    await logAudit(
+      "site-config",
+      "updated",
+      session!.user?.email ?? "",
+      `Updated config: ${config_key}`,
+    );
     return json(doc);
   } catch (e) {
     console.error(e);

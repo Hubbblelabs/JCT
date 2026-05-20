@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, ArrowRight } from "lucide-react";
+import { CheckCircle2, ArrowRight, Phone, Mail, MapPin } from "lucide-react";
 import { admissionsCriteria as fallbackCriteria } from "@/data/polytechnic";
 import {
   PolyButtonLink,

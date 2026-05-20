@@ -1,14 +1,25 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Testimonial } from "@/lib/models";
-import { requireRole, json, notFound, serverError, validateBody } from "@/lib/api-helpers";
+import {
+  requireRole,
+  json,
+  notFound,
+  serverError,
+  validateBody,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { TestimonialUpdateSchema } from "@/lib/validation";
 import { revalidateTargets, type RevalidateTarget } from "@/lib/revalidate";
 
 function targetsForInstitution(inst?: string): RevalidateTarget[] {
   const targets: RevalidateTarget[] = ["home"];
-  if (inst === "engineering" || inst === "arts-science" || inst === "polytechnic") targets.push(inst);
+  if (
+    inst === "engineering" ||
+    inst === "arts-science" ||
+    inst === "polytechnic"
+  )
+    targets.push(inst);
   return targets;
 }
 
@@ -53,7 +64,12 @@ export async function PATCH(
     if (!doc) return notFound();
 
     revalidateTargets(...targetsForInstitution(doc.institution));
-    await logAudit("testimonial", "updated", session!.user?.email ?? "", `Updated testimonial for ${doc.name}`);
+    await logAudit(
+      "testimonial",
+      "updated",
+      session!.user?.email ?? "",
+      `Updated testimonial for ${doc.name}`,
+    );
     return json(doc);
   } catch (e) {
     console.error(e);
@@ -75,7 +91,12 @@ export async function DELETE(
     if (!doc) return notFound();
 
     revalidateTargets(...targetsForInstitution(doc.institution));
-    await logAudit("testimonial", "deleted", session!.user?.email ?? "", `Deleted testimonial for ${doc.name}`);
+    await logAudit(
+      "testimonial",
+      "deleted",
+      session!.user?.email ?? "",
+      `Deleted testimonial for ${doc.name}`,
+    );
     return json({ message: "Deleted" });
   } catch (e) {
     console.error(e);

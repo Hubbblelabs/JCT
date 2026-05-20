@@ -201,7 +201,10 @@ export function EngineeringHeroForm({
   const bg = value.backgroundImages ?? [];
   return (
     <div className="space-y-4">
-      <Field label="Background Images" hint="3 fixed image slots. Upload or replace each one.">
+      <Field
+        label="Background Images"
+        hint="3 fixed image slots. Upload or replace each one."
+      >
         <div className="space-y-2">
           {Array.from({ length: ENG_HERO_LIMITS.backgroundImages }, (_, i) => (
             <ImageUploadInput
@@ -427,7 +430,13 @@ export function LifeAtJctForm({
   value: LifeAtJctVal;
   onChange: (v: LifeAtJctVal) => void;
 }) {
-  const categories = value.categories ?? ["All", "Labs", "Sports", "Events", "Clubs"];
+  const categories = value.categories ?? [
+    "All",
+    "Labs",
+    "Sports",
+    "Events",
+    "Clubs",
+  ];
   const photos = Array.isArray(value.photos) ? value.photos : [];
   const catsAtMax = categories.length >= LIMITS_lifeAtJct.categories;
   const photosAtMax = photos.length >= LIMITS_lifeAtJct.photos;
@@ -478,7 +487,10 @@ export function LifeAtJctForm({
             >
               <Plus size={14} /> Add Category
             </button>
-            <LimitHint count={categories.length} max={LIMITS_lifeAtJct.categories} />
+            <LimitHint
+              count={categories.length}
+              max={LIMITS_lifeAtJct.categories}
+            />
           </div>
         </div>
       </Field>
@@ -570,7 +582,8 @@ export function LifeAtJctForm({
                     {
                       src: "",
                       caption: "",
-                      category: categories.find((c) => c && c !== "All") ?? "Labs",
+                      category:
+                        categories.find((c) => c && c !== "All") ?? "Labs",
                       isAll: false,
                     },
                   ],
@@ -628,7 +641,10 @@ export function CampusLifeCarouselForm({
           onChange={(e) =>
             onChange({
               ...value,
-              cta: { ...(value.cta ?? { label: "", href: "" }), label: e.target.value },
+              cta: {
+                ...(value.cta ?? { label: "", href: "" }),
+                label: e.target.value,
+              },
             })
           }
           placeholder="Explore Full Campus Life"
@@ -640,7 +656,10 @@ export function CampusLifeCarouselForm({
           onChange={(e) =>
             onChange({
               ...value,
-              cta: { ...(value.cta ?? { label: "", href: "" }), href: e.target.value },
+              cta: {
+                ...(value.cta ?? { label: "", href: "" }),
+                href: e.target.value,
+              },
             })
           }
           placeholder="/campus-life"
@@ -723,7 +742,8 @@ export function PolytechnicAdmissionsForm({
   onChange: (v: AdmissionsVal) => void;
 }) {
   const criteria = Array.isArray(value.criteria) ? value.criteria : [];
-  const criteriaAtMax = criteria.length >= LIMITS_polytechnicAdmissions.criteriaMax;
+  const criteriaAtMax =
+    criteria.length >= LIMITS_polytechnicAdmissions.criteriaMax;
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
@@ -836,13 +856,14 @@ export function PolytechnicAdmissionsForm({
                       onChange({
                         ...value,
                         criteria: criteria.map((b, j) =>
-                          j === i
-                            ? { ...b, items: [...b.items, ""] }
-                            : b,
+                          j === i ? { ...b, items: [...b.items, ""] } : b,
                         ),
                       })
                     }
-                    disabled={block.items.length >= LIMITS_polytechnicAdmissions.itemsPerBlockMax}
+                    disabled={
+                      block.items.length >=
+                      LIMITS_polytechnicAdmissions.itemsPerBlockMax
+                    }
                     className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <Plus size={14} /> Add Item
@@ -877,7 +898,10 @@ export function PolytechnicAdmissionsForm({
             >
               <Plus size={14} /> Add Criterion Block
             </button>
-            <LimitHint count={criteria.length} max={LIMITS_polytechnicAdmissions.criteriaMax} />
+            <LimitHint
+              count={criteria.length}
+              max={LIMITS_polytechnicAdmissions.criteriaMax}
+            />
           </div>
         </div>
       </Field>
@@ -1067,7 +1091,10 @@ export function StringListForm({
         >
           <Plus size={14} /> Add Item
         </button>
-        <LimitHint count={safe.length} max={RESEARCH_HIGHLIGHTS_LIMITS.itemsMax} />
+        <LimitHint
+          count={safe.length}
+          max={RESEARCH_HIGHLIGHTS_LIMITS.itemsMax}
+        />
       </div>
     </div>
   );

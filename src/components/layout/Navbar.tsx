@@ -208,8 +208,16 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             {announcementConfig?.ctaLabel && announcementConfig?.ctaHref && (
               <Link
                 href={announcementConfig.ctaHref}
-                target={announcementConfig.ctaHref.startsWith("http") ? "_blank" : undefined}
-                rel={announcementConfig.ctaHref.startsWith("http") ? "noopener noreferrer" : undefined}
+                target={
+                  announcementConfig.ctaHref.startsWith("http")
+                    ? "_blank"
+                    : undefined
+                }
+                rel={
+                  announcementConfig.ctaHref.startsWith("http")
+                    ? "noopener noreferrer"
+                    : undefined
+                }
                 className="hidden shrink-0 underline underline-offset-2 hover:no-underline sm:inline"
               >
                 {announcementConfig.ctaLabel}

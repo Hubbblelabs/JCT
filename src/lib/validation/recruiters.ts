@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { zUrl, zClampedString, zOptionalString, zNonNegativeInt } from "./_primitives";
+import {
+  zUrl,
+  zClampedString,
+  zOptionalString,
+  zNonNegativeInt,
+} from "./_primitives";
 
 export const LIMITS = {
   nameMax: 120,

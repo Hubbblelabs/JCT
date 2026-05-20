@@ -11,7 +11,9 @@ import bcrypt from "bcryptjs";
 const [, , email, password, fullName] = process.argv;
 
 if (!email || !password || !fullName) {
-  console.error("Usage: node scripts/create-admin.mjs <email> <password> \"<full name>\"");
+  console.error(
+    'Usage: node scripts/create-admin.mjs <email> <password> "<full name>"',
+  );
   process.exit(1);
 }
 
@@ -23,15 +25,18 @@ if (!uri) {
 
 await mongoose.connect(uri);
 
-const UserSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true, lowercase: true },
-  password_hash: { type: String, required: true },
-  full_name: { type: String, required: true },
-  role: { type: String, default: "super_admin" },
-  institution: { type: String, default: "all" },
-  departments: { type: [String], default: [] },
-  is_active: { type: Boolean, default: true },
-}, { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } });
+const UserSchema = new mongoose.Schema(
+  {
+    email: { type: String, required: true, unique: true, lowercase: true },
+    password_hash: { type: String, required: true },
+    full_name: { type: String, required: true },
+    role: { type: String, default: "super_admin" },
+    institution: { type: String, default: "all" },
+    departments: { type: [String], default: [] },
+    is_active: { type: Boolean, default: true },
+  },
+  { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } },
+);
 
 const User = mongoose.models.User ?? mongoose.model("User", UserSchema);
 

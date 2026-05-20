@@ -1,12 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { Department } from "@/lib/models";
-import {
-  requireRole,
-  json,
-  notFound,
-  serverError,
-} from "@/lib/api-helpers";
+import { Program } from "@/lib/models";
+import { requireRole, json, notFound, serverError } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 
 type Tab = {
@@ -28,49 +23,48 @@ function arrayOrEmpty<T = unknown>(v: unknown): T[] {
   return Array.isArray(v) ? (v as T[]) : [];
 }
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /**
- * Convert legacy flat department fields (about, hod, faculty, vision, mission,
- * placement stats, …) into a default 6-tab structure. The output mirrors the
- * existing fixed DepartmentPageLayout so the public page looks familiar.
+ * Build a default 6-tab structure from legacy flat fields, mirroring the
+ * fixed-tab ProgramPageLayout.
  */
 function buildTabsFromLegacy(content: Record<string, unknown>): Tab[] {
   const tabs: Tab[] = [];
 
-  // Overview tab
+  // Overview
   const overviewSections: unknown[] = [];
-  const aboutParagraphs = [content.about1, content.about2]
+  const aboutParagraphs = [content.about1, content.about2, content.about3]
     .map(asString)
     .filter((p) => p.trim().length > 0);
   if (aboutParagraphs.length > 0) {
     overviewSections.push({
       kind: "richText",
-      html: aboutParagraphs
-        .map((p) => `<p>${escapeHtml(p)}</p>`)
-        .join("\n"),
+      html: aboutParagraphs.map((p) => `<p>${escapeHtml(p)}</p>`).join("\n"),
     });
   }
   const overviewStats: { label: string; value: string; sub?: string }[] = [];
-  if (nonEmptyString(content.established)) {
+  if (nonEmptyString(content.established))
     overviewStats.push({
       label: "Established",
       value: String(content.established),
     });
-  }
-  if (nonEmptyString(content.intake)) {
-    overviewStats.push({
-      label: "Intake",
-      value: String(content.intake),
-    });
-  }
-  if (nonEmptyString(content.accreditation)) {
+  if (nonEmptyString(content.intake))
+    overviewStats.push({ label: "Intake", value: String(content.intake) });
+  if (nonEmptyString(content.accreditation))
     overviewStats.push({
       label: "Accreditation",
       value: String(content.accreditation),
     });
-  }
-  if (overviewStats.length > 0) {
+  if (overviewStats.length > 0)
     overviewSections.push({ kind: "stats", items: overviewStats });
-  }
   tabs.push({
     id: "overview",
     label: "Overview",
@@ -78,30 +72,27 @@ function buildTabsFromLegacy(content: Record<string, unknown>): Tab[] {
     sections: overviewSections,
   });
 
-  // Academics tab (vision / mission)
+  // Academics
   const academicsSections: unknown[] = [];
-  if (nonEmptyString(content.vision)) {
+  if (nonEmptyString(content.vision))
     academicsSections.push({
       kind: "richText",
       html: `<h3>Vision</h3><p>${escapeHtml(String(content.vision))}</p>`,
     });
-  }
-  if (nonEmptyString(content.mission)) {
+  if (nonEmptyString(content.mission))
     academicsSections.push({
       kind: "richText",
       html: `<h3>Mission</h3><p>${escapeHtml(String(content.mission))}</p>`,
     });
-  }
   const outcomes = arrayOrEmpty<string>(content.outcomes).filter(
     (s) => typeof s === "string" && s.length > 0,
   );
-  if (outcomes.length > 0) {
+  if (outcomes.length > 0)
     academicsSections.push({
       kind: "list",
       title: "Programme Outcomes",
       items: outcomes,
     });
-  }
   tabs.push({
     id: "academics",
     label: "Academics",
@@ -109,7 +100,7 @@ function buildTabsFromLegacy(content: Record<string, unknown>): Tab[] {
     sections: academicsSections,
   });
 
-  // Faculty tab (HOD + faculty list, when present)
+  // Faculty
   const facultySections: unknown[] = [];
   const hodName = nonEmptyString(content.hodName);
   if (hodName) {
@@ -124,12 +115,11 @@ function buildTabsFromLegacy(content: Record<string, unknown>): Tab[] {
         },
       ],
     });
-    if (nonEmptyString(content.hodMessage)) {
+    if (nonEmptyString(content.hodMessage))
       facultySections.push({
         kind: "richText",
         html: `<h3>Message from the Head</h3><p>${escapeHtml(String(content.hodMessage))}</p>`,
       });
-    }
   }
   const facultyList = arrayOrEmpty<Record<string, unknown>>(content.faculty);
   if (facultyList.length > 0) {
@@ -151,7 +141,7 @@ function buildTabsFromLegacy(content: Record<string, unknown>): Tab[] {
     sections: facultySections,
   });
 
-  // Facilities tab
+  // Facilities
   const facilitiesSections: unknown[] = [];
   const labs = arrayOrEmpty<Record<string, unknown>>(content.labs);
   if (labs.length > 0) {
@@ -172,7 +162,7 @@ function buildTabsFromLegacy(content: Record<string, unknown>): Tab[] {
     sections: facilitiesSections,
   });
 
-  // Life & Achievements tab
+  // Life
   const lifeSections: unknown[] = [];
   const achievements = arrayOrEmpty<Record<string, unknown>>(
     content.achievements,
@@ -195,40 +185,35 @@ function buildTabsFromLegacy(content: Record<string, unknown>): Tab[] {
     sections: lifeSections,
   });
 
-  // Career & Feedback tab
+  // Career
   const careerSections: unknown[] = [];
   const careerStats: { label: string; value: string; sub?: string }[] = [];
-  if (nonEmptyString(content.placementRate)) {
+  if (nonEmptyString(content.placementRate))
     careerStats.push({
       label: "Placement Rate",
       value: String(content.placementRate),
     });
-  }
-  if (nonEmptyString(content.averagePackage)) {
+  if (nonEmptyString(content.averagePackage))
     careerStats.push({
       label: "Average Package",
       value: String(content.averagePackage),
     });
-  }
-  if (nonEmptyString(content.highestPackage)) {
+  if (nonEmptyString(content.highestPackage))
     careerStats.push({
       label: "Highest Package",
       value: String(content.highestPackage),
     });
-  }
-  if (careerStats.length > 0) {
+  if (careerStats.length > 0)
     careerSections.push({ kind: "stats", items: careerStats });
-  }
   const recruiters = arrayOrEmpty<string>(content.topRecruiters).filter(
     (s) => typeof s === "string" && s.length > 0,
   );
-  if (recruiters.length > 0) {
+  if (recruiters.length > 0)
     careerSections.push({
       kind: "list",
       title: "Top Recruiters",
       items: recruiters,
     });
-  }
   tabs.push({
     id: "career",
     label: "Career & Feedback",
@@ -237,15 +222,6 @@ function buildTabsFromLegacy(content: Record<string, unknown>): Tab[] {
   });
 
   return tabs;
-}
-
-function escapeHtml(s: string): string {
-  return s
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#39;");
 }
 
 export async function POST(
@@ -258,8 +234,8 @@ export async function POST(
   try {
     await connectDB();
     const { id } = await params;
-    const doc = await Department.findById(id);
-    if (!doc) return notFound("Department not found");
+    const doc = await Program.findById(id);
+    if (!doc) return notFound("Program not found");
 
     const existing = (doc.content ?? {}) as Record<string, unknown>;
     if (Array.isArray(existing.tabs) && existing.tabs.length > 0) {
@@ -276,10 +252,10 @@ export async function POST(
     await doc.save();
 
     await logAudit(
-      "department",
+      "program",
       "migrated-tabs",
       session!.user?.email ?? "",
-      `Generated default tabs for department ${doc.slug}`,
+      `Generated default tabs for program ${doc.slug}`,
     );
 
     return json({ content: nextContent });

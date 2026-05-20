@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 declare global {
-   
   var _mongooseConn: typeof mongoose | null;
 }
 
@@ -17,15 +16,15 @@ export async function connectDB() {
   if (!uri) throw new Error("MONGODB_URI environment variable is not set");
 
   try {
-    cached = await Promise.race([
+    cached = (await Promise.race([
       mongoose.connect(uri, { bufferCommands: false }),
       new Promise((_, reject) =>
         setTimeout(
           () => reject(new Error("MongoDB connection timeout")),
-          10000
-        )
+          10000,
+        ),
       ),
-    ]) as typeof mongoose;
+    ])) as typeof mongoose;
 
     global._mongooseConn = cached;
 
@@ -38,7 +37,7 @@ export async function connectDB() {
 
     if (mongoose.connection.readyState !== 1) {
       throw new Error(
-        "MongoDB connection failed to reach ready state after timeout"
+        "MongoDB connection failed to reach ready state after timeout",
       );
     }
 

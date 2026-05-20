@@ -10,7 +10,12 @@ export async function logAudit(
 ) {
   try {
     await connectDB();
-    await AuditLog.create({ entity_type: entityType, action, user_email: userEmail, summary });
+    await AuditLog.create({
+      entity_type: entityType,
+      action,
+      user_email: userEmail,
+      summary,
+    });
   } catch {
     // Audit logging should never break main flow
   }
@@ -25,9 +30,9 @@ export async function logValidationFailure(
   userEmail: string,
   issues: ZodIssue[],
 ) {
-  const head = issues.slice(0, 3).map(
-    (i) => `${i.path.length ? i.path.join(".") + ": " : ""}${i.message}`,
-  );
+  const head = issues
+    .slice(0, 3)
+    .map((i) => `${i.path.length ? i.path.join(".") + ": " : ""}${i.message}`);
   const more = issues.length > 3 ? ` (+${issues.length - 3} more)` : "";
   await logAudit(
     entityType,

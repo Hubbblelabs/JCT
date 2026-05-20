@@ -1,13 +1,24 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Program } from "@/lib/models";
-import { requireRole, json, badRequest, serverError, validateBody } from "@/lib/api-helpers";
+import {
+  requireRole,
+  json,
+  badRequest,
+  serverError,
+  validateBody,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { ProgramCreateSchema } from "@/lib/validation";
 import { revalidateTargets, type RevalidateTarget } from "@/lib/revalidate";
 
 function institutionTarget(inst: string): RevalidateTarget | null {
-  if (inst === "engineering" || inst === "arts-science" || inst === "polytechnic") return inst;
+  if (
+    inst === "engineering" ||
+    inst === "arts-science" ||
+    inst === "polytechnic"
+  )
+    return inst;
   return null;
 }
 
@@ -22,7 +33,11 @@ export async function GET(req: NextRequest) {
     const filter: Record<string, unknown> = {};
     if (institution) filter.institution = institution;
 
-    const docs = await Program.find(filter).sort({ institution: 1, sort_order: 1, name: 1 });
+    const docs = await Program.find(filter).sort({
+      institution: 1,
+      sort_order: 1,
+      name: 1,
+    });
     return json(docs);
   } catch (e) {
     console.error(e);
@@ -43,10 +58,18 @@ export async function POST(req: NextRequest) {
     const existing = await Program.findOne({ slug: body.slug });
     if (existing) return badRequest("Program with this slug already exists");
 
-    const doc = await Program.create({ ...body, updated_by: session!.user?.email });
+    const doc = await Program.create({
+      ...body,
+      updated_by: session!.user?.email,
+    });
     const target = institutionTarget(body.institution);
     if (target) revalidateTargets(target);
-    await logAudit("program", "created", session!.user?.email ?? "", `Created program ${body.name}`);
+    await logAudit(
+      "program",
+      "created",
+      session!.user?.email ?? "",
+      `Created program ${body.name}`,
+    );
     return json(doc, 201);
   } catch (e) {
     console.error(e);

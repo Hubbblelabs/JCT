@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
-import { Department } from "@/lib/models";
+import { Program } from "@/lib/models";
 import { requireRole, json, notFound, serverError } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { revalidatePaths } from "@/lib/revalidate";
@@ -15,10 +15,10 @@ export async function POST(
   try {
     await connectDB();
     const { id } = await params;
-    const current = await Department.findById(id);
-    if (!current) return notFound("Department not found");
+    const current = await Program.findById(id);
+    if (!current) return notFound("Program not found");
 
-    const doc = await Department.findByIdAndUpdate(
+    const doc = await Program.findByIdAndUpdate(
       id,
       {
         status: "published",
@@ -29,15 +29,20 @@ export async function POST(
       },
       { new: true },
     );
-    if (!doc) return notFound("Department not found");
+    if (!doc) return notFound("Program not found");
 
     revalidatePaths(
-      `/institutions/${doc.college}`,
-      `/institutions/${doc.college}/departments`,
-      `/institutions/${doc.college}/departments/${doc.slug}`,
+      `/institutions/${doc.institution}`,
+      `/institutions/${doc.institution}/programs`,
+      `/institutions/${doc.institution}/programs/${doc.slug}`,
     );
 
-    await logAudit("department", "published", session!.user?.email ?? "", `Published department ${doc.slug}`);
+    await logAudit(
+      "program",
+      "published",
+      session!.user?.email ?? "",
+      `Published program ${doc.slug}`,
+    );
     return json({ message: "Published", doc });
   } catch (e) {
     console.error(e);

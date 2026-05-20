@@ -45,7 +45,9 @@
   cursor: pointer;
   background: transparent;
   border: none;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .admin-nav-trigger:hover {
@@ -120,7 +122,9 @@
   font-weight: 500;
   color: #1f2937;
   text-decoration: none;
-  transition: background 0.1s, color 0.1s;
+  transition:
+    background 0.1s,
+    color 0.1s;
   white-space: nowrap;
 }
 
@@ -187,28 +191,36 @@
   background: var(--admin-navy);
   color: white;
 }
-.admin-btn-primary:hover { background: #1a2a42; }
+.admin-btn-primary:hover {
+  background: #1a2a42;
+}
 
 .admin-btn-gold {
   background: var(--admin-gold);
   color: var(--admin-navy);
   font-weight: 600;
 }
-.admin-btn-gold:hover { background: var(--admin-gold-hover); }
+.admin-btn-gold:hover {
+  background: var(--admin-gold-hover);
+}
 
 .admin-btn-outline {
   background: transparent;
   border: 1px solid var(--admin-border);
   color: #111827;
 }
-.admin-btn-outline:hover { background: #f3f4f6; }
+.admin-btn-outline:hover {
+  background: #f3f4f6;
+}
 
 .admin-btn-danger {
   background: #fee2e2;
   color: #7f1d1d;
   border: 1px solid #fca5a5;
 }
-.admin-btn-danger:hover { background: #fecaca; }
+.admin-btn-danger:hover {
+  background: #fecaca;
+}
 
 .admin-btn-sm {
   padding: 0.375rem 0.75rem;
@@ -225,11 +237,26 @@
   font-weight: 600;
 }
 
-.admin-badge-green  { background: #dcfce7; color: #14532d; }
-.admin-badge-yellow { background: #fef9c3; color: #713f12; }
-.admin-badge-red    { background: #fee2e2; color: #7f1d1d; }
-.admin-badge-gray   { background: #e5e7eb; color: #1f2937; }
-.admin-badge-blue   { background: #dbeafe; color: #1e3a8a; }
+.admin-badge-green {
+  background: #dcfce7;
+  color: #14532d;
+}
+.admin-badge-yellow {
+  background: #fef9c3;
+  color: #713f12;
+}
+.admin-badge-red {
+  background: #fee2e2;
+  color: #7f1d1d;
+}
+.admin-badge-gray {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+.admin-badge-blue {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
 
 /* ── Form elements ──────────────────────────────────── */
 .admin-input {

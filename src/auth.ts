@@ -8,13 +8,13 @@ declare module "next-auth" {
   interface User {
     role?: string;
     institution?: string;
-    departments?: string[];
+    programs?: string[];
   }
   interface Session {
     user: {
       role?: string;
       institution?: string;
-      departments?: string[];
+      programs?: string[];
     } & DefaultSession["user"];
   }
 }
@@ -35,12 +35,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         try {
           await connectDB();
           const email = (credentials.email as string).toLowerCase();
-          
+
           const user = await User.findOne({
             email,
             is_active: true,
           }).lean();
-          
+
           if (!user) {
             console.error(`[auth] User not found with email: ${email}`);
             return null;
@@ -50,7 +50,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             credentials.password as string,
             user.password_hash,
           );
-          
+
           if (!valid) {
             console.error(`[auth] Invalid password for user: ${email}`);
             return null;
@@ -59,7 +59,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           await User.updateOne({ _id: user._id }, { last_login: new Date() });
 
           console.log(`[auth] User authenticated successfully: ${email}`);
-          
+
           // Ensure all values are JSON-serializable primitives
           return {
             id: String(user._id),
@@ -67,7 +67,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             name: String(user.full_name),
             role: String(user.role || ""),
             institution: String(user.institution || ""),
-            departments: Array.isArray(user.departments) ? user.departments.map(String) : [],
+            programs: Array.isArray(user.programs)
+              ? user.programs.map(String)
+              : [],
           };
         } catch (error) {
           console.error("[auth] Authorization error:", error);
@@ -81,7 +83,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (user) {
         token.role = user.role;
         token.institution = user.institution;
-        token.departments = user.departments;
+        token.programs = user.programs;
         console.log("[auth] JWT token updated with user data");
       }
       return token;
@@ -90,7 +92,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       if (session.user) {
         session.user.role = token.role as string;
         session.user.institution = token.institution as string;
-        session.user.departments = token.departments as string[];
+        session.user.programs = token.programs as string[];
         console.log("[auth] Session updated from token");
       }
       return session;

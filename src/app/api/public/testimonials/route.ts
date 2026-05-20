@@ -7,7 +7,7 @@ export const revalidate = 3600;
 // Helper to convert storage key to full URL
 function getImageUrl(imageUrl: string | null | undefined): string | null {
   if (!imageUrl) return null;
-  
+
   // If it's already a full URL, return as-is
   if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
     return imageUrl;
@@ -37,7 +37,9 @@ export async function GET(req: Request) {
     const query = { is_active: true, institution };
 
     const testimonials = await Testimonial.find(query)
-      .select("name batch course company quote avatar category institution sort_order")
+      .select(
+        "name batch course company quote avatar category institution sort_order",
+      )
       .sort({ sort_order: 1, created_at: -1 })
       .limit(12);
 

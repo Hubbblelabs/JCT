@@ -7,7 +7,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Camera, ArrowRight, X } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
 
-const DEFAULT_CATEGORIES = ["All", "Labs", "Sports", "Events", "Clubs"] as const;
+const DEFAULT_CATEGORIES = [
+  "All",
+  "Labs",
+  "Sports",
+  "Events",
+  "Clubs",
+] as const;
 
 type Photo = {
   src: string;
@@ -16,7 +22,8 @@ type Photo = {
   isAll?: boolean;
 };
 
-const DEFAULT_VIDEO_URL = "https://www.youtube.com/embed/RBzA0cneWRA?autoplay=1";
+const DEFAULT_VIDEO_URL =
+  "https://www.youtube.com/embed/RBzA0cneWRA?autoplay=1";
 
 const DEFAULT_PHOTOS: Photo[] = [
   // --- All / Curated items (The original 5) ---
@@ -145,7 +152,9 @@ function normalizeLifeAtJct(raw: unknown): LifeAtJctConfig | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
   const categories = Array.isArray(r.categories)
-    ? r.categories.filter((c): c is string => typeof c === "string" && c.length > 0)
+    ? r.categories.filter(
+        (c): c is string => typeof c === "string" && c.length > 0,
+      )
     : [];
   const photos: Photo[] = Array.isArray(r.photos)
     ? r.photos
@@ -168,7 +177,8 @@ function normalizeLifeAtJct(raw: unknown): LifeAtJctConfig | null {
   return {
     categories: categories.length > 0 ? categories : [...DEFAULT_CATEGORIES],
     photos,
-    videoUrl: typeof r.videoUrl === "string" && r.videoUrl ? r.videoUrl : undefined,
+    videoUrl:
+      typeof r.videoUrl === "string" && r.videoUrl ? r.videoUrl : undefined,
   };
 }
 
@@ -195,7 +205,9 @@ export function CampusLife() {
             setPhotos(next.photos);
             if (next.videoUrl) setVideoUrl(next.videoUrl);
             setActiveFilter((prev) =>
-              next.categories.includes(prev) ? prev : next.categories[0] ?? "All",
+              next.categories.includes(prev)
+                ? prev
+                : (next.categories[0] ?? "All"),
             );
           }
         }

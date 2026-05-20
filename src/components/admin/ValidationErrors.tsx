@@ -22,7 +22,9 @@ export function ValidationErrors({
       <div className="flex items-start gap-2">
         <AlertCircle size={16} className="mt-0.5 shrink-0 text-red-500" />
         <div className="flex-1 text-sm">
-          <p className="font-semibold text-red-700">{error || "Validation failed"}</p>
+          <p className="font-semibold text-red-700">
+            {error || "Validation failed"}
+          </p>
           {details && details.length > 0 && (
             <ul className="mt-1 ml-4 list-disc space-y-0.5 text-red-600">
               {details.map((d, i) => (

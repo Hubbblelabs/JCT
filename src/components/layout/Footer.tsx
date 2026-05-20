@@ -64,7 +64,8 @@ export function Footer() {
             text: "#eadbd0",
             muted: "#c7b6aa",
             accent: "var(--color-arts-science-accent)",
-            border: "color-mix(in srgb, var(--color-arts-science-accent) 28%, transparent)",
+            border:
+              "color-mix(in srgb, var(--color-arts-science-accent) 28%, transparent)",
           }
         : isPolytechnic
           ? {
