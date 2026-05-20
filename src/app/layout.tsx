@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
-import Script from "next/script";
 import "@/styles/globals.css";
 import { GlobalElements } from "@/components/layout/GlobalElements";
 import { RouteQuickNav } from "@/components/layout/RouteQuickNav";
@@ -112,4 +111,6 @@ export default function RootLayout({
         {/* Meritto Chatbot - conditionally loaded on public pages only */}
         <MerittoScript />
 
-      </body>\n    </html>\n  );\n}\n
+      </body>
+    </html>);
+}
