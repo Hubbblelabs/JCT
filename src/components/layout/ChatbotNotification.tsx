@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import Image from "next/image";
 
 function clickMerittoLauncher() {
   for (const el of document.querySelectorAll<HTMLElement>("*")) {
@@ -61,7 +62,7 @@ export function ChatbotNotification() {
           exit={{ opacity: 0, x: -8, scale: 0.96 }}
           transition={{ duration: 0.22, ease: "easeOut" }}
           // Sits just to the left of the launcher icon (16px right + ~64px icon + 8px gap)
-          className="pointer-events-auto fixed bottom-5 z-[9997]"
+          className="pointer-events-auto fixed bottom-5 z-[9997] hidden md:block"
           style={{ right: "88px" }}
           data-own-fixed
         >
@@ -75,10 +76,18 @@ export function ChatbotNotification() {
           {/* Bubble */}
           <button
             onClick={open}
-            className="flex max-w-[220px] items-start gap-3 rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-left shadow-xl shadow-slate-900/10 transition-all hover:border-[#d4a024]/50 hover:shadow-2xl focus:outline-none"
+            className="flex max-w-[220px] items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-left shadow-xl shadow-slate-900/10 transition-all hover:border-[#d4a024]/50 hover:shadow-2xl focus:outline-none"
           >
-            {/* Gold accent bar */}
-            <span className="mt-0.5 h-8 w-1 shrink-0 rounded-full bg-[#d4a024]" />
+            {/* College Logo */}
+            <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full border border-slate-100 bg-slate-50 p-0.5 flex items-center justify-center">
+              <Image
+                src="/logo/jct_logo.webp"
+                alt="JCT Logo"
+                width={24}
+                height={24}
+                className="object-contain"
+              />
+            </div>
 
             <div className="min-w-0 flex-1">
               <p className="text-[12.5px] leading-tight font-bold text-[#0a1628]">

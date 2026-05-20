@@ -325,8 +325,22 @@ export function DiplomaPrograms() {
       <div className="bg-polytechnic-dark/5 pointer-events-none absolute bottom-0 left-0 z-0 h-100 w-100 -translate-x-1/3 translate-y-1/3 rounded-full blur-3xl" />
 
       <div className="relative z-10 container mx-auto px-4 md:px-6">
-        <div className="mb-8 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
-          <PolySectionHeader title="Diploma Programs" className="mb-0" />
+        <div className="mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <div>
+            <PolySectionHeader title="Diploma Programs" className="mb-0" />
+            <div className="mt-4">
+              <Link
+                href="/institutions/polytechnic/courses"
+                className="text-polytechnic hover:bg-polytechnic inline-flex items-center gap-2 rounded-full border border-current px-5 py-2 text-sm font-semibold transition-all hover:text-white"
+              >
+                View All Courses <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+          <p className="max-w-sm text-base leading-relaxed text-stone-600 md:text-lg">
+            3-year diploma programs approved by AICTE and governed by DOTE, Tamil Nadu.
+            Practical, workshop-driven curriculum designed to build immediate job-readiness.
+          </p>
         </div>
 
         {loading ? (

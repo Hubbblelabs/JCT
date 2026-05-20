@@ -250,30 +250,29 @@ export const admissionsCriteria = [
   {
     title: "Eligible Programs",
     items: [
-      "B.E. Computer Science & Engineering (4 Years)",
-      "B.Tech. AI & Data Science (4 Years)",
-      "B.E. CS & Business Systems (4 Years)",
-      "B.E. Electronics & Communication (4 Years)",
-      "B.E. Electrical & Electronics (4 Years)",
-      "B.E. Mechanical / Civil / Biotech (4 Years)",
+      "UG: B.E. / B.Tech Programs (4 Years)",
+      "PG: M.E. Structural Engineering / Power Electronics / CSE (2 Years)",
+      "Ph.D.: Doctoral Research Programmes (Electrical / Core Specializations)",
     ],
   },
   {
     title: "Eligibility Criteria",
     items: [
-      "First Year: Pass in HSC/12th standard with Mathematics, Physics, and Chemistry as compulsory subjects.",
-      "Minimum average marks: 45% (General Category), 40% (BC, MBC, SC, ST).",
-      "Lateral Entry (2nd Year): Pass in Diploma/B.Sc. with Mathematics, with at least 45% average marks (40% for reserved categories).",
+      "UG: Pass in HSC/12th standard with Math, Physics, and Chemistry as compulsory subjects (Min 45%, 40% for reserved category).",
+      "Lateral UG: Pass in relevant Diploma/B.Sc. with Math (Min 45%, 40% for reserved category).",
+      "PG (M.E.): Pass in appropriate B.E. / B.Tech degree program as per Anna University norms.",
+      "Ph.D.: First class Master's degree (M.E. / M.Tech) in the relevant engineering specialization.",
     ],
   },
   {
     title: "Required Documents",
     items: [
-      "TNEA Counselling / Joint Admission Allocation Letter",
-      "HSC / 12th Marks Sheet & Transfer Certificate (TC)",
-      "SSLC / 10th Marks Sheet",
-      "Permanent Community Certificate (for reserved categories)",
-      "First Graduate Certificate & Joint Declaration (if applicable)",
+      "TNEA / TANCET Counselling Allocation Letter (as applicable)",
+      "HSC / 12th / SSLC Marks Sheets & Transfer Certificate (TC)",
+      "Community Certificate & First Graduate Certificate (if applicable)",
+      "For PG / Ph.D.: UG/PG Mark Sheets, Consolidated Certificates & Entrance Exam card",
     ],
   },
 ];
+
+

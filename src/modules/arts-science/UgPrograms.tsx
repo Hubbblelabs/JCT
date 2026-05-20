@@ -344,7 +344,18 @@ export function UgPrograms() {
             <h3 className="text-arts-science mb-6 font-serif text-4xl leading-tight font-bold md:text-5xl">
               Study what moves you forward
             </h3>
+            <Link
+              href="/institutions/arts-science/courses"
+              className="text-arts-science-accent hover:bg-arts-science-accent inline-flex items-center gap-2 rounded-full border border-current px-5 py-2 text-sm font-semibold transition-all hover:text-white"
+            >
+              View All Courses <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
+          <p className="max-w-sm text-base leading-relaxed text-stone-600 md:text-lg">
+            3-year undergraduate programs designed to nurture creativity,
+            analytical skills, and industrial readiness. Affiliated to Bharathiar
+            University, Coimbatore.
+          </p>
         </div>
       </div>
 

@@ -92,7 +92,7 @@ export const engineeringNavigation: NavItem[] = [
   },
   {
     name: "COE",
-    href: "/research",
+    href: "/institutions/engineering/coe",
   },
 ];
 
