@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProgramPageLayout } from "@/components/layout/ProgramPageLayout";
-import { polytechnicPrograms } from "@/data/polytechnic-programs";
 import { siteConfig } from "@/data/site";
+import {
+  getPublishedProgramBySlug,
+  listPublishedProgramSlugs,
+} from "@/lib/public-programs";
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
-export function generateStaticParams() {
-  return polytechnicPrograms.map((program) => ({ slug: program.slug }));
+export async function generateStaticParams() {
+  try {
+    return await listPublishedProgramSlugs("polytechnic");
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({
@@ -16,24 +23,26 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const program = polytechnicPrograms.find((item) => item.slug === slug);
-
-  if (!program) {
-    return {};
+  const program = await getPublishedProgramBySlug({
+    institution: "polytechnic",
+    slug,
+  });
+  if (program) {
+    const programData = program.content;
+    return {
+      title: `${programData.name} | JCT Polytechnic College`,
+      description: programData.about.paragraphs[0] ?? "",
+      alternates: {
+        canonical: `${siteConfig.url}/institutions/polytechnic/programs/${slug}`,
+      },
+      openGraph: {
+        title: `${programData.name} | JCT Polytechnic College`,
+        description: programData.about.paragraphs[0] ?? "",
+        type: "website",
+      },
+    };
   }
-
-  return {
-    title: `${program.name} | JCT Polytechnic College`,
-    description: program.about.paragraphs[0],
-    alternates: {
-      canonical: `${siteConfig.url}/institutions/polytechnic/programs/${program.slug}`,
-    },
-    openGraph: {
-      title: `${program.name} | JCT Polytechnic College`,
-      description: program.about.paragraphs[0],
-      type: "website",
-    },
-  };
+  return {};
 }
 
 export default async function PolytechnicProgramPage({
@@ -42,17 +51,20 @@ export default async function PolytechnicProgramPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const program = polytechnicPrograms.find((item) => item.slug === slug);
 
-  if (!program) {
-    notFound();
+  const program = await getPublishedProgramBySlug({
+    institution: "polytechnic",
+    slug,
+  });
+  if (program) {
+    return (
+      <ProgramPageLayout
+        dept={program.content}
+        backHref="/institutions/polytechnic"
+        backLabel="Back to Polytechnic"
+      />
+    );
   }
 
-  return (
-    <ProgramPageLayout
-      dept={program}
-      backHref="/institutions/polytechnic"
-      backLabel="Back to Polytechnic"
-    />
-  );
+  notFound();
 }

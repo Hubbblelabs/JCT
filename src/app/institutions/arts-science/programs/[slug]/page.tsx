@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProgramPageLayout } from "@/components/layout/ProgramPageLayout";
-import { artsPrograms } from "@/data/arts-programs";
 import { siteConfig } from "@/data/site";
+import {
+  getPublishedProgramBySlug,
+  listPublishedProgramSlugs,
+} from "@/lib/public-programs";
 
-export const dynamicParams = false;
+export const dynamicParams = true;
 
-export function generateStaticParams() {
-  return artsPrograms.map((program) => ({ slug: program.slug }));
+export async function generateStaticParams() {
+  try {
+    return await listPublishedProgramSlugs("arts-science");
+  } catch {
+    return [];
+  }
 }
 
 export async function generateMetadata({
@@ -16,24 +23,26 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const program = artsPrograms.find((item) => item.slug === slug);
-
-  if (!program) {
-    return {};
+  const program = await getPublishedProgramBySlug({
+    institution: "arts-science",
+    slug,
+  });
+  if (program) {
+    const programData = program.content;
+    return {
+      title: `${programData.name} | JCT College of Arts and Science`,
+      description: programData.about.paragraphs[0] ?? "",
+      alternates: {
+        canonical: `${siteConfig.url}/institutions/arts-science/programs/${slug}`,
+      },
+      openGraph: {
+        title: `${programData.name} | JCT College of Arts and Science`,
+        description: programData.about.paragraphs[0] ?? "",
+        type: "website",
+      },
+    };
   }
-
-  return {
-    title: `${program.name} | JCT College of Arts and Science`,
-    description: program.about.paragraphs[0],
-    alternates: {
-      canonical: `${siteConfig.url}/institutions/arts-science/programs/${program.slug}`,
-    },
-    openGraph: {
-      title: `${program.name} | JCT College of Arts and Science`,
-      description: program.about.paragraphs[0],
-      type: "website",
-    },
-  };
+  return {};
 }
 
 export default async function ArtsProgramPage({
@@ -42,17 +51,20 @@ export default async function ArtsProgramPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const program = artsPrograms.find((item) => item.slug === slug);
 
-  if (!program) {
-    notFound();
+  const program = await getPublishedProgramBySlug({
+    institution: "arts-science",
+    slug,
+  });
+  if (program) {
+    return (
+      <ProgramPageLayout
+        dept={program.content}
+        backHref="/institutions/arts-science"
+        backLabel="Back to Arts & Science"
+      />
+    );
   }
 
-  return (
-    <ProgramPageLayout
-      dept={program}
-      backHref="/institutions/arts-science"
-      backLabel="Back to Arts & Science"
-    />
-  );
+  notFound();
 }

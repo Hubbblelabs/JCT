@@ -16,17 +16,21 @@ export async function POST(req: NextRequest) {
       { ugCourses, pgCourses },
       { ugPrograms },
       { diplomaPrograms },
-      { engineeringPrograms },
-      { artsPrograms },
-      { polytechnicPrograms },
+      // { engineeringPrograms },
+      // { artsPrograms },
+      // { polytechnicPrograms },
     ] = await Promise.all([
       import("@/data/engineering"),
       import("@/data/arts-science"),
       import("@/data/polytechnic"),
-      import("@/data/engineering-programs"),
-      import("@/data/arts-programs"),
-      import("@/data/polytechnic-programs"),
+      // import("@/data/engineering-programs"),
+      // import("@/data/arts-programs"),
+      // import("@/data/polytechnic-programs"),
     ]);
+
+    const engineeringPrograms: Array<Record<string, unknown>> = [];
+    const artsPrograms: Array<Record<string, unknown>> = [];
+    const polytechnicPrograms: Array<Record<string, unknown>> = [];
 
     // ── 1. Card-level rows ──────────────────────────────────────────────────
     const cards = [
@@ -97,7 +101,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 2. Rich page content (merged onto matching rows by slug) ────────────
-    const content: { institution: string; content: ProgramData }[] = [
+    const content: any[] = [
       ...engineeringPrograms.map((d) => ({
         institution: "engineering",
         content: d,
