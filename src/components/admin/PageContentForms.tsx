@@ -19,6 +19,7 @@ import {
   METRICS_LIMITS,
   FACILITIES_LIMITS,
   RESEARCH_HIGHLIGHTS_LIMITS,
+  HERO_STATS_LIMITS,
 } from "@/lib/validation";
 
 /* ─── Shared types ─── */
@@ -229,6 +230,7 @@ export function EngineeringHeroForm({
 }
 
 export type ArtsHeroVal = {
+  backgroundImages?: string[];
   titleLine1?: string;
   titleHighlight?: string;
   titleLine2?: string;
@@ -245,6 +247,13 @@ export function ArtsScienceHeroForm({
 }) {
   return (
     <div className="space-y-4">
+      <ImageList
+        label="Background Carousel Images"
+        max={ARTS_HERO_LIMITS.backgroundImages}
+        hint="Images rotate behind the hero. Upload, replace, or remove each one."
+        value={value.backgroundImages ?? []}
+        onChange={(next) => onChange({ ...value, backgroundImages: next })}
+      />
       <div className="grid grid-cols-3 gap-3">
         <TextInput
           label="Title Line 1"
@@ -282,6 +291,91 @@ export function ArtsScienceHeroForm({
         max={ARTS_HERO_LIMITS.ctas}
         onChange={(next) => onChange({ ...value, ctas: next })}
       />
+    </div>
+  );
+}
+
+/* ─── Hero stat cards (Arts & Science) ─── */
+
+export type HeroStat = { value: string; label: string; accent?: boolean };
+
+export function HeroStatsForm({
+  value,
+  onChange,
+}: {
+  value: HeroStat[];
+  onChange: (v: HeroStat[]) => void;
+}) {
+  const safe = Array.isArray(value) ? value : [];
+  const atMax = safe.length >= HERO_STATS_LIMITS.itemsMax;
+  return (
+    <div className="space-y-3">
+      {safe.map((item, i) => (
+        <div key={i} className="rounded-lg border border-gray-200 p-3">
+          <div className="grid grid-cols-2 gap-3">
+            <TextInput
+              label="Value"
+              value={item.value}
+              maxLength={HERO_STATS_LIMITS.valueMax}
+              placeholder="e.g. 2,500+"
+              onChange={(e) =>
+                onChange(
+                  safe.map((s, j) =>
+                    j === i ? { ...s, value: e.target.value } : s,
+                  ),
+                )
+              }
+            />
+            <TextInput
+              label="Label"
+              value={item.label}
+              maxLength={HERO_STATS_LIMITS.labelMax}
+              placeholder="e.g. Students"
+              onChange={(e) =>
+                onChange(
+                  safe.map((s, j) =>
+                    j === i ? { ...s, label: e.target.value } : s,
+                  ),
+                )
+              }
+            />
+          </div>
+          <label className="mt-2 flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={Boolean(item.accent)}
+              onChange={(e) =>
+                onChange(
+                  safe.map((s, j) =>
+                    j === i ? { ...s, accent: e.target.checked } : s,
+                  ),
+                )
+              }
+            />
+            Highlight in accent color
+          </label>
+          <button
+            type="button"
+            onClick={() => onChange(safe.filter((_, j) => j !== i))}
+            className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+          >
+            <Trash2 size={13} /> Remove
+          </button>
+        </div>
+      ))}
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() =>
+            onChange([...safe, { value: "", label: "", accent: false }])
+          }
+          disabled={atMax}
+          className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Plus size={14} /> Add Stat Card
+        </button>
+        <LimitHint count={safe.length} max={HERO_STATS_LIMITS.itemsMax} />
+      </div>
     </div>
   );
 }

@@ -98,12 +98,18 @@ export const EngineeringHeroSchema = z.object({
 
 // Arts & Science Hero — split title into 3 parts (line1 + highlight + line2).
 export const ARTS_HERO_LIMITS = {
+  backgroundImages: 6,
   partMax: 40,
   subtitleMax: 240,
   ctas: 3,
 } as const;
 
 export const ArtsScienceHeroSchema = z.object({
+  backgroundImages: z
+    .array(zUrl)
+    .max(ARTS_HERO_LIMITS.backgroundImages)
+    .optional()
+    .default([]),
   titleLine1: zOptionalString(ARTS_HERO_LIMITS.partMax).default(""),
   titleHighlight: zOptionalString(ARTS_HERO_LIMITS.partMax).default(""),
   titleLine2: zOptionalString(ARTS_HERO_LIMITS.partMax).default(""),

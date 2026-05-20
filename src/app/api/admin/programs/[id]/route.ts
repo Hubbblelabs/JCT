@@ -94,22 +94,21 @@ export async function DELETE(
   try {
     await connectDB();
     const { id } = await params;
-    const doc = await Program.findByIdAndUpdate(
-      id,
-      { is_active: false },
-      { new: true },
-    );
+    const doc = await Program.findByIdAndDelete(id);
     if (!doc) return notFound();
 
     const target = institutionTarget(doc.institution);
-    if (target) revalidateTargets(target);
+    if (target) {
+      revalidateTargets(target);
+      revalidatePaths(`/institutions/${doc.institution}/programs/${doc.slug}`);
+    }
     await logAudit(
       "program",
-      "deactivated",
+      "deleted",
       session!.user?.email ?? "",
-      `Deactivated program ${doc.name}`,
+      `Deleted program ${doc.name}`,
     );
-    return json({ message: "Deactivated" });
+    return json({ message: "Deleted" });
   } catch (e) {
     console.error(e);
     return serverError();

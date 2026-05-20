@@ -16,6 +16,7 @@ type HeroStat = {
 type HeroCta = { label: string; href: string; primary: boolean };
 
 type HeroContent = {
+  backgroundImages: string[];
   titleLine1: string;
   titleHighlight: string;
   titleLine2: string;
@@ -24,6 +25,11 @@ type HeroContent = {
 };
 
 const DEFAULT_HERO: HeroContent = {
+  backgroundImages: [
+    "/assets/jct-life4.webp",
+    "/assets/jct-life5.webp",
+    "/assets/campus5.webp",
+  ],
   titleLine1: "Good Education",
   titleHighlight: "for",
   titleLine2: "A Better Future",
@@ -58,8 +64,11 @@ function normalizeStats(raw: unknown): HeroStat[] {
 function normalizeHero(raw: unknown): HeroContent | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
-  const titleLine1 = typeof r.titleLine1 === "string" ? r.titleLine1 : null;
-  if (!titleLine1) return null;
+  const backgroundImages = Array.isArray(r.backgroundImages)
+    ? r.backgroundImages.filter(
+        (s): s is string => typeof s === "string" && s.length > 0,
+      )
+    : [];
   const ctas = Array.isArray(r.ctas)
     ? r.ctas
         .map((c) => {
@@ -72,11 +81,24 @@ function normalizeHero(raw: unknown): HeroContent | null {
         .filter((x): x is HeroCta => x !== null)
     : [];
   return {
-    titleLine1,
+    backgroundImages:
+      backgroundImages.length > 0
+        ? backgroundImages
+        : DEFAULT_HERO.backgroundImages,
+    titleLine1:
+      typeof r.titleLine1 === "string" && r.titleLine1
+        ? r.titleLine1
+        : DEFAULT_HERO.titleLine1,
     titleHighlight:
-      typeof r.titleHighlight === "string" ? r.titleHighlight : "",
-    titleLine2: typeof r.titleLine2 === "string" ? r.titleLine2 : "",
-    subtitle: typeof r.subtitle === "string" ? r.subtitle : "",
+      typeof r.titleHighlight === "string"
+        ? r.titleHighlight
+        : DEFAULT_HERO.titleHighlight,
+    titleLine2:
+      typeof r.titleLine2 === "string" && r.titleLine2
+        ? r.titleLine2
+        : DEFAULT_HERO.titleLine2,
+    subtitle:
+      typeof r.subtitle === "string" ? r.subtitle : DEFAULT_HERO.subtitle,
     ctas: ctas.length > 0 ? ctas : DEFAULT_HERO.ctas,
   };
 }
@@ -157,7 +179,7 @@ export function Hero() {
       onMouseMove={handleMouseMove}
     >
       <div className="pointer-events-none absolute inset-0 origin-top overflow-hidden">
-        <ArtsAndScienceHeroBg />
+        <ArtsAndScienceHeroBg images={hero.backgroundImages} />
       </div>
 
       <div className="pointer-events-none absolute inset-0 z-0 mask-[radial-gradient(ellipse_at_center,black_60%,transparent_100%)]">
@@ -201,12 +223,14 @@ export function Hero() {
             transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
             className="mb-2 font-sans text-4xl leading-[0.98] font-extrabold tracking-[-0.03em] text-white drop-shadow-[0_12px_24px_rgba(2,10,24,0.55)] sm:mb-4 sm:text-5xl md:text-6xl lg:text-7xl"
           >
-            Good Education
+            {hero.titleLine1}
             <br />
-            <span className="text-arts-science-accent font-extrabold">
-              for{" "}
-            </span>
-            A Better Future
+            {hero.titleHighlight && (
+              <span className="text-arts-science-accent font-extrabold">
+                {hero.titleHighlight}{" "}
+              </span>
+            )}
+            {hero.titleLine2}
           </motion.h1>
 
           {hero.subtitle && (
@@ -235,26 +259,36 @@ export function Hero() {
             }}
             className="mb-6 flex w-full max-w-md flex-col gap-2.5 sm:max-w-none sm:flex-row sm:justify-center sm:gap-4 md:mb-10"
           >
-            <motion.div
-              variants={{
-                hidden: { opacity: 0, y: 18 },
-                show: { opacity: 1, y: 0 },
-              }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
-            >
-              <Link
-                href="https://admissions.jct.ac.in/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group bg-arts-science-accent hover:bg-arts-science-accent-dark inline-flex h-11 w-full items-center justify-center gap-2 rounded-full px-5 font-sans text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
-              >
-                Apply Now
-                <ArrowRight
-                  size={16}
-                  className="transition-transform duration-300 group-hover:translate-x-1"
-                />
-              </Link>
-            </motion.div>
+            {hero.ctas.map((cta) => {
+              const isExternal = cta.href.startsWith("http");
+              return (
+                <motion.div
+                  key={cta.label}
+                  variants={{
+                    hidden: { opacity: 0, y: 18 },
+                    show: { opacity: 1, y: 0 },
+                  }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                >
+                  <Link
+                    href={cta.href}
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
+                    className={
+                      cta.primary
+                        ? "group bg-arts-science-accent hover:bg-arts-science-accent-dark inline-flex h-11 w-full items-center justify-center gap-2 rounded-full px-5 font-sans text-sm font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl active:translate-y-0 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
+                        : "group inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-white/30 bg-white/5 px-5 font-sans text-sm font-semibold text-white backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-white/10 active:translate-y-0 sm:h-12 sm:w-auto sm:min-w-44 sm:px-7 sm:text-base"
+                    }
+                  >
+                    {cta.label}
+                    <ArrowRight
+                      size={16}
+                      className="transition-transform duration-300 group-hover:translate-x-1"
+                    />
+                  </Link>
+                </motion.div>
+              );
+            })}
           </motion.div>
 
           {/* Stats Row */}

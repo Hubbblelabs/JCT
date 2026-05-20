@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, type MouseEvent } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, Loader2, ChevronRight } from "lucide-react";
+import { Plus, Loader2, ChevronRight, Trash2 } from "lucide-react";
 
 interface Program {
   _id: string;
@@ -27,6 +27,7 @@ function ProgramsPageInner() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [seeding, setSeeding] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [filter, setFilter] = useState(() => searchParams.get("college") ?? "");
 
   const load = async () => {
@@ -49,6 +50,31 @@ function ProgramsPageInner() {
     await fetch("/api/admin/programs/seed", { method: "POST" });
     await load();
     setSeeding(false);
+  };
+
+  const handleDelete = async (e: MouseEvent, program: Program) => {
+    e.stopPropagation();
+    if (
+      !confirm(
+        `Permanently delete "${program.name}"? This removes it completely and cannot be undone.`,
+      )
+    )
+      return;
+    setDeletingId(program._id);
+    try {
+      const r = await fetch(`/api/admin/programs/${program._id}`, {
+        method: "DELETE",
+      });
+      if (r.ok) {
+        setPrograms((prev) => prev.filter((p) => p._id !== program._id));
+      } else {
+        alert("Failed to delete program.");
+      }
+    } catch {
+      alert("Failed to delete program.");
+    } finally {
+      setDeletingId(null);
+    }
   };
 
   const filtered = (programs || []).filter((p) => !filter || p.institution === filter);
@@ -149,7 +175,22 @@ function ProgramsPageInner() {
                     </span>
                   </td>
                   <td>
-                    <ChevronRight size={16} className="text-gray-400" />
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        type="button"
+                        onClick={(e) => handleDelete(e, p)}
+                        disabled={deletingId === p._id}
+                        title="Delete program"
+                        className="admin-btn admin-btn-danger admin-btn-sm"
+                      >
+                        {deletingId === p._id ? (
+                          <Loader2 size={13} className="animate-spin" />
+                        ) : (
+                          <Trash2 size={13} />
+                        )}
+                      </button>
+                      <ChevronRight size={16} className="text-gray-400" />
+                    </div>
                   </td>
                 </tr>
               ))}

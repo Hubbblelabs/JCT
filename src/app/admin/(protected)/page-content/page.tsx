@@ -10,6 +10,7 @@ import {
 import {
   EngineeringHeroForm,
   ArtsScienceHeroForm,
+  HeroStatsForm,
   PolytechnicHeroForm,
   CampusLifeCarouselForm,
   AnnouncementForm,
@@ -18,6 +19,7 @@ import {
   MetricsForm,
   type EngHeroVal,
   type ArtsHeroVal,
+  type HeroStat,
   type PolyHeroVal,
   type CampusLifeCarouselVal,
   type AnnouncementVal,
@@ -459,6 +461,16 @@ function sectionsFor(college: College): SectionDef[] {
             value={(v as ArtsHeroVal) ?? {}}
             onChange={onChange}
           />
+        ),
+      },
+      {
+        id: "heroStats",
+        label: "Hero Stat Cards",
+        kind: "form",
+        configKey: "artsScienceHeroStats",
+        defaultValue: [] as HeroStat[],
+        render: (v, onChange) => (
+          <HeroStatsForm value={(v as HeroStat[]) ?? []} onChange={onChange} />
         ),
       },
       {

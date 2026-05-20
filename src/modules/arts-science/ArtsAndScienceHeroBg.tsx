@@ -3,29 +3,35 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import { getImageUrl } from "@/lib/utils";
 
-const CAROUSEL_IMAGES = [
+const DEFAULT_IMAGES = [
   "/assets/jct-life4.webp",
   "/assets/jct-life5.webp",
   "/assets/campus5.webp",
 ];
 
-export function ArtsAndScienceHeroBg() {
+export function ArtsAndScienceHeroBg({ images }: { images?: string[] }) {
+  const slides = images && images.length > 0 ? images : DEFAULT_IMAGES;
   const [currentIdx, setCurrentIdx] = useState(0);
 
   useEffect(() => {
+    if (slides.length <= 1) return;
     const timer = window.setInterval(() => {
-      setCurrentIdx((prev) => (prev + 1) % CAROUSEL_IMAGES.length);
+      setCurrentIdx((prev) => (prev + 1) % slides.length);
     }, 5500);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [slides.length]);
+
+  const idx = currentIdx % slides.length;
+  const src = slides[idx];
 
   return (
     <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden bg-[#081018]">
       <AnimatePresence mode="wait">
         <motion.div
-          key={currentIdx}
+          key={`${src}-${idx}`}
           className="absolute inset-0"
           initial={{ opacity: 0, scale: 1.12, y: 8 }}
           animate={{ opacity: 1, scale: 1.04, y: 0 }}
@@ -33,10 +39,10 @@ export function ArtsAndScienceHeroBg() {
           transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
         >
           <Image
-            src={CAROUSEL_IMAGES[currentIdx]}
-            alt={`Arts and Science campus background ${currentIdx + 1}`}
+            src={getImageUrl(src) ?? src}
+            alt={`Arts and Science campus background ${idx + 1}`}
             fill
-            priority={currentIdx === 0}
+            priority={idx === 0}
             sizes="100vw"
             className="object-cover object-center brightness-[0.9] contrast-[1.18] saturate-[1.12]"
           />

@@ -2079,7 +2079,6 @@ export function ProgramPageLayout({
   backHref: _backHref,
   backLabel: _backLabel,
   editable = false,
-  onEditTab,
   onEditSection,
 }: {
   dept: ProgramData;

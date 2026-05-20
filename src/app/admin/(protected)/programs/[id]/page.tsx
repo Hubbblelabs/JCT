@@ -21,6 +21,7 @@ import { normalizeProgramData } from "@/lib/normalize-program-data";
 import {
   Send,
   Trash2,
+  EyeOff,
   ArrowLeft,
   Loader2,
   Check,
@@ -89,6 +90,7 @@ function ProgramDetailInner() {
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
 
@@ -207,8 +209,15 @@ function ProgramDetailInner() {
   };
 
   const deactivate = async () => {
-    if (!confirm("Deactivate this program?")) return;
-    await fetch(`/api/admin/programs/${id}`, { method: "DELETE" });
+    if (
+      !confirm("Deactivate this program? It will be hidden from the public site.")
+    )
+      return;
+    await fetch(`/api/admin/programs/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_active: false }),
+    });
     router.push(`/admin/programs?college=${prog.institution}`);
   };
 
@@ -220,6 +229,33 @@ function ProgramDetailInner() {
       body: JSON.stringify({ is_active: true, status: "draft" }),
     });
     router.push(`/admin/programs?college=${prog.institution}`);
+  };
+
+  const remove = async () => {
+    if (
+      !confirm(
+        `Permanently delete "${prog.name || "this program"}"? This removes it completely and cannot be undone.`,
+      )
+    )
+      return;
+    setDeleting(true);
+    setMsg(null);
+    try {
+      const r = await fetch(`/api/admin/programs/${id}`, { method: "DELETE" });
+      if (r.ok) {
+        router.push(`/admin/programs?college=${prog.institution}`);
+      } else {
+        const err = await parseApiError(r);
+        setMsg({
+          text: err?.message ?? err?.error ?? "Error deleting program",
+          ok: false,
+        });
+        setDeleting(false);
+      }
+    } catch {
+      setMsg({ text: "Error deleting program", ok: false });
+      setDeleting(false);
+    }
   };
 
   const setP = (k: keyof ProgramFields, v: unknown) =>
@@ -299,9 +335,9 @@ function ProgramDetailInner() {
           {!isNew && prog.is_active && (
             <button
               onClick={deactivate}
-              className="admin-btn admin-btn-danger admin-btn-sm"
+              className="admin-btn admin-btn-outline admin-btn-sm"
             >
-              <Trash2 size={14} /> Deactivate
+              <EyeOff size={14} /> Deactivate
             </button>
           )}
           {!isNew && !prog.is_active && (
@@ -310,6 +346,20 @@ function ProgramDetailInner() {
               className="admin-btn admin-btn-green admin-btn-sm"
             >
               <Check size={14} /> Activate
+            </button>
+          )}
+          {!isNew && (
+            <button
+              onClick={remove}
+              disabled={deleting}
+              className="admin-btn admin-btn-danger admin-btn-sm"
+            >
+              {deleting ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Trash2 size={14} />
+              )}
+              {deleting ? "Deleting…" : "Delete"}
             </button>
           )}
           <button
