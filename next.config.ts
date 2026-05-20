@@ -18,15 +18,6 @@ const nextConfig: NextConfig = {
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     qualities: [75, 90],
   },
-  async redirects() {
-    return [
-      {
-        source: "/institutions/engineering/postgraduate/:slug",
-        destination: "/institutions/engineering/programs/:slug",
-        permanent: true,
-      },
-    ];
-  },
 };
 
 export default nextConfig;

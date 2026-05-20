@@ -4,194 +4,114 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**JCT Institutions** is a Next.js 16 admin + public website for three colleges (Engineering, Arts & Science, Polytechnic) in Coimbatore. The application has two distinct sections:
+**JCT Institutions** is a Next.js 16 app that combines a **public marketing/admissions website** and an **admin CMS** for three colleges (Engineering, Arts & Science, Polytechnic) in Coimbatore. 
 
-- **Public Site**: Institution pages, program listings, department info, campus life, research sections
-- **Admin Dashboard**: Content management system for managing departments, programs, users, images, testimonials, recruiters, and site configuration
+- **Public site** (`/`, `/institutions/*`, `/campus-life`, `/research`): institution landing pages, program listings, dynamic per-program detail pages, campus life, research. Server-rendered with ISR caching.
+- **Admin CMS** (`/admin/*`): manage programs (via a live-preview content builder), users, images, documents, testimonials, recruiters, page content, and site-wide config.
 
-The system uses **MongoDB Atlas** for persistence, **NextAuth.js** for authentication, **Cloudflare R2** for image storage, and **Server-Side Rendering** with caching strategies.
+Persistence is **MongoDB Atlas** (Mongoose), auth is **NextAuth.js**, image/document storage is **Cloudflare R2** (S3-compatible).
 
 ## Tech Stack
 
-- **Framework**: Next.js 16 (App Router, Turbopack)
-- **Language**: TypeScript 6
-- **Database**: MongoDB 9.6 (Mongoose)
-- **Auth**: NextAuth.js 5.0 (beta) with bcrypt for password hashing
-- **Validation**: Zod 4.4
-- **UI/Styling**: Tailwind CSS 4.3, Framer Motion, Lucide React, React Icons
-- **Image Storage**: AWS S3 API (Cloudflare R2 compatible)
-- **Forms**: React Hook Form with Zod schema validation
-- **Package Manager**: pnpm 11.1.2
+- **Framework**: Next.js 16 (App Router, Turbopack), React 19
+- **Language**: TypeScript 6 (strict, `noImplicitAny`)
+- **Database**: MongoDB via Mongoose 9
+- **Auth**: NextAuth.js 5 (beta) — Credentials provider, bcryptjs hashing
+- **Validation**: Zod 4
+- **UI/Styling**: Tailwind CSS 4, Framer Motion, Lucide React, React Icons
+- **Storage**: AWS S3 SDK against Cloudflare R2
+- **Forms**: React Hook Form + Zod resolver
+- **Package Manager**: pnpm
 
-## Development Scripts
+## Development Commands
 
 ```bash
-pnpm dev          # Start dev server with Turbopack on http://localhost:3000
-pnpm build        # Build for production (standalone output)
-pnpm start        # Start production server
-pnpm lint --fix   # Run ESLint with auto-fix
-pnpm format       # Format code with Prettier
+pnpm dev       # Dev server with Turbopack at http://localhost:3000
+pnpm build     # Production build (output: "standalone")
+pnpm start     # Run the production build
+pnpm lint      # ESLint — NOTE: this script always runs with --fix
+pnpm format    # Prettier (with Tailwind class sorting)
 ```
 
-## Architecture & Data Flow
+There is **no test framework** configured — no test runner, no test files, no `test` script. Verify changes with `pnpm build` + `pnpm lint` and by exercising the feature in the browser.
 
-### Project Structure
+## Architecture
 
-```
-src/
-├── app/
-│   ├── admin/                  # Admin routes (protected + public auth)
-│   │   ├── (protected)/        # Route group requiring authentication
-│   │   │   ├── dashboard/
-│   │   │   ├── departments/    # Department content editor
-│   │   │   ├── programs/       # Program CRUD
-│   │   │   ├── users/          # User management (super_admin only)
-│   │   │   ├── images/         # Image asset library
-│   │   │   ├── testimonials/
-│   │   │   ├── recruiters/
-│   │   │   ├── site-config/    # Site-wide config editor
-│   │   │   ├── page-content/   # Hero, announcements, etc.
-│   │   │   └── audit/          # Activity log viewer
-│   │   ├── login/              # Public login page
-│   │   └── layout.tsx          # Wrapper with auth check
-│   ├── api/
-│   │   ├── auth/[...nextauth]/ # NextAuth handlers
-│   │   ├── admin/              # Protected endpoints (GET/POST/PATCH)
-│   │   │   ├── departments/
-│   │   │   ├── programs/
-│   │   │   ├── users/
-│   │   │   ├── images/         # Upload & serve
-│   │   │   ├── site-config/
-│   │   │   └── [other admin routes]
-│   │   ├── public/             # Public API (cached, no auth)
-│   │   │   ├── programs/
-│   │   │   ├── site-config/
-│   │   │   └── [other public routes]
-│   │   └── chat/               # Meritto chatbot integration
-│   ├── institutions/           # Public pages
-│   │   ├── engineering/        # Department pages + dynamic course pages
-│   │   ├── arts-science/
-│   │   └── polytechnic/
-│   ├── campus-life/
-│   ├── research/
-│   └── layout.tsx              # Root layout with InstitutionProvider
-├── components/
-│   ├── admin/                  # Admin UI components
-│   │   ├── PageContentForms.tsx # Hero, announcement, section editors
-│   │   ├── DepartmentTabsEditor.tsx # Department content with tabs
-│   │   ├── inputs.tsx          # Form field wrappers
-│   │   └── [others]
-│   ├── layout/                 # Global nav, footer, etc.
-│   ├── shared/                 # Reusable UI (cards, modals, etc.)
-│   └── ui/                     # Base UI components (buttons, inputs)
-├── lib/
-│   ├── mongodb.ts              # Mongoose connection with caching
-│   ├── api-helpers.ts          # JSON/validation/auth response helpers
-│   ├── permissions.ts          # Role-based access control
-│   ├── r2.ts                   # Cloudflare R2 (S3) upload/delete/get
-│   ├── revalidate.ts           # Next.js ISR cache invalidation
-│   ├── audit.ts                # Audit log recording
-│   ├── models/                 # Mongoose schemas
-│   │   ├── User.ts             # Users with roles & institutions
-│   │   ├── Department.ts       # Department pages with draft/published
-│   │   ├── Program.ts          # Degree programs
-│   │   ├── ImageAsset.ts       # Image metadata + storage location
-│   │   ├── SiteConfig.ts       # Global site settings
-│   │   ├── Testimonial.ts      # Alumni/student/industry quotes
-│   │   ├── Recruiter.ts        # Company logos
-│   │   └── AuditLog.ts         # Activity tracking
-│   └── validation/             # ~1164 lines of Zod schemas
-│       ├── _primitives.ts      # Base validators (email, url, slug, color)
-│       ├── hero.ts             # Hero section schemas
-│       ├── departments.ts      # Department content with tabs
-│       ├── users.ts
-│       ├── siteConfig.ts       # Known config keys with validators
-│       └── [others]
-├── data/
-│   ├── site.ts                 # Static site config (name, contact, social, stats)
-│   └── chatbot/                # Meritto chatbot data
-├── contexts/
-│   └── InstitutionContext.tsx   # Tracks current institution (main/eng/arts/poly)
-├── styles/
-│   └── globals.css             # Tailwind + custom CSS
-├── types/
-└── auth.ts                     # NextAuth config + callbacks
+### Routing layout
 
-public/                          # Static assets (logos, favicons)
-```
+`src/app/` is the App Router root. The app has two halves:
 
-### Key Patterns
+- **`src/app/admin/`** — the CMS. `(protected)/` is a route group whose `layout.tsx` does a session check; `login/` is public.
+- **`src/app/institutions/<inst>/`** — public pages for each of `engineering`, `arts-science`, `polytechnic`. Each has `page.tsx` (landing), `about/`, `courses/`, `programs/` + `programs/[slug]/` (DB-driven program detail pages), and a legacy `[course]/` dynamic route. Engineering also has `coe/` (Centre of Excellence). 
 
-#### Authentication & Authorization
+### Authentication & authorization
 
-- **NextAuth.js Credentials Provider**: Email + password authentication
-- **Password Hashing**: bcryptjs (async, cost 12)
-- **Session Strategy**: JWT with 24-hour max age
-- **Role Hierarchy**: `viewer` (0) → `editor` (1) → `admin` (2) → `super_admin` (3)
-- **Scope Enforcement**:
-  - **super_admin**: All users, can manage all users
-  - **admin**: Can publish, access all departments
-  - **editor**: Can edit only assigned institution/departments
-  - **viewer**: Read-only access
-- **Protected Routes**: Layout redirects to `/admin/login` if `!session.user`
+- **`src/proxy.ts` is the Next.js 16 middleware** (Next 16 renamed `middleware.ts` → `proxy.ts`). It wraps NextAuth `auth()` and gates `/admin/:path*` + `/api/admin/:path*`: unauthenticated requests redirect to `/admin/login?callbackUrl=...`; an authenticated user hitting the login page is sent to `/admin/dashboard`. This proxy is the real route gate — admin layouts also check the session as defense-in-depth.
+- **`src/auth.ts`** configures NextAuth: Credentials provider only (email + password, bcrypt compare), JWT session with 24h `maxAge`. The session/JWT carries `role`, `institution`, and `programs[]`.
+- **Roles** (`src/lib/permissions.ts`): `viewer` (0) < `editor` (1) < `admin` (2) < `super_admin` (3). Helpers: `hasMinRole`, `canEdit` (editor+), `canPublish` (admin+), `canManageUsers` (super_admin), `canAccessProgram` — editors are scoped to their `institution` and an optional `programs[]` allowlist; admins+ access everything.
+- In API routes, call `requireRole(req, minRole)` from `src/lib/api-helpers.ts`. It returns `{ session, error }`; if `error` is truthy, return it directly.
 
-#### API Design
+### API design
 
-- All admin endpoints require role authorization via `requireRole(req, "editor")`
-- Public endpoints (no auth) are cached with `revalidate = 3600` (1 hour)
-- Validation: `validateBody(req, ZodSchema)` returns `{ ok, data | response }`
-- Error responses: `badRequest(msg, 400)`, `validationError(zodIssues, 422)`, `forbidden()`, `unauthorized()`, `serverError()`
-- Audit logging: `logAudit(entityType, action, email, summary)` (non-fatal)
+- **Admin routes** (`src/app/api/admin/*`): gate with `requireRole`, parse with `validateBody(req, ZodSchema)` (or `validateFields` for multipart), record `logAudit(...)` (non-fatal), and call `revalidateTargets(...)` after writes. Response/error helpers in `src/lib/api-helpers.ts`: `json`, `badRequest`, `validationError`, `unauthorized`, `forbidden`, `notFound`, `serverError`.
+- **Public routes** (`src/app/api/public/*`): no auth, `export const revalidate = 3600` (1h ISR). Responses use a `{ source, data }` envelope (`source` is `"db" | "empty" | "error"`).
+- Some admin routes have `seed/` sub-routes for bootstrapping data (`programs`, `recruiters`, `testimonials`, `site-config`).
 
-#### Database & Caching
+### Database & connection
 
-- MongoDB connection: Cached globally via `mongoose.connection.readyState` check with 10s timeout
-- Mongoose models: Singleton pattern (`mongoose.models.X ?? mongoose.model()`)
-- Public API routes: `revalidate = 3600` for 1-hour ISR caching
-- Manual cache invalidation: `revalidateTargets()` and `revalidateForConfigKey()` in `src/lib/revalidate.ts`
-  - When a site config key changes, automatically invalidates relevant public pages
-  - Department/program updates trigger revalidation of institution pages
+- **`connectDB()`** (`src/lib/mongodb.ts`): a globally cached Mongoose connection (`global._mongooseConn`), guarded by `readyState === 1`, with a 10s connect-timeout race and `bufferCommands: false`. Call it at the start of any route that touches the DB.
+- Models use the singleton guard `mongoose.models.X ?? mongoose.model(...)` to survive hot reload. Exported from `src/lib/models/index.ts`: `User`, `SiteConfig`, `ImageAsset`, `Program`, `Recruiter`, `Testimonial`, `AuditLog`.
 
-#### Content Management
+### Program CMS — the content builder (most important subsystem)
 
-- **Draft/Publish Model**: Departments and SiteConfig use `status: "draft" | "published"` with separate `content` and `published_content` fields
-- **Versioning**: All content entities have `version` field for tracking changes
-- **Department Tabs**: Departments store content as JSON object with tab structure (can have multiple tabs per department)
-- **Image Upload**:
-  - Images stored in Cloudflare R2 via AWS SDK
-  - Metadata (url, alt_text, category, institution) stored in MongoDB
-  - Categories: department, faculty, hero, campus, program, recruiter, testimonial, other
-  - Fallback to `/api/public/images/[...path]` if R2 not configured
-- **Institution Filtering**: Programs, testimonials, recruiters all support institution filtering
+There is **no `Department` model** anymore. Rich page content that used to live on a Department now lives on **`Program`** — the `Program.content` field's schema comment notes it "was previously stored on Department.content". If you encounter "department" in older branches/docs, that concept is folded into Program.
 
-#### Frontend State & Rendering
+- A **`Program`** (`src/lib/models/Program.ts`) has card-level fields (`name`, `abbr`, `slug`, `institution`, `degree`, `duration`, `seats`, `image`, `highlight`, `description`, `outcomes`, `sort_order`, `is_active`) **plus** a rich-content draft/publish pair: `content` (draft, `Mixed`), `published_content` (live snapshot), `status: "draft" | "published" | "archived"`, `version`, `published_at`.
+- **Content shape** (`src/lib/program-tabs.ts`): a `TabsProgram` has `tabs[]`; each `Tab` has `id`, `label`, optional `icon`, and `sections[]`; each `Section` is one of `richText`, `stats`, `list`, `cards`, `image`, `people`.
+- **The editor** (`src/app/admin/(protected)/programs/[id]/page.tsx` with `ProgramContentEditor`, `ProgramTabsEditor`, `CurriculumEditor`, `ProgramLabelsEditor` in `src/components/admin/`) is a **live-preview builder**: edit content on one side, see the rendered public page on the other.
+- **Publish flow**: `POST /api/admin/programs/[id]/publish` copies `content` → `published_content`, sets `status: "published"`, bumps `version`. `POST /api/admin/programs/[id]/migrate-tabs` upgrades older content shapes to the current tabs format.
+- **Public reads** go through `src/lib/public-programs.ts` (`listPublicPrograms`, `getPublishedProgramBySlug`, `listPublishedProgramSlugs`). These only return docs with `status: "published"` and non-null `published_content`, then run the content through `src/lib/normalize-program-data.ts` to produce the typed `ProgramData` the public pages render.
 
-- **InstitutionContext**: React context tracking which institution section user is viewing (main/engineering/arts-science/polytechnic)
-  - Synced to sessionStorage for persistence across navigations
-  - Auto-detects from pathname
-- **Server Components by Default**: Admin pages are server components with session checks
-- **Client Components**: Only where needed (forms, interactive UI, client-side hooks)
-- **Image Optimization**: Next.js `next/image` with remote patterns configured for external sources (unsplash, pravatar, wikimedia, companieslogo)
+### SiteConfig & page content
 
-### Database Schema Notes
+- **`SiteConfig`** docs are keyed by a unique `config_key`, with a draft/publish pair `value` / `published_value` and `status: "draft" | "published"`.
+- Allowed config keys are a **fixed registry** in `src/lib/validation/siteConfig.ts` (`SITE_CONFIG_SCHEMAS`) — each key maps to a Zod schema, and unknown keys are rejected. Keys include `contact`, `social`, `address`, `stats`, `accreditations`, `home`, `homeStats`, `engineeringHero`, `engineeringMetrics`, `artsScienceHero`, `polytechnicAdmissions`, etc. Add a new site-wide setting by adding an entry here.
+- The admin "page content" pages (`(protected)/page-content/`, `(protected)/main/page-content/`) edit these config keys via `PageContentForms.tsx` / `PageContentShell.tsx`.
 
-- **User**: Unique email index, stores role + institution + department access list
-- **Department**: Unique slug, indexes on college + status, published_content is snapshot at publish time
-- **Program**: Unique slug, indexes on institution + is_active
-- **ImageAsset**: Unique storage_key, indexes on category + institution
-- **SiteConfig**: Unique config_key (global site settings, stored as documents, not key-value)
-- **AuditLog**: No unique constraints, indexes on entity_type + created_at for efficient querying
+### Images & documents
+
+- **Images**: uploaded via `POST /api/admin/images/upload` (FormData) → validated for mime/size → stored in R2 via `src/lib/r2.ts` → an `ImageAsset` doc records metadata (url, alt text, category, institution). If R2 env vars are absent, images fall back to local serving via `/api/public/images/[...path]` or `/api/admin/images/serve/[...key]`.
+- **Documents**: `POST /api/admin/documents/upload` handles non-image assets (e.g. prospectus/pamphlet PDFs).
+- `next.config.ts` `images.remotePatterns` allowlists external hosts (unsplash, pravatar, wikimedia, companieslogo, the R2 public domain) and applies a strict CSP that sandboxes SVGs.
+
+### Caching & revalidation
+
+- Public API routes use 1h ISR (`export const revalidate = 3600`).
+- After a content write, call helpers from `src/lib/revalidate.ts`:
+  - `revalidateTargets(...targets)` — targets are `"home" | "engineering" | "arts-science" | "polytechnic" | "all-institutions"`.
+  - `revalidateForConfigKey(key)` — looks up the affected pages via the `SITE_CONFIG_KEY_TARGETS` map and also clears the `/api/public/site-config` route cache.
+  - `revalidatePaths(...paths)` — revalidate explicit paths.
+
+### Frontend structure & state
+
+- **`src/modules/<inst>/`** holds per-institution public page **section components** (e.g. `EngineeringHero`, `EngineeringMetrics`, `EngineeringDomains`, `Admissions`, `Testimonials`), composed by the institution `page.tsx` files. Reusable layout/UI components live in `src/components/layout`, `src/components/shared`, `src/components/ui`.
+- **`src/data/`** holds static content not in the CMS: `site.ts`, `home.ts`, `engineering.ts`, `*-programs.ts`, `all-navigations.ts`, and `chatbot/` (data for the Meritto chatbot wired through `/api/chat`).
+- **`InstitutionContext`** (`src/contexts/InstitutionContext.tsx`): client context tracking the current section (`main | engineering | arts-science | polytechnic`). Auto-detected from the pathname and mirrored to `sessionStorage`.
+- Server Components are the default; `"use client"` only for interactive UI (forms, the program builder, context consumers).
 
 ## Environment Configuration
 
-Required environment variables (see `.env.example`):
+See `.env.example`. Required:
 
 ```
-MONGODB_URI              # MongoDB Atlas connection string
-NEXTAUTH_SECRET          # 32-char random secret for JWT (openssl rand -base64 32)
-NEXTAUTH_URL             # http://localhost:3000 (dev) or https://jct.ac.in (prod)
+MONGODB_URI       # MongoDB Atlas connection string
+NEXTAUTH_SECRET   # 32-char random secret (openssl rand -base64 32)
+NEXTAUTH_URL      # http://localhost:3000 (dev) / https://jct.ac.in (prod)
+```
 
-# Optional (images fallback to local if not set)
+Optional — images/documents fall back to local serving if unset:
+
+```
 R2_ACCOUNT_ID
 R2_ACCESS_KEY_ID
 R2_SECRET_ACCESS_KEY
@@ -199,17 +119,13 @@ R2_BUCKET_NAME
 NEXT_PUBLIC_R2_PUBLIC_URL
 ```
 
-## Validation & Forms
+## Validation
 
-Zod schemas define all entity shapes. Key locations:
+Zod schemas define every entity shape. They live in `src/lib/validation/` and are re-exported from `src/lib/validation/index.ts` (the barrel), each alongside a `LIMITS` constant for max string lengths / array sizes.
 
-- `src/lib/validation/index.ts`: Barrel export of all schemas + LIMITS constants
-- Every schema has associated `LIMITS` object (max string lengths, array sizes, etc.)
-- Primitives in `_primitives.ts`: `zEmail`, `zSlug`, `zUrl`, `zClampedString()`, `zPasswordMin8`
-- Form validation on admin pages uses React Hook Form + Zod resolver
-- API routes validate incoming JSON with `validateBody()` returning structured 422 errors
-
-Example validation error response:
+- Primitives in `_primitives.ts`: `zEmail`, `zSlug`, `zUrl`, `zClampedString()`, `zPasswordMin8`, color validators.
+- Admin pages validate forms with React Hook Form + Zod resolver; API routes validate JSON with `validateBody()`.
+- Validation failures return a structured **422** that is additive over `{ error }`:
 
 ```json
 {
@@ -219,70 +135,40 @@ Example validation error response:
 }
 ```
 
-## Common Development Workflows
+## Common Workflows
 
-### Adding a New Content Type
+### Add a new content type
 
-1. Create MongoDB schema in `src/lib/models/NewType.ts`
-2. Export from `src/lib/models/index.ts`
-3. Create Zod validators in `src/lib/validation/newtype.ts` with LIMITS
-4. Add to barrel export in `src/lib/validation/index.ts`
-5. Create API routes: `src/app/api/admin/newtype/route.ts` (GET, POST) and `[id]/route.ts` (PATCH, DELETE)
-6. Create admin UI page in `src/app/admin/(protected)/newtype/page.tsx`
-7. Add public API at `src/app/api/public/newtype/route.ts` if needed
-8. Update revalidation map in `src/lib/revalidate.ts` if ISR caching is needed
+1. Mongoose schema in `src/lib/models/NewType.ts`; export it from `src/lib/models/index.ts`.
+2. Zod schemas (+ `LIMITS`) in `src/lib/validation/newtype.ts`; re-export from the validation barrel.
+3. Admin API: `src/app/api/admin/newtype/route.ts` (GET/POST) and `[id]/route.ts` (PATCH/DELETE) — gate with `requireRole`, validate, audit, revalidate.
+4. Admin UI: `src/app/admin/(protected)/newtype/page.tsx`.
+5. Public API (if needed): `src/app/api/public/newtype/route.ts` with `revalidate = 3600`.
+6. If it affects public pages, extend `src/lib/revalidate.ts`.
 
-### Publishing Draft Content
+### Publish draft content
 
-Department and SiteConfig use publish workflow:
+`Program` and `SiteConfig` use a draft/publish split. Publishing copies the draft field into the published field, flips `status` to `"published"`, and bumps `version`. The public site reads **only** published content; drafts are visible only in the admin.
 
-- POST to `/api/admin/departments/[id]/publish` (or similar) to copy `content` → `published_content` and set `status: "published"`
-- Published content is what's served to public API / rendered on frontend
-- Drafts visible only in admin
-
-### Image Upload Flow
-
-1. Admin selects image via file input
-2. Frontend POST to `/api/admin/images/upload` with FormData
-3. Backend: Validate mime type/size → Upload to R2 → Create ImageAsset doc → Return URL
-4. Admin stores returned URL in content field
-5. Public API uses `getImageUrl()` helper to build full CDN URL
-
-### Cache Invalidation
-
-After content changes, call revalidation helpers in API route:
+### Cache invalidation after a write
 
 ```typescript
 import { revalidateTargets, revalidateForConfigKey } from "@/lib/revalidate";
 
-// Invalidate specific institution pages
-revalidateTargets("engineering", "arts-science");
-
-// Or, if site config changes
-revalidateForConfigKey("engineeringHero");
+revalidateTargets("engineering", "arts-science"); // institution pages
+revalidateForConfigKey("engineeringHero");        // a changed site-config key
 ```
 
-## Code Quality & Conventions
+## Conventions
 
-- **ESLint + Prettier**: Config in `eslint.config.mjs` + `.prettierrc`
-- **TypeScript Strict Mode**: Enabled, with `noImplicitAny: true`
-- **No Unused Variables**: Enforced (except those starting with `_`)
-- **Formatting**: Prettier plugin for Tailwind CSS class sorting
-- **Logging**: Use `console.log/error` with `[context]` prefix (see `src/auth.ts` for examples)
-- **Error Handling**: API routes catch and log errors, return 500 responses. Audit logging is non-fatal.
+- **ESLint + Prettier**: `eslint.config.mjs` (flat config, TS + react-hooks) and `.prettierrc` (2-space, double quotes, trailing commas, 80 col, Tailwind class sorting). Unused vars are a warning unless prefixed `_`.
+- **Imports**: use the `@/*` alias for `src/*`.
+- **Logging**: `console.log/error` with a `[context]` prefix (see `src/auth.ts`).
+- **Errors**: API routes catch, log, and return a 500 via `serverError()`. Audit logging never throws fatally.
+- **Build**: `output: "standalone"` for Docker/Node deployment.
 
-## Important Notes
+### Agent guidance (from `AGENTS.md`)
 
-- **Mongoose Connection Caching**: Global `_mongooseConn` is cached; connection state checked via `readyState === 1` (ready)
-- **Credentials Provider Only**: No OAuth (GitHub, Google, etc.) - only local admin accounts
-- **Admin-Only by Default**: All admin routes redirect to login if not authenticated; public routes have no auth
-- **Standalone Build**: Next.js configured with `output: "standalone"` for Docker deployments
-- **Image CSP**: Strict CSP for images (inline SVG sandboxed, no external script sources)
-- **Turbopack**: Dev server uses Turbopack for faster builds (see `package.json` dev script)
-
-## Agent Instructions (from AGENTS.md)
-
-- Prefer local Next.js documentation in `node_modules/next/dist/docs` over training data
-- Follow App Router conventions
-- Use Server Components by default; only client components when interaction is required
-- Prefer async/await data fetching with caching
+- Prefer local Next.js docs in `node_modules/next/dist/docs` over training data.
+- Follow App Router conventions; Server Components by default, Client Components only when interaction is required.
+- Prefer async/await data fetching with caching.
