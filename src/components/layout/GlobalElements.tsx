@@ -8,7 +8,8 @@ import { siteConfig } from "@/data/site";
 
 export function GlobalElements() {
   const pathname = usePathname();
-  const isAdmin = pathname.startsWith("/admin");
+  const isAdmin = pathname?.startsWith("/admin");
+  if (isAdmin) return null;
 
   return (
     <>

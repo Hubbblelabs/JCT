@@ -105,15 +105,15 @@ export function Admissions() {
               href="tel:+919361488801"
               className="text-engineering-dark hover:text-engineering-light flex items-center gap-2.5 font-medium transition-colors"
             >
-              <Phone size={16} className="text-engineering-light" /> +91 93614
-              88801
+              <Phone size={16} className="text-engineering-light shrink-0" />
+              <span>+91 93614 88801</span>
             </a>
             <a
               href="mailto:admissions@jct.ac.in"
               className="text-engineering-dark hover:text-engineering-light flex items-center gap-2.5 font-medium transition-colors"
             >
-              <Mail size={16} className="text-engineering-light" />{" "}
-              admissions@jct.ac.in
+              <Mail size={16} className="text-engineering-light shrink-0" />
+              <span>admissions@jct.ac.in</span>
             </a>
             <div className="text-engineering-dark flex items-start gap-2.5 font-medium">
               <MapPin

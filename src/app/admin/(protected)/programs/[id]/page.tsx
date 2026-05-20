@@ -212,6 +212,16 @@ function ProgramDetailInner() {
     router.push(`/admin/programs?college=${prog.institution}`);
   };
 
+  const activate = async () => {
+    if (!confirm("Activate this program?")) return;
+    await fetch(`/api/admin/programs/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ is_active: true, status: "draft" }),
+    });
+    router.push(`/admin/programs?college=${prog.institution}`);
+  };
+
   const setP = (k: keyof ProgramFields, v: unknown) =>
     setProg((f) => ({ ...f, [k]: v }));
   const backHref = `/admin/programs?college=${isNew ? urlCollege : prog.institution}`;
@@ -294,12 +304,12 @@ function ProgramDetailInner() {
               <Trash2 size={14} /> Deactivate
             </button>
           )}
-          {!isNew && (
+          {!isNew && !prog.is_active && (
             <button
-              onClick={() => setIsInspectorOpen(true)}
-              className="admin-btn admin-btn-outline"
+              onClick={activate}
+              className="admin-btn admin-btn-green admin-btn-sm"
             >
-              Edit Settings
+              <Check size={14} /> Activate
             </button>
           )}
           <button
@@ -361,8 +371,39 @@ function ProgramDetailInner() {
               }}
             />
           ) : (
-            <div className="py-28 text-center text-sm text-gray-400">
-              Add a program name to start the live builder preview.
+            <div className="py-28 px-6 text-sm text-gray-400">
+              <div className="mx-auto max-w-md space-y-4 text-left">
+                <h3 className="mb-6 text-xl font-bold text-gray-900">
+                  Create New Program
+                </h3>
+                <TextInput
+                  label="Program Name"
+                  value={prog.name}
+                  onChange={(e) => setP("name", e.target.value)}
+                  placeholder="e.g. Artificial Intelligence"
+                  required
+                />
+                <TextInput
+                  label="Abbreviation / Short Name"
+                  value={prog.abbr}
+                  onChange={(e) => setP("abbr", e.target.value)}
+                  placeholder="e.g. AI"
+                  required
+                />
+                <TextInput
+                  label="Slug"
+                  value={prog.slug}
+                  onChange={(e) => setP("slug", e.target.value)}
+                  placeholder="e.g. artificial-intelligence"
+                  required
+                />
+                <ImageUploadInput
+                  label="Program Photo"
+                  value={prog.image}
+                  onChange={(v) => setP("image", v)}
+                  uploadOnly
+                />
+              </div>
             </div>
           )}
         </div>
@@ -393,103 +434,6 @@ function ProgramDetailInner() {
                   content={content}
                   onChange={setContent}
                 />
-
-                <Accordion title="Program Basics">
-                  <div className="grid grid-cols-1 gap-3">
-                    <TextInput
-                      label="Program Name"
-                      value={prog.name}
-                      onChange={(e) => setP("name", e.target.value)}
-                      required
-                    />
-                    <TextInput
-                      label="Abbreviation"
-                      value={prog.abbr}
-                      onChange={(e) => setP("abbr", e.target.value)}
-                      placeholder="CSE"
-                      required
-                    />
-                    <TextInput
-                      label="Slug"
-                      value={prog.slug}
-                      onChange={(e) => setP("slug", e.target.value)}
-                      placeholder="cse"
-                      required
-                    />
-                    <TextInput
-                      label="Degree"
-                      value={prog.degree}
-                      onChange={(e) => setP("degree", e.target.value)}
-                      placeholder="B.E."
-                    />
-                    <TextInput
-                      label="Duration"
-                      value={prog.duration}
-                      onChange={(e) => setP("duration", e.target.value)}
-                      placeholder="4 Years"
-                    />
-                    <NumberInput
-                      label="Seats"
-                      value={prog.seats}
-                      min={0}
-                      onChange={(e) =>
-                        setP("seats", parseInt(e.target.value) || 0)
-                      }
-                    />
-                    <TextInput
-                      label="Highlight"
-                      value={prog.highlight}
-                      onChange={(e) => setP("highlight", e.target.value)}
-                    />
-                    <NumberInput
-                      label="Sort Order"
-                      value={prog.sort_order}
-                      onChange={(e) =>
-                        setP("sort_order", parseInt(e.target.value) || 0)
-                      }
-                    />
-                  </div>
-                  <TextArea
-                    label="Description"
-                    value={prog.description}
-                    onChange={(e) => setP("description", e.target.value)}
-                    rows={3}
-                  />
-                  <StringList
-                    label="Outcomes (card-level bullets)"
-                    values={prog.outcomes}
-                    onChange={(v) => setP("outcomes", v)}
-                  />
-                  <ImageUploadInput
-                    label="Program Image"
-                    value={prog.image}
-                    onChange={(url) => setP("image", url)}
-                    uploadOnly
-                  />
-                  <div className="mt-3 flex items-center gap-2">
-                    <input
-                      id="is_active"
-                      type="checkbox"
-                      checked={prog.is_active}
-                      onChange={(e) => setP("is_active", e.target.checked)}
-                    />
-                    <label
-                      htmlFor="is_active"
-                      className="text-sm text-gray-700"
-                    >
-                      Active (show on public site)
-                    </label>
-                  </div>
-                </Accordion>
-
-                <Accordion title="Advanced full editor / raw JSON">
-                  <ProgramContentEditor
-                    content={content}
-                    onChange={setContent}
-                    slug={prog.slug}
-                    college={prog.institution}
-                  />
-                </Accordion>
               </div>
             </aside>
           </div>

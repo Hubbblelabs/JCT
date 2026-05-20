@@ -33,7 +33,7 @@ function ProgramsPageInner() {
     setLoading(true);
     const r = await fetch("/api/admin/programs");
     const data = await r.json();
-    setPrograms(data);
+    if (Array.isArray(data)) setPrograms(data); else setPrograms([]);
     setLoading(false);
   };
 
@@ -51,7 +51,7 @@ function ProgramsPageInner() {
     setSeeding(false);
   };
 
-  const filtered = programs.filter((p) => !filter || p.institution === filter);
+  const filtered = (programs || []).filter((p) => !filter || p.institution === filter);
 
   const collegeLabel =
     filter === "engineering"

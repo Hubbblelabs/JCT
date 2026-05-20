@@ -269,10 +269,10 @@ function hasOverviewContent(
   return (
     editable ||
     sec(l?.stats?.visible, hasAboutStats(d)) ||
-    sec(l?.about?.visible, has(d, editable)) ||
-    sec(l?.hod?.visible, has(d, editable)) ||
-    sec(l?.visionMission?.visible, has(d, editable)) ||
-    sec(l?.programOutcomes?.visible, has(d, editable))
+    sec(l?.about?.visible, hasAboutSection(d, editable)) ||
+    sec(l?.hod?.visible, hasHodSection(d, editable)) ||
+    sec(l?.visionMission?.visible, hasVisionMissionSection(d, editable)) ||
+    sec(l?.programOutcomes?.visible, hasProgramOutcomesSection(d, editable))
   );
 }
 
@@ -303,9 +303,9 @@ function hasAcademicsContent(
     visible !== false && predicate;
   return (
     editable ||
-    sec(l?.curriculum?.visible, has(d, editable)) ||
-    sec(l?.teachingLearning?.visible, has(d, editable)) ||
-    sec(l?.valueAddedCourses?.visible, has(d, editable))
+    sec(l?.curriculum?.visible, hasCurriculumSection(d, editable)) ||
+    sec(l?.teachingLearning?.visible, hasTeachingLearningSection(d, editable)) ||
+    sec(l?.valueAddedCourses?.visible, hasValueAddedSection(d, editable))
   );
 }
 
@@ -330,10 +330,10 @@ function hasFacultyContent(
     visible !== false && predicate;
   return (
     editable ||
-    sec(l?.coreFaculty?.visible, has(d, editable)) ||
-    sec(l?.advisoryBoard?.visible, has(d, editable)) ||
-    sec(l?.pac?.visible, has(d, editable)) ||
-    sec(l?.bos?.visible, has(d, editable))
+    sec(l?.coreFaculty?.visible, hasCoreFacultySection(d, editable)) ||
+    sec(l?.advisoryBoard?.visible, hasAdvisorySection(d, editable)) ||
+    sec(l?.pac?.visible, hasPacSection(d, editable)) ||
+    sec(l?.bos?.visible, hasBosSection(d, editable))
   );
 }
 
@@ -359,8 +359,8 @@ function hasFacilitiesContent(
     visible !== false && predicate;
   return (
     editable ||
-    sec(l?.labs?.visible, has(d, editable)) ||
-    sec(l?.library?.visible, has(d, editable))
+    sec(l?.labs?.visible, hasLabsSection(d, editable)) ||
+    sec(l?.library?.visible, hasLibrarySection(d, editable))
   );
 }
 
@@ -388,11 +388,11 @@ function hasLifeContent(d: ProgramData, l?: LifeLabels, editable?: boolean) {
     visible !== false && predicate;
   return (
     editable ||
-    sec(l?.events?.visible, has(d, editable)) ||
-    sec(l?.studentAchievements?.visible, has(d, editable)) ||
-    sec(l?.facultyAchievements?.visible, has(d, editable)) ||
-    sec(l?.magazine?.visible, has(d, editable)) ||
-    sec(l?.participation?.visible, has(d, editable))
+    sec(l?.events?.visible, hasEventsSection(d, editable)) ||
+    sec(l?.studentAchievements?.visible, hasStudentAchievementsSection(d, editable)) ||
+    sec(l?.facultyAchievements?.visible, hasFacultyAchievementsSection(d, editable)) ||
+    sec(l?.magazine?.visible, hasMagazineSection(d, editable)) ||
+    sec(l?.participation?.visible, hasParticipationSection(d, editable))
   );
 }
 
@@ -422,8 +422,8 @@ function hasCareerContent(
     visible !== false && predicate;
   return (
     editable ||
-    sec(l?.careerProgression?.visible, has(d, editable)) ||
-    sec(l?.feedback?.visible, has(d, editable))
+    sec(l?.careerProgression?.visible, hasCareerProgressionSection(d, editable)) ||
+    sec(l?.feedback?.visible, hasFeedbackSection(d, editable))
   );
 }
 
@@ -2222,7 +2222,7 @@ export function ProgramPageLayout({
 
   return (
     <>
-      <Navbar forceSolidOnTop />
+      {!editable && <Navbar forceSolidOnTop />}
 
       {/* ── Hero ──────────────────────────────────────────────────────── */}
       <EditableRegion
@@ -2400,7 +2400,7 @@ export function ProgramPageLayout({
         </div>
       </main>
 
-      <Footer />
+      {!editable && <Footer />}
     </>
   );
 }

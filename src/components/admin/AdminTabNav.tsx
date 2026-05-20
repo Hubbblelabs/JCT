@@ -206,6 +206,10 @@ function TabNavInner() {
   const adminMenuActive = ADMIN_ITEMS.some((i) => pathname === i.href);
   const mainActive = isDropdownActive(MAIN_ITEMS, pathname, null);
 
+  if (pathname.startsWith("/admin/programs/") && pathname !== "/admin/programs") {
+    return null;
+  }
+
   return (
     <div className="admin-top-nav">
       <div className="admin-brand-bar">
