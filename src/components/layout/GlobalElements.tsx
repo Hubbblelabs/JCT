@@ -28,9 +28,9 @@ export function GlobalElements() {
       {!isAdmin && (
         <div
           data-own-fixed
-          className="group fixed right-4 bottom-5 z-50 md:right-6 md:bottom-6"
+          className="group fixed left-4 bottom-5 z-50 md:left-6 md:bottom-6"
         >
-          <span className="pointer-events-none absolute top-1/2 right-14 -translate-y-1/2 rounded-md bg-[#0a1628]/92 px-2 py-1 text-xs font-semibold whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100">
+          <span className="pointer-events-none absolute top-1/2 left-14 -translate-y-1/2 rounded-md bg-[#0a1628]/92 px-2 py-1 text-xs font-semibold whitespace-nowrap text-white opacity-0 shadow-lg transition-opacity duration-200 group-focus-within:opacity-100 group-hover:opacity-100">
             Chat on WhatsApp
           </span>
           <span className="pointer-events-none absolute inset-0 animate-ping rounded-full bg-[#25D366] opacity-30" />
