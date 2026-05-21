@@ -54,17 +54,21 @@ function createArtsDepartment(config: {
   shortName: string;
   intake: number;
   focusAreas: string[];
+  bgColor?: string;
+  accentColor?: string;
+  aboutParagraphs?: string[];
+  mission?: string[];
 }): DepartmentData {
   return {
     slug: config.slug,
     name: config.name,
     shortName: config.shortName,
     college: "arts-science",
-    bgColor: "#800020",
-    accentColor: "#d4a024",
+    bgColor: config.bgColor || "#800020",
+    accentColor: config.accentColor || "#d4a024",
     heroImage: "/site_assests/arts.jpeg",
     about: {
-      paragraphs: [
+      paragraphs: config.aboutParagraphs || [
         `${config.name} offers a contemporary curriculum with a strong blend of academic depth, practical application, and career-oriented training.`,
         "Students engage in workshops, seminars, internship opportunities, and club-based activities that build communication and analytical skills.",
         "The department nurtures ethical values, social responsibility, and readiness for employment, entrepreneurship, and higher studies.",
@@ -87,7 +91,7 @@ function createArtsDepartment(config: {
     },
     visionMission: {
       vision: `To emerge as a vibrant department in ${config.shortName} education fostering innovation, employability, and social contribution.`,
-      mission: [
+      mission: config.mission || [
         "Deliver quality education with strong conceptual and applied learning.",
         "Encourage skill development, research orientation, and entrepreneurial mindset.",
         "Promote ethics, leadership, and life-long learning among students.",
@@ -427,6 +431,15 @@ export const artsDepartments: DepartmentData[] = [
     shortName: "BCS",
     intake: 60,
     focusAreas: ["Programming", "Data Analytics", "Web Development"],
+    aboutParagraphs: [
+      "Bachelor of Computer Science (B.Sc. CS) is the foundation technology for building a rich and fulfilling information society. At the department, students are not simply taught how to program in multiple languages, but they are also given the practical training to acquire a deeper understanding, such as the basics of data structures and control structures, basic algorithms and methods involved in software design and constructions.",
+      "The department provide students with the propitious platform and standard education in Computer Science education and reinforce their potential for lifelong quality career in the highly competitive global environment."
+    ],
+    mission: [
+      "To enrich knowledge in core areas related to the field of computer science and Mathematics.",
+      "To provide opportunities for acquiring in-depth knowledge in Industry 4.0/5.0 tools and techniques and there by design and implement software projects to meet customer’s business objectives.",
+      "To enable graduates to pursue higher education leading to Master and Research Degrees or have a successful career in industries associated with Computer Science or as entrepreneurs."
+    ]
   }),
   createArtsDepartment({
     slug: "bsc-ai-ml",
@@ -434,6 +447,17 @@ export const artsDepartments: DepartmentData[] = [
     shortName: "AIM",
     intake: 60,
     focusAreas: ["Machine Learning", "Data Science", "AI Applications"],
+    aboutParagraphs: [
+      "B.Sc. Artificial Intelligence & Machine learning programme prepare students with the skills to perform intelligent data analysis which is a key component in numerous real-world applications. During the past ten years, data science has emerged as one of the most high-growth, dynamic and lucrative careers in technology.",
+      "The department aims to providing not only the core technologies such as artificial intelligence, data mining and data modelling but also gives intensive inputs in areas of machine learning and big data analytics.",
+      "The students will gain cross-disciplinary skills across fields such as statistics, computer science, machine learning, and logic, data scientist and may have career opportunities in health care, business, social networking companies, climatology, biotechnology, genetics and other important areas.",
+      "The major focus of the department is to equip students with statistical, mathematical reasoning, machine learning, knowledge discovery and visualization skills."
+    ],
+    mission: [
+      "Expertized with the principles of Artificial Intelligence and problem solving, inference, perception, knowledge representation, and learning.",
+      "Exhibit high standards with regard to application of AI techniques in intelligent agents, expert systems, artificial neural networks and other machine learning models.",
+      "Investigate with a machine learning model for simulation and analysis and explore the scope, potential, limitations, and implications of intelligent systems."
+    ]
   }),
   createArtsDepartment({
     slug: "bca",
@@ -441,6 +465,15 @@ export const artsDepartments: DepartmentData[] = [
     shortName: "BCA",
     intake: 60,
     focusAreas: ["Application Development", "Cloud Basics", "UI/UX"],
+    aboutParagraphs: [
+      "BCA is a three-year undergraduate degree program for candidates wishing to start a career in computers and its applications. This department aims to provide the graduates the required skills from fundamentals to current technologies for them to create efficient solution for industrial and real-life problems.",
+      "The department provides the graduates with the knowledge and promote innovative thoughts by addressing design and developmental trade-offs in the IT industry. It comprises of papers like database, networking, data structure, core programming languages like ‘C’ and ‘Java’. This course develops critical, analytical thinking and problem solving abilities for a smooth transition from academic to real-life work environment. In addition, students are trained in communication skills and interdisciplinary topics to enhance their skills and employment opportunities."
+    ],
+    mission: [
+      "Aims to inculcating essential skills as demanded by the global software industry through interactive learning process. This also include team-building skills, audio-visual presentations and personality development programs.",
+      "To enable students for pursuing respectable career through self-employment, executive employment, entrepreneurship, professional career in the field of service sectors such as web design, data analysis, network security, and software development.",
+      "To provide students with the knowledge and abilities necessary for professions in the software sector, as well as with the application of computers."
+    ]
   }),
   createArtsDepartment({
     slug: "bcom-logistics-supply-chain",
@@ -452,6 +485,17 @@ export const artsDepartments: DepartmentData[] = [
       "Supply Chain Analytics",
       "Warehouse Management",
     ],
+    aboutParagraphs: [
+      "The focus of the department is to build the wide range of knowledge in the areas of accounting concepts and techniques to meet the current and future requirement of the industry.",
+      "The department aim to develop the strong knowledge in the areas such as finance, taxation, and laws relating to commerce helps to relate the conceptual and analytical skills in the field of auditing, finance etc.",
+      "This programme offers the students value-based education by acquiring adequate knowledge, skill and attitude to creatively and systematically apply the principles and practices of management, accountancy, finance, business law, statistics, HR, operations and IT to management problems and work effectively in modern day business and non-business organizations specifically in areas of Logistics and Supply Chain Management.",
+      "Inculcate the students to nurture their skills in personal, interpersonal, intellectual and other skills to develop their professional career and growth."
+    ],
+    mission: [
+      "Empower the graduates to develop comprehensive professional skills which are required for commerce with specialization in logistics and supply chain management.",
+      "To enhance various commerce functions such as finance, accounting, financial analysis, project evaluation, taxation and cost accounting.",
+      "Enable the students to engage exams like C.A., C.S., and CMA."
+    ]
   }),
   createArtsDepartment({
     slug: "bba-logistics",
@@ -459,5 +503,51 @@ export const artsDepartments: DepartmentData[] = [
     shortName: "BBL",
     intake: 60,
     focusAreas: ["Business Management", "Freight Operations", "Leadership"],
+    aboutParagraphs: [
+      "BBA Logistics, a three-year full time degree program essentially covering the concepts and process involved in logistics. Logistic management includes the designing and administration to control the flow of materials to all business units.",
+      "The curriculum is designed to give a holistic business perspective with in-depth industry knowledge in logistic domain. It equips students with required business expertise and industry-centric knowledge.",
+      "Demonstrate the critical thinking mindset and the ability to identify and formulate research problems, research literature, design tools, analyze and interpret data, and synthesize the information to provide valid conclusions and Logistical approaches across a variety of subject matter."
+    ],
+    mission: [
+      "Graduates will be capable of making a positive contribution to business, trade and industry in the national and global context in logistics.",
+      "Graduates will be able to apply frameworks and tools to arrive at informed decisions in profession and practice, striking a balance between business and social dimensions.",
+      "Graduates will have solid foundation to pursue professional careers and take up higher learning courses such as MBA, MCA, MCM, MMM as well as research."
+    ]
+  }),
+  createArtsDepartment({
+    slug: "bsc-digital-cyber-forensic-science",
+    name: "B.Sc. Digital & Cyber Forensic Science",
+    shortName: "BCF",
+    intake: 60,
+    focusAreas: ["Cyber Security", "Digital Forensics", "Incident Response"],
+    bgColor: "#0f172a",
+    accentColor: "#06b6d4",
+    aboutParagraphs: [
+      "The Department of B.Sc. Digital & Cyber Forensic Science is dedicated to providing quality education and training in the field of cyber security, digital investigation, and forensic analysis. The department focuses on developing students’ technical expertise in handling cybercrimes, data recovery, digital evidence collection, and analysis using modern tools and technologies.",
+      "It aims to bridge the gap between theoretical knowledge and practical application by offering hands-on training, case studies, and industry-oriented learning. The department encourages ethical practices, critical thinking, and problem-solving skills to prepare students for real-world challenges in cybercrime investigation and digital security.",
+      "With a curriculum aligned to current industry needs, the department prepares students for careers in law enforcement agencies, IT companies, cybersecurity firms, and forensic laboratories, while also promoting research and innovation in the field of digital forensics."
+    ],
+    mission: [
+      "To equip students with advanced knowledge and practical skills in digital and cyber forensic science.",
+      "The program aims to develop ethical professionals who can contribute effectively to law enforcement agencies, corporate sectors, and digital security domains while adapting to emerging technologies and cyber threats."
+    ]
+  }),
+  createArtsDepartment({
+    slug: "bcom-computer-applications",
+    name: "B.Com. Computer Applications",
+    shortName: "BCA-COM",
+    intake: 60,
+    focusAreas: ["Commerce", "Computer Applications", "Accounting Software"],
+    bgColor: "#1e1b4b",
+    accentColor: "#fbbf24",
+    aboutParagraphs: [
+      "The Department of B. Com Computer Applications focuses on building a strong foundation in commerce along with practical knowledge of computer applications. It equips students with essential skills in accounting, finance, business management, and the use of modern digital tools required in today’s business environment.",
+      "The department emphasizes a balanced approach between theoretical concepts and hands-on training in trending areas such as Data Analytics (Excel, Power BI), Cloud Accounting (Tally Prime, Zoho Books), E-commerce Management, and Digital Marketing.",
+      "Students also gain practical exposure to ERP systems, database management, and financial technologies (FinTech). Through workshops, internships, live projects, and industry-oriented training, students develop real-world skills. The program also enhances analytical thinking, problem-solving abilities, and ethical values, preparing students to adapt to the rapidly evolving corporate and digital business world."
+    ],
+    mission: [
+      "To provide quality education in commerce integrated with computer applications, equipping students with strong knowledge in accounting, business management, and information technology.",
+      "To develop skilled and ethical professionals who can effectively use modern software tools, adapt to technological advancements, and meet the demands of the corporate world."
+    ]
   }),
 ];

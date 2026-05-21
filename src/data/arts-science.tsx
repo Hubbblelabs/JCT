@@ -4,60 +4,58 @@ import {
   BarChart3,
   Briefcase,
   Lightbulb,
+  Shield,
+  Laptop,
 } from "lucide-react";
 
 export const heroStats = [
   { value: "2,500+", label: "Students", accent: true },
-  { value: "5", label: "Programs", accent: false },
-  { value: "60+", label: "Faculty Members", accent: false },
+  { value: "7", label: "Programs", accent: false },
+  { value: "80+", label: "Faculty Members", accent: false },
   { value: "16+", label: "Years of Excellence", accent: true },
 ];
 
 export const ugPrograms = [
   {
-    name: "B.Sc Computer Science",
+    name: "B.Sc. Computer Science",
     slug: "bsc-computer-science",
     duration: "3 Years",
     abbr: "B.Sc. CS",
     image: "/programs/arts-science/cs.webp",
     highlight:
-      "Foundational technology for building a rich information society",
+      "Foundation technology for building a rich and fulfilling information society",
     icon: Atom,
-    desc: "Bachelor of Computer Science (B.Sc. CS) is the foundational technology for building a rich and fulfilling information society.",
+    desc: "Bachelor of Computer Science (B.Sc. CS) is the foundation technology for building a rich and fulfilling information society.",
     longDesc: [
-      "The B.Sc. Computer Science program at JCT College of Arts & Science provides a rigorous grounding in computational theory, software development, and data structures. Students master programming languages, algorithms, and system design principles that form the backbone of the modern software industry.",
-      "The curriculum is regularly refreshed in consultation with industry partners to reflect current trends — including cloud computing, cybersecurity, and full-stack development. Hands-on labs, mini-projects, and a structured internship program ensure graduates are job-ready from day one.",
-      "Our graduates have secured placements with leading technology companies and have gone on to pursue M.Sc., MCA, and MBA programs at premier institutions. The department maintains strong ties with the IT industry through its active alumni network and placement cell.",
+      "Bachelor of Computer Science (B.Sc. CS) is the foundation technology for building a rich and fulfilling information society. At the department, students are not simply taught how to program in multiple languages, but they are also given the practical training to acquire a deeper understanding, such as the basics of data structures and control structures, basic algorithms and methods involved in software design and constructions.",
+      "The department provide students with the propitious platform and standard education in Computer Science education and reinforce their potential for lifelong quality career in the highly competitive global environment."
     ],
     outcomes: [
-      "Design, implement, and debug software applications using modern programming languages and frameworks.",
-      "Analyse computational problems and apply appropriate data structures and algorithms for optimised solutions.",
-      "Understand operating systems, computer networks, and database management systems at an architectural level.",
-      "Build collaborative, version-controlled projects that simulate real-world software engineering workflows.",
-      "Demonstrate readiness for industry roles or higher studies through capstone projects and technical assessments.",
+      "To enrich knowledge in core areas related to the field of computer science and Mathematics.",
+      "To provide opportunities for acquiring in-depth knowledge in Industry 4.0/5.0 tools and techniques and there by design and implement software projects to meet customer’s business objectives.",
+      "To enable graduates to pursue higher education leading to Master and Research Degrees or have a successful career in industries associated with Computer Science or as entrepreneurs."
     ],
   },
   {
-    name: "B.Sc Artificial Intelligence and Machine Learning",
+    name: "B.Sc. Artificial Intelligence & Machine Learning",
     slug: "bsc-ai-ml",
     duration: "3 Years",
     abbr: "B.Sc. AI&ML",
     image: "/programs/arts-science/aiml.webp",
     highlight:
-      "Skills to perform intelligent data analysis for real-world applications",
+      "Prepare students with the skills to perform intelligent data analysis for real-world applications",
     icon: Lightbulb,
     desc: "Programme prepares students with the skills to perform intelligent data analysis which is a key component in numerous real-world applications.",
     longDesc: [
-      "The B.Sc. Artificial Intelligence and Machine Learning program equips students with the mathematical foundations and practical tools required to build intelligent systems. Coursework spans linear algebra, probability, Python programming, deep learning, and natural language processing.",
-      "Through a project-centric curriculum, students apply machine learning frameworks such as TensorFlow and scikit-learn to solve real-world problems in healthcare, finance, and logistics. The program emphasises reproducible experimentation and responsible AI development.",
-      "Graduates are well-positioned for roles in data science, AI engineering, and research. Many students go on to pursue postgraduate studies in machine learning at national and international institutions.",
+      "B.Sc. Artificial Intelligence & Machine learning programme prepare students with the skills to perform intelligent data analysis which is a key component in numerous real-world applications. During the past ten years, data science has emerged as one of the most high-growth, dynamic and lucrative careers in technology.",
+      "The department aims to providing not only the core technologies such as artificial intelligence, data mining and data modelling but also gives intensive inputs in areas of machine learning and big data analytics.",
+      "The students will gain cross-disciplinary skills across fields such as statistics, computer science, machine learning, and logic, data scientist and may have career opportunities in health care, business, social networking companies, climatology, biotechnology, genetics and other important areas.",
+      "The major focus of the department is to equip students with statistical, mathematical reasoning, machine learning, knowledge discovery and visualization skills."
     ],
     outcomes: [
-      "Implement supervised, unsupervised, and reinforcement learning algorithms from first principles.",
-      "Build, train, and evaluate deep neural networks using industry-standard frameworks such as TensorFlow and PyTorch.",
-      "Apply statistical analysis and data visualisation techniques to communicate insights effectively.",
-      "Understand the ethical implications of AI systems and design models with fairness and transparency in mind.",
-      "Deliver an end-to-end machine learning project — from data collection and preprocessing to model deployment.",
+      "Expertized with the principles of Artificial Intelligence and problem solving, inference, perception, knowledge representation, and learning.",
+      "Exhibit high standards with regard to application of AI techniques in intelligent agents, expert systems, artificial neural networks and other machine learning models.",
+      "Investigate with a machine learning model for simulation and analysis and explore the scope, potential, limitations, and implications of intelligent systems."
     ],
   },
   {
@@ -66,42 +64,38 @@ export const ugPrograms = [
     duration: "3 Years",
     abbr: "BCA",
     image: "/programs/arts-science/ca.webp",
-    highlight: "Career in computers and its applications",
+    highlight: "Inculcate essential skills as demanded by the global software industry",
     icon: Calculator,
     desc: "A three-year undergraduate degree program for candidates wishing to start a career in computers and its applications.",
     longDesc: [
-      "The Bachelor of Computer Applications (BCA) program is a three-year undergraduate degree designed for students who aspire to careers in software development, IT support, and systems administration. The curriculum blends computer science fundamentals with a strong practical orientation.",
-      "Students learn programming, web development, database design, and networking in a hands-on environment supported by well-equipped labs. Regular industry interactions, live projects, and a final-year dissertation develop both technical and professional competencies.",
-      "BCA graduates are highly sought after by IT companies and startups alike. The program also serves as a strong foundation for those wishing to pursue MCA or MBA (IT) studies at top institutions.",
+      "BCA is a three-year undergraduate degree program for candidates wishing to start a career in computers and its applications. This department aims to provide the graduates the required skills from fundamentals to current technologies for them to create efficient solution for industrial and real-life problems.",
+      "The department provides the graduates with the knowledge and promote innovative thoughts by addressing design and developmental trade-offs in the IT industry. It comprises of papers like database, networking, data structure, core programming languages like ‘C’ and ‘Java’. This course develops critical, analytical thinking and problem solving abilities for a smooth transition from academic to real-life work environment. In addition, students are trained in communication skills and interdisciplinary topics to enhance their skills and employment opportunities."
     ],
     outcomes: [
-      "Develop web and desktop applications using languages including C, Java, Python, and JavaScript.",
-      "Design and manage relational databases using SQL and popular database management systems.",
-      "Understand networking concepts, client–server architecture, and basic cybersecurity principles.",
-      "Collaborate on team-based software projects using version control and agile methodologies.",
-      "Communicate technical ideas clearly through documentation, presentations, and project reports.",
+      "Aims to inculcating essential skills as demanded by the global software industry through interactive learning process. This also include team-building skills, audio-visual presentations and personality development programs.",
+      "To enable students for pursuing respectable career through self-employment, executive employment, entrepreneurship, professional career in the field of service sectors such as web design, data analysis, network security, and software development.",
+      "To provide students with the knowledge and abilities necessary for professions in the software sector, as well as with the application of computers."
     ],
   },
   {
-    name: "B.Com Logistics and Supply Chain Management",
+    name: "B.Com. Logistics & Supply Chain Management",
     slug: "bcom-logistics-supply-chain",
     duration: "3 Years",
-    abbr: "B.Com",
+    abbr: "B.Com. LSCM",
     image: "/programs/arts-science/logistics-supply-chain.webp",
-    highlight: "Commerce with conceptual and practical knowledge in logistics",
+    highlight: "Empower the graduates to develop comprehensive professional skills in logistics",
     icon: BarChart3,
-    desc: "Undergraduate programme focusing on quality education in commerce with conceptual and practical knowledge.",
+    desc: "Undergraduate programme focusing on quality education in commerce with core specialisation in logistics and supply chain management.",
     longDesc: [
-      "The B.Com Logistics and Supply Chain Management program provides a comprehensive education in commerce combined with specialised knowledge of global supply chains. Students study accounting, business law, economics, and the operational mechanics of logistics networks.",
-      "The course prepares graduates for the rapidly expanding logistics sector, covering topics such as inventory management, port operations, freight forwarding, and export–import documentation. Industry visits and guest lectures from logistics professionals enrich the learning experience.",
-      "With India's logistics industry growing at over 10% annually, demand for trained professionals is high. Graduates are equipped for roles in shipping companies, freight forwarders, customs brokers, and e-commerce fulfillment centres.",
+      "The focus of the department is to build the wide range of knowledge in the areas of accounting concepts and techniques to meet the current and future requirement of the industry.",
+      "The department aim to develop the strong knowledge in the areas such as finance, taxation, and laws relating to commerce helps to relate the conceptual and analytical skills in the field of auditing, finance etc.",
+      "This programme offers the students value-based education by acquiring adequate knowledge, skill and attitude to creatively and systematically apply the principles and practices of management, accountancy, finance, business law, statistics, HR, operations and IT to management problems and work effectively in modern day business and non-business organizations specifically in areas of Logistics and Supply Chain Management.",
+      "Inculcate the students to nurture their skills in personal, interpersonal, intellectual and other skills to develop their professional career and growth."
     ],
     outcomes: [
-      "Apply core accounting and commerce principles to business scenarios in the logistics sector.",
-      "Understand the end-to-end supply chain — from procurement and warehousing to last-mile delivery.",
-      "Handle documentation for import–export operations, customs clearance, and freight management.",
-      "Analyse supply chain data to identify inefficiencies and propose evidence-based improvements.",
-      "Communicate professionally in business contexts and prepare for industry certifications in logistics.",
+      "Empower the graduates to develop comprehensive professional skills which are required for commerce with specialization in logistics and supply chain management.",
+      "To enhance various commerce functions such as finance, accounting, financial analysis, project evaluation, taxation and cost accounting.",
+      "Enable the students to engage exams like C.A., C.S., and CMA."
     ],
   },
   {
@@ -110,20 +104,56 @@ export const ugPrograms = [
     duration: "3 Years",
     abbr: "BBA",
     image: "/programs/arts-science/logistics.webp",
-    highlight: "Concepts and processes involved in logistics and shipping",
+    highlight: "Designed to give a holistic business perspective with in-depth industry knowledge in logistics",
     icon: Briefcase,
     desc: "Three-year full-time degree program covering concepts and processes involved in logistics and shipping.",
     longDesc: [
-      "The BBA Logistics program is a three-year management degree that combines foundational business education with deep expertise in logistics and supply chain operations. Students develop managerial acumen alongside domain knowledge in transportation, warehousing, and trade facilitation.",
-      "The program emphasises decision-making, leadership, and strategic thinking through case studies, simulations, and internships with logistics firms. Students also study entrepreneurship, equipping those who wish to start ventures in freight, courier, or supply chain consulting.",
-      "Graduates command strong placement opportunities with shipping lines, third-party logistics providers, e-commerce companies, and government port authorities. The program's industry alignment ensures that graduates can contribute from day one.",
+      "BBA Logistics, a three-year full time degree program essentially covering the concepts and process involved in logistics. Logistic management includes the designing and administration to control the flow of materials to all business units.",
+      "The curriculum is designed to give a holistic business perspective with in-depth industry knowledge in logistic domain. It equips students with required business expertise and industry-centric knowledge.",
+      "Demonstrate the critical thinking mindset and the ability to identify and formulate research problems, research literature, design tools, analyze and interpret data, and synthesize the information to provide valid conclusions and Logistical approaches across a variety of subject matter."
     ],
     outcomes: [
-      "Lead and manage logistics operations including transportation, warehousing, and distribution networks.",
-      "Apply business management principles — marketing, finance, and HR — within a logistics context.",
-      "Evaluate and optimise supply chain processes using quantitative and qualitative management tools.",
-      "Develop and pitch entrepreneurial ventures in the logistics and supply chain space.",
-      "Demonstrate professional competencies in communication, teamwork, and ethical decision-making.",
+      "Graduates will be capable of making a positive contribution to business, trade and industry in the national and global context in logistics.",
+      "Graduates will be able to apply frameworks and tools to arrive at informed decisions in profession and practice, striking a balance between business and social dimensions.",
+      "Graduates will have solid foundation to pursue professional careers and take up higher learning courses such as MBA, MCA, MCM, MMM as well as research."
+    ],
+  },
+  {
+    name: "B.Sc. Digital & Cyber Forensic Science",
+    slug: "bsc-digital-cyber-forensic-science",
+    duration: "3 Years",
+    abbr: "B.Sc. DFS",
+    image: "/programs/arts-science/forensics.webp",
+    highlight: "Equip students with advanced knowledge and practical skills in digital and cyber forensic science",
+    icon: Shield,
+    desc: "Provides quality education and training in cyber security, digital investigation, and forensic analysis using modern tools.",
+    longDesc: [
+      "The Department of B.Sc. Digital & Cyber Forensic Science is dedicated to providing quality education and training in the field of cyber security, digital investigation, and forensic analysis. The department focuses on developing students’ technical expertise in handling cybercrimes, data recovery, digital evidence collection, and analysis using modern tools and technologies.",
+      "It aims to bridge the gap between theoretical knowledge and practical application by offering hands-on training, case studies, and industry-oriented learning. The department encourages ethical practices, critical thinking, and problem-solving skills to prepare students for real-world challenges in cybercrime investigation and digital security.",
+      "With a curriculum aligned to current industry needs, the department prepares students for careers in law enforcement agencies, IT companies, cybersecurity firms, and forensic laboratories, while also promoting research and innovation in the field of digital forensics."
+    ],
+    outcomes: [
+      "To equip students with advanced knowledge and practical skills in digital and cyber forensic science.",
+      "The program aims to develop ethical professionals who can contribute effectively to law enforcement agencies, corporate sectors, and digital security domains while adapting to emerging technologies and cyber threats."
+    ],
+  },
+  {
+    name: "B.Com. Computer Applications",
+    slug: "bcom-computer-applications",
+    duration: "3 Years",
+    abbr: "B.Com. CA",
+    image: "/programs/arts-science/commerce-ca.webp",
+    highlight: "Quality education in commerce integrated with computer applications",
+    icon: Laptop,
+    desc: "Focuses on building a strong foundation in commerce along with practical knowledge of trending computer applications.",
+    longDesc: [
+      "The Department of B. Com Computer Applications focuses on building a strong foundation in commerce along with practical knowledge of computer applications. It equips students with essential skills in accounting, finance, business management, and the use of modern digital tools required in today’s business environment.",
+      "The department emphasizes a balanced approach between theoretical concepts and hands-on training in trending areas such as Data Analytics (Excel, Power BI), Cloud Accounting (Tally Prime, Zoho Books), E-commerce Management, and Digital Marketing.",
+      "Students also gain practical exposure to ERP systems, database management, and financial technologies (FinTech). Through workshops, internships, live projects, and industry-oriented training, students develop real-world skills. The program also enhances analytical thinking, problem-solving abilities, and ethical values, preparing students to adapt to the rapidly evolving corporate and digital business world."
+    ],
+    outcomes: [
+      "To provide quality education in commerce integrated with computer applications, equipping students with strong knowledge in accounting, business management, and information technology.",
+      "To develop skilled and ethical professionals who can effectively use modern software tools, adapt to technological advancements, and meet the demands of the corporate world."
     ],
   },
 ];
@@ -182,14 +212,16 @@ export const admissionsCriteria = [
       "BCA (Computer Applications) (3 Years)",
       "B.Com Logistics & SCM (3 Years)",
       "BBA Logistics (3 Years)",
+      "B.Sc. Digital & Cyber Forensic Science (3 Years)",
+      "B.Com. Computer Applications (3 Years)",
     ],
   },
   {
     title: "Eligibility Criteria",
     items: [
-      "B.Sc CS & BCA: Pass in HSC/12th standard with Mathematics / Computer Science / Statistics / Business Mathematics.",
+      "B.Sc CS, BCA & B.Sc. DFS: Pass in HSC/12th standard with Mathematics / Computer Science / Statistics / Business Mathematics / Physics / Chemistry.",
       "B.Sc AI&ML: Pass in HSC/12th standard with Mathematics or Computer Science as one of the subjects.",
-      "B.Com & BBA: Pass in HSC/12th standard in any stream from a recognised board.",
+      "B.Com, BBA & B.Com CA: Pass in HSC/12th standard in any stream from a recognised board.",
     ],
   },
   {
