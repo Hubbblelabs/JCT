@@ -1,8 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Award, Users, GraduationCap, BadgeDollarSign } from "lucide-react";
-import { homeHeroContent } from "@/data/home";
+import { useSiteConfig } from "@/lib/use-site-config";
 
 type Highlight = { icon: string; label: string };
 
@@ -38,28 +37,22 @@ function normalizeHighlights(raw: unknown): Highlight[] {
 }
 
 export function TrustHighlightsRow() {
-  const [highlights, setHighlights] = useState<Highlight[]>(
-    homeHeroContent.trustHighlights as unknown as Highlight[],
-  );
+  const { data, loading } = useSiteConfig("homeStatistics");
+  const highlights = normalizeHighlights(data);
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/public/site-config?key=home")
-      .then((r) => r.json())
-      .then((res) => {
-        if (cancelled) return;
-        if (res?.source === "db" && res.data && typeof res.data === "object") {
-          const next = normalizeHighlights(
-            (res.data as Record<string, unknown>).trustHighlights,
-          );
-          if (next.length > 0) setHighlights(next);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  // While loading, reserve the row height to avoid layout shift.
+  if (loading) {
+    return (
+      <section
+        aria-busy="true"
+        className="relative -mt-1 w-full border-y border-slate-200/60 bg-[#f5f3ef]/92 py-2 md:py-2.5"
+      >
+        <div className="mx-auto h-5 w-full max-w-352 animate-pulse px-4" />
+      </section>
+    );
+  }
+
+  if (highlights.length === 0) return null;
 
   return (
     <section className="relative -mt-1 w-full border-y border-slate-200/60 bg-[#f5f3ef]/92 py-2 md:py-2.5">

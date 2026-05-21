@@ -3,69 +3,6 @@
 import { useEffect, useState } from "react";
 import { CollegeTestimonials } from "@/components/layout/CollegeTestimonials";
 
-const STATIC_TESTIMONIALS = [
-  {
-    name: "Priya Krishnan",
-    batch: "2024",
-    course: "B.E. CSE",
-    company: "Infosys",
-    quote:
-      "The practical exposure at JCT gave me real confidence. From hackathons to internships, every experience prepared me for my career at Infosys.",
-    avatar: "/avatars/female_avatar.png",
-    category: "Alumni",
-  },
-  {
-    name: "Arjun Raghavan",
-    batch: "2023",
-    course: "B.E. Mechanical",
-    company: "Caterpillar",
-    quote:
-      "JCT's engineering labs and faculty mentorship helped me develop real-world problem-solving skills. I landed my dream role straight from campus.",
-    avatar: "/avatars/male_avatar.png",
-    category: "Student",
-  },
-  {
-    name: "Sneha Patel",
-    batch: "2024",
-    course: "B.Sc Computer Science",
-    company: "TCS",
-    quote:
-      "The Arts & Science college provided a perfect blend of theory and practice. The coding bootcamps and placement training made all the difference.",
-    avatar: "/avatars/female_avatar.png",
-    category: "Alumni",
-  },
-  {
-    name: "Karthik Sundaram",
-    batch: "2023",
-    course: "Diploma — Mechanical",
-    company: "TVS Motors",
-    quote:
-      "JCT Polytechnic's hands-on approach gave me skills employers value. I was offered a role before even completing my final semester.",
-    avatar: "/avatars/male_avatar.png",
-    category: "Industry",
-  },
-  {
-    name: "Anjali Devi",
-    batch: "2024",
-    course: "B.Com (CA)",
-    company: "Zoho Corp",
-    quote:
-      "The faculty at JCT go beyond textbooks. They helped me prepare for competitive exams, interviews, and real-world business scenarios.",
-    avatar: "/avatars/female_avatar.png",
-    category: "Alumni",
-  },
-  {
-    name: "Muthu Selvan",
-    batch: "2024",
-    course: "Diploma — Electrical",
-    company: "L&T",
-    quote:
-      "Hands-on lab sessions and workshop discipline gave me confidence from day one in my trainee role.",
-    avatar: "/avatars/male_avatar.png",
-    category: "Student",
-  },
-];
-
 interface TestimonialItem {
   name: string;
   batch: string;
@@ -77,28 +14,50 @@ interface TestimonialItem {
 }
 
 export function Testimonials() {
-  const [items, setItems] = useState<TestimonialItem[]>(STATIC_TESTIMONIALS);
+  const [items, setItems] = useState<TestimonialItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
     fetch("/api/public/testimonials?institution=all")
       .then((r) => r.json())
       .then((res) => {
-        if (res.source === "db" && res.data.length > 0) {
+        if (cancelled) return;
+        if (res?.source === "db" && Array.isArray(res.data)) {
           setItems(
             res.data.map((t: Record<string, unknown>) => ({
-              name: String(t.name),
-              batch: String(t.batch),
+              name: String(t.name ?? ""),
+              batch: String(t.batch ?? ""),
               course: String(t.course ?? ""),
               company: String(t.company ?? ""),
-              quote: String(t.quote),
+              quote: String(t.quote ?? ""),
               avatar: String(t.avatar ?? "/avatars/male_avatar.png"),
               category: String(t.category ?? "Alumni"),
             })),
           );
         }
+        setLoading(false);
       })
-      .catch(() => {});
+      .catch(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  if (loading) {
+    return (
+      <section
+        aria-busy="true"
+        className="bg-[#F5F5F5] py-20"
+      >
+        <div className="container mx-auto h-72 px-4" />
+      </section>
+    );
+  }
+
+  if (items.length === 0) return null;
 
   return (
     <CollegeTestimonials

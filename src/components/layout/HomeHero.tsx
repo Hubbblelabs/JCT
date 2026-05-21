@@ -1,14 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { ArrowRight, X } from "lucide-react";
-import { homeHeroContent as fallbackHero } from "@/data/home";
 import { Accreditations } from "@/components/layout/Accreditations";
 import { getImageUrl } from "@/lib/utils";
+import { useSiteConfig } from "@/lib/use-site-config";
 
 type HeroCta = { label: string; href: string; primary: boolean };
 type HeroCard = {
@@ -25,12 +25,11 @@ type HeroContent = {
   titleLines: string[];
   ctas: HeroCta[];
   cards: HeroCard[];
-  tourVideoUrl?: string;
+  tourVideoUrl: string;
+  intervalMs: number;
 };
 
-// Returns only the fields that are present in the DB config so callers can
-// merge them into the fallback instead of replacing it wholesale.
-function normalizeHero(raw: unknown): Partial<HeroContent> | null {
+function normalizeHero(raw: unknown): HeroContent | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
 
@@ -73,22 +72,18 @@ function normalizeHero(raw: unknown): Partial<HeroContent> | null {
         .filter((x): x is HeroCard => x !== null)
     : [];
 
-  const tourVideoUrl =
-    typeof r.tourVideoUrl === "string" && r.tourVideoUrl.trim()
-      ? r.tourVideoUrl.trim()
-      : undefined;
-
-  // Only override each field if the DB actually has data for it.
-  // This allows partially-configured heroes (e.g. only title lines changed)
-  // to still show fallback backgrounds/cards for the rest.
-  const partial: Partial<HeroContent> = {};
-  if (backgroundImages.length > 0) partial.backgroundImages = backgroundImages;
-  if (titleLines.length > 0) partial.titleLines = titleLines;
-  if (ctas.length > 0) partial.ctas = ctas;
-  if (cards.length > 0) partial.cards = cards;
-  if (tourVideoUrl) partial.tourVideoUrl = tourVideoUrl;
-
-  return Object.keys(partial).length > 0 ? partial : null;
+  return {
+    backgroundImages,
+    titleLines,
+    ctas,
+    cards,
+    tourVideoUrl:
+      typeof r.tourVideoUrl === "string" ? r.tourVideoUrl.trim() : "",
+    intervalMs:
+      typeof r.intervalMs === "number" && r.intervalMs > 0
+        ? r.intervalMs
+        : 6000,
+  };
 }
 
 const BACKGROUND_MOTIONS = [
@@ -111,51 +106,36 @@ const BACKGROUND_MOTIONS = [
 
 export function HomeHero() {
   const router = useRouter();
+  const { data: heroData, loading } = useSiteConfig("home");
+  const { data: prospectusData } =
+    useSiteConfig<{ url?: string }>("homeProspectus");
+
+  const hero = useMemo(() => normalizeHero(heroData), [heroData]);
+
   const [isTouchScreen, setIsTouchScreen] = useState(false);
   const [currentBackgroundIndex, setCurrentBackgroundIndex] = useState(0);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
-  const [homeHeroContent, setHomeHeroContent] = useState<HeroContent>(
-    fallbackHero as unknown as HeroContent,
-  );
-  const [prospectusUrl, setProspectusUrl] = useState<string>("");
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/public/site-config?key=home")
-      .then((r) => r.json())
-      .then((res) => {
-        if (cancelled) return;
-        if (res?.source === "db") {
-          const partial = normalizeHero(res.data);
-          // Merge only the fields present in DB; keep fallback for the rest
-          if (partial) setHomeHeroContent((prev) => ({ ...prev, ...partial }));
-        }
-      })
-      .catch(() => {});
-    fetch("/api/public/site-config?key=homeProspectus")
-      .then((r) => r.json())
-      .then((res) => {
-        if (cancelled) return;
-        if (res?.source === "db" && typeof res.data?.url === "string") {
-          const raw = res.data.url.trim();
-          if (raw) {
-            // Resolve storage keys via the public image proxy
-            const resolved =
-              raw.startsWith("http://") ||
-              raw.startsWith("https://") ||
-              raw.startsWith("/")
-                ? raw
-                : `/api/public/images/${raw}`;
-            setProspectusUrl(resolved);
-          }
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const prospectusUrl = useMemo(() => {
+    const raw =
+      typeof prospectusData?.url === "string" ? prospectusData.url.trim() : "";
+    if (!raw) return "";
+    return raw.startsWith("http://") ||
+      raw.startsWith("https://") ||
+      raw.startsWith("/")
+      ? raw
+      : `/api/public/images/${raw}`;
+  }, [prospectusData]);
+
+  const backgroundImages = useMemo(
+    () => hero?.backgroundImages ?? [],
+    [hero],
+  );
+  const titleLines = hero?.titleLines ?? [];
+  const ctas = hero?.ctas ?? [];
+  const cards = hero?.cards ?? [];
+  const intervalMs = hero?.intervalMs ?? 6000;
 
   useEffect(() => {
     const media = window.matchMedia("(hover: none), (pointer: coarse)");
@@ -173,33 +153,42 @@ export function HomeHero() {
   }, []);
 
   useEffect(() => {
-    const len = homeHeroContent.backgroundImages.length;
+    const len = backgroundImages.length;
     if (len === 0) return;
     const timer = window.setInterval(() => {
       setCurrentBackgroundIndex((currentIndex) => (currentIndex + 1) % len);
-    }, 8000);
+    }, intervalMs);
 
     return () => window.clearInterval(timer);
-  }, [homeHeroContent.backgroundImages.length]);
+  }, [backgroundImages.length, intervalMs]);
 
   useEffect(() => {
-    homeHeroContent.backgroundImages.forEach((src) => {
+    backgroundImages.forEach((src) => {
       const image = new window.Image();
-      image.src = src;
+      image.src = getImageUrl(src) ?? src;
     });
-  }, [homeHeroContent.backgroundImages]);
+  }, [backgroundImages]);
 
   function isCardExpanded(index: number) {
     return hoveredCard === index;
   }
 
   const rawImageSrc =
-    homeHeroContent.backgroundImages[currentBackgroundIndex]?.trim() || null;
+    backgroundImages[currentBackgroundIndex]?.trim() || null;
   const currentImageSrc = rawImageSrc ? getImageUrl(rawImageSrc) : null;
+
+  if (loading) {
+    return (
+      <section
+        aria-busy="true"
+        className="relative flex min-h-[102svh] w-full animate-pulse flex-col justify-center bg-[#081a34] pt-28 pb-40 lg:pt-32 lg:pb-24"
+      />
+    );
+  }
 
   return (
     <section className="relative flex min-h-[102svh] w-full flex-col justify-center overflow-hidden pt-28 pb-40 lg:pt-32 lg:pb-24">
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 bg-[#081a34]">
         <AnimatePresence mode="sync">
           {currentImageSrc && (
             <motion.div
@@ -244,7 +233,7 @@ export function HomeHero() {
       </div>
 
       <AnimatePresence>
-        {isVideoOpen && (
+        {isVideoOpen && hero?.tourVideoUrl && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -264,7 +253,7 @@ export function HomeHero() {
                 <X size={24} />
               </button>
               <iframe
-                src={`${homeHeroContent.tourVideoUrl || "https://www.youtube.com/embed/RBzA0cneWRA"}?autoplay=1`}
+                src={`${hero.tourVideoUrl}?autoplay=1`}
                 title="JCT Campus Tour"
                 className="h-full w-full border-none"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -299,7 +288,7 @@ export function HomeHero() {
         {/* Left Content */}
         <div className="flex w-full flex-col items-center text-center lg:items-start lg:text-left">
           <h1 className="max-w-3xl font-sans text-[2.5rem] leading-[1.05] font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl xl:text-[5.25rem]">
-            {homeHeroContent.titleLines.map((line, index) => (
+            {titleLines.map((line, index) => (
               <motion.span
                 key={line}
                 className="block"
@@ -322,7 +311,7 @@ export function HomeHero() {
             transition={{ duration: 0.55, delay: 0.18, ease: "easeOut" }}
             className="mt-8 flex flex-wrap items-center justify-center gap-4 lg:justify-start"
           >
-            {homeHeroContent.ctas.map((cta) => {
+            {ctas.map((cta) => {
               if (cta.label === "Take a Virtual Campus Tour") {
                 return (
                   <button
@@ -390,7 +379,7 @@ export function HomeHero() {
           className="mx-auto flex w-full max-w-md flex-col items-center gap-4 sm:max-w-xl lg:max-w-none lg:translate-x-8 lg:items-end xl:translate-x-10"
         >
           <div className="flex w-full flex-col items-center gap-4 lg:items-end">
-            {homeHeroContent.cards.map((card, index) => {
+            {cards.map((card, index) => {
               const expanded = isCardExpanded(index);
 
               return (

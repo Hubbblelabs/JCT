@@ -9,7 +9,6 @@ import {
   Briefcase,
   MessageSquare,
   Image,
-  Settings,
   ClipboardList,
   Users,
   LogOut,
@@ -26,6 +25,9 @@ import {
   Globe,
   PanelTop,
   PanelBottom,
+  Award,
+  Sparkles,
+  LayoutGrid,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Suspense } from "react";
@@ -49,6 +51,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: Image,
     },
     {
+      label: "Programs",
+      href: "/admin/programs?college=engineering",
+      icon: GraduationCap,
+    },
+    {
       label: "Performance Metrics",
       href: "/admin/page-content?college=engineering&section=metrics",
       icon: BarChart3,
@@ -64,9 +71,9 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: Camera,
     },
     {
-      label: "Programs",
-      href: "/admin/programs?college=engineering",
-      icon: GraduationCap,
+      label: "Testimonials",
+      href: "/admin/page-content?college=engineering&section=testimonials",
+      icon: MessageSquare,
     },
   ],
   "arts-science": [
@@ -74,6 +81,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       label: "Hero",
       href: "/admin/page-content?college=arts-science&section=hero",
       icon: FileEdit,
+    },
+    {
+      label: "Programs",
+      href: "/admin/programs?college=arts-science",
+      icon: GraduationCap,
     },
     {
       label: "Admissions",
@@ -87,13 +99,8 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
     },
     {
       label: "Testimonials",
-      href: "/admin/testimonials?college=arts-science",
+      href: "/admin/page-content?college=arts-science&section=testimonials",
       icon: MessageSquare,
-    },
-    {
-      label: "Programs",
-      href: "/admin/programs?college=arts-science",
-      icon: GraduationCap,
     },
   ],
   polytechnic: [
@@ -103,9 +110,9 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: FileEdit,
     },
     {
-      label: "Campus Life",
-      href: "/admin/page-content?college=polytechnic&section=campusLife",
-      icon: Camera,
+      label: "Programs",
+      href: "/admin/programs?college=polytechnic",
+      icon: GraduationCap,
     },
     {
       label: "Admissions",
@@ -113,28 +120,48 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: ClipboardList,
     },
     {
-      label: "Testimonials",
-      href: "/admin/testimonials?college=polytechnic",
-      icon: MessageSquare,
+      label: "Campus Life",
+      href: "/admin/page-content?college=polytechnic&section=campusLife",
+      icon: Camera,
     },
     {
-      label: "Programs",
-      href: "/admin/programs?college=polytechnic",
-      icon: GraduationCap,
+      label: "Testimonials",
+      href: "/admin/page-content?college=polytechnic&section=testimonials",
+      icon: MessageSquare,
     },
   ],
 };
 
 const MAIN_ITEMS: NavItem[] = [
   {
+    label: "Pamphlet Popup",
+    href: "/admin/main/page-content?section=pamphlet",
+    icon: Layers,
+  },
+  {
     label: "Hero",
     href: "/admin/main/page-content?section=hero",
     icon: FileEdit,
   },
   {
+    label: "Accreditations",
+    href: "/admin/main/page-content?section=accreditations",
+    icon: Award,
+  },
+  {
+    label: "Statistics",
+    href: "/admin/main/page-content?section=statistics",
+    icon: BarChart3,
+  },
+  {
+    label: "Why Choose JCT",
+    href: "/admin/main/page-content?section=whyChooseJct",
+    icon: Sparkles,
+  },
+  {
     label: "Card",
     href: "/admin/main/page-content?section=card",
-    icon: BarChart3,
+    icon: LayoutGrid,
   },
   {
     label: "Life at JCT",
@@ -147,26 +174,32 @@ const MAIN_ITEMS: NavItem[] = [
     icon: MessageSquare,
   },
   {
+    label: "Admissions",
+    href: "/admin/main/page-content?section=homeAdmissions",
+    icon: ClipboardList,
+  },
+  {
     label: "Prospectus",
     href: "/admin/main/page-content?section=prospectus",
     icon: FileDown,
   },
-  {
-    label: "Pamphlet Popup",
-    href: "/admin/main/page-content?section=pamphlet",
-    icon: Layers,
-  },
 ];
 
 const GLOBAL_CMS_ITEMS: NavItem[] = [
-  { label: "Header", href: "/admin/global/page-content?section=header", icon: PanelTop },
-  { label: "Footer", href: "/admin/global/page-content?section=footer", icon: PanelBottom },
+  {
+    label: "Header",
+    href: "/admin/global/page-content?section=header",
+    icon: PanelTop,
+  },
+  {
+    label: "Footer",
+    href: "/admin/global/page-content?section=footer",
+    icon: PanelBottom,
+  },
+  { label: "Recruiters", href: "/admin/recruiters", icon: Briefcase },
 ];
 
 const ADMIN_ITEMS: NavItem[] = [
-  { label: "Recruiters", href: "/admin/recruiters", icon: Briefcase },
-  { label: "Site Config", href: "/admin/site-config", icon: Settings },
-  { label: "Images", href: "/admin/images", icon: Image },
   { label: "Users", href: "/admin/users", icon: Users },
   { label: "Audit Log", href: "/admin/audit", icon: ClipboardList },
 ];
@@ -221,11 +254,14 @@ function TabNavInner() {
   const section = searchParams.get("section");
 
   const dashActive = pathname === "/admin/dashboard" || pathname === "/admin";
-  const adminMenuActive = ADMIN_ITEMS.some((i) => pathname === i.href);
+  const adminMenuActive = isDropdownActive(ADMIN_ITEMS, pathname, null);
   const mainActive = isDropdownActive(MAIN_ITEMS, pathname, null);
   const globalCmsActive = isDropdownActive(GLOBAL_CMS_ITEMS, pathname, null);
 
-  if (pathname.startsWith("/admin/programs/") && pathname !== "/admin/programs") {
+  if (
+    pathname.startsWith("/admin/programs/") &&
+    pathname !== "/admin/programs"
+  ) {
     return null;
   }
 
@@ -255,6 +291,57 @@ function TabNavInner() {
             <LayoutDashboard size={13} />
             Dashboard
           </Link>
+
+          {/* Admin tools dropdown */}
+          <div className="admin-nav-item">
+            <button
+              className={`admin-nav-trigger ${adminMenuActive ? "active" : ""}`}
+            >
+              <Wrench size={13} />
+              Admin
+              <ChevronDown size={11} />
+            </button>
+            <div className="admin-nav-dropdown-menu">
+              {ADMIN_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`admin-nav-dropdown-item ${pathname === item.href ? "active" : ""}`}
+                >
+                  <item.icon size={14} />
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Global CMS dropdown */}
+          <div className="admin-nav-item">
+            <Link
+              href="/admin/global/page-content"
+              className={`admin-nav-trigger ${globalCmsActive ? "active" : ""}`}
+            >
+              <Globe size={13} />
+              Global CMS
+              <ChevronDown size={11} />
+            </Link>
+            <div className="admin-nav-dropdown-menu">
+              {GLOBAL_CMS_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`admin-nav-dropdown-item ${
+                    isItemActive(item.href, pathname, null, section)
+                      ? "active"
+                      : ""
+                  }`}
+                >
+                  <item.icon size={14} />
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
 
           {/* Main (landing page) dropdown */}
           <div className="admin-nav-item">
@@ -288,7 +375,7 @@ function TabNavInner() {
           {(
             [
               { id: "engineering", label: "Engineering" },
-              { id: "arts-science", label: "Arts & Science" },
+              { id: "arts-science", label: "Arts" },
               { id: "polytechnic", label: "Polytechnic" },
             ] as const
           ).map(({ id, label }) => {
@@ -322,55 +409,6 @@ function TabNavInner() {
               </div>
             );
           })}
-
-          {/* Global CMS dropdown */}
-          <div className="admin-nav-item">
-            <Link
-              href="/admin/global/page-content"
-              className={`admin-nav-trigger ${globalCmsActive ? "active" : ""}`}
-            >
-              <Globe size={13} />
-              Global CMS
-              <ChevronDown size={11} />
-            </Link>
-            <div className="admin-nav-dropdown-menu">
-              {GLOBAL_CMS_ITEMS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`admin-nav-dropdown-item ${
-                    isItemActive(item.href, pathname, null, section) ? "active" : ""
-                  }`}
-                >
-                  <item.icon size={14} />
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          {/* Admin tools dropdown */}
-          <div className="admin-nav-item">
-            <button
-              className={`admin-nav-trigger ${adminMenuActive ? "active" : ""}`}
-            >
-              <Wrench size={13} />
-              Admin
-              <ChevronDown size={11} />
-            </button>
-            <div className="admin-nav-dropdown-menu">
-              {ADMIN_ITEMS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`admin-nav-dropdown-item ${pathname === item.href ? "active" : ""}`}
-                >
-                  <item.icon size={14} />
-                  {item.label}
-                </Link>
-              ))}
-            </div>
-          </div>
         </nav>
 
         {/* User info + sign out */}

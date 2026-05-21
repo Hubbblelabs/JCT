@@ -67,9 +67,11 @@ export {
   RecruiterSchema,
   RecruiterCreateSchema,
   RecruiterUpdateSchema,
+  RecruitersSectionSchema,
   LIMITS as LIMITS_recruiter,
+  RECRUITERS_SECTION_LIMITS,
 } from "./recruiters";
-export type { RecruiterValue } from "./recruiters";
+export type { RecruiterValue, RecruitersSectionValue } from "./recruiters";
 
 export {
   ProgramSchema,
@@ -138,10 +140,16 @@ export type { AdmissionsValue } from "./admissions";
 export {
   WhyChooseJctSchema,
   HomeAdmissionsSchema,
+  HomeStatisticsSchema,
   WHY_CHOOSE_JCT_LIMITS,
   HOME_ADMISSIONS_LIMITS,
+  HOME_STATISTICS_LIMITS,
 } from "./homeSections";
-export type { WhyChooseJctValue, HomeAdmissionsValue } from "./homeSections";
+export type {
+  WhyChooseJctValue,
+  HomeAdmissionsValue,
+  HomeStatisticsValue,
+} from "./homeSections";
 
 export {
   HeaderSchema,

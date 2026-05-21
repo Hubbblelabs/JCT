@@ -11,10 +11,14 @@ import {
   LifeAtJctForm,
   WhyChooseJctForm,
   HomeAdmissionsForm,
+  AccreditationsForm,
+  StatisticsForm,
   type PamphletVal,
   type LifeAtJctVal,
   type WhyChooseJctVal,
   type HomeAdmissionsVal,
+  type AccreditationItem,
+  type HomeStatisticItem,
 } from "@/components/admin/PageContentForms";
 import {
   TextArea,
@@ -40,6 +44,7 @@ type HomeVal = {
   titleLines?: string[];
   cards?: HeroCard[];
   tourVideoUrl?: string;
+  intervalMs?: number;
 };
 
 type HomeStatsVal = {
@@ -55,7 +60,7 @@ type HomeProspectusVal = {
 
 // ─── Hero Form ────────────────────────────────────────────────────────────────
 
-const BG_LIMIT = 3;
+const BG_LIMIT = 6;
 const TITLE_COUNT = 3;
 
 const DEFAULT_CARD: HeroCard = {
@@ -105,35 +110,72 @@ function HomeHeroForm({
         />
       </div>
 
-      {/* Background Images (3 fixed slots — replace or remove only) */}
+      {/* Background Images — up to 6, add / replace / remove */}
       <div>
         <h3 className="mb-1 text-sm font-semibold text-gray-700">
           Background Images{" "}
-          <span className="font-normal text-gray-400">(3 fixed slots)</span>
+          <span className="font-normal text-gray-400">
+            (up to {BG_LIMIT})
+          </span>
         </h3>
         <p className="mb-3 text-xs text-gray-400">
-          Upload or replace each slide image. Use the ✕ on the preview to clear
-          a slot.
+          Images rotate behind the hero. Upload, replace, or remove each one.
         </p>
         <div className="space-y-2">
-          {Array.from({ length: BG_LIMIT }, (_, i) => (
-            <ImageUploadInput
-              key={i}
-              label={`Slide ${i + 1}`}
-              value={bg[i] ?? ""}
-              onChange={(url) => {
-                const next = Array.from(
-                  { length: BG_LIMIT },
-                  (__, j) => bg[j] ?? "",
-                );
-                next[i] = url;
-                onChange({ ...value, backgroundImages: next });
-              }}
-              uploadOnly
-            />
+          {bg.map((src, i) => (
+            <div key={i} className="flex items-start gap-2">
+              <div className="flex-1">
+                <ImageUploadInput
+                  label={`Slide ${i + 1}`}
+                  value={src}
+                  onChange={(url) =>
+                    onChange({
+                      ...value,
+                      backgroundImages: bg.map((s, j) => (j === i ? url : s)),
+                    })
+                  }
+                  uploadOnly
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  onChange({
+                    ...value,
+                    backgroundImages: bg.filter((_, j) => j !== i),
+                  })
+                }
+                className="admin-btn admin-btn-danger admin-btn-sm"
+              >
+                <Trash2 size={13} />
+              </button>
+            </div>
           ))}
+          <button
+            type="button"
+            onClick={() =>
+              onChange({ ...value, backgroundImages: [...bg, ""] })
+            }
+            disabled={bg.length >= BG_LIMIT}
+            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Plus size={14} /> Add Background Image
+          </button>
         </div>
       </div>
+
+      {/* Carousel speed */}
+      <TextInput
+        label="Carousel Speed (ms)"
+        type="number"
+        min={1500}
+        max={60000}
+        value={value.intervalMs ?? 6000}
+        onChange={(e) =>
+          onChange({ ...value, intervalMs: Number(e.target.value) || 6000 })
+        }
+        hint="How long each background image stays before rotating. Between 1500ms and 60000ms."
+      />
 
       {/* Title Lines (exactly 3, fixed count) */}
       <div>
@@ -671,6 +713,19 @@ function SeedBanner() {
 function Inner() {
   const sections: SectionDef[] = [
     {
+      id: "pamphlet",
+      label: "Pamphlet Popup",
+      kind: "form",
+      configKey: "homePamphlet",
+      defaultValue: { enabled: true, images: [], delayMs: 2000 } as PamphletVal,
+      render: (v, onChange) => (
+        <PamphletForm
+          value={(v as PamphletVal) ?? {}}
+          onChange={(next) => onChange(next)}
+        />
+      ),
+    },
+    {
       id: "hero",
       label: "Hero",
       kind: "form",
@@ -679,6 +734,45 @@ function Inner() {
       render: (v, onChange) => (
         <HomeHeroForm
           value={(v as HomeVal) ?? {}}
+          onChange={(next) => onChange(next)}
+        />
+      ),
+    },
+    {
+      id: "accreditations",
+      label: "Accreditations",
+      kind: "form",
+      configKey: "accreditations",
+      defaultValue: [] as AccreditationItem[],
+      render: (v, onChange) => (
+        <AccreditationsForm
+          value={(v as AccreditationItem[]) ?? []}
+          onChange={(next) => onChange(next)}
+        />
+      ),
+    },
+    {
+      id: "statistics",
+      label: "Statistics",
+      kind: "form",
+      configKey: "homeStatistics",
+      defaultValue: [] as HomeStatisticItem[],
+      render: (v, onChange) => (
+        <StatisticsForm
+          value={(v as HomeStatisticItem[]) ?? []}
+          onChange={(next) => onChange(next)}
+        />
+      ),
+    },
+    {
+      id: "whyChooseJct",
+      label: "Why Choose JCT",
+      kind: "form",
+      configKey: "whyChooseJct",
+      defaultValue: {} as WhyChooseJctVal,
+      render: (v, onChange) => (
+        <WhyChooseJctForm
+          value={(v as WhyChooseJctVal) ?? {}}
           onChange={(next) => onChange(next)}
         />
       ),
@@ -725,6 +819,19 @@ function Inner() {
       customRender: () => <VoicesInlineManager />,
     },
     {
+      id: "homeAdmissions",
+      label: "Admissions",
+      kind: "form",
+      configKey: "homeAdmissions",
+      defaultValue: {} as HomeAdmissionsVal,
+      render: (v, onChange) => (
+        <HomeAdmissionsForm
+          value={(v as HomeAdmissionsVal) ?? {}}
+          onChange={(next) => onChange(next)}
+        />
+      ),
+    },
+    {
       id: "prospectus",
       label: "Prospectus",
       kind: "form",
@@ -733,45 +840,6 @@ function Inner() {
       render: (v, onChange) => (
         <HomeProspectusForm
           value={(v as HomeProspectusVal) ?? {}}
-          onChange={(next) => onChange(next)}
-        />
-      ),
-    },
-    {
-      id: "pamphlet",
-      label: "Pamphlet Popup",
-      kind: "form",
-      configKey: "homePamphlet",
-      defaultValue: { enabled: true, images: [], delayMs: 2000 } as PamphletVal,
-      render: (v, onChange) => (
-        <PamphletForm
-          value={(v as PamphletVal) ?? {}}
-          onChange={(next) => onChange(next)}
-        />
-      ),
-    },
-    {
-      id: "whyChooseJct",
-      label: "Why Choose JCT",
-      kind: "form",
-      configKey: "whyChooseJct",
-      defaultValue: {} as WhyChooseJctVal,
-      render: (v, onChange) => (
-        <WhyChooseJctForm
-          value={(v as WhyChooseJctVal) ?? {}}
-          onChange={(next) => onChange(next)}
-        />
-      ),
-    },
-    {
-      id: "homeAdmissions",
-      label: "Admissions CTA",
-      kind: "form",
-      configKey: "homeAdmissions",
-      defaultValue: {} as HomeAdmissionsVal,
-      render: (v, onChange) => (
-        <HomeAdmissionsForm
-          value={(v as HomeAdmissionsVal) ?? {}}
           onChange={(next) => onChange(next)}
         />
       ),

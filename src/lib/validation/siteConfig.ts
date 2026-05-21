@@ -26,7 +26,12 @@ import {
   HeroStatsListSchema,
 } from "./siteInfo";
 import { AdmissionsSchema } from "./admissions";
-import { WhyChooseJctSchema, HomeAdmissionsSchema } from "./homeSections";
+import {
+  WhyChooseJctSchema,
+  HomeAdmissionsSchema,
+  HomeStatisticsSchema,
+} from "./homeSections";
+import { RecruitersSectionSchema } from "./recruiters";
 import { HeaderSchema, FooterSchema } from "./globalCms";
 
 // Every site-config key the admin UI writes must have an entry below.
@@ -42,6 +47,7 @@ export const SITE_CONFIG_SCHEMAS = {
   homeProspectus: HomeProspectusSchema,
   homePamphlet: PamphletSchema,
   homeAdmissions: HomeAdmissionsSchema,
+  homeStatistics: HomeStatisticsSchema,
   whyChooseJct: WhyChooseJctSchema,
   lifeAtJct: LifeAtJctSchema,
   engineeringAnnouncement: AnnouncementSchema,
@@ -57,6 +63,7 @@ export const SITE_CONFIG_SCHEMAS = {
   polytechnicHero: PolytechnicHeroSchema,
   polytechnicCampusLife: CampusLifeCarouselSchema,
   polytechnicAdmissions: PolytechnicAdmissionsSchema,
+  recruitersSection: RecruitersSectionSchema,
   header: HeaderSchema,
   footer: FooterSchema,
 } as const;

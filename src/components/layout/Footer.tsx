@@ -12,24 +12,42 @@ import {
   FaYoutube,
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-import { siteConfig } from "@/data/site";
+import { useSiteConfig } from "@/lib/use-site-config";
 
-const socialLinks = [
-  { Icon: FaFacebookF, label: "Facebook", href: siteConfig.social.facebook },
-  { Icon: FaInstagram, label: "Instagram", href: siteConfig.social.instagram },
-  { Icon: FaXTwitter, label: "X", href: siteConfig.social.twitter },
-  { Icon: FaLinkedinIn, label: "LinkedIn", href: siteConfig.social.linkedin },
-  { Icon: FaYoutube, label: "YouTube", href: siteConfig.social.youtube },
-];
+type FooterConfig = {
+  helplineLabel?: string;
+  phone?: string;
+  admissionsEmail?: string;
+  email?: string;
+  addressLines?: string[];
+  facebook?: string;
+  instagram?: string;
+  twitter?: string;
+  linkedin?: string;
+  youtube?: string;
+};
 
-const legalLinks = [
+const SOCIAL_DEFS = [
+  { key: "facebook", Icon: FaFacebookF, label: "Facebook" },
+  { key: "instagram", Icon: FaInstagram, label: "Instagram" },
+  { key: "twitter", Icon: FaXTwitter, label: "X" },
+  { key: "linkedin", Icon: FaLinkedinIn, label: "LinkedIn" },
+  { key: "youtube", Icon: FaYoutube, label: "YouTube" },
+] as const;
+
+// Fixed footer chrome — not part of the editable Footer CMS.
+const LEGAL_LINKS = [
   { name: "Privacy Policy", href: "/mandatory-disclosure/privacy" },
   { name: "Terms of Service", href: "/mandatory-disclosure/terms" },
   { name: "Contact Support", href: "/contact" },
 ];
 
+const MAP_EMBED_URL =
+  "https://www.google.com/maps?q=JCT+Institutions+Knowledge+Park+Pichanur+Coimbatore+641105&output=embed";
+
 export function Footer() {
   const pathname = usePathname();
+  const { data: footer } = useSiteConfig<FooterConfig>("footer");
 
   const isHome = pathname === "/";
   const isEngineering = pathname.startsWith("/institutions/engineering");
@@ -97,7 +115,17 @@ export function Footer() {
     "--footer-border": footerTheme.border,
   } as CSSProperties;
 
-  const phoneHref = `tel:${siteConfig.contact.phone.replace(/\s/g, "")}`;
+  const addressLines = Array.isArray(footer?.addressLines)
+    ? footer.addressLines.filter((l) => l.trim().length > 0)
+    : [];
+  const socials = SOCIAL_DEFS.map((d) => ({
+    Icon: d.Icon,
+    label: d.label,
+    href: footer?.[d.key] ?? "",
+  })).filter((s) => s.href);
+  const phoneHref = footer?.phone
+    ? `tel:${footer.phone.replace(/\s/g, "")}`
+    : "";
 
   return (
     <footer
@@ -123,34 +151,40 @@ export function Footer() {
               </span>
             </Link>
 
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
-              <div className="flex min-h-56 flex-1 flex-col items-center justify-center rounded-lg bg-(--footer-surface) px-6 py-7 text-center shadow-[0_18px_42px_-28px_rgba(0,0,0,0.8)]">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-(--footer-accent)/35 text-(--footer-accent)">
-                  <Phone className="h-5 w-5" strokeWidth={1.7} />
+            {(footer?.phone || footer?.admissionsEmail) && (
+              <div className="flex flex-col gap-4 lg:flex-row lg:items-stretch">
+                <div className="flex min-h-56 flex-1 flex-col items-center justify-center rounded-lg bg-(--footer-surface) px-6 py-7 text-center shadow-[0_18px_42px_-28px_rgba(0,0,0,0.8)]">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-(--footer-accent)/35 text-(--footer-accent)">
+                    <Phone className="h-5 w-5" strokeWidth={1.7} />
+                  </div>
+
+                  <p className="text-sm font-bold tracking-wide text-(--footer-accent)">
+                    {footer?.helplineLabel || "Admissions Helpline"}
+                  </p>
+                  {footer?.phone && (
+                    <a
+                      href={phoneHref}
+                      className="mt-2 text-3xl font-black tracking-tight text-white transition-colors hover:text-(--footer-accent) sm:text-4xl"
+                    >
+                      {footer.phone}
+                    </a>
+                  )}
+
+                  {footer?.admissionsEmail && (
+                    <a
+                      href={`mailto:${footer.admissionsEmail}`}
+                      className="mt-9 inline-flex items-center gap-2 text-sm font-semibold text-(--footer-text) transition-colors hover:text-(--footer-accent)"
+                    >
+                      <Mail className="h-4 w-4 text-(--footer-accent)" />
+                      {footer.admissionsEmail}
+                    </a>
+                  )}
                 </div>
-
-                <p className="text-sm font-bold tracking-wide text-(--footer-accent)">
-                  Admissions Helpline
-                </p>
-                <a
-                  href={phoneHref}
-                  className="mt-2 text-3xl font-black tracking-tight text-white transition-colors hover:text-(--footer-accent) sm:text-4xl"
-                >
-                  {siteConfig.contact.phone}
-                </a>
-
-                <a
-                  href={`mailto:${siteConfig.contact.admissionsEmail}`}
-                  className="mt-9 inline-flex items-center gap-2 text-sm font-semibold text-(--footer-text) transition-colors hover:text-(--footer-accent)"
-                >
-                  <Mail className="h-4 w-4 text-(--footer-accent)" />
-                  {siteConfig.contact.admissionsEmail}
-                </a>
               </div>
-            </div>
+            )}
 
             <p className="hidden text-sm leading-6 text-(--footer-muted) lg:block">
-              © {new Date().getFullYear()} {siteConfig.name}. All rights
+              © {new Date().getFullYear()} JCT Institutions. All rights
               reserved.
             </p>
           </div>
@@ -161,54 +195,62 @@ export function Footer() {
             </h2>
 
             <div className="mt-7 space-y-5">
-              <div className="flex items-start gap-4 text-[15px] leading-7 text-(--footer-text)">
-                <MapPin className="mt-1 h-4 w-4 shrink-0 text-(--footer-accent)" />
-                <p>
-                  {siteConfig.address.line1}
-                  <br />
-                  {siteConfig.address.line2}
-                  <br />
-                  {siteConfig.address.city} - {siteConfig.address.pincode},{" "}
-                  {siteConfig.address.state}
-                </p>
-              </div>
+              {addressLines.length > 0 && (
+                <div className="flex items-start gap-4 text-[15px] leading-7 text-(--footer-text)">
+                  <MapPin className="mt-1 h-4 w-4 shrink-0 text-(--footer-accent)" />
+                  <p>
+                    {addressLines.map((line, i) => (
+                      <span key={i}>
+                        {line}
+                        {i < addressLines.length - 1 && <br />}
+                      </span>
+                    ))}
+                  </p>
+                </div>
+              )}
 
-              <a
-                href={phoneHref}
-                className="flex items-center gap-4 text-[15px] text-(--footer-text) transition-colors hover:text-(--footer-accent)"
-              >
-                <Phone className="h-4 w-4 text-(--footer-accent)" />
-                {siteConfig.contact.phone}
-              </a>
+              {footer?.phone && (
+                <a
+                  href={phoneHref}
+                  className="flex items-center gap-4 text-[15px] text-(--footer-text) transition-colors hover:text-(--footer-accent)"
+                >
+                  <Phone className="h-4 w-4 text-(--footer-accent)" />
+                  {footer.phone}
+                </a>
+              )}
 
-              <a
-                href={`mailto:${siteConfig.contact.email}`}
-                className="flex items-center gap-4 text-[15px] text-(--footer-text) transition-colors hover:text-(--footer-accent)"
-              >
-                <Mail className="h-4 w-4 text-(--footer-accent)" />
-                {siteConfig.contact.email}
-              </a>
+              {footer?.email && (
+                <a
+                  href={`mailto:${footer.email}`}
+                  className="flex items-center gap-4 text-[15px] text-(--footer-text) transition-colors hover:text-(--footer-accent)"
+                >
+                  <Mail className="h-4 w-4 text-(--footer-accent)" />
+                  {footer.email}
+                </a>
+              )}
             </div>
 
-            <div className="mt-7">
-              <h3 className="text-xs font-extrabold tracking-wide text-(--footer-heading) uppercase">
-                Connect With Us
-              </h3>
-              <div className="mt-3 flex flex-wrap gap-3">
-                {socialLinks.map(({ Icon, label, href }) => (
-                  <a
-                    key={label}
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={label}
-                    className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-slate-500 transition-colors hover:bg-(--footer-accent) hover:text-(--footer-bg)"
-                  >
-                    <Icon size={15} />
-                  </a>
-                ))}
+            {socials.length > 0 && (
+              <div className="mt-7">
+                <h3 className="text-xs font-extrabold tracking-wide text-(--footer-heading) uppercase">
+                  Connect With Us
+                </h3>
+                <div className="mt-3 flex flex-wrap gap-3">
+                  {socials.map(({ Icon, label, href }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={label}
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-slate-500 transition-colors hover:bg-(--footer-accent) hover:text-(--footer-bg)"
+                    >
+                      <Icon size={15} />
+                    </a>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           <div className="lg:pl-14">
@@ -218,7 +260,7 @@ export function Footer() {
 
             <div className="mt-7 overflow-hidden rounded-lg bg-(--footer-surface) shadow-[0_18px_42px_-28px_rgba(0,0,0,0.8)]">
               <iframe
-                src={siteConfig.address.mapEmbedUrl}
+                src={MAP_EMBED_URL}
                 className="h-56 w-full"
                 style={{ border: 0 }}
                 allowFullScreen
@@ -232,7 +274,7 @@ export function Footer() {
               aria-label="Footer legal links"
               className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-3 text-sm text-(--footer-muted)"
             >
-              {legalLinks.map((link) => (
+              {LEGAL_LINKS.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
@@ -247,7 +289,7 @@ export function Footer() {
 
         <div className="mt-4 lg:hidden">
           <p className="text-sm leading-6 text-(--footer-muted)">
-            © {new Date().getFullYear()} {siteConfig.name}. All rights reserved.
+            © {new Date().getFullYear()} JCT Institutions. All rights reserved.
           </p>
         </div>
       </div>

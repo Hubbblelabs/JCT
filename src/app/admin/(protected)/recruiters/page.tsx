@@ -6,6 +6,10 @@ import { Plus, Pencil, Trash2, X, Loader2, Check } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
+import {
+  RecruitersSectionForm,
+  type RecruitersSectionVal,
+} from "@/components/admin/PageContentForms";
 
 interface Recruiter {
   _id: string;
@@ -23,6 +27,114 @@ const EMPTY: Omit<Recruiter, "_id"> = {
   industry: "",
   is_active: true,
 };
+
+function RecruitersSectionPanel() {
+  const [value, setValue] = useState<RecruitersSectionVal>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(
+    null,
+  );
+  const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const r = await fetch("/api/admin/site-config");
+      const data: { config_key: string; value: unknown }[] = await r.json();
+      const found = data.find((d) => d.config_key === "recruitersSection");
+      setValue((found?.value as RecruitersSectionVal) ?? {});
+    } catch {
+      setMsg({ kind: "err", text: "Failed to load section content." });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const save = async () => {
+    setSaving(true);
+    setMsg(null);
+    setApiError(null);
+    try {
+      const r = await fetch("/api/admin/site-config", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ config_key: "recruitersSection", value }),
+      });
+      if (r.ok) {
+        setMsg({ kind: "ok", text: "Section content saved!" });
+      } else {
+        const parsed = await parseApiError(r);
+        setApiError(parsed);
+        setMsg({
+          kind: "err",
+          text: parsed?.message ?? parsed?.error ?? "Save failed.",
+        });
+      }
+    } catch {
+      setMsg({ kind: "err", text: "Save failed." });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="admin-card mb-4">
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <div>
+          <h2 className="font-semibold text-gray-800">
+            Placement Highlights Section
+          </h2>
+          <p className="text-xs text-gray-500">
+            Heading, description, and stat cards for the recruiters section on
+            the home page.
+          </p>
+        </div>
+        <button
+          onClick={save}
+          disabled={saving || loading}
+          className="admin-btn admin-btn-gold shrink-0"
+        >
+          {saving ? (
+            <Loader2 size={15} className="animate-spin" />
+          ) : (
+            <Check size={15} />
+          )}
+          {saving ? "Saving…" : "Save Section"}
+        </button>
+      </div>
+
+      {msg?.kind === "ok" && (
+        <p className="mb-3 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
+          {msg.text}
+        </p>
+      )}
+      {apiError && (
+        <ValidationErrors
+          error={apiError.message ?? apiError.error}
+          details={apiError.details}
+        />
+      )}
+      {msg?.kind === "err" && !apiError && (
+        <p className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+          {msg.text}
+        </p>
+      )}
+
+      {loading ? (
+        <div className="flex justify-center py-8">
+          <Loader2 size={20} className="animate-spin text-gray-400" />
+        </div>
+      ) : (
+        <RecruitersSectionForm value={value} onChange={setValue} />
+      )}
+    </div>
+  );
+}
 
 export default function RecruitersPage() {
   const [recruiters, setRecruiters] = useState<Recruiter[]>([]);
@@ -120,6 +232,8 @@ export default function RecruitersPage() {
             </button>
           </div>
         </div>
+
+        <RecruitersSectionPanel />
 
         <div className="admin-card overflow-hidden p-0">
           {loading ? (

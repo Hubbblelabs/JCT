@@ -23,6 +23,9 @@ import {
   ADMISSIONS_LIMITS,
   WHY_CHOOSE_JCT_LIMITS,
   HOME_ADMISSIONS_LIMITS,
+  HOME_STATISTICS_LIMITS,
+  ACCREDITATIONS_LIMITS,
+  RECRUITERS_SECTION_LIMITS,
   HEADER_LIMITS,
   FOOTER_LIMITS,
 } from "@/lib/validation";
@@ -191,6 +194,117 @@ function CtaList({
   );
 }
 
+/* ─── Carousel speed ─── */
+
+function IntervalInput({
+  value,
+  onChange,
+  min,
+  max,
+}: {
+  value: number | undefined;
+  onChange: (v: number) => void;
+  min: number;
+  max: number;
+}) {
+  return (
+    <TextInput
+      label="Carousel Speed (ms)"
+      type="number"
+      min={min}
+      max={max}
+      value={value ?? 6000}
+      onChange={(e) => onChange(Number(e.target.value) || 6000)}
+      hint={`How long each background image stays before the carousel rotates. Between ${min}ms and ${max}ms.`}
+    />
+  );
+}
+
+/* ─── Accreditations editor (logo + name + description) ─── */
+
+export type AccreditationItem = {
+  name: string;
+  logo: string;
+  description?: string;
+};
+
+function AccreditationList({
+  value,
+  onChange,
+  max,
+}: {
+  value: AccreditationItem[];
+  onChange: (next: AccreditationItem[]) => void;
+  max: number;
+}) {
+  const safe = Array.isArray(value) ? value : [];
+  const atMax = safe.length >= max;
+  return (
+    <div className="space-y-3">
+      {safe.map((item, i) => (
+        <div key={i} className="rounded-lg border border-gray-200 p-3">
+          <ImageUploadInput
+            label="Logo"
+            value={item.logo}
+            onChange={(url) =>
+              onChange(safe.map((a, j) => (j === i ? { ...a, logo: url } : a)))
+            }
+            uploadOnly
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <TextInput
+              label="Name"
+              value={item.name}
+              maxLength={ACCREDITATIONS_LIMITS.nameMax}
+              placeholder="e.g. NAAC Accredited"
+              onChange={(e) =>
+                onChange(
+                  safe.map((a, j) =>
+                    j === i ? { ...a, name: e.target.value } : a,
+                  ),
+                )
+              }
+            />
+            <TextInput
+              label="Description"
+              value={item.description ?? ""}
+              maxLength={ACCREDITATIONS_LIMITS.descriptionMax}
+              placeholder="Short note shown under the name"
+              onChange={(e) =>
+                onChange(
+                  safe.map((a, j) =>
+                    j === i ? { ...a, description: e.target.value } : a,
+                  ),
+                )
+              }
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => onChange(safe.filter((_, j) => j !== i))}
+            className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+          >
+            <Trash2 size={13} /> Remove
+          </button>
+        </div>
+      ))}
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() =>
+            onChange([...safe, { name: "", logo: "", description: "" }])
+          }
+          disabled={atMax}
+          className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Plus size={14} /> Add Accreditation
+        </button>
+        <LimitHint count={safe.length} max={max} />
+      </div>
+    </div>
+  );
+}
+
 /* ─── Hero forms ─── */
 
 export type EngHeroVal = {
@@ -201,6 +315,9 @@ export type EngHeroVal = {
   badgeText?: string;
   counsellingLabel?: string;
   counsellingCode?: string;
+  accreditations?: AccreditationItem[];
+  accreditationsCaption?: string;
+  intervalMs?: number;
 };
 
 export function EngineeringHeroForm({
@@ -261,9 +378,40 @@ export function EngineeringHeroForm({
         onChange={(e) => onChange({ ...value, counsellingCode: e.target.value })}
         hint="e.g. 2724"
       />
+      <IntervalInput
+        value={value.intervalMs}
+        min={ENG_HERO_LIMITS.minIntervalMs}
+        max={ENG_HERO_LIMITS.maxIntervalMs}
+        onChange={(intervalMs) => onChange({ ...value, intervalMs })}
+      />
+      <Field
+        label="Accreditation Logos"
+        hint={`Logos shown in the hero accreditation strip (up to ${ENG_HERO_LIMITS.accreditationsMax}).`}
+      >
+        <AccreditationList
+          value={value.accreditations ?? []}
+          max={ENG_HERO_LIMITS.accreditationsMax}
+          onChange={(next) => onChange({ ...value, accreditations: next })}
+        />
+      </Field>
+      <TextInput
+        label="Accreditation Caption"
+        value={value.accreditationsCaption ?? ""}
+        maxLength={ENG_HERO_LIMITS.accreditationCaptionMax}
+        onChange={(e) =>
+          onChange({ ...value, accreditationsCaption: e.target.value })
+        }
+        hint='Text shown next to the logos, e.g. "Top accreditations & approvals"'
+      />
     </div>
   );
 }
+
+export type ArtsHeroSubsection = {
+  icon: string;
+  title: string;
+  description: string;
+};
 
 export type ArtsHeroVal = {
   backgroundImages?: string[];
@@ -272,7 +420,92 @@ export type ArtsHeroVal = {
   titleLine2?: string;
   subtitle?: string;
   ctas?: Cta[];
+  subsections?: ArtsHeroSubsection[];
+  stats?: HeroStat[];
+  intervalMs?: number;
 };
+
+function ArtsSubsectionList({
+  value,
+  onChange,
+  max,
+}: {
+  value: ArtsHeroSubsection[];
+  onChange: (next: ArtsHeroSubsection[]) => void;
+  max: number;
+}) {
+  const safe = Array.isArray(value) ? value : [];
+  const atMax = safe.length >= max;
+  return (
+    <div className="space-y-3">
+      {safe.map((item, i) => (
+        <div key={i} className="rounded-lg border border-gray-200 p-3">
+          <div className="grid grid-cols-2 gap-3">
+            <TextInput
+              label="Icon"
+              value={item.icon}
+              maxLength={ARTS_HERO_LIMITS.subsectionIconMax}
+              placeholder="Award"
+              onChange={(e) =>
+                onChange(
+                  safe.map((s, j) =>
+                    j === i ? { ...s, icon: e.target.value } : s,
+                  ),
+                )
+              }
+            />
+            <TextInput
+              label="Title"
+              value={item.title}
+              maxLength={ARTS_HERO_LIMITS.subsectionTitleMax}
+              placeholder="Quality"
+              onChange={(e) =>
+                onChange(
+                  safe.map((s, j) =>
+                    j === i ? { ...s, title: e.target.value } : s,
+                  ),
+                )
+              }
+            />
+          </div>
+          <TextArea
+            label="Description"
+            rows={2}
+            value={item.description}
+            maxLength={ARTS_HERO_LIMITS.subsectionDescMax}
+            onChange={(e) =>
+              onChange(
+                safe.map((s, j) =>
+                  j === i ? { ...s, description: e.target.value } : s,
+                ),
+              )
+            }
+          />
+          <button
+            type="button"
+            onClick={() => onChange(safe.filter((_, j) => j !== i))}
+            className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+          >
+            <Trash2 size={13} /> Remove
+          </button>
+        </div>
+      ))}
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() =>
+            onChange([...safe, { icon: "", title: "", description: "" }])
+          }
+          disabled={atMax}
+          className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Plus size={14} /> Add Subsection
+        </button>
+        <LimitHint count={safe.length} max={max} />
+      </div>
+    </div>
+  );
+}
 
 export function ArtsScienceHeroForm({
   value,
@@ -326,6 +559,31 @@ export function ArtsScienceHeroForm({
         value={value.ctas ?? []}
         max={ARTS_HERO_LIMITS.ctas}
         onChange={(next) => onChange({ ...value, ctas: next })}
+      />
+      <Field
+        label="Hero Subsections"
+        hint={`Feature blocks below the hero — Quality, Leadership, Experience (up to ${ARTS_HERO_LIMITS.subsectionsMax}). Icon is a Lucide icon name.`}
+      >
+        <ArtsSubsectionList
+          value={value.subsections ?? []}
+          max={ARTS_HERO_LIMITS.subsectionsMax}
+          onChange={(next) => onChange({ ...value, subsections: next })}
+        />
+      </Field>
+      <Field
+        label="Hero Stat Cards"
+        hint="The numbers shown in the hero stat row."
+      >
+        <HeroStatsForm
+          value={value.stats ?? []}
+          onChange={(next) => onChange({ ...value, stats: next })}
+        />
+      </Field>
+      <IntervalInput
+        value={value.intervalMs}
+        min={ARTS_HERO_LIMITS.minIntervalMs}
+        max={ARTS_HERO_LIMITS.maxIntervalMs}
+        onChange={(intervalMs) => onChange({ ...value, intervalMs })}
       />
     </div>
   );
@@ -862,6 +1120,9 @@ export type AdmissionsVal = {
   ctaLabel?: string;
   ctaHref?: string;
   criteria?: AdmissionsCriterion[];
+  phone?: string;
+  email?: string;
+  address?: string;
 };
 
 export function PolytechnicAdmissionsForm({
@@ -1033,6 +1294,35 @@ export function PolytechnicAdmissionsForm({
               max={LIMITS_polytechnicAdmissions.criteriaMax}
             />
           </div>
+        </div>
+      </Field>
+
+      <Field
+        label="Contact Strip"
+        hint="Phone, email, and address shown below the admission criteria."
+      >
+        <div className="space-y-3">
+          <TextInput
+            label="Phone"
+            value={value.phone ?? ""}
+            maxLength={LIMITS_polytechnicAdmissions.phoneMax}
+            onChange={(e) => onChange({ ...value, phone: e.target.value })}
+            placeholder="+91 93614 88801"
+          />
+          <TextInput
+            label="Email"
+            value={value.email ?? ""}
+            maxLength={LIMITS_polytechnicAdmissions.emailMax}
+            onChange={(e) => onChange({ ...value, email: e.target.value })}
+            placeholder="admissions@jct.ac.in"
+          />
+          <TextInput
+            label="Address"
+            value={value.address ?? ""}
+            maxLength={LIMITS_polytechnicAdmissions.addressMax}
+            onChange={(e) => onChange({ ...value, address: e.target.value })}
+            placeholder="Knowledge Park, Pichanur, Coimbatore - 641105"
+          />
         </div>
       </Field>
     </div>
@@ -1777,11 +2067,7 @@ export function HomeAdmissionsForm({
 /* ─── Global CMS — Header ─── */
 
 export type HeaderVal = {
-  logo?: string;
-  logoText?: string;
   phone?: string;
-  applyLabel?: string;
-  applyUrl?: string;
   studentLoginLabel?: string;
   studentLoginUrl?: string;
   showStudentLogin?: boolean;
@@ -1796,47 +2082,21 @@ export function HeaderForm({
 }) {
   return (
     <div className="space-y-4">
-      <ImageUploadInput
-        label="Logo"
-        value={value.logo ?? ""}
-        onChange={(url) => onChange({ ...value, logo: url })}
-        uploadOnly
-      />
-      <TextInput
-        label="Logo Text"
-        value={value.logoText ?? ""}
-        maxLength={HEADER_LIMITS.logoTextMax}
-        onChange={(e) => onChange({ ...value, logoText: e.target.value })}
-        hint="Text displayed next to the logo"
-      />
       <TextInput
         label="Phone Number"
         value={value.phone ?? ""}
         maxLength={HEADER_LIMITS.phoneMax}
         onChange={(e) => onChange({ ...value, phone: e.target.value })}
         placeholder="+91 93614 88801"
+        hint="Shown in the public site header."
       />
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Apply Button Label"
-          value={value.applyLabel ?? ""}
-          maxLength={HEADER_LIMITS.ctaLabelMax}
-          onChange={(e) => onChange({ ...value, applyLabel: e.target.value })}
-          placeholder="Apply Now"
-        />
-        <TextInput
-          label="Apply Button URL"
-          value={value.applyUrl ?? ""}
-          maxLength={500}
-          onChange={(e) => onChange({ ...value, applyUrl: e.target.value })}
-          placeholder="https://admissions.jct.ac.in"
-        />
-      </div>
       <label className="flex items-center gap-2 text-sm">
         <input
           type="checkbox"
           checked={value.showStudentLogin !== false}
-          onChange={(e) => onChange({ ...value, showStudentLogin: e.target.checked })}
+          onChange={(e) =>
+            onChange({ ...value, showStudentLogin: e.target.checked })
+          }
         />
         Show Student Login button
       </label>
@@ -1846,14 +2106,18 @@ export function HeaderForm({
             label="Student Login Label"
             value={value.studentLoginLabel ?? ""}
             maxLength={HEADER_LIMITS.ctaLabelMax}
-            onChange={(e) => onChange({ ...value, studentLoginLabel: e.target.value })}
+            onChange={(e) =>
+              onChange({ ...value, studentLoginLabel: e.target.value })
+            }
             placeholder="Student Login"
           />
           <TextInput
             label="Student Login URL"
             value={value.studentLoginUrl ?? ""}
             maxLength={500}
-            onChange={(e) => onChange({ ...value, studentLoginUrl: e.target.value })}
+            onChange={(e) =>
+              onChange({ ...value, studentLoginUrl: e.target.value })
+            }
             placeholder="https://..."
           />
         </div>
@@ -1864,23 +2128,17 @@ export function HeaderForm({
 
 /* ─── Global CMS — Footer ─── */
 
-export type FooterLegalLink = { name: string; href: string };
 export type FooterVal = {
-  orgName?: string;
-  description?: string;
   helplineLabel?: string;
   phone?: string;
-  email?: string;
   admissionsEmail?: string;
+  email?: string;
   addressLines?: string[];
-  mapEmbedUrl?: string;
   facebook?: string;
   instagram?: string;
   twitter?: string;
   linkedin?: string;
   youtube?: string;
-  legalLinks?: FooterLegalLink[];
-  copyright?: string;
 };
 
 export function FooterForm({
@@ -1890,101 +2148,109 @@ export function FooterForm({
   value: FooterVal;
   onChange: (v: FooterVal) => void;
 }) {
-  const addressLines = Array.isArray(value.addressLines) ? value.addressLines : [];
-  const legalLinks = Array.isArray(value.legalLinks) ? value.legalLinks : [];
+  const addressLines = Array.isArray(value.addressLines)
+    ? value.addressLines
+    : [];
   const addressAtMax = addressLines.length >= FOOTER_LIMITS.addressLinesMax;
-  const legalAtMax = legalLinks.length >= FOOTER_LIMITS.legalLinksMax;
 
   return (
     <div className="space-y-5">
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Organisation Name"
-          value={value.orgName ?? ""}
-          maxLength={FOOTER_LIMITS.orgNameMax}
-          onChange={(e) => onChange({ ...value, orgName: e.target.value })}
-        />
-        <TextInput
-          label="Helpline Label"
-          value={value.helplineLabel ?? ""}
-          maxLength={FOOTER_LIMITS.labelMax}
-          onChange={(e) => onChange({ ...value, helplineLabel: e.target.value })}
-          placeholder="Helpline"
-        />
-      </div>
-      <TextArea
-        label="Description"
-        rows={3}
-        value={value.description ?? ""}
-        maxLength={FOOTER_LIMITS.descriptionMax}
-        onChange={(e) => onChange({ ...value, description: e.target.value })}
-      />
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Phone"
-          value={value.phone ?? ""}
-          maxLength={FOOTER_LIMITS.phoneMax}
-          onChange={(e) => onChange({ ...value, phone: e.target.value })}
-        />
-        <TextInput
-          label="General Email"
-          value={value.email ?? ""}
-          maxLength={FOOTER_LIMITS.emailMax}
-          onChange={(e) => onChange({ ...value, email: e.target.value })}
-        />
-      </div>
-      <TextInput
-        label="Admissions Email"
-        value={value.admissionsEmail ?? ""}
-        maxLength={FOOTER_LIMITS.emailMax}
-        onChange={(e) => onChange({ ...value, admissionsEmail: e.target.value })}
-      />
-
-      <Field label="Address Lines" hint={`Up to ${FOOTER_LIMITS.addressLinesMax} lines.`}>
-        <div className="space-y-2">
-          {addressLines.map((line, i) => (
-            <div key={i} className="flex gap-2">
-              <input
-                className="admin-input"
-                value={line}
-                maxLength={FOOTER_LIMITS.addressLineMax}
-                onChange={(e) =>
-                  onChange({
-                    ...value,
-                    addressLines: addressLines.map((l, j) => (j === i ? e.target.value : l)),
-                  })
-                }
-              />
-              <button
-                type="button"
-                onClick={() =>
-                  onChange({ ...value, addressLines: addressLines.filter((_, j) => j !== i) })
-                }
-                className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
-              >
-                <Trash2 size={13} />
-              </button>
-            </div>
-          ))}
-          <button
-            type="button"
-            onClick={() => onChange({ ...value, addressLines: [...addressLines, ""] })}
-            disabled={addressAtMax}
-            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Plus size={14} /> Add Line
-          </button>
+      <Field
+        label="Admissions Helpline Box"
+        hint="The highlighted contact card shown in the footer."
+      >
+        <div className="space-y-3">
+          <TextInput
+            label="Helpline Label"
+            value={value.helplineLabel ?? ""}
+            maxLength={FOOTER_LIMITS.labelMax}
+            onChange={(e) =>
+              onChange({ ...value, helplineLabel: e.target.value })
+            }
+            placeholder="Admissions Helpline"
+          />
+          <TextInput
+            label="Phone"
+            value={value.phone ?? ""}
+            maxLength={FOOTER_LIMITS.phoneMax}
+            onChange={(e) => onChange({ ...value, phone: e.target.value })}
+            placeholder="+91 93614 88801"
+          />
+          <TextInput
+            label="Admissions Email"
+            value={value.admissionsEmail ?? ""}
+            maxLength={FOOTER_LIMITS.emailMax}
+            onChange={(e) =>
+              onChange({ ...value, admissionsEmail: e.target.value })
+            }
+            placeholder="admissions@jct.ac.in"
+          />
         </div>
       </Field>
 
-      <TextArea
-        label="Map Embed URL"
-        rows={2}
-        value={value.mapEmbedUrl ?? ""}
-        maxLength={FOOTER_LIMITS.mapEmbedMax}
-        onChange={(e) => onChange({ ...value, mapEmbedUrl: e.target.value })}
-        hint="Google Maps embed src URL"
-      />
+      <Field
+        label="Contact Us Column"
+        hint="Email and address shown in the footer's Contact Us column. The helpline phone above is reused here."
+      >
+        <div className="space-y-3">
+          <TextInput
+            label="General Email"
+            value={value.email ?? ""}
+            maxLength={FOOTER_LIMITS.emailMax}
+            onChange={(e) => onChange({ ...value, email: e.target.value })}
+            placeholder="info@jct.ac.in"
+          />
+          <Field
+            label="Address Lines"
+            hint={`Up to ${FOOTER_LIMITS.addressLinesMax} lines.`}
+          >
+            <div className="space-y-2">
+              {addressLines.map((line, i) => (
+                <div key={i} className="flex gap-2">
+                  <input
+                    className="admin-input"
+                    value={line}
+                    maxLength={FOOTER_LIMITS.addressLineMax}
+                    onChange={(e) =>
+                      onChange({
+                        ...value,
+                        addressLines: addressLines.map((l, j) =>
+                          j === i ? e.target.value : l,
+                        ),
+                      })
+                    }
+                  />
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onChange({
+                        ...value,
+                        addressLines: addressLines.filter((_, j) => j !== i),
+                      })
+                    }
+                    className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() =>
+                  onChange({
+                    ...value,
+                    addressLines: [...addressLines, ""],
+                  })
+                }
+                disabled={addressAtMax}
+                className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Plus size={14} /> Add Line
+              </button>
+            </div>
+          </Field>
+        </div>
+      </Field>
 
       <Field label="Social Links">
         <div className="space-y-2">
@@ -2008,70 +2274,251 @@ export function FooterForm({
           ))}
         </div>
       </Field>
+    </div>
+  );
+}
 
-      <Field label="Legal Links" hint={`Up to ${FOOTER_LIMITS.legalLinksMax} links.`}>
-        <div className="space-y-2">
-          {legalLinks.map((link, i) => (
-            <div key={i} className="grid grid-cols-2 gap-2">
-              <TextInput
-                label="Name"
-                value={link.name}
-                maxLength={FOOTER_LIMITS.legalNameMax}
-                onChange={(e) =>
-                  onChange({
-                    ...value,
-                    legalLinks: legalLinks.map((l, j) =>
-                      j === i ? { ...l, name: e.target.value } : l,
-                    ),
-                  })
-                }
-              />
-              <div className="flex gap-2">
+/* ─── Accreditations (home landing page) ─── */
+
+export function AccreditationsForm({
+  value,
+  onChange,
+}: {
+  value: AccreditationItem[];
+  onChange: (v: AccreditationItem[]) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-gray-400">
+        Accreditation logos and titles shown in the hero of the main landing
+        page.
+      </p>
+      <AccreditationList
+        value={Array.isArray(value) ? value : []}
+        max={ACCREDITATIONS_LIMITS.itemsMax}
+        onChange={onChange}
+      />
+    </div>
+  );
+}
+
+/* ─── Home Statistics (hero stat row) ─── */
+
+export type HomeStatisticItem = { icon: string; label: string };
+
+export function StatisticsForm({
+  value,
+  onChange,
+}: {
+  value: HomeStatisticItem[];
+  onChange: (v: HomeStatisticItem[]) => void;
+}) {
+  const safe = Array.isArray(value) ? value : [];
+  const atMax = safe.length >= HOME_STATISTICS_LIMITS.itemsMax;
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-gray-400">
+        The row of badges shown directly beneath the home hero. Icon is one of:
+        laurel, users, cap, badge, growth.
+      </p>
+      {safe.map((item, i) => (
+        <div key={i} className="rounded-lg border border-gray-200 p-3">
+          <div className="grid grid-cols-2 gap-3">
+            <TextInput
+              label="Icon"
+              value={item.icon}
+              maxLength={HOME_STATISTICS_LIMITS.iconMax}
+              placeholder="laurel"
+              onChange={(e) =>
+                onChange(
+                  safe.map((s, j) =>
+                    j === i ? { ...s, icon: e.target.value } : s,
+                  ),
+                )
+              }
+            />
+            <TextInput
+              label="Label"
+              value={item.label}
+              maxLength={HOME_STATISTICS_LIMITS.labelMax}
+              placeholder="NAAC Accredited"
+              onChange={(e) =>
+                onChange(
+                  safe.map((s, j) =>
+                    j === i ? { ...s, label: e.target.value } : s,
+                  ),
+                )
+              }
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => onChange(safe.filter((_, j) => j !== i))}
+            className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+          >
+            <Trash2 size={13} /> Remove
+          </button>
+        </div>
+      ))}
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() => onChange([...safe, { icon: "laurel", label: "" }])}
+          disabled={atMax}
+          className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Plus size={14} /> Add Statistic
+        </button>
+        <LimitHint count={safe.length} max={HOME_STATISTICS_LIMITS.itemsMax} />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Recruiters / Placement Highlights section ─── */
+
+export type RecruitersSectionStat = {
+  icon: string;
+  value: string;
+  label: string;
+};
+export type RecruitersSectionVal = {
+  eyebrow?: string;
+  title?: string;
+  titleHighlight?: string;
+  description?: string;
+  stats?: RecruitersSectionStat[];
+};
+
+export function RecruitersSectionForm({
+  value,
+  onChange,
+}: {
+  value: RecruitersSectionVal;
+  onChange: (v: RecruitersSectionVal) => void;
+}) {
+  const stats = Array.isArray(value.stats) ? value.stats : [];
+  const atMax = stats.length >= RECRUITERS_SECTION_LIMITS.statsMax;
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="Eyebrow"
+          value={value.eyebrow ?? ""}
+          maxLength={RECRUITERS_SECTION_LIMITS.eyebrowMax}
+          onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
+          placeholder="Placement Highlights"
+        />
+        <TextInput
+          label="Title Highlight"
+          value={value.titleHighlight ?? ""}
+          maxLength={RECRUITERS_SECTION_LIMITS.titleHighlightMax}
+          onChange={(e) =>
+            onChange({ ...value, titleHighlight: e.target.value })
+          }
+          hint="Rendered in italic accent within the title"
+        />
+      </div>
+      <TextInput
+        label="Title"
+        value={value.title ?? ""}
+        maxLength={RECRUITERS_SECTION_LIMITS.titleMax}
+        onChange={(e) => onChange({ ...value, title: e.target.value })}
+        placeholder="Our Recruiters"
+      />
+      <TextArea
+        label="Description"
+        rows={2}
+        value={value.description ?? ""}
+        maxLength={RECRUITERS_SECTION_LIMITS.descriptionMax}
+        onChange={(e) => onChange({ ...value, description: e.target.value })}
+      />
+      <Field
+        label="Stat Cards"
+        hint={`Up to ${RECRUITERS_SECTION_LIMITS.statsMax} cards. Icon is one of: trend, award, building, users.`}
+      >
+        <div className="space-y-3">
+          {stats.map((stat, i) => (
+            <div key={i} className="rounded-lg border border-gray-200 p-3">
+              <div className="grid grid-cols-3 gap-3">
                 <TextInput
-                  label="Href"
-                  value={link.href}
-                  maxLength={500}
+                  label="Icon"
+                  value={stat.icon}
+                  maxLength={RECRUITERS_SECTION_LIMITS.statIconMax}
+                  placeholder="trend"
                   onChange={(e) =>
                     onChange({
                       ...value,
-                      legalLinks: legalLinks.map((l, j) =>
-                        j === i ? { ...l, href: e.target.value } : l,
+                      stats: stats.map((s, j) =>
+                        j === i ? { ...s, icon: e.target.value } : s,
                       ),
                     })
                   }
                 />
-                <button
-                  type="button"
-                  onClick={() =>
-                    onChange({ ...value, legalLinks: legalLinks.filter((_, j) => j !== i) })
+                <TextInput
+                  label="Value"
+                  value={stat.value}
+                  maxLength={RECRUITERS_SECTION_LIMITS.statValueMax}
+                  placeholder="98%"
+                  onChange={(e) =>
+                    onChange({
+                      ...value,
+                      stats: stats.map((s, j) =>
+                        j === i ? { ...s, value: e.target.value } : s,
+                      ),
+                    })
                   }
-                  className="admin-btn admin-btn-danger admin-btn-sm mt-5 shrink-0"
-                >
-                  <Trash2 size={13} />
-                </button>
+                />
+                <TextInput
+                  label="Label"
+                  value={stat.label}
+                  maxLength={RECRUITERS_SECTION_LIMITS.statLabelMax}
+                  placeholder="Placement Rate"
+                  onChange={(e) =>
+                    onChange({
+                      ...value,
+                      stats: stats.map((s, j) =>
+                        j === i ? { ...s, label: e.target.value } : s,
+                      ),
+                    })
+                  }
+                />
               </div>
+              <button
+                type="button"
+                onClick={() =>
+                  onChange({
+                    ...value,
+                    stats: stats.filter((_, j) => j !== i),
+                  })
+                }
+                className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+              >
+                <Trash2 size={13} /> Remove
+              </button>
             </div>
           ))}
-          <button
-            type="button"
-            onClick={() =>
-              onChange({ ...value, legalLinks: [...legalLinks, { name: "", href: "" }] })
-            }
-            disabled={legalAtMax}
-            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Plus size={14} /> Add Legal Link
-          </button>
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() =>
+                onChange({
+                  ...value,
+                  stats: [...stats, { icon: "", value: "", label: "" }],
+                })
+              }
+              disabled={atMax}
+              className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus size={14} /> Add Stat
+            </button>
+            <LimitHint
+              count={stats.length}
+              max={RECRUITERS_SECTION_LIMITS.statsMax}
+            />
+          </div>
         </div>
       </Field>
-
-      <TextInput
-        label="Copyright Text"
-        value={value.copyright ?? ""}
-        maxLength={FOOTER_LIMITS.copyrightMax}
-        onChange={(e) => onChange({ ...value, copyright: e.target.value })}
-        placeholder="JCT Institutions. All rights reserved."
-      />
     </div>
   );
 }

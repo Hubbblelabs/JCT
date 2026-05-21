@@ -6,14 +6,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { Camera, ArrowRight, X } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
-
-const DEFAULT_CATEGORIES = [
-  "All",
-  "Labs",
-  "Sports",
-  "Events",
-  "Clubs",
-] as const;
+import { useSiteConfig } from "@/lib/use-site-config";
 
 type Photo = {
   src: string;
@@ -22,201 +15,63 @@ type Photo = {
   isAll?: boolean;
 };
 
-const DEFAULT_VIDEO_URL =
-  "https://www.youtube.com/embed/RBzA0cneWRA?autoplay=1";
-
-const DEFAULT_PHOTOS: Photo[] = [
-  // --- All / Curated items (The original 5) ---
-  {
-    src: "/assets/lab2.webp",
-    caption: "Advanced Computer Lab",
-    category: "Labs",
-    isAll: true,
-  },
-  {
-    src: "/campus-life-assets/sports3.webp",
-    caption: "Annual Sports Day",
-    category: "Sports",
-    isAll: true,
-  },
-  {
-    src: "/campus-life-assets/sports2.webp",
-    caption: "Inter-College Basketball",
-    category: "Sports",
-    isAll: true,
-  },
-  {
-    src: "/assets/jct-life12.webp",
-    caption: "Robotics Club Workshop",
-    category: "Clubs",
-    isAll: true,
-  },
-  {
-    src: "/assets/campus1.webp",
-    caption: "Campus Green Walkway",
-    category: "Events",
-    isAll: true,
-  },
-
-  // --- Additional Labs ---
-  {
-    src: "/assets/lab1.webp",
-    caption: "Bio-Technology Research",
-    category: "Labs",
-  },
-  {
-    src: "/assets/lab3.webp",
-    caption: "Electrical Engineering Lab",
-    category: "Labs",
-  },
-  {
-    src: "/assets/lab4.webp",
-    caption: "Mechanical Workshop",
-    category: "Labs",
-  },
-  {
-    src: "/assets/lab5.webp",
-    caption: "Petrochemical Lab",
-    category: "Labs",
-  },
-
-  // --- Additional Sports ---
-  {
-    src: "/campus-life-assets/sports4.webp",
-    caption: "Football Championship",
-    category: "Sports",
-  },
-  {
-    src: "/campus-life-assets/sports3.webp",
-    caption: "Cricket Tournament",
-    category: "Sports",
-  },
-  {
-    src: "/campus-life-assets/sports1.webp",
-    caption: "Athletics Meet",
-    category: "Sports",
-  },
-
-  // --- Additional Events ---
-  {
-    src: "/assets/jct-life14.webp",
-    caption: "Cultural Fest Highlights",
-    category: "Events",
-  },
-  {
-    src: "/assets/campus4.webp",
-    caption: "Guest Lecture Series",
-    category: "Events",
-  },
-  {
-    src: "/assets/jct-life1.webp",
-    caption: "Technical Symposium",
-    category: "Events",
-  },
-  {
-    src: "/assets/jct-life9.webp",
-    caption: "Graduation Ceremony",
-    category: "Events",
-  },
-
-  // --- Additional Clubs ---
-  {
-    src: "/assets/jct-life11.webp",
-    caption: "Photography Club Outing",
-    category: "Clubs",
-  },
-  {
-    src: "/assets/jct-life9.webp",
-    caption: "Coding Club Hackathon",
-    category: "Clubs",
-  },
-  {
-    src: "/assets/jct-life10.webp",
-    caption: "Arts & Music Performance",
-    category: "Clubs",
-  },
-  {
-    src: "/assets/jct-life8.webp",
-    caption: "Innovation & Startup Cell",
-    category: "Clubs",
-  },
-];
-
 type LifeAtJctConfig = {
   categories: string[];
   photos: Photo[];
-  videoUrl?: string;
+  videoUrl: string;
 };
 
 function normalizeLifeAtJct(raw: unknown): LifeAtJctConfig | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
-  const categories = Array.isArray(r.categories)
-    ? r.categories.filter(
-        (c): c is string => typeof c === "string" && c.length > 0,
-      )
-    : [];
   const photos: Photo[] = Array.isArray(r.photos)
     ? r.photos
         .map((p): Photo | null => {
           const o = (p ?? {}) as Record<string, unknown>;
           const src = typeof o.src === "string" ? o.src : null;
-          const caption = typeof o.caption === "string" ? o.caption : null;
-          const category = typeof o.category === "string" ? o.category : null;
-          if (!src || !caption || !category) return null;
-          return {
-            src,
-            caption,
-            category,
-            isAll: Boolean(o.isAll),
-          };
+          const caption = typeof o.caption === "string" ? o.caption : "";
+          const category = typeof o.category === "string" ? o.category : "";
+          if (!src) return null;
+          return { src, caption, category, isAll: Boolean(o.isAll) };
         })
         .filter((x): x is Photo => x !== null)
     : [];
   if (photos.length === 0) return null;
+
+  const rawCategories = Array.isArray(r.categories)
+    ? r.categories.filter(
+        (c): c is string => typeof c === "string" && c.length > 0,
+      )
+    : [];
+  const categories =
+    rawCategories.length > 0
+      ? rawCategories
+      : ["All", ...new Set(photos.map((p) => p.category).filter(Boolean))];
+
   return {
-    categories: categories.length > 0 ? categories : [...DEFAULT_CATEGORIES],
+    categories,
     photos,
-    videoUrl:
-      typeof r.videoUrl === "string" && r.videoUrl ? r.videoUrl : undefined,
+    videoUrl: typeof r.videoUrl === "string" ? r.videoUrl.trim() : "",
   };
 }
 
 export function CampusLife() {
-  const [categories, setCategories] = useState<string[]>([
-    ...DEFAULT_CATEGORIES,
-  ]);
-  const [photos, setPhotos] = useState<Photo[]>(DEFAULT_PHOTOS);
-  const [videoUrl, setVideoUrl] = useState<string>(DEFAULT_VIDEO_URL);
+  const { data, loading } = useSiteConfig("lifeAtJct");
+  const config = normalizeLifeAtJct(data);
+
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
 
+  const categories = useMemo(() => config?.categories ?? [], [config]);
+  const photos = useMemo(() => config?.photos ?? [], [config]);
+  const videoUrl = config?.videoUrl ?? "";
+
   useEffect(() => {
-    let cancelled = false;
-    fetch("/api/public/site-config?key=lifeAtJct")
-      .then((r) => r.json())
-      .then((res) => {
-        if (cancelled) return;
-        if (res?.source === "db") {
-          const next = normalizeLifeAtJct(res.data);
-          if (next) {
-            setCategories(next.categories);
-            setPhotos(next.photos);
-            if (next.videoUrl) setVideoUrl(next.videoUrl);
-            setActiveFilter((prev) =>
-              next.categories.includes(prev)
-                ? prev
-                : (next.categories[0] ?? "All"),
-            );
-          }
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    if (categories.length > 0 && !categories.includes(activeFilter)) {
+      setActiveFilter(categories[0]);
+    }
+  }, [categories, activeFilter]);
 
   const filtered = useMemo(
     () =>
@@ -226,13 +81,27 @@ export function CampusLife() {
     [photos, activeFilter],
   );
 
+  if (loading) {
+    return (
+      <section
+        aria-busy="true"
+        id="campus-life"
+        className="section-padding bg-navy"
+      >
+        <div className="container mx-auto h-96 px-4 md:px-6" />
+      </section>
+    );
+  }
+
+  if (!config) return null;
+
   return (
     <section
       id="campus-life"
       className="section-padding bg-navy noise-overlay relative overflow-hidden"
     >
       <AnimatePresence>
-        {isVideoOpen && (
+        {isVideoOpen && videoUrl && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -252,7 +121,7 @@ export function CampusLife() {
                 <X size={24} />
               </button>
               <iframe
-                src={videoUrl}
+                src={`${videoUrl}${videoUrl.includes("?") ? "&" : "?"}autoplay=1`}
                 title="JCT Campus Tour"
                 className="h-full w-full border-none"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -313,7 +182,7 @@ export function CampusLife() {
         >
           {filtered.map((photo, i) => (
             <motion.div
-              key={photo.caption}
+              key={`${photo.caption}-${i}`}
               layout
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -358,12 +227,14 @@ export function CampusLife() {
           viewport={{ once: true }}
           className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row md:mt-14"
         >
-          <button
-            onClick={() => setIsVideoOpen(true)}
-            className="group inline-flex h-12 items-center gap-3 rounded-full border border-white/15 bg-white/5 px-8 font-sans text-sm font-semibold text-white transition-all hover:border-white/30 hover:bg-white/10"
-          >
-            Take a Virtual Campus Tour
-          </button>
+          {videoUrl && (
+            <button
+              onClick={() => setIsVideoOpen(true)}
+              className="group inline-flex h-12 items-center gap-3 rounded-full border border-white/15 bg-white/5 px-8 font-sans text-sm font-semibold text-white transition-all hover:border-white/30 hover:bg-white/10"
+            >
+              Take a Virtual Campus Tour
+            </button>
+          )}
           <Link
             href="/campus-life"
             className="group border-gold/30 bg-gold/10 text-gold hover:border-gold/50 hover:bg-gold/20 inline-flex h-12 items-center gap-3 rounded-full border px-8 font-sans text-sm font-semibold transition-all"

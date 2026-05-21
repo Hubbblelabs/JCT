@@ -10,7 +10,6 @@ import {
 import {
   EngineeringHeroForm,
   ArtsScienceHeroForm,
-  HeroStatsForm,
   PolytechnicHeroForm,
   CampusLifeCarouselForm,
   AnnouncementForm,
@@ -20,7 +19,6 @@ import {
   MetricsForm,
   type EngHeroVal,
   type ArtsHeroVal,
-  type HeroStat,
   type PolyHeroVal,
   type CampusLifeCarouselVal,
   type AnnouncementVal,
@@ -480,16 +478,6 @@ function sectionsFor(college: College): SectionDef[] {
         ),
       },
       {
-        id: "heroStats",
-        label: "Hero Stat Cards",
-        kind: "form",
-        configKey: "artsScienceHeroStats",
-        defaultValue: [] as HeroStat[],
-        render: (v, onChange) => (
-          <HeroStatsForm value={(v as HeroStat[]) ?? []} onChange={onChange} />
-        ),
-      },
-      {
         id: "admissions",
         label: "Admissions",
         kind: "form",
@@ -505,7 +493,7 @@ function sectionsFor(college: College): SectionDef[] {
       },
       {
         id: "campusLife",
-        label: "Campus Life Carousel",
+        label: "Campus Life",
         kind: "form",
         configKey: "artsScienceCampusLife",
         defaultValue: {} as CampusLifeCarouselVal,
@@ -518,9 +506,11 @@ function sectionsFor(college: College): SectionDef[] {
       },
       {
         id: "testimonials",
-        label: "Voices / Testimonials",
-        kind: "link",
-        href: "/admin/testimonials?college=arts-science",
+        label: "Testimonials",
+        kind: "custom",
+        customRender: () => (
+          <CollegeTestimonialsManager institution="arts-science" />
+        ),
       },
     ];
   }
@@ -541,19 +531,6 @@ function sectionsFor(college: College): SectionDef[] {
       ),
     },
     {
-      id: "campusLife",
-      label: "Campus Life Carousel",
-      kind: "form",
-      configKey: "polytechnicCampusLife",
-      defaultValue: {} as CampusLifeCarouselVal,
-      render: (v, onChange) => (
-        <CampusLifeCarouselForm
-          value={(v as CampusLifeCarouselVal) ?? {}}
-          onChange={onChange}
-        />
-      ),
-    },
-    {
       id: "admissions",
       label: "Admissions",
       kind: "form",
@@ -567,10 +544,25 @@ function sectionsFor(college: College): SectionDef[] {
       ),
     },
     {
+      id: "campusLife",
+      label: "Campus Life",
+      kind: "form",
+      configKey: "polytechnicCampusLife",
+      defaultValue: {} as CampusLifeCarouselVal,
+      render: (v, onChange) => (
+        <CampusLifeCarouselForm
+          value={(v as CampusLifeCarouselVal) ?? {}}
+          onChange={onChange}
+        />
+      ),
+    },
+    {
       id: "testimonials",
-      label: "Voices / Testimonials",
-      kind: "link",
-      href: "/admin/testimonials?college=polytechnic",
+      label: "Testimonials",
+      kind: "custom",
+      customRender: () => (
+        <CollegeTestimonialsManager institution="polytechnic" />
+      ),
     },
   ];
 }

@@ -73,3 +73,29 @@ export const HomeAdmissionsSchema = z.object({
 });
 
 export type HomeAdmissionsValue = z.infer<typeof HomeAdmissionsSchema>;
+
+// ── Home Statistics (hero stat row) ──────────────────────────────────────────
+// The row of badges shown directly beneath the home hero
+// (e.g. "NAAC Accredited", "100+ Recruiters", "10,000+ Students").
+export const HOME_STATISTICS_LIMITS = {
+  itemsMax: 8,
+  iconMax: 40,
+  labelMax: 60,
+} as const;
+
+export const HomeStatisticsSchema = z
+  .array(
+    z.object({
+      icon: zClampedString(0, HOME_STATISTICS_LIMITS.iconMax, "Icon").default(
+        "",
+      ),
+      label: zClampedString(
+        0,
+        HOME_STATISTICS_LIMITS.labelMax,
+        "Label",
+      ).default(""),
+    }),
+  )
+  .max(HOME_STATISTICS_LIMITS.itemsMax);
+
+export type HomeStatisticsValue = z.infer<typeof HomeStatisticsSchema>;

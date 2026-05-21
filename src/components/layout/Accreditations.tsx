@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { getImageUrl } from "@/lib/utils";
+import { useSiteConfig } from "@/lib/use-site-config";
 
 type AccreditationsProps = {
   variant?: "default" | "hero";
@@ -14,49 +15,6 @@ type AccreditationLogo = {
   name: string;
   note: string;
 };
-
-const FALLBACK_LOGOS: AccreditationLogo[] = [
-  {
-    src: "/accreditations/naac.webp",
-    name: "NAAC Accredited",
-    note: "Quality benchmark in higher education",
-  },
-  {
-    src: "/accreditations/nba.webp",
-    name: "NBA Accredited",
-    note: "Outcome-based program excellence",
-  },
-  {
-    src: "/accreditations/iso.webp",
-    name: "ISO 9001:2015",
-    note: "Certified process quality systems",
-  },
-  {
-    src: "/accreditations/ugc.webp",
-    name: "UGC Recognized",
-    note: "Nationally recognized institution",
-  },
-  {
-    src: "/accreditations/aicte.webp",
-    name: "AICTE Approved",
-    note: "Technical education regulatory approval",
-  },
-  {
-    src: "/accreditations/anna.webp",
-    name: "Anna University",
-    note: "Affiliated academic framework",
-  },
-  {
-    src: "/accreditations/dote.webp",
-    name: "DOTE Approved",
-    note: "State diploma education compliance",
-  },
-  {
-    src: "/accreditations/bharathiar_university.webp",
-    name: "Bharathiar University",
-    note: "Affiliated arts and science programs",
-  },
-];
 
 const VISIBLE_OFFSETS = [-2, -1, 0, 1, 2] as const;
 
@@ -87,26 +45,10 @@ function normalizeFromDb(raw: unknown): AccreditationLogo[] {
 
 export function Accreditations({ variant = "default" }: AccreditationsProps) {
   const isHero = variant === "hero";
-  const [logos, setLogos] = useState<AccreditationLogo[]>(FALLBACK_LOGOS);
+  const { data } = useSiteConfig("accreditations");
+  const logos = normalizeFromDb(data);
   const [activeIndex, setActiveIndex] = useState(0);
   const [offsetBase, setOffsetBase] = useState(92);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/public/site-config?key=accreditations")
-      .then((r) => r.json())
-      .then((res) => {
-        if (cancelled) return;
-        if (res?.source === "db") {
-          const next = normalizeFromDb(res.data);
-          if (next.length > 0) setLogos(next);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useEffect(() => {
     const handleResize = () => setOffsetBase(window.innerWidth < 640 ? 64 : 92);

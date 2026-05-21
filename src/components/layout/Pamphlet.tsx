@@ -6,19 +6,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
 import { getImageUrl } from "@/lib/utils";
-
-const DEFAULT_IMAGES = [
-  "/pamphlets/jct-pamphlet.webp",
-  "/pamphlets/engineering-pamphlet.webp",
-];
-
-const DEFAULT_VIDEO_URL = "https://www.youtube.com/embed/RBzA0cneWRA";
+import { useSiteConfig } from "@/lib/use-site-config";
 
 type PamphletConfig = {
   enabled: boolean;
   images: string[];
-  delayMs?: number;
-  videoUrl?: string;
+  delayMs: number;
+  videoUrl: string;
 };
 
 function normalizePamphlet(raw: unknown): PamphletConfig | null {
@@ -30,68 +24,42 @@ function normalizePamphlet(raw: unknown): PamphletConfig | null {
   return {
     enabled: r.enabled !== false,
     images,
-    delayMs: typeof r.delayMs === "number" ? r.delayMs : undefined,
+    delayMs: typeof r.delayMs === "number" ? r.delayMs : 2000,
     videoUrl:
       typeof r.videoUrl === "string" && r.videoUrl.trim()
         ? r.videoUrl.trim()
-        : undefined,
+        : "",
   };
 }
 
 export function Pamphlet() {
+  const { data } = useSiteConfig("homePamphlet");
+  const config = normalizePamphlet(data);
+
   const [isOpen, setIsOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
-  const [enabled, setEnabled] = useState(true);
-  const [images, setImages] = useState<string[]>(DEFAULT_IMAGES);
-  const [delayMs, setDelayMs] = useState(2000);
-  const [videoUrl, setVideoUrl] = useState(DEFAULT_VIDEO_URL);
-  const [configLoaded, setConfigLoaded] = useState(false);
+
+  const enabled = config?.enabled ?? false;
+  const images = config?.images ?? [];
+  const delayMs = config?.delayMs ?? 2000;
+  const videoUrl = config?.videoUrl ?? "";
 
   useEffect(() => {
-    let cancelled = false;
-    fetch("/api/public/site-config?key=homePamphlet")
-      .then((r) => r.json())
-      .then((res) => {
-        if (cancelled) return;
-        if (res?.source === "db") {
-          const next = normalizePamphlet(res.data);
-          if (next) {
-            setEnabled(next.enabled);
-            if (next.images.length > 0) setImages(next.images);
-            if (typeof next.delayMs === "number") setDelayMs(next.delayMs);
-            if (next.videoUrl) setVideoUrl(next.videoUrl);
-          }
-        }
-        setConfigLoaded(true);
-      })
-      .catch(() => {
-        setConfigLoaded(true);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!configLoaded || !enabled || images.length === 0) return;
-    const timer = setTimeout(() => {
-      setIsOpen(true);
-    }, delayMs);
+    if (!enabled || images.length === 0) return;
+    const timer = setTimeout(() => setIsOpen(true), delayMs);
     return () => clearTimeout(timer);
-  }, [configLoaded, enabled, images.length, delayMs]);
+  }, [enabled, images.length, delayMs]);
 
-  const handleClose = () => {
-    setIsOpen(false);
-  };
+  const handleClose = () => setIsOpen(false);
 
-  const [leftImage, rightImage] = [
-    images[0] ?? DEFAULT_IMAGES[0],
-    images[1] ?? images[0] ?? DEFAULT_IMAGES[1],
-  ];
+  if (!enabled || images.length === 0) return null;
+
+  const leftImage = images[0];
+  const rightImage = images[1] ?? images[0];
 
   return (
     <AnimatePresence>
-      {isOpen && enabled && (
+      {isOpen && (
         <div className="fixed inset-0 z-[999999] flex items-center justify-center px-4 sm:px-6">
           <motion.div
             initial={{ opacity: 0 }}
@@ -138,12 +106,14 @@ export function Pamphlet() {
               </div>
 
               <div className="absolute right-6 bottom-4 z-50 flex flex-wrap items-center justify-end gap-3 md:right-8 md:bottom-6">
-                <button
-                  onClick={() => setIsVideoOpen(true)}
-                  className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:px-10"
-                >
-                  <Play size={20} className="fill-current" /> Virtual Tour
-                </button>
+                {videoUrl && (
+                  <button
+                    onClick={() => setIsVideoOpen(true)}
+                    className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:px-10"
+                  >
+                    <Play size={20} className="fill-current" /> Virtual Tour
+                  </button>
+                )}
                 <Link
                   href="https://admissions.jct.ac.in"
                   target="_blank"
@@ -161,7 +131,7 @@ export function Pamphlet() {
             </div>
 
             <AnimatePresence>
-              {isVideoOpen && (
+              {isVideoOpen && videoUrl && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}

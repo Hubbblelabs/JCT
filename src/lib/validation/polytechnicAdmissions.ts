@@ -2,7 +2,8 @@ import { z } from "zod";
 import { zUrl, zClampedString, zOptionalString } from "./_primitives";
 
 // The polytechnic Admissions section always renders exactly 3 criteria
-// blocks (grid-cols-3). We allow 0 (empty draft) or up to 3.
+// blocks (grid-cols-3). We allow 0 (empty draft) or up to 3. A contact
+// strip (phone / email / address) renders below the criteria.
 export const LIMITS = {
   criteriaMax: 3,
   blockTitleMax: 80,
@@ -12,6 +13,9 @@ export const LIMITS = {
   titleMax: 120,
   descriptionMax: 320,
   ctaLabelMax: 40,
+  phoneMax: 40,
+  emailMax: 200,
+  addressMax: 200,
 } as const;
 
 const CriterionSchema = z.object({
@@ -33,6 +37,9 @@ export const PolytechnicAdmissionsSchema = z.object({
     .max(LIMITS.criteriaMax)
     .optional()
     .default([]),
+  phone: zOptionalString(LIMITS.phoneMax).default(""),
+  email: zOptionalString(LIMITS.emailMax).default(""),
+  address: zOptionalString(LIMITS.addressMax).default(""),
 });
 
 export type PolytechnicAdmissionsValue = z.infer<

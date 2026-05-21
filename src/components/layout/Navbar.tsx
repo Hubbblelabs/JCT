@@ -6,8 +6,8 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Menu, X, ChevronDown, Phone, ArrowRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { siteConfig } from "@/data/site";
 import { useInstitution } from "@/contexts/InstitutionContext";
+import { useSiteConfig } from "@/lib/use-site-config";
 import {
   mainNavigation,
   engineeringNavigation,
@@ -21,9 +21,17 @@ type NavbarProps = {
   forceSolidOnTop?: boolean;
 };
 
+type HeaderConfig = {
+  phone?: string;
+  studentLoginLabel?: string;
+  studentLoginUrl?: string;
+  showStudentLogin?: boolean;
+};
+
 export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const pathname = usePathname();
   const { institution } = useInstitution();
+  const { data: header } = useSiteConfig<HeaderConfig>("header");
 
   const isEngineeringPage = institution === "engineering";
   const [isOpen, setIsOpen] = useState(false);
@@ -427,16 +435,21 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
           </div>
 
           <div className="z-50 hidden shrink-0 items-center justify-end gap-2 whitespace-nowrap xl:flex xl:flex-1 xl:gap-3 2xl:gap-6">
-            <a
-              href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-              className="flex max-w-[180px] items-center gap-1 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white min-[1400px]:max-w-none xl:gap-1.5 xl:text-[14px] 2xl:text-[15px]"
-            >
-              <Phone size={16} className="h-3.5 w-3.5 shrink-0 xl:h-4 xl:w-4" />
-              <span className="truncate">{siteConfig.contact.phone}</span>
-            </a>
-            {institution === "main" && (
+            {header?.phone && (
+              <a
+                href={`tel:${header.phone.replace(/\s/g, "")}`}
+                className="flex max-w-[180px] items-center gap-1 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white min-[1400px]:max-w-none xl:gap-1.5 xl:text-[14px] 2xl:text-[15px]"
+              >
+                <Phone
+                  size={16}
+                  className="h-3.5 w-3.5 shrink-0 xl:h-4 xl:w-4"
+                />
+                <span className="truncate">{header.phone}</span>
+              </a>
+            )}
+            {header?.showStudentLogin !== false && header?.studentLoginUrl && (
               <Link
-                href="http://erp.jct.ac.in/impres/students/default.aspx"
+                href={header.studentLoginUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`inline-flex h-9 items-center justify-center rounded-full px-4 font-sans text-sm font-medium transition-all hover:scale-105 active:scale-95 xl:h-10 xl:px-5 xl:text-[14px] 2xl:text-[15px] ${
@@ -445,7 +458,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                     : "bg-white/20 text-white backdrop-blur-sm hover:bg-white/30"
                 }`}
               >
-                Student Login
+                {header.studentLoginLabel || "Student Login"}
               </Link>
             )}
           </div>
@@ -596,21 +609,27 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               </div>
 
               <div className="space-y-3 border-t border-white/5 p-5 pt-2">
-                <a
-                  href={`tel:${siteConfig.contact.phone.replace(/\s/g, "")}`}
-                  className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-white/5 font-sans text-sm font-medium text-white transition-all hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98]"
-                >
-                  <Phone size={16} /> {siteConfig.contact.phone}
-                </a>
-                <Link
-                  href="https://admissions.jct.ac.in"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setIsOpen(false)}
-                  className={`flex h-12 w-full items-center justify-center gap-2 rounded-2xl ${highlightBgColor} font-sans text-sm font-bold text-[#0a1628] shadow-lg ${highlightShadowColor} transition-all hover:scale-[1.02] ${highlightHoverBgColor} active:scale-[0.98]`}
-                >
-                  Apply Now <ArrowRight size={14} />
-                </Link>
+                {header?.phone && (
+                  <a
+                    href={`tel:${header.phone.replace(/\s/g, "")}`}
+                    className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-white/5 font-sans text-sm font-medium text-white transition-all hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98]"
+                  >
+                    <Phone size={16} /> {header.phone}
+                  </a>
+                )}
+                {header?.showStudentLogin !== false &&
+                  header?.studentLoginUrl && (
+                    <Link
+                      href={header.studentLoginUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setIsOpen(false)}
+                      className={`flex h-12 w-full items-center justify-center gap-2 rounded-2xl ${highlightBgColor} font-sans text-sm font-bold text-[#0a1628] shadow-lg ${highlightShadowColor} transition-all hover:scale-[1.02] ${highlightHoverBgColor} active:scale-[0.98]`}
+                    >
+                      {header.studentLoginLabel || "Student Login"}{" "}
+                      <ArrowRight size={14} />
+                    </Link>
+                  )}
               </div>
             </motion.div>
           </>
