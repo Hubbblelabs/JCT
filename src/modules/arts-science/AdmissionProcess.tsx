@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, CheckCircle2, ArrowRight } from "lucide-react";
-import { admissionsCriteria as fallbackCriteria } from "@/data/arts-science";
+import { useSiteConfig } from "@/lib/use-site-config";
 import React from "react";
 
 type Criterion = { title: string; items: string[] };
@@ -20,32 +19,9 @@ type AdmissionsConfig = {
   address: string;
 };
 
-const DEFAULTS: AdmissionsConfig = {
-  eyebrow: "Admissions",
-  title: "Admission Process",
-  description:
-    "Start your academic journey with a simple and transparent admission procedure aligned with university standards.",
-  ctaLabel: "Apply Now",
-  ctaHref: "https://admissions.jct.ac.in",
-  criteria: fallbackCriteria as Criterion[],
-  phone: "+91 93614 88801",
-  email: "admissions@jct.ac.in",
-  address: "Knowledge Park, Pichanur, Coimbatore - 641105",
-};
-
-function normalize(raw: unknown): Partial<AdmissionsConfig> | null {
+function normalize(raw: unknown): AdmissionsConfig | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
-  const out: Partial<AdmissionsConfig> = {};
-
-  if (typeof r.eyebrow === "string" && r.eyebrow) out.eyebrow = r.eyebrow;
-  if (typeof r.title === "string" && r.title) out.title = r.title;
-  if (typeof r.description === "string") out.description = r.description;
-  if (typeof r.ctaLabel === "string" && r.ctaLabel) out.ctaLabel = r.ctaLabel;
-  if (typeof r.ctaHref === "string" && r.ctaHref) out.ctaHref = r.ctaHref;
-  if (typeof r.phone === "string" && r.phone) out.phone = r.phone;
-  if (typeof r.email === "string" && r.email) out.email = r.email;
-  if (typeof r.address === "string" && r.address) out.address = r.address;
 
   const criteria = Array.isArray(r.criteria)
     ? r.criteria
@@ -62,30 +38,23 @@ function normalize(raw: unknown): Partial<AdmissionsConfig> | null {
         })
         .filter((x): x is Criterion => x !== null)
     : [];
-  if (criteria.length > 0) out.criteria = criteria;
 
-  return Object.keys(out).length > 0 ? out : null;
+  return {
+    eyebrow: typeof r.eyebrow === "string" ? r.eyebrow : "",
+    title: typeof r.title === "string" ? r.title : "",
+    description: typeof r.description === "string" ? r.description : "",
+    ctaLabel: typeof r.ctaLabel === "string" ? r.ctaLabel : "",
+    ctaHref: typeof r.ctaHref === "string" ? r.ctaHref : "",
+    criteria,
+    phone: typeof r.phone === "string" ? r.phone : "",
+    email: typeof r.email === "string" ? r.email : "",
+    address: typeof r.address === "string" ? r.address : "",
+  };
 }
 
 export function AdmissionProcess() {
-  const [config, setConfig] = useState<AdmissionsConfig>(DEFAULTS);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/public/site-config?key=artsScienceAdmissions")
-      .then((r) => r.json())
-      .then((res) => {
-        if (cancelled) return;
-        if (res?.source === "db") {
-          const next = normalize(res.data);
-          if (next) setConfig((prev) => ({ ...prev, ...next }));
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { data, loading } = useSiteConfig("artsScienceAdmissions");
+  const config = normalize(data);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -95,8 +64,23 @@ export function AdmissionProcess() {
     e.currentTarget.style.setProperty("--mouse-y", `${y}px`);
   };
 
+  if (loading) {
+    return (
+      <section className="border-t border-slate-200 bg-slate-50 py-20 md:py-24">
+        <div className="container mx-auto flex justify-center px-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-slate-500" />
+        </div>
+      </section>
+    );
+  }
+
+  if (!config) return null;
+
   const isExternal = config.ctaHref.startsWith("http");
-  const telHref = `tel:${config.phone.replace(/[^0-9+]/g, "")}`;
+  const telHref = config.phone
+    ? `tel:${config.phone.replace(/[^0-9+]/g, "")}`
+    : "";
+  const hasContact = config.phone || config.email || config.address;
 
   return (
     <section
@@ -125,19 +109,23 @@ export function AdmissionProcess() {
         <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-xs backdrop-blur-md md:p-10">
           <div className="flex flex-col gap-6 border-b border-slate-100 pb-8 md:flex-row md:items-end md:justify-between">
             <div>
-              <h2 className="text-arts-science-accent mb-3 text-xs font-bold tracking-[0.2em] uppercase">
-                {config.eyebrow}
-              </h2>
-              <h3 className="text-arts-science font-serif text-3xl leading-tight font-bold md:text-4xl">
-                {config.title}
-              </h3>
+              {config.eyebrow && (
+                <h2 className="text-arts-science-accent mb-3 text-xs font-bold tracking-[0.2em] uppercase">
+                  {config.eyebrow}
+                </h2>
+              )}
+              {config.title && (
+                <h3 className="text-arts-science font-serif text-3xl leading-tight font-bold md:text-4xl">
+                  {config.title}
+                </h3>
+              )}
               {config.description && (
                 <p className="mt-2 max-w-xl text-sm text-slate-500">
                   {config.description}
                 </p>
               )}
             </div>
-            {config.ctaLabel && (
+            {config.ctaLabel && config.ctaHref && (
               <a
                 href={config.ctaHref}
                 target={isExternal ? "_blank" : undefined}
@@ -150,69 +138,79 @@ export function AdmissionProcess() {
             )}
           </div>
 
-          <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {config.criteria.map((block, index) => (
-              <motion.article
-                key={block.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: index * 0.08 }}
-                className="rounded-xl border border-slate-100 bg-slate-50/50 p-6 transition-shadow duration-300 hover:shadow-xs"
-              >
-                <h4 className="text-arts-science mb-4 border-b border-slate-100 pb-2 font-serif text-[1.1rem] font-bold">
-                  {block.title}
-                </h4>
-                <ul className="space-y-3">
-                  {block.items.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-2.5 text-[0.925rem] leading-relaxed text-slate-600"
-                    >
-                      <CheckCircle2
-                        size={15}
-                        className="text-arts-science-accent mt-0.5 shrink-0"
-                      />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </motion.article>
-            ))}
-          </div>
+          {config.criteria.length > 0 && (
+            <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
+              {config.criteria.map((block, index) => (
+                <motion.article
+                  key={block.title}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: index * 0.08 }}
+                  className="rounded-xl border border-slate-100 bg-slate-50/50 p-6 transition-shadow duration-300 hover:shadow-xs"
+                >
+                  <h4 className="text-arts-science mb-4 border-b border-slate-100 pb-2 font-serif text-[1.1rem] font-bold">
+                    {block.title}
+                  </h4>
+                  <ul className="space-y-3">
+                    {block.items.map((item) => (
+                      <li
+                        key={item}
+                        className="flex items-start gap-2.5 text-[0.925rem] leading-relaxed text-slate-600"
+                      >
+                        <CheckCircle2
+                          size={15}
+                          className="text-arts-science-accent mt-0.5 shrink-0"
+                        />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </motion.article>
+              ))}
+            </div>
+          )}
 
-          <div
-            id="contact"
-            className="mt-8 grid grid-cols-1 gap-4 rounded-xl border border-slate-100 bg-slate-50/30 p-5 text-sm md:grid-cols-3 md:gap-6"
-          >
-            {config.phone && (
-              <a
-                href={telHref}
-                className="text-arts-science hover:text-arts-science-accent flex items-center gap-2.5 font-medium transition-colors"
-              >
-                <Phone size={16} className="text-arts-science-accent shrink-0" />
-                <span>{config.phone}</span>
-              </a>
-            )}
-            {config.email && (
-              <a
-                href={`mailto:${config.email}`}
-                className="text-arts-science hover:text-arts-science-accent flex items-center gap-2.5 font-medium transition-colors"
-              >
-                <Mail size={16} className="text-arts-science-accent shrink-0" />
-                <span>{config.email}</span>
-              </a>
-            )}
-            {config.address && (
-              <div className="text-arts-science flex items-start gap-2.5 font-medium">
-                <MapPin
-                  size={16}
-                  className="text-arts-science-accent mt-0.5 shrink-0"
-                />
-                <span>{config.address}</span>
-              </div>
-            )}
-          </div>
+          {hasContact && (
+            <div
+              id="contact"
+              className="mt-8 grid grid-cols-1 gap-4 rounded-xl border border-slate-100 bg-slate-50/30 p-5 text-sm md:grid-cols-3 md:gap-6"
+            >
+              {config.phone && (
+                <a
+                  href={telHref}
+                  className="text-arts-science hover:text-arts-science-accent flex items-center gap-2.5 font-medium transition-colors"
+                >
+                  <Phone
+                    size={16}
+                    className="text-arts-science-accent shrink-0"
+                  />
+                  <span>{config.phone}</span>
+                </a>
+              )}
+              {config.email && (
+                <a
+                  href={`mailto:${config.email}`}
+                  className="text-arts-science hover:text-arts-science-accent flex items-center gap-2.5 font-medium transition-colors"
+                >
+                  <Mail
+                    size={16}
+                    className="text-arts-science-accent shrink-0"
+                  />
+                  <span>{config.email}</span>
+                </a>
+              )}
+              {config.address && (
+                <div className="text-arts-science flex items-start gap-2.5 font-medium">
+                  <MapPin
+                    size={16}
+                    className="text-arts-science-accent mt-0.5 shrink-0"
+                  />
+                  <span>{config.address}</span>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </section>

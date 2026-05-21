@@ -1,9 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2, ArrowRight, Phone, Mail, MapPin } from "lucide-react";
-import { admissionsCriteria as fallbackCriteria } from "@/data/polytechnic";
+import { useSiteConfig } from "@/lib/use-site-config";
 import {
   PolyButtonLink,
   PolySection,
@@ -19,16 +18,9 @@ type AdmissionsConfig = {
   ctaLabel: string;
   ctaHref: string;
   criteria: Criterion[];
-};
-
-const DEFAULTS: AdmissionsConfig = {
-  eyebrow: "Admissions",
-  title: "Admission Process",
-  description:
-    "Simple and transparent admissions aligned with current DOTE and Tamil Nadu polytechnic guidelines.",
-  ctaLabel: "Apply Now",
-  ctaHref: "https://admissions.jct.ac.in",
-  criteria: fallbackCriteria as Criterion[],
+  phone: string;
+  email: string;
+  address: string;
 };
 
 function normalize(raw: unknown): AdmissionsConfig | null {
@@ -50,42 +42,40 @@ function normalize(raw: unknown): AdmissionsConfig | null {
         .filter((x): x is Criterion => x !== null)
     : [];
   return {
-    eyebrow:
-      typeof r.eyebrow === "string" && r.eyebrow ? r.eyebrow : DEFAULTS.eyebrow,
-    title: typeof r.title === "string" && r.title ? r.title : DEFAULTS.title,
-    description:
-      typeof r.description === "string" ? r.description : DEFAULTS.description,
-    ctaLabel:
-      typeof r.ctaLabel === "string" && r.ctaLabel
-        ? r.ctaLabel
-        : DEFAULTS.ctaLabel,
-    ctaHref:
-      typeof r.ctaHref === "string" && r.ctaHref ? r.ctaHref : DEFAULTS.ctaHref,
-    criteria: criteria.length > 0 ? criteria : DEFAULTS.criteria,
+    eyebrow: typeof r.eyebrow === "string" ? r.eyebrow : "",
+    title: typeof r.title === "string" ? r.title : "",
+    description: typeof r.description === "string" ? r.description : "",
+    ctaLabel: typeof r.ctaLabel === "string" ? r.ctaLabel : "",
+    ctaHref: typeof r.ctaHref === "string" ? r.ctaHref : "",
+    criteria,
+    phone: typeof r.phone === "string" ? r.phone : "",
+    email: typeof r.email === "string" ? r.email : "",
+    address: typeof r.address === "string" ? r.address : "",
   };
 }
 
 export function Admissions() {
-  const [config, setConfig] = useState<AdmissionsConfig>(DEFAULTS);
+  const { data, loading } = useSiteConfig("polytechnicAdmissions");
+  const config = normalize(data);
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/public/site-config?key=polytechnicAdmissions")
-      .then((r) => r.json())
-      .then((res) => {
-        if (cancelled) return;
-        if (res?.source === "db") {
-          const next = normalize(res.data);
-          if (next) setConfig(next);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  if (loading) {
+    return (
+      <PolySection
+        id="admissions"
+        tone="subtle"
+        className="border-t border-slate-100"
+      >
+        <div className="flex justify-center py-16">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-slate-500" />
+        </div>
+      </PolySection>
+    );
+  }
+
+  if (!config) return null;
 
   const isExternal = config.ctaHref.startsWith("http");
+  const hasContact = config.phone || config.email || config.address;
 
   return (
     <PolySection
@@ -101,69 +91,84 @@ export function Admissions() {
             description={config.description}
             className="mb-0"
           />
-          <PolyButtonLink
-            href={config.ctaHref}
-            target={isExternal ? "_blank" : undefined}
-            rel={isExternal ? "noopener noreferrer" : undefined}
-            className="shrink-0"
-          >
-            {config.ctaLabel}
-            <ArrowRight className="ml-2 h-4 w-4" />
-          </PolyButtonLink>
-        </div>
-
-        <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
-          {config.criteria.map((block, index) => (
-            <motion.article
-              key={block.title}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: index * 0.06 }}
-              className="rounded-xl border border-slate-200 bg-[#fbfdfc] p-5"
+          {config.ctaLabel && config.ctaHref && (
+            <PolyButtonLink
+              href={config.ctaHref}
+              target={isExternal ? "_blank" : undefined}
+              rel={isExternal ? "noopener noreferrer" : undefined}
+              className="shrink-0"
             >
-              <h3 className="text-polytechnic-dark mb-3 text-base font-semibold">
-                {block.title}
-              </h3>
-              <ul className="space-y-2.5">
-                {block.items.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 text-sm text-slate-600"
-                  >
-                    <CheckCircle2
-                      size={14}
-                      className="text-polytechnic mt-0.5 shrink-0"
-                    />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </motion.article>
-          ))}
+              {config.ctaLabel}
+              <ArrowRight className="ml-2 h-4 w-4" />
+            </PolyButtonLink>
+          )}
         </div>
 
-        <div
-          id="contact"
-          className="mt-8 grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-4 text-sm md:grid-cols-3 md:gap-4"
-        >
-          <a
-            href="tel:+919361422201"
-            className="text-polytechnic-dark hover:text-polytechnic flex items-center gap-2"
-          >
-            <Phone size={15} className="text-polytechnic" /> +91 93614 88801
-          </a>
-          <a
-            href="mailto:admissions@jct.ac.in"
-            className="text-polytechnic-dark hover:text-polytechnic flex items-center gap-2"
-          >
-            <Mail size={15} className="text-polytechnic" /> admissions@jct.ac.in
-          </a>
-          <div className="text-polytechnic-dark flex items-start gap-2">
-            <MapPin size={15} className="text-polytechnic mt-0.5 shrink-0" />
-            <span>Knowledge Park, Pichanur, Coimbatore - 641105</span>
+        {config.criteria.length > 0 && (
+          <div className="mt-8 grid grid-cols-1 gap-5 md:grid-cols-3">
+            {config.criteria.map((block, index) => (
+              <motion.article
+                key={block.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.06 }}
+                className="rounded-xl border border-slate-200 bg-[#fbfdfc] p-5"
+              >
+                <h3 className="text-polytechnic-dark mb-3 text-base font-semibold">
+                  {block.title}
+                </h3>
+                <ul className="space-y-2.5">
+                  {block.items.map((item) => (
+                    <li
+                      key={item}
+                      className="flex items-start gap-2 text-sm text-slate-600"
+                    >
+                      <CheckCircle2
+                        size={14}
+                        className="text-polytechnic mt-0.5 shrink-0"
+                      />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </motion.article>
+            ))}
           </div>
-        </div>
+        )}
+
+        {hasContact && (
+          <div
+            id="contact"
+            className="mt-8 grid grid-cols-1 gap-3 rounded-xl border border-slate-200 bg-white p-4 text-sm md:grid-cols-3 md:gap-4"
+          >
+            {config.phone && (
+              <a
+                href={`tel:${config.phone.replace(/[^0-9+]/g, "")}`}
+                className="text-polytechnic-dark hover:text-polytechnic flex items-center gap-2"
+              >
+                <Phone size={15} className="text-polytechnic" /> {config.phone}
+              </a>
+            )}
+            {config.email && (
+              <a
+                href={`mailto:${config.email}`}
+                className="text-polytechnic-dark hover:text-polytechnic flex items-center gap-2"
+              >
+                <Mail size={15} className="text-polytechnic" /> {config.email}
+              </a>
+            )}
+            {config.address && (
+              <div className="text-polytechnic-dark flex items-start gap-2">
+                <MapPin
+                  size={15}
+                  className="text-polytechnic mt-0.5 shrink-0"
+                />
+                <span>{config.address}</span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </PolySection>
   );

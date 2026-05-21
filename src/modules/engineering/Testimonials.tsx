@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { CollegeTestimonials } from "@/components/layout/CollegeTestimonials";
-import { testimonials as fallback } from "@/data/engineering";
 
 type Item = {
   quote: string;
@@ -40,7 +39,8 @@ function normalizeDb(raw: unknown): Item[] {
 }
 
 export function Testimonials() {
-  const [items, setItems] = useState<Item[]>(fallback);
+  const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
@@ -49,15 +49,27 @@ export function Testimonials() {
       .then((res) => {
         if (cancelled) return;
         if (res?.source === "db") {
-          const next = normalizeDb(res.data);
-          if (next.length > 0) setItems(next);
+          setItems(normalizeDb(res.data));
         }
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     return () => {
       cancelled = true;
     };
   }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-16">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-slate-500" />
+      </div>
+    );
+  }
+
+  if (items.length === 0) return null;
 
   return (
     <div id="life-at-jct">

@@ -5,24 +5,26 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { getImageUrl } from "@/lib/utils";
 
-const DEFAULT_IMAGES = [
-  "/assets/jct-life4.webp",
-  "/assets/jct-life5.webp",
-  "/assets/campus5.webp",
-];
-
-export function ArtsAndScienceHeroBg({ images }: { images?: string[] }) {
-  const slides = images && images.length > 0 ? images : DEFAULT_IMAGES;
+export function ArtsAndScienceHeroBg({
+  images,
+  intervalMs = 5500,
+}: {
+  images?: string[];
+  intervalMs?: number;
+}) {
+  const slides = images && images.length > 0 ? images : [];
   const [currentIdx, setCurrentIdx] = useState(0);
 
   useEffect(() => {
     if (slides.length <= 1) return;
     const timer = window.setInterval(() => {
       setCurrentIdx((prev) => (prev + 1) % slides.length);
-    }, 5500);
+    }, intervalMs);
 
     return () => window.clearInterval(timer);
-  }, [slides.length]);
+  }, [slides.length, intervalMs]);
+
+  if (slides.length === 0) return null;
 
   const idx = currentIdx % slides.length;
   const src = slides[idx];

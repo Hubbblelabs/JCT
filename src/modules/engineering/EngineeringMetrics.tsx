@@ -1,8 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { metrics as fallbackMetrics } from "@/data/engineering";
+import { useSiteConfig } from "@/lib/use-site-config";
 
 type Metric = {
   value: string;
@@ -28,24 +27,20 @@ function normalizeDbMetrics(raw: unknown): Metric[] {
 }
 
 export function EngineeringMetrics() {
-  const [metrics, setMetrics] = useState<Metric[]>(fallbackMetrics);
+  const { data, loading } = useSiteConfig("engineeringMetrics");
+  const metrics = normalizeDbMetrics(data);
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch("/api/public/site-config?key=engineeringMetrics")
-      .then((r) => r.json())
-      .then((res) => {
-        if (cancelled) return;
-        if (res?.source === "db") {
-          const next = normalizeDbMetrics(res.data);
-          if (next.length > 0) setMetrics(next);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  if (loading) {
+    return (
+      <section className="bg-primary py-16 md:py-24">
+        <div className="container mx-auto flex justify-center px-4">
+          <div className="h-10 w-10 animate-spin rounded-full border-4 border-white/20 border-t-white/70" />
+        </div>
+      </section>
+    );
+  }
+
+  if (metrics.length === 0) return null;
 
   return (
     <section id="courses" className="bg-primary py-16 md:py-24">

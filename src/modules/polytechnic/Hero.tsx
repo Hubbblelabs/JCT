@@ -7,27 +7,7 @@ import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { getImageUrl } from "@/lib/utils";
-
-const DEFAULT_HERO: HeroContent = {
-  backgroundImages: [
-    "/assets/polytechnic.webp",
-    "/assets/lab4.webp",
-    "/assets/jct-life8.webp",
-  ],
-  eyebrow: "AICTE Approved Diploma Programs",
-  titleLine1: "Real World Skills.",
-  titleLine2: "Future Ready Careers.",
-  subtitle:
-    "At JCT Polytechnic, we focus on hands-on training and workshops. Graduate with the exact technical skills that top manufacturing, IT, and engineering firms are actively hiring for today.",
-  ctas: [
-    {
-      label: "Apply Now",
-      href: "https://admissions.jct.ac.in",
-      primary: true,
-    },
-  ],
-  intervalMs: 6000,
-};
+import { useSiteConfig } from "@/lib/use-site-config";
 
 type HeroCta = { label: string; href: string; primary: boolean };
 
@@ -49,7 +29,6 @@ function normalizeHero(raw: unknown): HeroContent | null {
         (s): s is string => typeof s === "string" && s.length > 0,
       )
     : [];
-  if (backgroundImages.length === 0) return null;
   const ctas = Array.isArray(r.ctas)
     ? r.ctas
         .map((c) => {
@@ -63,18 +42,15 @@ function normalizeHero(raw: unknown): HeroContent | null {
     : [];
   return {
     backgroundImages,
-    eyebrow: typeof r.eyebrow === "string" ? r.eyebrow : DEFAULT_HERO.eyebrow,
-    titleLine1:
-      typeof r.titleLine1 === "string" ? r.titleLine1 : DEFAULT_HERO.titleLine1,
-    titleLine2:
-      typeof r.titleLine2 === "string" ? r.titleLine2 : DEFAULT_HERO.titleLine2,
-    subtitle:
-      typeof r.subtitle === "string" ? r.subtitle : DEFAULT_HERO.subtitle,
-    ctas: ctas.length > 0 ? ctas : DEFAULT_HERO.ctas,
+    eyebrow: typeof r.eyebrow === "string" ? r.eyebrow : "",
+    titleLine1: typeof r.titleLine1 === "string" ? r.titleLine1 : "",
+    titleLine2: typeof r.titleLine2 === "string" ? r.titleLine2 : "",
+    subtitle: typeof r.subtitle === "string" ? r.subtitle : "",
+    ctas,
     intervalMs:
       typeof r.intervalMs === "number" && r.intervalMs > 0
         ? r.intervalMs
-        : DEFAULT_HERO.intervalMs,
+        : 6000,
   };
 }
 
@@ -85,59 +61,55 @@ const fadeUp = (delay = 0) => ({
 });
 
 export function Hero() {
-  const [hero, setHero] = useState<HeroContent>(DEFAULT_HERO);
+  const { data, loading } = useSiteConfig("polytechnicHero");
+  const hero = normalizeHero(data);
   const [currentIdx, setCurrentIdx] = useState(0);
 
   useEffect(() => {
-    let cancelled = false;
-    fetch("/api/public/site-config?key=polytechnicHero")
-      .then((r) => r.json())
-      .then((res) => {
-        if (cancelled) return;
-        if (res?.source === "db") {
-          const next = normalizeHero(res.data);
-          if (next) setHero(next);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (hero.backgroundImages.length <= 1) return;
+    if (!hero || hero.backgroundImages.length <= 1) return;
     const timer = setInterval(() => {
       setCurrentIdx((prev) => (prev + 1) % hero.backgroundImages.length);
     }, hero.intervalMs);
     return () => clearInterval(timer);
-  }, [hero.backgroundImages.length, hero.intervalMs]);
+  }, [hero?.backgroundImages.length, hero?.intervalMs]);
+
+  if (loading) {
+    return (
+      <section className="bg-polytechnic-dark flex min-h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-white/20 border-t-white/70" />
+      </section>
+    );
+  }
+
+  if (!hero) return null;
 
   return (
     <section className="bg-polytechnic-dark relative flex h-dvh min-h-150 flex-col justify-center overflow-hidden">
       <div className="absolute inset-0 z-0">
-        <AnimatePresence mode="popLayout">
-          <motion.div
-            key={currentIdx}
-            className="absolute inset-0"
-            initial={{ opacity: 0, scale: 1.05 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
-          >
-            <Image
-              src={
-                getImageUrl(hero.backgroundImages[currentIdx]) ??
-                hero.backgroundImages[currentIdx]
-              }
-              alt={`Polytechnic campus background ${currentIdx + 1}`}
-              fill
-              priority={currentIdx === 0}
-              className="object-cover"
-              sizes="100vw"
-            />
-          </motion.div>
-        </AnimatePresence>
+        {hero.backgroundImages.length > 0 && (
+          <AnimatePresence mode="popLayout">
+            <motion.div
+              key={currentIdx}
+              className="absolute inset-0"
+              initial={{ opacity: 0, scale: 1.05 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+            >
+              <Image
+                src={
+                  getImageUrl(hero.backgroundImages[currentIdx]) ??
+                  hero.backgroundImages[currentIdx]
+                }
+                alt={`Polytechnic campus background ${currentIdx + 1}`}
+                fill
+                priority={currentIdx === 0}
+                className="object-cover"
+                sizes="100vw"
+              />
+            </motion.div>
+          </AnimatePresence>
+        )}
 
         <div className="from-polytechnic-dark/95 via-polytechnic-dark/70 absolute inset-0 bg-linear-to-r to-transparent" />
         <div className="absolute inset-0 bg-black/40 mix-blend-multiply" />
@@ -185,34 +157,36 @@ export function Hero() {
             </motion.p>
           )}
 
-          <motion.div
-            {...fadeUp(0.3)}
-            className="flex flex-col gap-4 sm:flex-row"
-          >
-            {hero.ctas.map((cta) => {
-              const isExternal = cta.href.startsWith("http");
-              return (
-                <Link
-                  key={cta.label}
-                  href={cta.href}
-                  target={isExternal ? "_blank" : undefined}
-                  rel={isExternal ? "noopener noreferrer" : undefined}
-                >
-                  <Button
-                    size="lg"
-                    className={
-                      cta.primary
-                        ? "bg-polytechnic-light hover:text-polytechnic-dark h-14 rounded-full px-8 text-sm font-bold text-white shadow-xl transition-all hover:scale-105 hover:bg-white active:scale-95 sm:w-auto"
-                        : "h-14 rounded-full border border-white/30 bg-transparent px-8 text-sm font-bold text-white backdrop-blur-sm transition-all hover:scale-105 hover:bg-white/10 active:scale-95 sm:w-auto"
-                    }
+          {hero.ctas.length > 0 && (
+            <motion.div
+              {...fadeUp(0.3)}
+              className="flex flex-col gap-4 sm:flex-row"
+            >
+              {hero.ctas.map((cta) => {
+                const isExternal = cta.href.startsWith("http");
+                return (
+                  <Link
+                    key={cta.label}
+                    href={cta.href}
+                    target={isExternal ? "_blank" : undefined}
+                    rel={isExternal ? "noopener noreferrer" : undefined}
                   >
-                    {cta.label}{" "}
-                    {cta.primary && <ArrowRight className="ml-2 h-5 w-5" />}
-                  </Button>
-                </Link>
-              );
-            })}
-          </motion.div>
+                    <Button
+                      size="lg"
+                      className={
+                        cta.primary
+                          ? "bg-polytechnic-light hover:text-polytechnic-dark h-14 rounded-full px-8 text-sm font-bold text-white shadow-xl transition-all hover:scale-105 hover:bg-white active:scale-95 sm:w-auto"
+                          : "h-14 rounded-full border border-white/30 bg-transparent px-8 text-sm font-bold text-white backdrop-blur-sm transition-all hover:scale-105 hover:bg-white/10 active:scale-95 sm:w-auto"
+                      }
+                    >
+                      {cta.label}{" "}
+                      {cta.primary && <ArrowRight className="ml-2 h-5 w-5" />}
+                    </Button>
+                  </Link>
+                );
+              })}
+            </motion.div>
+          )}
         </div>
       </div>
 
