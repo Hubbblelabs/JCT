@@ -1,11 +1,92 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Phone, Mail, MapPin, CheckCircle2, ArrowRight } from "lucide-react";
-import { admissionsCriteria } from "@/data/engineering";
+import { admissionsCriteria as fallbackCriteria } from "@/data/engineering";
 import React from "react";
 
+type Criterion = { title: string; items: string[] };
+
+type AdmissionsConfig = {
+  eyebrow: string;
+  title: string;
+  description: string;
+  ctaLabel: string;
+  ctaHref: string;
+  criteria: Criterion[];
+  phone: string;
+  email: string;
+  address: string;
+};
+
+const DEFAULTS: AdmissionsConfig = {
+  eyebrow: "Admissions",
+  title: "Admission Process",
+  description:
+    "Begin your professional engineering career through Anna University Counselling (TNEA Code: 2724) or direct admission guidelines.",
+  ctaLabel: "Apply Now",
+  ctaHref: "https://admissions.jct.ac.in",
+  criteria: fallbackCriteria as Criterion[],
+  phone: "+91 93614 88801",
+  email: "admissions@jct.ac.in",
+  address: "Knowledge Park, Pichanur, Coimbatore - 641105",
+};
+
+function normalize(raw: unknown): Partial<AdmissionsConfig> | null {
+  if (!raw || typeof raw !== "object") return null;
+  const r = raw as Record<string, unknown>;
+  const out: Partial<AdmissionsConfig> = {};
+
+  if (typeof r.eyebrow === "string" && r.eyebrow) out.eyebrow = r.eyebrow;
+  if (typeof r.title === "string" && r.title) out.title = r.title;
+  if (typeof r.description === "string") out.description = r.description;
+  if (typeof r.ctaLabel === "string" && r.ctaLabel) out.ctaLabel = r.ctaLabel;
+  if (typeof r.ctaHref === "string" && r.ctaHref) out.ctaHref = r.ctaHref;
+  if (typeof r.phone === "string" && r.phone) out.phone = r.phone;
+  if (typeof r.email === "string" && r.email) out.email = r.email;
+  if (typeof r.address === "string" && r.address) out.address = r.address;
+
+  const criteria = Array.isArray(r.criteria)
+    ? r.criteria
+        .map((c) => {
+          const o = (c ?? {}) as Record<string, unknown>;
+          const title = typeof o.title === "string" ? o.title : null;
+          const items = Array.isArray(o.items)
+            ? o.items.filter(
+                (s): s is string => typeof s === "string" && s.length > 0,
+              )
+            : [];
+          if (!title || items.length === 0) return null;
+          return { title, items } satisfies Criterion;
+        })
+        .filter((x): x is Criterion => x !== null)
+    : [];
+  if (criteria.length > 0) out.criteria = criteria;
+
+  return Object.keys(out).length > 0 ? out : null;
+}
+
 export function Admissions() {
+  const [config, setConfig] = useState<AdmissionsConfig>(DEFAULTS);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/site-config?key=engineeringAdmissions")
+      .then((r) => r.json())
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.source === "db") {
+          const next = normalize(res.data);
+          if (next) setConfig((prev) => ({ ...prev, ...next }));
+        }
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const handleMouseMove = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -13,6 +94,9 @@ export function Admissions() {
     e.currentTarget.style.setProperty("--mouse-x", `${x}px`);
     e.currentTarget.style.setProperty("--mouse-y", `${y}px`);
   };
+
+  const isExternal = config.ctaHref.startsWith("http");
+  const telHref = `tel:${config.phone.replace(/[^0-9+]/g, "")}`;
 
   return (
     <section
@@ -24,7 +108,6 @@ export function Admissions() {
       <div className="pointer-events-none absolute inset-0 z-0 mask-[radial-gradient(ellipse_at_center,black_60%,transparent_100%)]">
         <div className="bg-engineering-light/10 absolute inset-0 mask-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMiIgY3k9IjIiIHI9IjEuNSIgZmlsbD0iYmxhY2siLz48L3N2Zz4=')] mask-size-[24px_24px]" />
 
-        {/* Spotlight dots layer tracking the mouse */}
         <div
           className="absolute inset-0 opacity-0 transition-opacity duration-500 group-hover/section:opacity-100"
           style={{
@@ -43,31 +126,33 @@ export function Admissions() {
           <div className="flex flex-col gap-6 border-b border-slate-100 pb-8 md:flex-row md:items-end md:justify-between">
             <div>
               <h2 className="text-engineering-light mb-3 text-xs font-bold tracking-[0.2em] uppercase">
-                Admissions
+                {config.eyebrow}
               </h2>
               <h3 className="text-engineering-dark font-serif text-3xl leading-tight font-bold md:text-4xl">
-                Admission Process
+                {config.title}
               </h3>
-              <p className="mt-2 max-w-xl text-sm text-slate-500">
-                Begin your professional engineering career through Anna
-                University Counselling (TNEA Code: 2724) or direct admission
-                guidelines.
-              </p>
+              {config.description && (
+                <p className="mt-2 max-w-xl text-sm text-slate-500">
+                  {config.description}
+                </p>
+              )}
             </div>
-            <a
-              href="https://admissions.jct.ac.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex h-12 w-full shrink-0 items-center justify-center self-start rounded-full px-8 text-sm font-bold tracking-wide transition-all hover:brightness-110 active:scale-[0.98] sm:w-auto md:self-end"
-              style={{ backgroundColor: "#d4a024", color: "#081323" }}
-            >
-              Apply Now
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </a>
+            {config.ctaLabel && (
+              <a
+                href={config.ctaHref}
+                target={isExternal ? "_blank" : undefined}
+                rel={isExternal ? "noopener noreferrer" : undefined}
+                className="inline-flex h-12 w-full shrink-0 items-center justify-center self-start rounded-full px-8 text-sm font-bold tracking-wide transition-all hover:brightness-110 active:scale-[0.98] sm:w-auto md:self-end"
+                style={{ backgroundColor: "#d4a024", color: "#081323" }}
+              >
+                {config.ctaLabel}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </a>
+            )}
           </div>
 
           <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-            {admissionsCriteria.map((block, index) => (
+            {config.criteria.map((block, index) => (
               <motion.article
                 key={block.title}
                 initial={{ opacity: 0, y: 20 }}
@@ -101,27 +186,33 @@ export function Admissions() {
             id="contact"
             className="mt-8 grid grid-cols-1 gap-4 rounded-xl border border-slate-100 bg-slate-50/30 p-5 text-sm md:grid-cols-3 md:gap-6"
           >
-            <a
-              href="tel:+919361488801"
-              className="text-engineering-dark hover:text-engineering-light flex items-center gap-2.5 font-medium transition-colors"
-            >
-              <Phone size={16} className="text-engineering-light shrink-0" />
-              <span>+91 93614 88801</span>
-            </a>
-            <a
-              href="mailto:admissions@jct.ac.in"
-              className="text-engineering-dark hover:text-engineering-light flex items-center gap-2.5 font-medium transition-colors"
-            >
-              <Mail size={16} className="text-engineering-light shrink-0" />
-              <span>admissions@jct.ac.in</span>
-            </a>
-            <div className="text-engineering-dark flex items-start gap-2.5 font-medium">
-              <MapPin
-                size={16}
-                className="text-engineering-light mt-0.5 shrink-0"
-              />
-              <span>Knowledge Park, Pichanur, Coimbatore - 641105</span>
-            </div>
+            {config.phone && (
+              <a
+                href={telHref}
+                className="text-engineering-dark hover:text-engineering-light flex items-center gap-2.5 font-medium transition-colors"
+              >
+                <Phone size={16} className="text-engineering-light shrink-0" />
+                <span>{config.phone}</span>
+              </a>
+            )}
+            {config.email && (
+              <a
+                href={`mailto:${config.email}`}
+                className="text-engineering-dark hover:text-engineering-light flex items-center gap-2.5 font-medium transition-colors"
+              >
+                <Mail size={16} className="text-engineering-light shrink-0" />
+                <span>{config.email}</span>
+              </a>
+            )}
+            {config.address && (
+              <div className="text-engineering-dark flex items-start gap-2.5 font-medium">
+                <MapPin
+                  size={16}
+                  className="text-engineering-light mt-0.5 shrink-0"
+                />
+                <span>{config.address}</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

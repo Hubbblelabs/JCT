@@ -25,6 +25,9 @@ import {
   AccreditationsSchema,
   HeroStatsListSchema,
 } from "./siteInfo";
+import { AdmissionsSchema } from "./admissions";
+import { WhyChooseJctSchema, HomeAdmissionsSchema } from "./homeSections";
+import { HeaderSchema, FooterSchema } from "./globalCms";
 
 // Every site-config key the admin UI writes must have an entry below.
 // Keys in this map are validated strictly; unknown keys are rejected.
@@ -38,18 +41,24 @@ export const SITE_CONFIG_SCHEMAS = {
   homeStats: HomeStatsSchema,
   homeProspectus: HomeProspectusSchema,
   homePamphlet: PamphletSchema,
+  homeAdmissions: HomeAdmissionsSchema,
+  whyChooseJct: WhyChooseJctSchema,
   lifeAtJct: LifeAtJctSchema,
   engineeringAnnouncement: AnnouncementSchema,
   engineeringHero: EngineeringHeroSchema,
   engineeringMetrics: MetricsSchema,
   engineeringFacilities: FacilitiesSchema,
   engineeringResearchHighlights: ResearchHighlightsSchema,
+  engineeringAdmissions: AdmissionsSchema,
   artsScienceHero: ArtsScienceHeroSchema,
   artsScienceHeroStats: HeroStatsListSchema,
   artsScienceCampusLife: CampusLifeCarouselSchema,
+  artsScienceAdmissions: AdmissionsSchema,
   polytechnicHero: PolytechnicHeroSchema,
   polytechnicCampusLife: CampusLifeCarouselSchema,
   polytechnicAdmissions: PolytechnicAdmissionsSchema,
+  header: HeaderSchema,
+  footer: FooterSchema,
 } as const;
 
 export type SiteConfigKey = keyof typeof SITE_CONFIG_SCHEMAS;

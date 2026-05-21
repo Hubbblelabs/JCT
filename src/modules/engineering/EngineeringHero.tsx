@@ -3,7 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+} from "framer-motion";
 import { siteConfig } from "@/data/site";
 import { getImageUrl } from "@/lib/utils";
 
@@ -15,6 +20,7 @@ type HeroConfig = {
   subtitle: string;
   ctas: HeroCta[];
   badgeText: string;
+  counsellingLabel: string;
   counsellingCode: string;
 };
 
@@ -32,31 +38,51 @@ const DEFAULT_HERO: HeroConfig = {
     { label: "EXPLORE PROGRAMS", href: "#programs", primary: false },
   ],
   badgeText: "An Autonomous Institution",
+  counsellingLabel: "Counselling Code:",
   counsellingCode: siteConfig.counsellingCode,
 };
 
-function normalizeHero(raw: unknown): HeroConfig | null {
+function normalizeHero(raw: unknown): Partial<HeroConfig> | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
+  const out: Partial<HeroConfig> = {};
+
   const backgroundImages = Array.isArray(r.backgroundImages)
     ? r.backgroundImages.filter(
-        (s): s is string => typeof s === "string" && s.length > 0,
+        (s): s is string => typeof s === "string" && s.trim().length > 0,
       )
     : [];
-  if (backgroundImages.length === 0) return null;
-  return {
-    backgroundImages,
-    title: DEFAULT_HERO.title,
-    subtitle: DEFAULT_HERO.subtitle,
-    ctas: DEFAULT_HERO.ctas,
-    badgeText: DEFAULT_HERO.badgeText,
-    counsellingCode: DEFAULT_HERO.counsellingCode,
-  };
+  if (backgroundImages.length > 0) out.backgroundImages = backgroundImages;
+
+  if (typeof r.title === "string" && r.title.trim()) out.title = r.title;
+  if (typeof r.subtitle === "string") out.subtitle = r.subtitle;
+  if (typeof r.badgeText === "string" && r.badgeText.trim())
+    out.badgeText = r.badgeText;
+  if (typeof r.counsellingLabel === "string" && r.counsellingLabel.trim())
+    out.counsellingLabel = r.counsellingLabel;
+  if (typeof r.counsellingCode === "string" && r.counsellingCode.trim())
+    out.counsellingCode = r.counsellingCode;
+
+  const ctas = Array.isArray(r.ctas)
+    ? r.ctas
+        .map((c) => {
+          const o = (c ?? {}) as Record<string, unknown>;
+          const label = typeof o.label === "string" ? o.label : null;
+          const href = typeof o.href === "string" ? o.href : null;
+          if (!label || !href) return null;
+          return { label, href, primary: Boolean(o.primary) } satisfies HeroCta;
+        })
+        .filter((x): x is HeroCta => x !== null)
+    : [];
+  if (ctas.length > 0) out.ctas = ctas;
+
+  return Object.keys(out).length > 0 ? out : null;
 }
 
 export function EngineeringHero() {
   const heroRef = useRef<HTMLElement | null>(null);
   const [hero, setHero] = useState<HeroConfig>(DEFAULT_HERO);
+  const [bgIndex, setBgIndex] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -66,7 +92,7 @@ export function EngineeringHero() {
         if (cancelled) return;
         if (res?.source === "db") {
           const next = normalizeHero(res.data);
-          if (next) setHero(next);
+          if (next) setHero((prev) => ({ ...prev, ...next }));
         }
       })
       .catch(() => {});
@@ -75,6 +101,15 @@ export function EngineeringHero() {
     };
   }, []);
 
+  useEffect(() => {
+    const len = hero.backgroundImages.length;
+    if (len < 2) return;
+    const timer = window.setInterval(() => {
+      setBgIndex((i) => (i + 1) % len);
+    }, 6000);
+    return () => window.clearInterval(timer);
+  }, [hero.backgroundImages.length]);
+
   const { scrollYProgress } = useScroll({
     target: heroRef,
     offset: ["start start", "end start"],
@@ -82,7 +117,10 @@ export function EngineeringHero() {
 
   const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 50]);
 
-  const bg = hero.backgroundImages[0] ?? DEFAULT_HERO.backgroundImages[0];
+  const safeIndex = bgIndex % Math.max(hero.backgroundImages.length, 1);
+  const rawBg =
+    hero.backgroundImages[safeIndex] ?? DEFAULT_HERO.backgroundImages[0];
+  const bg = getImageUrl(rawBg) ?? rawBg;
 
   return (
     <section
@@ -94,14 +132,25 @@ export function EngineeringHero() {
         style={{ y: backgroundY }}
         className="pointer-events-none absolute inset-0"
       >
-        <Image
-          src={getImageUrl(bg) ?? bg}
-          alt="JCT Engineering Campus"
-          fill
-          priority
-          sizes="100vw"
-          className="object-cover object-center opacity-40"
-        />
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={bg}
+            className="absolute inset-0"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1 }}
+          >
+            <Image
+              src={bg}
+              alt="JCT Engineering Campus"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center opacity-40"
+            />
+          </motion.div>
+        </AnimatePresence>
 
         <div className="absolute inset-0 bg-gradient-to-b from-[#07111d]/80 via-[#07111d]/45 to-[#07111d]/0" />
         <div className="absolute top-0 right-0 h-[50rem] w-[50rem] translate-x-1/3 -translate-y-1/2 rounded-full bg-[#d4a024]/10 mix-blend-screen blur-[120px]" />
@@ -162,25 +211,33 @@ export function EngineeringHero() {
               })}
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.65, delay: 0.24 }}
-              className="mt-8 flex flex-col items-center gap-2 rounded-2xl border border-white/15 bg-white/8 px-6 py-3 text-sm font-medium text-white/85 backdrop-blur-sm md:flex-row md:rounded-full"
-            >
-              <span className="font-bold tracking-[0.1em] text-[#d4a024] uppercase">
-                {hero.badgeText}
-              </span>
-              <span className="mx-2 hidden text-white/30 md:inline">|</span>
-              <div className="flex items-center gap-2">
-                <span className="font-bold tracking-[0.15em] text-white uppercase">
-                  Counselling Code:
-                </span>
-                <span className="text-lg font-extrabold text-[#d4a024]">
-                  {hero.counsellingCode}
-                </span>
-              </div>
-            </motion.div>
+            {(hero.badgeText || hero.counsellingCode) && (
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, delay: 0.24 }}
+                className="mt-8 flex flex-col items-center gap-2 rounded-2xl border border-white/15 bg-white/8 px-6 py-3 text-sm font-medium text-white/85 backdrop-blur-sm md:flex-row md:rounded-full"
+              >
+                {hero.badgeText && (
+                  <span className="font-bold tracking-[0.1em] text-[#d4a024] uppercase">
+                    {hero.badgeText}
+                  </span>
+                )}
+                {hero.badgeText && hero.counsellingCode && (
+                  <span className="mx-2 hidden text-white/30 md:inline">|</span>
+                )}
+                {hero.counsellingCode && (
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold tracking-[0.15em] text-white uppercase">
+                      {hero.counsellingLabel}
+                    </span>
+                    <span className="text-lg font-extrabold text-[#d4a024]">
+                      {hero.counsellingCode}
+                    </span>
+                  </div>
+                )}
+              </motion.div>
+            )}
 
             <motion.div
               initial={{ opacity: 0, y: 16 }}

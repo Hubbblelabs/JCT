@@ -130,6 +130,28 @@ export type {
 } from "./siteInfo";
 
 export {
+  AdmissionsSchema,
+  ADMISSIONS_LIMITS,
+} from "./admissions";
+export type { AdmissionsValue } from "./admissions";
+
+export {
+  WhyChooseJctSchema,
+  HomeAdmissionsSchema,
+  WHY_CHOOSE_JCT_LIMITS,
+  HOME_ADMISSIONS_LIMITS,
+} from "./homeSections";
+export type { WhyChooseJctValue, HomeAdmissionsValue } from "./homeSections";
+
+export {
+  HeaderSchema,
+  FooterSchema,
+  HEADER_LIMITS,
+  FOOTER_LIMITS,
+} from "./globalCms";
+export type { HeaderValue, FooterValue } from "./globalCms";
+
+export {
   SITE_CONFIG_SCHEMAS,
   SiteConfigPutSchema,
   isKnownSiteConfigKey,

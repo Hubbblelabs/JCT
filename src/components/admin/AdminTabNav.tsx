@@ -23,6 +23,9 @@ import {
   Camera,
   FileDown,
   Layers,
+  Globe,
+  PanelTop,
+  PanelBottom,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Suspense } from "react";
@@ -51,6 +54,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: BarChart3,
     },
     {
+      label: "Admissions",
+      href: "/admin/page-content?college=engineering&section=admissions",
+      icon: ClipboardList,
+    },
+    {
       label: "Life at JCT",
       href: "/admin/page-content?college=engineering&section=lifeAtJct",
       icon: Camera,
@@ -66,6 +74,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       label: "Hero",
       href: "/admin/page-content?college=arts-science&section=hero",
       icon: FileEdit,
+    },
+    {
+      label: "Admissions",
+      href: "/admin/page-content?college=arts-science&section=admissions",
+      icon: ClipboardList,
     },
     {
       label: "Campus Life",
@@ -145,6 +158,11 @@ const MAIN_ITEMS: NavItem[] = [
   },
 ];
 
+const GLOBAL_CMS_ITEMS: NavItem[] = [
+  { label: "Header", href: "/admin/global/page-content?section=header", icon: PanelTop },
+  { label: "Footer", href: "/admin/global/page-content?section=footer", icon: PanelBottom },
+];
+
 const ADMIN_ITEMS: NavItem[] = [
   { label: "Recruiters", href: "/admin/recruiters", icon: Briefcase },
   { label: "Site Config", href: "/admin/site-config", icon: Settings },
@@ -205,6 +223,7 @@ function TabNavInner() {
   const dashActive = pathname === "/admin/dashboard" || pathname === "/admin";
   const adminMenuActive = ADMIN_ITEMS.some((i) => pathname === i.href);
   const mainActive = isDropdownActive(MAIN_ITEMS, pathname, null);
+  const globalCmsActive = isDropdownActive(GLOBAL_CMS_ITEMS, pathname, null);
 
   if (pathname.startsWith("/admin/programs/") && pathname !== "/admin/programs") {
     return null;
@@ -303,6 +322,32 @@ function TabNavInner() {
               </div>
             );
           })}
+
+          {/* Global CMS dropdown */}
+          <div className="admin-nav-item">
+            <Link
+              href="/admin/global/page-content"
+              className={`admin-nav-trigger ${globalCmsActive ? "active" : ""}`}
+            >
+              <Globe size={13} />
+              Global CMS
+              <ChevronDown size={11} />
+            </Link>
+            <div className="admin-nav-dropdown-menu">
+              {GLOBAL_CMS_ITEMS.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`admin-nav-dropdown-item ${
+                    isItemActive(item.href, pathname, null, section) ? "active" : ""
+                  }`}
+                >
+                  <item.icon size={14} />
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
 
           {/* Admin tools dropdown */}
           <div className="admin-nav-item">

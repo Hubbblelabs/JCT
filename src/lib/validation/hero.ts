@@ -73,11 +73,12 @@ export const HomeProspectusSchema = z.object({
 });
 
 export const ENG_HERO_LIMITS = {
-  backgroundImages: 1,
+  backgroundImages: 6,
   titleMax: 120,
   subtitleMax: 240,
   ctas: 3,
   badgeTextMax: 80,
+  counsellingLabelMax: 80,
   counsellingCodeMax: 30,
 } as const;
 
@@ -91,6 +92,7 @@ export const EngineeringHeroSchema = z.object({
   subtitle: zOptionalString(ENG_HERO_LIMITS.subtitleMax).default(""),
   ctas: z.array(zCta).max(ENG_HERO_LIMITS.ctas).optional().default([]),
   badgeText: zOptionalString(ENG_HERO_LIMITS.badgeTextMax).default(""),
+  counsellingLabel: zOptionalString(ENG_HERO_LIMITS.counsellingLabelMax).default(""),
   counsellingCode: zOptionalString(ENG_HERO_LIMITS.counsellingCodeMax).default(
     "",
   ),

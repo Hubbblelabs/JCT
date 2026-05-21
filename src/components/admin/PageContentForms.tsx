@@ -20,6 +20,11 @@ import {
   FACILITIES_LIMITS,
   RESEARCH_HIGHLIGHTS_LIMITS,
   HERO_STATS_LIMITS,
+  ADMISSIONS_LIMITS,
+  WHY_CHOOSE_JCT_LIMITS,
+  HOME_ADMISSIONS_LIMITS,
+  HEADER_LIMITS,
+  FOOTER_LIMITS,
 } from "@/lib/validation";
 
 /* ─── Shared types ─── */
@@ -190,6 +195,12 @@ function CtaList({
 
 export type EngHeroVal = {
   backgroundImages?: string[];
+  title?: string;
+  subtitle?: string;
+  ctas?: Cta[];
+  badgeText?: string;
+  counsellingLabel?: string;
+  counsellingCode?: string;
 };
 
 export function EngineeringHeroForm({
@@ -199,32 +210,57 @@ export function EngineeringHeroForm({
   value: EngHeroVal;
   onChange: (v: EngHeroVal) => void;
 }) {
-  const bg = value.backgroundImages ?? [];
   return (
     <div className="space-y-4">
-      <Field
-        label="Background Images"
-        hint="3 fixed image slots. Upload or replace each one."
-      >
-        <div className="space-y-2">
-          {Array.from({ length: ENG_HERO_LIMITS.backgroundImages }, (_, i) => (
-            <ImageUploadInput
-              key={i}
-              label={`Image ${i + 1}`}
-              value={bg[i] ?? ""}
-              onChange={(url) => {
-                const next = Array.from(
-                  { length: ENG_HERO_LIMITS.backgroundImages },
-                  (__, j) => bg[j] ?? "",
-                );
-                next[i] = url;
-                onChange({ ...value, backgroundImages: next });
-              }}
-              uploadOnly
-            />
-          ))}
-        </div>
-      </Field>
+      <ImageList
+        label="Background Carousel Images"
+        max={ENG_HERO_LIMITS.backgroundImages}
+        hint="Images rotate behind the hero (up to 6). Upload, replace, or remove each one."
+        value={value.backgroundImages ?? []}
+        onChange={(next) => onChange({ ...value, backgroundImages: next })}
+      />
+      <TextInput
+        label="Hero Title"
+        value={value.title ?? ""}
+        maxLength={ENG_HERO_LIMITS.titleMax}
+        onChange={(e) => onChange({ ...value, title: e.target.value })}
+        hint="Main headline displayed on the hero section"
+      />
+      <TextArea
+        label="Subtitle"
+        value={value.subtitle ?? ""}
+        rows={3}
+        maxLength={ENG_HERO_LIMITS.subtitleMax}
+        onChange={(e) => onChange({ ...value, subtitle: e.target.value })}
+      />
+      <CtaList
+        value={value.ctas ?? []}
+        max={ENG_HERO_LIMITS.ctas}
+        onChange={(next) => onChange({ ...value, ctas: next })}
+      />
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="Badge Text"
+          value={value.badgeText ?? ""}
+          maxLength={ENG_HERO_LIMITS.badgeTextMax}
+          onChange={(e) => onChange({ ...value, badgeText: e.target.value })}
+          hint='e.g. "An Autonomous Institution"'
+        />
+        <TextInput
+          label="Counselling Label"
+          value={value.counsellingLabel ?? ""}
+          maxLength={ENG_HERO_LIMITS.counsellingLabelMax}
+          onChange={(e) => onChange({ ...value, counsellingLabel: e.target.value })}
+          hint='e.g. "Counselling Code:"'
+        />
+      </div>
+      <TextInput
+        label="Counselling Code"
+        value={value.counsellingCode ?? ""}
+        maxLength={ENG_HERO_LIMITS.counsellingCodeMax}
+        onChange={(e) => onChange({ ...value, counsellingCode: e.target.value })}
+        hint="e.g. 2724"
+      />
     </div>
   );
 }
@@ -1190,6 +1226,852 @@ export function StringListForm({
           max={RESEARCH_HIGHLIGHTS_LIMITS.itemsMax}
         />
       </div>
+    </div>
+  );
+}
+
+/* ─── Generic Admissions (Engineering + Arts & Science) ─── */
+
+export type GenericAdmissionsCriterion = { title: string; items: string[] };
+export type GenericAdmissionsVal = {
+  eyebrow?: string;
+  title?: string;
+  description?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  criteria?: GenericAdmissionsCriterion[];
+  phone?: string;
+  email?: string;
+  address?: string;
+};
+
+export function AdmissionsForm({
+  value,
+  onChange,
+  showContact = true,
+}: {
+  value: GenericAdmissionsVal;
+  onChange: (v: GenericAdmissionsVal) => void;
+  showContact?: boolean;
+}) {
+  const criteria = Array.isArray(value.criteria) ? value.criteria : [];
+  const criteriaAtMax = criteria.length >= ADMISSIONS_LIMITS.criteriaMax;
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="Eyebrow"
+          value={value.eyebrow ?? ""}
+          maxLength={ADMISSIONS_LIMITS.eyebrowMax}
+          onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
+          hint='Small label above the title (e.g. "Admissions")'
+        />
+        <TextInput
+          label="Title"
+          value={value.title ?? ""}
+          maxLength={ADMISSIONS_LIMITS.titleMax}
+          onChange={(e) => onChange({ ...value, title: e.target.value })}
+        />
+      </div>
+      <TextArea
+        label="Description"
+        rows={2}
+        value={value.description ?? ""}
+        maxLength={ADMISSIONS_LIMITS.descriptionMax}
+        onChange={(e) => onChange({ ...value, description: e.target.value })}
+      />
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="CTA Label"
+          value={value.ctaLabel ?? ""}
+          maxLength={ADMISSIONS_LIMITS.ctaLabelMax}
+          onChange={(e) => onChange({ ...value, ctaLabel: e.target.value })}
+          placeholder="Apply Now"
+        />
+        <TextInput
+          label="CTA Href"
+          value={value.ctaHref ?? ""}
+          maxLength={500}
+          onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
+          placeholder="https://admissions.jct.ac.in"
+        />
+      </div>
+
+      <Field
+        label="Admission Criteria Blocks"
+        hint={`Renders as ${ADMISSIONS_LIMITS.criteriaMax} columns on the page. Up to ${ADMISSIONS_LIMITS.itemsPerBlockMax} items per block.`}
+      >
+        <div className="space-y-3">
+          {criteria.map((block, i) => (
+            <div key={i} className="rounded-lg border border-gray-200 p-3">
+              <TextInput
+                label="Block Title"
+                value={block.title}
+                maxLength={ADMISSIONS_LIMITS.blockTitleMax}
+                onChange={(e) =>
+                  onChange({
+                    ...value,
+                    criteria: criteria.map((b, j) =>
+                      j === i ? { ...b, title: e.target.value } : b,
+                    ),
+                  })
+                }
+              />
+              <Field label="Items">
+                <div className="space-y-2">
+                  {block.items.map((item, k) => (
+                    <div key={k} className="flex gap-2">
+                      <input
+                        className="admin-input"
+                        value={item}
+                        maxLength={ADMISSIONS_LIMITS.itemMax}
+                        onChange={(e) =>
+                          onChange({
+                            ...value,
+                            criteria: criteria.map((b, j) =>
+                              j === i
+                                ? {
+                                    ...b,
+                                    items: b.items.map((it, m) =>
+                                      m === k ? e.target.value : it,
+                                    ),
+                                  }
+                                : b,
+                            ),
+                          })
+                        }
+                      />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onChange({
+                            ...value,
+                            criteria: criteria.map((b, j) =>
+                              j === i
+                                ? { ...b, items: b.items.filter((_, m) => m !== k) }
+                                : b,
+                            ),
+                          })
+                        }
+                        className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onChange({
+                        ...value,
+                        criteria: criteria.map((b, j) =>
+                          j === i ? { ...b, items: [...b.items, ""] } : b,
+                        ),
+                      })
+                    }
+                    disabled={block.items.length >= ADMISSIONS_LIMITS.itemsPerBlockMax}
+                    className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    <Plus size={14} /> Add Item
+                  </button>
+                </div>
+              </Field>
+              <button
+                type="button"
+                onClick={() =>
+                  onChange({ ...value, criteria: criteria.filter((_, j) => j !== i) })
+                }
+                className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+              >
+                <Trash2 size={13} /> Remove Block
+              </button>
+            </div>
+          ))}
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() =>
+                onChange({ ...value, criteria: [...criteria, { title: "", items: [] }] })
+              }
+              disabled={criteriaAtMax}
+              className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus size={14} /> Add Criterion Block
+            </button>
+            <LimitHint count={criteria.length} max={ADMISSIONS_LIMITS.criteriaMax} />
+          </div>
+        </div>
+      </Field>
+
+      {showContact && (
+        <Field label="Contact Strip" hint="Phone, email, and address displayed below the criteria.">
+          <div className="space-y-3">
+            <TextInput
+              label="Phone"
+              value={value.phone ?? ""}
+              maxLength={ADMISSIONS_LIMITS.phoneMax}
+              onChange={(e) => onChange({ ...value, phone: e.target.value })}
+              placeholder="+91 93614 88801"
+            />
+            <TextInput
+              label="Email"
+              value={value.email ?? ""}
+              maxLength={ADMISSIONS_LIMITS.emailMax}
+              onChange={(e) => onChange({ ...value, email: e.target.value })}
+              placeholder="admissions@jct.ac.in"
+            />
+            <TextInput
+              label="Address"
+              value={value.address ?? ""}
+              maxLength={ADMISSIONS_LIMITS.addressMax}
+              onChange={(e) => onChange({ ...value, address: e.target.value })}
+              placeholder="Knowledge Park, Pichanur, Coimbatore - 641105"
+            />
+          </div>
+        </Field>
+      )}
+    </div>
+  );
+}
+
+/* ─── Why Choose JCT ─── */
+
+export type WhyChooseJctFeature = { icon: string; title: string; description: string };
+export type WhyChooseJctVal = {
+  eyebrow?: string;
+  title?: string;
+  titleHighlight?: string;
+  description?: string;
+  features?: WhyChooseJctFeature[];
+};
+
+export function WhyChooseJctForm({
+  value,
+  onChange,
+}: {
+  value: WhyChooseJctVal;
+  onChange: (v: WhyChooseJctVal) => void;
+}) {
+  const features = Array.isArray(value.features) ? value.features : [];
+  const atMax = features.length >= WHY_CHOOSE_JCT_LIMITS.featuresMax;
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="Eyebrow"
+          value={value.eyebrow ?? ""}
+          maxLength={WHY_CHOOSE_JCT_LIMITS.eyebrowMax}
+          onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
+        />
+        <TextInput
+          label="Title Highlight"
+          value={value.titleHighlight ?? ""}
+          maxLength={WHY_CHOOSE_JCT_LIMITS.titleHighlightMax}
+          onChange={(e) => onChange({ ...value, titleHighlight: e.target.value })}
+          hint="Rendered in accent color within the title"
+        />
+      </div>
+      <TextInput
+        label="Title"
+        value={value.title ?? ""}
+        maxLength={WHY_CHOOSE_JCT_LIMITS.titleMax}
+        onChange={(e) => onChange({ ...value, title: e.target.value })}
+      />
+      <TextArea
+        label="Description"
+        rows={2}
+        value={value.description ?? ""}
+        maxLength={WHY_CHOOSE_JCT_LIMITS.descriptionMax}
+        onChange={(e) => onChange({ ...value, description: e.target.value })}
+      />
+      <Field
+        label="Feature Cards"
+        hint={`Up to ${WHY_CHOOSE_JCT_LIMITS.featuresMax} cards. Icon is a Lucide icon name (e.g. BookOpen, Award).`}
+      >
+        <div className="space-y-3">
+          {features.map((feat, i) => (
+            <div key={i} className="rounded-lg border border-gray-200 p-3">
+              <div className="grid grid-cols-2 gap-3">
+                <TextInput
+                  label="Icon"
+                  value={feat.icon}
+                  maxLength={WHY_CHOOSE_JCT_LIMITS.featureIconMax}
+                  onChange={(e) =>
+                    onChange({
+                      ...value,
+                      features: features.map((f, j) =>
+                        j === i ? { ...f, icon: e.target.value } : f,
+                      ),
+                    })
+                  }
+                  placeholder="BookOpen"
+                />
+                <TextInput
+                  label="Title"
+                  value={feat.title}
+                  maxLength={WHY_CHOOSE_JCT_LIMITS.featureTitleMax}
+                  onChange={(e) =>
+                    onChange({
+                      ...value,
+                      features: features.map((f, j) =>
+                        j === i ? { ...f, title: e.target.value } : f,
+                      ),
+                    })
+                  }
+                />
+              </div>
+              <TextArea
+                label="Description"
+                rows={2}
+                value={feat.description}
+                maxLength={WHY_CHOOSE_JCT_LIMITS.featureDescMax}
+                onChange={(e) =>
+                  onChange({
+                    ...value,
+                    features: features.map((f, j) =>
+                      j === i ? { ...f, description: e.target.value } : f,
+                    ),
+                  })
+                }
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  onChange({ ...value, features: features.filter((_, j) => j !== i) })
+                }
+                className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+              >
+                <Trash2 size={13} /> Remove
+              </button>
+            </div>
+          ))}
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() =>
+                onChange({
+                  ...value,
+                  features: [...features, { icon: "", title: "", description: "" }],
+                })
+              }
+              disabled={atMax}
+              className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus size={14} /> Add Feature
+            </button>
+            <LimitHint count={features.length} max={WHY_CHOOSE_JCT_LIMITS.featuresMax} />
+          </div>
+        </div>
+      </Field>
+    </div>
+  );
+}
+
+/* ─── Home Admissions CTA ─── */
+
+export type HomeAdmissionsPathway = {
+  icon: string;
+  title: string;
+  description: string;
+  ctaLabel: string;
+  ctaHref: string;
+};
+export type HomeAdmissionsVal = {
+  eyebrow?: string;
+  title?: string;
+  titleHighlight?: string;
+  description?: string;
+  pathways?: HomeAdmissionsPathway[];
+  applyLabel?: string;
+  applyHref?: string;
+  prospectusLabel?: string;
+  prospectusUrl?: string;
+};
+
+export function HomeAdmissionsForm({
+  value,
+  onChange,
+}: {
+  value: HomeAdmissionsVal;
+  onChange: (v: HomeAdmissionsVal) => void;
+}) {
+  const pathways = Array.isArray(value.pathways) ? value.pathways : [];
+  const atMax = pathways.length >= HOME_ADMISSIONS_LIMITS.pathwaysMax;
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="Eyebrow"
+          value={value.eyebrow ?? ""}
+          maxLength={HOME_ADMISSIONS_LIMITS.eyebrowMax}
+          onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
+        />
+        <TextInput
+          label="Title Highlight"
+          value={value.titleHighlight ?? ""}
+          maxLength={HOME_ADMISSIONS_LIMITS.titleHighlightMax}
+          onChange={(e) => onChange({ ...value, titleHighlight: e.target.value })}
+          hint="Rendered in accent color"
+        />
+      </div>
+      <TextInput
+        label="Title"
+        value={value.title ?? ""}
+        maxLength={HOME_ADMISSIONS_LIMITS.titleMax}
+        onChange={(e) => onChange({ ...value, title: e.target.value })}
+      />
+      <TextArea
+        label="Description"
+        rows={2}
+        value={value.description ?? ""}
+        maxLength={HOME_ADMISSIONS_LIMITS.descriptionMax}
+        onChange={(e) => onChange({ ...value, description: e.target.value })}
+      />
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="Apply Button Label"
+          value={value.applyLabel ?? ""}
+          maxLength={HOME_ADMISSIONS_LIMITS.applyLabelMax}
+          onChange={(e) => onChange({ ...value, applyLabel: e.target.value })}
+          placeholder="Apply Now"
+        />
+        <TextInput
+          label="Apply Button Href"
+          value={value.applyHref ?? ""}
+          maxLength={500}
+          onChange={(e) => onChange({ ...value, applyHref: e.target.value })}
+          placeholder="https://admissions.jct.ac.in"
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="Prospectus Button Label"
+          value={value.prospectusLabel ?? ""}
+          maxLength={HOME_ADMISSIONS_LIMITS.prospectusLabelMax}
+          onChange={(e) => onChange({ ...value, prospectusLabel: e.target.value })}
+          placeholder="Download Prospectus"
+        />
+        <TextInput
+          label="Prospectus URL"
+          value={value.prospectusUrl ?? ""}
+          maxLength={500}
+          onChange={(e) => onChange({ ...value, prospectusUrl: e.target.value })}
+          placeholder="https://... or storage key"
+        />
+      </div>
+
+      <Field
+        label="Pathway Cards"
+        hint={`Up to ${HOME_ADMISSIONS_LIMITS.pathwaysMax} cards. Icon is a Lucide icon name.`}
+      >
+        <div className="space-y-3">
+          {pathways.map((p, i) => (
+            <div key={i} className="rounded-lg border border-gray-200 p-3">
+              <div className="grid grid-cols-2 gap-3">
+                <TextInput
+                  label="Icon"
+                  value={p.icon}
+                  maxLength={HOME_ADMISSIONS_LIMITS.pathwayIconMax}
+                  onChange={(e) =>
+                    onChange({
+                      ...value,
+                      pathways: pathways.map((pw, j) =>
+                        j === i ? { ...pw, icon: e.target.value } : pw,
+                      ),
+                    })
+                  }
+                  placeholder="GraduationCap"
+                />
+                <TextInput
+                  label="Title"
+                  value={p.title}
+                  maxLength={HOME_ADMISSIONS_LIMITS.pathwayTitleMax}
+                  onChange={(e) =>
+                    onChange({
+                      ...value,
+                      pathways: pathways.map((pw, j) =>
+                        j === i ? { ...pw, title: e.target.value } : pw,
+                      ),
+                    })
+                  }
+                />
+              </div>
+              <TextArea
+                label="Description"
+                rows={2}
+                value={p.description}
+                maxLength={HOME_ADMISSIONS_LIMITS.pathwayDescMax}
+                onChange={(e) =>
+                  onChange({
+                    ...value,
+                    pathways: pathways.map((pw, j) =>
+                      j === i ? { ...pw, description: e.target.value } : pw,
+                    ),
+                  })
+                }
+              />
+              <div className="grid grid-cols-2 gap-3">
+                <TextInput
+                  label="CTA Label"
+                  value={p.ctaLabel}
+                  maxLength={HOME_ADMISSIONS_LIMITS.pathwayCtaLabelMax}
+                  onChange={(e) =>
+                    onChange({
+                      ...value,
+                      pathways: pathways.map((pw, j) =>
+                        j === i ? { ...pw, ctaLabel: e.target.value } : pw,
+                      ),
+                    })
+                  }
+                />
+                <TextInput
+                  label="CTA Href"
+                  value={p.ctaHref}
+                  maxLength={500}
+                  onChange={(e) =>
+                    onChange({
+                      ...value,
+                      pathways: pathways.map((pw, j) =>
+                        j === i ? { ...pw, ctaHref: e.target.value } : pw,
+                      ),
+                    })
+                  }
+                />
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  onChange({ ...value, pathways: pathways.filter((_, j) => j !== i) })
+                }
+                className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+              >
+                <Trash2 size={13} /> Remove
+              </button>
+            </div>
+          ))}
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() =>
+                onChange({
+                  ...value,
+                  pathways: [
+                    ...pathways,
+                    { icon: "", title: "", description: "", ctaLabel: "", ctaHref: "" },
+                  ],
+                })
+              }
+              disabled={atMax}
+              className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus size={14} /> Add Pathway
+            </button>
+            <LimitHint count={pathways.length} max={HOME_ADMISSIONS_LIMITS.pathwaysMax} />
+          </div>
+        </div>
+      </Field>
+    </div>
+  );
+}
+
+/* ─── Global CMS — Header ─── */
+
+export type HeaderVal = {
+  logo?: string;
+  logoText?: string;
+  phone?: string;
+  applyLabel?: string;
+  applyUrl?: string;
+  studentLoginLabel?: string;
+  studentLoginUrl?: string;
+  showStudentLogin?: boolean;
+};
+
+export function HeaderForm({
+  value,
+  onChange,
+}: {
+  value: HeaderVal;
+  onChange: (v: HeaderVal) => void;
+}) {
+  return (
+    <div className="space-y-4">
+      <ImageUploadInput
+        label="Logo"
+        value={value.logo ?? ""}
+        onChange={(url) => onChange({ ...value, logo: url })}
+        uploadOnly
+      />
+      <TextInput
+        label="Logo Text"
+        value={value.logoText ?? ""}
+        maxLength={HEADER_LIMITS.logoTextMax}
+        onChange={(e) => onChange({ ...value, logoText: e.target.value })}
+        hint="Text displayed next to the logo"
+      />
+      <TextInput
+        label="Phone Number"
+        value={value.phone ?? ""}
+        maxLength={HEADER_LIMITS.phoneMax}
+        onChange={(e) => onChange({ ...value, phone: e.target.value })}
+        placeholder="+91 93614 88801"
+      />
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="Apply Button Label"
+          value={value.applyLabel ?? ""}
+          maxLength={HEADER_LIMITS.ctaLabelMax}
+          onChange={(e) => onChange({ ...value, applyLabel: e.target.value })}
+          placeholder="Apply Now"
+        />
+        <TextInput
+          label="Apply Button URL"
+          value={value.applyUrl ?? ""}
+          maxLength={500}
+          onChange={(e) => onChange({ ...value, applyUrl: e.target.value })}
+          placeholder="https://admissions.jct.ac.in"
+        />
+      </div>
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={value.showStudentLogin !== false}
+          onChange={(e) => onChange({ ...value, showStudentLogin: e.target.checked })}
+        />
+        Show Student Login button
+      </label>
+      {value.showStudentLogin !== false && (
+        <div className="grid grid-cols-2 gap-3">
+          <TextInput
+            label="Student Login Label"
+            value={value.studentLoginLabel ?? ""}
+            maxLength={HEADER_LIMITS.ctaLabelMax}
+            onChange={(e) => onChange({ ...value, studentLoginLabel: e.target.value })}
+            placeholder="Student Login"
+          />
+          <TextInput
+            label="Student Login URL"
+            value={value.studentLoginUrl ?? ""}
+            maxLength={500}
+            onChange={(e) => onChange({ ...value, studentLoginUrl: e.target.value })}
+            placeholder="https://..."
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Global CMS — Footer ─── */
+
+export type FooterLegalLink = { name: string; href: string };
+export type FooterVal = {
+  orgName?: string;
+  description?: string;
+  helplineLabel?: string;
+  phone?: string;
+  email?: string;
+  admissionsEmail?: string;
+  addressLines?: string[];
+  mapEmbedUrl?: string;
+  facebook?: string;
+  instagram?: string;
+  twitter?: string;
+  linkedin?: string;
+  youtube?: string;
+  legalLinks?: FooterLegalLink[];
+  copyright?: string;
+};
+
+export function FooterForm({
+  value,
+  onChange,
+}: {
+  value: FooterVal;
+  onChange: (v: FooterVal) => void;
+}) {
+  const addressLines = Array.isArray(value.addressLines) ? value.addressLines : [];
+  const legalLinks = Array.isArray(value.legalLinks) ? value.legalLinks : [];
+  const addressAtMax = addressLines.length >= FOOTER_LIMITS.addressLinesMax;
+  const legalAtMax = legalLinks.length >= FOOTER_LIMITS.legalLinksMax;
+
+  return (
+    <div className="space-y-5">
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="Organisation Name"
+          value={value.orgName ?? ""}
+          maxLength={FOOTER_LIMITS.orgNameMax}
+          onChange={(e) => onChange({ ...value, orgName: e.target.value })}
+        />
+        <TextInput
+          label="Helpline Label"
+          value={value.helplineLabel ?? ""}
+          maxLength={FOOTER_LIMITS.labelMax}
+          onChange={(e) => onChange({ ...value, helplineLabel: e.target.value })}
+          placeholder="Helpline"
+        />
+      </div>
+      <TextArea
+        label="Description"
+        rows={3}
+        value={value.description ?? ""}
+        maxLength={FOOTER_LIMITS.descriptionMax}
+        onChange={(e) => onChange({ ...value, description: e.target.value })}
+      />
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="Phone"
+          value={value.phone ?? ""}
+          maxLength={FOOTER_LIMITS.phoneMax}
+          onChange={(e) => onChange({ ...value, phone: e.target.value })}
+        />
+        <TextInput
+          label="General Email"
+          value={value.email ?? ""}
+          maxLength={FOOTER_LIMITS.emailMax}
+          onChange={(e) => onChange({ ...value, email: e.target.value })}
+        />
+      </div>
+      <TextInput
+        label="Admissions Email"
+        value={value.admissionsEmail ?? ""}
+        maxLength={FOOTER_LIMITS.emailMax}
+        onChange={(e) => onChange({ ...value, admissionsEmail: e.target.value })}
+      />
+
+      <Field label="Address Lines" hint={`Up to ${FOOTER_LIMITS.addressLinesMax} lines.`}>
+        <div className="space-y-2">
+          {addressLines.map((line, i) => (
+            <div key={i} className="flex gap-2">
+              <input
+                className="admin-input"
+                value={line}
+                maxLength={FOOTER_LIMITS.addressLineMax}
+                onChange={(e) =>
+                  onChange({
+                    ...value,
+                    addressLines: addressLines.map((l, j) => (j === i ? e.target.value : l)),
+                  })
+                }
+              />
+              <button
+                type="button"
+                onClick={() =>
+                  onChange({ ...value, addressLines: addressLines.filter((_, j) => j !== i) })
+                }
+                className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+              >
+                <Trash2 size={13} />
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => onChange({ ...value, addressLines: [...addressLines, ""] })}
+            disabled={addressAtMax}
+            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Plus size={14} /> Add Line
+          </button>
+        </div>
+      </Field>
+
+      <TextArea
+        label="Map Embed URL"
+        rows={2}
+        value={value.mapEmbedUrl ?? ""}
+        maxLength={FOOTER_LIMITS.mapEmbedMax}
+        onChange={(e) => onChange({ ...value, mapEmbedUrl: e.target.value })}
+        hint="Google Maps embed src URL"
+      />
+
+      <Field label="Social Links">
+        <div className="space-y-2">
+          {(
+            [
+              { key: "facebook", label: "Facebook" },
+              { key: "instagram", label: "Instagram" },
+              { key: "twitter", label: "X / Twitter" },
+              { key: "linkedin", label: "LinkedIn" },
+              { key: "youtube", label: "YouTube" },
+            ] as { key: keyof FooterVal; label: string }[]
+          ).map(({ key, label }) => (
+            <TextInput
+              key={key}
+              label={label}
+              value={(value[key] as string) ?? ""}
+              maxLength={500}
+              onChange={(e) => onChange({ ...value, [key]: e.target.value })}
+              placeholder="https://..."
+            />
+          ))}
+        </div>
+      </Field>
+
+      <Field label="Legal Links" hint={`Up to ${FOOTER_LIMITS.legalLinksMax} links.`}>
+        <div className="space-y-2">
+          {legalLinks.map((link, i) => (
+            <div key={i} className="grid grid-cols-2 gap-2">
+              <TextInput
+                label="Name"
+                value={link.name}
+                maxLength={FOOTER_LIMITS.legalNameMax}
+                onChange={(e) =>
+                  onChange({
+                    ...value,
+                    legalLinks: legalLinks.map((l, j) =>
+                      j === i ? { ...l, name: e.target.value } : l,
+                    ),
+                  })
+                }
+              />
+              <div className="flex gap-2">
+                <TextInput
+                  label="Href"
+                  value={link.href}
+                  maxLength={500}
+                  onChange={(e) =>
+                    onChange({
+                      ...value,
+                      legalLinks: legalLinks.map((l, j) =>
+                        j === i ? { ...l, href: e.target.value } : l,
+                      ),
+                    })
+                  }
+                />
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChange({ ...value, legalLinks: legalLinks.filter((_, j) => j !== i) })
+                  }
+                  className="admin-btn admin-btn-danger admin-btn-sm mt-5 shrink-0"
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              onChange({ ...value, legalLinks: [...legalLinks, { name: "", href: "" }] })
+            }
+            disabled={legalAtMax}
+            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Plus size={14} /> Add Legal Link
+          </button>
+        </div>
+      </Field>
+
+      <TextInput
+        label="Copyright Text"
+        value={value.copyright ?? ""}
+        maxLength={FOOTER_LIMITS.copyrightMax}
+        onChange={(e) => onChange({ ...value, copyright: e.target.value })}
+        placeholder="JCT Institutions. All rights reserved."
+      />
     </div>
   );
 }

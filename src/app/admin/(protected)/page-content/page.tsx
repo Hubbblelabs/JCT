@@ -15,6 +15,7 @@ import {
   CampusLifeCarouselForm,
   AnnouncementForm,
   PolytechnicAdmissionsForm,
+  AdmissionsForm,
   LifeAtJctForm,
   MetricsForm,
   type EngHeroVal,
@@ -24,6 +25,7 @@ import {
   type CampusLifeCarouselVal,
   type AnnouncementVal,
   type AdmissionsVal,
+  type GenericAdmissionsVal,
   type LifeAtJctVal,
   type Metric,
 } from "@/components/admin/PageContentForms";
@@ -417,6 +419,20 @@ function sectionsFor(college: College): SectionDef[] {
         ),
       },
       {
+        id: "admissions",
+        label: "Admissions",
+        kind: "form",
+        configKey: "engineeringAdmissions",
+        defaultValue: {} as GenericAdmissionsVal,
+        render: (v, onChange) => (
+          <AdmissionsForm
+            value={(v as GenericAdmissionsVal) ?? {}}
+            onChange={onChange}
+            showContact={true}
+          />
+        ),
+      },
+      {
         id: "lifeAtJct",
         label: "Life at JCT",
         kind: "form",
@@ -471,6 +487,20 @@ function sectionsFor(college: College): SectionDef[] {
         defaultValue: [] as HeroStat[],
         render: (v, onChange) => (
           <HeroStatsForm value={(v as HeroStat[]) ?? []} onChange={onChange} />
+        ),
+      },
+      {
+        id: "admissions",
+        label: "Admissions",
+        kind: "form",
+        configKey: "artsScienceAdmissions",
+        defaultValue: {} as GenericAdmissionsVal,
+        render: (v, onChange) => (
+          <AdmissionsForm
+            value={(v as GenericAdmissionsVal) ?? {}}
+            onChange={onChange}
+            showContact={true}
+          />
         ),
       },
       {

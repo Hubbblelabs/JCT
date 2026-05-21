@@ -9,8 +9,12 @@ import {
 import {
   PamphletForm,
   LifeAtJctForm,
+  WhyChooseJctForm,
+  HomeAdmissionsForm,
   type PamphletVal,
   type LifeAtJctVal,
+  type WhyChooseJctVal,
+  type HomeAdmissionsVal,
 } from "@/components/admin/PageContentForms";
 import {
   TextArea,
@@ -742,6 +746,32 @@ function Inner() {
       render: (v, onChange) => (
         <PamphletForm
           value={(v as PamphletVal) ?? {}}
+          onChange={(next) => onChange(next)}
+        />
+      ),
+    },
+    {
+      id: "whyChooseJct",
+      label: "Why Choose JCT",
+      kind: "form",
+      configKey: "whyChooseJct",
+      defaultValue: {} as WhyChooseJctVal,
+      render: (v, onChange) => (
+        <WhyChooseJctForm
+          value={(v as WhyChooseJctVal) ?? {}}
+          onChange={(next) => onChange(next)}
+        />
+      ),
+    },
+    {
+      id: "homeAdmissions",
+      label: "Admissions CTA",
+      kind: "form",
+      configKey: "homeAdmissions",
+      defaultValue: {} as HomeAdmissionsVal,
+      render: (v, onChange) => (
+        <HomeAdmissionsForm
+          value={(v as HomeAdmissionsVal) ?? {}}
           onChange={(next) => onChange(next)}
         />
       ),
