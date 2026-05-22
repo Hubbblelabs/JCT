@@ -6,12 +6,7 @@ export interface IProgram extends Document {
   abbr: string;
   slug: string;
   institution: "engineering" | "arts-science" | "polytechnic";
-  degree: string;
-  duration: string;
-  seats: number;
   image: string;
-  highlight: string;
-  description: string;
   outcomes: string[];
   is_active: boolean;
   sort_order: number;
@@ -38,12 +33,7 @@ const ProgramSchema = new Schema<IProgram>(
       required: true,
       enum: ["engineering", "arts-science", "polytechnic"],
     },
-    degree: { type: String, default: "" },
-    duration: { type: String, default: "" },
-    seats: { type: Number, default: 60 },
     image: { type: String, default: "" },
-    highlight: { type: String, default: "" },
-    description: { type: String, default: "" },
     outcomes: { type: [String], default: [] },
     is_active: { type: Boolean, default: true },
     sort_order: { type: Number, default: 0 },

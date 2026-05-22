@@ -16,9 +16,13 @@ type WhyChooseJct = {
 };
 type HomeStats = {
   yearsOfExcellence?: string;
+  yearsOfExcellenceLabel?: string;
   alumni?: string;
+  alumniLabel?: string;
   studentsPlaced?: string;
+  studentsPlacedLabel?: string;
   industryAwards?: string;
+  industryAwardsLabel?: string;
 };
 
 const CARD_GRADIENTS = [
@@ -30,11 +34,11 @@ const CARD_GRADIENTS = [
   "from-sky-50 to-cyan-50",
 ];
 
-const COUNTER_FIELDS: { key: keyof HomeStats; label: string }[] = [
-  { key: "yearsOfExcellence", label: "Years of Excellence" },
-  { key: "alumni", label: "Alumni Worldwide" },
-  { key: "studentsPlaced", label: "Students Placed" },
-  { key: "industryAwards", label: "Industry Awards" },
+const COUNTER_FIELDS: { key: keyof HomeStats; labelKey: keyof HomeStats; defaultLabel: string }[] = [
+  { key: "yearsOfExcellence", labelKey: "yearsOfExcellenceLabel", defaultLabel: "Years of Excellence" },
+  { key: "alumni", labelKey: "alumniLabel", defaultLabel: "Alumni Worldwide" },
+  { key: "studentsPlaced", labelKey: "studentsPlacedLabel", defaultLabel: "Students Placed" },
+  { key: "industryAwards", labelKey: "industryAwardsLabel", defaultLabel: "Industry Awards" },
 ];
 
 function normalizeWhy(raw: unknown): WhyChooseJct | null {
@@ -73,7 +77,10 @@ export function WhyJCT() {
   const why = normalizeWhy(whyData);
 
   const counters = COUNTER_FIELDS.map((f) => ({
-    label: f.label,
+    label:
+      statsData && typeof statsData[f.labelKey] === "string" && (statsData[f.labelKey] as string).trim()
+        ? (statsData[f.labelKey] as string).trim()
+        : f.defaultLabel,
     value:
       statsData && typeof statsData[f.key] === "string"
         ? (statsData[f.key] as string)

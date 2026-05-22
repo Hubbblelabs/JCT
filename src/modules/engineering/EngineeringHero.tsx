@@ -182,11 +182,11 @@ export function EngineeringHero() {
                   transition={{ duration: 0.65, delay: 0.18 }}
                   className="mt-10 flex w-full flex-col items-center justify-center gap-4 sm:w-auto sm:flex-row"
                 >
-                  {hero.ctas.map((cta) => {
+                  {hero.ctas.map((cta, idx) => {
                     const isExternal = cta.href.startsWith("http");
                     return (
                       <Link
-                        key={cta.label}
+                        key={idx}
                         href={cta.href}
                         target={isExternal ? "_blank" : undefined}
                         rel={isExternal ? "noopener noreferrer" : undefined}

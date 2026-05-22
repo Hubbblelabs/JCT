@@ -25,7 +25,6 @@ import {
   TextInput,
   Select,
   ImageUploadInput,
-  DocumentUploadInput,
 } from "@/components/admin/inputs";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -49,14 +48,46 @@ type HomeVal = {
 
 type HomeStatsVal = {
   yearsOfExcellence?: string;
+  yearsOfExcellenceLabel?: string;
   alumni?: string;
+  alumniLabel?: string;
   studentsPlaced?: string;
+  studentsPlacedLabel?: string;
   industryAwards?: string;
+  industryAwardsLabel?: string;
 };
 
-type HomeProspectusVal = {
-  url?: string;
-};
+// ─── Carousel Speed Input ────────────────────────────────────────────────────
+
+function CarouselSpeedInput({
+  value,
+  onChange,
+}: {
+  value: number | undefined;
+  onChange: (v: number) => void;
+}) {
+  const [draft, setDraft] = useState(() => String(value ?? 6000));
+  useEffect(() => { setDraft(String(value ?? 6000)); }, [value]);
+  return (
+    <TextInput
+      label="Carousel Speed (ms)"
+      type="number"
+      min={1500}
+      max={60000}
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={() => {
+        const num = Number(draft);
+        if (draft !== "" && !isNaN(num) && num >= 1500 && num <= 60000) {
+          onChange(num);
+        } else {
+          setDraft(String(value ?? 6000));
+        }
+      }}
+      hint="How long each background image stays before rotating. Between 1500ms and 60000ms."
+    />
+  );
+}
 
 // ─── Hero Form ────────────────────────────────────────────────────────────────
 
@@ -165,16 +196,9 @@ function HomeHeroForm({
       </div>
 
       {/* Carousel speed */}
-      <TextInput
-        label="Carousel Speed (ms)"
-        type="number"
-        min={1500}
-        max={60000}
-        value={value.intervalMs ?? 6000}
-        onChange={(e) =>
-          onChange({ ...value, intervalMs: Number(e.target.value) || 6000 })
-        }
-        hint="How long each background image stays before rotating. Between 1500ms and 60000ms."
+      <CarouselSpeedInput
+        value={value.intervalMs}
+        onChange={(intervalMs) => onChange({ ...value, intervalMs })}
       />
 
       {/* Title Lines (exactly 3, fixed count) */}
@@ -252,11 +276,17 @@ function HomeHeroForm({
 
 // ─── Card / Stats Form ────────────────────────────────────────────────────────
 
-const STAT_FIELDS: { key: keyof HomeStatsVal; label: string }[] = [
-  { key: "yearsOfExcellence", label: "Years of Excellence" },
-  { key: "alumni", label: "Alumni" },
-  { key: "studentsPlaced", label: "Students Placed" },
-  { key: "industryAwards", label: "Industry Awards" },
+type StatCardField = {
+  valueKey: keyof HomeStatsVal;
+  labelKey: keyof HomeStatsVal;
+  defaultLabel: string;
+};
+
+const STAT_CARD_FIELDS: StatCardField[] = [
+  { valueKey: "yearsOfExcellence", labelKey: "yearsOfExcellenceLabel", defaultLabel: "Years of Excellence" },
+  { valueKey: "alumni", labelKey: "alumniLabel", defaultLabel: "Alumni" },
+  { valueKey: "studentsPlaced", labelKey: "studentsPlacedLabel", defaultLabel: "Students Placed" },
+  { valueKey: "industryAwards", labelKey: "industryAwardsLabel", defaultLabel: "Industry Awards" },
 ];
 
 function HomeStatsForm({
@@ -267,47 +297,35 @@ function HomeStatsForm({
   onChange: (v: HomeStatsVal) => void;
 }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       <p className="text-xs text-gray-400">
-        Enter the value displayed for each stat card (e.g. &ldquo;60+&rdquo;,
-        &ldquo;15,000+&rdquo;).
+        Each card shows a value (e.g. &ldquo;60+&rdquo;) and a label (e.g. &ldquo;Years of Excellence&rdquo;). Both are fully customizable.
       </p>
-      {STAT_FIELDS.map(({ key, label }) => (
-        <TextInput
-          key={key}
-          label={label}
-          value={(value[key] as string) ?? ""}
-          onChange={(e) => onChange({ ...value, [key]: e.target.value })}
-          placeholder="e.g. 60+"
-        />
+      {STAT_CARD_FIELDS.map(({ valueKey, labelKey, defaultLabel }, i) => (
+        <div key={valueKey} className="rounded-lg border border-gray-200 p-3">
+          <p className="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+            Card {i + 1}
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <TextInput
+              label="Value"
+              value={(value[valueKey] as string) ?? ""}
+              onChange={(e) => onChange({ ...value, [valueKey]: e.target.value })}
+              placeholder="e.g. 60+"
+            />
+            <TextInput
+              label="Label"
+              value={(value[labelKey] as string) ?? ""}
+              onChange={(e) => onChange({ ...value, [labelKey]: e.target.value })}
+              placeholder={defaultLabel}
+            />
+          </div>
+        </div>
       ))}
     </div>
   );
 }
 
-// ─── Prospectus Form ──────────────────────────────────────────────────────────
-
-function HomeProspectusForm({
-  value,
-  onChange,
-}: {
-  value: HomeProspectusVal;
-  onChange: (v: HomeProspectusVal) => void;
-}) {
-  return (
-    <div className="space-y-3">
-      <p className="text-xs text-gray-400">
-        Upload the prospectus PDF. The Download Prospectus button on the
-        homepage will link to this file.
-      </p>
-      <DocumentUploadInput
-        label="Prospectus PDF"
-        value={value.url ?? ""}
-        onChange={(url) => onChange({ ...value, url })}
-      />
-    </div>
-  );
-}
 
 // ─── Inline Voices / Testimonials Manager ────────────────────────────────────
 
@@ -649,64 +667,6 @@ function VoicesInlineManager() {
   );
 }
 
-// ─── Seed Banner ──────────────────────────────────────────────────────────────
-
-function SeedBanner() {
-  const [seeding, setSeeding] = useState(false);
-  const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(
-    null,
-  );
-
-  const handleSeed = async () => {
-    setSeeding(true);
-    setMsg(null);
-    try {
-      const r = await fetch("/api/admin/site-config/seed", { method: "POST" });
-      if (r.ok) {
-        setMsg({
-          kind: "ok",
-          text: "Default content seeded. Reload the page to see it in the forms.",
-        });
-      } else {
-        setMsg({ kind: "err", text: "Seed failed. Check your permissions." });
-      }
-    } catch {
-      setMsg({ kind: "err", text: "Seed failed." });
-    } finally {
-      setSeeding(false);
-    }
-  };
-
-  return (
-    <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-      <div>
-        <p className="text-sm font-medium text-amber-800">
-          Seed default content
-        </p>
-        <p className="text-xs text-amber-600">
-          Write the built-in default data for Hero and Card sections to the
-          database. Reload the page after seeding to see the data in the forms.
-        </p>
-        {msg && (
-          <p
-            className={`mt-1 text-xs font-medium ${msg.kind === "ok" ? "text-green-700" : "text-red-600"}`}
-          >
-            {msg.text}
-          </p>
-        )}
-      </div>
-      <button
-        type="button"
-        onClick={handleSeed}
-        disabled={seeding}
-        className="admin-btn admin-btn-outline admin-btn-sm shrink-0"
-      >
-        {seeding ? <Loader2 size={13} className="animate-spin" /> : null}
-        {seeding ? "Seeding…" : "Seed Defaults"}
-      </button>
-    </div>
-  );
-}
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
@@ -831,30 +791,14 @@ function Inner() {
         />
       ),
     },
-    {
-      id: "prospectus",
-      label: "Prospectus",
-      kind: "form",
-      configKey: "homeProspectus",
-      defaultValue: { url: "" } as HomeProspectusVal,
-      render: (v, onChange) => (
-        <HomeProspectusForm
-          value={(v as HomeProspectusVal) ?? {}}
-          onChange={(next) => onChange(next)}
-        />
-      ),
-    },
   ];
 
   return (
-    <div>
-      <SeedBanner />
-      <PageContentShell
-        pageTitle="Main Landing Page"
-        pageSubtitle="Hero, stat cards, Life at JCT gallery, testimonials, and prospectus."
-        sections={sections}
-      />
-    </div>
+    <PageContentShell
+      pageTitle="Main Landing Page"
+      pageSubtitle="Hero, stat cards, Life at JCT gallery, testimonials, and admissions."
+      sections={sections}
+    />
   );
 }
 

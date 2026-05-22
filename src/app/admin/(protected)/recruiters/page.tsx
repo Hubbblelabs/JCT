@@ -142,7 +142,6 @@ export default function RecruitersPage() {
   const [editing, setEditing] = useState<Recruiter | null>(null);
   const [form, setForm] = useState<Omit<Recruiter, "_id">>(EMPTY);
   const [saving, setSaving] = useState(false);
-  const [seeding, setSeeding] = useState(false);
   const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
 
   const load = async () => {
@@ -201,13 +200,6 @@ export default function RecruitersPage() {
     await load();
   };
 
-  const seed = async () => {
-    setSeeding(true);
-    await fetch("/api/admin/recruiters/seed", { method: "POST" });
-    await load();
-    setSeeding(false);
-  };
-
   return (
     <>
       <div className="admin-content">
@@ -219,14 +211,6 @@ export default function RecruitersPage() {
             </p>
           </div>
           <div className="flex gap-2">
-            <button
-              onClick={seed}
-              disabled={seeding}
-              className="admin-btn admin-btn-outline admin-btn-sm"
-            >
-              {seeding ? <Loader2 size={14} className="animate-spin" /> : null}
-              Seed from data files
-            </button>
             <button onClick={openNew} className="admin-btn admin-btn-primary">
               <Plus size={16} /> Add Recruiter
             </button>

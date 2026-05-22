@@ -3,7 +3,6 @@ import {
   zEnum,
   zSlug,
   zUrl,
-  zHexColor,
   zClampedString,
   zOptionalString,
   zNonNegativeInt,
@@ -19,16 +18,10 @@ export const LIMITS = {
   // Card-level limits
   nameMax: 120,
   abbrMax: 16,
-  degreeMax: 40,
-  durationMax: 20,
-  seatsMax: 600,
-  highlightMax: 160,
-  descriptionMax: 1200,
   outcomesMax: 12,
   outcomeItemMax: 240,
 
   // Rich content limits
-  shortNameMax: 30,
   tabsMax: 8,
   tabLabelMax: 40,
   tabIdMax: 40,
@@ -48,7 +41,6 @@ export const LIMITS = {
   personTitleMax: 80,
   personQualificationsMax: 160,
   imageCaptionMax: 200,
-  degreePrefixMax: 30,
   heroMetaMax: 6,
   heroMetaLabelMax: 40,
   heroMetaValueMax: 60,
@@ -66,15 +58,7 @@ export const ProgramSchema = z.object({
   abbr: zClampedString(1, LIMITS.abbrMax, "Abbreviation"),
   slug: zSlug,
   institution: zEnum(INSTITUTIONS),
-  degree: zOptionalString(LIMITS.degreeMax).default(""),
-  duration: zOptionalString(LIMITS.durationMax).default(""),
-  seats: zNonNegativeInt
-    .max(LIMITS.seatsMax, `Seats must be ≤ ${LIMITS.seatsMax}`)
-    .optional()
-    .default(60),
   image: zUrl.optional().or(z.literal("")),
-  highlight: zOptionalString(LIMITS.highlightMax).default(""),
-  description: zOptionalString(LIMITS.descriptionMax).default(""),
   outcomes: z
     .array(zClampedString(0, LIMITS.outcomeItemMax, "Outcome"))
     .max(LIMITS.outcomesMax)
@@ -401,12 +385,8 @@ const LabelsTreeSchema = z
 // legacy / additional fields keep working.
 export const ProgramContentSchema = z
   .object({
-    name: zOptionalString(LIMITS.nameMax).default(""),
-    shortName: zOptionalString(LIMITS.shortNameMax).default(""),
     heroImage: zUrl.optional().or(z.literal("")),
-    accentColor: zHexColor.optional(),
     tabs: z.array(TabSchema).max(LIMITS.tabsMax).optional(),
-    degreePrefix: zOptionalString(LIMITS.degreePrefixMax).default(""),
     heroMeta: z.array(HeroMetaItemSchema).max(LIMITS.heroMetaMax).optional(),
     tabsConfig: z
       .array(TabConfigItemSchema)

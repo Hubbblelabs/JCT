@@ -6,7 +6,13 @@ import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInstitution } from "@/contexts/InstitutionContext";
 
-export function StickyApplyButton() {
+export function StickyApplyButton({
+  label = "Apply Now",
+  href = "https://admissions.jct.ac.in",
+}: {
+  label?: string;
+  href?: string;
+} = {}) {
   const [isVisible, setIsVisible] = useState(false);
   const { institution } = useInstitution();
 
@@ -47,14 +53,14 @@ export function StickyApplyButton() {
           className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 md:bottom-6 md:left-24 md:translate-x-0"
         >
           <Link
-            href="https://admissions.jct.ac.in"
+            href={href}
             target="_blank"
             rel="noopener noreferrer"
             className={`${themeClasses} flex h-12 items-center gap-2 rounded-full px-5 font-sans text-sm font-bold shadow-xl transition-all hover:scale-105 active:scale-95`}
             aria-label="Apply for Admission"
           >
             <GraduationCap className="h-[18px] w-[18px] shrink-0" />
-            <span>Apply Now</span>
+            <span>{label}</span>
           </Link>
         </motion.div>
       )}

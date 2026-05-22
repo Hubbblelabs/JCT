@@ -335,10 +335,22 @@ export function ProgramSectionInspector({
   section,
   content,
   onChange,
+  programName,
+  onProgramNameChange,
+  programAbbr,
+  onProgramAbbrChange,
+  programSlug,
+  onProgramSlugChange,
 }: {
   section: ProgramContentSection;
   content: RawContent;
   onChange: (next: RawContent) => void;
+  programName?: string;
+  onProgramNameChange?: (name: string) => void;
+  programAbbr?: string;
+  onProgramAbbrChange?: (abbr: string) => void;
+  programSlug?: string;
+  onProgramSlugChange?: (slug: string) => void;
 }) {
   const set = (key: string, val: unknown) =>
     onChange({ ...content, [key]: val });
@@ -358,31 +370,50 @@ export function ProgramSectionInspector({
           <div className="grid grid-cols-1 gap-3">
             <TextInput
               label="Program Name"
-              value={String(content.name ?? "")}
-              onChange={(e) => set("name", e.target.value)}
+              value={
+                onProgramNameChange
+                  ? (programName ?? "")
+                  : String(content.name ?? "")
+              }
+              onChange={(e) =>
+                onProgramNameChange
+                  ? onProgramNameChange(e.target.value)
+                  : set("name", e.target.value)
+              }
             />
             <TextInput
-              label="Short Name"
-              value={String(content.shortName ?? "")}
-              onChange={(e) => set("shortName", e.target.value)}
+              label="Abbreviation"
+              value={
+                onProgramAbbrChange
+                  ? (programAbbr ?? "")
+                  : String(content.abbr ?? "")
+              }
+              onChange={(e) =>
+                onProgramAbbrChange
+                  ? onProgramAbbrChange(e.target.value)
+                  : set("abbr", e.target.value)
+              }
+              placeholder="e.g., CSE, ECE"
+            />
+            <TextInput
+              label="Slug"
+              value={
+                onProgramSlugChange
+                  ? (programSlug ?? "")
+                  : String(content.slug ?? "")
+              }
+              onChange={(e) =>
+                onProgramSlugChange
+                  ? onProgramSlugChange(e.target.value)
+                  : set("slug", e.target.value)
+              }
+              placeholder="e.g., computer-science"
             />
             <ImageUploadInput
               label="Hero Image"
               value={String(content.heroImage ?? "")}
               onChange={(url) => set("heroImage", url)}
               uploadOnly
-            />
-            <TextInput
-              label="Accent Color"
-              value={String(content.accentColor ?? "")}
-              onChange={(e) => set("accentColor", e.target.value)}
-              placeholder="#0F4C81"
-            />
-            <TextInput
-              label="Degree Prefix"
-              value={String(content.degreePrefix ?? "")}
-              onChange={(e) => set("degreePrefix", e.target.value)}
-              placeholder="B.E/B.Tech "
             />
           </div>
           <ItemsEditor
@@ -411,11 +442,6 @@ export function ProgramSectionInspector({
             label="Accreditation"
             value={flatStr(content, "accreditation", "about.accreditation")}
             onChange={(e) => set("accreditation", e.target.value)}
-          />
-          <TextInput
-            label="Duration"
-            value={flatStr(content, "duration", "about.duration")}
-            onChange={(e) => set("duration", e.target.value)}
           />
           <TextInput
             label="Affiliation"

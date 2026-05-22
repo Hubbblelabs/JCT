@@ -166,3 +166,9 @@ export {
   validateSiteConfigValue,
 } from "./siteConfig";
 export type { SiteConfigKey } from "./siteConfig";
+
+export {
+  FloatingElementsSchema,
+  FLOATING_ELEMENTS_LIMITS,
+} from "./floatingElements";
+export type { FloatingElementsValue } from "./floatingElements";

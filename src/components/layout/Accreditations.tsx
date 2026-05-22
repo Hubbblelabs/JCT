@@ -112,7 +112,7 @@ export function Accreditations({ variant = "default" }: AccreditationsProps) {
 
             return (
               <motion.div
-                key={`${logo.name}-${wrappedIndex}`}
+                key={offset}
                 animate={{
                   x: offset * offsetBase,
                   scale: isActive ? 1.1 : 0.92,

@@ -36,12 +36,7 @@ interface ProgramFields {
   abbr: string;
   slug: string;
   institution: string;
-  degree: string;
-  duration: string;
-  seats: number;
   image: string;
-  highlight: string;
-  description: string;
   outcomes: string[];
   is_active: boolean;
   sort_order: number;
@@ -52,12 +47,7 @@ const EMPTY_PROG: ProgramFields = {
   abbr: "",
   slug: "",
   institution: "engineering",
-  degree: "",
-  duration: "",
-  seats: 60,
   image: "",
-  highlight: "",
-  description: "",
   outcomes: [],
   is_active: true,
   sort_order: 0,
@@ -113,9 +103,9 @@ function ProgramDetailInner() {
   const previewData = useMemo(() => {
     const merged = {
       ...content,
-      name: (content.name as string) || prog.name,
-      shortName: (content.shortName as string) || prog.abbr,
-      college: (content.college as string) || prog.institution,
+      name: prog.name || (content.name as string) || "",
+      shortName: prog.abbr || "",
+      college: prog.institution || "",
     };
     return normalizeProgramData(merged, prog.slug || "preview");
   }, [content, prog]);
@@ -286,7 +276,7 @@ function ProgramDetailInner() {
             </h1>
             {!isNew && (
               <p className="admin-page-subtitle">
-                {prog.institution} · {prog.degree}
+                {prog.institution === "arts-science" ? "Arts & Science" : prog.institution}
               </p>
             )}
           </div>
@@ -483,6 +473,12 @@ function ProgramDetailInner() {
                   section={selectedSection}
                   content={content}
                   onChange={setContent}
+                  programName={prog.name}
+                  onProgramNameChange={(name) => setP("name", name)}
+                  programAbbr={prog.abbr}
+                  onProgramAbbrChange={(abbr) => setP("abbr", abbr)}
+                  programSlug={prog.slug}
+                  onProgramSlugChange={(slug) => setP("slug", slug)}
                 />
               </div>
             </aside>

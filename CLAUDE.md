@@ -172,3 +172,5 @@ revalidateForConfigKey("engineeringHero");        // a changed site-config key
 - Prefer local Next.js docs in `node_modules/next/dist/docs` over training data.
 - Follow App Router conventions; Server Components by default, Client Components only when interaction is required.
 - Prefer async/await data fetching with caching.
+
+The codebase is indexed using ccc. Use ccc for codebase knowledge.

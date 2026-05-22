@@ -33,6 +33,7 @@ import {
 } from "./homeSections";
 import { RecruitersSectionSchema } from "./recruiters";
 import { HeaderSchema, FooterSchema } from "./globalCms";
+import { FloatingElementsSchema } from "./floatingElements";
 
 // Every site-config key the admin UI writes must have an entry below.
 // Keys in this map are validated strictly; unknown keys are rejected.
@@ -66,6 +67,7 @@ export const SITE_CONFIG_SCHEMAS = {
   recruitersSection: RecruitersSectionSchema,
   header: HeaderSchema,
   footer: FooterSchema,
+  floatingElements: FloatingElementsSchema,
 } as const;
 
 export type SiteConfigKey = keyof typeof SITE_CONFIG_SCHEMAS;

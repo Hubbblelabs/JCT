@@ -20,7 +20,6 @@ import {
   Bell,
   BarChart3,
   Camera,
-  FileDown,
   Layers,
   Globe,
   PanelTop,
@@ -28,6 +27,7 @@ import {
   Award,
   Sparkles,
   LayoutGrid,
+  MousePointerClick,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Suspense } from "react";
@@ -178,11 +178,6 @@ const MAIN_ITEMS: NavItem[] = [
     href: "/admin/main/page-content?section=homeAdmissions",
     icon: ClipboardList,
   },
-  {
-    label: "Prospectus",
-    href: "/admin/main/page-content?section=prospectus",
-    icon: FileDown,
-  },
 ];
 
 const GLOBAL_CMS_ITEMS: NavItem[] = [
@@ -197,6 +192,11 @@ const GLOBAL_CMS_ITEMS: NavItem[] = [
     icon: PanelBottom,
   },
   { label: "Recruiters", href: "/admin/recruiters", icon: Briefcase },
+  {
+    label: "Floating Elements",
+    href: "/admin/global/page-content?section=floatingElements",
+    icon: MousePointerClick,
+  },
 ];
 
 const ADMIN_ITEMS: NavItem[] = [

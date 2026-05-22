@@ -2208,9 +2208,7 @@ export function ProgramPageLayout({
   const degreePrefix =
     typeof dept.degreePrefix === "string"
       ? dept.degreePrefix
-      : dept.college === "engineering"
-        ? "B.E/B.Tech "
-        : "";
+      : "";
 
   const heroPills =
     dept.heroMeta && dept.heroMeta.length > 0

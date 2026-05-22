@@ -1,9 +1,11 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import {
   Field,
   ImageUploadInput,
+  DocumentUploadInput,
   Select,
   TextArea,
   TextInput,
@@ -28,6 +30,7 @@ import {
   RECRUITERS_SECTION_LIMITS,
   HEADER_LIMITS,
   FOOTER_LIMITS,
+  FLOATING_ELEMENTS_LIMITS,
 } from "@/lib/validation";
 
 /* ─── Shared types ─── */
@@ -207,14 +210,28 @@ function IntervalInput({
   min: number;
   max: number;
 }) {
+  const [draft, setDraft] = useState(() => String(value ?? 6000));
+
+  useEffect(() => {
+    setDraft(String(value ?? 6000));
+  }, [value]);
+
   return (
     <TextInput
       label="Carousel Speed (ms)"
       type="number"
       min={min}
       max={max}
-      value={value ?? 6000}
-      onChange={(e) => onChange(Number(e.target.value) || 6000)}
+      value={draft}
+      onChange={(e) => setDraft(e.target.value)}
+      onBlur={() => {
+        const num = Number(draft);
+        if (draft !== "" && !isNaN(num) && num >= min && num <= max) {
+          onChange(num);
+        } else {
+          setDraft(String(value ?? 6000));
+        }
+      }}
       hint={`How long each background image stays before the carousel rotates. Between ${min}ms and ${max}ms.`}
     />
   );
@@ -560,25 +577,27 @@ export function ArtsScienceHeroForm({
         max={ARTS_HERO_LIMITS.ctas}
         onChange={(next) => onChange({ ...value, ctas: next })}
       />
-      <Field
-        label="Hero Subsections"
-        hint={`Feature blocks below the hero — Quality, Leadership, Experience (up to ${ARTS_HERO_LIMITS.subsectionsMax}). Icon is a Lucide icon name.`}
-      >
-        <ArtsSubsectionList
-          value={value.subsections ?? []}
-          max={ARTS_HERO_LIMITS.subsectionsMax}
-          onChange={(next) => onChange({ ...value, subsections: next })}
-        />
-      </Field>
-      <Field
-        label="Hero Stat Cards"
-        hint="The numbers shown in the hero stat row."
-      >
-        <HeroStatsForm
-          value={value.stats ?? []}
-          onChange={(next) => onChange({ ...value, stats: next })}
-        />
-      </Field>
+      <div className="grid grid-cols-2 gap-6">
+        <Field
+          label="Hero Stat Cards"
+          hint="The numbers shown in the hero stat row."
+        >
+          <HeroStatsForm
+            value={value.stats ?? []}
+            onChange={(next) => onChange({ ...value, stats: next })}
+          />
+        </Field>
+        <Field
+          label="Hero Subsections"
+          hint={`Feature blocks below the hero — Quality, Leadership, Experience (up to ${ARTS_HERO_LIMITS.subsectionsMax}). Icon is a Lucide icon name.`}
+        >
+          <ArtsSubsectionList
+            value={value.subsections ?? []}
+            max={ARTS_HERO_LIMITS.subsectionsMax}
+            onChange={(next) => onChange({ ...value, subsections: next })}
+          />
+        </Field>
+      </div>
       <IntervalInput
         value={value.intervalMs}
         min={ARTS_HERO_LIMITS.minIntervalMs}
@@ -733,16 +752,11 @@ export function PolytechnicHeroForm({
         max={POLY_HERO_LIMITS.ctas}
         onChange={(next) => onChange({ ...value, ctas: next })}
       />
-      <TextInput
-        label="Carousel Interval (ms)"
-        type="number"
+      <IntervalInput
+        value={value.intervalMs}
         min={POLY_HERO_LIMITS.minIntervalMs}
         max={POLY_HERO_LIMITS.maxIntervalMs}
-        value={value.intervalMs ?? 6000}
-        onChange={(e) =>
-          onChange({ ...value, intervalMs: Number(e.target.value) || 6000 })
-        }
-        hint={`Between ${POLY_HERO_LIMITS.minIntervalMs}ms and ${POLY_HERO_LIMITS.maxIntervalMs}ms`}
+        onChange={(intervalMs) => onChange({ ...value, intervalMs })}
       />
     </div>
   );
@@ -755,6 +769,8 @@ export type PamphletVal = {
   images?: string[];
   delayMs?: number;
   videoUrl?: string;
+  applyLabel?: string;
+  applyHref?: string;
 };
 
 export function PamphletForm({
@@ -799,6 +815,24 @@ export function PamphletForm({
         placeholder="https://www.youtube.com/embed/VIDEO_ID"
         hint="YouTube embed URL — used for the Virtual Tour button inside the popup."
       />
+      <Field label="Apply Now Button" hint="Customize the Apply Now button shown inside the pamphlet popup.">
+        <div className="grid grid-cols-2 gap-3">
+          <TextInput
+            label="Button Label"
+            value={value.applyLabel ?? ""}
+            maxLength={LIMITS_pamphlet.applyLabelMax}
+            onChange={(e) => onChange({ ...value, applyLabel: e.target.value })}
+            placeholder="Apply Now"
+          />
+          <TextInput
+            label="Button Link"
+            value={value.applyHref ?? ""}
+            maxLength={LIMITS_pamphlet.applyHrefMax}
+            onChange={(e) => onChange({ ...value, applyHref: e.target.value })}
+            placeholder="https://admissions.jct.ac.in"
+          />
+        </div>
+      </Field>
     </div>
   );
 }
@@ -1935,18 +1969,17 @@ export function HomeAdmissionsForm({
       </div>
       <div className="grid grid-cols-2 gap-3">
         <TextInput
-          label="Prospectus Button Label"
+          label="PDF Button Label"
           value={value.prospectusLabel ?? ""}
           maxLength={HOME_ADMISSIONS_LIMITS.prospectusLabelMax}
           onChange={(e) => onChange({ ...value, prospectusLabel: e.target.value })}
           placeholder="Download Prospectus"
+          hint="Label shown on the prospectus download button"
         />
-        <TextInput
-          label="Prospectus URL"
+        <DocumentUploadInput
+          label="Prospectus PDF"
           value={value.prospectusUrl ?? ""}
-          maxLength={500}
-          onChange={(e) => onChange({ ...value, prospectusUrl: e.target.value })}
-          placeholder="https://... or storage key"
+          onChange={(url) => onChange({ ...value, prospectusUrl: url })}
         />
       </div>
 
@@ -2371,6 +2404,120 @@ export function StatisticsForm({
         </button>
         <LimitHint count={safe.length} max={HOME_STATISTICS_LIMITS.itemsMax} />
       </div>
+    </div>
+  );
+}
+
+/* ─── Floating site elements ─── */
+
+export type FloatingElementsVal = {
+  whatsapp?: {
+    enabled?: boolean;
+    phone?: string;
+  };
+  applyNow?: {
+    enabled?: boolean;
+    label?: string;
+    href?: string;
+  };
+  meritto?: {
+    enabled?: boolean;
+  };
+};
+
+export function FloatingElementsForm({
+  value,
+  onChange,
+}: {
+  value: FloatingElementsVal;
+  onChange: (v: FloatingElementsVal) => void;
+}) {
+  const wa = value.whatsapp ?? {};
+  const ap = value.applyNow ?? {};
+  const mt = value.meritto ?? {};
+  return (
+    <div className="space-y-6">
+      <Field
+        label="WhatsApp Button"
+        hint="Floating WhatsApp icon shown on all public pages."
+      >
+        <div className="space-y-3">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={wa.enabled !== false}
+              onChange={(e) =>
+                onChange({ ...value, whatsapp: { ...wa, enabled: e.target.checked } })
+              }
+            />
+            Enable WhatsApp button
+          </label>
+          <TextInput
+            label="Phone Number"
+            value={wa.phone ?? ""}
+            maxLength={FLOATING_ELEMENTS_LIMITS.phoneMax}
+            onChange={(e) =>
+              onChange({ ...value, whatsapp: { ...wa, phone: e.target.value } })
+            }
+            placeholder="+91 93614 88801"
+            hint="Include country code. Used as the WhatsApp chat link."
+          />
+        </div>
+      </Field>
+
+      <Field
+        label="Apply Now Button"
+        hint="Floating Apply Now button shown on all public pages."
+      >
+        <div className="space-y-3">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={ap.enabled !== false}
+              onChange={(e) =>
+                onChange({ ...value, applyNow: { ...ap, enabled: e.target.checked } })
+              }
+            />
+            Enable Apply Now button
+          </label>
+          <TextInput
+            label="Button Label"
+            value={ap.label ?? ""}
+            maxLength={FLOATING_ELEMENTS_LIMITS.labelMax}
+            onChange={(e) =>
+              onChange({ ...value, applyNow: { ...ap, label: e.target.value } })
+            }
+            placeholder="Apply Now"
+          />
+          <TextInput
+            label="Button Link"
+            value={ap.href ?? ""}
+            maxLength={FLOATING_ELEMENTS_LIMITS.hrefMax}
+            onChange={(e) =>
+              onChange({ ...value, applyNow: { ...ap, href: e.target.value } })
+            }
+            placeholder="https://admissions.jct.ac.in"
+          />
+        </div>
+      </Field>
+
+      <Field
+        label="Meritto Chat"
+        hint="Show/hide the Meritto chatbot on public pages."
+      >
+        <div className="space-y-3">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={mt.enabled !== false}
+              onChange={(e) =>
+                onChange({ ...value, meritto: { ...mt, enabled: e.target.checked } })
+              }
+            />
+            Enable Meritto Chat
+          </label>
+        </div>
+      </Field>
     </div>
   );
 }

@@ -2,13 +2,20 @@
 
 import { usePathname } from "next/navigation";
 import Script from "next/script";
+import { useSiteConfig } from "@/lib/use-site-config";
 
 export function MerittoScript() {
   const pathname = usePathname();
   const isAdmin = pathname.startsWith("/admin");
 
-  // Don't render Meritto on admin pages
-  if (isAdmin) {
+  // Get meritto config from floating elements
+  const { data: floatingData } = useSiteConfig<{
+    meritto?: { enabled?: boolean };
+  }>("floatingElements");
+  const mtEnabled = floatingData?.meritto?.enabled !== false;
+
+  // Don't render Meritto on admin pages or if disabled
+  if (isAdmin || !mtEnabled) {
     return null;
   }
 

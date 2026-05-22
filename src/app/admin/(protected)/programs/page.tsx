@@ -2,7 +2,7 @@
 
 import { useEffect, useState, Suspense, type MouseEvent } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, Loader2, ChevronRight, Trash2 } from "lucide-react";
+import { Plus, ChevronRight, Trash2, Loader2 } from "lucide-react";
 
 interface Program {
   _id: string;
@@ -10,15 +10,11 @@ interface Program {
   abbr: string;
   slug: string;
   institution: string;
-  degree: string;
-  duration: string;
-  seats: number;
   image: string;
-  highlight: string;
-  description: string;
   outcomes: string[];
   is_active: boolean;
   sort_order: number;
+  status: "draft" | "published" | "archived";
 }
 
 function ProgramsPageInner() {
@@ -26,8 +22,8 @@ function ProgramsPageInner() {
   const router = useRouter();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
-  const [seeding, setSeeding] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [creatingNew, setCreatingNew] = useState(false);
   const [filter, setFilter] = useState(() => searchParams.get("college") ?? "");
 
   const load = async () => {
@@ -44,13 +40,6 @@ function ProgramsPageInner() {
   useEffect(() => {
     setFilter(searchParams.get("college") ?? "");
   }, [searchParams]);
-
-  const seed = async () => {
-    setSeeding(true);
-    await fetch("/api/admin/programs/seed", { method: "POST" });
-    await load();
-    setSeeding(false);
-  };
 
   const handleDelete = async (e: MouseEvent, program: Program) => {
     e.stopPropagation();
@@ -77,6 +66,40 @@ function ProgramsPageInner() {
     }
   };
 
+  const handleCreateNew = async () => {
+    setCreatingNew(true);
+    try {
+      const college = filter || "engineering";
+      // Generate unique slug from timestamp
+      const timestamp = Date.now();
+      const r = await fetch("/api/admin/programs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Untitled Program",
+          abbr: "UP",
+          slug: `untitled-program-${timestamp}`,
+          institution: college,
+          image: "",
+          outcomes: [],
+          is_active: true,
+          sort_order: 0,
+          content: {},
+        }),
+      });
+      if (r.ok) {
+        const data = await r.json();
+        router.push(`/admin/programs/${data._id}?college=${college}`);
+      } else {
+        alert("Failed to create program.");
+        setCreatingNew(false);
+      }
+    } catch {
+      alert("Failed to create program.");
+      setCreatingNew(false);
+    }
+  };
+
   const filtered = (programs || []).filter((p) => !filter || p.institution === filter);
 
   const collegeLabel =
@@ -99,22 +122,19 @@ function ProgramsPageInner() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={seed}
-            disabled={seeding}
-            className="admin-btn admin-btn-outline admin-btn-sm"
+            onClick={handleCreateNew}
+            disabled={creatingNew}
+            className="admin-btn admin-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {seeding ? <Loader2 size={14} className="animate-spin" /> : null}
-            Seed from data files
-          </button>
-          <button
-            onClick={() =>
-              router.push(
-                `/admin/programs/new${filter ? `?college=${filter}` : ""}`,
-              )
-            }
-            className="admin-btn admin-btn-primary"
-          >
-            <Plus size={16} /> New Program
+            {creatingNew ? (
+              <>
+                <Loader2 size={16} className="animate-spin" /> Creating...
+              </>
+            ) : (
+              <>
+                <Plus size={16} /> New Program
+              </>
+            )}
           </button>
         </div>
       </div>
@@ -129,44 +149,55 @@ function ProgramsPageInner() {
             <thead>
               <tr>
                 <th>Program</th>
-                <th>Abbr</th>
-                <th>Degree</th>
-                <th>Duration</th>
-                <th>Seats</th>
-                <th>Status</th>
+                <th>Institution</th>
+                <th>Draft / Published</th>
+                <th>Active</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="py-10 text-center text-gray-400">
-                    No programs found. Seed from data files to populate.
+                  <td colSpan={5} className="py-10 text-center text-gray-400">
+                    No programs found.
                   </td>
                 </tr>
               )}
               {filtered.map((p) => (
                 <tr
                   key={p._id}
-                  className="cursor-pointer transition-colors hover:bg-gray-50"
-                  onClick={() =>
-                    router.push(
-                      `/admin/programs/${p._id}?college=${p.institution}`,
-                    )
-                  }
+                  className="transition-colors hover:bg-gray-50"
                 >
                   <td>
-                    <div className="font-medium text-gray-900">{p.name}</div>
-                    {p.highlight && (
-                      <div className="mt-0.5 max-w-xs truncate text-xs text-gray-400">
-                        {p.highlight}
-                      </div>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        router.push(
+                          `/admin/programs/${p._id}?college=${p.institution}`,
+                        )
+                      }
+                      className="text-left hover:underline"
+                    >
+                      <div className="font-medium text-gray-900">{p.name}</div>
+                      <div className="mt-0.5 text-xs text-gray-400 font-mono">{p.abbr}</div>
+                    </button>
                   </td>
-                  <td className="font-mono text-sm text-gray-600">{p.abbr}</td>
-                  <td className="text-sm text-gray-600">{p.degree}</td>
-                  <td className="text-sm text-gray-500">{p.duration}</td>
-                  <td className="text-sm text-gray-500">{p.seats}</td>
+                  <td className="text-sm capitalize text-gray-600">
+                    {p.institution === "arts-science" ? "Arts & Science" : p.institution}
+                  </td>
+                  <td>
+                    <span
+                      className={`admin-badge ${
+                        p.status === "published"
+                          ? "admin-badge-green"
+                          : p.status === "archived"
+                            ? "admin-badge-red"
+                            : "admin-badge-yellow"
+                      }`}
+                    >
+                      {p.status ?? "draft"}
+                    </span>
+                  </td>
                   <td>
                     <span
                       className={`admin-badge ${p.is_active ? "admin-badge-green" : "admin-badge-red"}`}
@@ -189,7 +220,18 @@ function ProgramsPageInner() {
                           <Trash2 size={13} />
                         )}
                       </button>
-                      <ChevronRight size={16} className="text-gray-400" />
+                      <button
+                        type="button"
+                        onClick={() =>
+                          router.push(
+                            `/admin/programs/${p._id}?college=${p.institution}`,
+                          )
+                        }
+                        title="Open CMS editor"
+                        className="admin-btn admin-btn-outline admin-btn-sm"
+                      >
+                        <ChevronRight size={16} />
+                      </button>
                     </div>
                   </td>
                 </tr>

@@ -59,7 +59,6 @@ function TestimonialsPageInner() {
   const [editing, setEditing] = useState<Testimonial | null>(null);
   const [form, setForm] = useState<Omit<Testimonial, "_id">>(EMPTY);
   const [saving, setSaving] = useState(false);
-  const [seeding, setSeeding] = useState(false);
   const [filterInst, setFilterInst] = useState(
     () => searchParams.get("college") ?? "",
   );
@@ -124,13 +123,6 @@ function TestimonialsPageInner() {
     await load();
   };
 
-  const seed = async () => {
-    setSeeding(true);
-    await fetch("/api/admin/testimonials/seed", { method: "POST" });
-    await load();
-    setSeeding(false);
-  };
-
   return (
     <>
       <div className="admin-content">
@@ -143,14 +135,6 @@ function TestimonialsPageInner() {
             </p>
           </div>
           <div className="flex gap-2">
-            <button
-              onClick={seed}
-              disabled={seeding}
-              className="admin-btn admin-btn-outline admin-btn-sm"
-            >
-              {seeding ? <Loader2 size={14} className="animate-spin" /> : null}
-              Seed from data files
-            </button>
             <button onClick={openNew} className="admin-btn admin-btn-primary">
               <Plus size={16} /> Add Testimonial
             </button>

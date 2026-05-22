@@ -13,6 +13,8 @@ type PamphletConfig = {
   images: string[];
   delayMs: number;
   videoUrl: string;
+  applyLabel: string;
+  applyHref: string;
 };
 
 function normalizePamphlet(raw: unknown): PamphletConfig | null {
@@ -29,6 +31,14 @@ function normalizePamphlet(raw: unknown): PamphletConfig | null {
       typeof r.videoUrl === "string" && r.videoUrl.trim()
         ? r.videoUrl.trim()
         : "",
+    applyLabel:
+      typeof r.applyLabel === "string" && r.applyLabel.trim()
+        ? r.applyLabel.trim()
+        : "Apply Now",
+    applyHref:
+      typeof r.applyHref === "string" && r.applyHref.trim()
+        ? r.applyHref.trim()
+        : "https://admissions.jct.ac.in",
   };
 }
 
@@ -43,6 +53,8 @@ export function Pamphlet() {
   const images = config?.images ?? [];
   const delayMs = config?.delayMs ?? 2000;
   const videoUrl = config?.videoUrl ?? "";
+  const applyLabel = config?.applyLabel ?? "Apply Now";
+  const applyHref = config?.applyHref ?? "https://admissions.jct.ac.in";
 
   useEffect(() => {
     if (!enabled || images.length === 0) return;
@@ -115,13 +127,13 @@ export function Pamphlet() {
                   </button>
                 )}
                 <Link
-                  href="https://admissions.jct.ac.in"
+                  href={applyHref}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={handleClose}
                   className="group bg-gold flex items-center gap-3 rounded-full px-10 py-4 text-base font-bold text-black shadow-[0_20px_40px_-10px_rgba(212,160,36,0.6)] transition-all hover:scale-105 hover:bg-white active:scale-95 sm:px-12 sm:text-lg"
                 >
-                  Apply Now{" "}
+                  {applyLabel}{" "}
                   <ArrowRight
                     size={22}
                     className="transition-transform group-hover:translate-x-1"

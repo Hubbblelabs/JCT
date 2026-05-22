@@ -4,28 +4,52 @@ import { usePathname } from "next/navigation";
 import { StickyApplyButton } from "./StickyApplyButton";
 import { MerittoPositioner } from "./MerittoPositioner";
 import { ChatbotNotification } from "./ChatbotNotification";
+import { useSiteConfig } from "@/lib/use-site-config";
 import { siteConfig } from "@/data/site";
+
+type FloatingConfig = {
+  whatsapp?: {
+    enabled?: boolean;
+    phone?: string;
+  };
+  applyNow?: {
+    enabled?: boolean;
+    label?: string;
+    href?: string;
+  };
+  meritto?: {
+    enabled?: boolean;
+  };
+};
 
 export function GlobalElements() {
   const pathname = usePathname();
   const isAdmin = pathname?.startsWith("/admin");
+  const { data: floatingData } = useSiteConfig<FloatingConfig>("floatingElements");
+
   if (isAdmin) return null;
+
+  const wa = floatingData?.whatsapp ?? {};
+  const ap = floatingData?.applyNow ?? {};
+  const mt = floatingData?.meritto ?? {};
+
+  const waEnabled = wa.enabled !== false;
+  const waPhone = (wa.phone && wa.phone.trim()) || siteConfig.contact.whatsapp;
+
+  const apEnabled = ap.enabled !== false;
+  const apLabel = (ap.label && ap.label.trim()) || "Apply Now";
+  const apHref = (ap.href && ap.href.trim()) || "https://admissions.jct.ac.in";
+
+  const mtEnabled = mt.enabled !== false;
 
   return (
     <>
-      {/* Apply button always visible */}
-      {!isAdmin && <StickyApplyButton />}
+      {apEnabled && <StickyApplyButton label={apLabel} href={apHref} />}
 
-      {/* Meritto only on public pages */}
-      {!isAdmin && (
-        <>
-          <MerittoPositioner />
-          <ChatbotNotification />
-        </>
-      )}
+      {mtEnabled && <MerittoPositioner />}
+      {mtEnabled && <ChatbotNotification />}
 
-      {/* Floating WhatsApp — public pages only */}
-      {!isAdmin && (
+      {waEnabled && waPhone && (
         <div
           data-own-fixed
           className="group fixed left-4 bottom-5 z-50 md:left-6 md:bottom-6"
@@ -35,7 +59,7 @@ export function GlobalElements() {
           </span>
           <span className="pointer-events-none absolute inset-0 animate-ping rounded-full bg-[#25D366] opacity-30" />
           <a
-            href={`https://wa.me/${siteConfig.contact.whatsapp}`}
+            href={`https://wa.me/${waPhone.replace(/[^0-9]/g, "")}`}
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Chat on WhatsApp"

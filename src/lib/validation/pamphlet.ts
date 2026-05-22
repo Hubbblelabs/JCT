@@ -1,11 +1,13 @@
 import { z } from "zod";
-import { zUrl, zCta } from "./_primitives";
+import { zUrl, zCta, zClampedString } from "./_primitives";
 
 export const LIMITS = {
   images: 2,
   ctas: 2,
   minDelayMs: 0,
   maxDelayMs: 60_000,
+  applyLabelMax: 40,
+  applyHrefMax: 500,
 } as const;
 
 export const PamphletSchema = z.object({
@@ -24,6 +26,8 @@ export const PamphletSchema = z.object({
     .default([]),
   ctas: z.array(zCta).max(LIMITS.ctas).optional().default([]),
   videoUrl: zUrl.optional().or(z.literal("")),
+  applyLabel: zClampedString(0, LIMITS.applyLabelMax, "Apply label").default("Apply Now"),
+  applyHref: zUrl.optional().or(z.literal("")),
 });
 
 export type PamphletValue = z.infer<typeof PamphletSchema>;

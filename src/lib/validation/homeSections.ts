@@ -45,7 +45,7 @@ export const HOME_ADMISSIONS_LIMITS = {
   pathwayIconMax: 40,
   pathwayCtaLabelMax: 40,
   applyLabelMax: 40,
-  prospectusLabelMax: 40,
+  prospectusLabelMax: 60,
 } as const;
 
 const PathwaySchema = z.object({

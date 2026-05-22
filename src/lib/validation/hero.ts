@@ -69,11 +69,20 @@ export const HomeHeroSchema = z.object({
 });
 
 // Stat cards shown below the hero (Years of Excellence, Alumni, etc.)
+export const HOME_STATS_LIMITS = {
+  valueMax: 30,
+  labelMax: 50,
+} as const;
+
 export const HomeStatsSchema = z.object({
-  yearsOfExcellence: zOptionalString(30).default(""),
-  alumni: zOptionalString(30).default(""),
-  studentsPlaced: zOptionalString(30).default(""),
-  industryAwards: zOptionalString(30).default(""),
+  yearsOfExcellence: zOptionalString(HOME_STATS_LIMITS.valueMax).default(""),
+  yearsOfExcellenceLabel: zOptionalString(HOME_STATS_LIMITS.labelMax).default(""),
+  alumni: zOptionalString(HOME_STATS_LIMITS.valueMax).default(""),
+  alumniLabel: zOptionalString(HOME_STATS_LIMITS.labelMax).default(""),
+  studentsPlaced: zOptionalString(HOME_STATS_LIMITS.valueMax).default(""),
+  studentsPlacedLabel: zOptionalString(HOME_STATS_LIMITS.labelMax).default(""),
+  industryAwards: zOptionalString(HOME_STATS_LIMITS.valueMax).default(""),
+  industryAwardsLabel: zOptionalString(HOME_STATS_LIMITS.labelMax).default(""),
 });
 
 // Prospectus PDF URL — stored separately so the hero config isn't bloated.

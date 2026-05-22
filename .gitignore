@@ -68,3 +68,5 @@ chatbot/faiss_index/
 
 # Large video files
 public/assets/videos/
+# CocoIndex Code (ccc)
+/.cocoindex_code/

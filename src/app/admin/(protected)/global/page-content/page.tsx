@@ -9,8 +9,10 @@ import {
 import {
   HeaderForm,
   FooterForm,
+  FloatingElementsForm,
   type HeaderVal,
   type FooterVal,
+  type FloatingElementsVal,
 } from "@/components/admin/PageContentForms";
 
 function Inner() {
@@ -38,6 +40,19 @@ function Inner() {
         <FooterForm value={(v as FooterVal) ?? {}} onChange={onChange} />
       ),
     },
+    {
+      id: "floatingElements",
+      label: "Floating Elements",
+      kind: "form",
+      configKey: "floatingElements",
+      defaultValue: {} as FloatingElementsVal,
+      render: (v, onChange) => (
+        <FloatingElementsForm
+          value={(v as FloatingElementsVal) ?? {}}
+          onChange={onChange}
+        />
+      ),
+    },
   ];
 
   void section;
@@ -45,7 +60,7 @@ function Inner() {
   return (
     <PageContentShell
       pageTitle="Global CMS"
-      pageSubtitle="Site-wide header and footer content shared across all pages."
+      pageSubtitle="Site-wide header, footer, and floating UI elements shared across all pages."
       sections={sections}
     />
   );
