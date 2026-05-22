@@ -28,14 +28,18 @@ import {
   Sparkles,
   LayoutGrid,
   MousePointerClick,
+  Settings,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Suspense } from "react";
+import { hasMinRole } from "@/lib/permissions";
 
 type NavItem = {
   label: string;
   href: string;
   icon: React.ComponentType<{ size?: number }>;
+  /** Minimum role required to see this item. Defaults to "viewer" if omitted. */
+  minRole?: "viewer" | "editor" | "admin" | "super_admin";
 };
 
 const COLLEGE_ITEMS: Record<string, NavItem[]> = {
@@ -200,8 +204,19 @@ const GLOBAL_CMS_ITEMS: NavItem[] = [
 ];
 
 const ADMIN_ITEMS: NavItem[] = [
-  { label: "Users", href: "/admin/users", icon: Users },
-  { label: "Audit Log", href: "/admin/audit", icon: ClipboardList },
+  { label: "Users", href: "/admin/users", icon: Users, minRole: "super_admin" },
+  {
+    label: "Audit Log",
+    href: "/admin/audit",
+    icon: ClipboardList,
+    minRole: "admin",
+  },
+  {
+    label: "Settings",
+    href: "/admin/settings",
+    icon: Settings,
+    minRole: "super_admin",
+  },
 ];
 
 function isItemActive(
@@ -253,8 +268,14 @@ function TabNavInner() {
   const college = searchParams.get("college");
   const section = searchParams.get("section");
 
+  const userRole =
+    ((session?.user as Record<string, unknown>)?.role as string) ?? "viewer";
+  const visibleAdminItems = ADMIN_ITEMS.filter((item) =>
+    hasMinRole(userRole, item.minRole ?? "viewer"),
+  );
+
   const dashActive = pathname === "/admin/dashboard" || pathname === "/admin";
-  const adminMenuActive = isDropdownActive(ADMIN_ITEMS, pathname, null);
+  const adminMenuActive = isDropdownActive(visibleAdminItems, pathname, null);
   const mainActive = isDropdownActive(MAIN_ITEMS, pathname, null);
   const globalCmsActive = isDropdownActive(GLOBAL_CMS_ITEMS, pathname, null);
 
@@ -292,28 +313,30 @@ function TabNavInner() {
             Dashboard
           </Link>
 
-          {/* Admin tools dropdown */}
-          <div className="admin-nav-item">
-            <button
-              className={`admin-nav-trigger ${adminMenuActive ? "active" : ""}`}
-            >
-              <Wrench size={13} />
-              Admin
-              <ChevronDown size={11} />
-            </button>
-            <div className="admin-nav-dropdown-menu">
-              {ADMIN_ITEMS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`admin-nav-dropdown-item ${pathname === item.href ? "active" : ""}`}
-                >
-                  <item.icon size={14} />
-                  {item.label}
-                </Link>
-              ))}
+          {/* Admin tools dropdown — only shown when user has access to ≥1 item */}
+          {visibleAdminItems.length > 0 && (
+            <div className="admin-nav-item">
+              <button
+                className={`admin-nav-trigger ${adminMenuActive ? "active" : ""}`}
+              >
+                <Wrench size={13} />
+                Admin
+                <ChevronDown size={11} />
+              </button>
+              <div className="admin-nav-dropdown-menu">
+                {visibleAdminItems.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`admin-nav-dropdown-item ${pathname === item.href ? "active" : ""}`}
+                  >
+                    <item.icon size={14} />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Global CMS dropdown */}
           <div className="admin-nav-item">
