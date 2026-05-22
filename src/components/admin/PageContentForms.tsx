@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Plus, Trash2 } from "lucide-react";
 import {
   Field,
@@ -207,14 +208,34 @@ function IntervalInput({
   min: number;
   max: number;
 }) {
+  const [localValue, setLocalValue] = useState<string>(
+    value ? String(value) : "6000"
+  );
+
+  // Sync with external value when it changes
+  useEffect(() => {
+    if (value !== undefined) {
+      setLocalValue(String(value));
+    }
+  }, [value]);
+
+  const handleBlur = () => {
+    let num = Number(localValue);
+    if (isNaN(num) || num < min) num = min;
+    if (num > max) num = max;
+    setLocalValue(String(num));
+    onChange(num);
+  };
+
   return (
     <TextInput
       label="Carousel Speed (ms)"
       type="number"
       min={min}
       max={max}
-      value={value ?? 6000}
-      onChange={(e) => onChange(Number(e.target.value) || 6000)}
+      value={localValue}
+      onChange={(e) => setLocalValue(e.target.value)}
+      onBlur={handleBlur}
       hint={`How long each background image stays before the carousel rotates. Between ${min}ms and ${max}ms.`}
     />
   );
@@ -560,25 +581,27 @@ export function ArtsScienceHeroForm({
         max={ARTS_HERO_LIMITS.ctas}
         onChange={(next) => onChange({ ...value, ctas: next })}
       />
-      <Field
-        label="Hero Subsections"
-        hint={`Feature blocks below the hero — Quality, Leadership, Experience (up to ${ARTS_HERO_LIMITS.subsectionsMax}). Icon is a Lucide icon name.`}
-      >
-        <ArtsSubsectionList
-          value={value.subsections ?? []}
-          max={ARTS_HERO_LIMITS.subsectionsMax}
-          onChange={(next) => onChange({ ...value, subsections: next })}
-        />
-      </Field>
-      <Field
-        label="Hero Stat Cards"
-        hint="The numbers shown in the hero stat row."
-      >
-        <HeroStatsForm
-          value={value.stats ?? []}
-          onChange={(next) => onChange({ ...value, stats: next })}
-        />
-      </Field>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Field
+          label="Hero Subsections"
+          hint={`Feature blocks below the hero — Quality, Leadership, Experience (up to ${ARTS_HERO_LIMITS.subsectionsMax}). Icon is a Lucide icon name.`}
+        >
+          <ArtsSubsectionList
+            value={value.subsections ?? []}
+            max={ARTS_HERO_LIMITS.subsectionsMax}
+            onChange={(next) => onChange({ ...value, subsections: next })}
+          />
+        </Field>
+        <Field
+          label="Hero Stat Cards"
+          hint="The numbers shown in the hero stat row."
+        >
+          <HeroStatsForm
+            value={value.stats ?? []}
+            onChange={(next) => onChange({ ...value, stats: next })}
+          />
+        </Field>
+      </div>
       <IntervalInput
         value={value.intervalMs}
         min={ARTS_HERO_LIMITS.minIntervalMs}

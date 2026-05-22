@@ -649,65 +649,6 @@ function VoicesInlineManager() {
   );
 }
 
-// ─── Seed Banner ──────────────────────────────────────────────────────────────
-
-function SeedBanner() {
-  const [seeding, setSeeding] = useState(false);
-  const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(
-    null,
-  );
-
-  const handleSeed = async () => {
-    setSeeding(true);
-    setMsg(null);
-    try {
-      const r = await fetch("/api/admin/site-config/seed", { method: "POST" });
-      if (r.ok) {
-        setMsg({
-          kind: "ok",
-          text: "Default content seeded. Reload the page to see it in the forms.",
-        });
-      } else {
-        setMsg({ kind: "err", text: "Seed failed. Check your permissions." });
-      }
-    } catch {
-      setMsg({ kind: "err", text: "Seed failed." });
-    } finally {
-      setSeeding(false);
-    }
-  };
-
-  return (
-    <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3">
-      <div>
-        <p className="text-sm font-medium text-amber-800">
-          Seed default content
-        </p>
-        <p className="text-xs text-amber-600">
-          Write the built-in default data for Hero and Card sections to the
-          database. Reload the page after seeding to see the data in the forms.
-        </p>
-        {msg && (
-          <p
-            className={`mt-1 text-xs font-medium ${msg.kind === "ok" ? "text-green-700" : "text-red-600"}`}
-          >
-            {msg.text}
-          </p>
-        )}
-      </div>
-      <button
-        type="button"
-        onClick={handleSeed}
-        disabled={seeding}
-        className="admin-btn admin-btn-outline admin-btn-sm shrink-0"
-      >
-        {seeding ? <Loader2 size={13} className="animate-spin" /> : null}
-        {seeding ? "Seeding…" : "Seed Defaults"}
-      </button>
-    </div>
-  );
-}
-
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 function Inner() {
@@ -848,7 +789,6 @@ function Inner() {
 
   return (
     <div>
-      <SeedBanner />
       <PageContentShell
         pageTitle="Main Landing Page"
         pageSubtitle="Hero, stat cards, Life at JCT gallery, testimonials, and prospectus."
