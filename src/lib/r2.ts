@@ -51,6 +51,33 @@ export async function deleteFromR2(key: string): Promise<void> {
   await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
 }
 
+/**
+ * Recursively walk any JSON-serialisable value and collect every string that
+ * looks like a tracked R2 storage key. Only keys we generate ourselves are
+ * matched: images are under "uploads/…" and documents under "documents/…".
+ * External URLs (http/https) and local proxy paths are intentionally excluded.
+ */
+export function extractR2Keys(
+  value: unknown,
+  out = new Set<string>(),
+): Set<string> {
+  if (typeof value === "string") {
+    if (
+      (value.startsWith("uploads/") || value.startsWith("documents/")) &&
+      !value.startsWith("http")
+    ) {
+      out.add(value);
+    }
+  } else if (Array.isArray(value)) {
+    for (const item of value) extractR2Keys(item, out);
+  } else if (value !== null && typeof value === "object") {
+    for (const v of Object.values(value as Record<string, unknown>)) {
+      extractR2Keys(v, out);
+    }
+  }
+  return out;
+}
+
 export async function getFromR2(
   key: string,
 ): Promise<{ body: ReadableStream; contentType: string }> {

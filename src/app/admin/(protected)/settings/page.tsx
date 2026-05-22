@@ -180,16 +180,16 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* ── Export ── */}
         <div className="admin-card">
-          <div className="flex items-start gap-3 mb-4">
+          <div className="mb-4 flex items-start gap-3">
             <div className="rounded-lg bg-blue-50 p-2">
               <Download size={18} className="text-blue-600" />
             </div>
             <div>
               <h2 className="font-semibold text-gray-900">Export Backup</h2>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <p className="mt-0.5 text-sm text-gray-500">
                 Download all site config entries as a JSON file. Includes draft
                 and published values for every key.
               </p>
@@ -212,13 +212,15 @@ export default function SettingsPage() {
 
         {/* ── Restore ── */}
         <div className="admin-card">
-          <div className="flex items-start gap-3 mb-4">
+          <div className="mb-4 flex items-start gap-3">
             <div className="rounded-lg bg-green-50 p-2">
               <Upload size={18} className="text-green-600" />
             </div>
             <div>
-              <h2 className="font-semibold text-gray-900">Restore from Backup</h2>
-              <p className="text-sm text-gray-500 mt-0.5">
+              <h2 className="font-semibold text-gray-900">
+                Restore from Backup
+              </h2>
+              <p className="mt-0.5 text-sm text-gray-500">
                 Upload a previously exported JSON file. Existing configs are
                 overwritten; unknown keys are skipped. All public pages are
                 revalidated after restore.
@@ -242,13 +244,11 @@ export default function SettingsPage() {
               />
             </label>
 
-            {fileError && (
-              <p className="text-sm text-red-600">{fileError}</p>
-            )}
+            {fileError && <p className="text-sm text-red-600">{fileError}</p>}
 
             {preview && (
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm space-y-1">
-                <div className="flex items-center gap-1.5 text-gray-700 font-medium">
+              <div className="space-y-1 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm">
+                <div className="flex items-center gap-1.5 font-medium text-gray-700">
                   <FileJson size={14} />
                   Backup preview
                 </div>
@@ -290,13 +290,13 @@ export default function SettingsPage() {
 
         {/* ── Reset ── */}
         <div className="admin-card border-red-200 bg-red-50/30 lg:col-span-2">
-          <div className="flex items-start gap-3 mb-4">
+          <div className="mb-4 flex items-start gap-3">
             <div className="rounded-lg bg-red-100 p-2">
               <ShieldAlert size={18} className="text-red-600" />
             </div>
             <div>
               <h2 className="font-semibold text-red-800">Reset All Configs</h2>
-              <p className="text-sm text-red-700/80 mt-0.5">
+              <p className="mt-0.5 text-sm text-red-700/80">
                 Permanently deletes every site config entry from the database.
                 Public pages will revert to hard-coded defaults until
                 reconfigured. This cannot be undone — export a backup first.

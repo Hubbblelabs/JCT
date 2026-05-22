@@ -10,6 +10,7 @@ import {
 import { logAudit } from "@/lib/audit";
 import { SiteConfigPutSchema } from "@/lib/validation";
 import { revalidateForConfigKey } from "@/lib/revalidate";
+import { extractR2Keys, deleteFromR2 } from "@/lib/r2";
 
 export async function GET(req: NextRequest) {
   const { error } = await requireRole(req, "viewer");
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest) {
     const docs = await SiteConfig.find().sort({ config_key: 1 });
     return json(docs);
   } catch (e) {
-    console.error(e);
+    console.error("[site-config GET]", e);
     return serverError();
   }
 }
@@ -36,6 +37,16 @@ export async function PUT(req: NextRequest) {
   try {
     await connectDB();
 
+    // Fetch the existing doc BEFORE overwriting so we can detect orphaned
+    // document keys. Images are not cleaned here — they live in ImageAsset and
+    // have their own delete lifecycle.
+    const existing = await SiteConfig.findOne({ config_key }).lean();
+    const oldDocKeys = existing?.value
+      ? [...extractR2Keys(existing.value)].filter((k) =>
+          k.startsWith("documents/"),
+        )
+      : [];
+
     const doc = await SiteConfig.findOneAndUpdate(
       { config_key },
       {
@@ -50,6 +61,19 @@ export async function PUT(req: NextRequest) {
       { upsert: true, new: true },
     );
 
+    // Delete any document R2 objects that were present in the old value but are
+    // no longer referenced by the new value. Non-fatal — a failed R2 delete
+    // never blocks the save.
+    const newDocKeys = new Set(
+      [...extractR2Keys(value)].filter((k) => k.startsWith("documents/")),
+    );
+    const orphaned = oldDocKeys.filter((k) => !newDocKeys.has(k));
+    for (const key of orphaned) {
+      deleteFromR2(key).catch((err) =>
+        console.warn(`[site-config] R2 cleanup failed for "${key}":`, err),
+      );
+    }
+
     revalidateForConfigKey(config_key);
     await logAudit(
       "site-config",
@@ -59,7 +83,7 @@ export async function PUT(req: NextRequest) {
     );
     return json(doc);
   } catch (e) {
-    console.error(e);
+    console.error("[site-config PUT]", e);
     return serverError();
   }
 }

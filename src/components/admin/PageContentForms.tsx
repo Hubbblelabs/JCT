@@ -10,6 +10,7 @@ import {
   TextArea,
   TextInput,
 } from "@/components/admin/inputs";
+import { deleteUploadedAsset } from "@/lib/storage-cleanup";
 import {
   LIMITS_pamphlet,
   ENG_HERO_LIMITS,
@@ -89,7 +90,11 @@ function ImageList({
             </div>
             <button
               type="button"
-              onClick={() => onChange(safe.filter((_, j) => j !== i))}
+              onClick={() => {
+                // Remove the R2 object and its DB record before dropping the slot.
+                deleteUploadedAsset(src);
+                onChange(safe.filter((_, j) => j !== i));
+              }}
               className="admin-btn admin-btn-danger admin-btn-sm"
             >
               <Trash2 size={13} />

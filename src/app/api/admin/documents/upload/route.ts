@@ -1,5 +1,7 @@
 import { NextRequest } from "next/server";
-import { uploadToR2 } from "@/lib/r2";
+import { connectDB } from "@/lib/mongodb";
+import { DocumentAsset } from "@/lib/models";
+import { uploadToR2, deleteFromR2 } from "@/lib/r2";
 import { requireRole, json, badRequest, serverError } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 
@@ -30,6 +32,32 @@ export async function POST(req: NextRequest) {
     const storageKey = `documents/all/${Date.now()}-${safeName}`;
 
     const publicUrl = await uploadToR2(storageKey, buffer, "application/pdf");
+
+    // Track the document in MongoDB so it can be deleted later (and R2 cleaned up).
+    // If the DB write fails, roll back the R2 upload.
+    try {
+      await connectDB();
+      await DocumentAsset.create({
+        filename: safeName,
+        storage_key: storageKey,
+        url: publicUrl,
+        mime_type: file.type,
+        file_size: file.size,
+        uploaded_by: session!.user?.email ?? "",
+      });
+    } catch (dbErr) {
+      console.error(
+        "[documents/upload] DB write failed — rolling back R2",
+        dbErr,
+      );
+      try {
+        await deleteFromR2(storageKey);
+      } catch {
+        /* non-fatal */
+      }
+      return serverError();
+    }
+
     await logAudit(
       "document",
       "uploaded",
@@ -48,7 +76,7 @@ export async function POST(req: NextRequest) {
       201,
     );
   } catch (e) {
-    console.error(e);
+    console.error("[documents/upload]", e);
     return serverError();
   }
 }

@@ -124,7 +124,9 @@ export async function POST(req: NextRequest) {
           slug: c.slug,
           institution: entry.institution,
           name: c.name,
-          abbr: (c.shortName as string | undefined) || (c.name as string).slice(0, 16),
+          abbr:
+            (c.shortName as string | undefined) ||
+            (c.name as string).slice(0, 16),
           degree: (c.degreePrefix as string | undefined)?.trim() ?? "",
           duration: (c.about as Record<string, unknown>)?.duration ?? "",
           image: (c.heroImage as string | undefined) ?? "",

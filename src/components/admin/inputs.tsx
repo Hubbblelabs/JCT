@@ -11,6 +11,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { parseApiError } from "@/lib/validation-helpers";
+import { deleteUploadedAsset } from "@/lib/storage-cleanup";
 
 interface FieldProps {
   label: string;
@@ -197,6 +198,9 @@ export function ImageUploadInput({
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Capture the old value before the async upload so we can clean it up
+    // afterwards if the new upload succeeds.
+    const previousKey = value;
     setUploading(true);
     setUploadError(null);
     const fd = new FormData();
@@ -209,8 +213,11 @@ export function ImageUploadInput({
     });
     if (r.ok) {
       const data = await r.json();
-      // Store only the storage key/relative path
-      onChange(data.url || data.storage_key);
+      const newKey: string = data.url || data.storage_key;
+      // Delete the previously-stored image from R2 + DB now that it has been
+      // successfully replaced. Fire-and-forget — never blocks the UI update.
+      deleteUploadedAsset(previousKey);
+      onChange(newKey);
     } else {
       const err = await parseApiError(r);
       const detailMsg = err?.details?.[0]?.message;
@@ -220,6 +227,12 @@ export function ImageUploadInput({
     }
     setUploading(false);
     if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const handleRemove = () => {
+    // Clean up the R2 object and its DB record before clearing the form value.
+    deleteUploadedAsset(value);
+    onChange("");
   };
 
   // Helper to get full URL for preview
@@ -255,7 +268,7 @@ export function ImageUploadInput({
             {uploadOnly && (
               <button
                 type="button"
-                onClick={() => onChange("")}
+                onClick={handleRemove}
                 className="admin-btn admin-btn-danger admin-btn-sm absolute top-1 right-1"
                 style={{ padding: "0.2rem 0.4rem" }}
               >
@@ -391,11 +404,17 @@ export function DocumentUploadInput({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [filename, setFilename] = useState<string>("");
+  // Track the R2 storage key separately from the public URL stored in `value`.
+  // The key is available from the upload response and is needed to call the
+  // delete API when the document is removed or replaced.
+  const [storageKey, setStorageKey] = useState<string>("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    // Save the current key before upload so we can delete it on success.
+    const previousKey = storageKey;
     setUploading(true);
     setUploadError(null);
     const fd = new FormData();
@@ -406,7 +425,10 @@ export function DocumentUploadInput({
     });
     if (r.ok) {
       const data = await r.json();
+      // Clean up the previously-stored document from R2 + DB.
+      deleteUploadedAsset(previousKey);
       onChange(data.url);
+      setStorageKey(data.storage_key ?? "");
       setFilename(data.filename ?? file.name);
     } else {
       const err = await parseApiError(r);
@@ -414,6 +436,13 @@ export function DocumentUploadInput({
     }
     setUploading(false);
     if (fileRef.current) fileRef.current.value = "";
+  };
+
+  const handleRemove = () => {
+    deleteUploadedAsset(storageKey);
+    onChange("");
+    setFilename("");
+    setStorageKey("");
   };
 
   const displayName = filename || (value ? value.split("/").pop() : "");
@@ -428,10 +457,7 @@ export function DocumentUploadInput({
             </span>
             <button
               type="button"
-              onClick={() => {
-                onChange("");
-                setFilename("");
-              }}
+              onClick={handleRemove}
               className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
             >
               <Trash2 size={12} />

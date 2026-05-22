@@ -1,6 +1,7 @@
 export { User } from "./User";
 export { SiteConfig } from "./SiteConfig";
 export { ImageAsset } from "./ImageAsset";
+export { DocumentAsset } from "./DocumentAsset";
 export { Program } from "./Program";
 export { Recruiter } from "./Recruiter";
 export { Testimonial } from "./Testimonial";
