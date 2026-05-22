@@ -271,7 +271,7 @@ function TestimonialsPageInner() {
                   label="Avatar"
                   value={form.avatar}
                   onChange={(url) => set("avatar", url)}
-                  uploadOnly
+                  hideUrlField
                 />
               </div>
               <TextArea

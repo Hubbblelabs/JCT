@@ -85,7 +85,7 @@ function ImageList({
                 onChange={(url) =>
                   onChange(safe.map((s, j) => (j === i ? url : s)))
                 }
-                uploadOnly
+                hideUrlField
               />
             </div>
             <button
@@ -271,7 +271,7 @@ function AccreditationList({
             onChange={(url) =>
               onChange(safe.map((a, j) => (j === i ? { ...a, logo: url } : a)))
             }
-            uploadOnly
+            hideUrlField
           />
           <div className="grid grid-cols-2 gap-3">
             <TextInput
@@ -944,7 +944,7 @@ export function LifeAtJctForm({
                     ),
                   })
                 }
-                uploadOnly
+                hideUrlField
               />
               <div className="grid grid-cols-2 gap-3">
                 <TextInput

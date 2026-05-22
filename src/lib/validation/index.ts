@@ -169,3 +169,16 @@ export {
   FLOATING_ELEMENTS_LIMITS,
 } from "./floatingElements";
 export type { FloatingElementsValue } from "./floatingElements";
+
+export {
+  EngineeringAboutSchema,
+  ArtsScienceAboutSchema,
+  PolytechnicAboutSchema,
+  CoePageSchema,
+} from "./aboutPage";
+export type {
+  EngineeringAboutValue,
+  ArtsScienceAboutValue,
+  PolytechnicAboutValue,
+  CoePageValue,
+} from "./aboutPage";

@@ -437,7 +437,7 @@ function ProgramDetailInner() {
                   label="Program Photo"
                   value={prog.image}
                   onChange={(v) => setP("image", v)}
-                  uploadOnly
+                  hideUrlField
                 />
               </div>
             </div>

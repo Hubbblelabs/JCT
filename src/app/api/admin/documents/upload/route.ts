@@ -29,7 +29,10 @@ export async function POST(req: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-    const storageKey = `documents/all/${Date.now()}-${safeName}`;
+    const storageContext = (formData.get("storageContext") as string) ?? null;
+    const storageKey = storageContext
+      ? `documents/${storageContext}/${Date.now()}-${safeName}`
+      : `documents/general/${Date.now()}-${safeName}`;
 
     const publicUrl = await uploadToR2(storageKey, buffer, "application/pdf");
 

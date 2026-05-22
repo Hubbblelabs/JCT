@@ -176,7 +176,9 @@ interface ImageUploadInputProps {
   onChange: (url: string) => void;
   hint?: string;
   /** Hide the URL text field — show only the upload button + preview */
-  uploadOnly?: boolean;
+  hideUrlField?: boolean;
+  /** R2 storage folder context (e.g., "about-photos", "coe", "programs") */
+  storageContext?: string;
 }
 
 export function ImageUploadInput({
@@ -184,7 +186,8 @@ export function ImageUploadInput({
   value,
   onChange,
   hint,
-  uploadOnly,
+  hideUrlField,
+  storageContext,
 }: ImageUploadInputProps) {
   const [uploading, setUploading] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -205,8 +208,9 @@ export function ImageUploadInput({
     setUploadError(null);
     const fd = new FormData();
     fd.append("file", file);
-    fd.append("category", "other");
-    fd.append("institution", "all");
+    if (storageContext) {
+      fd.append("storageContext", storageContext);
+    }
     const r = await fetch("/api/admin/images/upload", {
       method: "POST",
       body: fd,
@@ -265,16 +269,15 @@ export function ImageUploadInput({
                 onError={() => setImgError(true)}
               />
             )}
-            {uploadOnly && (
-              <button
-                type="button"
-                onClick={handleRemove}
-                className="admin-btn admin-btn-danger admin-btn-sm absolute top-1 right-1"
-                style={{ padding: "0.2rem 0.4rem" }}
-              >
-                <Trash2 size={12} />
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={handleRemove}
+              className="admin-btn admin-btn-danger admin-btn-sm absolute top-1 right-1"
+              style={{ padding: "0.2rem 0.4rem" }}
+              title="Delete image"
+            >
+              <Trash2 size={12} />
+            </button>
           </div>
         )}
         <input
@@ -284,7 +287,7 @@ export function ImageUploadInput({
           className="hidden"
           onChange={handleUpload}
         />
-        {uploadOnly ? (
+        {hideUrlField ? (
           <button
             type="button"
             onClick={() => fileRef.current?.click()}
@@ -391,8 +394,10 @@ export function TextAreaList({
 interface DocumentUploadInputProps {
   label: string;
   value: string;
-  onChange: (url: string) => void;
+  onChange: (url: string, storageKey?: string) => void;
   hint?: string;
+  /** R2 storage folder context (e.g., "coe-forms", "programs") */
+  storageContext?: string;
 }
 
 export function DocumentUploadInput({
@@ -400,6 +405,7 @@ export function DocumentUploadInput({
   value,
   onChange,
   hint,
+  storageContext,
 }: DocumentUploadInputProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -419,6 +425,9 @@ export function DocumentUploadInput({
     setUploadError(null);
     const fd = new FormData();
     fd.append("file", file);
+    if (storageContext) {
+      fd.append("storageContext", storageContext);
+    }
     const r = await fetch("/api/admin/documents/upload", {
       method: "POST",
       body: fd,
@@ -427,8 +436,9 @@ export function DocumentUploadInput({
       const data = await r.json();
       // Clean up the previously-stored document from R2 + DB.
       deleteUploadedAsset(previousKey);
-      onChange(data.url);
-      setStorageKey(data.storage_key ?? "");
+      const newKey = data.storage_key ?? "";
+      onChange(data.url, newKey);
+      setStorageKey(newKey);
       setFilename(data.filename ?? file.name);
     } else {
       const err = await parseApiError(r);
@@ -459,6 +469,7 @@ export function DocumentUploadInput({
               type="button"
               onClick={handleRemove}
               className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+              title="Delete document"
             >
               <Trash2 size={12} />
             </button>
@@ -652,6 +663,7 @@ interface RepeaterProps<T> {
   label: string;
   items: T[];
   onChange: (items: T[]) => void;
+  onItemRemove?: (item: T) => void;
   newItem: () => T;
   renderItem: (
     item: T,
@@ -664,9 +676,16 @@ export function Repeater<T>({
   label,
   items,
   onChange,
+  onItemRemove,
   newItem,
   renderItem,
 }: RepeaterProps<T>) {
+  const handleRemove = (i: number) => {
+    const removedItem = items[i];
+    if (onItemRemove) onItemRemove(removedItem);
+    onChange(items.filter((_, j) => j !== i));
+  };
+
   return (
     <div className="mb-4">
       <div className="mb-2 flex items-center justify-between">
@@ -687,7 +706,7 @@ export function Repeater<T>({
           >
             <button
               type="button"
-              onClick={() => onChange(items.filter((_, j) => j !== i))}
+              onClick={() => handleRemove(i)}
               className="admin-btn admin-btn-danger admin-btn-sm absolute top-2 right-2"
             >
               <Trash2 size={13} />

@@ -328,7 +328,7 @@ export default function RecruitersPage() {
                 label="Logo"
                 value={form.logo}
                 onChange={(url) => set("logo", url)}
-                uploadOnly
+                hideUrlField
               />
               <TextInput
                 label="Website"

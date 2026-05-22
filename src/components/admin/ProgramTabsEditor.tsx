@@ -196,9 +196,11 @@ function ListSectionEditor({
 function CardsSectionEditor({
   section,
   onChange,
+  storageContext,
 }: {
   section: Extract<Section, { kind: "cards" }>;
   onChange: (s: Section) => void;
+  storageContext?: string;
 }) {
   return (
     <>
@@ -247,7 +249,8 @@ function CardsSectionEditor({
                     ),
                   })
                 }
-                uploadOnly
+                hideUrlField
+                storageContext={storageContext}
               />
               <button
                 type="button"
@@ -287,9 +290,11 @@ function CardsSectionEditor({
 function PeopleSectionEditor({
   section,
   onChange,
+  storageContext,
 }: {
   section: Extract<Section, { kind: "people" }>;
   onChange: (s: Section) => void;
+  storageContext?: string;
 }) {
   return (
     <Field label="People">
@@ -357,7 +362,8 @@ function PeopleSectionEditor({
                   ),
                 })
               }
-              uploadOnly
+              hideUrlField
+              storageContext={storageContext}
             />
             <button
               type="button"
@@ -405,12 +411,14 @@ function SectionEditor({
   onRemove,
   onMoveUp,
   onMoveDown,
+  storageContext,
 }: {
   section: Section;
   onChange: (s: Section) => void;
   onRemove: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
+  storageContext?: string;
 }) {
   return (
     <div className="rounded-lg border border-slate-200 bg-white p-3">
@@ -460,7 +468,11 @@ function SectionEditor({
         <ListSectionEditor section={section} onChange={onChange} />
       )}
       {section.kind === "cards" && (
-        <CardsSectionEditor section={section} onChange={onChange} />
+        <CardsSectionEditor
+          section={section}
+          onChange={onChange}
+          storageContext={storageContext}
+        />
       )}
       {section.kind === "image" && (
         <>
@@ -468,7 +480,8 @@ function SectionEditor({
             label="Image"
             value={section.src}
             onChange={(url) => onChange({ ...section, src: url })}
-            uploadOnly
+            hideUrlField
+            storageContext={storageContext}
           />
           <TextInput
             label="Caption (optional)"
@@ -478,7 +491,11 @@ function SectionEditor({
         </>
       )}
       {section.kind === "people" && (
-        <PeopleSectionEditor section={section} onChange={onChange} />
+        <PeopleSectionEditor
+          section={section}
+          onChange={onChange}
+          storageContext={storageContext}
+        />
       )}
     </div>
   );
@@ -487,9 +504,10 @@ function SectionEditor({
 type Props = {
   tabs: Tab[];
   onChange: (next: Tab[]) => void;
+  storageContext?: string;
 };
 
-export function ProgramTabsEditor({ tabs, onChange }: Props) {
+export function ProgramTabsEditor({ tabs, onChange, storageContext }: Props) {
   return (
     <div className="space-y-3">
       {tabs.length === 0 && (
@@ -623,6 +641,7 @@ export function ProgramTabsEditor({ tabs, onChange }: Props) {
                     ),
                   )
                 }
+                storageContext={storageContext}
               />
             ))}
           </div>

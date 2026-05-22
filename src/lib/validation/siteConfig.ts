@@ -8,6 +8,12 @@ import {
   ArtsScienceHeroSchema,
   PolytechnicHeroSchema,
 } from "./hero";
+import {
+  EngineeringAboutSchema,
+  ArtsScienceAboutSchema,
+  PolytechnicAboutSchema,
+  CoePageSchema,
+} from "./aboutPage";
 import { AnnouncementSchema } from "./announcement";
 import { LifeAtJctSchema } from "./lifeAtJct";
 import { CampusLifeCarouselSchema } from "./campusLifeCarousel";
@@ -68,6 +74,10 @@ export const SITE_CONFIG_SCHEMAS = {
   header: HeaderSchema,
   footer: FooterSchema,
   floatingElements: FloatingElementsSchema,
+  engineeringAbout: EngineeringAboutSchema,
+  artsScienceAbout: ArtsScienceAboutSchema,
+  polytechnicAbout: PolytechnicAboutSchema,
+  engineeringCoe: CoePageSchema,
 } as const;
 
 export type SiteConfigKey = keyof typeof SITE_CONFIG_SCHEMAS;

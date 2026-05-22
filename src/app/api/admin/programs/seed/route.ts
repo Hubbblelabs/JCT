@@ -11,16 +11,12 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
-    const [
-      { ugCourses, pgCourses },
-      { ugPrograms },
-      { diplomaPrograms },
-    ] = await Promise.all([
-      import("@/data/engineering"),
-      import("@/data/arts-science"),
-      import("@/data/polytechnic"),
-    ]);
-
+    const [{ ugCourses, pgCourses }, { ugPrograms }, { diplomaPrograms }] =
+      await Promise.all([
+        import("@/data/engineering"),
+        import("@/data/arts-science"),
+        import("@/data/polytechnic"),
+      ]);
 
     // ── 1. Card-level rows ──────────────────────────────────────────────────
     const cards = [

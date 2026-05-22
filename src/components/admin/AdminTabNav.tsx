@@ -29,6 +29,8 @@ import {
   LayoutGrid,
   MousePointerClick,
   Settings,
+  Info,
+  ScrollText,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Suspense } from "react";
@@ -79,6 +81,16 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       href: "/admin/page-content?college=engineering&section=testimonials",
       icon: MessageSquare,
     },
+    {
+      label: "About Us",
+      href: "/admin/about?college=engineering",
+      icon: Info,
+    },
+    {
+      label: "COE",
+      href: "/admin/coe",
+      icon: ScrollText,
+    },
   ],
   "arts-science": [
     {
@@ -106,6 +118,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       href: "/admin/page-content?college=arts-science&section=testimonials",
       icon: MessageSquare,
     },
+    {
+      label: "About Us",
+      href: "/admin/about?college=arts-science",
+      icon: Info,
+    },
   ],
   polytechnic: [
     {
@@ -132,6 +149,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       label: "Testimonials",
       href: "/admin/page-content?college=polytechnic&section=testimonials",
       icon: MessageSquare,
+    },
+    {
+      label: "About Us",
+      href: "/admin/about?college=polytechnic",
+      icon: Info,
     },
   ],
 };
@@ -283,6 +305,12 @@ function TabNavInner() {
     pathname.startsWith("/admin/programs/") &&
     pathname !== "/admin/programs"
   ) {
+    return null;
+  }
+
+  // Full-screen live CMS editors hide the admin nav (same as the program
+  // builder) — they provide their own back button.
+  if (pathname === "/admin/about" || pathname === "/admin/coe") {
     return null;
   }
 

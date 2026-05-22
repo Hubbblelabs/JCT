@@ -132,7 +132,7 @@ function TestimonialForm({
         label="Avatar"
         value={draft.avatar}
         onChange={(url) => onChange({ ...draft, avatar: url })}
-        uploadOnly
+        hideUrlField
       />
       <label className="flex items-center gap-2 text-sm">
         <input

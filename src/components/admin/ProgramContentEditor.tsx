@@ -413,7 +413,7 @@ export function ProgramSectionInspector({
               label="Hero Image"
               value={String(content.heroImage ?? "")}
               onChange={(url) => set("heroImage", url)}
-              uploadOnly
+              hideUrlField
             />
           </div>
           <ItemsEditor
@@ -492,7 +492,7 @@ export function ProgramSectionInspector({
               label="Photo"
               value={flatStr(content, "hodPhoto", "hod.photo")}
               onChange={(url) => set("hodPhoto", url)}
-              uploadOnly
+              hideUrlField
             />
           </div>
           <TextArea
@@ -1035,7 +1035,7 @@ export function ProgramContentEditor({
             label="Photo"
             value={flatStr(content, "hodPhoto", "hod.photo")}
             onChange={(url) => set("hodPhoto", url)}
-            uploadOnly
+            hideUrlField
           />
         </div>
         <TextArea
@@ -1536,7 +1536,7 @@ export function ProgramContentEditor({
             label="Hero Image"
             value={String(content.heroImage ?? "")}
             onChange={(url) => set("heroImage", url)}
-            uploadOnly
+            hideUrlField
           />
           <TextInput
             label="Accent Color"
@@ -1647,6 +1647,7 @@ export function ProgramContentEditor({
         <ProgramTabsEditor
           tabs={customTabs}
           onChange={(next) => set("tabs", next)}
+          storageContext={`programs-${college}-${slug}`}
         />
         <div className="mt-6">
           <p className="admin-label mb-2">Raw JSON</p>

@@ -12,23 +12,31 @@ const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
   engineering: [
     "/institutions/engineering",
     "/institutions/engineering/programs",
+    "/institutions/engineering/about",
+    "/institutions/engineering/coe",
   ],
   "arts-science": [
     "/institutions/arts-science",
     "/institutions/arts-science/programs",
+    "/institutions/arts-science/about",
   ],
   polytechnic: [
     "/institutions/polytechnic",
     "/institutions/polytechnic/programs",
+    "/institutions/polytechnic/about",
   ],
   "all-institutions": [
     "/",
     "/institutions/engineering",
     "/institutions/engineering/programs",
+    "/institutions/engineering/about",
+    "/institutions/engineering/coe",
     "/institutions/arts-science",
     "/institutions/arts-science/programs",
+    "/institutions/arts-science/about",
     "/institutions/polytechnic",
     "/institutions/polytechnic/programs",
+    "/institutions/polytechnic/about",
   ],
 };
 
@@ -62,6 +70,10 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   polytechnicHero: ["polytechnic"],
   polytechnicCampusLife: ["polytechnic"],
   polytechnicAdmissions: ["polytechnic"],
+  engineeringAbout: ["engineering"],
+  artsScienceAbout: ["arts-science"],
+  polytechnicAbout: ["polytechnic"],
+  engineeringCoe: ["engineering"],
 };
 
 export function revalidateTargets(...targets: RevalidateTarget[]): void {

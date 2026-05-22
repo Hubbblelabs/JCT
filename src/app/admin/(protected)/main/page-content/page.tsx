@@ -165,7 +165,7 @@ function HomeHeroForm({
                       backgroundImages: bg.map((s, j) => (j === i ? url : s)),
                     })
                   }
-                  uploadOnly
+                  hideUrlField
                 />
               </div>
               <button
@@ -439,7 +439,7 @@ function TestimonialForm({
         label="Avatar"
         value={draft.avatar}
         onChange={(url) => onChange({ ...draft, avatar: url })}
-        uploadOnly
+        hideUrlField
       />
       <label className="flex items-center gap-2 text-sm">
         <input
