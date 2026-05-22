@@ -47,9 +47,9 @@ export const RecruitersSectionSchema = z.object({
   titleHighlight: zOptionalString(
     RECRUITERS_SECTION_LIMITS.titleHighlightMax,
   ).default(""),
-  description: zOptionalString(RECRUITERS_SECTION_LIMITS.descriptionMax).default(
-    "",
-  ),
+  description: zOptionalString(
+    RECRUITERS_SECTION_LIMITS.descriptionMax,
+  ).default(""),
   stats: z
     .array(
       z.object({

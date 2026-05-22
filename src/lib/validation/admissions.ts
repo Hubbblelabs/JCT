@@ -18,7 +18,11 @@ export const ADMISSIONS_LIMITS = {
 } as const;
 
 const CriterionSchema = z.object({
-  title: zClampedString(0, ADMISSIONS_LIMITS.blockTitleMax, "Block title").default(""),
+  title: zClampedString(
+    0,
+    ADMISSIONS_LIMITS.blockTitleMax,
+    "Block title",
+  ).default(""),
   items: z
     .array(zClampedString(0, ADMISSIONS_LIMITS.itemMax, "Item"))
     .max(ADMISSIONS_LIMITS.itemsPerBlockMax)

@@ -384,7 +384,9 @@ export function EngineeringHeroForm({
           label="Counselling Label"
           value={value.counsellingLabel ?? ""}
           maxLength={ENG_HERO_LIMITS.counsellingLabelMax}
-          onChange={(e) => onChange({ ...value, counsellingLabel: e.target.value })}
+          onChange={(e) =>
+            onChange({ ...value, counsellingLabel: e.target.value })
+          }
           hint='e.g. "Counselling Code:"'
         />
       </div>
@@ -392,7 +394,9 @@ export function EngineeringHeroForm({
         label="Counselling Code"
         value={value.counsellingCode ?? ""}
         maxLength={ENG_HERO_LIMITS.counsellingCodeMax}
-        onChange={(e) => onChange({ ...value, counsellingCode: e.target.value })}
+        onChange={(e) =>
+          onChange({ ...value, counsellingCode: e.target.value })
+        }
         hint="e.g. 2724"
       />
       <IntervalInput
@@ -815,7 +819,10 @@ export function PamphletForm({
         placeholder="https://www.youtube.com/embed/VIDEO_ID"
         hint="YouTube embed URL — used for the Virtual Tour button inside the popup."
       />
-      <Field label="Apply Now Button" hint="Customize the Apply Now button shown inside the pamphlet popup.">
+      <Field
+        label="Apply Now Button"
+        hint="Customize the Apply Now button shown inside the pamphlet popup."
+      >
         <div className="grid grid-cols-2 gap-3">
           <TextInput
             label="Button Label"
@@ -1672,7 +1679,10 @@ export function AdmissionsForm({
                             ...value,
                             criteria: criteria.map((b, j) =>
                               j === i
-                                ? { ...b, items: b.items.filter((_, m) => m !== k) }
+                                ? {
+                                    ...b,
+                                    items: b.items.filter((_, m) => m !== k),
+                                  }
                                 : b,
                             ),
                           })
@@ -1693,7 +1703,9 @@ export function AdmissionsForm({
                         ),
                       })
                     }
-                    disabled={block.items.length >= ADMISSIONS_LIMITS.itemsPerBlockMax}
+                    disabled={
+                      block.items.length >= ADMISSIONS_LIMITS.itemsPerBlockMax
+                    }
                     className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     <Plus size={14} /> Add Item
@@ -1703,7 +1715,10 @@ export function AdmissionsForm({
               <button
                 type="button"
                 onClick={() =>
-                  onChange({ ...value, criteria: criteria.filter((_, j) => j !== i) })
+                  onChange({
+                    ...value,
+                    criteria: criteria.filter((_, j) => j !== i),
+                  })
                 }
                 className="admin-btn admin-btn-danger admin-btn-sm mt-2"
               >
@@ -1715,20 +1730,29 @@ export function AdmissionsForm({
             <button
               type="button"
               onClick={() =>
-                onChange({ ...value, criteria: [...criteria, { title: "", items: [] }] })
+                onChange({
+                  ...value,
+                  criteria: [...criteria, { title: "", items: [] }],
+                })
               }
               disabled={criteriaAtMax}
               className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Plus size={14} /> Add Criterion Block
             </button>
-            <LimitHint count={criteria.length} max={ADMISSIONS_LIMITS.criteriaMax} />
+            <LimitHint
+              count={criteria.length}
+              max={ADMISSIONS_LIMITS.criteriaMax}
+            />
           </div>
         </div>
       </Field>
 
       {showContact && (
-        <Field label="Contact Strip" hint="Phone, email, and address displayed below the criteria.">
+        <Field
+          label="Contact Strip"
+          hint="Phone, email, and address displayed below the criteria."
+        >
           <div className="space-y-3">
             <TextInput
               label="Phone"
@@ -1760,7 +1784,11 @@ export function AdmissionsForm({
 
 /* ─── Why Choose JCT ─── */
 
-export type WhyChooseJctFeature = { icon: string; title: string; description: string };
+export type WhyChooseJctFeature = {
+  icon: string;
+  title: string;
+  description: string;
+};
 export type WhyChooseJctVal = {
   eyebrow?: string;
   title?: string;
@@ -1791,7 +1819,9 @@ export function WhyChooseJctForm({
           label="Title Highlight"
           value={value.titleHighlight ?? ""}
           maxLength={WHY_CHOOSE_JCT_LIMITS.titleHighlightMax}
-          onChange={(e) => onChange({ ...value, titleHighlight: e.target.value })}
+          onChange={(e) =>
+            onChange({ ...value, titleHighlight: e.target.value })
+          }
           hint="Rendered in accent color within the title"
         />
       </div>
@@ -1861,7 +1891,10 @@ export function WhyChooseJctForm({
               <button
                 type="button"
                 onClick={() =>
-                  onChange({ ...value, features: features.filter((_, j) => j !== i) })
+                  onChange({
+                    ...value,
+                    features: features.filter((_, j) => j !== i),
+                  })
                 }
                 className="admin-btn admin-btn-danger admin-btn-sm mt-2"
               >
@@ -1875,7 +1908,10 @@ export function WhyChooseJctForm({
               onClick={() =>
                 onChange({
                   ...value,
-                  features: [...features, { icon: "", title: "", description: "" }],
+                  features: [
+                    ...features,
+                    { icon: "", title: "", description: "" },
+                  ],
                 })
               }
               disabled={atMax}
@@ -1883,7 +1919,10 @@ export function WhyChooseJctForm({
             >
               <Plus size={14} /> Add Feature
             </button>
-            <LimitHint count={features.length} max={WHY_CHOOSE_JCT_LIMITS.featuresMax} />
+            <LimitHint
+              count={features.length}
+              max={WHY_CHOOSE_JCT_LIMITS.featuresMax}
+            />
           </div>
         </div>
       </Field>
@@ -1934,7 +1973,9 @@ export function HomeAdmissionsForm({
           label="Title Highlight"
           value={value.titleHighlight ?? ""}
           maxLength={HOME_ADMISSIONS_LIMITS.titleHighlightMax}
-          onChange={(e) => onChange({ ...value, titleHighlight: e.target.value })}
+          onChange={(e) =>
+            onChange({ ...value, titleHighlight: e.target.value })
+          }
           hint="Rendered in accent color"
         />
       </div>
@@ -1972,7 +2013,9 @@ export function HomeAdmissionsForm({
           label="PDF Button Label"
           value={value.prospectusLabel ?? ""}
           maxLength={HOME_ADMISSIONS_LIMITS.prospectusLabelMax}
-          onChange={(e) => onChange({ ...value, prospectusLabel: e.target.value })}
+          onChange={(e) =>
+            onChange({ ...value, prospectusLabel: e.target.value })
+          }
           placeholder="Download Prospectus"
           hint="Label shown on the prospectus download button"
         />
@@ -2064,7 +2107,10 @@ export function HomeAdmissionsForm({
               <button
                 type="button"
                 onClick={() =>
-                  onChange({ ...value, pathways: pathways.filter((_, j) => j !== i) })
+                  onChange({
+                    ...value,
+                    pathways: pathways.filter((_, j) => j !== i),
+                  })
                 }
                 className="admin-btn admin-btn-danger admin-btn-sm mt-2"
               >
@@ -2080,7 +2126,13 @@ export function HomeAdmissionsForm({
                   ...value,
                   pathways: [
                     ...pathways,
-                    { icon: "", title: "", description: "", ctaLabel: "", ctaHref: "" },
+                    {
+                      icon: "",
+                      title: "",
+                      description: "",
+                      ctaLabel: "",
+                      ctaHref: "",
+                    },
                   ],
                 })
               }
@@ -2089,7 +2141,10 @@ export function HomeAdmissionsForm({
             >
               <Plus size={14} /> Add Pathway
             </button>
-            <LimitHint count={pathways.length} max={HOME_ADMISSIONS_LIMITS.pathwaysMax} />
+            <LimitHint
+              count={pathways.length}
+              max={HOME_ADMISSIONS_LIMITS.pathwaysMax}
+            />
           </div>
         </div>
       </Field>
@@ -2447,7 +2502,10 @@ export function FloatingElementsForm({
               type="checkbox"
               checked={wa.enabled !== false}
               onChange={(e) =>
-                onChange({ ...value, whatsapp: { ...wa, enabled: e.target.checked } })
+                onChange({
+                  ...value,
+                  whatsapp: { ...wa, enabled: e.target.checked },
+                })
               }
             />
             Enable WhatsApp button
@@ -2475,7 +2533,10 @@ export function FloatingElementsForm({
               type="checkbox"
               checked={ap.enabled !== false}
               onChange={(e) =>
-                onChange({ ...value, applyNow: { ...ap, enabled: e.target.checked } })
+                onChange({
+                  ...value,
+                  applyNow: { ...ap, enabled: e.target.checked },
+                })
               }
             />
             Enable Apply Now button
@@ -2511,7 +2572,10 @@ export function FloatingElementsForm({
               type="checkbox"
               checked={mt.enabled !== false}
               onChange={(e) =>
-                onChange({ ...value, meritto: { ...mt, enabled: e.target.checked } })
+                onChange({
+                  ...value,
+                  meritto: { ...mt, enabled: e.target.checked },
+                })
               }
             />
             Enable Meritto Chat

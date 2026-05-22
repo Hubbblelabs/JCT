@@ -353,8 +353,8 @@ export function UgPrograms() {
           </div>
           <p className="max-w-sm text-base leading-relaxed text-stone-600 md:text-lg">
             3-year undergraduate programs designed to nurture creativity,
-            analytical skills, and industrial readiness. Affiliated to Bharathiar
-            University, Coimbatore.
+            analytical skills, and industrial readiness. Affiliated to
+            Bharathiar University, Coimbatore.
           </p>
         </div>
       </div>

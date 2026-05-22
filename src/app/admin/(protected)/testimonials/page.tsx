@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   TextInput,
@@ -45,7 +45,7 @@ const CATEGORIES = [
   { value: "Industry", label: "Industry" },
 ];
 
-const INSTITUTIONS = [
+const _INSTITUTIONS = [
   { value: "all", label: "All / Home page" },
   { value: "engineering", label: "Engineering" },
   { value: "arts-science", label: "Arts & Science" },
@@ -59,12 +59,12 @@ function TestimonialsPageInner() {
   const [editing, setEditing] = useState<Testimonial | null>(null);
   const [form, setForm] = useState<Omit<Testimonial, "_id">>(EMPTY);
   const [saving, setSaving] = useState(false);
-  const [filterInst, setFilterInst] = useState(
+  const [filterInst, _setFilterInst] = useState(
     () => searchParams.get("college") ?? "",
   );
   const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     const url = filterInst
       ? `/api/admin/testimonials?institution=${filterInst}`
@@ -72,11 +72,11 @@ function TestimonialsPageInner() {
     const r = await fetch(url);
     setTestimonials(await r.json());
     setLoading(false);
-  };
+  }, [filterInst]);
 
   useEffect(() => {
     load();
-  }, [filterInst]);
+  }, [filterInst, load]);
 
   const openNew = () => {
     setEditing({ _id: "", ...EMPTY });

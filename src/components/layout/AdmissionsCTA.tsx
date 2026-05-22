@@ -56,8 +56,7 @@ function normalize(raw: unknown): HomeAdmissions | null {
           return {
             icon: typeof o.icon === "string" ? o.icon : "",
             title,
-            description:
-              typeof o.description === "string" ? o.description : "",
+            description: typeof o.description === "string" ? o.description : "",
             ctaLabel: typeof o.ctaLabel === "string" ? o.ctaLabel : "",
             ctaHref: typeof o.ctaHref === "string" ? o.ctaHref : "",
           } satisfies Pathway;

@@ -76,7 +76,9 @@ export const HOME_STATS_LIMITS = {
 
 export const HomeStatsSchema = z.object({
   yearsOfExcellence: zOptionalString(HOME_STATS_LIMITS.valueMax).default(""),
-  yearsOfExcellenceLabel: zOptionalString(HOME_STATS_LIMITS.labelMax).default(""),
+  yearsOfExcellenceLabel: zOptionalString(HOME_STATS_LIMITS.labelMax).default(
+    "",
+  ),
   alumni: zOptionalString(HOME_STATS_LIMITS.valueMax).default(""),
   alumniLabel: zOptionalString(HOME_STATS_LIMITS.labelMax).default(""),
   studentsPlaced: zOptionalString(HOME_STATS_LIMITS.valueMax).default(""),
@@ -114,9 +116,9 @@ export const EngineeringHeroSchema = z.object({
   subtitle: zOptionalString(ENG_HERO_LIMITS.subtitleMax).default(""),
   ctas: z.array(zCta).max(ENG_HERO_LIMITS.ctas).optional().default([]),
   badgeText: zOptionalString(ENG_HERO_LIMITS.badgeTextMax).default(""),
-  counsellingLabel: zOptionalString(ENG_HERO_LIMITS.counsellingLabelMax).default(
-    "",
-  ),
+  counsellingLabel: zOptionalString(
+    ENG_HERO_LIMITS.counsellingLabelMax,
+  ).default(""),
   counsellingCode: zOptionalString(ENG_HERO_LIMITS.counsellingCodeMax).default(
     "",
   ),
@@ -163,9 +165,11 @@ const ArtsSubsectionSchema = z.object({
   icon: zClampedString(0, ARTS_HERO_LIMITS.subsectionIconMax, "Icon").default(
     "",
   ),
-  title: zClampedString(0, ARTS_HERO_LIMITS.subsectionTitleMax, "Title").default(
-    "",
-  ),
+  title: zClampedString(
+    0,
+    ARTS_HERO_LIMITS.subsectionTitleMax,
+    "Title",
+  ).default(""),
   description: zOptionalString(ARTS_HERO_LIMITS.subsectionDescMax).default(""),
 });
 

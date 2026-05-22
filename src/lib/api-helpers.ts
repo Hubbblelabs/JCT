@@ -95,7 +95,7 @@ export function serverError(message = "Internal server error") {
   return json({ error: message }, 500);
 }
 
-export async function requireAuth(req: NextRequest) {
+export async function requireAuth(_req: NextRequest) {
   const session = await auth();
   if (!session?.user) {
     return { session: null, error: unauthorized() };

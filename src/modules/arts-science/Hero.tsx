@@ -58,8 +58,7 @@ function normalizeHero(raw: unknown): HeroContent | null {
           return {
             icon: typeof o.icon === "string" ? o.icon : "",
             title,
-            description:
-              typeof o.description === "string" ? o.description : "",
+            description: typeof o.description === "string" ? o.description : "",
           } satisfies Subsection;
         })
         .filter((x): x is Subsection => x !== null)

@@ -71,7 +71,7 @@ export function Hero() {
       setCurrentIdx((prev) => (prev + 1) % hero.backgroundImages.length);
     }, hero.intervalMs);
     return () => clearInterval(timer);
-  }, [hero?.backgroundImages.length, hero?.intervalMs]);
+  }, [hero]);
 
   if (loading) {
     return (

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 import { Hero } from "@/modules/arts-science/Hero";
-import { AboutArtsScience } from "@/modules/arts-science/AboutArtsScience";
+import { _AboutArtsScience } from "@/modules/arts-science/AboutArtsScience";
 import { UgPrograms } from "@/modules/arts-science/UgPrograms";
 import { AdmissionProcess } from "@/modules/arts-science/AdmissionProcess";
 import { CampusLife } from "@/modules/arts-science/CampusLife";

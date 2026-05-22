@@ -14,16 +14,28 @@ export const WHY_CHOOSE_JCT_LIMITS = {
 } as const;
 
 const WhyFeatureSchema = z.object({
-  icon: zClampedString(0, WHY_CHOOSE_JCT_LIMITS.featureIconMax, "Icon").default(""),
-  title: zClampedString(0, WHY_CHOOSE_JCT_LIMITS.featureTitleMax, "Feature title").default(""),
-  description: zOptionalString(WHY_CHOOSE_JCT_LIMITS.featureDescMax).default(""),
+  icon: zClampedString(0, WHY_CHOOSE_JCT_LIMITS.featureIconMax, "Icon").default(
+    "",
+  ),
+  title: zClampedString(
+    0,
+    WHY_CHOOSE_JCT_LIMITS.featureTitleMax,
+    "Feature title",
+  ).default(""),
+  description: zOptionalString(WHY_CHOOSE_JCT_LIMITS.featureDescMax).default(
+    "",
+  ),
 });
 
 export const WhyChooseJctSchema = z.object({
   eyebrow: zOptionalString(WHY_CHOOSE_JCT_LIMITS.eyebrowMax).default(""),
   title: zOptionalString(WHY_CHOOSE_JCT_LIMITS.titleMax).default(""),
-  titleHighlight: zOptionalString(WHY_CHOOSE_JCT_LIMITS.titleHighlightMax).default(""),
-  description: zOptionalString(WHY_CHOOSE_JCT_LIMITS.descriptionMax).default(""),
+  titleHighlight: zOptionalString(
+    WHY_CHOOSE_JCT_LIMITS.titleHighlightMax,
+  ).default(""),
+  description: zOptionalString(WHY_CHOOSE_JCT_LIMITS.descriptionMax).default(
+    "",
+  ),
   features: z
     .array(WhyFeatureSchema)
     .max(WHY_CHOOSE_JCT_LIMITS.featuresMax)
@@ -49,18 +61,34 @@ export const HOME_ADMISSIONS_LIMITS = {
 } as const;
 
 const PathwaySchema = z.object({
-  icon: zClampedString(0, HOME_ADMISSIONS_LIMITS.pathwayIconMax, "Icon").default(""),
-  title: zClampedString(0, HOME_ADMISSIONS_LIMITS.pathwayTitleMax, "Pathway title").default(""),
-  description: zOptionalString(HOME_ADMISSIONS_LIMITS.pathwayDescMax).default(""),
-  ctaLabel: zOptionalString(HOME_ADMISSIONS_LIMITS.pathwayCtaLabelMax).default(""),
+  icon: zClampedString(
+    0,
+    HOME_ADMISSIONS_LIMITS.pathwayIconMax,
+    "Icon",
+  ).default(""),
+  title: zClampedString(
+    0,
+    HOME_ADMISSIONS_LIMITS.pathwayTitleMax,
+    "Pathway title",
+  ).default(""),
+  description: zOptionalString(HOME_ADMISSIONS_LIMITS.pathwayDescMax).default(
+    "",
+  ),
+  ctaLabel: zOptionalString(HOME_ADMISSIONS_LIMITS.pathwayCtaLabelMax).default(
+    "",
+  ),
   ctaHref: zUrl.optional().or(z.literal("")),
 });
 
 export const HomeAdmissionsSchema = z.object({
   eyebrow: zOptionalString(HOME_ADMISSIONS_LIMITS.eyebrowMax).default(""),
   title: zOptionalString(HOME_ADMISSIONS_LIMITS.titleMax).default(""),
-  titleHighlight: zOptionalString(HOME_ADMISSIONS_LIMITS.titleHighlightMax).default(""),
-  description: zOptionalString(HOME_ADMISSIONS_LIMITS.descriptionMax).default(""),
+  titleHighlight: zOptionalString(
+    HOME_ADMISSIONS_LIMITS.titleHighlightMax,
+  ).default(""),
+  description: zOptionalString(HOME_ADMISSIONS_LIMITS.descriptionMax).default(
+    "",
+  ),
   pathways: z
     .array(PathwaySchema)
     .max(HOME_ADMISSIONS_LIMITS.pathwaysMax)
@@ -68,7 +96,9 @@ export const HomeAdmissionsSchema = z.object({
     .default([]),
   applyLabel: zOptionalString(HOME_ADMISSIONS_LIMITS.applyLabelMax).default(""),
   applyHref: zUrl.optional().or(z.literal("")),
-  prospectusLabel: zOptionalString(HOME_ADMISSIONS_LIMITS.prospectusLabelMax).default(""),
+  prospectusLabel: zOptionalString(
+    HOME_ADMISSIONS_LIMITS.prospectusLabelMax,
+  ).default(""),
   prospectusUrl: zOptionalString(500).default(""),
 });
 

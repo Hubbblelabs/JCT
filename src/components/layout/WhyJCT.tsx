@@ -34,11 +34,27 @@ const CARD_GRADIENTS = [
   "from-sky-50 to-cyan-50",
 ];
 
-const COUNTER_FIELDS: { key: keyof HomeStats; labelKey: keyof HomeStats; defaultLabel: string }[] = [
-  { key: "yearsOfExcellence", labelKey: "yearsOfExcellenceLabel", defaultLabel: "Years of Excellence" },
+const COUNTER_FIELDS: {
+  key: keyof HomeStats;
+  labelKey: keyof HomeStats;
+  defaultLabel: string;
+}[] = [
+  {
+    key: "yearsOfExcellence",
+    labelKey: "yearsOfExcellenceLabel",
+    defaultLabel: "Years of Excellence",
+  },
   { key: "alumni", labelKey: "alumniLabel", defaultLabel: "Alumni Worldwide" },
-  { key: "studentsPlaced", labelKey: "studentsPlacedLabel", defaultLabel: "Students Placed" },
-  { key: "industryAwards", labelKey: "industryAwardsLabel", defaultLabel: "Industry Awards" },
+  {
+    key: "studentsPlaced",
+    labelKey: "studentsPlacedLabel",
+    defaultLabel: "Students Placed",
+  },
+  {
+    key: "industryAwards",
+    labelKey: "industryAwardsLabel",
+    defaultLabel: "Industry Awards",
+  },
 ];
 
 function normalizeWhy(raw: unknown): WhyChooseJct | null {
@@ -53,8 +69,7 @@ function normalizeWhy(raw: unknown): WhyChooseJct | null {
           return {
             icon: typeof o.icon === "string" ? o.icon : "",
             title,
-            description:
-              typeof o.description === "string" ? o.description : "",
+            description: typeof o.description === "string" ? o.description : "",
           } satisfies Feature;
         })
         .filter((x): x is Feature => x !== null)
@@ -78,7 +93,9 @@ export function WhyJCT() {
 
   const counters = COUNTER_FIELDS.map((f) => ({
     label:
-      statsData && typeof statsData[f.labelKey] === "string" && (statsData[f.labelKey] as string).trim()
+      statsData &&
+      typeof statsData[f.labelKey] === "string" &&
+      (statsData[f.labelKey] as string).trim()
         ? (statsData[f.labelKey] as string).trim()
         : f.defaultLabel,
     value:

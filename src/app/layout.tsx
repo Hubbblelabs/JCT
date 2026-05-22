@@ -110,7 +110,7 @@ export default function RootLayout({
 
         {/* Meritto Chatbot - conditionally loaded on public pages only */}
         <MerittoScript />
-
       </body>
-    </html>);
+    </html>
+  );
 }

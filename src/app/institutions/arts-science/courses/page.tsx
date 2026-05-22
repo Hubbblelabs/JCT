@@ -83,10 +83,7 @@ export default function ArtsScienceCoursesPage() {
   return (
     <main className="bg-surface text-foreground min-h-screen">
       <Navbar forceSolidOnTop />
-      <PageHero
-        title="All Courses"
-        subtitle="JCT College of Arts & Science"
-      />
+      <PageHero title="All Courses" subtitle="JCT College of Arts & Science" />
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
         <Breadcrumb

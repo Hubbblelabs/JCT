@@ -48,10 +48,7 @@ export function Testimonials() {
 
   if (loading) {
     return (
-      <section
-        aria-busy="true"
-        className="bg-[#F5F5F5] py-20"
-      >
+      <section aria-busy="true" className="bg-[#F5F5F5] py-20">
         <div className="container mx-auto h-72 px-4" />
       </section>
     );

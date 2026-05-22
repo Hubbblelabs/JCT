@@ -4,15 +4,15 @@ import { useEffect, useMemo, useState, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   TextInput,
-  NumberInput,
-  TextArea,
-  StringList,
-  Accordion,
+  _NumberInput,
+  _TextArea,
+  _StringList,
+  _Accordion,
   ImageUploadInput,
 } from "@/components/admin/inputs";
 import {
   PROGRAM_CONTENT_SECTION_LABELS,
-  ProgramContentEditor,
+  _ProgramContentEditor,
   ProgramSectionInspector,
   type ProgramContentSection,
 } from "@/components/admin/ProgramContentEditor";
@@ -200,7 +200,9 @@ function ProgramDetailInner() {
 
   const deactivate = async () => {
     if (
-      !confirm("Deactivate this program? It will be hidden from the public site.")
+      !confirm(
+        "Deactivate this program? It will be hidden from the public site.",
+      )
     )
       return;
     await fetch(`/api/admin/programs/${id}`, {
@@ -276,7 +278,9 @@ function ProgramDetailInner() {
             </h1>
             {!isNew && (
               <p className="admin-page-subtitle">
-                {prog.institution === "arts-science" ? "Arts & Science" : prog.institution}
+                {prog.institution === "arts-science"
+                  ? "Arts & Science"
+                  : prog.institution}
               </p>
             )}
           </div>
@@ -411,7 +415,7 @@ function ProgramDetailInner() {
               }}
             />
           ) : (
-            <div className="py-28 px-6 text-sm text-gray-400">
+            <div className="px-6 py-28 text-sm text-gray-400">
               <div className="mx-auto max-w-md space-y-4 text-left">
                 <h3 className="mb-6 text-xl font-bold text-gray-900">
                   Create New Program

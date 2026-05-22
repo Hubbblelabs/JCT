@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { Check, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 import {
@@ -179,7 +179,7 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -193,11 +193,11 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [institution]);
 
   useEffect(() => {
     load();
-  }, []);
+  }, [load]);
 
   const handleAdd = async () => {
     if (!draft.name.trim() || !draft.quote.trim()) return;

@@ -26,7 +26,9 @@ export const PamphletSchema = z.object({
     .default([]),
   ctas: z.array(zCta).max(LIMITS.ctas).optional().default([]),
   videoUrl: zUrl.optional().or(z.literal("")),
-  applyLabel: zClampedString(0, LIMITS.applyLabelMax, "Apply label").default("Apply Now"),
+  applyLabel: zClampedString(0, LIMITS.applyLabelMax, "Apply label").default(
+    "Apply Now",
+  ),
   applyHref: zUrl.optional().or(z.literal("")),
 });
 

@@ -67,7 +67,9 @@ function CarouselSpeedInput({
   onChange: (v: number) => void;
 }) {
   const [draft, setDraft] = useState(() => String(value ?? 6000));
-  useEffect(() => { setDraft(String(value ?? 6000)); }, [value]);
+  useEffect(() => {
+    setDraft(String(value ?? 6000));
+  }, [value]);
   return (
     <TextInput
       label="Carousel Speed (ms)"
@@ -145,9 +147,7 @@ function HomeHeroForm({
       <div>
         <h3 className="mb-1 text-sm font-semibold text-gray-700">
           Background Images{" "}
-          <span className="font-normal text-gray-400">
-            (up to {BG_LIMIT})
-          </span>
+          <span className="font-normal text-gray-400">(up to {BG_LIMIT})</span>
         </h3>
         <p className="mb-3 text-xs text-gray-400">
           Images rotate behind the hero. Upload, replace, or remove each one.
@@ -283,10 +283,22 @@ type StatCardField = {
 };
 
 const STAT_CARD_FIELDS: StatCardField[] = [
-  { valueKey: "yearsOfExcellence", labelKey: "yearsOfExcellenceLabel", defaultLabel: "Years of Excellence" },
+  {
+    valueKey: "yearsOfExcellence",
+    labelKey: "yearsOfExcellenceLabel",
+    defaultLabel: "Years of Excellence",
+  },
   { valueKey: "alumni", labelKey: "alumniLabel", defaultLabel: "Alumni" },
-  { valueKey: "studentsPlaced", labelKey: "studentsPlacedLabel", defaultLabel: "Students Placed" },
-  { valueKey: "industryAwards", labelKey: "industryAwardsLabel", defaultLabel: "Industry Awards" },
+  {
+    valueKey: "studentsPlaced",
+    labelKey: "studentsPlacedLabel",
+    defaultLabel: "Students Placed",
+  },
+  {
+    valueKey: "industryAwards",
+    labelKey: "industryAwardsLabel",
+    defaultLabel: "Industry Awards",
+  },
 ];
 
 function HomeStatsForm({
@@ -299,7 +311,8 @@ function HomeStatsForm({
   return (
     <div className="space-y-4">
       <p className="text-xs text-gray-400">
-        Each card shows a value (e.g. &ldquo;60+&rdquo;) and a label (e.g. &ldquo;Years of Excellence&rdquo;). Both are fully customizable.
+        Each card shows a value (e.g. &ldquo;60+&rdquo;) and a label (e.g.
+        &ldquo;Years of Excellence&rdquo;). Both are fully customizable.
       </p>
       {STAT_CARD_FIELDS.map(({ valueKey, labelKey, defaultLabel }, i) => (
         <div key={valueKey} className="rounded-lg border border-gray-200 p-3">
@@ -310,13 +323,17 @@ function HomeStatsForm({
             <TextInput
               label="Value"
               value={(value[valueKey] as string) ?? ""}
-              onChange={(e) => onChange({ ...value, [valueKey]: e.target.value })}
+              onChange={(e) =>
+                onChange({ ...value, [valueKey]: e.target.value })
+              }
               placeholder="e.g. 60+"
             />
             <TextInput
               label="Label"
               value={(value[labelKey] as string) ?? ""}
-              onChange={(e) => onChange({ ...value, [labelKey]: e.target.value })}
+              onChange={(e) =>
+                onChange({ ...value, [labelKey]: e.target.value })
+              }
               placeholder={defaultLabel}
             />
           </div>
@@ -325,7 +342,6 @@ function HomeStatsForm({
     </div>
   );
 }
-
 
 // ─── Inline Voices / Testimonials Manager ────────────────────────────────────
 
@@ -666,7 +682,6 @@ function VoicesInlineManager() {
     </div>
   );
 }
-
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 

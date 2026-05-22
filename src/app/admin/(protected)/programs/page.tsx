@@ -30,7 +30,8 @@ function ProgramsPageInner() {
     setLoading(true);
     const r = await fetch("/api/admin/programs");
     const data = await r.json();
-    if (Array.isArray(data)) setPrograms(data); else setPrograms([]);
+    if (Array.isArray(data)) setPrograms(data);
+    else setPrograms([]);
     setLoading(false);
   };
 
@@ -100,7 +101,9 @@ function ProgramsPageInner() {
     }
   };
 
-  const filtered = (programs || []).filter((p) => !filter || p.institution === filter);
+  const filtered = (programs || []).filter(
+    (p) => !filter || p.institution === filter,
+  );
 
   const collegeLabel =
     filter === "engineering"
@@ -124,7 +127,7 @@ function ProgramsPageInner() {
           <button
             onClick={handleCreateNew}
             disabled={creatingNew}
-            className="admin-btn admin-btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+            className="admin-btn admin-btn-primary disabled:cursor-not-allowed disabled:opacity-50"
           >
             {creatingNew ? (
               <>
@@ -164,10 +167,7 @@ function ProgramsPageInner() {
                 </tr>
               )}
               {filtered.map((p) => (
-                <tr
-                  key={p._id}
-                  className="transition-colors hover:bg-gray-50"
-                >
+                <tr key={p._id} className="transition-colors hover:bg-gray-50">
                   <td>
                     <button
                       type="button"
@@ -179,11 +179,15 @@ function ProgramsPageInner() {
                       className="text-left hover:underline"
                     >
                       <div className="font-medium text-gray-900">{p.name}</div>
-                      <div className="mt-0.5 text-xs text-gray-400 font-mono">{p.abbr}</div>
+                      <div className="mt-0.5 font-mono text-xs text-gray-400">
+                        {p.abbr}
+                      </div>
                     </button>
                   </td>
-                  <td className="text-sm capitalize text-gray-600">
-                    {p.institution === "arts-science" ? "Arts & Science" : p.institution}
+                  <td className="text-sm text-gray-600 capitalize">
+                    {p.institution === "arts-science"
+                      ? "Arts & Science"
+                      : p.institution}
                   </td>
                   <td>
                     <span

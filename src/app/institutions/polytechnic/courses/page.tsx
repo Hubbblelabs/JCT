@@ -82,10 +82,7 @@ export default function PolytechnicCoursesPage() {
   return (
     <main className="bg-surface text-foreground min-h-screen">
       <Navbar forceSolidOnTop />
-      <PageHero
-        title="All Courses"
-        subtitle="JCT Polytechnic College"
-      />
+      <PageHero title="All Courses" subtitle="JCT Polytechnic College" />
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
         <Breadcrumb

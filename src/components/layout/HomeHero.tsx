@@ -107,8 +107,9 @@ const BACKGROUND_MOTIONS = [
 export function HomeHero() {
   const router = useRouter();
   const { data: heroData, loading } = useSiteConfig("home");
-  const { data: prospectusData } =
-    useSiteConfig<{ url?: string }>("homeProspectus");
+  const { data: prospectusData } = useSiteConfig<{ url?: string }>(
+    "homeProspectus",
+  );
 
   const hero = useMemo(() => normalizeHero(heroData), [heroData]);
 
@@ -128,10 +129,7 @@ export function HomeHero() {
       : `/api/public/images/${raw}`;
   }, [prospectusData]);
 
-  const backgroundImages = useMemo(
-    () => hero?.backgroundImages ?? [],
-    [hero],
-  );
+  const backgroundImages = useMemo(() => hero?.backgroundImages ?? [], [hero]);
   const titleLines = hero?.titleLines ?? [];
   const ctas = hero?.ctas ?? [];
   const cards = hero?.cards ?? [];
@@ -173,8 +171,7 @@ export function HomeHero() {
     return hoveredCard === index;
   }
 
-  const rawImageSrc =
-    backgroundImages[currentBackgroundIndex]?.trim() || null;
+  const rawImageSrc = backgroundImages[currentBackgroundIndex]?.trim() || null;
   const currentImageSrc = rawImageSrc ? getImageUrl(rawImageSrc) : null;
 
   if (loading) {

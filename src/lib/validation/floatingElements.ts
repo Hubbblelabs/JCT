@@ -11,14 +11,22 @@ export const FloatingElementsSchema = z.object({
   whatsapp: z
     .object({
       enabled: z.boolean().optional().default(true),
-      phone: zClampedString(0, FLOATING_ELEMENTS_LIMITS.phoneMax, "Phone number").default(""),
+      phone: zClampedString(
+        0,
+        FLOATING_ELEMENTS_LIMITS.phoneMax,
+        "Phone number",
+      ).default(""),
     })
     .optional()
     .default({ enabled: true, phone: "" }),
   applyNow: z
     .object({
       enabled: z.boolean().optional().default(true),
-      label: zClampedString(0, FLOATING_ELEMENTS_LIMITS.labelMax, "Button label").default("Apply Now"),
+      label: zClampedString(
+        0,
+        FLOATING_ELEMENTS_LIMITS.labelMax,
+        "Button label",
+      ).default("Apply Now"),
       href: zUrl.optional().or(z.literal("")),
     })
     .optional()

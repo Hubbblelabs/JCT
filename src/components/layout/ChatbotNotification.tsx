@@ -79,7 +79,7 @@ export function ChatbotNotification() {
             className="flex max-w-[220px] items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-left shadow-xl shadow-slate-900/10 transition-all hover:border-[#d4a024]/50 hover:shadow-2xl focus:outline-none"
           >
             {/* College Logo */}
-            <div className="relative h-8 w-8 shrink-0 overflow-hidden rounded-full border border-slate-100 bg-slate-50 p-0.5 flex items-center justify-center">
+            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-100 bg-slate-50 p-0.5">
               <Image
                 src="/logo/jct_logo.webp"
                 alt="JCT Logo"

@@ -131,10 +131,7 @@ export type {
   HeroStatsListValue,
 } from "./siteInfo";
 
-export {
-  AdmissionsSchema,
-  ADMISSIONS_LIMITS,
-} from "./admissions";
+export { AdmissionsSchema, ADMISSIONS_LIMITS } from "./admissions";
 export type { AdmissionsValue } from "./admissions";
 
 export {

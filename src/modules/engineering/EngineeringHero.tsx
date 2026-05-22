@@ -86,10 +86,7 @@ export function EngineeringHero() {
   const hero = useMemo(() => normalizeHero(data), [data]);
   const [bgIndex, setBgIndex] = useState(0);
 
-  const backgroundImages = useMemo(
-    () => hero?.backgroundImages ?? [],
-    [hero],
-  );
+  const backgroundImages = useMemo(() => hero?.backgroundImages ?? [], [hero]);
   const intervalMs = hero?.intervalMs ?? 6000;
 
   useEffect(() => {

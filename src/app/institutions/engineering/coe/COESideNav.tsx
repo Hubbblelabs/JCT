@@ -12,7 +12,11 @@ import {
 
 const navSections = [
   { id: "overview", label: "Overview", icon: FileText },
-  { id: "responsibilities", label: "Roles & Responsibilities", icon: ClipboardList },
+  {
+    id: "responsibilities",
+    label: "Roles & Responsibilities",
+    icon: ClipboardList,
+  },
   { id: "obe", label: "Outcome Based Education", icon: BookOpen },
   { id: "downloads", label: "Circulars & Downloads", icon: Download },
 ];

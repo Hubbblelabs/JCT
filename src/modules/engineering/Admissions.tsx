@@ -194,10 +194,7 @@ export function Admissions() {
                   href={`mailto:${config.email}`}
                   className="text-engineering-dark hover:text-engineering-light flex items-center gap-2.5 font-medium transition-colors"
                 >
-                  <Mail
-                    size={16}
-                    className="text-engineering-light shrink-0"
-                  />
+                  <Mail size={16} className="text-engineering-light shrink-0" />
                   <span>{config.email}</span>
                 </a>
               )}

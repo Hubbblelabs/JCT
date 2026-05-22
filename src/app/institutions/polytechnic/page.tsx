@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/modules/polytechnic/Hero";
-import { AboutPolytechnic } from "@/modules/polytechnic/AboutPolytechnic";
+import { _AboutPolytechnic } from "@/modules/polytechnic/AboutPolytechnic";
 import { DiplomaPrograms } from "@/modules/polytechnic/DiplomaPrograms";
 import { Admissions } from "@/modules/polytechnic/Admissions";
 import { Placements } from "@/components/layout/Placements";

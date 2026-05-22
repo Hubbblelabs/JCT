@@ -304,7 +304,10 @@ function hasAcademicsContent(
   return (
     editable ||
     sec(l?.curriculum?.visible, hasCurriculumSection(d, editable)) ||
-    sec(l?.teachingLearning?.visible, hasTeachingLearningSection(d, editable)) ||
+    sec(
+      l?.teachingLearning?.visible,
+      hasTeachingLearningSection(d, editable),
+    ) ||
     sec(l?.valueAddedCourses?.visible, hasValueAddedSection(d, editable))
   );
 }
@@ -389,8 +392,14 @@ function hasLifeContent(d: ProgramData, l?: LifeLabels, editable?: boolean) {
   return (
     editable ||
     sec(l?.events?.visible, hasEventsSection(d, editable)) ||
-    sec(l?.studentAchievements?.visible, hasStudentAchievementsSection(d, editable)) ||
-    sec(l?.facultyAchievements?.visible, hasFacultyAchievementsSection(d, editable)) ||
+    sec(
+      l?.studentAchievements?.visible,
+      hasStudentAchievementsSection(d, editable),
+    ) ||
+    sec(
+      l?.facultyAchievements?.visible,
+      hasFacultyAchievementsSection(d, editable),
+    ) ||
     sec(l?.magazine?.visible, hasMagazineSection(d, editable)) ||
     sec(l?.participation?.visible, hasParticipationSection(d, editable))
   );
@@ -422,7 +431,10 @@ function hasCareerContent(
     visible !== false && predicate;
   return (
     editable ||
-    sec(l?.careerProgression?.visible, hasCareerProgressionSection(d, editable)) ||
+    sec(
+      l?.careerProgression?.visible,
+      hasCareerProgressionSection(d, editable),
+    ) ||
     sec(l?.feedback?.visible, hasFeedbackSection(d, editable))
   );
 }
@@ -1907,10 +1919,8 @@ function CareerTab({
 } & EditableSectionProps) {
   // It appears `has` was undeclared or intended to be something else.
   // Replacing with a safe default boolean or true for now as a fallback to fix the build error.
-  const showCareer =
-    labels?.careerProgression?.visible !== false;
-  const showFeedback =
-    labels?.feedback?.visible !== false;
+  const showCareer = labels?.careerProgression?.visible !== false;
+  const showFeedback = labels?.feedback?.visible !== false;
 
   return (
     <div className="space-y-14">
@@ -2206,9 +2216,7 @@ export function ProgramPageLayout({
   };
 
   const degreePrefix =
-    typeof dept.degreePrefix === "string"
-      ? dept.degreePrefix
-      : "";
+    typeof dept.degreePrefix === "string" ? dept.degreePrefix : "";
 
   const heroPills =
     dept.heroMeta && dept.heroMeta.length > 0

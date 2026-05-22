@@ -338,8 +338,9 @@ export function DiplomaPrograms() {
             </div>
           </div>
           <p className="max-w-sm text-base leading-relaxed text-stone-600 md:text-lg">
-            3-year diploma programs approved by AICTE and governed by DOTE, Tamil Nadu.
-            Practical, workshop-driven curriculum designed to build immediate job-readiness.
+            3-year diploma programs approved by AICTE and governed by DOTE,
+            Tamil Nadu. Practical, workshop-driven curriculum designed to build
+            immediate job-readiness.
           </p>
         </div>
 

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**JCT Institutions** is a Next.js 16 app that combines a **public marketing/admissions website** and an **admin CMS** for three colleges (Engineering, Arts & Science, Polytechnic) in Coimbatore. 
+**JCT Institutions** is a Next.js 16 app that combines a **public marketing/admissions website** and an **admin CMS** for three colleges (Engineering, Arts & Science, Polytechnic) in Coimbatore.
 
 - **Public site** (`/`, `/institutions/*`, `/campus-life`, `/research`): institution landing pages, program listings, dynamic per-program detail pages, campus life, research. Server-rendered with ISR caching.
 - **Admin CMS** (`/admin/*`): manage programs (via a live-preview content builder), users, images, documents, testimonials, recruiters, page content, and site-wide config.
@@ -42,7 +42,7 @@ There is **no test framework** configured — no test runner, no test files, no 
 `src/app/` is the App Router root. The app has two halves:
 
 - **`src/app/admin/`** — the CMS. `(protected)/` is a route group whose `layout.tsx` does a session check; `login/` is public.
-- **`src/app/institutions/<inst>/`** — public pages for each of `engineering`, `arts-science`, `polytechnic`. Each has `page.tsx` (landing), `about/`, `courses/`, `programs/` + `programs/[slug]/` (DB-driven program detail pages), and a legacy `[course]/` dynamic route. Engineering also has `coe/` (Centre of Excellence). 
+- **`src/app/institutions/<inst>/`** — public pages for each of `engineering`, `arts-science`, `polytechnic`. Each has `page.tsx` (landing), `about/`, `courses/`, `programs/` + `programs/[slug]/` (DB-driven program detail pages), and a legacy `[course]/` dynamic route. Engineering also has `coe/` (Centre of Excellence).
 
 ### Authentication & authorization
 
@@ -156,7 +156,7 @@ Zod schemas define every entity shape. They live in `src/lib/validation/` and ar
 import { revalidateTargets, revalidateForConfigKey } from "@/lib/revalidate";
 
 revalidateTargets("engineering", "arts-science"); // institution pages
-revalidateForConfigKey("engineeringHero");        // a changed site-config key
+revalidateForConfigKey("engineeringHero"); // a changed site-config key
 ```
 
 ## Conventions

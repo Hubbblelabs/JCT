@@ -3,7 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { Program } from "@/lib/models";
 import { requireRole, json, serverError } from "@/lib/api-helpers";
 import { revalidateTargets } from "@/lib/revalidate";
-import type { ProgramData } from "@/types/program";
+import type { _ProgramData } from "@/types/program";
 
 export async function POST(req: NextRequest) {
   const { error } = await requireRole(req, "super_admin");
@@ -101,7 +101,10 @@ export async function POST(req: NextRequest) {
     }
 
     // ── 2. Rich page content (merged onto matching rows by slug) ────────────
-    const content: any[] = [
+    const content: Array<{
+      institution: string;
+      content: Record<string, unknown>;
+    }> = [
       ...engineeringPrograms.map((d) => ({
         institution: "engineering",
         content: d,
