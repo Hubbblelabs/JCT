@@ -3,9 +3,7 @@ import {
   Cog,
   Zap,
   Building2,
-  Wrench,
   Beaker,
-  GraduationCap,
   BrainCircuit,
   Globe,
   Utensils,
@@ -151,128 +149,5 @@ export const pgCourses = [
   },
 ];
 
-export const researchCourses = [
-  {
-    name: "Electrical and Electronics Engineering (Doctoral Programme)",
-    abbr: "Ph.D.",
-    slug: "eee-doctoral",
-    icon: GraduationCap,
-    image: "/programs/engineering/eee-phd.webp",
-    highlight:
-      "Doctoral research in advanced Electrical and Electronics domains",
-  },
-];
-
-export const metrics = [
-  { value: "98%", label: "Placement Rate", sub: "2023-24 Batch" },
-  { value: "₹70L", label: "Highest Package", sub: "On-campus" },
-  { value: "45+", label: "Recruiters", sub: "Annual visits" },
-  { value: "500+", label: "Offers Made", sub: "Last 3 years" },
-  { value: "100%", label: "Lab Access", sub: "Industry-grade" },
-  { value: "25+", label: "Patents Filed", sub: "Faculty & Students" },
-];
-
-export const facilities = [
-  {
-    title: "High-Performance Computing Lab",
-    desc: "GPU clusters for machine learning, simulation, and computational engineering projects.",
-    icon: Cpu,
-  },
-  {
-    title: "Advanced Manufacturing Workshop",
-    desc: "CNC machines, 3D printers, welding stations, and a materials testing facility.",
-    icon: Wrench,
-  },
-  {
-    title: "Electronics Prototyping Center",
-    desc: "PCB fabrication, oscilloscopes, spectrum analyzers, and embedded systems test benches.",
-    icon: Zap,
-  },
-  {
-    title: "Research & Innovation Cell",
-    desc: "A cross-disciplinary space for faculty-guided research, patent applications, and prototype development.",
-    icon: Beaker,
-  },
-];
-
-export const testimonials = [
-  {
-    quote:
-      "Our final-year project was reviewed by industry mentors, and that experience changed how I approached problem-solving in real engineering teams.",
-    name: "Harish V.",
-    role: "Software Engineer at Infosys",
-    image: "/avatars/male_avatar.png",
-    tag: "Alumni",
-  },
-  {
-    quote:
-      "The placement training and mock interviews made a huge difference. I stepped into campus recruitment with confidence and secured my offer early.",
-    name: "Keerthana M.",
-    role: "Graduate Engineer Trainee at Caterpillar",
-    image: "/avatars/female_avatar.png",
-    tag: "Student",
-  },
-  {
-    quote:
-      "JCT students stand out for practical clarity. They arrive ready for production environments, not just textbook discussions.",
-    name: "R. Suresh",
-    role: "Senior Manager, Industry Partner",
-    image: "/avatars/male_avatar.png",
-    tag: "INDUSTRY",
-  },
-  {
-    quote:
-      "Faculty encouraged us to build beyond syllabus requirements. That project depth helped me during technical interviews and onboarding.",
-    name: "Vikram N.",
-    role: "Design Engineer at L&T",
-    image: "/avatars/male_avatar.png",
-    tag: "Alumni",
-  },
-  {
-    quote:
-      "The coding and aptitude sessions were consistent and practical. I improved every month and was ready by placement season.",
-    name: "Janani P.",
-    role: "Final Year ECE Student",
-    image: "/avatars/female_avatar.png",
-    tag: "Student",
-  },
-  {
-    quote:
-      "The graduates we recruit from JCT show strong fundamentals and discipline in execution, especially in quality and documentation workflows.",
-    name: "Mohan Raj",
-    role: "Plant Operations Lead, Caterpillar",
-    image: "/avatars/male_avatar.png",
-    tag: "INDUSTRY",
-  },
-];
-
-export const admissionsCriteria = [
-  {
-    title: "Eligible Programs",
-    items: [
-      "UG: B.E. / B.Tech Programs (4 Years)",
-      "PG: M.E. Structural Engineering / Power Electronics / CSE (2 Years)",
-      "Ph.D.: Doctoral Research Programmes (Electrical / Core Specializations)",
-    ],
-  },
-  {
-    title: "Eligibility Criteria",
-    items: [
-      "UG: Pass in HSC/12th standard with Math, Physics, and Chemistry as compulsory subjects (Min 45%, 40% for reserved category).",
-      "Lateral UG: Pass in relevant Diploma/B.Sc. with Math (Min 45%, 40% for reserved category).",
-      "PG (M.E.): Pass in appropriate B.E. / B.Tech degree program as per Anna University norms.",
-      "Ph.D.: First class Master's degree (M.E. / M.Tech) in the relevant engineering specialization.",
-    ],
-  },
-  {
-    title: "Required Documents",
-    items: [
-      "TNEA / TANCET Counselling Allocation Letter (as applicable)",
-      "HSC / 12th / SSLC Marks Sheets & Transfer Certificate (TC)",
-      "Community Certificate & First Graduate Certificate (if applicable)",
-      "For PG / Ph.D.: UG/PG Mark Sheets, Consolidated Certificates & Entrance Exam card",
-    ],
-  },
-];
 
 

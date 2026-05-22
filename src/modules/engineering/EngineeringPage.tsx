@@ -20,8 +20,6 @@ export default function EngineeringPage() {
       <EngineeringDomains />
       <EngineeringMetrics />
       <Admissions />
-      {/* <EngineeringResearch /> */}
-
       <Placements />
       <CampusLife />
 

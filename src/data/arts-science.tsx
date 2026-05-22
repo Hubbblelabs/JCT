@@ -6,13 +6,6 @@ import {
   Lightbulb,
 } from "lucide-react";
 
-export const heroStats = [
-  { value: "2,500+", label: "Students", accent: true },
-  { value: "5", label: "Programs", accent: false },
-  { value: "60+", label: "Faculty Members", accent: false },
-  { value: "16+", label: "Years of Excellence", accent: true },
-];
-
 export const ugPrograms = [
   {
     name: "B.Sc Computer Science",
@@ -128,78 +121,3 @@ export const ugPrograms = [
   },
 ];
 
-export const testimonials = [
-  {
-    quote:
-      "The education here prepared me for real challenges. I walked into my first job feeling confident and capable, all thanks to the rigorous curriculum and supportive faculty.",
-    name: "Rajesh Kumar",
-    role: "Engineering at TCS",
-    image: "/avatars/male_avatar.png",
-  },
-  {
-    quote:
-      "I came here uncertain about my direction. The diverse environment and the mentorship I received helped me discover my true passion and shape my career path.",
-    name: "Priya Sharma",
-    role: "Management at Accenture",
-    image: "/avatars/female_avatar.png",
-  },
-  {
-    quote:
-      "The faculty understood that we needed more than theory. The hands-on projects and industry connections gave me the exact experience I needed to stand out.",
-    name: "Arjun Patel",
-    role: "Computer Science at Google",
-    image: "/avatars/male_avatar.png",
-  },
-  {
-    quote:
-      "The placement cell gave us structured preparation from the second year itself. That consistency helped me clear rounds at a product company.",
-    name: "Kirthika M.",
-    role: "Associate Analyst at Zoho",
-    image: "/avatars/female_avatar.png",
-  },
-  {
-    quote:
-      "I joined with stage fear and left with confidence. Presentations, seminars, and project reviews made communication one of my strengths.",
-    name: "Vignesh R.",
-    role: "Business Operations at Accenture",
-    image: "/avatars/male_avatar.png",
-  },
-  {
-    quote:
-      "The faculty mentorship and practical assignments made a real difference. I could connect theory to real business and technology use-cases quickly.",
-    name: "Revathi S.",
-    role: "Data Associate at TCS",
-    image: "/avatars/female_avatar.png",
-  },
-];
-
-export const admissionsCriteria = [
-  {
-    title: "Eligible Programs",
-    items: [
-      "B.Sc Computer Science (3 Years)",
-      "B.Sc AI & ML (3 Years)",
-      "BCA (Computer Applications) (3 Years)",
-      "B.Com Logistics & SCM (3 Years)",
-      "BBA Logistics (3 Years)",
-    ],
-  },
-  {
-    title: "Eligibility Criteria",
-    items: [
-      "B.Sc CS & BCA: Pass in HSC/12th standard with Mathematics / Computer Science / Statistics / Business Mathematics.",
-      "B.Sc AI&ML: Pass in HSC/12th standard with Mathematics or Computer Science as one of the subjects.",
-      "B.Com & BBA: Pass in HSC/12th standard in any stream from a recognised board.",
-    ],
-  },
-  {
-    title: "Required Documents",
-    items: [
-      "HSC / 12th Marks Sheet & Transfer Certificate (TC)",
-      "SSLC / 10th Marks Sheet",
-      "Community Certificate (if applicable)",
-      "Aadhar Card Copy",
-      "Passport Size Photographs (3 copies)",
-    ],
-  },
-];

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProgramPageLayout } from "@/components/layout/ProgramPageLayout";
-import { siteConfig } from "@/data/site";
 import {
   getPublishedProgramBySlug,
   listPublishedProgramSlugs,
@@ -33,7 +32,7 @@ export async function generateMetadata({
       title: `${programData.name} | JCT College of Arts and Science`,
       description: programData.about.paragraphs[0] ?? "",
       alternates: {
-        canonical: `${siteConfig.url}/institutions/arts-science/programs/${slug}`,
+        canonical: `${process.env.NEXTAUTH_URL}/institutions/arts-science/programs/${slug}`,
       },
       openGraph: {
         title: `${programData.name} | JCT College of Arts and Science`,

@@ -5,7 +5,6 @@ import { StickyApplyButton } from "./StickyApplyButton";
 import { MerittoPositioner } from "./MerittoPositioner";
 import { ChatbotNotification } from "./ChatbotNotification";
 import { useSiteConfig } from "@/lib/use-site-config";
-import { siteConfig } from "@/data/site";
 
 type FloatingConfig = {
   whatsapp?: {
@@ -35,7 +34,7 @@ export function GlobalElements() {
   const mt = floatingData?.meritto ?? {};
 
   const waEnabled = wa.enabled !== false;
-  const waPhone = (wa.phone && wa.phone.trim()) || siteConfig.contact.whatsapp;
+  const waPhone = wa.phone?.trim() ?? null;
 
   const apEnabled = ap.enabled !== false;
   const apLabel = (ap.label && ap.label.trim()) || "Apply Now";

@@ -30,8 +30,6 @@ export default function PolytechnicPage() {
       <Hero />
       <DiplomaPrograms />
       <Admissions />
-      {/* <AboutPolytechnic /> */}
-      {/* <Distinction /> */}
       <Placements />
       <CampusLife />
       <Testimonials />

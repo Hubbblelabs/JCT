@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProgramPageLayout } from "@/components/layout/ProgramPageLayout";
-import { siteConfig } from "@/data/site";
 import {
   getPublishedProgramBySlug,
   listPublishedProgramSlugs,
@@ -33,7 +32,7 @@ export async function generateMetadata({
       title: `${programData.name} | JCT Polytechnic College`,
       description: programData.about.paragraphs[0] ?? "",
       alternates: {
-        canonical: `${siteConfig.url}/institutions/polytechnic/programs/${slug}`,
+        canonical: `${process.env.NEXTAUTH_URL}/institutions/polytechnic/programs/${slug}`,
       },
       openGraph: {
         title: `${programData.name} | JCT Polytechnic College`,

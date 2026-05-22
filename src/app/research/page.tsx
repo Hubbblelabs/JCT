@@ -3,7 +3,6 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
-import { siteConfig } from "@/data/site";
 import Image from "next/image";
 import {
   Lightbulb,
@@ -21,11 +20,11 @@ import {
 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: `Research & Innovation | ${siteConfig.name}`,
+  title: "Research & Innovation | JCT Institutions",
   description:
     "Explore research activities at JCT Institutions — Centre of Excellence, R&D cell, research centres, publications, funded projects, patents, innovation, and workshops.",
   openGraph: {
-    title: `Research & Innovation | ${siteConfig.name}`,
+    title: "Research & Innovation | JCT Institutions",
     description:
       "Explore research activities at JCT Institutions — Centre of Excellence, R&D cell, research centres, publications, funded projects, patents, innovation, and workshops.",
     type: "website",

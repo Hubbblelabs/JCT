@@ -31,11 +31,9 @@ export default function ArtsSciencePage() {
       <Hero />
       <UgPrograms />
       <AdmissionProcess />
-      {/* <AboutArtsScience /> */}
-      {/* <Distinction /> */}
-      <Placements /> <CampusLife />
+      <Placements />
+      <CampusLife />
       <Testimonials />
-      {/* <CTA /> */}
       <Footer />
     </main>
   );

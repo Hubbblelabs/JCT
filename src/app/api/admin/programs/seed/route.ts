@@ -15,21 +15,12 @@ export async function POST(req: NextRequest) {
       { ugCourses, pgCourses },
       { ugPrograms },
       { diplomaPrograms },
-      // { engineeringPrograms },
-      // { artsPrograms },
-      // { polytechnicPrograms },
     ] = await Promise.all([
       import("@/data/engineering"),
       import("@/data/arts-science"),
       import("@/data/polytechnic"),
-      // import("@/data/engineering-programs"),
-      // import("@/data/arts-programs"),
-      // import("@/data/polytechnic-programs"),
     ]);
 
-    const engineeringPrograms: Array<Record<string, unknown>> = [];
-    const artsPrograms: Array<Record<string, unknown>> = [];
-    const polytechnicPrograms: Array<Record<string, unknown>> = [];
 
     // ── 1. Card-level rows ──────────────────────────────────────────────────
     const cards = [
@@ -99,64 +90,9 @@ export async function POST(req: NextRequest) {
       cardCount++;
     }
 
-    // ── 2. Rich page content (merged onto matching rows by slug) ────────────
-    const content: Array<{
-      institution: string;
-      content: Record<string, unknown>;
-    }> = [
-      ...engineeringPrograms.map((d) => ({
-        institution: "engineering",
-        content: d,
-      })),
-      ...artsPrograms.map((d) => ({ institution: "arts-science", content: d })),
-      ...polytechnicPrograms.map((d) => ({
-        institution: "polytechnic",
-        content: d,
-      })),
-    ];
-
-    let contentCount = 0;
-    for (const entry of content) {
-      const c = entry.content;
-      const update: Record<string, unknown> = {
-        $set: { content: c },
-        $setOnInsert: {
-          slug: c.slug,
-          institution: entry.institution,
-          name: c.name,
-          abbr:
-            (c.shortName as string | undefined) ||
-            (c.name as string).slice(0, 16),
-          degree: (c.degreePrefix as string | undefined)?.trim() ?? "",
-          duration: (c.about as Record<string, unknown>)?.duration ?? "",
-          image: (c.heroImage as string | undefined) ?? "",
-          status: entry.institution === "engineering" ? "published" : "draft",
-          ...(entry.institution === "engineering"
-            ? {
-                published_content: c,
-                published_at: new Date(),
-              }
-            : {}),
-        },
-      };
-
-      const doc = await Program.findOneAndUpdate({ slug: c.slug }, update, {
-        upsert: true,
-        new: true,
-      });
-
-      if (entry.institution === "engineering" && !doc.published_content) {
-        doc.published_content = c;
-        doc.status = "published";
-        doc.published_at = new Date();
-        await doc.save();
-      }
-      contentCount++;
-    }
-
     revalidateTargets("all-institutions");
     return json({
-      message: `Seeded ${cardCount} program cards, merged content into ${contentCount} programs`,
+      message: `Seeded ${cardCount} program cards`,
     });
   } catch (e) {
     console.error(e);

@@ -4,8 +4,9 @@ import "@/styles/globals.css";
 import { GlobalElements } from "@/components/layout/GlobalElements";
 import { RouteQuickNav } from "@/components/layout/RouteQuickNav";
 import { MerittoScript } from "@/components/layout/MerittoScript";
-import { siteConfig } from "@/data/site";
 import { InstitutionProvider } from "@/contexts/InstitutionContext";
+
+const SITE_URL = process.env.NEXTAUTH_URL ?? "https://jct.ac.in";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     title: "JCT Institutions — Three Colleges, One Commitment to Excellence",
     description:
       "Premier Engineering, Arts & Science, and Polytechnic colleges in Coimbatore. Established 2009. 98% Placement Rate.",
-    url: siteConfig.url,
+    url: SITE_URL,
     siteName: "JCT Institutions",
     locale: "en_IN",
     type: "website",
@@ -48,15 +49,15 @@ export const metadata: Metadata = {
     description:
       "Engineering, Arts & Science, and Polytechnic colleges. NAAC & NBA Accredited.",
   },
-  metadataBase: new URL(siteConfig.url),
+  metadataBase: new URL(SITE_URL),
 };
 
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "EducationalOrganization",
-  name: siteConfig.name,
-  url: siteConfig.url,
-  logo: `${siteConfig.url}/logo/jct_logo.webp`,
+  name: "JCT Institutions",
+  url: SITE_URL,
+  logo: `${SITE_URL}/logo/jct_logo.webp`,
   description:
     "JCT Institutions is a premier group of three colleges in Coimbatore offering Engineering, Arts & Science, and Polytechnic programs.",
   foundingDate: "2009",
@@ -68,19 +69,6 @@ const jsonLd = {
     postalCode: "641105",
     addressCountry: "IN",
   },
-  contactPoint: {
-    "@type": "ContactPoint",
-    telephone: siteConfig.contact.phone,
-    email: siteConfig.contact.email,
-    contactType: "admissions",
-  },
-  sameAs: [
-    siteConfig.social.facebook,
-    siteConfig.social.instagram,
-    siteConfig.social.twitter,
-    siteConfig.social.linkedin,
-    siteConfig.social.youtube,
-  ],
 };
 
 export default function RootLayout({

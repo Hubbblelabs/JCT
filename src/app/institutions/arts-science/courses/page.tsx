@@ -4,11 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
-import { ugPrograms } from "@/data/arts-science";
+import { getImageUrl } from "@/lib/utils";
 
 type Course = {
   name: string;
@@ -17,6 +18,25 @@ type Course = {
   image: string;
   highlight: string;
 };
+
+function normalizePrograms(raw: unknown): Course[] {
+  if (!Array.isArray(raw)) return [];
+  const out: Course[] = [];
+  for (const entry of raw) {
+    const r = (entry ?? {}) as Record<string, unknown>;
+    const name = typeof r.name === "string" ? r.name : null;
+    const slug = typeof r.slug === "string" ? r.slug : null;
+    if (!name || !slug) continue;
+    out.push({
+      name,
+      slug,
+      abbr: typeof r.abbr === "string" ? r.abbr : "",
+      image: typeof r.image === "string" ? r.image : "",
+      highlight: typeof r.highlight === "string" ? r.highlight : "",
+    });
+  }
+  return out;
+}
 
 function CourseCard({
   course,
@@ -38,7 +58,7 @@ function CourseCard({
       <div className="relative aspect-[16/9] overflow-hidden">
         {course.image && (
           <Image
-            src={course.image}
+            src={getImageUrl(course.image) ?? course.image}
             alt={course.name}
             fill
             sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
@@ -80,6 +100,25 @@ function CourseCard({
 }
 
 export default function ArtsScienceCoursesPage() {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/programs?institution=arts-science")
+      .then((r) => r.json())
+      .then((res) => {
+        if (!cancelled) setCourses(normalizePrograms(res?.data));
+      })
+      .catch(() => {})
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <main className="bg-surface text-foreground min-h-screen">
       <Navbar forceSolidOnTop />
@@ -94,7 +133,6 @@ export default function ArtsScienceCoursesPage() {
           ]}
         />
 
-        {/* UG Programs */}
         <section className="mt-12">
           <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -110,16 +148,26 @@ export default function ArtsScienceCoursesPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {ugPrograms.map((course) => (
-              <CourseCard
-                key={course.slug}
-                course={course as Course}
-                href={`/institutions/arts-science/departments/${course.slug}`}
-                badge="UG"
-              />
-            ))}
-          </div>
+          {loading ? (
+            <div className="py-16 text-center text-sm text-slate-400">
+              Loading programs…
+            </div>
+          ) : courses.length === 0 ? (
+            <div className="py-16 text-center text-sm text-slate-400">
+              No programs published yet.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {courses.map((course) => (
+                <CourseCard
+                  key={course.slug}
+                  course={course}
+                  href={`/institutions/arts-science/programs/${course.slug}`}
+                  badge="UG"
+                />
+              ))}
+            </div>
+          )}
         </section>
       </div>
 
