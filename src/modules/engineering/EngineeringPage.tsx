@@ -6,7 +6,6 @@ import { EngineeringHero } from "./EngineeringHero";
 import { EngineeringDomains } from "./EngineeringDomains";
 import { EngineeringMetrics } from "./EngineeringMetrics";
 import { Admissions } from "./Admissions";
-import { _EngineeringResearch } from "./EngineeringResearch";
 import { CampusLife } from "@/components/layout/CampusLife";
 import { Testimonials } from "./Testimonials";
 

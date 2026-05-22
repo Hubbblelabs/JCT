@@ -2,17 +2,9 @@
 
 import { useEffect, useMemo, useState, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import {
-  TextInput,
-  _NumberInput,
-  _TextArea,
-  _StringList,
-  _Accordion,
-  ImageUploadInput,
-} from "@/components/admin/inputs";
+import { TextInput, ImageUploadInput } from "@/components/admin/inputs";
 import {
   PROGRAM_CONTENT_SECTION_LABELS,
-  _ProgramContentEditor,
   ProgramSectionInspector,
   type ProgramContentSection,
 } from "@/components/admin/ProgramContentEditor";

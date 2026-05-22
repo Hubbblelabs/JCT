@@ -20,8 +20,6 @@ import {
   Layers,
   Settings,
   Activity,
-  _ShieldAlert,
-  _ChevronRight,
 } from "lucide-react";
 
 export default function COEPage() {

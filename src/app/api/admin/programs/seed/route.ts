@@ -3,7 +3,6 @@ import { connectDB } from "@/lib/mongodb";
 import { Program } from "@/lib/models";
 import { requireRole, json, serverError } from "@/lib/api-helpers";
 import { revalidateTargets } from "@/lib/revalidate";
-import type { _ProgramData } from "@/types/program";
 
 export async function POST(req: NextRequest) {
   const { error } = await requireRole(req, "super_admin");
@@ -125,10 +124,10 @@ export async function POST(req: NextRequest) {
           slug: c.slug,
           institution: entry.institution,
           name: c.name,
-          abbr: c.shortName || c.name.slice(0, 16),
-          degree: c.degreePrefix?.trim() ?? "",
-          duration: c.about?.duration ?? "",
-          image: c.heroImage ?? "",
+          abbr: (c.shortName as string | undefined) || (c.name as string).slice(0, 16),
+          degree: (c.degreePrefix as string | undefined)?.trim() ?? "",
+          duration: (c.about as Record<string, unknown>)?.duration ?? "",
+          image: (c.heroImage as string | undefined) ?? "",
           status: entry.institution === "engineering" ? "published" : "draft",
           ...(entry.institution === "engineering"
             ? {
