@@ -139,7 +139,7 @@ export default function CoeEditorPage() {
         </div>
       ) : (
         <div className="-mx-6 -mb-6 overflow-hidden border-t border-gray-200 bg-white xl:mx-0 xl:rounded-xl xl:border">
-          <CoePageLayout data={draft} editable onEditSection={selectSection} />
+          <CoePageLayout data={draft!} editable onEditSection={selectSection} />
         </div>
       )}
 
@@ -166,7 +166,7 @@ export default function CoeEditorPage() {
             <div className="p-6">
               <CoeSectionInspector
                 section={selected}
-                data={draft}
+                data={draft!}
                 onChange={setDraft}
               />
             </div>

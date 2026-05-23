@@ -174,7 +174,7 @@ function AboutEditorInner() {
             <div className="p-6">
               <AboutSectionInspector
                 section={selected}
-                data={draft}
+                data={draft!}
                 onChange={setDraft}
               />
             </div>
