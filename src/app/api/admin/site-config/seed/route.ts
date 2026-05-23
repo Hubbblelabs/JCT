@@ -3,10 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { SiteConfig } from "@/lib/models";
 import { requireRole, json, serverError } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
-import { homeHeroContent } from "@/data/home";
 import { revalidateForConfigKey } from "@/lib/revalidate";
-import { ABOUT_CONFIG_KEY, ABOUT_DEFAULTS } from "@/data/about-content";
-import { COE_CONFIG_KEY, COE_DEFAULT } from "@/data/coe-content";
 
 type Seed = {
   config_key: string;
@@ -15,24 +12,7 @@ type Seed = {
   publish?: boolean;
 };
 
-const asValue = (v: unknown) => v as Record<string, unknown>;
-
 const SEEDS: Seed[] = [
-  {
-    config_key: "home",
-    value: {
-      backgroundImages: [...homeHeroContent.backgroundImages],
-      titleLines: [...homeHeroContent.titleLines],
-      ctas: homeHeroContent.ctas.map((c) => ({
-        ...c,
-        // Replace fragment-only hrefs — the frontend matches CTAs by label,
-        // so the href value only matters for non-special-cased buttons.
-        href: c.href.startsWith("#") ? "/" : c.href,
-      })),
-      cards: homeHeroContent.cards.map((c) => ({ ...c })),
-      tourVideoUrl: "",
-    },
-  },
   {
     config_key: "homeStats",
     value: {
@@ -42,27 +22,27 @@ const SEEDS: Seed[] = [
       industryAwards: "50+",
     },
   },
-  // About + COE pages — published on seed so the public pages render the
-  // baseline content immediately.
+  // About pages — empty placeholders, to be filled in via the admin CMS
   {
-    config_key: ABOUT_CONFIG_KEY.engineering,
-    value: asValue(ABOUT_DEFAULTS.engineering),
-    publish: true,
+    config_key: "engineeringAbout",
+    value: {},
+    publish: false,
   },
   {
-    config_key: ABOUT_CONFIG_KEY["arts-science"],
-    value: asValue(ABOUT_DEFAULTS["arts-science"]),
-    publish: true,
+    config_key: "artsScienceAbout",
+    value: {},
+    publish: false,
   },
   {
-    config_key: ABOUT_CONFIG_KEY.polytechnic,
-    value: asValue(ABOUT_DEFAULTS.polytechnic),
-    publish: true,
+    config_key: "polytechnicAbout",
+    value: {},
+    publish: false,
   },
+  // COE page — empty placeholder
   {
-    config_key: COE_CONFIG_KEY,
-    value: asValue(COE_DEFAULT),
-    publish: true,
+    config_key: "engineeringCoe",
+    value: {},
+    publish: false,
   },
 ];
 
@@ -93,7 +73,7 @@ export async function POST(req: NextRequest) {
       "site-config",
       "seeded",
       session!.user?.email ?? "",
-      "Seeded default content (home, homeStats, About pages, COE page)",
+      "Seeded site config keys (homeStats, About pages, COE page)",
     );
 
     return json({ message: "Default content seeded successfully." });

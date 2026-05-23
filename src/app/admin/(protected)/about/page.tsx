@@ -9,20 +9,15 @@ import {
   type AboutEditableSection,
 } from "@/components/layout/AboutPageLayout";
 import { AboutSectionInspector } from "@/components/admin/AboutSectionInspector";
-import {
-  ABOUT_CONFIG_KEY,
-  ABOUT_DEFAULTS,
-  type AboutPageValue,
-  type Institution,
-} from "@/data/about-content";
+import type { AboutPageValue } from "@/lib/validation";
+
+const INSTITUTION = "engineering" as const;
+const CONFIG_KEY = "engineeringAbout";
 
 function AboutEditorInner() {
   const router = useRouter();
-  const institution: Institution = "engineering";
 
-  const [draft, setDraft] = useState<AboutPageValue>(
-    ABOUT_DEFAULTS[institution],
-  );
+  const [draft, setDraft] = useState<AboutPageValue | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
@@ -33,18 +28,21 @@ function AboutEditorInner() {
     let cancelled = false;
     setLoading(true);
     setMsg(null);
-    fetch(`/api/public/site-config?key=${ABOUT_CONFIG_KEY[institution]}`)
+    fetch(`/api/public/site-config?key=${CONFIG_KEY}`)
       .then((r) => r.json())
       .then((res) => {
         if (cancelled) return;
         if (res?.data && typeof res.data === "object") {
-          setDraft({ ...ABOUT_DEFAULTS[institution], ...res.data });
+          setDraft(res.data as AboutPageValue);
         } else {
-          setDraft(ABOUT_DEFAULTS[institution]);
+          setMsg({ text: "No data found", ok: false });
         }
       })
-      .catch(() => {
-        if (!cancelled) setDraft(ABOUT_DEFAULTS[institution]);
+      .catch((err) => {
+        if (!cancelled) {
+          console.error("[AboutEditor]", err);
+          setMsg({ text: "Failed to load content", ok: false });
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -52,7 +50,7 @@ function AboutEditorInner() {
     return () => {
       cancelled = true;
     };
-  }, [institution]);
+  }, []);
 
   const selectSection = (s: AboutEditableSection) => {
     setSelected(s);
@@ -67,7 +65,7 @@ function AboutEditorInner() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          config_key: ABOUT_CONFIG_KEY[institution],
+          config_key: CONFIG_KEY,
           value: draft,
         }),
       });
@@ -138,7 +136,7 @@ function AboutEditorInner() {
         </div>
       </div>
 
-      {loading ? (
+      {loading || !draft ? (
         <div className="flex items-center justify-center py-28">
           <Loader2 size={24} className="animate-spin text-gray-400" />
         </div>
@@ -146,7 +144,7 @@ function AboutEditorInner() {
         <div className="-mx-6 -mb-6 overflow-hidden border-t border-gray-200 bg-white xl:mx-0 xl:rounded-xl xl:border">
           <AboutPageLayout
             data={draft}
-            institution={institution}
+            institution={INSTITUTION}
             editable
             onEditSection={selectSection}
           />

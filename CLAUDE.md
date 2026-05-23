@@ -41,7 +41,7 @@ There is **no test framework** configured — no test runner, no test files, no 
 
 `src/app/` is the App Router root. The app has two halves:
 
-- **`src/app/admin/`** — the CMS. `(protected)/` is a route group whose `layout.tsx` does a session check; `login/` is public.
+- **`src/app/admin/`** — the CMS. `(protected)/` is a route group whose `layout.tsx` does a session check; `login/` is public. Key admin pages: `dashboard/`, `programs/`, `users/`, `testimonials/`, `recruiters/`, `about/`, `coe/`, `page-content/`, `main/page-content/`, `global/page-content/`, `settings/`, `audit/`.
 - **`src/app/institutions/<inst>/`** — public pages for each of `engineering`, `arts-science`, `polytechnic`. Each has `page.tsx` (landing), `about/`, `courses/`, `programs/` + `programs/[slug]/` (DB-driven program detail pages), and a legacy `[course]/` dynamic route. Engineering also has `coe/` (Centre of Excellence).
 
 ### Authentication & authorization
@@ -62,6 +62,16 @@ There is **no test framework** configured — no test runner, no test files, no 
 - **`connectDB()`** (`src/lib/mongodb.ts`): a globally cached Mongoose connection (`global._mongooseConn`), guarded by `readyState === 1`, with a 10s connect-timeout race and `bufferCommands: false`. Call it at the start of any route that touches the DB.
 - Models use the singleton guard `mongoose.models.X ?? mongoose.model(...)` to survive hot reload. Exported from `src/lib/models/index.ts`: `User`, `SiteConfig`, `ImageAsset`, `Program`, `Recruiter`, `Testimonial`, `AuditLog`.
 
+### Visual page editors
+
+Three admin areas share a **click-to-edit + inspector** pattern:
+
+- **Program builder** (`/admin/programs/[id]`) — edit tabs/sections on the left, live-preview on the right (see below).
+- **About editor** (`/admin/about`) — renders the public `AboutPageLayout` with editable overlays; clicking a section opens `AboutSectionInspector` in a slide-over panel. Backed by SiteConfig keys like `engineeringAbout`.
+- **CoE editor** (`/admin/coe`) — same pattern with `CoePageLayout` / `CoeSectionInspector`, backed by the `engineeringCoe` SiteConfig key.
+
+All three save via `PUT /api/admin/site-config` and revalidate the relevant institution pages immediately.
+
 ### Program CMS — the content builder (most important subsystem)
 
 There is **no `Department` model** anymore. Rich page content that used to live on a Department now lives on **`Program`** — the `Program.content` field's schema comment notes it "was previously stored on Department.content". If you encounter "department" in older branches/docs, that concept is folded into Program.
@@ -76,12 +86,14 @@ There is **no `Department` model** anymore. Rich page content that used to live 
 
 - **`SiteConfig`** docs are keyed by a unique `config_key`, with a draft/publish pair `value` / `published_value` and `status: "draft" | "published"`.
 - Allowed config keys are a **fixed registry** in `src/lib/validation/siteConfig.ts` (`SITE_CONFIG_SCHEMAS`) — each key maps to a Zod schema, and unknown keys are rejected. Keys include `contact`, `social`, `address`, `stats`, `accreditations`, `home`, `homeStats`, `engineeringHero`, `engineeringMetrics`, `artsScienceHero`, `polytechnicAdmissions`, etc. Add a new site-wide setting by adding an entry here.
-- The admin "page content" pages (`(protected)/page-content/`, `(protected)/main/page-content/`) edit these config keys via `PageContentForms.tsx` / `PageContentShell.tsx`.
+- The admin "page content" pages (`(protected)/page-content/`, `(protected)/main/page-content/`, `(protected)/global/page-content/`) edit these config keys via `PageContentForms.tsx` / `PageContentShell.tsx`.
+- **Backup/restore/reset**: `POST /api/admin/site-config/backup` snapshots all configs, `POST /api/admin/site-config/restore` restores from a snapshot, `POST /api/admin/site-config/reset` reverts a key to its seed default. All are accessible from the admin Settings page.
 
 ### Images & documents
 
 - **Images**: uploaded via `POST /api/admin/images/upload` (FormData) → validated for mime/size → stored in R2 via `src/lib/r2.ts` → an `ImageAsset` doc records metadata (url, alt text, category, institution). If R2 env vars are absent, images fall back to local serving via `/api/public/images/[...path]` or `/api/admin/images/serve/[...key]`.
 - **Documents**: `POST /api/admin/documents/upload` handles non-image assets (e.g. prospectus/pamphlet PDFs).
+- **R2 key tracking**: `extractR2Keys(value)` in `src/lib/r2.ts` recursively walks any JSON value and collects strings that look like R2 storage keys (`images/…` or `documents/…`). Use it before deleting a Program or SiteConfig value to find and delete the associated R2 objects and avoid orphaned files.
 - `next.config.ts` `images.remotePatterns` allowlists external hosts (unsplash, pravatar, wikimedia, companieslogo, the R2 public domain) and applies a strict CSP that sandboxes SVGs.
 
 ### Caching & revalidation
@@ -166,11 +178,5 @@ revalidateForConfigKey("engineeringHero"); // a changed site-config key
 - **Logging**: `console.log/error` with a `[context]` prefix (see `src/auth.ts`).
 - **Errors**: API routes catch, log, and return a 500 via `serverError()`. Audit logging never throws fatally.
 - **Build**: `output: "standalone"` for Docker/Node deployment.
-
-### Agent guidance (from `AGENTS.md`)
-
-- Prefer local Next.js docs in `node_modules/next/dist/docs` over training data.
-- Follow App Router conventions; Server Components by default, Client Components only when interaction is required.
-- Prefer async/await data fetching with caching.
 
 The codebase is indexed using ccc. Use ccc for codebase knowledge.

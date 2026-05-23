@@ -11,7 +11,9 @@ import {
 } from "@/components/admin/inputs";
 import { deleteUploadedAsset } from "@/lib/storage-cleanup";
 import type { AboutEditableSection } from "@/components/layout/AboutPageLayout";
-import type { AboutPageValue } from "@/data/about-content";
+import type { EngineeringAboutValue } from "@/lib/validation/aboutPage";
+
+type AboutPageValue = EngineeringAboutValue;
 
 type Stat = AboutPageValue["about"]["stats"][number];
 type MgmtMember = AboutPageValue["management"]["members"][number];

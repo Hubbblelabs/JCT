@@ -9,15 +9,15 @@ import {
   type CoeEditableSection,
 } from "@/components/layout/CoePageLayout";
 import { CoeSectionInspector } from "@/components/admin/CoeSectionInspector";
-import { COE_CONFIG_KEY, COE_DEFAULT } from "@/data/coe-content";
 import type { CoePageValue } from "@/lib/validation";
 
+const CONFIG_KEY = "engineeringCoe";
 const PREVIEW_URL = "/institutions/engineering/coe";
 
 export default function CoeEditorPage() {
   const router = useRouter();
 
-  const [draft, setDraft] = useState<CoePageValue>(COE_DEFAULT);
+  const [draft, setDraft] = useState<CoePageValue | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
@@ -26,18 +26,23 @@ export default function CoeEditorPage() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch(`/api/public/site-config?key=${COE_CONFIG_KEY}`)
+    setLoading(true);
+    setMsg(null);
+    fetch(`/api/public/site-config?key=${CONFIG_KEY}`)
       .then((r) => r.json())
       .then((res) => {
         if (cancelled) return;
         if (res?.data && typeof res.data === "object") {
-          setDraft({ ...COE_DEFAULT, ...res.data });
+          setDraft(res.data as CoePageValue);
         } else {
-          setDraft(COE_DEFAULT);
+          setMsg({ text: "No data found", ok: false });
         }
       })
-      .catch(() => {
-        if (!cancelled) setDraft(COE_DEFAULT);
+      .catch((err) => {
+        if (!cancelled) {
+          console.error("[CoeEditor]", err);
+          setMsg({ text: "Failed to load content", ok: false });
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -59,7 +64,7 @@ export default function CoeEditorPage() {
       const r = await fetch("/api/admin/site-config", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ config_key: COE_CONFIG_KEY, value: draft }),
+        body: JSON.stringify({ config_key: CONFIG_KEY, value: draft }),
       });
       if (r.ok) {
         setMsg({ text: "Saved & published", ok: true });
@@ -128,7 +133,7 @@ export default function CoeEditorPage() {
         </div>
       </div>
 
-      {loading ? (
+      {loading || !draft ? (
         <div className="flex items-center justify-center py-28">
           <Loader2 size={24} className="animate-spin text-gray-400" />
         </div>

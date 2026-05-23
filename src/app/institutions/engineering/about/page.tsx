@@ -2,28 +2,38 @@
 
 import { useEffect, useState } from "react";
 import { AboutPageLayout } from "@/components/layout/AboutPageLayout";
-import {
-  ABOUT_CONFIG_KEY,
-  ABOUT_DEFAULTS,
-  type AboutPageValue,
-} from "@/data/about-content";
+import type { AboutPageValue } from "@/lib/validation";
 
 const INSTITUTION = "engineering" as const;
-const DEFAULT = ABOUT_DEFAULTS[INSTITUTION];
+const CONFIG_KEY = "engineeringAbout";
 
 export default function EngineeringAboutPage() {
-  const [data, setData] = useState<AboutPageValue>(DEFAULT);
+  const [data, setData] = useState<AboutPageValue | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`/api/public/site-config?key=${ABOUT_CONFIG_KEY[INSTITUTION]}`)
+    fetch(`/api/public/site-config?key=${CONFIG_KEY}`)
       .then((r) => r.json())
       .then((res) => {
         if (res?.data && typeof res.data === "object") {
-          setData({ ...DEFAULT, ...res.data });
+          setData(res.data as AboutPageValue);
+        } else {
+          setError("Failed to load content");
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error("[EngineeringAboutPage]", err);
+        setError("Failed to load content");
+      });
   }, []);
+
+  if (error) {
+    return <div className="p-6 text-center text-red-600">{error}</div>;
+  }
+
+  if (!data) {
+    return <div className="p-6 text-center text-gray-500">Loading...</div>;
+  }
 
   return <AboutPageLayout data={data} institution={INSTITUTION} />;
 }

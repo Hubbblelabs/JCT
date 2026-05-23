@@ -2,22 +2,37 @@
 
 import { useEffect, useState } from "react";
 import { CoePageLayout } from "@/components/layout/CoePageLayout";
-import { COE_CONFIG_KEY, COE_DEFAULT } from "@/data/coe-content";
 import type { CoePageValue } from "@/lib/validation";
 
+const CONFIG_KEY = "engineeringCoe";
+
 export default function COEPage() {
-  const [data, setData] = useState<CoePageValue>(COE_DEFAULT);
+  const [data, setData] = useState<CoePageValue | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch(`/api/public/site-config?key=${COE_CONFIG_KEY}`)
+    fetch(`/api/public/site-config?key=${CONFIG_KEY}`)
       .then((r) => r.json())
       .then((res) => {
         if (res?.data && typeof res.data === "object") {
-          setData({ ...COE_DEFAULT, ...res.data });
+          setData(res.data as CoePageValue);
+        } else {
+          setError("Failed to load content");
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        console.error("[COEPage]", err);
+        setError("Failed to load content");
+      });
   }, []);
+
+  if (error) {
+    return <div className="p-6 text-center text-red-600">{error}</div>;
+  }
+
+  if (!data) {
+    return <div className="p-6 text-center text-gray-500">Loading...</div>;
+  }
 
   return <CoePageLayout data={data} />;
 }
