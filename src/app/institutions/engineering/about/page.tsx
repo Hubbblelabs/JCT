@@ -462,81 +462,88 @@ export default function EngineeringAboutPage() {
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {[
                   {
-                    name: "Dr. G. Rajiv",
-                    designation: "Professor & Head",
-                    dept: "Computer Science & Engineering",
-                    abbr: "CSE",
-                    avatar: "/avatars/male_avatar.png",
+                    name: "Dr. S. Karthikumar",
+                    designation: "Director - IQAC & Professor",
+                    dept: "Internal Quality Assurance Cell",
+                    abbr: "IQAC",
+                    avatar: "/Eng-staff/KARTHIKUMAR-S.jpeg",
                   },
                   {
-                    name: "Dr. S. Kavitha",
-                    designation: "Associate Professor & Head",
-                    dept: "Electronics & Communication Eng.",
-                    abbr: "ECE",
-                    avatar: "/avatars/female_avatar.png",
+                    name: "Dr. V. Jethose",
+                    designation: "Director - Training & Placement & Head",
+                    dept: "Artificial Intelligence & Data Science",
+                    abbr: "AIDS",
+                    avatar: "/Eng-staff/jethosh.jpeg",
                   },
                   {
-                    name: "Dr. P. Mohan",
-                    designation: "Professor & Head",
-                    dept: "Electrical & Electronics Eng.",
+                    name: "Dr. B. Balraj",
+                    designation: "Dean Academics & Head",
+                    dept: "Electrical & Electronics Eng. (EEE)",
                     abbr: "EEE",
-                    avatar: "/avatars/male_avatar.png",
+                    avatar: "/Eng-staff/Balraj.jpeg",
                   },
                   {
-                    name: "Dr. K. Venkat",
+                    name: "Dr. M. Bhuvaneshwaran",
                     designation: "Professor & Head",
                     dept: "Mechanical Engineering",
                     abbr: "MECH",
-                    avatar: "/avatars/male_avatar.png",
+                    avatar: "/Eng-staff/Dr.M.-Bhuvaneshwaran.jpeg",
                   },
                   {
-                    name: "Dr. M. Suresh",
+                    name: "Dr. V. Murugesh",
                     designation: "Professor & Head",
                     dept: "Civil Engineering",
-                    abbr: "CE",
-                    avatar: "/avatars/male_avatar.png",
+                    abbr: "CIVIL",
+                    avatar: "/Eng-staff/murugesh.jpeg",
                   },
                   {
-                    name: "Dr. R. Anitha",
-                    designation: "Associate Professor & Head",
-                    dept: "Bio-Tech & Bio-Chemical Eng.",
-                    abbr: "BT",
-                    avatar: "/avatars/female_avatar.png",
-                  },
-                  {
-                    name: "Dr. S. Praveen",
-                    designation: "Assistant Professor & Head",
-                    dept: "Food Technology",
-                    abbr: "FT",
-                    avatar: "/avatars/male_avatar.png",
-                  },
-                  {
-                    name: "Dr. L. Albert",
-                    designation: "Professor & Head",
-                    dept: "Petroleum Engineering",
-                    abbr: "PE",
-                    avatar: "/avatars/male_avatar.png",
-                  },
-                  {
-                    name: "Dr. J. Jerome",
+                    name: "Dr. A. Murugesan",
                     designation: "Professor & Head",
                     dept: "Petrochemical Technology",
                     abbr: "PCT",
-                    avatar: "/avatars/male_avatar.png",
+                    avatar: "/Eng-staff/Dr.-A.Murugesan.jpeg",
                   },
                   {
-                    name: "Dr. T. Sandhya",
-                    designation: "Associate Professor & Head",
-                    dept: "AI & Data Science",
-                    abbr: "AI&DS",
-                    avatar: "/avatars/female_avatar.png",
+                    name: "Dr. K. Mohanapandian",
+                    designation: "Professor & Head",
+                    dept: "Science & Humanities",
+                    abbr: "SH",
+                    avatar: "/Eng-staff/Dr.-K.-Mohanapandian-HOD-Science-Humanities.jpeg",
                   },
                   {
-                    name: "Dr. V. Rajesh",
-                    designation: "Associate Professor & Head",
-                    dept: "CS & Business Systems",
+                    name: "Dr. K. Malarvizhi",
+                    designation: "Professor & Head",
+                    dept: "Computer Science & Business Systems",
                     abbr: "CSBS",
-                    avatar: "/avatars/male_avatar.png",
+                    avatar: "/Eng-staff/malarvizhi.jpg",
+                  },
+                  {
+                    name: "Dr. P. Balamurugan",
+                    designation: "Professor & Head",
+                    dept: "Food Technology",
+                    abbr: "FT",
+                    avatar: "/Eng-staff/balamurugan.jpg",
+                  },
+                  {
+                    name: "Dr. K. Ramachandran K",
+                    designation: "Professor & Head",
+                    dept: "Petroleum Engineering",
+                    abbr: "PE",
+                    avatar: "/Eng-staff/Dr.-Ramachandran-K-Head-of-Petroleum-Engineering.jpeg",
+                  },
+                  {
+                    name: "Dr. K. V. Selvakumar",
+                    designation: "Professor & Head",
+                    dept: "Biotech & Biochemical Engineering",
+                    abbr: "BT",
+                    avatar: "/Eng-staff/Dr.K.V.Selvakumar-Professor-and-Head-Department-of-Biotech-and-Biochemical-Engg.jpeg",
+                  },
+                  {
+                    name: "Dr. S. Sakthi Vinayagam",
+                    designation: "Professor & Head",
+                    dept: "Computer Science & Engineering",
+                    abbr: "CSE",
+                    avatar: "/Eng-staff/Sakthi-Vinayagam.jpeg",
                   },
                 ].map((d) => (
                   <div
@@ -548,7 +555,7 @@ export default function EngineeringAboutPage() {
                         src={d.avatar}
                         alt={d.name}
                         fill
-                        className="object-cover"
+                        className="object-cover object-top"
                         sizes="56px"
                       />
                     </div>
