@@ -35,9 +35,8 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EditableRegion } from "@/components/admin/EditableRegion";
 import { getImageUrl } from "@/lib/utils";
-import type { EngineeringAboutValue } from "@/lib/validation/aboutPage";
+import type { AboutPageValue } from "@/lib/validation";
 
-type AboutPageValue = EngineeringAboutValue;
 type Institution = "engineering" | "arts-science" | "polytechnic";
 
 // ─── Editable sections ───────────────────────────────────────────────────────

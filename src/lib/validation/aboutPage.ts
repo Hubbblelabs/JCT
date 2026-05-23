@@ -137,6 +137,9 @@ export const EngineeringAboutSchema = z.object({
 
 export type EngineeringAboutValue = z.infer<typeof EngineeringAboutSchema>;
 
+/** Union alias — all three institution About pages share the same schema shape. */
+export type AboutPageValue = EngineeringAboutValue;
+
 // ─── Arts & Science About ─────────────────────────────────────────────────────
 
 export const ArtsScienceAboutSchema = z.object({

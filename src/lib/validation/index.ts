@@ -181,4 +181,5 @@ export type {
   ArtsScienceAboutValue,
   PolytechnicAboutValue,
   CoePageValue,
+  AboutPageValue,
 } from "./aboutPage";
