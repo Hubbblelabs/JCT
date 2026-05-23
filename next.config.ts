@@ -1,5 +1,17 @@
 import type { NextConfig } from "next";
 
+function r2Hostname(): string | null {
+  const raw = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+  if (!raw) return null;
+  try {
+    return new URL(raw).hostname;
+  } catch {
+    return null;
+  }
+}
+
+const r2Host = r2Hostname();
+
 const nextConfig: NextConfig = {
   output: "standalone",
   images: {
@@ -8,10 +20,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "upload.wikimedia.org" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "i.pravatar.cc" },
-      {
-        protocol: "https",
-        hostname: "pub-f5f4af227edc4d43923310ac626e1479.r2.dev",
-      },
+      ...(r2Host ? [{ protocol: "https" as const, hostname: r2Host }] : []),
     ],
     dangerouslyAllowSVG: true,
     contentDispositionType: "attachment",

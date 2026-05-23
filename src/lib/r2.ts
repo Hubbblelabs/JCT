@@ -54,7 +54,7 @@ export async function deleteFromR2(key: string): Promise<void> {
 /**
  * Recursively walk any JSON-serialisable value and collect every string that
  * looks like a tracked R2 storage key. Only keys we generate ourselves are
- * matched: images are under "uploads/…" and documents under "documents/…".
+ * matched: images are under "images/…" and documents under "documents/…".
  * External URLs (http/https) and local proxy paths are intentionally excluded.
  */
 export function extractR2Keys(
@@ -63,7 +63,7 @@ export function extractR2Keys(
 ): Set<string> {
   if (typeof value === "string") {
     if (
-      (value.startsWith("uploads/") || value.startsWith("documents/")) &&
+      (value.startsWith("images/") || value.startsWith("documents/")) &&
       !value.startsWith("http")
     ) {
       out.add(value);

@@ -1647,7 +1647,6 @@ export function ProgramContentEditor({
         <ProgramTabsEditor
           tabs={customTabs}
           onChange={(next) => set("tabs", next)}
-          storageContext={`programs-${college}-${slug}`}
         />
         <div className="mt-6">
           <p className="admin-label mb-2">Raw JSON</p>

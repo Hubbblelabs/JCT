@@ -112,7 +112,6 @@ export function CoeSectionInspector({
               patch({ overview: { ...ov, controller: { ...ctrl, image } } })
             }
             hideUrlField
-            storageContext="coe-controller-photos"
           />
           <TextArea
             label="Pull Quote"
@@ -272,7 +271,6 @@ export function CoeSectionInspector({
                   value={item.href}
                   onChange={(href) => oc({ ...item, href })}
                   hint="Upload the form PDF — its link powers the Download button."
-                  storageContext="coe-forms"
                 />
               </div>
             )}

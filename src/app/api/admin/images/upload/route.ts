@@ -83,10 +83,6 @@ export async function POST(req: NextRequest) {
     if (!parsed.ok) return parsed.response;
     const { altText, category, institution } = parsed.data;
 
-    // Use storageContext if provided (for organized folder structure),
-    // otherwise fall back to institution/category structure.
-    const storageContext = (formData.get("storageContext") as string) ?? null;
-
     const buffer = Buffer.from(await file.arrayBuffer());
 
     // Inspect dimensions before resize so per-category rules apply to the
@@ -119,9 +115,7 @@ export async function POST(req: NextRequest) {
       .toBuffer();
 
     const filename = `${Date.now()}-${file.name.replace(/\.[^.]+$/, "")}.webp`;
-    const storageKey = storageContext
-      ? `images/${storageContext}/${filename}`
-      : `uploads/${institution}/${category}/${filename}`;
+    const storageKey = `images/${filename}`;
 
     await uploadToR2(storageKey, webpBuffer, "image/webp");
 

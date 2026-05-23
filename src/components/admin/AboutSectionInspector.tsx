@@ -163,7 +163,6 @@ export function AboutSectionInspector({
               patch({ principal: { ...data.principal, image } })
             }
             hideUrlField
-            storageContext="about-principal-photos"
           />
           <TextArea
             label="Pull Quote"
@@ -230,7 +229,6 @@ export function AboutSectionInspector({
                   value={item.image}
                   onChange={(image) => oc({ ...item, image })}
                   hideUrlField
-                  storageContext="about-management-photos"
                 />
                 <TextArea
                   label="Bio"
@@ -297,7 +295,6 @@ export function AboutSectionInspector({
                   value={item.avatar}
                   onChange={(avatar) => oc({ ...item, avatar })}
                   hideUrlField
-                  storageContext="about-hod-avatars"
                 />
               </div>
             )}
@@ -400,7 +397,6 @@ export function AboutSectionInspector({
                 value={item.logo}
                 onChange={(logo) => oc({ ...item, logo })}
                 hideUrlField
-                storageContext="about-accreditation-logos"
               />
             </div>
           )}

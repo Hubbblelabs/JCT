@@ -58,8 +58,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
           await User.updateOne({ _id: user._id }, { last_login: new Date() });
 
-          console.log(`[auth] User authenticated successfully: ${email}`);
-
           // Ensure all values are JSON-serializable primitives
           return {
             id: String(user._id),
@@ -84,7 +82,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = user.role;
         token.institution = user.institution;
         token.programs = user.programs;
-        console.log("[auth] JWT token updated with user data");
       }
       return token;
     },
@@ -93,7 +90,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         session.user.role = token.role as string;
         session.user.institution = token.institution as string;
         session.user.programs = token.programs as string[];
-        console.log("[auth] Session updated from token");
       }
       return session;
     },

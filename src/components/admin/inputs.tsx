@@ -177,8 +177,6 @@ interface ImageUploadInputProps {
   hint?: string;
   /** Hide the URL text field — show only the upload button + preview */
   hideUrlField?: boolean;
-  /** R2 storage folder context (e.g., "about-photos", "coe", "programs") */
-  storageContext?: string;
 }
 
 export function ImageUploadInput({
@@ -187,7 +185,6 @@ export function ImageUploadInput({
   onChange,
   hint,
   hideUrlField,
-  storageContext,
 }: ImageUploadInputProps) {
   const [uploading, setUploading] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -208,9 +205,6 @@ export function ImageUploadInput({
     setUploadError(null);
     const fd = new FormData();
     fd.append("file", file);
-    if (storageContext) {
-      fd.append("storageContext", storageContext);
-    }
     const r = await fetch("/api/admin/images/upload", {
       method: "POST",
       body: fd,
@@ -396,8 +390,6 @@ interface DocumentUploadInputProps {
   value: string;
   onChange: (url: string, storageKey?: string) => void;
   hint?: string;
-  /** R2 storage folder context (e.g., "coe-forms", "programs") */
-  storageContext?: string;
 }
 
 export function DocumentUploadInput({
@@ -405,7 +397,6 @@ export function DocumentUploadInput({
   value,
   onChange,
   hint,
-  storageContext,
 }: DocumentUploadInputProps) {
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -425,9 +416,6 @@ export function DocumentUploadInput({
     setUploadError(null);
     const fd = new FormData();
     fd.append("file", file);
-    if (storageContext) {
-      fd.append("storageContext", storageContext);
-    }
     const r = await fetch("/api/admin/documents/upload", {
       method: "POST",
       body: fd,
