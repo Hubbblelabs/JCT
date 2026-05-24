@@ -117,14 +117,14 @@ export default function SettingsPage() {
 
       const configFile = zip.file("site-config.json");
       if (!configFile) {
-        setFileError(
-          "Invalid backup — ZIP does not contain site-config.json.",
-        );
+        setFileError("Invalid backup — ZIP does not contain site-config.json.");
         return;
       }
-      const configData = JSON.parse(
-        await configFile.async("string"),
-      ) as { exported_at?: string; exported_by?: string; configs?: unknown[] };
+      const configData = JSON.parse(await configFile.async("string")) as {
+        exported_at?: string;
+        exported_by?: string;
+        configs?: unknown[];
+      };
       const configCount = Array.isArray(configData.configs)
         ? configData.configs.length
         : 0;
@@ -141,9 +141,7 @@ export default function SettingsPage() {
       let docCount = 0;
       const docMetaFile = zip.file("documents/_metadata.json");
       if (docMetaFile) {
-        const meta = JSON.parse(
-          await docMetaFile.async("string"),
-        ) as unknown[];
+        const meta = JSON.parse(await docMetaFile.async("string")) as unknown[];
         docCount = Array.isArray(meta) ? meta.length : 0;
       }
 
@@ -220,9 +218,7 @@ export default function SettingsPage() {
         });
         return;
       }
-      const parts: string[] = [
-        `${data.deleted as number} config entries`,
-      ];
+      const parts: string[] = [`${data.deleted as number} config entries`];
       if ((data.images_deleted as number) > 0)
         parts.push(`${data.images_deleted as number} images`);
       if ((data.documents_deleted as number) > 0)
@@ -329,9 +325,8 @@ export default function SettingsPage() {
                 Restore from Backup
               </h2>
               <p className="mt-0.5 text-sm text-gray-500">
-                Upload a previously exported ZIP archive. Site configs,
-                images, and documents are restored. Existing entries are
-                overwritten.
+                Upload a previously exported ZIP archive. Site configs, images,
+                and documents are restored. Existing entries are overwritten.
               </p>
             </div>
           </div>
@@ -460,8 +455,7 @@ function StatusBanner({ status }: { status: Status | null }) {
     error: "bg-red-50 text-red-700 border-red-200",
     warning: "bg-yellow-50 text-yellow-700 border-yellow-200",
   };
-  const Icon =
-    status.type === "success" ? CheckCircle : AlertTriangle;
+  const Icon = status.type === "success" ? CheckCircle : AlertTriangle;
   return (
     <div
       className={`mb-3 flex items-start gap-2 rounded-lg border px-3 py-2 text-sm ${styles[status.type]}`}

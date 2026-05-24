@@ -9,7 +9,10 @@ import {
   forbidden,
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
-import { SiteConfigPutSchema, SITE_CONFIG_KEY_INSTITUTION } from "@/lib/validation";
+import {
+  SiteConfigPutSchema,
+  SITE_CONFIG_KEY_INSTITUTION,
+} from "@/lib/validation";
 import { revalidateForConfigKey } from "@/lib/revalidate";
 import { extractR2Keys, deleteFromR2 } from "@/lib/r2";
 import { hasMinRole } from "@/lib/permissions";

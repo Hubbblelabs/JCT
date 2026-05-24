@@ -147,9 +147,7 @@ export async function POST(req: NextRequest) {
           await imageMetaFile.async("string"),
         ) as ImageMeta[];
       } catch {
-        warnings.push(
-          "Could not parse images/_metadata.json — images skipped",
-        );
+        warnings.push("Could not parse images/_metadata.json — images skipped");
       }
 
       for (const meta of imageMeta) {
@@ -161,7 +159,11 @@ export async function POST(req: NextRequest) {
             continue;
           }
           const buffer = Buffer.from(await imgFile.async("arraybuffer"));
-          await uploadToR2(meta.storage_key, buffer, meta.mime_type || "image/webp");
+          await uploadToR2(
+            meta.storage_key,
+            buffer,
+            meta.mime_type || "image/webp",
+          );
           await ImageAsset.findOneAndUpdate(
             { storage_key: meta.storage_key },
             {
@@ -176,8 +178,7 @@ export async function POST(req: NextRequest) {
                 mime_type: meta.mime_type || "image/webp",
                 width: meta.width,
                 height: meta.height,
-                uploaded_by:
-                  meta.uploaded_by || session!.user?.email || "",
+                uploaded_by: meta.uploaded_by || session!.user?.email || "",
               },
             },
             { upsert: true },
@@ -228,8 +229,7 @@ export async function POST(req: NextRequest) {
                 url: publicUrl,
                 mime_type: meta.mime_type || "application/pdf",
                 file_size: meta.file_size || 0,
-                uploaded_by:
-                  meta.uploaded_by || session!.user?.email || "",
+                uploaded_by: meta.uploaded_by || session!.user?.email || "",
               },
             },
             { upsert: true },
