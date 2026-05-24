@@ -9,6 +9,7 @@ import {
   type AboutEditableSection,
 } from "@/components/layout/AboutPageLayout";
 import { AboutSectionInspector } from "@/components/admin/AboutSectionInspector";
+import { EngineeringAboutSchema } from "@/lib/validation";
 import type { AboutPageValue } from "@/lib/validation";
 
 const INSTITUTION = "engineering" as const;
@@ -35,7 +36,8 @@ function AboutEditorInner() {
         if (res?.data && typeof res.data === "object") {
           setDraft(res.data as AboutPageValue);
         } else {
-          setMsg({ text: "No data found", ok: false });
+          // Key not yet seeded — open editor with schema defaults
+          setDraft(EngineeringAboutSchema.parse({}) as AboutPageValue);
         }
       })
       .catch((err) => {

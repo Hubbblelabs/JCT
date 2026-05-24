@@ -9,12 +9,12 @@ export function deleteUploadedAsset(key: string): void {
   if (!key) return;
 
   // Only act on storage keys we generate ourselves.
-  // Images: "uploads/<institution>/<category>/<filename>"
-  // Documents: "documents/all/<filename>"
+  // Images: "images/<filename>"
+  // Documents: "documents/<filename>"
   // External URLs, proxy paths, and empty strings are silently ignored.
-  if (!key.startsWith("uploads/") && !key.startsWith("documents/")) return;
+  if (!key.startsWith("images/") && !key.startsWith("documents/")) return;
 
-  const endpoint = key.startsWith("uploads/")
+  const endpoint = key.startsWith("images/")
     ? `/api/admin/images?storage_key=${encodeURIComponent(key)}`
     : `/api/admin/documents?storage_key=${encodeURIComponent(key)}`;
 

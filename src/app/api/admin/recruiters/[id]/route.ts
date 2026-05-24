@@ -11,6 +11,7 @@ import {
 import { logAudit } from "@/lib/audit";
 import { RecruiterUpdateSchema } from "@/lib/validation";
 import { revalidateTargets } from "@/lib/revalidate";
+import { deleteFromR2 } from "@/lib/r2";
 
 export async function GET(
   req: NextRequest,
@@ -45,12 +46,24 @@ export async function PATCH(
   try {
     await connectDB();
     const { id } = await params;
+
+    const oldLogo =
+      body.logo !== undefined
+        ? (await Recruiter.findById(id).select("logo").lean())?.logo ?? ""
+        : "";
+
     const doc = await Recruiter.findByIdAndUpdate(
       id,
       { $set: { ...body, updated_by: session!.user?.email } },
       { new: true },
     );
     if (!doc) return notFound();
+
+    if (oldLogo && oldLogo !== body.logo && oldLogo.startsWith("images/")) {
+      deleteFromR2(oldLogo).catch((err) =>
+        console.warn(`[recruiters/patch] R2 cleanup failed for "${oldLogo}":`, err),
+      );
+    }
 
     revalidateTargets("home");
     await logAudit(
@@ -78,6 +91,12 @@ export async function DELETE(
     const { id } = await params;
     const doc = await Recruiter.findByIdAndDelete(id);
     if (!doc) return notFound();
+
+    if (doc.logo?.startsWith("images/")) {
+      deleteFromR2(doc.logo).catch((err) =>
+        console.warn(`[recruiters/delete] R2 cleanup failed for "${doc.logo}":`, err),
+      );
+    }
 
     revalidateTargets("home");
     await logAudit(

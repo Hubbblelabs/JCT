@@ -1,6 +1,6 @@
 /* Admin panel styles — loaded only in admin layout */
 
-.admin-layout {
+:root {
   --admin-brand-h: 56px;
   --admin-nav-total: var(--admin-brand-h);
   --admin-navy: #0a1628;

@@ -9,6 +9,7 @@ import {
   type CoeEditableSection,
 } from "@/components/layout/CoePageLayout";
 import { CoeSectionInspector } from "@/components/admin/CoeSectionInspector";
+import { CoePageSchema } from "@/lib/validation";
 import type { CoePageValue } from "@/lib/validation";
 
 const CONFIG_KEY = "engineeringCoe";
@@ -35,7 +36,8 @@ export default function CoeEditorPage() {
         if (res?.data && typeof res.data === "object") {
           setDraft(res.data as CoePageValue);
         } else {
-          setMsg({ text: "No data found", ok: false });
+          // Key not yet seeded — open editor with schema defaults
+          setDraft(CoePageSchema.parse({}) as CoePageValue);
         }
       })
       .catch((err) => {

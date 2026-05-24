@@ -11,6 +11,7 @@ import {
 import { logAudit } from "@/lib/audit";
 import { TestimonialUpdateSchema } from "@/lib/validation";
 import { revalidateTargets, type RevalidateTarget } from "@/lib/revalidate";
+import { deleteFromR2 } from "@/lib/r2";
 
 function targetsForInstitution(inst?: string): RevalidateTarget[] {
   const targets: RevalidateTarget[] = ["home"];
@@ -56,12 +57,24 @@ export async function PATCH(
   try {
     await connectDB();
     const { id } = await params;
+
+    const oldAvatar =
+      body.avatar !== undefined
+        ? (await Testimonial.findById(id).select("avatar").lean())?.avatar ?? ""
+        : "";
+
     const doc = await Testimonial.findByIdAndUpdate(
       id,
       { $set: { ...body, updated_by: session!.user?.email } },
       { new: true },
     );
     if (!doc) return notFound();
+
+    if (oldAvatar && oldAvatar !== body.avatar && oldAvatar.startsWith("images/")) {
+      deleteFromR2(oldAvatar).catch((err) =>
+        console.warn(`[testimonials/patch] R2 cleanup failed for "${oldAvatar}":`, err),
+      );
+    }
 
     revalidateTargets(...targetsForInstitution(doc.institution));
     await logAudit(
@@ -89,6 +102,12 @@ export async function DELETE(
     const { id } = await params;
     const doc = await Testimonial.findByIdAndDelete(id);
     if (!doc) return notFound();
+
+    if (doc.avatar?.startsWith("images/")) {
+      deleteFromR2(doc.avatar).catch((err) =>
+        console.warn(`[testimonials/delete] R2 cleanup failed for "${doc.avatar}":`, err),
+      );
+    }
 
     revalidateTargets(...targetsForInstitution(doc.institution));
     await logAudit(

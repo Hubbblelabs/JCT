@@ -37,15 +37,9 @@ export async function PUT(req: NextRequest) {
   try {
     await connectDB();
 
-    // Fetch the existing doc BEFORE overwriting so we can detect orphaned
-    // document keys. Images are not cleaned here — they live in ImageAsset and
-    // have their own delete lifecycle.
+    // Fetch the existing doc BEFORE overwriting so we can detect orphaned R2 keys.
     const existing = await SiteConfig.findOne({ config_key }).lean();
-    const oldDocKeys = existing?.value
-      ? [...extractR2Keys(existing.value)].filter((k) =>
-          k.startsWith("documents/"),
-        )
-      : [];
+    const oldKeys = existing?.value ? [...extractR2Keys(existing.value)] : [];
 
     const doc = await SiteConfig.findOneAndUpdate(
       { config_key },
@@ -61,13 +55,11 @@ export async function PUT(req: NextRequest) {
       { upsert: true, new: true },
     );
 
-    // Delete any document R2 objects that were present in the old value but are
-    // no longer referenced by the new value. Non-fatal — a failed R2 delete
-    // never blocks the save.
-    const newDocKeys = new Set(
-      [...extractR2Keys(value)].filter((k) => k.startsWith("documents/")),
-    );
-    const orphaned = oldDocKeys.filter((k) => !newDocKeys.has(k));
+    // Delete any R2 objects (images or documents) that were present in the old
+    // value but are no longer referenced by the new value. Non-fatal — a failed
+    // R2 delete never blocks the save.
+    const newKeys = new Set([...extractR2Keys(value)]);
+    const orphaned = oldKeys.filter((k) => !newKeys.has(k));
     for (const key of orphaned) {
       deleteFromR2(key).catch((err) =>
         console.warn(`[site-config] R2 cleanup failed for "${key}":`, err),
