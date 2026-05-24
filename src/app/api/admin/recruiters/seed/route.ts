@@ -54,7 +54,7 @@ const COMPANIES = [
 ];
 
 export async function POST(req: NextRequest) {
-  const { error } = await requireRole(req, "super_admin");
+  const { error } = await requireRole(req, "admin");
   if (error) return error;
 
   try {

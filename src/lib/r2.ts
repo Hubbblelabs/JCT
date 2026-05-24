@@ -93,3 +93,31 @@ export async function getFromR2(
     contentType: res.ContentType ?? "image/webp",
   };
 }
+
+export async function getR2AsBuffer(
+  key: string,
+): Promise<{ buffer: Buffer; contentType: string }> {
+  const client = getR2Client();
+  const bucket = process.env.R2_BUCKET_NAME;
+  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+
+  const res = await client.send(
+    new GetObjectCommand({ Bucket: bucket, Key: key }),
+  );
+  if (!res.Body) throw new Error(`No body returned for R2 key: ${key}`);
+
+  const bytes = await res.Body.transformToByteArray();
+  return {
+    buffer: Buffer.from(bytes),
+    contentType: res.ContentType ?? "application/octet-stream",
+  };
+}
+
+export function isR2Configured(): boolean {
+  return !!(
+    process.env.R2_ACCOUNT_ID &&
+    process.env.R2_ACCESS_KEY_ID &&
+    process.env.R2_SECRET_ACCESS_KEY &&
+    process.env.R2_BUCKET_NAME
+  );
+}

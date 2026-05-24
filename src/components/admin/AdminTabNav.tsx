@@ -41,8 +41,7 @@ type NavItem = {
   label: string;
   href: string;
   icon: React.ComponentType<{ size?: number }>;
-  /** Minimum role required to see this item. Defaults to "viewer" if omitted. */
-  minRole?: "viewer" | "editor" | "admin" | "super_admin";
+  minRole?: "editor" | "admin";
 };
 
 const COLLEGE_ITEMS: Record<string, NavItem[]> = {
@@ -232,7 +231,7 @@ const GLOBAL_CMS_ITEMS: NavItem[] = [
 ];
 
 const ADMIN_ITEMS: NavItem[] = [
-  { label: "Users", href: "/admin/users", icon: Users, minRole: "super_admin" },
+  { label: "Users", href: "/admin/users", icon: Users, minRole: "admin" },
   {
     label: "Audit Log",
     href: "/admin/audit",
@@ -243,9 +242,15 @@ const ADMIN_ITEMS: NavItem[] = [
     label: "Settings",
     href: "/admin/settings",
     icon: Settings,
-    minRole: "super_admin",
+    minRole: "admin",
   },
 ];
+
+const ALL_COLLEGES = [
+  { id: "engineering", label: "Engineering" },
+  { id: "arts-science", label: "Arts" },
+  { id: "polytechnic", label: "Polytechnic" },
+] as const;
 
 function isItemActive(
   href: string,
@@ -297,10 +302,19 @@ function TabNavInner() {
   const section = searchParams.get("section");
 
   const userRole =
-    ((session?.user as Record<string, unknown>)?.role as string) ?? "viewer";
+    ((session?.user as Record<string, unknown>)?.role as string) ?? "editor";
+  const userInstitution =
+    ((session?.user as Record<string, unknown>)?.institution as string) ?? "";
+  const isAdmin = hasMinRole(userRole, "admin");
+
   const visibleAdminItems = ADMIN_ITEMS.filter((item) =>
-    hasMinRole(userRole, item.minRole ?? "viewer"),
+    hasMinRole(userRole, item.minRole ?? "editor"),
   );
+
+  // Editors see only their assigned college; admins see all three
+  const visibleColleges = isAdmin
+    ? ALL_COLLEGES
+    : ALL_COLLEGES.filter((c) => c.id === userInstitution);
 
   const dashActive = pathname === "/admin/dashboard" || pathname === "/admin";
   const adminMenuActive = isDropdownActive(visibleAdminItems, pathname, null);
@@ -314,8 +328,6 @@ function TabNavInner() {
     return null;
   }
 
-  // Full-screen live CMS editors hide the admin nav (same as the program
-  // builder) — they provide their own back button.
   if (
     pathname === "/admin/about" ||
     pathname === "/admin/coe" ||
@@ -342,17 +354,19 @@ function TabNavInner() {
 
         {/* Nav items */}
         <nav className="flex items-center gap-0.5">
-          {/* Dashboard — direct link */}
-          <Link
-            href="/admin/dashboard"
-            className={`admin-nav-trigger ${dashActive ? "active" : ""}`}
-          >
-            <LayoutDashboard size={13} />
-            Dashboard
-          </Link>
+          {/* Dashboard — admin only */}
+          {isAdmin && (
+            <Link
+              href="/admin/dashboard"
+              className={`admin-nav-trigger ${dashActive ? "active" : ""}`}
+            >
+              <LayoutDashboard size={13} />
+              Dashboard
+            </Link>
+          )}
 
-          {/* Admin tools dropdown — only shown when user has access to ≥1 item */}
-          {visibleAdminItems.length > 0 && (
+          {/* Admin tools dropdown — admin only */}
+          {isAdmin && visibleAdminItems.length > 0 && (
             <div className="admin-nav-item">
               <button
                 className={`admin-nav-trigger ${adminMenuActive ? "active" : ""}`}
@@ -376,70 +390,68 @@ function TabNavInner() {
             </div>
           )}
 
-          {/* Global CMS dropdown */}
-          <div className="admin-nav-item">
-            <Link
-              href="/admin/global/page-content"
-              className={`admin-nav-trigger ${globalCmsActive ? "active" : ""}`}
-            >
-              <Globe size={13} />
-              Global CMS
-              <ChevronDown size={11} />
-            </Link>
-            <div className="admin-nav-dropdown-menu">
-              {GLOBAL_CMS_ITEMS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`admin-nav-dropdown-item ${
-                    isItemActive(item.href, pathname, null, section)
-                      ? "active"
-                      : ""
-                  }`}
-                >
-                  <item.icon size={14} />
-                  {item.label}
-                </Link>
-              ))}
+          {/* Global CMS — admin only */}
+          {isAdmin && (
+            <div className="admin-nav-item">
+              <Link
+                href="/admin/global/page-content"
+                className={`admin-nav-trigger ${globalCmsActive ? "active" : ""}`}
+              >
+                <Globe size={13} />
+                Global CMS
+                <ChevronDown size={11} />
+              </Link>
+              <div className="admin-nav-dropdown-menu">
+                {GLOBAL_CMS_ITEMS.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`admin-nav-dropdown-item ${
+                      isItemActive(item.href, pathname, null, section)
+                        ? "active"
+                        : ""
+                    }`}
+                  >
+                    <item.icon size={14} />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Main (landing page) dropdown */}
-          <div className="admin-nav-item">
-            <Link
-              href="/admin/main/page-content"
-              className={`admin-nav-trigger ${mainActive ? "active" : ""}`}
-            >
-              <Home size={13} />
-              Main
-              <ChevronDown size={11} />
-            </Link>
-            <div className="admin-nav-dropdown-menu">
-              {MAIN_ITEMS.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`admin-nav-dropdown-item ${
-                    isItemActive(item.href, pathname, null, section)
-                      ? "active"
-                      : ""
-                  }`}
-                >
-                  <item.icon size={14} />
-                  {item.label}
-                </Link>
-              ))}
+          {/* Main (landing page) — admin only */}
+          {isAdmin && (
+            <div className="admin-nav-item">
+              <Link
+                href="/admin/main/page-content"
+                className={`admin-nav-trigger ${mainActive ? "active" : ""}`}
+              >
+                <Home size={13} />
+                Main
+                <ChevronDown size={11} />
+              </Link>
+              <div className="admin-nav-dropdown-menu">
+                {MAIN_ITEMS.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`admin-nav-dropdown-item ${
+                      isItemActive(item.href, pathname, null, section)
+                        ? "active"
+                        : ""
+                    }`}
+                  >
+                    <item.icon size={14} />
+                    {item.label}
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* College dropdowns */}
-          {(
-            [
-              { id: "engineering", label: "Engineering" },
-              { id: "arts-science", label: "Arts" },
-              { id: "polytechnic", label: "Polytechnic" },
-            ] as const
-          ).map(({ id, label }) => {
+          {/* College dropdowns — editors see only their assigned college */}
+          {visibleColleges.map(({ id, label }) => {
             const items = COLLEGE_ITEMS[id];
             const active = isDropdownActive(items, pathname, college);
             return (
@@ -480,8 +492,7 @@ function TabNavInner() {
               {session?.user?.name ?? session?.user?.email}
             </span>
             <span className="admin-badge admin-badge-blue text-[11px] capitalize">
-              {((session?.user as Record<string, unknown>)?.role as string) ??
-                "admin"}
+              {userRole}
             </span>
           </div>
           <button

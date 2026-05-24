@@ -22,25 +22,22 @@ const EMPTY_NEW = {
   full_name: "",
   password: "",
   role: "editor",
-  institution: "all",
+  institution: "engineering",
 };
 const EMPTY_EDIT = {
   full_name: "",
   role: "editor",
-  institution: "all",
+  institution: "engineering",
   is_active: true,
   password: "",
 };
 
 const ROLES = [
-  { value: "viewer", label: "Viewer (read-only)" },
   { value: "editor", label: "Editor" },
   { value: "admin", label: "Admin" },
-  { value: "super_admin", label: "Super Admin" },
 ];
 
-const INSTITUTIONS = [
-  { value: "all", label: "All Colleges" },
+const EDITOR_INSTITUTIONS = [
   { value: "engineering", label: "Engineering" },
   { value: "arts-science", label: "Arts & Science" },
   { value: "polytechnic", label: "Polytechnic" },
@@ -79,10 +76,16 @@ export default function UsersPage() {
 
   const openEdit = (u: User) => {
     setEditingUser(u);
+    const inst =
+      u.role === "admin"
+        ? "all"
+        : u.institution === "all"
+          ? "engineering"
+          : u.institution;
     setEditForm({
       full_name: u.full_name,
       role: u.role,
-      institution: u.institution,
+      institution: inst,
       is_active: u.is_active,
       password: "",
     });
@@ -287,14 +290,30 @@ export default function UsersPage() {
                 label="Role"
                 value={newForm.role}
                 options={ROLES}
-                onChange={(e) => setN("role", e.target.value)}
+                onChange={(e) => {
+                  const r = e.target.value;
+                  setN("role", r);
+                  if (r === "admin") setN("institution", "all");
+                  else if (newForm.institution === "all")
+                    setN("institution", "engineering");
+                }}
               />
-              <Select
-                label="College Access"
-                value={newForm.institution}
-                options={INSTITUTIONS}
-                onChange={(e) => setN("institution", e.target.value)}
-              />
+              {newForm.role === "editor" && (
+                <Select
+                  label="College Access"
+                  value={newForm.institution}
+                  options={EDITOR_INSTITUTIONS}
+                  onChange={(e) => setN("institution", e.target.value)}
+                />
+              )}
+              {newForm.role === "admin" && (
+                <p className="text-sm text-gray-500">
+                  College Access:{" "}
+                  <span className="font-medium text-gray-700">
+                    All Colleges
+                  </span>
+                </p>
+              )}
               {msg && !newApiError?.details?.length && (
                 <p className="text-sm text-red-600">{msg}</p>
               )}
@@ -358,14 +377,30 @@ export default function UsersPage() {
                 label="Role"
                 value={editForm.role}
                 options={ROLES}
-                onChange={(e) => setE("role", e.target.value)}
+                onChange={(e) => {
+                  const r = e.target.value;
+                  setE("role", r);
+                  if (r === "admin") setE("institution", "all");
+                  else if (editForm.institution === "all")
+                    setE("institution", "engineering");
+                }}
               />
-              <Select
-                label="College Access"
-                value={editForm.institution}
-                options={INSTITUTIONS}
-                onChange={(e) => setE("institution", e.target.value)}
-              />
+              {editForm.role === "editor" && (
+                <Select
+                  label="College Access"
+                  value={editForm.institution}
+                  options={EDITOR_INSTITUTIONS}
+                  onChange={(e) => setE("institution", e.target.value)}
+                />
+              )}
+              {editForm.role === "admin" && (
+                <p className="text-sm text-gray-500">
+                  College Access:{" "}
+                  <span className="font-medium text-gray-700">
+                    All Colleges
+                  </span>
+                </p>
+              )}
               <TextInput
                 label="New Password"
                 type="password"

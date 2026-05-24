@@ -113,6 +113,30 @@ export function isKnownSiteConfigKey(key: string): key is SiteConfigKey {
   return key in SITE_CONFIG_SCHEMAS;
 }
 
+// Maps college-specific config keys to their institution.
+// Keys absent from this map are global (admin-only writes).
+export const SITE_CONFIG_KEY_INSTITUTION: Partial<
+  Record<SiteConfigKey, "engineering" | "arts-science" | "polytechnic">
+> = {
+  engineeringAnnouncement: "engineering",
+  engineeringHero: "engineering",
+  engineeringMetrics: "engineering",
+  engineeringFacilities: "engineering",
+  engineeringResearchHighlights: "engineering",
+  engineeringAdmissions: "engineering",
+  engineeringAbout: "engineering",
+  engineeringCoe: "engineering",
+  artsScienceHero: "arts-science",
+  artsScienceHeroStats: "arts-science",
+  artsScienceCampusLife: "arts-science",
+  artsScienceAdmissions: "arts-science",
+  artsScienceAbout: "arts-science",
+  polytechnicHero: "polytechnic",
+  polytechnicCampusLife: "polytechnic",
+  polytechnicAdmissions: "polytechnic",
+  polytechnicAbout: "polytechnic",
+};
+
 export function validateSiteConfigValue(key: SiteConfigKey, value: unknown) {
   return SITE_CONFIG_SCHEMAS[key].safeParse(value);
 }

@@ -22,6 +22,18 @@ export default auth((req) => {
 
   // Redirect already-authenticated users away from login
   if (isLoginPage && req.auth) {
+    const userRole = (req.auth.user as Record<string, unknown>)
+      ?.role as string;
+    const institution = (req.auth.user as Record<string, unknown>)
+      ?.institution as string;
+    if (userRole === "editor") {
+      return NextResponse.redirect(
+        new URL(
+          `/admin/page-content?college=${institution || "engineering"}`,
+          req.url,
+        ),
+      );
+    }
     return NextResponse.redirect(new URL("/admin/dashboard", req.url));
   }
 

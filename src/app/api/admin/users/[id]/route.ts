@@ -16,7 +16,7 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { session, error } = await requireRole(req, "super_admin");
+  const { session, error } = await requireRole(req, "admin");
   if (error) return error;
 
   const parsed = await validateBody(req, UserUpdateSchema);
@@ -28,8 +28,12 @@ export async function PATCH(
     const { id } = await params;
     const update: Record<string, unknown> = {};
 
-    if (body.role) update.role = body.role;
-    if (body.institution) update.institution = body.institution;
+    if (body.role) {
+      update.role = body.role;
+      if (body.role === "admin") update.institution = "all";
+    }
+    if (body.institution && body.role !== "admin")
+      update.institution = body.institution;
     if (body.programs) update.programs = body.programs;
     if (body.full_name) update.full_name = body.full_name;
     if (typeof body.is_active === "boolean") update.is_active = body.is_active;
@@ -60,7 +64,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { session, error } = await requireRole(req, "super_admin");
+  const { session, error } = await requireRole(req, "admin");
   if (error) return error;
 
   try {

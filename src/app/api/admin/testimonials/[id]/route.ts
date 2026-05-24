@@ -28,7 +28,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { error } = await requireRole(req, "viewer");
+  const { error } = await requireRole(req, "editor");
   if (error) return error;
 
   try {

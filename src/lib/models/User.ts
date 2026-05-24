@@ -4,7 +4,7 @@ export interface IUser extends Document {
   email: string;
   password_hash: string;
   full_name: string;
-  role: "viewer" | "editor" | "admin" | "super_admin";
+  role: "admin" | "editor";
   institution: string;
   programs: string[];
   is_active: boolean;
@@ -20,7 +20,7 @@ const UserSchema = new Schema<IUser>(
     full_name: { type: String, required: true },
     role: {
       type: String,
-      enum: ["viewer", "editor", "admin", "super_admin"],
+      enum: ["admin", "editor"],
       default: "editor",
     },
     institution: { type: String, default: "all" },

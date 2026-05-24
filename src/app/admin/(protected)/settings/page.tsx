@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
+import JSZip from "jszip";
 import {
   Download,
   Upload,
@@ -11,14 +12,17 @@ import {
   CheckCircle,
   AlertTriangle,
   ShieldAlert,
-  FileJson,
+  FileArchive,
+  Image,
+  FileText,
 } from "lucide-react";
 
-interface BackupFile {
-  version: string;
-  exported_at: string;
-  exported_by: string;
-  configs: Array<{ config_key: string; status: string }>;
+interface BackupPreview {
+  exportedAt: string;
+  exportedBy: string;
+  configCount: number;
+  imageCount: number;
+  docCount: number;
 }
 
 type Status = { type: "success" | "error" | "warning"; message: string };
@@ -27,20 +31,28 @@ export default function SettingsPage() {
   const { data: session, status } = useSession();
   const role = (session?.user as Record<string, unknown>)?.role as string;
 
-  // Redirect non-super-admin users away
-  if (status === "authenticated" && role !== "super_admin") {
+  if (status === "authenticated" && role !== "admin") {
     redirect("/admin/dashboard");
   }
 
   const fileRef = useRef<HTMLInputElement>(null);
-  const [preview, setPreview] = useState<BackupFile | null>(null);
-  const [fileError, setFileError] = useState("");
+
+  // Export state
+  const [includeImages, setIncludeImages] = useState(false);
+  const [includeDocs, setIncludeDocs] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [exportStatus, setExportStatus] = useState<Status | null>(null);
+
+  // Restore state
+  const [preview, setPreview] = useState<BackupPreview | null>(null);
+  const [restoreFile, setRestoreFile] = useState<File | null>(null);
+  const [fileError, setFileError] = useState("");
   const [restoring, setRestoring] = useState(false);
+  const [restoreStatus, setRestoreStatus] = useState<Status | null>(null);
+
+  // Reset state
   const [resetting, setResetting] = useState(false);
   const [resetConfirm, setResetConfirm] = useState("");
-  const [exportStatus, setExportStatus] = useState<Status | null>(null);
-  const [restoreStatus, setRestoreStatus] = useState<Status | null>(null);
   const [resetStatus, setResetStatus] = useState<Status | null>(null);
 
   if (status === "loading") {
@@ -55,7 +67,13 @@ export default function SettingsPage() {
     setExporting(true);
     setExportStatus(null);
     try {
-      const res = await fetch("/api/admin/site-config/backup");
+      const params = new URLSearchParams();
+      if (includeImages) params.set("includeImages", "1");
+      if (includeDocs) params.set("includeDocs", "1");
+      const qs = params.toString();
+      const res = await fetch(
+        `/api/admin/site-config/backup${qs ? `?${qs}` : ""}`,
+      );
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         setExportStatus({
@@ -67,7 +85,7 @@ export default function SettingsPage() {
       const blob = await res.blob();
       const disposition = res.headers.get("Content-Disposition") ?? "";
       const match = disposition.match(/filename="([^"]+)"/);
-      const filename = match?.[1] ?? "jct-site-config.json";
+      const filename = match?.[1] ?? "jct-backup.zip";
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -82,34 +100,76 @@ export default function SettingsPage() {
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     setPreview(null);
+    setRestoreFile(null);
     setFileError("");
     setRestoreStatus(null);
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      try {
-        const parsed = JSON.parse(ev.target?.result as string) as BackupFile;
-        if (!Array.isArray(parsed.configs)) throw new Error("Invalid format");
-        setPreview(parsed);
-      } catch {
-        setFileError("Invalid backup file — expected JCT site config JSON.");
+    if (!file.name.toLowerCase().endsWith(".zip")) {
+      setFileError("Invalid file — expected a .zip backup archive.");
+      return;
+    }
+    try {
+      const buffer = await file.arrayBuffer();
+      const zip = await JSZip.loadAsync(buffer);
+
+      const configFile = zip.file("site-config.json");
+      if (!configFile) {
+        setFileError(
+          "Invalid backup — ZIP does not contain site-config.json.",
+        );
+        return;
       }
-    };
-    reader.readAsText(file);
+      const configData = JSON.parse(
+        await configFile.async("string"),
+      ) as { exported_at?: string; exported_by?: string; configs?: unknown[] };
+      const configCount = Array.isArray(configData.configs)
+        ? configData.configs.length
+        : 0;
+
+      let imageCount = 0;
+      const imageMetaFile = zip.file("images/_metadata.json");
+      if (imageMetaFile) {
+        const meta = JSON.parse(
+          await imageMetaFile.async("string"),
+        ) as unknown[];
+        imageCount = Array.isArray(meta) ? meta.length : 0;
+      }
+
+      let docCount = 0;
+      const docMetaFile = zip.file("documents/_metadata.json");
+      if (docMetaFile) {
+        const meta = JSON.parse(
+          await docMetaFile.async("string"),
+        ) as unknown[];
+        docCount = Array.isArray(meta) ? meta.length : 0;
+      }
+
+      setPreview({
+        exportedAt: configData.exported_at ?? "",
+        exportedBy: configData.exported_by ?? "",
+        configCount,
+        imageCount,
+        docCount,
+      });
+      setRestoreFile(file);
+    } catch {
+      setFileError("Could not read ZIP file — the archive may be corrupted.");
+    }
   };
 
   const handleRestore = async () => {
-    if (!preview) return;
+    if (!restoreFile) return;
     setRestoring(true);
     setRestoreStatus(null);
     try {
+      const body = new FormData();
+      body.append("file", restoreFile);
       const res = await fetch("/api/admin/site-config/restore", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ configs: preview.configs }),
+        body,
       });
       const data = (await res.json()) as Record<string, unknown>;
       if (!res.ok) {
@@ -120,16 +180,19 @@ export default function SettingsPage() {
         });
         return;
       }
-      const msg =
-        `Restored ${data.restored as number} entries.` +
-        ((data.skipped as number) > 0
-          ? ` ${data.skipped as number} entries skipped (unknown keys).`
-          : "");
+      const parts = [`${data.restored as number} config entries`];
+      if ((data.images_restored as number) > 0)
+        parts.push(`${data.images_restored as number} images`);
+      if ((data.documents_restored as number) > 0)
+        parts.push(`${data.documents_restored as number} documents`);
+      const warnings = data.warnings as string[] | undefined;
+      const msg = `Restored: ${parts.join(", ")}.${warnings?.length ? ` ${warnings.length} warning(s).` : ""}`;
       setRestoreStatus({
-        type: (data.skipped as number) > 0 ? "warning" : "success",
+        type: warnings?.length ? "warning" : "success",
         message: msg,
       });
       setPreview(null);
+      setRestoreFile(null);
       if (fileRef.current) fileRef.current.value = "";
     } catch {
       setRestoreStatus({
@@ -190,11 +253,45 @@ export default function SettingsPage() {
             <div>
               <h2 className="font-semibold text-gray-900">Export Backup</h2>
               <p className="mt-0.5 text-sm text-gray-500">
-                Download all site config entries as a JSON file. Includes draft
-                and published values for every key.
+                Download a ZIP archive containing all site config entries plus
+                any selected assets.
               </p>
             </div>
           </div>
+
+          {/* Asset options */}
+          <div className="mb-4 space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-3">
+            <p className="text-xs font-medium tracking-wide text-gray-500 uppercase">
+              Include in backup
+            </p>
+            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={includeImages}
+                onChange={(e) => setIncludeImages(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300"
+              />
+              <Image size={14} className="text-gray-400" />
+              Uploaded images
+            </label>
+            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={includeDocs}
+                onChange={(e) => setIncludeDocs(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300"
+              />
+              <FileText size={14} className="text-gray-400" />
+              Uploaded documents / files
+            </label>
+            {(includeImages || includeDocs) && (
+              <p className="pt-1 text-xs text-amber-600">
+                Including assets may take longer and produce a large ZIP file.
+                Requires R2 storage to be configured.
+              </p>
+            )}
+          </div>
+
           <StatusBanner status={exportStatus} />
           <button
             onClick={handleExport}
@@ -206,7 +303,7 @@ export default function SettingsPage() {
             ) : (
               <Download size={15} />
             )}
-            {exporting ? "Exporting…" : "Download Backup"}
+            {exporting ? "Creating backup…" : "Download Backup"}
           </button>
         </div>
 
@@ -221,9 +318,9 @@ export default function SettingsPage() {
                 Restore from Backup
               </h2>
               <p className="mt-0.5 text-sm text-gray-500">
-                Upload a previously exported JSON file. Existing configs are
-                overwritten; unknown keys are skipped. All public pages are
-                revalidated after restore.
+                Upload a previously exported ZIP archive. Site configs,
+                images, and documents are restored. Existing entries are
+                overwritten.
               </p>
             </div>
           </div>
@@ -233,12 +330,12 @@ export default function SettingsPage() {
           <div className="space-y-3">
             <label className="flex flex-col gap-1">
               <span className="text-sm font-medium text-gray-700">
-                Backup file (.json)
+                Backup archive (.zip)
               </span>
               <input
                 ref={fileRef}
                 type="file"
-                accept="application/json,.json"
+                accept=".zip,application/zip"
                 onChange={handleFileChange}
                 className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-200"
               />
@@ -249,33 +346,39 @@ export default function SettingsPage() {
             {preview && (
               <div className="space-y-1 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm">
                 <div className="flex items-center gap-1.5 font-medium text-gray-700">
-                  <FileJson size={14} />
+                  <FileArchive size={14} />
                   Backup preview
                 </div>
-                <p className="text-gray-500">
-                  Exported:{" "}
-                  {new Date(preview.exported_at).toLocaleString("en-IN")}
-                </p>
-                <p className="text-gray-500">By: {preview.exported_by}</p>
-                <p className="text-gray-500">
-                  {preview.configs.length} config entries
-                </p>
-                <div className="flex flex-wrap gap-1 pt-1">
-                  {preview.configs.map((c) => (
-                    <span
-                      key={c.config_key}
-                      className="admin-badge admin-badge-gray text-[11px]"
-                    >
-                      {c.config_key}
+                {preview.exportedAt && (
+                  <p className="text-gray-500">
+                    Exported:{" "}
+                    {new Date(preview.exportedAt).toLocaleString("en-IN")}
+                  </p>
+                )}
+                {preview.exportedBy && (
+                  <p className="text-gray-500">By: {preview.exportedBy}</p>
+                )}
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <span className="admin-badge admin-badge-gray text-[11px]">
+                    {preview.configCount} config entries
+                  </span>
+                  {preview.imageCount > 0 && (
+                    <span className="admin-badge admin-badge-blue text-[11px]">
+                      {preview.imageCount} images
                     </span>
-                  ))}
+                  )}
+                  {preview.docCount > 0 && (
+                    <span className="admin-badge admin-badge-blue text-[11px]">
+                      {preview.docCount} documents
+                    </span>
+                  )}
                 </div>
               </div>
             )}
 
             <button
               onClick={handleRestore}
-              disabled={!preview || restoring}
+              disabled={!restoreFile || restoring}
               className="admin-btn admin-btn-gold"
             >
               {restoring ? (
@@ -346,11 +449,7 @@ function StatusBanner({ status }: { status: Status | null }) {
     warning: "bg-yellow-50 text-yellow-700 border-yellow-200",
   };
   const Icon =
-    status.type === "success"
-      ? CheckCircle
-      : status.type === "warning"
-        ? AlertTriangle
-        : AlertTriangle;
+    status.type === "success" ? CheckCircle : AlertTriangle;
   return (
     <div
       className={`mb-3 flex items-start gap-2 rounded-lg border px-3 py-2 text-sm ${styles[status.type]}`}

@@ -23,7 +23,7 @@ function institutionTarget(inst: string): RevalidateTarget | null {
 }
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireRole(req, "viewer");
+  const { error } = await requireRole(req, "editor");
   if (error) return error;
 
   try {

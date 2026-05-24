@@ -6,7 +6,7 @@ import { logAudit } from "@/lib/audit";
 import { revalidateTargets } from "@/lib/revalidate";
 
 export async function POST(req: NextRequest) {
-  const { session, error } = await requireRole(req, "super_admin");
+  const { session, error } = await requireRole(req, "admin");
   if (error) return error;
 
   try {

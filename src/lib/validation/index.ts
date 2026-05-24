@@ -161,6 +161,7 @@ export {
   SiteConfigPutSchema,
   isKnownSiteConfigKey,
   validateSiteConfigValue,
+  SITE_CONFIG_KEY_INSTITUTION,
 } from "./siteConfig";
 export type { SiteConfigKey } from "./siteConfig";
 

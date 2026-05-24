@@ -1,4 +1,5 @@
 import { auth } from "@/auth";
+import { redirect } from "next/navigation";
 import { connectDB } from "@/lib/mongodb";
 import { Program, Recruiter, Testimonial, AuditLog } from "@/lib/models";
 import { GraduationCap, Send, Briefcase, MessageSquare } from "lucide-react";
@@ -28,6 +29,14 @@ async function getStats() {
 
 export default async function DashboardPage() {
   const session = await auth();
+
+  const role = (session?.user as Record<string, unknown>)?.role as string;
+  if (role === "editor") {
+    const institution = (session?.user as Record<string, unknown>)
+      ?.institution as string;
+    redirect(`/admin/page-content?college=${institution || "engineering"}`);
+  }
+
   const { programs, published, recruiters, testimonials, logs } =
     await getStats();
 

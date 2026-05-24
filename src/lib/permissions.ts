@@ -1,40 +1,41 @@
-export type Role = "viewer" | "editor" | "admin" | "super_admin";
+export type Role = "admin" | "editor";
 
 const ROLE_RANK: Record<Role, number> = {
-  viewer: 0,
-  editor: 1,
-  admin: 2,
-  super_admin: 3,
+  editor: 0,
+  admin: 1,
 };
 
 export function hasMinRole(userRole: string, minRole: Role): boolean {
   return (ROLE_RANK[userRole as Role] ?? -1) >= ROLE_RANK[minRole];
 }
 
-export function canEdit(userRole: string): boolean {
-  return hasMinRole(userRole, "editor");
+export function canEdit(_userRole: string): boolean {
+  return true;
 }
 
-export function canPublish(userRole: string): boolean {
-  return hasMinRole(userRole, "admin");
+export function canPublish(_userRole: string): boolean {
+  return true;
 }
 
 export function canManageUsers(userRole: string): boolean {
-  return hasMinRole(userRole, "super_admin");
+  return hasMinRole(userRole, "admin");
+}
+
+export function canAccessInstitution(
+  userRole: string,
+  userInstitution: string,
+  targetInstitution: string,
+): boolean {
+  if (userRole === "admin") return true;
+  return userInstitution === targetInstitution;
 }
 
 export function canAccessProgram(
   userRole: string,
   userInstitution: string,
-  userPrograms: string[],
-  targetProgram: string,
+  _userPrograms: string[],
+  _targetProgram: string,
   targetInstitution: string,
 ): boolean {
-  if (hasMinRole(userRole, "admin")) return true;
-  if (userRole === "editor") {
-    if (userInstitution !== "all" && userInstitution !== targetInstitution)
-      return false;
-    return userPrograms.length === 0 || userPrograms.includes(targetProgram);
-  }
-  return false;
+  return canAccessInstitution(userRole, userInstitution, targetInstitution);
 }

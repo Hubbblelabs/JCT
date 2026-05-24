@@ -6,14 +6,16 @@ import {
   json,
   serverError,
   validateBody,
+  forbidden,
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
-import { SiteConfigPutSchema } from "@/lib/validation";
+import { SiteConfigPutSchema, SITE_CONFIG_KEY_INSTITUTION } from "@/lib/validation";
 import { revalidateForConfigKey } from "@/lib/revalidate";
 import { extractR2Keys, deleteFromR2 } from "@/lib/r2";
+import { hasMinRole } from "@/lib/permissions";
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireRole(req, "viewer");
+  const { error } = await requireRole(req, "editor");
   if (error) return error;
 
   try {
@@ -27,12 +29,22 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const { session, error } = await requireRole(req, "admin");
+  const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
   const parsed = await validateBody(req, SiteConfigPutSchema);
   if (!parsed.ok) return parsed.response;
   const { config_key, value } = parsed.data;
+
+  const userRole = (session!.user as Record<string, unknown>).role as string;
+  if (!hasMinRole(userRole, "admin")) {
+    const userInstitution = (session!.user as Record<string, unknown>)
+      .institution as string;
+    const keyInstitution = SITE_CONFIG_KEY_INSTITUTION[config_key];
+    if (!keyInstitution || keyInstitution !== userInstitution) {
+      return forbidden();
+    }
+  }
 
   try {
     await connectDB();

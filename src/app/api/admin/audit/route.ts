@@ -4,7 +4,7 @@ import { AuditLog } from "@/lib/models";
 import { requireRole, json, serverError } from "@/lib/api-helpers";
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireRole(req, "viewer");
+  const { error } = await requireRole(req, "editor");
   if (error) return error;
 
   try {

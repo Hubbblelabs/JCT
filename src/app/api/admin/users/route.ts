@@ -13,7 +13,7 @@ import { logAudit } from "@/lib/audit";
 import { UserCreateSchema } from "@/lib/validation";
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireRole(req, "super_admin");
+  const { error } = await requireRole(req, "admin");
   if (error) return error;
 
   try {
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const { session, error } = await requireRole(req, "super_admin");
+  const { session, error } = await requireRole(req, "admin");
   if (error) return error;
 
   const parsed = await validateBody(req, UserCreateSchema);
@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       password_hash,
       full_name: body.full_name,
       role: body.role,
-      institution: body.institution,
+      institution: body.role === "admin" ? "all" : body.institution,
       programs: body.programs,
     });
 

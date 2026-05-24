@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { zEmail, zEnum, zPasswordMin8, zClampedString } from "./_primitives";
 
-export const ROLES = ["viewer", "editor", "admin", "super_admin"] as const;
+export const ROLES = ["admin", "editor"] as const;
 export const INSTITUTIONS = [
   "all",
   "engineering",
@@ -25,14 +25,27 @@ const programsArray = z
   )
   .max(LIMITS.programsMax);
 
-export const UserCreateSchema = z.object({
-  email: zEmail,
-  password: zPasswordMin8,
-  full_name: zClampedString(1, LIMITS.fullNameMax, "Full name"),
-  role: zEnum(ROLES).optional().default("editor"),
-  institution: zEnum(INSTITUTIONS).optional().default("all"),
-  programs: programsArray.optional().default([]),
-});
+export const UserCreateSchema = z
+  .object({
+    email: zEmail,
+    password: zPasswordMin8,
+    full_name: zClampedString(1, LIMITS.fullNameMax, "Full name"),
+    role: zEnum(ROLES).optional().default("editor"),
+    institution: zEnum(INSTITUTIONS).optional().default("all"),
+    programs: programsArray.optional().default([]),
+  })
+  .superRefine((data, ctx) => {
+    if (data.role === "editor" && data.institution === "all") {
+      ctx.addIssue({
+        code: "custom",
+        path: ["institution"],
+        message: "Editors must be assigned to a specific college",
+      });
+    }
+    if (data.role === "admin") {
+      // Silently normalise — API will store "all" regardless
+    }
+  });
 
 export const UserUpdateSchema = z
   .object({
@@ -43,7 +56,16 @@ export const UserUpdateSchema = z
     is_active: z.boolean().optional(),
     password: zPasswordMin8.optional(),
   })
-  .strict();
+  .strict()
+  .superRefine((data, ctx) => {
+    if (data.role === "editor" && data.institution === "all") {
+      ctx.addIssue({
+        code: "custom",
+        path: ["institution"],
+        message: "Editors must be assigned to a specific college",
+      });
+    }
+  });
 
 export type UserCreateValue = z.infer<typeof UserCreateSchema>;
 export type UserUpdateValue = z.infer<typeof UserUpdateSchema>;
