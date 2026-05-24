@@ -314,7 +314,11 @@ export function ImageUploadInput({
               value={isPending ? "" : value}
               readOnly={!!isPending}
               onChange={(e) => onChange(e.target.value)}
-              placeholder={isPending ? "Pending upload — save to confirm" : "Paste URL or upload a file"}
+              placeholder={
+                isPending
+                  ? "Pending upload — save to confirm"
+                  : "Paste URL or upload a file"
+              }
             />
             <button
               type="button"
@@ -464,12 +468,11 @@ export function DocumentUploadInput({
   };
 
   const isPending = deferred && value.startsWith("pending:");
-  const displayName =
-    isPending
-      ? pendingFilename
-      : value
-        ? value.split("/").pop() ?? value
-        : "";
+  const displayName = isPending
+    ? pendingFilename
+    : value
+      ? (value.split("/").pop() ?? value)
+      : "";
 
   return (
     <Field label={label} hint={hint}>

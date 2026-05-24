@@ -60,7 +60,8 @@ export async function PATCH(
 
     const oldAvatar =
       body.avatar !== undefined
-        ? (await Testimonial.findById(id).select("avatar").lean())?.avatar ?? ""
+        ? ((await Testimonial.findById(id).select("avatar").lean())?.avatar ??
+          "")
         : "";
 
     const doc = await Testimonial.findByIdAndUpdate(
@@ -70,9 +71,16 @@ export async function PATCH(
     );
     if (!doc) return notFound();
 
-    if (oldAvatar && oldAvatar !== body.avatar && oldAvatar.startsWith("images/")) {
+    if (
+      oldAvatar &&
+      oldAvatar !== body.avatar &&
+      oldAvatar.startsWith("images/")
+    ) {
       deleteFromR2(oldAvatar).catch((err) =>
-        console.warn(`[testimonials/patch] R2 cleanup failed for "${oldAvatar}":`, err),
+        console.warn(
+          `[testimonials/patch] R2 cleanup failed for "${oldAvatar}":`,
+          err,
+        ),
       );
     }
 
@@ -105,7 +113,10 @@ export async function DELETE(
 
     if (doc.avatar?.startsWith("images/")) {
       deleteFromR2(doc.avatar).catch((err) =>
-        console.warn(`[testimonials/delete] R2 cleanup failed for "${doc.avatar}":`, err),
+        console.warn(
+          `[testimonials/delete] R2 cleanup failed for "${doc.avatar}":`,
+          err,
+        ),
       );
     }
 

@@ -95,9 +95,7 @@ export function CampusLifeSectionInspector({
           <ImageUploadInput
             label="Section Image"
             value={exp.image}
-            onChange={(image) =>
-              patch({ experience: { ...exp, image } })
-            }
+            onChange={(image) => patch({ experience: { ...exp, image } })}
           />
 
           <div className="admin-label mt-5 mb-2 border-t border-gray-100 pt-4">
@@ -106,9 +104,7 @@ export function CampusLifeSectionInspector({
           <Repeater<Feature>
             label="Features"
             items={exp.features}
-            onChange={(features) =>
-              patch({ experience: { ...exp, features } })
-            }
+            onChange={(features) => patch({ experience: { ...exp, features } })}
             newItem={() => ({ icon: "", title: "", desc: "" })}
             renderItem={(feat, _i, update) => (
               <div className="space-y-2 pr-8">
@@ -211,17 +207,13 @@ export function CampusLifeSectionInspector({
                 <TextInput
                   label="Title"
                   value={item.title}
-                  onChange={(e) =>
-                    update({ ...item, title: e.target.value })
-                  }
+                  onChange={(e) => update({ ...item, title: e.target.value })}
                 />
                 <TextArea
                   label="Description"
                   rows={3}
                   value={item.desc}
-                  onChange={(e) =>
-                    update({ ...item, desc: e.target.value })
-                  }
+                  onChange={(e) => update({ ...item, desc: e.target.value })}
                 />
                 <ImageUploadInput
                   label="Image"
@@ -232,9 +224,7 @@ export function CampusLifeSectionInspector({
                 <TextInput
                   label="Icon name (e.g. Home, Bus, Microscope)"
                   value={item.icon}
-                  onChange={(e) =>
-                    update({ ...item, icon: e.target.value })
-                  }
+                  onChange={(e) => update({ ...item, icon: e.target.value })}
                 />
                 <StringList
                   label="Bullet Points (max 5)"
@@ -279,9 +269,7 @@ export function CampusLifeSectionInspector({
             label="Body Text"
             rows={4}
             value={sp.body}
-            onChange={(e) =>
-              patch({ sports: { ...sp, body: e.target.value } })
-            }
+            onChange={(e) => patch({ sports: { ...sp, body: e.target.value } })}
           />
 
           <div className="admin-label mt-5 mb-2 border-t border-gray-100 pt-4">
@@ -302,9 +290,7 @@ export function CampusLifeSectionInspector({
                 <TextInput
                   label="Label"
                   value={stat.label}
-                  onChange={(e) =>
-                    update({ ...stat, label: e.target.value })
-                  }
+                  onChange={(e) => update({ ...stat, label: e.target.value })}
                 />
               </div>
             )}
@@ -364,9 +350,7 @@ export function CampusLifeSectionInspector({
           <TextInput
             label="Section Title"
             value={cl.title}
-            onChange={(e) =>
-              patch({ clubs: { ...cl, title: e.target.value } })
-            }
+            onChange={(e) => patch({ clubs: { ...cl, title: e.target.value } })}
           />
 
           <div className="admin-label mt-5 mb-2 border-t border-gray-100 pt-4">
@@ -415,16 +399,12 @@ export function CampusLifeSectionInspector({
                 <TextInput
                   label="Icon name (e.g. Zap, Music, Trophy)"
                   value={event.icon}
-                  onChange={(e) =>
-                    update({ ...event, icon: e.target.value })
-                  }
+                  onChange={(e) => update({ ...event, icon: e.target.value })}
                 />
                 <TextInput
                   label="Title"
                   value={event.title}
-                  onChange={(e) =>
-                    update({ ...event, title: e.target.value })
-                  }
+                  onChange={(e) => update({ ...event, title: e.target.value })}
                 />
                 <TextArea
                   label="Description"

@@ -8,7 +8,7 @@ export type RevalidateTarget =
   | "all-institutions";
 
 const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
-  home: ["/"],
+  home: ["/", "/campus-life"],
   engineering: [
     "/institutions/engineering",
     "/institutions/engineering/programs",
@@ -74,6 +74,7 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   artsScienceAbout: ["arts-science"],
   polytechnicAbout: ["polytechnic"],
   engineeringCoe: ["engineering"],
+  campusLifePage: ["home"],
 };
 
 export function revalidateTargets(...targets: RevalidateTarget[]): void {

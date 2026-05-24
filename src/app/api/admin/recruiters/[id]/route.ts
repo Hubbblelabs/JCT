@@ -49,7 +49,7 @@ export async function PATCH(
 
     const oldLogo =
       body.logo !== undefined
-        ? (await Recruiter.findById(id).select("logo").lean())?.logo ?? ""
+        ? ((await Recruiter.findById(id).select("logo").lean())?.logo ?? "")
         : "";
 
     const doc = await Recruiter.findByIdAndUpdate(
@@ -61,7 +61,10 @@ export async function PATCH(
 
     if (oldLogo && oldLogo !== body.logo && oldLogo.startsWith("images/")) {
       deleteFromR2(oldLogo).catch((err) =>
-        console.warn(`[recruiters/patch] R2 cleanup failed for "${oldLogo}":`, err),
+        console.warn(
+          `[recruiters/patch] R2 cleanup failed for "${oldLogo}":`,
+          err,
+        ),
       );
     }
 
@@ -94,7 +97,10 @@ export async function DELETE(
 
     if (doc.logo?.startsWith("images/")) {
       deleteFromR2(doc.logo).catch((err) =>
-        console.warn(`[recruiters/delete] R2 cleanup failed for "${doc.logo}":`, err),
+        console.warn(
+          `[recruiters/delete] R2 cleanup failed for "${doc.logo}":`,
+          err,
+        ),
       );
     }
 

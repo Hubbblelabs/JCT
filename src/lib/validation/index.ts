@@ -183,3 +183,6 @@ export type {
   CoePageValue,
   AboutPageValue,
 } from "./aboutPage";
+
+export { CampusLifePageSchema, CAMPUS_LIFE_LIMITS } from "./campusLifePage";
+export type { CampusLifePageValue } from "./campusLifePage";

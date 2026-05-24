@@ -180,3 +180,44 @@ revalidateForConfigKey("engineeringHero"); // a changed site-config key
 - **Build**: `output: "standalone"` for Docker/Node deployment.
 
 The codebase is indexed using ccc. Use ccc for codebase knowledge.
+
+## Build Rules
+
+- Always run:
+  pnpm run build
+  pnpm run typecheck
+
+## Next.js 16
+
+- Use proxy.ts instead of middleware.ts
+- useSearchParams requires Suspense boundary
+
+## Zod 4
+
+- Avoid .default({})
+- Use explicit schema shape or function defaults
+
+## CMS Conventions
+
+- Use Programs-style inspector editors
+- Never use tab-based admin editors
+
+## Storage Cleanup
+
+- Audit ALL delete paths:
+  - Trash buttons
+  - Replace flows
+  - PhotoList
+  - nested delete actions
+
+## Git
+
+- Never end session without:
+  git push
+
+  Before editing:
+
+1. Identify the actual root cause.
+2. Grep all affected code paths
+3. Analyse every component/API/hook touching this feature
+4. Then implement

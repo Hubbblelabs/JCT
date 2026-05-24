@@ -198,9 +198,7 @@ function TestimonialFormInner({
         />
         Active (visible on site)
       </label>
-      {flushError && (
-        <p className="text-xs text-red-600">{flushError}</p>
-      )}
+      {flushError && <p className="text-xs text-red-600">{flushError}</p>}
       <div className="flex gap-2">
         <button
           type="button"
@@ -340,7 +338,6 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
           }}
           saving={saving}
         />
-
       ) : (
         <button
           type="button"

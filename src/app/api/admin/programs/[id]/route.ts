@@ -63,7 +63,7 @@ export async function PATCH(
 
     const oldImageKey =
       body.image !== undefined
-        ? (await Program.findById(id).select("image").lean())?.image ?? ""
+        ? ((await Program.findById(id).select("image").lean())?.image ?? "")
         : "";
 
     const doc = await Program.findByIdAndUpdate(
@@ -73,9 +73,16 @@ export async function PATCH(
     );
     if (!doc) return notFound();
 
-    if (oldImageKey && oldImageKey !== body.image && oldImageKey.startsWith("images/")) {
+    if (
+      oldImageKey &&
+      oldImageKey !== body.image &&
+      oldImageKey.startsWith("images/")
+    ) {
       deleteFromR2(oldImageKey).catch((err) =>
-        console.warn(`[programs/patch] R2 cleanup failed for "${oldImageKey}":`, err),
+        console.warn(
+          `[programs/patch] R2 cleanup failed for "${oldImageKey}":`,
+          err,
+        ),
       );
     }
 

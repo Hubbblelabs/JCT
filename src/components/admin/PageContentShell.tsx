@@ -133,8 +133,7 @@ function PageContentShellInner({ pageTitle, pageSubtitle, sections }: Props) {
         });
       }
     } catch (err) {
-      const msg =
-        err instanceof Error ? err.message : "Save failed.";
+      const msg = err instanceof Error ? err.message : "Save failed.";
       setMsg({ kind: "err", text: msg });
     } finally {
       setSaving(false);

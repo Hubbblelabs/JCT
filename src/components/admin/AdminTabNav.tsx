@@ -31,6 +31,7 @@ import {
   Settings,
   Info,
   ScrollText,
+  TreePalm,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Suspense } from "react";
@@ -204,6 +205,11 @@ const MAIN_ITEMS: NavItem[] = [
     href: "/admin/main/page-content?section=homeAdmissions",
     icon: ClipboardList,
   },
+  {
+    label: "Campus Life",
+    href: "/admin/campus-life",
+    icon: TreePalm,
+  },
 ];
 
 const GLOBAL_CMS_ITEMS: NavItem[] = [
@@ -310,7 +316,11 @@ function TabNavInner() {
 
   // Full-screen live CMS editors hide the admin nav (same as the program
   // builder) — they provide their own back button.
-  if (pathname === "/admin/about" || pathname === "/admin/coe") {
+  if (
+    pathname === "/admin/about" ||
+    pathname === "/admin/coe" ||
+    pathname === "/admin/campus-life"
+  ) {
     return null;
   }
 
