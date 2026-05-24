@@ -220,9 +220,20 @@ export default function SettingsPage() {
         });
         return;
       }
+      const parts: string[] = [
+        `${data.deleted as number} config entries`,
+      ];
+      if ((data.images_deleted as number) > 0)
+        parts.push(`${data.images_deleted as number} images`);
+      if ((data.documents_deleted as number) > 0)
+        parts.push(`${data.documents_deleted as number} documents`);
+      const r2Warn =
+        (data.r2_failures as number) > 0
+          ? ` ${data.r2_failures as number} R2 file(s) could not be deleted — remove them manually.`
+          : "";
       setResetStatus({
-        type: "success",
-        message: `All site configs cleared (${data.deleted as number} entries deleted). Pages will serve defaults until reconfigured.`,
+        type: (data.r2_failures as number) > 0 ? "warning" : "success",
+        message: `Deleted: ${parts.join(", ")}.${r2Warn} Pages will serve defaults until reconfigured.`,
       });
       setResetConfirm("");
     } catch {
@@ -398,11 +409,12 @@ export default function SettingsPage() {
               <ShieldAlert size={18} className="text-red-600" />
             </div>
             <div>
-              <h2 className="font-semibold text-red-800">Reset All Configs</h2>
+              <h2 className="font-semibold text-red-800">Reset All Data</h2>
               <p className="mt-0.5 text-sm text-red-700/80">
-                Permanently deletes every site config entry from the database.
-                Public pages will revert to hard-coded defaults until
-                reconfigured. This cannot be undone — export a backup first.
+                Permanently deletes all site config entries, uploaded images,
+                and uploaded documents — from both the database and R2 storage.
+                Public pages revert to hard-coded defaults. This cannot be
+                undone — export a backup first.
               </p>
             </div>
           </div>
@@ -432,7 +444,7 @@ export default function SettingsPage() {
               ) : (
                 <Trash2 size={15} />
               )}
-              {resetting ? "Resetting…" : "Reset All Site Configs"}
+              {resetting ? "Resetting…" : "Reset All Data"}
             </button>
           </div>
         </div>
