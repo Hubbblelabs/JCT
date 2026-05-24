@@ -14,6 +14,11 @@ const r2Host = r2Hostname();
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "25mb",
+    },
+  },
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "companieslogo.com" },

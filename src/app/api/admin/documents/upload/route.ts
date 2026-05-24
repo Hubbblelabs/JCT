@@ -6,7 +6,9 @@ import { requireRole, json, badRequest, serverError } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 
 const ALLOWED_MIME = ["application/pdf"] as const;
-const MAX_SIZE = 20 * 1024 * 1024; // 20 MB
+const MAX_SIZE = 25 * 1024 * 1024; // 25 MB
+
+export const maxDuration = 60;
 
 export async function POST(req: NextRequest) {
   const { session, error } = await requireRole(req, "editor");
@@ -23,7 +25,7 @@ export async function POST(req: NextRequest) {
     }
     if (file.size > MAX_SIZE) {
       return badRequest(
-        `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max is 20 MB.`,
+        `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max is 25 MB.`,
       );
     }
 

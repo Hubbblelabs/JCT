@@ -786,6 +786,14 @@ export function PamphletForm({
   value: PamphletVal;
   onChange: (v: PamphletVal) => void;
 }) {
+  const [rawDelay, setRawDelay] = useState<string>(
+    String(value.delayMs ?? 2000),
+  );
+
+  useEffect(() => {
+    setRawDelay(String(value.delayMs ?? 2000));
+  }, [value.delayMs]);
+
   return (
     <div className="space-y-4">
       <label className="flex items-center gap-2 text-sm">
@@ -801,10 +809,18 @@ export function PamphletForm({
         type="number"
         min={LIMITS_pamphlet.minDelayMs}
         max={LIMITS_pamphlet.maxDelayMs}
-        value={value.delayMs ?? 2000}
-        onChange={(e) =>
-          onChange({ ...value, delayMs: Number(e.target.value) || 2000 })
-        }
+        value={rawDelay}
+        onChange={(e) => setRawDelay(e.target.value)}
+        onBlur={() => {
+          const parsed = parseInt(rawDelay, 10);
+          const valid =
+            Number.isFinite(parsed) &&
+            parsed >= LIMITS_pamphlet.minDelayMs &&
+            parsed <= LIMITS_pamphlet.maxDelayMs;
+          const final = valid ? parsed : (value.delayMs ?? 2000);
+          setRawDelay(String(final));
+          onChange({ ...value, delayMs: final });
+        }}
         hint={`Delay in milliseconds before the popup appears (max ${LIMITS_pamphlet.maxDelayMs})`}
       />
       <ImageList
