@@ -1,33 +1,41 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Check, Loader2, X, ExternalLink } from "lucide-react";
 import {
-  AboutPageLayout,
-  ABOUT_SECTION_LABELS,
-  type AboutEditableSection,
-} from "@/components/layout/AboutPageLayout";
-import { AboutSectionInspector } from "@/components/admin/AboutSectionInspector";
-import { EngineeringAboutSchema } from "@/lib/validation";
-import type { AboutPageValue } from "@/lib/validation";
+  CampusLifePageLayout,
+  CAMPUS_LIFE_SECTION_LABELS,
+  type CampusLifeEditableSection,
+} from "@/components/layout/CampusLifePageLayout";
+import { CampusLifeSectionInspector } from "@/components/admin/CampusLifeSectionInspector";
+import type { CampusLifePageValue } from "@/lib/validation";
+import { CampusLifePageSchema } from "@/lib/validation/campusLifePage";
 import {
   DeferredUploadsProvider,
   useDeferredUploads,
 } from "@/lib/deferred-uploads";
 
-const INSTITUTION = "engineering" as const;
-const CONFIG_KEY = "engineeringAbout";
+const CONFIG_KEY = "campusLifePage";
+const PREVIEW_URL = "/campus-life";
 
-function AboutEditorInner() {
+export default function CampusLifeEditorPage() {
+  return (
+    <DeferredUploadsProvider>
+      <CampusLifeEditorInner />
+    </DeferredUploadsProvider>
+  );
+}
+
+function CampusLifeEditorInner() {
   const router = useRouter();
   const { flush } = useDeferredUploads();
 
-  const [draft, setDraft] = useState<AboutPageValue | null>(null);
+  const [draft, setDraft] = useState<CampusLifePageValue | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
-  const [selected, setSelected] = useState<AboutEditableSection>("hero");
+  const [selected, setSelected] = useState<CampusLifeEditableSection>("hero");
   const [inspectorOpen, setInspectorOpen] = useState(false);
 
   useEffect(() => {
@@ -39,15 +47,15 @@ function AboutEditorInner() {
       .then((res) => {
         if (cancelled) return;
         if (res?.data && typeof res.data === "object") {
-          setDraft(res.data as AboutPageValue);
+          setDraft(res.data as CampusLifePageValue);
         } else {
-          // Key not yet seeded — open editor with schema defaults
-          setDraft(EngineeringAboutSchema.parse({}) as AboutPageValue);
+          // No doc in DB yet — initialize with schema defaults so the editor works
+          setDraft(CampusLifePageSchema.parse({}));
         }
       })
       .catch((err) => {
         if (!cancelled) {
-          console.error("[AboutEditor]", err);
+          console.error("[CampusLifeEditor]", err);
           setMsg({ text: "Failed to load content", ok: false });
         }
       })
@@ -59,7 +67,7 @@ function AboutEditorInner() {
     };
   }, []);
 
-  const selectSection = (s: AboutEditableSection) => {
+  const selectSection = (s: CampusLifeEditableSection) => {
     setSelected(s);
     setInspectorOpen(true);
   };
@@ -69,14 +77,11 @@ function AboutEditorInner() {
     setMsg(null);
     try {
       const flushedDraft = await flush(draft);
-      setDraft(flushedDraft as AboutPageValue);
+      setDraft(flushedDraft as CampusLifePageValue);
       const r = await fetch("/api/admin/site-config", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          config_key: CONFIG_KEY,
-          value: flushedDraft,
-        }),
+        body: JSON.stringify({ config_key: CONFIG_KEY, value: flushedDraft }),
       });
       if (r.ok) {
         setMsg({ text: "Saved & published", ok: true });
@@ -108,16 +113,16 @@ function AboutEditorInner() {
             <ArrowLeft size={14} />
           </button>
           <div>
-            <h1 className="admin-page-title">About Page Editor</h1>
+            <h1 className="admin-page-title">Campus Life Page Editor</h1>
             <p className="admin-page-subtitle">
-              Live CMS editor — click any section to edit
+              Click any section to edit its content
             </p>
           </div>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
           <a
-            href="/institutions/engineering/about"
+            href={PREVIEW_URL}
             target="_blank"
             rel="noopener noreferrer"
             className="admin-btn admin-btn-outline admin-btn-sm"
@@ -154,9 +159,8 @@ function AboutEditorInner() {
         </div>
       ) : (
         <div className="-mx-6 -mb-6 overflow-hidden border-t border-gray-200 bg-white xl:mx-0 xl:rounded-xl xl:border">
-          <AboutPageLayout
-            data={draft}
-            institution={INSTITUTION}
+          <CampusLifePageLayout
+            data={draft!}
             editable
             onEditSection={selectSection}
           />
@@ -172,7 +176,7 @@ function AboutEditorInner() {
                   Inspector
                 </p>
                 <h2 className="mt-0.5 font-semibold text-gray-900">
-                  {ABOUT_SECTION_LABELS[selected]}
+                  {CAMPUS_LIFE_SECTION_LABELS[selected]}
                 </h2>
               </div>
               <button
@@ -184,7 +188,7 @@ function AboutEditorInner() {
               </button>
             </div>
             <div className="p-6">
-              <AboutSectionInspector
+              <CampusLifeSectionInspector
                 section={selected}
                 data={draft!}
                 onChange={setDraft}
@@ -208,15 +212,5 @@ function AboutEditorInner() {
         </div>
       )}
     </div>
-  );
-}
-
-export default function AboutEditorPage() {
-  return (
-    <DeferredUploadsProvider>
-      <Suspense fallback={null}>
-        <AboutEditorInner />
-      </Suspense>
-    </DeferredUploadsProvider>
   );
 }

@@ -7,6 +7,10 @@ import { getImageUrl } from "@/lib/utils";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 import {
+  DeferredUploadsProvider,
+  useDeferredUploads,
+} from "@/lib/deferred-uploads";
+import {
   RecruitersSectionForm,
   type RecruitersSectionVal,
 } from "@/components/admin/PageContentForms";
@@ -137,6 +141,15 @@ function RecruitersSectionPanel() {
 }
 
 export default function RecruitersPage() {
+  return (
+    <DeferredUploadsProvider>
+      <RecruitersPageInner />
+    </DeferredUploadsProvider>
+  );
+}
+
+function RecruitersPageInner() {
+  const { flush, discardAll } = useDeferredUploads();
   const [recruiters, setRecruiters] = useState<Recruiter[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Recruiter | null>(null);
@@ -166,6 +179,7 @@ export default function RecruitersPage() {
     setApiError(null);
   };
   const close = () => {
+    discardAll();
     setEditing(null);
     setForm(EMPTY);
     setApiError(null);
@@ -176,20 +190,28 @@ export default function RecruitersPage() {
   const save = async () => {
     setSaving(true);
     setApiError(null);
-    const isNew = !editing?._id;
-    const url = isNew
-      ? "/api/admin/recruiters"
-      : `/api/admin/recruiters/${editing!._id}`;
-    const r = await fetch(url, {
-      method: isNew ? "POST" : "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    if (r.ok) {
-      await load();
-      close();
-    } else {
-      setApiError(await parseApiError(r));
+    try {
+      const flushedForm = await flush(form);
+      setForm(flushedForm as Omit<Recruiter, "_id">);
+      const isNew = !editing?._id;
+      const url = isNew
+        ? "/api/admin/recruiters"
+        : `/api/admin/recruiters/${editing!._id}`;
+      const r = await fetch(url, {
+        method: isNew ? "POST" : "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(flushedForm),
+      });
+      if (r.ok) {
+        await load();
+        close();
+      } else {
+        setApiError(await parseApiError(r));
+      }
+    } catch (err) {
+      setApiError({
+        error: err instanceof Error ? err.message : "Upload failed",
+      } as ApiErrorPayload);
     }
     setSaving(false);
   };

@@ -22,6 +22,10 @@ import {
 } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
+import {
+  DeferredUploadsProvider,
+  useDeferredUploads,
+} from "@/lib/deferred-uploads";
 
 interface ProgramFields {
   name: string;
@@ -46,6 +50,7 @@ const EMPTY_PROG: ProgramFields = {
 };
 
 function ProgramDetailInner() {
+  const { flush } = useDeferredUploads();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -121,11 +126,17 @@ function ProgramDetailInner() {
     setApiError(null);
 
     try {
+      const flushedPayload = await flush({ ...prog, content });
+      const { content: flushedContent, ...flushedProg } = flushedPayload as {
+        content: unknown;
+        [k: string]: unknown;
+      };
+
       if (isNew) {
         const r = await fetch("/api/admin/programs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...prog, content }),
+          body: JSON.stringify({ ...flushedProg, content: flushedContent }),
         });
         if (!r.ok) {
           const err = await parseApiError(r);
@@ -146,7 +157,11 @@ function ProgramDetailInner() {
       const pRes = await fetch(`/api/admin/programs/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...prog, content, status: "draft" }),
+        body: JSON.stringify({
+          ...flushedProg,
+          content: flushedContent,
+          status: "draft",
+        }),
       });
       if (!pRes.ok) {
         const err = await parseApiError(pRes);
@@ -160,6 +175,11 @@ function ProgramDetailInner() {
 
       setStatus("draft");
       setMsg({ text: "Draft saved successfully", ok: true });
+    } catch (err) {
+      setMsg({
+        text: err instanceof Error ? err.message : "Save failed",
+        ok: false,
+      });
     } finally {
       setSaving(false);
     }
@@ -487,8 +507,10 @@ function ProgramDetailInner() {
 
 export default function ProgramDetailPage() {
   return (
-    <Suspense fallback={null}>
-      <ProgramDetailInner />
-    </Suspense>
+    <DeferredUploadsProvider>
+      <Suspense fallback={null}>
+        <ProgramDetailInner />
+      </Suspense>
+    </DeferredUploadsProvider>
   );
 }

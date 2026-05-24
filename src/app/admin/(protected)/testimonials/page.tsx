@@ -11,6 +11,10 @@ import {
 import { Plus, Pencil, Trash2, X, Loader2, Check } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
+import {
+  DeferredUploadsProvider,
+  useDeferredUploads,
+} from "@/lib/deferred-uploads";
 
 interface Testimonial {
   _id: string;
@@ -53,6 +57,7 @@ const _INSTITUTIONS = [
 ];
 
 function TestimonialsPageInner() {
+  const { flush, discardAll } = useDeferredUploads();
   const searchParams = useSearchParams();
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
@@ -89,6 +94,7 @@ function TestimonialsPageInner() {
     setApiError(null);
   };
   const close = () => {
+    discardAll();
     setEditing(null);
     setForm(EMPTY);
     setApiError(null);
@@ -99,20 +105,28 @@ function TestimonialsPageInner() {
   const save = async () => {
     setSaving(true);
     setApiError(null);
-    const isNew = !editing?._id;
-    const url = isNew
-      ? "/api/admin/testimonials"
-      : `/api/admin/testimonials/${editing!._id}`;
-    const r = await fetch(url, {
-      method: isNew ? "POST" : "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-    if (r.ok) {
-      await load();
-      close();
-    } else {
-      setApiError(await parseApiError(r));
+    try {
+      const flushedForm = await flush(form);
+      setForm(flushedForm as Omit<Testimonial, "_id">);
+      const isNew = !editing?._id;
+      const url = isNew
+        ? "/api/admin/testimonials"
+        : `/api/admin/testimonials/${editing!._id}`;
+      const r = await fetch(url, {
+        method: isNew ? "POST" : "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(flushedForm),
+      });
+      if (r.ok) {
+        await load();
+        close();
+      } else {
+        setApiError(await parseApiError(r));
+      }
+    } catch (err) {
+      setApiError({
+        error: err instanceof Error ? err.message : "Upload failed",
+      } as ApiErrorPayload);
     }
     setSaving(false);
   };
@@ -319,8 +333,10 @@ function TestimonialsPageInner() {
 
 export default function TestimonialsPage() {
   return (
-    <Suspense fallback={null}>
-      <TestimonialsPageInner />
-    </Suspense>
+    <DeferredUploadsProvider>
+      <Suspense fallback={null}>
+        <TestimonialsPageInner />
+      </Suspense>
+    </DeferredUploadsProvider>
   );
 }

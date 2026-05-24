@@ -11,12 +11,25 @@ import {
 import { CoeSectionInspector } from "@/components/admin/CoeSectionInspector";
 import { CoePageSchema } from "@/lib/validation";
 import type { CoePageValue } from "@/lib/validation";
+import {
+  DeferredUploadsProvider,
+  useDeferredUploads,
+} from "@/lib/deferred-uploads";
 
 const CONFIG_KEY = "engineeringCoe";
 const PREVIEW_URL = "/institutions/engineering/coe";
 
 export default function CoeEditorPage() {
+  return (
+    <DeferredUploadsProvider>
+      <CoeEditorInner />
+    </DeferredUploadsProvider>
+  );
+}
+
+function CoeEditorInner() {
   const router = useRouter();
+  const { flush } = useDeferredUploads();
 
   const [draft, setDraft] = useState<CoePageValue | null>(null);
   const [loading, setLoading] = useState(true);
@@ -63,10 +76,12 @@ export default function CoeEditorPage() {
     setSaving(true);
     setMsg(null);
     try {
+      const flushedDraft = await flush(draft);
+      setDraft(flushedDraft as CoePageValue);
       const r = await fetch("/api/admin/site-config", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ config_key: CONFIG_KEY, value: draft }),
+        body: JSON.stringify({ config_key: CONFIG_KEY, value: flushedDraft }),
       });
       if (r.ok) {
         setMsg({ text: "Saved & published", ok: true });
@@ -77,8 +92,11 @@ export default function CoeEditorPage() {
           ok: false,
         });
       }
-    } catch {
-      setMsg({ text: "Save failed", ok: false });
+    } catch (err) {
+      setMsg({
+        text: err instanceof Error ? err.message : "Save failed",
+        ok: false,
+      });
     } finally {
       setSaving(false);
     }

@@ -6,6 +6,10 @@ import { Save, Loader2, ExternalLink } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 import { useSearchParams } from "next/navigation";
+import {
+  DeferredUploadsProvider,
+  useDeferredUploads,
+} from "@/lib/deferred-uploads";
 
 export type SectionDef = {
   /** Unique id for sidebar nav */
@@ -33,6 +37,18 @@ type Props = {
 };
 
 export function PageContentShell({ pageTitle, pageSubtitle, sections }: Props) {
+  return (
+    <DeferredUploadsProvider>
+      <PageContentShellInner
+        pageTitle={pageTitle}
+        pageSubtitle={pageSubtitle}
+        sections={sections}
+      />
+    </DeferredUploadsProvider>
+  );
+}
+
+function PageContentShellInner({ pageTitle, pageSubtitle, sections }: Props) {
   const searchParams = useSearchParams();
   const sectionParam = searchParams.get("section");
   const resolveInitial = () => {
@@ -86,6 +102,7 @@ export function PageContentShell({ pageTitle, pageSubtitle, sections }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const { flush } = useDeferredUploads();
   const section = sections.find((s) => s.id === selected);
 
   const save = async () => {
@@ -94,12 +111,14 @@ export function PageContentShell({ pageTitle, pageSubtitle, sections }: Props) {
     setMsg(null);
     setApiError(null);
     try {
+      const flushedValue = await flush(values[section.configKey] ?? null);
+      setValues((prev) => ({ ...prev, [section.configKey!]: flushedValue }));
       const r = await fetch("/api/admin/site-config", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           config_key: section.configKey,
-          value: values[section.configKey] ?? null,
+          value: flushedValue,
         }),
       });
       if (r.ok) {
@@ -113,8 +132,10 @@ export function PageContentShell({ pageTitle, pageSubtitle, sections }: Props) {
           text: parsed?.message ?? parsed?.error ?? "Save failed.",
         });
       }
-    } catch {
-      setMsg({ kind: "err", text: "Save failed." });
+    } catch (err) {
+      const msg =
+        err instanceof Error ? err.message : "Save failed.";
+      setMsg({ kind: "err", text: msg });
     } finally {
       setSaving(false);
     }

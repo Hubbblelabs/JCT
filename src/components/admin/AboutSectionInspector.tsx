@@ -9,7 +9,6 @@ import {
   ItemsEditor,
   Repeater,
 } from "@/components/admin/inputs";
-import { deleteUploadedAsset } from "@/lib/storage-cleanup";
 import type { AboutEditableSection } from "@/components/layout/AboutPageLayout";
 import type { AboutPageValue } from "@/lib/validation";
 
@@ -207,10 +206,7 @@ export function AboutSectionInspector({
             onChange={(members) =>
               patch({ management: { ...data.management, members } })
             }
-            onItemRemove={(item) => {
-              // Clean up image from R2 when item is removed
-              if (item.image) deleteUploadedAsset(item.image);
-            }}
+            onItemRemove={undefined}
             newItem={() => ({ name: "", role: "", image: "", bio: "" })}
             renderItem={(item, _i, oc) => (
               <div className="space-y-1">
@@ -257,10 +253,7 @@ export function AboutSectionInspector({
             label="Heads of Department"
             items={data.hod.members}
             onChange={(members) => patch({ hod: { ...data.hod, members } })}
-            onItemRemove={(item) => {
-              // Clean up image from R2 when item is removed
-              if (item.avatar) deleteUploadedAsset(item.avatar);
-            }}
+            onItemRemove={undefined}
             newItem={() => ({
               name: "",
               designation: "",
@@ -375,10 +368,7 @@ export function AboutSectionInspector({
           label="Accreditations"
           items={data.accreditations}
           onChange={(accreditations) => patch({ accreditations })}
-          onItemRemove={(item) => {
-            // Clean up image from R2 when item is removed
-            if (item.logo) deleteUploadedAsset(item.logo);
-          }}
+          onItemRemove={undefined}
           newItem={() => ({ name: "", desc: "", logo: "" })}
           renderItem={(item, _i, oc) => (
             <div className="space-y-1">

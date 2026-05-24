@@ -1,12 +1,16 @@
 "use client";
 
-import { Suspense, useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { Check, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 import {
   PageContentShell,
   type SectionDef,
 } from "@/components/admin/PageContentShell";
+import {
+  DeferredUploadsProvider,
+  useDeferredUploads,
+} from "@/lib/deferred-uploads";
 import {
   EngineeringHeroForm,
   ArtsScienceHeroForm,
@@ -78,10 +82,62 @@ function TestimonialForm({
 }: {
   draft: TestimonialDraft;
   onChange: (d: TestimonialDraft) => void;
-  onSave: () => void;
+  onSave: (flushed: TestimonialDraft) => void;
   onCancel: () => void;
   saving: boolean;
 }) {
+  return (
+    <DeferredUploadsProvider>
+      <TestimonialFormInner
+        draft={draft}
+        onChange={onChange}
+        onSave={onSave}
+        onCancel={onCancel}
+        saving={saving}
+      />
+    </DeferredUploadsProvider>
+  );
+}
+
+function TestimonialFormInner({
+  draft,
+  onChange,
+  onSave,
+  onCancel,
+  saving,
+}: {
+  draft: TestimonialDraft;
+  onChange: (d: TestimonialDraft) => void;
+  onSave: (flushed: TestimonialDraft) => void;
+  onCancel: () => void;
+  saving: boolean;
+}) {
+  const { flush, discardAll } = useDeferredUploads();
+  const [flushing, setFlushing] = useState(false);
+  const [flushError, setFlushError] = useState<string | null>(null);
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
+
+  const handleSave = async () => {
+    setFlushing(true);
+    setFlushError(null);
+    try {
+      const flushed = await flush(draftRef.current);
+      onSave(flushed as TestimonialDraft);
+    } catch (err) {
+      setFlushError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setFlushing(false);
+    }
+  };
+
+  const handleCancel = () => {
+    discardAll();
+    onCancel();
+  };
+
+  const busy = saving || flushing;
+
   return (
     <div className="space-y-3 rounded-lg border border-blue-100 bg-blue-50/40 p-4">
       <div className="grid grid-cols-2 gap-3">
@@ -142,23 +198,26 @@ function TestimonialForm({
         />
         Active (visible on site)
       </label>
+      {flushError && (
+        <p className="text-xs text-red-600">{flushError}</p>
+      )}
       <div className="flex gap-2">
         <button
           type="button"
-          onClick={onSave}
-          disabled={saving}
+          onClick={handleSave}
+          disabled={busy}
           className="admin-btn admin-btn-gold admin-btn-sm"
         >
-          {saving ? (
+          {busy ? (
             <Loader2 size={13} className="animate-spin" />
           ) : (
             <Check size={13} />
           )}
-          {saving ? "Saving…" : "Save"}
+          {busy ? "Saving…" : "Save"}
         </button>
         <button
           type="button"
-          onClick={onCancel}
+          onClick={handleCancel}
           className="admin-btn admin-btn-outline admin-btn-sm"
         >
           <X size={13} /> Cancel
@@ -199,14 +258,14 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
     load();
   }, [load]);
 
-  const handleAdd = async () => {
-    if (!draft.name.trim() || !draft.quote.trim()) return;
+  const handleAdd = async (flushed: TestimonialDraft) => {
+    if (!flushed.name.trim() || !flushed.quote.trim()) return;
     setSaving(true);
     try {
       const r = await fetch("/api/admin/testimonials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...draft, institution }),
+        body: JSON.stringify({ ...flushed, institution }),
       });
       if (!r.ok) throw new Error();
       setAddingNew(false);
@@ -219,14 +278,14 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
     }
   };
 
-  const handleEdit = async (id: string) => {
-    if (!editDraft.name.trim() || !editDraft.quote.trim()) return;
+  const handleEdit = async (id: string, flushed: TestimonialDraft) => {
+    if (!flushed.name.trim() || !flushed.quote.trim()) return;
     setSaving(true);
     try {
       const r = await fetch(`/api/admin/testimonials/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editDraft),
+        body: JSON.stringify(flushed),
       });
       if (!r.ok) throw new Error();
       setEditingId(null);
@@ -281,6 +340,7 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
           }}
           saving={saving}
         />
+
       ) : (
         <button
           type="button"
@@ -304,7 +364,7 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
               key={item._id}
               draft={editDraft}
               onChange={setEditDraft}
-              onSave={() => handleEdit(item._id)}
+              onSave={(flushed) => handleEdit(item._id, flushed)}
               onCancel={() => setEditingId(null)}
               saving={saving}
             />

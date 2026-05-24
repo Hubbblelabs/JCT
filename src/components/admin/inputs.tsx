@@ -10,8 +10,7 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
-import { parseApiError } from "@/lib/validation-helpers";
-import { deleteUploadedAsset } from "@/lib/storage-cleanup";
+import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
 
 interface FieldProps {
   label: string;
@@ -186,6 +185,7 @@ export function ImageUploadInput({
   hint,
   hideUrlField,
 }: ImageUploadInputProps) {
+  const deferred = useDeferredUploadsOptional();
   const [uploading, setUploading] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -195,56 +195,59 @@ export function ImageUploadInput({
     setImgError(false);
   }, [value]);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Capture the old value before the async upload so we can clean it up
-    // afterwards if the new upload succeeds.
-    const previousKey = value;
-    setUploading(true);
-    setUploadError(null);
-    const fd = new FormData();
-    fd.append("file", file);
-    const r = await fetch("/api/admin/images/upload", {
-      method: "POST",
-      body: fd,
-    });
-    if (r.ok) {
-      const data = await r.json();
-      const newKey: string = data.url || data.storage_key;
-      // Delete the previously-stored image from R2 + DB now that it has been
-      // successfully replaced. Fire-and-forget — never blocks the UI update.
-      deleteUploadedAsset(previousKey);
-      onChange(newKey);
+
+    if (deferred) {
+      const id = Math.random().toString(36).slice(2);
+      const placeholder = `pending:img:${id}`;
+      const previewUrl = URL.createObjectURL(file);
+      if (value.startsWith("pending:")) deferred.cancel(value);
+      deferred.register(placeholder, { file, previewUrl, endpoint: "images" });
+      onChange(placeholder);
     } else {
-      const err = await parseApiError(r);
-      const detailMsg = err?.details?.[0]?.message;
-      setUploadError(
-        detailMsg ?? err?.message ?? err?.error ?? "Upload failed",
-      );
+      setUploading(true);
+      setUploadError(null);
+      const fd = new FormData();
+      fd.append("file", file);
+      const r = await fetch("/api/admin/images/upload", {
+        method: "POST",
+        body: fd,
+      });
+      if (r.ok) {
+        const data = (await r.json()) as Record<string, string>;
+        onChange(data.url || data.storage_key);
+      } else {
+        const body = (await r.json().catch(() => ({}))) as Record<
+          string,
+          unknown
+        >;
+        setUploadError(
+          (body.message as string) ?? (body.error as string) ?? "Upload failed",
+        );
+      }
+      setUploading(false);
     }
-    setUploading(false);
     if (fileRef.current) fileRef.current.value = "";
   };
 
   const handleRemove = () => {
-    // Clean up the R2 object and its DB record before clearing the form value.
-    deleteUploadedAsset(value);
+    if (value.startsWith("pending:") && deferred) deferred.cancel(value);
     onChange("");
   };
 
-  // Helper to get full URL for preview
-  const getPreviewUrl = (url: string): string => {
-    if (!url) return "";
-    if (url.startsWith("http://") || url.startsWith("https://")) {
-      return url;
-    }
+  const getPreviewUrl = (key: string): string => {
+    if (!key) return "";
+    if (deferred && key.startsWith("pending:"))
+      return deferred.getPreview(key) ?? "";
+    if (key.startsWith("http://") || key.startsWith("https://")) return key;
     const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
-    if (publicUrl) {
-      return `${publicUrl}/${url}`;
-    }
-    return `/api/admin/images/serve/${url}`;
+    if (publicUrl) return `${publicUrl}/${key}`;
+    return `/api/admin/images/serve/${key}`;
   };
+
+  const isPending = deferred && value.startsWith("pending:");
 
   return (
     <Field label={label} hint={hint}>
@@ -263,12 +266,17 @@ export function ImageUploadInput({
                 onError={() => setImgError(true)}
               />
             )}
+            {isPending && (
+              <span className="absolute bottom-1 left-1 rounded bg-amber-500 px-1 py-0.5 text-[10px] font-semibold text-white">
+                Pending
+              </span>
+            )}
             <button
               type="button"
               onClick={handleRemove}
               className="admin-btn admin-btn-danger admin-btn-sm absolute top-1 right-1"
               style={{ padding: "0.2rem 0.4rem" }}
-              title="Delete image"
+              title="Remove image"
             >
               <Trash2 size={12} />
             </button>
@@ -279,7 +287,7 @@ export function ImageUploadInput({
           ref={fileRef}
           accept="image/*"
           className="hidden"
-          onChange={handleUpload}
+          onChange={handleFileChange}
         />
         {hideUrlField ? (
           <button
@@ -303,9 +311,10 @@ export function ImageUploadInput({
           <div className="flex gap-2">
             <input
               className="admin-input min-w-0 flex-1"
-              value={value}
+              value={isPending ? "" : value}
+              readOnly={!!isPending}
               onChange={(e) => onChange(e.target.value)}
-              placeholder="Paste URL or upload a file"
+              placeholder={isPending ? "Pending upload — save to confirm" : "Paste URL or upload a file"}
             />
             <button
               type="button"
@@ -388,7 +397,7 @@ export function TextAreaList({
 interface DocumentUploadInputProps {
   label: string;
   value: string;
-  onChange: (url: string, storageKey?: string) => void;
+  onChange: (key: string) => void;
   hint?: string;
 }
 
@@ -398,52 +407,69 @@ export function DocumentUploadInput({
   onChange,
   hint,
 }: DocumentUploadInputProps) {
+  const deferred = useDeferredUploadsOptional();
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [filename, setFilename] = useState<string>("");
-  // Track the R2 storage key separately from the public URL stored in `value`.
-  // The key is available from the upload response and is needed to call the
-  // delete API when the document is removed or replaced.
-  const [storageKey, setStorageKey] = useState<string>("");
+  const [pendingFilename, setPendingFilename] = useState<string>("");
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    // Save the current key before upload so we can delete it on success.
-    const previousKey = storageKey;
-    setUploading(true);
-    setUploadError(null);
-    const fd = new FormData();
-    fd.append("file", file);
-    const r = await fetch("/api/admin/documents/upload", {
-      method: "POST",
-      body: fd,
-    });
-    if (r.ok) {
-      const data = await r.json();
-      // Clean up the previously-stored document from R2 + DB.
-      deleteUploadedAsset(previousKey);
-      const newKey = data.storage_key ?? "";
-      onChange(data.url, newKey);
-      setStorageKey(newKey);
-      setFilename(data.filename ?? file.name);
+
+    if (deferred) {
+      const id = Math.random().toString(36).slice(2);
+      const placeholder = `pending:doc:${id}`;
+      const previewUrl = URL.createObjectURL(file);
+      if (value.startsWith("pending:")) deferred.cancel(value);
+      deferred.register(placeholder, {
+        file,
+        previewUrl,
+        endpoint: "documents",
+      });
+      setPendingFilename(file.name);
+      onChange(placeholder);
     } else {
-      const err = await parseApiError(r);
-      setUploadError(err?.message ?? err?.error ?? "Upload failed");
+      setUploading(true);
+      setUploadError(null);
+      const fd = new FormData();
+      fd.append("file", file);
+      const r = await fetch("/api/admin/documents/upload", {
+        method: "POST",
+        body: fd,
+      });
+      if (r.ok) {
+        const data = (await r.json()) as Record<string, string>;
+        onChange(data.storage_key ?? data.url ?? "");
+      } else {
+        const body = (await r.json().catch(() => ({}))) as Record<
+          string,
+          unknown
+        >;
+        setUploadError(
+          (body.message as string) ?? (body.error as string) ?? "Upload failed",
+        );
+      }
+      setUploading(false);
     }
-    setUploading(false);
     if (fileRef.current) fileRef.current.value = "";
   };
 
   const handleRemove = () => {
-    deleteUploadedAsset(storageKey);
+    if (value.startsWith("pending:") && deferred) {
+      deferred.cancel(value);
+      setPendingFilename("");
+    }
     onChange("");
-    setFilename("");
-    setStorageKey("");
   };
 
-  const displayName = filename || (value ? value.split("/").pop() : "");
+  const isPending = deferred && value.startsWith("pending:");
+  const displayName =
+    isPending
+      ? pendingFilename
+      : value
+        ? value.split("/").pop() ?? value
+        : "";
 
   return (
     <Field label={label} hint={hint}>
@@ -453,11 +479,16 @@ export function DocumentUploadInput({
             <span className="flex-1 truncate text-sm text-gray-700">
               {displayName || value}
             </span>
+            {isPending && (
+              <span className="shrink-0 rounded bg-amber-500 px-1 py-0.5 text-[10px] font-semibold text-white">
+                Pending
+              </span>
+            )}
             <button
               type="button"
               onClick={handleRemove}
               className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
-              title="Delete document"
+              title="Remove document"
             >
               <Trash2 size={12} />
             </button>
@@ -468,7 +499,7 @@ export function DocumentUploadInput({
           ref={fileRef}
           accept="application/pdf"
           className="hidden"
-          onChange={handleUpload}
+          onChange={handleFileChange}
         />
         <button
           type="button"

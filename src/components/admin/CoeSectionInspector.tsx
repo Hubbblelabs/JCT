@@ -10,7 +10,6 @@ import {
   ItemsEditor,
   Repeater,
 } from "@/components/admin/inputs";
-import { deleteUploadedAsset } from "@/lib/storage-cleanup";
 import type { CoeEditableSection } from "@/components/layout/CoePageLayout";
 import type { CoePageValue } from "@/lib/validation";
 
@@ -248,10 +247,7 @@ export function CoeSectionInspector({
             onChange={(forms) =>
               patch({ downloads: { ...data.downloads, forms } })
             }
-            onItemRemove={(item) => {
-              // Clean up document from R2 when item is removed
-              if (item.href) deleteUploadedAsset(item.href);
-            }}
+            onItemRemove={undefined}
             newItem={() => ({ title: "", desc: "", href: "" })}
             renderItem={(item, _i, oc) => (
               <div className="space-y-1">
