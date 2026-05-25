@@ -64,9 +64,12 @@ export async function PATCH(
           "")
         : "";
 
+    const updateFields = Object.fromEntries(
+      Object.entries(body).filter(([, v]) => v !== undefined),
+    );
     const doc = await Testimonial.findByIdAndUpdate(
       id,
-      { $set: { ...body, updated_by: session!.user?.email } },
+      { $set: { ...updateFields, updated_by: session!.user?.email } },
       { new: true },
     );
     if (!doc) return notFound();

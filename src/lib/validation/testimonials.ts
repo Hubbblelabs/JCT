@@ -38,6 +38,20 @@ export const TestimonialSchema = z.object({
 });
 
 export const TestimonialCreateSchema = TestimonialSchema;
-export const TestimonialUpdateSchema = TestimonialSchema.partial();
+
+// Explicit partial — no .default() so absent fields stay undefined and
+// won't overwrite existing DB values (e.g. institution stays "engineering").
+export const TestimonialUpdateSchema = z.object({
+  name: zClampedString(1, LIMITS.nameMax, "Name").optional(),
+  batch: zClampedString(1, LIMITS.batchMax, "Batch").optional(),
+  course: zOptionalString(LIMITS.courseMax),
+  company: zOptionalString(LIMITS.companyMax),
+  quote: zClampedString(1, LIMITS.quoteMax, "Quote").optional(),
+  avatar: zUrl.optional().or(z.literal("")),
+  category: zEnum(CATEGORIES).optional(),
+  institution: zEnum(INSTITUTIONS).optional(),
+  is_active: z.boolean().optional(),
+  sort_order: zNonNegativeInt.optional(),
+});
 
 export type TestimonialValue = z.infer<typeof TestimonialSchema>;
