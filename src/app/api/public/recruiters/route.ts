@@ -31,7 +31,8 @@ export async function GET() {
     await connectDB();
     const recruiters = await Recruiter.find({ is_active: true })
       .select("name logo website industry sort_order")
-      .sort({ sort_order: 1, name: 1 });
+      .sort({ sort_order: 1, name: 1 })
+      .lean<{ _id: unknown; name?: string; logo?: string; website?: string; industry?: string; sort_order?: number }[]>();
 
     if (recruiters.length === 0) {
       // Return null to trigger static fallback on the client
@@ -40,7 +41,8 @@ export async function GET() {
 
     // Transform logos to full URLs
     const transformedRecruiters = recruiters.map((r) => ({
-      ...r.toObject(),
+      ...r,
+      _id: String(r._id),
       logo: getImageUrl(r.logo),
     }));
 

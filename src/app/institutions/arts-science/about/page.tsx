@@ -1,39 +1,36 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { notFound } from "next/navigation";
+import { connectDB } from "@/lib/mongodb";
+import { SiteConfig } from "@/lib/models";
 import { AboutPageLayout } from "@/components/layout/AboutPageLayout";
 import type { AboutPageValue } from "@/lib/validation";
 
-const INSTITUTION = "arts-science" as const;
-const CONFIG_KEY = "artsScienceAbout";
+export const revalidate = 86400;
 
-export default function ArtsScienceAboutPage() {
-  const [data, setData] = useState<AboutPageValue | null>(null);
-  const [error, setError] = useState<string | null>(null);
+type ConfigLean = {
+  status: "draft" | "published";
+  value?: unknown;
+  published_value?: unknown;
+};
 
-  useEffect(() => {
-    fetch(`/api/public/site-config?key=${CONFIG_KEY}`)
-      .then((r) => r.json())
-      .then((res) => {
-        if (res?.data && typeof res.data === "object") {
-          setData(res.data as AboutPageValue);
-        } else {
-          setError("Failed to load content");
-        }
-      })
-      .catch((err) => {
-        console.error("[ArtsScienceAboutPage]", err);
-        setError("Failed to load content");
-      });
-  }, []);
+export default async function ArtsScienceAboutPage() {
+  await connectDB();
+  const doc = await SiteConfig.findOne({
+    config_key: "artsScienceAbout",
+  }).lean<ConfigLean>();
 
-  if (error) {
-    return <div className="p-6 text-center text-red-600">{error}</div>;
-  }
+  if (!doc) return notFound();
 
-  if (!data) {
-    return <div className="p-6 text-center text-gray-500">Loading...</div>;
-  }
+  const value =
+    doc.status === "published" && doc.published_value
+      ? doc.published_value
+      : doc.value;
 
-  return <AboutPageLayout data={data} institution={INSTITUTION} />;
+  if (!value || typeof value !== "object") return notFound();
+
+  return (
+    <AboutPageLayout
+      data={value as AboutPageValue}
+      institution="arts-science"
+    />
+  );
 }

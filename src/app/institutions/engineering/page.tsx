@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import EngineeringPage from "@/modules/engineering/EngineeringPage";
 
+export const revalidate = 86400;
+
 export const metadata: Metadata = {
   title: "Engineering | JCT College of Engineering & Technology, Coimbatore",
   description:

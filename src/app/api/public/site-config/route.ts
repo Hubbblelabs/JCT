@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { SiteConfig } from "@/lib/models";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 function resolveProspectusUrl(value: unknown): unknown {
   if (!value || typeof value !== "object") return value;

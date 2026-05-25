@@ -1,56 +1,31 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { notFound } from "next/navigation";
+import { connectDB } from "@/lib/mongodb";
+import { SiteConfig } from "@/lib/models";
 import { CampusLifePageLayout } from "@/components/layout/CampusLifePageLayout";
 import type { CampusLifePageValue } from "@/lib/validation";
 
-const CONFIG_KEY = "campusLifePage";
+export const revalidate = 86400;
 
-export default function CampusLifePage() {
-  const [data, setData] = useState<CampusLifePageValue | null>(null);
-  const [error, setError] = useState<string | null>(null);
+type ConfigLean = {
+  status: "draft" | "published";
+  value?: unknown;
+  published_value?: unknown;
+};
 
-  useEffect(() => {
-    fetch(`/api/public/site-config?key=${CONFIG_KEY}`)
-      .then((r) => r.json())
-      .then((res) => {
-        if (res?.data && typeof res.data === "object") {
-          setData(res.data as CampusLifePageValue);
-        } else {
-          setError("Failed to load content");
-        }
-      })
-      .catch((err) => {
-        console.error("[CampusLifePage]", err);
-        setError("Failed to load content");
-      });
-  }, []);
+export default async function CampusLifePage() {
+  await connectDB();
+  const doc = await SiteConfig.findOne({
+    config_key: "campusLifePage",
+  }).lean<ConfigLean>();
 
-  if (error) {
-    return (
-      <main className="bg-background min-h-screen">
-        <Navbar />
-        <div className="flex min-h-[60vh] items-center justify-center">
-          <p className="text-muted-foreground text-lg">{error}</p>
-        </div>
-        <Footer />
-      </main>
-    );
-  }
+  if (!doc) return notFound();
 
-  if (!data) {
-    return (
-      <main className="bg-background min-h-screen">
-        <Navbar />
-        <div className="flex min-h-[60vh] items-center justify-center">
-          <p className="text-muted-foreground text-lg">Loading…</p>
-        </div>
-        <Footer />
-      </main>
-    );
-  }
+  const value =
+    doc.status === "published" && doc.published_value
+      ? doc.published_value
+      : doc.value;
 
-  return <CampusLifePageLayout data={data} />;
+  if (!value || typeof value !== "object") return notFound();
+
+  return <CampusLifePageLayout data={value as CampusLifePageValue} />;
 }

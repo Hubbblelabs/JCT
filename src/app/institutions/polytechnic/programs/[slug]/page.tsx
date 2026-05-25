@@ -7,6 +7,7 @@ import {
 } from "@/lib/public-programs";
 
 export const dynamicParams = true;
+export const revalidate = 86400;
 
 export async function generateStaticParams() {
   try {

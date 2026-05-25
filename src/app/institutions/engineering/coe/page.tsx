@@ -1,38 +1,31 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { notFound } from "next/navigation";
+import { connectDB } from "@/lib/mongodb";
+import { SiteConfig } from "@/lib/models";
 import { CoePageLayout } from "@/components/layout/CoePageLayout";
 import type { CoePageValue } from "@/lib/validation";
 
-const CONFIG_KEY = "engineeringCoe";
+export const revalidate = 86400;
 
-export default function COEPage() {
-  const [data, setData] = useState<CoePageValue | null>(null);
-  const [error, setError] = useState<string | null>(null);
+type ConfigLean = {
+  status: "draft" | "published";
+  value?: unknown;
+  published_value?: unknown;
+};
 
-  useEffect(() => {
-    fetch(`/api/public/site-config?key=${CONFIG_KEY}`)
-      .then((r) => r.json())
-      .then((res) => {
-        if (res?.data && typeof res.data === "object") {
-          setData(res.data as CoePageValue);
-        } else {
-          setError("Failed to load content");
-        }
-      })
-      .catch((err) => {
-        console.error("[COEPage]", err);
-        setError("Failed to load content");
-      });
-  }, []);
+export default async function COEPage() {
+  await connectDB();
+  const doc = await SiteConfig.findOne({
+    config_key: "engineeringCoe",
+  }).lean<ConfigLean>();
 
-  if (error) {
-    return <div className="p-6 text-center text-red-600">{error}</div>;
-  }
+  if (!doc) return notFound();
 
-  if (!data) {
-    return <div className="p-6 text-center text-gray-500">Loading...</div>;
-  }
+  const value =
+    doc.status === "published" && doc.published_value
+      ? doc.published_value
+      : doc.value;
 
-  return <CoePageLayout data={data} />;
+  if (!value || typeof value !== "object") return notFound();
+
+  return <CoePageLayout data={value as CoePageValue} />;
 }

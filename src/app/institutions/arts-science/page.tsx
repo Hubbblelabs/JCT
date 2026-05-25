@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 
+export const revalidate = 86400;
+
 export const metadata: Metadata = {
   title: "Arts & Science | JCT College of Arts & Science, Coimbatore",
   description:
