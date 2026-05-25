@@ -114,7 +114,11 @@ export async function POST(req: NextRequest) {
       .webp({ quality: 85 })
       .toBuffer();
 
-    const filename = `${Date.now()}-${file.name.replace(/\.[^.]+$/, "")}.webp`;
+    const baseName = file.name
+      .replace(/\.[^.]+$/, "")
+      .replace(/\s+/g, "-")
+      .replace(/[^a-zA-Z0-9._-]/g, "_");
+    const filename = `${Date.now()}-${baseName}.webp`;
     const storageKey = `images/${filename}`;
 
     await uploadToR2(storageKey, webpBuffer, "image/webp");

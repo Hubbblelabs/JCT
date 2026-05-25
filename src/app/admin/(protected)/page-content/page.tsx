@@ -259,18 +259,22 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
   const handleAdd = async (flushed: TestimonialDraft) => {
     if (!flushed.name.trim() || !flushed.quote.trim()) return;
     setSaving(true);
+    setError(null);
     try {
       const r = await fetch("/api/admin/testimonials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...flushed, institution }),
       });
-      if (!r.ok) throw new Error();
+      if (!r.ok) {
+        const body = await r.json().catch(() => null);
+        throw new Error(body?.message ?? body?.error ?? "Save failed");
+      }
       setAddingNew(false);
       setDraft(EMPTY_DRAFT);
       await load();
-    } catch {
-      setError("Save failed.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed.");
     } finally {
       setSaving(false);
     }
@@ -279,17 +283,21 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
   const handleEdit = async (id: string, flushed: TestimonialDraft) => {
     if (!flushed.name.trim() || !flushed.quote.trim()) return;
     setSaving(true);
+    setError(null);
     try {
       const r = await fetch(`/api/admin/testimonials/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(flushed),
       });
-      if (!r.ok) throw new Error();
+      if (!r.ok) {
+        const body = await r.json().catch(() => null);
+        throw new Error(body?.message ?? body?.error ?? "Save failed");
+      }
       setEditingId(null);
       await load();
-    } catch {
-      setError("Save failed.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed.");
     } finally {
       setSaving(false);
     }

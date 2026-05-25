@@ -102,13 +102,14 @@ async function doUpload(
   file: File,
   endpoint: "images" | "documents",
 ): Promise<string> {
+  if (endpoint === "documents") return doPresignedDocumentUpload(file);
+
   const fd = new FormData();
   fd.append("file", file);
-  const url =
-    endpoint === "images"
-      ? "/api/admin/images/upload"
-      : "/api/admin/documents/upload";
-  const r = await fetch(url, { method: "POST", body: fd });
+  const r = await fetch("/api/admin/images/upload", {
+    method: "POST",
+    body: fd,
+  });
   if (!r.ok) {
     const body = (await r.json().catch(() => ({}))) as Record<string, unknown>;
     const detail = Array.isArray(body.details)
@@ -123,6 +124,70 @@ async function doUpload(
   }
   const data = (await r.json()) as Record<string, string>;
   return data.storage_key ?? data.url;
+}
+
+async function doPresignedDocumentUpload(file: File): Promise<string> {
+  // Step 1: get a presigned PUT URL from the server (tiny payload — no file bytes)
+  const presignRes = await fetch("/api/admin/documents/presign", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      filename: file.name,
+      size: file.size,
+      mime_type: file.type,
+    }),
+  });
+  if (!presignRes.ok) {
+    const body = (await presignRes.json().catch(() => ({}))) as Record<
+      string,
+      unknown
+    >;
+    throw new Error(
+      (body.message as string) ??
+        (body.error as string) ??
+        "Failed to get upload URL",
+    );
+  }
+  const { presigned_url, storage_key, safe_name } = (await presignRes.json()) as {
+    presigned_url: string;
+    storage_key: string;
+    safe_name: string;
+  };
+
+  // Step 2: upload directly to R2 — bypasses Vercel's 4.5 MB payload limit
+  const uploadRes = await fetch(presigned_url, {
+    method: "PUT",
+    headers: { "Content-Type": "application/pdf" },
+    body: file,
+  });
+  if (!uploadRes.ok) {
+    throw new Error("Direct upload to storage failed");
+  }
+
+  // Step 3: record the upload in the DB
+  const confirmRes = await fetch("/api/admin/documents/confirm", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      storage_key,
+      filename: safe_name,
+      size: file.size,
+      mime_type: file.type,
+    }),
+  });
+  if (!confirmRes.ok) {
+    const body = (await confirmRes.json().catch(() => ({}))) as Record<
+      string,
+      unknown
+    >;
+    throw new Error(
+      (body.message as string) ??
+        (body.error as string) ??
+        "Failed to confirm upload",
+    );
+  }
+
+  return storage_key;
 }
 
 function valueContains(value: unknown, needle: string): boolean {

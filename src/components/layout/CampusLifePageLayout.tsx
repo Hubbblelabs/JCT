@@ -120,7 +120,7 @@ export function CampusLifePageLayout({
 
   return (
     <main className="bg-background selection:bg-gold selection:text-navy min-h-screen overflow-x-hidden">
-      <Navbar />
+      {!editable && <Navbar />}
 
       {/* ── Hero ────────────────────────────────────────────────────────── */}
       <EditableRegion
@@ -698,7 +698,7 @@ export function CampusLifePageLayout({
         </EditableRegion>
       )}
 
-      <Footer />
+      {!editable && <Footer />}
     </main>
   );
 }
