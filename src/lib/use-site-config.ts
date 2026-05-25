@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSiteConfigContext } from "@/contexts/SiteConfigContext";
 
 export type SiteConfigResult<T> = {
   data: T | null;
@@ -8,19 +9,20 @@ export type SiteConfigResult<T> = {
   error: boolean;
 };
 
-/**
- * Fetches a single SiteConfig key from the public API. Returns the raw stored
- * value (or null when the key is unset / on error). Public pages use this as
- * the single source of truth — there is no static fallback content.
- */
 export function useSiteConfig<T = unknown>(key: string): SiteConfigResult<T> {
-  const [result, setResult] = useState<SiteConfigResult<T>>({
-    data: null,
-    loading: true,
+  const ctx = useSiteConfigContext();
+  const hasCtxData = key in ctx;
+
+  const [result, setResult] = useState<SiteConfigResult<T>>(() => ({
+    data: hasCtxData ? (ctx[key] as T) : null,
+    loading: !hasCtxData,
     error: false,
-  });
+  }));
 
   useEffect(() => {
+    // Context provided server-side data — skip the client fetch entirely.
+    if (hasCtxData) return;
+
     let cancelled = false;
     setResult({ data: null, loading: true, error: false });
     fetch(`/api/public/site-config?key=${encodeURIComponent(key)}`)
@@ -28,11 +30,7 @@ export function useSiteConfig<T = unknown>(key: string): SiteConfigResult<T> {
       .then((res) => {
         if (cancelled) return;
         if (res?.source === "db") {
-          setResult({
-            data: (res.data as T) ?? null,
-            loading: false,
-            error: false,
-          });
+          setResult({ data: res.data as T, loading: false, error: false });
         } else if (res?.source === "empty") {
           setResult({ data: null, loading: false, error: false });
         } else {
@@ -40,13 +38,13 @@ export function useSiteConfig<T = unknown>(key: string): SiteConfigResult<T> {
         }
       })
       .catch(() => {
-        if (!cancelled) {
-          setResult({ data: null, loading: false, error: true });
-        }
+        if (!cancelled) setResult({ data: null, loading: false, error: true });
       });
     return () => {
       cancelled = true;
     };
+    // hasCtxData is stable — derived from server props, never changes after mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
   return result;

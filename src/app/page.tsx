@@ -8,20 +8,31 @@ import { Footer } from "@/components/layout/Footer";
 import { WhyJCT } from "@/components/layout/WhyJCT";
 import { CampusLife } from "@/components/layout/CampusLife";
 import { Pamphlet } from "@/components/layout/Pamphlet";
+import { SiteConfigProvider } from "@/contexts/SiteConfigContext";
+import {
+  getPublishedConfigs,
+  HOME_CONFIG_KEYS,
+} from "@/lib/site-config-server";
 
-export default function HomePage() {
+export const revalidate = 86400;
+
+export default async function HomePage() {
+  const configs = await getPublishedConfigs([...HOME_CONFIG_KEYS]);
+
   return (
-    <main className="bg-surface text-foreground min-h-screen overflow-x-hidden">
-      <Navbar />
-      <Pamphlet />
-      <HomeHero />
-      <TrustHighlightsRow />
-      <WhyJCT />
-      <Placements />
-      <CampusLife />
-      <Testimonials />
-      <AdmissionsCTA />
-      <Footer />
-    </main>
+    <SiteConfigProvider configs={configs}>
+      <main className="bg-surface text-foreground min-h-screen overflow-x-hidden">
+        <Navbar />
+        <Pamphlet />
+        <HomeHero />
+        <TrustHighlightsRow />
+        <WhyJCT />
+        <Placements />
+        <CampusLife />
+        <Testimonials />
+        <AdmissionsCTA />
+        <Footer />
+      </main>
+    </SiteConfigProvider>
   );
 }

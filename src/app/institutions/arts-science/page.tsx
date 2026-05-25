@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { SiteConfigProvider } from "@/contexts/SiteConfigContext";
+import {
+  getPublishedConfigs,
+  ARTS_SCIENCE_CONFIG_KEYS,
+} from "@/lib/site-config-server";
 
 export const revalidate = 86400;
 
@@ -23,20 +28,24 @@ import { CampusLife } from "@/modules/arts-science/CampusLife";
 import { Testimonials } from "@/modules/arts-science/Testimonials";
 import { Placements } from "@/components/layout/Placements";
 
-export default function ArtsSciencePage() {
+export default async function ArtsSciencePage() {
+  const configs = await getPublishedConfigs([...ARTS_SCIENCE_CONFIG_KEYS]);
+
   return (
-    <main
-      id="top"
-      className="bg-background text-foreground arts-science-theme min-h-screen overflow-x-hidden"
-    >
-      <Navbar />
-      <Hero />
-      <UgPrograms />
-      <AdmissionProcess />
-      <Placements />
-      <CampusLife />
-      <Testimonials />
-      <Footer />
-    </main>
+    <SiteConfigProvider configs={configs}>
+      <main
+        id="top"
+        className="bg-background text-foreground arts-science-theme min-h-screen overflow-x-hidden"
+      >
+        <Navbar />
+        <Hero />
+        <UgPrograms />
+        <AdmissionProcess />
+        <Placements />
+        <CampusLife />
+        <Testimonials />
+        <Footer />
+      </main>
+    </SiteConfigProvider>
   );
 }

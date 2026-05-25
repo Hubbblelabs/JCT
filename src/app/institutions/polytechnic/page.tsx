@@ -2,8 +2,14 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/modules/polytechnic/Hero";
+import { SiteConfigProvider } from "@/contexts/SiteConfigContext";
+import {
+  getPublishedConfigs,
+  POLYTECHNIC_CONFIG_KEYS,
+} from "@/lib/site-config-server";
 
 export const revalidate = 86400;
+
 import { DiplomaPrograms } from "@/modules/polytechnic/DiplomaPrograms";
 import { Admissions } from "@/modules/polytechnic/Admissions";
 import { Placements } from "@/components/layout/Placements";
@@ -22,20 +28,24 @@ export const metadata: Metadata = {
   },
 };
 
-export default function PolytechnicPage() {
+export default async function PolytechnicPage() {
+  const configs = await getPublishedConfigs([...POLYTECHNIC_CONFIG_KEYS]);
+
   return (
-    <main
-      id="top"
-      className="polytechnic-theme min-h-screen overflow-x-hidden bg-[#F8F9FA] font-sans"
-    >
-      <Navbar />
-      <Hero />
-      <DiplomaPrograms />
-      <Admissions />
-      <Placements />
-      <CampusLife />
-      <Testimonials />
-      <Footer />
-    </main>
+    <SiteConfigProvider configs={configs}>
+      <main
+        id="top"
+        className="polytechnic-theme min-h-screen overflow-x-hidden bg-[#F8F9FA] font-sans"
+      >
+        <Navbar />
+        <Hero />
+        <DiplomaPrograms />
+        <Admissions />
+        <Placements />
+        <CampusLife />
+        <Testimonials />
+        <Footer />
+      </main>
+    </SiteConfigProvider>
   );
 }
