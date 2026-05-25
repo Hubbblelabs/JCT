@@ -41,7 +41,11 @@ export async function POST(req: NextRequest) {
       "application/pdf",
     );
 
-    return json({ presigned_url: presignedUrl, storage_key: storageKey, safe_name: safeName });
+    return json({
+      presigned_url: presignedUrl,
+      storage_key: storageKey,
+      safe_name: safeName,
+    });
   } catch (e) {
     console.error("[documents/presign]", e);
     return serverError();

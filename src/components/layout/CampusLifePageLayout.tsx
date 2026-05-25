@@ -401,7 +401,10 @@ export function CampusLifePageLayout({
 
       <div className="container mx-auto px-4 md:px-6">
         {/* ── Sports ──────────────────────────────────────────────────── */}
-        {(editable || sports.title || sports.body || sports.stats.length > 0) && (
+        {(editable ||
+          sports.title ||
+          sports.body ||
+          sports.stats.length > 0) && (
           <EditableRegion
             as="section"
             section="sports"
@@ -541,7 +544,10 @@ export function CampusLifePageLayout({
       </div>
 
       {/* ── Clubs & Culture ───────────────────────────────────────────── */}
-      {(editable || clubs.title || clubs.featuredTitle || clubs.events.length > 0) && (
+      {(editable ||
+        clubs.title ||
+        clubs.featuredTitle ||
+        clubs.events.length > 0) && (
         <EditableRegion
           as="section"
           section="clubs"

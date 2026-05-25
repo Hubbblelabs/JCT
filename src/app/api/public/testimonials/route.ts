@@ -42,7 +42,20 @@ export async function GET(req: Request) {
       )
       .sort({ sort_order: 1, created_at: -1 })
       .limit(12)
-      .lean<{ _id: unknown; name?: string; batch?: string; course?: string; company?: string; quote?: string; avatar?: string; category?: string; institution?: string; sort_order?: number }[]>();
+      .lean<
+        {
+          _id: unknown;
+          name?: string;
+          batch?: string;
+          course?: string;
+          company?: string;
+          quote?: string;
+          avatar?: string;
+          category?: string;
+          institution?: string;
+          sort_order?: number;
+        }[]
+      >();
 
     if (testimonials.length === 0) {
       return NextResponse.json({ source: "empty", data: [] });

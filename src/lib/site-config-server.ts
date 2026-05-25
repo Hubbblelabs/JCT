@@ -37,7 +37,8 @@ export async function getPublishedConfigs(
       doc.status === "published" && doc.published_value
         ? doc.published_value
         : doc.value;
-    if (doc.config_key === "homeProspectus") value = resolveProspectusUrl(value);
+    if (doc.config_key === "homeProspectus")
+      value = resolveProspectusUrl(value);
     result[doc.config_key] = value;
   }
   return result;

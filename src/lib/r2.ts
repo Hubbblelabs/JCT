@@ -32,7 +32,11 @@ export async function getPresignedPutUrl(
   if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
   return getSignedUrl(
     client,
-    new PutObjectCommand({ Bucket: bucket, Key: key, ContentType: contentType }),
+    new PutObjectCommand({
+      Bucket: bucket,
+      Key: key,
+      ContentType: contentType,
+    }),
     { expiresIn },
   );
 }

@@ -50,7 +50,8 @@ const courseData: Record<
     overview:
       "B.Sc. Artificial Intelligence & Machine learning programme prepare students with the skills to perform intelligent data analysis which is a key component in numerous real-world applications. During the past ten years, data science has emerged as one of the most high-growth, dynamic and lucrative careers.",
     duration: "3 Years (6 Semesters)",
-    eligibility: "Pass in HSC/12th standard with Mathematics or Computer Science as one of the subjects.",
+    eligibility:
+      "Pass in HSC/12th standard with Mathematics or Computer Science as one of the subjects.",
     syllabus: [
       "Python Programming",
       "Machine Learning Algorithms",
@@ -76,7 +77,8 @@ const courseData: Record<
     overview:
       "BCA is a three-year undergraduate degree program for candidates wishing to start a career in computers and its applications. This department aims to provide the graduates the required skills from fundamentals to current technologies for them to create efficient solution for industrial and real-life problems.",
     duration: "3 Years (6 Semesters)",
-    eligibility: "Pass in HSC/12th standard with Mathematics / Computer Science / Statistics / Business Mathematics.",
+    eligibility:
+      "Pass in HSC/12th standard with Mathematics / Computer Science / Statistics / Business Mathematics.",
     syllabus: [
       "Fundamentals of Computing",
       "Programming in C",
@@ -102,7 +104,8 @@ const courseData: Record<
     overview:
       "The focus of the department is to build a wide range of knowledge in the areas of accounting concepts and techniques to meet the current and future requirement of the industry. This programme offers the students value-based education specifically in areas of Logistics and Supply Chain Management.",
     duration: "3 Years (6 Semesters)",
-    eligibility: "Pass in HSC/12th standard in any stream from a recognised board.",
+    eligibility:
+      "Pass in HSC/12th standard in any stream from a recognised board.",
     syllabus: [
       "Principles of Management",
       "Financial Accounting",
@@ -128,7 +131,8 @@ const courseData: Record<
     overview:
       "The focus of the department is to build a wide range of knowledge in the areas of accounting concepts and techniques to meet the current and future requirement of the industry. This programme offers the students value-based education specifically in areas of Logistics and Supply Chain Management.",
     duration: "3 Years (6 Semesters)",
-    eligibility: "Pass in HSC/12th standard in any stream from a recognised board.",
+    eligibility:
+      "Pass in HSC/12th standard in any stream from a recognised board.",
     syllabus: [
       "Principles of Management",
       "Financial Accounting",
@@ -154,7 +158,8 @@ const courseData: Record<
     overview:
       "BBA Logistics, a three-year full time degree program essentially covering the concepts and process involved in logistics. Logistic management includes the designing and administration to control the flow of materials to all business units.",
     duration: "3 Years (6 Semesters)",
-    eligibility: "Pass in HSC/12th standard in any stream from a recognised board.",
+    eligibility:
+      "Pass in HSC/12th standard in any stream from a recognised board.",
     syllabus: [
       "Fundamentals of Business",
       "Transport Economics",
@@ -180,7 +185,8 @@ const courseData: Record<
     overview:
       "The Department of B.Sc. Digital & Cyber Forensic Science is dedicated to providing quality education and training in the field of cyber security, digital investigation, and forensic analysis using modern tools and techniques.",
     duration: "3 Years (6 Semesters)",
-    eligibility: "Pass in HSC/12th standard with Mathematics / Computer Science / Statistics / Business Mathematics / Physics / Chemistry.",
+    eligibility:
+      "Pass in HSC/12th standard with Mathematics / Computer Science / Statistics / Business Mathematics / Physics / Chemistry.",
     syllabus: [
       "Computer Forensics",
       "Cyber Security & Laws",
@@ -208,7 +214,8 @@ const courseData: Record<
     overview:
       "The Department of B. Com Computer Applications focuses on building a strong foundation in commerce along with practical knowledge of computer applications, database systems, and enterprise tools.",
     duration: "3 Years (6 Semesters)",
-    eligibility: "Pass in HSC/12th standard in any stream from a recognised board.",
+    eligibility:
+      "Pass in HSC/12th standard in any stream from a recognised board.",
     syllabus: [
       "Financial Accounting",
       "Tally Prime & Zoho Books",

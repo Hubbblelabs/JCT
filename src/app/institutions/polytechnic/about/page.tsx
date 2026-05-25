@@ -28,9 +28,6 @@ export default async function PolytechnicAboutPage() {
   if (!value || typeof value !== "object") return notFound();
 
   return (
-    <AboutPageLayout
-      data={value as AboutPageValue}
-      institution="polytechnic"
-    />
+    <AboutPageLayout data={value as AboutPageValue} institution="polytechnic" />
   );
 }

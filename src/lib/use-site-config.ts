@@ -44,8 +44,7 @@ export function useSiteConfig<T = unknown>(key: string): SiteConfigResult<T> {
       cancelled = true;
     };
     // hasCtxData is stable — derived from server props, never changes after mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [key]);
+  }, [key, hasCtxData]);
 
   return result;
 }

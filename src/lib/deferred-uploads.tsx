@@ -148,11 +148,12 @@ async function doPresignedDocumentUpload(file: File): Promise<string> {
         "Failed to get upload URL",
     );
   }
-  const { presigned_url, storage_key, safe_name } = (await presignRes.json()) as {
-    presigned_url: string;
-    storage_key: string;
-    safe_name: string;
-  };
+  const { presigned_url, storage_key, safe_name } =
+    (await presignRes.json()) as {
+      presigned_url: string;
+      storage_key: string;
+      safe_name: string;
+    };
 
   // Step 2: upload directly to R2 — bypasses Vercel's 4.5 MB payload limit
   const uploadRes = await fetch(presigned_url, {
