@@ -174,7 +174,8 @@ export function CampusLifePageLayout({
         <Breadcrumb items={[{ label: "Campus Life" }]} />
 
         {/* ── Experience ──────────────────────────────────────────────── */}
-        {(experience.title ||
+        {(editable ||
+          experience.title ||
           experience.body ||
           experience.features.length > 0) && (
           <EditableRegion
@@ -248,7 +249,7 @@ export function CampusLifePageLayout({
         )}
 
         {/* ── Highlights Gallery ──────────────────────────────────────── */}
-        {highlights.items.length > 0 && (
+        {(editable || highlights.items.length > 0) && (
           <EditableRegion
             as="section"
             section="highlights"
@@ -307,7 +308,7 @@ export function CampusLifePageLayout({
       </div>
 
       {/* ── Services ──────────────────────────────────────────────────── */}
-      {(services.title || services.items.length > 0) && (
+      {(editable || services.title || services.items.length > 0) && (
         <EditableRegion
           as="section"
           section="services"
@@ -400,7 +401,7 @@ export function CampusLifePageLayout({
 
       <div className="container mx-auto px-4 md:px-6">
         {/* ── Sports ──────────────────────────────────────────────────── */}
-        {(sports.title || sports.body || sports.stats.length > 0) && (
+        {(editable || sports.title || sports.body || sports.stats.length > 0) && (
           <EditableRegion
             as="section"
             section="sports"
@@ -540,7 +541,7 @@ export function CampusLifePageLayout({
       </div>
 
       {/* ── Clubs & Culture ───────────────────────────────────────────── */}
-      {(clubs.title || clubs.featuredTitle || clubs.events.length > 0) && (
+      {(editable || clubs.title || clubs.featuredTitle || clubs.events.length > 0) && (
         <EditableRegion
           as="section"
           section="clubs"
@@ -651,7 +652,7 @@ export function CampusLifePageLayout({
       )}
 
       {/* ── CTA ───────────────────────────────────────────────────────── */}
-      {(cta.title || cta.ctaLabel) && (
+      {(editable || cta.title || cta.ctaLabel) && (
         <EditableRegion
           as="section"
           section="cta"
