@@ -25,7 +25,7 @@ export function PageHero({ title, subtitle, className }: PageHeroProps) {
           {title}
         </h1>
         {subtitle && (
-          <p className="mt-4 font-sans text-base text-white/60 md:text-lg">
+          <p className="mt-4 text-center font-sans text-base text-white/60 md:text-lg">
             {subtitle}
           </p>
         )}

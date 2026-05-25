@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, Check, Loader2, X, ExternalLink } from "lucide-react";
 import {
   AboutPageLayout,
@@ -9,19 +9,64 @@ import {
   type AboutEditableSection,
 } from "@/components/layout/AboutPageLayout";
 import { AboutSectionInspector } from "@/components/admin/AboutSectionInspector";
-import { EngineeringAboutSchema } from "@/lib/validation";
+import {
+  EngineeringAboutSchema,
+  ArtsScienceAboutSchema,
+  PolytechnicAboutSchema,
+} from "@/lib/validation";
 import type { AboutPageValue } from "@/lib/validation";
 import {
   DeferredUploadsProvider,
   useDeferredUploads,
 } from "@/lib/deferred-uploads";
 
-const INSTITUTION = "engineering" as const;
-const CONFIG_KEY = "engineeringAbout";
+type Institution = "engineering" | "arts-science" | "polytechnic";
+
+const INSTITUTION_MAP: Record<
+  string,
+  {
+    institution: Institution;
+    configKey: string;
+    publicPath: string;
+    label: string;
+  }
+> = {
+  engineering: {
+    institution: "engineering",
+    configKey: "engineeringAbout",
+    publicPath: "/institutions/engineering/about",
+    label: "Engineering",
+  },
+  "arts-science": {
+    institution: "arts-science",
+    configKey: "artsScienceAbout",
+    publicPath: "/institutions/arts-science/about",
+    label: "Arts & Science",
+  },
+  polytechnic: {
+    institution: "polytechnic",
+    configKey: "polytechnicAbout",
+    publicPath: "/institutions/polytechnic/about",
+    label: "Polytechnic",
+  },
+};
+
+function getDefaultDraft(institution: Institution): AboutPageValue {
+  if (institution === "arts-science")
+    return ArtsScienceAboutSchema.parse({}) as AboutPageValue;
+  if (institution === "polytechnic")
+    return PolytechnicAboutSchema.parse({}) as AboutPageValue;
+  return EngineeringAboutSchema.parse({}) as AboutPageValue;
+}
 
 function AboutEditorInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { flush } = useDeferredUploads();
+
+  const college = searchParams.get("college") ?? "engineering";
+  const config = INSTITUTION_MAP[college] ?? INSTITUTION_MAP["engineering"];
+  const { institution, configKey, publicPath, label } = config;
 
   const [draft, setDraft] = useState<AboutPageValue | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,16 +78,16 @@ function AboutEditorInner() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setDraft(null);
     setMsg(null);
-    fetch(`/api/public/site-config?key=${CONFIG_KEY}`)
+    fetch(`/api/public/site-config?key=${configKey}`)
       .then((r) => r.json())
       .then((res) => {
         if (cancelled) return;
         if (res?.data && typeof res.data === "object") {
           setDraft(res.data as AboutPageValue);
         } else {
-          // Key not yet seeded — open editor with schema defaults
-          setDraft(EngineeringAboutSchema.parse({}) as AboutPageValue);
+          setDraft(getDefaultDraft(institution));
         }
       })
       .catch((err) => {
@@ -57,7 +102,7 @@ function AboutEditorInner() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [configKey, institution]);
 
   const selectSection = (s: AboutEditableSection) => {
     setSelected(s);
@@ -74,7 +119,7 @@ function AboutEditorInner() {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          config_key: CONFIG_KEY,
+          config_key: configKey,
           value: flushedDraft,
         }),
       });
@@ -108,7 +153,7 @@ function AboutEditorInner() {
             <ArrowLeft size={14} />
           </button>
           <div>
-            <h1 className="admin-page-title">About Page Editor</h1>
+            <h1 className="admin-page-title">{label} — About Page Editor</h1>
             <p className="admin-page-subtitle">
               Live CMS editor — click any section to edit
             </p>
@@ -117,7 +162,7 @@ function AboutEditorInner() {
 
         <div className="flex flex-wrap items-center gap-2">
           <a
-            href="/institutions/engineering/about"
+            href={publicPath}
             target="_blank"
             rel="noopener noreferrer"
             className="admin-btn admin-btn-outline admin-btn-sm"
@@ -156,7 +201,7 @@ function AboutEditorInner() {
         <div className="-mx-6 -mb-6 overflow-hidden border-t border-gray-200 bg-white xl:mx-0 xl:rounded-xl xl:border">
           <AboutPageLayout
             data={draft}
-            institution={INSTITUTION}
+            institution={institution}
             editable
             onEditSection={selectSection}
           />
