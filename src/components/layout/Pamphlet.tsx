@@ -7,39 +7,182 @@ import { X, ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
 import { getImageUrl } from "@/lib/utils";
 import { useSiteConfig } from "@/lib/use-site-config";
+import type { PamphletLayout } from "@/lib/validation";
+
+type Slot = {
+  image: string;
+  heading: string;
+  subheading: string;
+  body: string;
+};
+
+type VirtualTour = {
+  enabled: boolean;
+  label: string;
+  url: string;
+};
 
 type PamphletConfig = {
   enabled: boolean;
-  images: string[];
   delayMs: number;
-  videoUrl: string;
+  layout: PamphletLayout;
+  leftSlot: Slot;
+  rightSlot: Slot;
+  virtualTour: VirtualTour;
   applyLabel: string;
   applyHref: string;
 };
 
+const EMPTY_SLOT: Slot = { image: "", heading: "", subheading: "", body: "" };
+
+function asString(v: unknown): string {
+  return typeof v === "string" ? v.trim() : "";
+}
+
+function readSlot(raw: unknown): Slot {
+  if (!raw || typeof raw !== "object") return { ...EMPTY_SLOT };
+  const r = raw as Record<string, unknown>;
+  return {
+    image: asString(r.image),
+    heading: asString(r.heading),
+    subheading: asString(r.subheading),
+    body: asString(r.body),
+  };
+}
+
 function normalizePamphlet(raw: unknown): PamphletConfig | null {
   if (!raw || typeof raw !== "object") return null;
   const r = raw as Record<string, unknown>;
-  const images = Array.isArray(r.images)
+
+  const legacyImages = Array.isArray(r.images)
     ? r.images.filter((s): s is string => typeof s === "string" && s.length > 0)
     : [];
+
+  const explicitLeft = readSlot(r.leftSlot);
+  const explicitRight = readSlot(r.rightSlot);
+
+  const leftSlot: Slot = {
+    ...explicitLeft,
+    image: explicitLeft.image || legacyImages[0] || "",
+  };
+  const rightSlot: Slot = {
+    ...explicitRight,
+    image:
+      explicitRight.image || legacyImages[1] || legacyImages[0] || "",
+  };
+
+  const allowedLayouts: PamphletLayout[] = [
+    "image-image",
+    "image-text",
+    "text-image",
+    "text-text",
+  ];
+  const rawLayout = typeof r.layout === "string" ? r.layout : "";
+  const layout: PamphletLayout = allowedLayouts.includes(
+    rawLayout as PamphletLayout,
+  )
+    ? (rawLayout as PamphletLayout)
+    : "image-image";
+
+  const vt = (r.virtualTour ?? null) as Record<string, unknown> | null;
+  const legacyVideoUrl = asString(r.videoUrl);
+  const virtualTour: VirtualTour = vt
+    ? {
+        enabled:
+          vt.enabled === undefined
+            ? Boolean(asString(vt.url) || legacyVideoUrl)
+            : Boolean(vt.enabled),
+        label: asString(vt.label) || "Virtual Tour",
+        url: asString(vt.url) || legacyVideoUrl,
+      }
+    : {
+        enabled: Boolean(legacyVideoUrl),
+        label: "Virtual Tour",
+        url: legacyVideoUrl,
+      };
+
   return {
     enabled: r.enabled !== false,
-    images,
     delayMs: typeof r.delayMs === "number" ? r.delayMs : 2000,
-    videoUrl:
-      typeof r.videoUrl === "string" && r.videoUrl.trim()
-        ? r.videoUrl.trim()
-        : "",
-    applyLabel:
-      typeof r.applyLabel === "string" && r.applyLabel.trim()
-        ? r.applyLabel.trim()
-        : "Apply Now",
-    applyHref:
-      typeof r.applyHref === "string" && r.applyHref.trim()
-        ? r.applyHref.trim()
-        : "https://admissions.jct.ac.in",
+    layout,
+    leftSlot,
+    rightSlot,
+    virtualTour,
+    applyLabel: asString(r.applyLabel) || "Apply Now",
+    applyHref: asString(r.applyHref) || "https://admissions.jct.ac.in",
   };
+}
+
+function slotIsImage(layout: PamphletLayout, side: "left" | "right"): boolean {
+  if (layout === "image-image") return true;
+  if (layout === "text-text") return false;
+  if (layout === "image-text") return side === "left";
+  return side === "right"; // text-image
+}
+
+function isEmbeddableVideo(url: string): boolean {
+  return /\/embed\//i.test(url) || /youtu\.?be/i.test(url);
+}
+
+function ImageSlot({ src, alt }: { src: string; alt: string }) {
+  if (!src) {
+    return <div className="h-full w-full bg-gray-100" />;
+  }
+  return (
+    <Image
+      src={getImageUrl(src) ?? src}
+      alt={alt}
+      fill
+      sizes="(min-width: 768px) 50vw, 100vw"
+      className="object-cover object-top"
+    />
+  );
+}
+
+function TextSlot({ slot, accent }: { slot: Slot; accent: boolean }) {
+  const hasContent = slot.heading || slot.subheading || slot.body;
+  if (!hasContent) {
+    return (
+      <div className="flex h-full w-full items-center justify-center bg-white p-8 text-sm text-gray-400">
+        No text content
+      </div>
+    );
+  }
+  return (
+    <div
+      className={`flex h-full w-full flex-col justify-center gap-3 p-8 md:p-12 ${
+        accent ? "bg-navy text-white" : "bg-white text-gray-900"
+      }`}
+    >
+      {slot.heading && (
+        <h2
+          className={`text-2xl leading-tight font-bold md:text-3xl lg:text-4xl ${
+            accent ? "text-gold" : "text-navy"
+          }`}
+        >
+          {slot.heading}
+        </h2>
+      )}
+      {slot.subheading && (
+        <p
+          className={`text-base font-semibold md:text-lg ${
+            accent ? "text-white/90" : "text-gray-700"
+          }`}
+        >
+          {slot.subheading}
+        </p>
+      )}
+      {slot.body && (
+        <p
+          className={`text-sm leading-relaxed md:text-base ${
+            accent ? "text-white/80" : "text-gray-600"
+          } whitespace-pre-line`}
+        >
+          {slot.body}
+        </p>
+      )}
+    </div>
+  );
 }
 
 export function Pamphlet() {
@@ -50,24 +193,45 @@ export function Pamphlet() {
   const [isVideoOpen, setIsVideoOpen] = useState(false);
 
   const enabled = config?.enabled ?? false;
-  const images = config?.images ?? [];
-  const delayMs = config?.delayMs ?? 2000;
-  const videoUrl = config?.videoUrl ?? "";
+  const layout = config?.layout ?? "image-image";
+  const leftSlot = config?.leftSlot ?? EMPTY_SLOT;
+  const rightSlot = config?.rightSlot ?? EMPTY_SLOT;
+  const virtualTour = config?.virtualTour ?? {
+    enabled: false,
+    label: "Virtual Tour",
+    url: "",
+  };
   const applyLabel = config?.applyLabel ?? "Apply Now";
   const applyHref = config?.applyHref ?? "https://admissions.jct.ac.in";
+  const delayMs = config?.delayMs ?? 2000;
+
+  const leftIsImage = slotIsImage(layout, "left");
+  const rightIsImage = slotIsImage(layout, "right");
+
+  // Hide entirely if the chosen layout has no usable content.
+  const leftHasContent = leftIsImage
+    ? Boolean(leftSlot.image)
+    : Boolean(leftSlot.heading || leftSlot.subheading || leftSlot.body);
+  const rightHasContent = rightIsImage
+    ? Boolean(rightSlot.image)
+    : Boolean(rightSlot.heading || rightSlot.subheading || rightSlot.body);
+  const hasAnyContent = leftHasContent || rightHasContent;
 
   useEffect(() => {
-    if (!enabled || images.length === 0) return;
+    if (!enabled || !hasAnyContent) return;
     const timer = setTimeout(() => setIsOpen(true), delayMs);
     return () => clearTimeout(timer);
-  }, [enabled, images.length, delayMs]);
+  }, [enabled, hasAnyContent, delayMs]);
 
   const handleClose = () => setIsOpen(false);
 
-  if (!enabled || images.length === 0) return null;
+  if (!enabled || !hasAnyContent) return null;
 
-  const leftImage = images[0];
-  const rightImage = images[1] ?? images[0];
+  const showVirtualTour = virtualTour.enabled && Boolean(virtualTour.url);
+  const tourEmbeds = showVirtualTour && isEmbeddableVideo(virtualTour.url);
+
+  const leftSplit = layout === "image-text" ? "md:w-[45%]" : "md:w-1/2";
+  const rightSplit = layout === "image-text" ? "md:w-[55%]" : "md:w-1/2";
 
   return (
     <AnimatePresence>
@@ -97,34 +261,49 @@ export function Pamphlet() {
             </button>
 
             <div className="relative flex h-[75vh] min-h-[550px] flex-col overflow-hidden md:flex-row">
-              <div className="relative h-1/2 w-full overflow-hidden bg-white md:h-auto md:w-[45%]">
-                <Image
-                  src={getImageUrl(leftImage) ?? leftImage}
-                  alt="JCT Brochure"
-                  fill
-                  sizes="(min-width: 768px) 45vw, 100vw"
-                  className="object-cover object-top"
-                />
+              <div
+                className={`relative h-1/2 w-full overflow-hidden bg-white md:h-auto ${leftSplit}`}
+              >
+                {leftIsImage ? (
+                  <ImageSlot src={leftSlot.image} alt="JCT Brochure" />
+                ) : (
+                  <TextSlot slot={leftSlot} accent={false} />
+                )}
               </div>
 
-              <div className="relative h-1/2 w-full overflow-hidden bg-white md:h-auto md:w-[55%]">
-                <Image
-                  src={getImageUrl(rightImage) ?? rightImage}
-                  alt="JCT Programs"
-                  fill
-                  sizes="(min-width: 768px) 55vw, 100vw"
-                  className="object-cover object-top"
-                />
+              <div
+                className={`relative h-1/2 w-full overflow-hidden bg-white md:h-auto ${rightSplit}`}
+              >
+                {rightIsImage ? (
+                  <ImageSlot src={rightSlot.image} alt="JCT Programs" />
+                ) : (
+                  <TextSlot
+                    slot={rightSlot}
+                    accent={layout === "text-text" || layout === "image-text"}
+                  />
+                )}
               </div>
 
               <div className="absolute right-6 bottom-4 z-50 flex flex-wrap items-center justify-end gap-3 md:right-8 md:bottom-6">
-                {videoUrl && (
+                {showVirtualTour && tourEmbeds && (
                   <button
                     onClick={() => setIsVideoOpen(true)}
                     className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:px-10"
                   >
-                    <Play size={20} className="fill-current" /> Virtual Tour
+                    <Play size={20} className="fill-current" />{" "}
+                    {virtualTour.label}
                   </button>
+                )}
+                {showVirtualTour && !tourEmbeds && (
+                  <a
+                    href={virtualTour.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:px-10"
+                  >
+                    <Play size={20} className="fill-current" />{" "}
+                    {virtualTour.label}
+                  </a>
                 )}
                 <Link
                   href={applyHref}
@@ -143,7 +322,7 @@ export function Pamphlet() {
             </div>
 
             <AnimatePresence>
-              {isVideoOpen && videoUrl && (
+              {isVideoOpen && tourEmbeds && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -163,7 +342,7 @@ export function Pamphlet() {
                       <X size={24} />
                     </button>
                     <iframe
-                      src={`${videoUrl}${videoUrl.includes("?") ? "&" : "?"}autoplay=1`}
+                      src={`${virtualTour.url}${virtualTour.url.includes("?") ? "&" : "?"}autoplay=1`}
                       title="JCT Campus Tour"
                       className="h-full w-full border-none"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

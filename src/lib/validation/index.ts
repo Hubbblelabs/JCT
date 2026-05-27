@@ -3,8 +3,20 @@
 
 export * from "./_primitives";
 
-export { PamphletSchema, LIMITS as LIMITS_pamphlet } from "./pamphlet";
-export type { PamphletValue } from "./pamphlet";
+export {
+  PamphletSchema,
+  PamphletSlotSchema,
+  PamphletVirtualTourSchema,
+  PamphletLayoutSchema,
+  PAMPHLET_LAYOUTS,
+  LIMITS as LIMITS_pamphlet,
+} from "./pamphlet";
+export type {
+  PamphletValue,
+  PamphletSlot,
+  PamphletVirtualTour,
+  PamphletLayout,
+} from "./pamphlet";
 
 export {
   HomeHeroSchema,
@@ -155,6 +167,49 @@ export {
   FOOTER_LIMITS,
 } from "./globalCms";
 export type { HeaderValue, FooterValue } from "./globalCms";
+
+export {
+  NavbarSchema,
+  NavbarItemSchema,
+  NavbarChildSchema,
+  NAVBAR_LIMITS,
+} from "./navbar";
+export type { NavbarValue, NavbarItem, NavbarChild } from "./navbar";
+
+export {
+  SidebarNavItemSchema,
+  SidebarNavOverrideSchema,
+  SIDEBAR_NAV_LIMITS,
+} from "./sidebarNav";
+export type { SidebarNavItem, SidebarNavOverride } from "./sidebarNav";
+
+export {
+  PageDocumentSchema,
+  PageCreateSchema,
+  PageUpdateSchema,
+  PageContentSchema,
+  PageSeoSchema,
+  PageHeroSchema,
+  PageBodySectionSchema,
+  PageSidebarSchema,
+  PageGallerySchema,
+  PageContactSchema,
+  PAGE_INSTITUTIONS,
+  PAGE_TEMPLATES,
+  PAGE_STATUSES,
+  PAGE_LIMITS,
+} from "./pages";
+export type {
+  PageCreateValue,
+  PageUpdateValue,
+  PageContent,
+  PageSeo,
+  PageHero,
+  PageBodySection,
+  PageInstitution,
+  PageTemplate,
+  PageStatus,
+} from "./pages";
 
 export {
   SITE_CONFIG_SCHEMAS,

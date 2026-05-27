@@ -52,6 +52,8 @@ export type TabConfigItem = {
   label: string;
   icon?: string;
   visible?: boolean;
+  /** When set, the sidebar entry renders as a link to this URL instead of activating a tab. */
+  href?: string;
 };
 
 export type OverviewLabels = {

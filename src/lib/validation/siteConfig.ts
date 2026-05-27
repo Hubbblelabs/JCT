@@ -41,6 +41,7 @@ import { RecruitersSectionSchema } from "./recruiters";
 import { HeaderSchema, FooterSchema } from "./globalCms";
 import { FloatingElementsSchema } from "./floatingElements";
 import { CampusLifePageSchema } from "./campusLifePage";
+import { NavbarSchema } from "./navbar";
 
 // Every site-config key the admin UI writes must have an entry below.
 // Keys in this map are validated strictly; unknown keys are rejected.
@@ -73,6 +74,14 @@ export const SITE_CONFIG_SCHEMAS = {
   polytechnicAdmissions: PolytechnicAdmissionsSchema,
   recruitersSection: RecruitersSectionSchema,
   header: HeaderSchema,
+  mainHeader: HeaderSchema,
+  engineeringHeader: HeaderSchema,
+  artsScienceHeader: HeaderSchema,
+  polytechnicHeader: HeaderSchema,
+  mainNavbar: NavbarSchema,
+  engineeringNavbar: NavbarSchema,
+  artsScienceNavbar: NavbarSchema,
+  polytechnicNavbar: NavbarSchema,
   footer: FooterSchema,
   floatingElements: FloatingElementsSchema,
   engineeringAbout: EngineeringAboutSchema,
@@ -126,15 +135,21 @@ export const SITE_CONFIG_KEY_INSTITUTION: Partial<
   engineeringAdmissions: "engineering",
   engineeringAbout: "engineering",
   engineeringCoe: "engineering",
+  engineeringHeader: "engineering",
+  engineeringNavbar: "engineering",
   artsScienceHero: "arts-science",
   artsScienceHeroStats: "arts-science",
   artsScienceCampusLife: "arts-science",
   artsScienceAdmissions: "arts-science",
   artsScienceAbout: "arts-science",
+  artsScienceHeader: "arts-science",
+  artsScienceNavbar: "arts-science",
   polytechnicHero: "polytechnic",
   polytechnicCampusLife: "polytechnic",
   polytechnicAdmissions: "polytechnic",
   polytechnicAbout: "polytechnic",
+  polytechnicHeader: "polytechnic",
+  polytechnicNavbar: "polytechnic",
 };
 
 export function validateSiteConfigValue(key: SiteConfigKey, value: unknown) {

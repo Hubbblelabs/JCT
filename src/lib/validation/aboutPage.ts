@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SidebarNavItemSchema } from "./sidebarNav";
 
 // ─── Shared sub-schemas ──────────────────────────────────────────────────────
 
@@ -90,6 +91,7 @@ const AboutSidebarSchema = z.object({
   counsellingCode: s(20),
   ctaLabel: s(40),
   ctaHref: s(500),
+  navItems: z.array(SidebarNavItemSchema).optional(),
 });
 
 const ABOUT_SIDEBAR_DEFAULT = {
@@ -299,6 +301,7 @@ export const CoePageSchema = z.object({
       quickFacts: z.array(QuickFactSchema).default([]),
       ctaLabel: s(40),
       ctaHref: s(500),
+      navItems: z.array(SidebarNavItemSchema).optional(),
     })
     .default({ quickFacts: [], ctaLabel: "", ctaHref: "" }),
 });

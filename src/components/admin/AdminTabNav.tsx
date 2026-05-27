@@ -47,6 +47,16 @@ type NavItem = {
 const COLLEGE_ITEMS: Record<string, NavItem[]> = {
   engineering: [
     {
+      label: "Header",
+      href: "/admin/page-content?college=engineering&section=header",
+      icon: PanelTop,
+    },
+    {
+      label: "Navbar",
+      href: "/admin/page-content?college=engineering&section=navbar",
+      icon: Layers,
+    },
+    {
       label: "Announcement Bar",
       href: "/admin/page-content?college=engineering&section=announcement",
       icon: Bell,
@@ -94,6 +104,16 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
   ],
   "arts-science": [
     {
+      label: "Header",
+      href: "/admin/page-content?college=arts-science&section=header",
+      icon: PanelTop,
+    },
+    {
+      label: "Navbar",
+      href: "/admin/page-content?college=arts-science&section=navbar",
+      icon: Layers,
+    },
+    {
       label: "Hero",
       href: "/admin/page-content?college=arts-science&section=hero",
       icon: FileEdit,
@@ -125,6 +145,16 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
     },
   ],
   polytechnic: [
+    {
+      label: "Header",
+      href: "/admin/page-content?college=polytechnic&section=header",
+      icon: PanelTop,
+    },
+    {
+      label: "Navbar",
+      href: "/admin/page-content?college=polytechnic&section=navbar",
+      icon: Layers,
+    },
     {
       label: "Hero",
       href: "/admin/page-content?college=polytechnic&section=hero",
@@ -159,6 +189,16 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
 };
 
 const MAIN_ITEMS: NavItem[] = [
+  {
+    label: "Header",
+    href: "/admin/main/page-content?section=header",
+    icon: PanelTop,
+  },
+  {
+    label: "Navbar",
+    href: "/admin/main/page-content?section=navbar",
+    icon: Layers,
+  },
   {
     label: "Pamphlet Popup",
     href: "/admin/main/page-content?section=pamphlet",
@@ -212,11 +252,6 @@ const MAIN_ITEMS: NavItem[] = [
 ];
 
 const GLOBAL_CMS_ITEMS: NavItem[] = [
-  {
-    label: "Header",
-    href: "/admin/global/page-content?section=header",
-    icon: PanelTop,
-  },
   {
     label: "Footer",
     href: "/admin/global/page-content?section=footer",
@@ -364,6 +399,15 @@ function TabNavInner() {
               Dashboard
             </Link>
           )}
+
+          {/* Dynamic Pages — top-level for visibility */}
+          <Link
+            href="/admin/pages"
+            className={`admin-nav-trigger ${pathname.startsWith("/admin/pages") ? "active" : ""}`}
+          >
+            <FileEdit size={13} />
+            Pages
+          </Link>
 
           {/* Admin tools dropdown — admin only */}
           {isAdmin && visibleAdminItems.length > 0 && (

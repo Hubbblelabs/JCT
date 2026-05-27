@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -28,10 +28,88 @@ type HeaderConfig = {
   showStudentLogin?: boolean;
 };
 
+type NavbarConfigChild = {
+  label?: string;
+  href?: string;
+  desc?: string;
+  visible?: boolean;
+};
+
+type NavbarConfigItem = {
+  label?: string;
+  href?: string;
+  desc?: string;
+  visible?: boolean;
+  inMore?: boolean;
+  children?: NavbarConfigChild[];
+};
+
+type NavbarConfig = {
+  moreLabel?: string;
+  items?: NavbarConfigItem[];
+};
+
+function navbarKeyFor(institution: string): string {
+  if (institution === "engineering") return "engineeringNavbar";
+  if (institution === "arts-science") return "artsScienceNavbar";
+  if (institution === "polytechnic") return "polytechnicNavbar";
+  return "mainNavbar";
+}
+
+function headerKeyFor(institution: string): string {
+  if (institution === "engineering") return "engineeringHeader";
+  if (institution === "arts-science") return "artsScienceHeader";
+  if (institution === "polytechnic") return "polytechnicHeader";
+  return "mainHeader";
+}
+
+function staticNavFor(institution: string): NavItem[] {
+  if (institution === "engineering") return engineeringNavigation;
+  if (institution === "arts-science") return artsNavigation;
+  if (institution === "polytechnic") return polytechnicNavigation;
+  return mainNavigation;
+}
+
+function applyNavbarConfig(
+  cfg: NavbarConfig | null,
+  fallback: NavItem[],
+): { primary: NavItem[]; more: NavItem[]; moreLabel: string } {
+  const items = Array.isArray(cfg?.items) ? cfg!.items : [];
+  if (items.length === 0) {
+    return { primary: fallback, more: [], moreLabel: cfg?.moreLabel || "More" };
+  }
+  const primary: NavItem[] = [];
+  const more: NavItem[] = [];
+  for (const raw of items) {
+    if (!raw || raw.visible === false || !raw.label) continue;
+    const children = Array.isArray(raw.children)
+      ? raw.children
+          .filter((c) => c && c.visible !== false && c.label && c.href)
+          .map<NavChild>((c) => ({
+            name: c.label!,
+            href: c.href!,
+            desc: c.desc,
+          }))
+      : undefined;
+    const item: NavItem = {
+      name: raw.label,
+      href: raw.href || "#",
+      children: children && children.length > 0 ? children : undefined,
+    };
+    (raw.inMore ? more : primary).push(item);
+  }
+  return { primary, more, moreLabel: cfg?.moreLabel || "More" };
+}
+
 export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const pathname = usePathname();
   const { institution } = useInstitution();
-  const { data: header } = useSiteConfig<HeaderConfig>("header");
+  const navbarKey = navbarKeyFor(institution);
+  const headerKey = headerKeyFor(institution);
+  const { data: navbarCfg } = useSiteConfig<NavbarConfig>(navbarKey);
+  const { data: headerCfgRaw } = useSiteConfig<HeaderConfig>(headerKey);
+  const { data: legacyHeader } = useSiteConfig<HeaderConfig>("header");
+  const header = headerCfgRaw ?? legacyHeader;
 
   const isEngineeringPage = institution === "engineering";
   const [isOpen, setIsOpen] = useState(false);
@@ -124,39 +202,49 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const isSolid = scrolled || forceSolidOnTop;
   const isDropdownSolid = isSolid || dropdownSolidOverride || !!desktopExpanded;
 
-  let navigationLinks: NavItem[] = mainNavigation;
   let logoText = "JCT Institutions";
   let logoSubText = "";
-  let logoLink = "/";
+  const logoLink = "/";
   let highlightColor = "text-[#d4a024]";
   let highlightBgColor = "bg-[#d4a024]";
   let highlightHoverBgColor = "hover:bg-[#e8b84a]";
   let highlightShadowColor = "shadow-[#d4a024]/10";
 
   if (institution === "engineering") {
-    navigationLinks = engineeringNavigation;
     logoText = "JCT College of";
     logoSubText = "Engineering & Technology";
-    logoLink = "/";
   } else if (institution === "arts-science") {
-    navigationLinks = artsNavigation;
     logoText = "JCT College of";
     logoSubText = "Arts and Science";
-    logoLink = "/";
     highlightColor = "text-arts-science-accent";
     highlightBgColor = "bg-arts-science-accent";
     highlightHoverBgColor = "hover:bg-arts-science-accent-dark";
     highlightShadowColor = "shadow-arts-science-accent/10";
   } else if (institution === "polytechnic") {
-    navigationLinks = polytechnicNavigation;
     logoText = "JCT Polytechnic College";
     logoSubText = "Est. 2009";
-    logoLink = "/";
     highlightColor = "text-slate-400";
     highlightBgColor = "bg-slate-500";
     highlightHoverBgColor = "hover:bg-slate-600";
     highlightShadowColor = "shadow-slate-500/10";
   }
+
+  const navigationLinks = useMemo<NavItem[]>(() => {
+    const { primary, more, moreLabel } = applyNavbarConfig(
+      navbarCfg,
+      staticNavFor(institution),
+    );
+    if (more.length === 0) return primary;
+    const moreItem: NavItem = {
+      name: moreLabel,
+      href: "#",
+      children: more.map<NavChild>((it) => ({
+        name: it.name,
+        href: it.href,
+      })),
+    };
+    return [...primary, moreItem];
+  }, [navbarCfg, institution]);
 
   const isSamePageHashLink = (href: string) => {
     return href.startsWith("#") || href.includes("#");

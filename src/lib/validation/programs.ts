@@ -183,6 +183,9 @@ const TabConfigItemSchema = z.object({
   label: zClampedString(0, LIMITS.tabLabelMax, "Tab label").default(""),
   icon: zOptionalString(LIMITS.iconNameMax).default(""),
   visible: z.boolean().optional(),
+  // When `href` is set, this entry renders as a sidebar link (not a tab activator).
+  // Used to add external URLs or links to dynamically created pages.
+  href: zOptionalString(500).default(""),
 });
 
 const sectionTitle = zOptionalString(LIMITS.sectionTitleMax);

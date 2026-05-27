@@ -13,13 +13,18 @@ import {
   HomeAdmissionsForm,
   AccreditationsForm,
   StatisticsForm,
+  HeaderForm,
+  NavbarForm,
   type PamphletVal,
   type LifeAtJctVal,
   type WhyChooseJctVal,
   type HomeAdmissionsVal,
   type AccreditationItem,
   type HomeStatisticItem,
+  type HeaderVal,
+  type NavbarVal,
 } from "@/components/admin/PageContentForms";
+import { mainNavigation } from "@/data/all-navigations";
 import {
   TextArea,
   TextInput,
@@ -750,8 +755,49 @@ function VoicesInlineManager() {
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
+const MAIN_NAVBAR_DEFAULT: NavbarVal = {
+  moreLabel: "More",
+  items: mainNavigation.map((it) => ({
+    label: it.name,
+    href: it.href,
+    visible: true,
+    inMore: false,
+    children: it.children?.map((c) => ({
+      label: c.name,
+      href: c.href,
+      desc: c.desc,
+      visible: true,
+    })),
+  })),
+};
+
 function Inner() {
   const sections: SectionDef[] = [
+    {
+      id: "header",
+      label: "Header",
+      kind: "form",
+      configKey: "mainHeader",
+      defaultValue: {
+        phone: "",
+        studentLoginLabel: "",
+        studentLoginUrl: "",
+        showStudentLogin: true,
+      } as HeaderVal,
+      render: (v, onChange) => (
+        <HeaderForm value={(v as HeaderVal) ?? {}} onChange={onChange} />
+      ),
+    },
+    {
+      id: "navbar",
+      label: "Navbar",
+      kind: "form",
+      configKey: "mainNavbar",
+      defaultValue: MAIN_NAVBAR_DEFAULT,
+      render: (v, onChange) => (
+        <NavbarForm value={(v as NavbarVal) ?? {}} onChange={onChange} />
+      ),
+    },
     {
       id: "pamphlet",
       label: "Pamphlet Popup",

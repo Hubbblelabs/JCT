@@ -26,6 +26,11 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EditableRegion } from "@/components/admin/EditableRegion";
 import { getImageUrl } from "@/lib/utils";
 import type { CoePageValue } from "@/lib/validation";
+import {
+  resolveSidebarItems,
+  type ResolvedSidebarItem,
+  type SidebarNavDefault,
+} from "@/lib/sidebar-nav";
 
 // ─── Editable sections ───────────────────────────────────────────────────────
 
@@ -59,7 +64,7 @@ export const COE_SECTION_ORDER: CoeEditableSection[] = [
 const GOVERNANCE_ICONS: LucideIcon[] = [Users, ScrollText, Landmark, Building2];
 const PHASE_ICONS: LucideIcon[] = [Settings, Activity, FileText];
 
-const NAV_SECTIONS: { anchor: string; navLabel: string; icon: LucideIcon }[] = [
+export const COE_NAV_DEFAULTS: SidebarNavDefault[] = [
   { anchor: "overview", navLabel: "Overview", icon: FileText },
   {
     anchor: "responsibilities",
@@ -104,10 +109,16 @@ function CoeSideNav({
   editable?: boolean;
   onEditSection?: (section: CoeEditableSection) => void;
 }) {
+  const navItems: ResolvedSidebarItem[] = resolveSidebarItems(
+    COE_NAV_DEFAULTS,
+    data.sidebar.navItems,
+  );
+  const builtins = navItems.filter((n) => !n.customHref);
+
   useEffect(() => {
     if (typeof window === "undefined" || window.innerWidth < 1024) return;
     const observers: IntersectionObserver[] = [];
-    NAV_SECTIONS.forEach(({ anchor }) => {
+    builtins.forEach(({ anchor }) => {
       const el = document.getElementById(anchor);
       if (!el) return;
       const observer = new IntersectionObserver(
@@ -120,7 +131,7 @@ function CoeSideNav({
       observers.push(observer);
     });
     return () => observers.forEach((obs) => obs.disconnect());
-  }, [setActiveId]);
+  }, [setActiveId, builtins]);
 
   const handleClick = (id: string) => {
     setActiveId(id);
@@ -135,55 +146,101 @@ function CoeSideNav({
   return (
     <>
       {/* Mobile pill bar */}
-      <div className="-mx-4 w-full overflow-x-auto px-4 pb-2 lg:hidden">
+      <EditableRegion
+        as="div"
+        section="sidebar"
+        label={COE_SECTION_LABELS.sidebar}
+        editable={editable}
+        onEditSection={onEditSection}
+        className="-mx-4 w-full overflow-x-auto px-4 pb-2 lg:hidden"
+      >
         <div className="flex w-max gap-2">
-          {NAV_SECTIONS.map(({ anchor, navLabel, icon: Icon }) => {
-            const isActive = activeId === anchor;
+          {navItems.map((it) => {
+            const Icon = it.icon;
+            const isActive = !it.customHref && activeId === it.anchor;
+            const cls = `flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all ${
+              isActive
+                ? "border-gold bg-gold/15 text-gold"
+                : "text-muted-foreground hover:text-foreground border-white/10 bg-white/5 hover:border-white/20"
+            }`;
+            if (it.customHref) {
+              return (
+                <Link
+                  key={it.id}
+                  href={it.customHref}
+                  target={it.isExternal ? "_blank" : undefined}
+                  rel={it.isExternal ? "noopener noreferrer" : undefined}
+                  onClick={editable ? (e) => e.preventDefault() : undefined}
+                  className={cls}
+                >
+                  <Icon size={13} className="shrink-0" />
+                  {it.navLabel}
+                </Link>
+              );
+            }
             return (
               <button
-                key={anchor}
-                onClick={() => handleClick(anchor)}
-                className={`flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all ${
-                  isActive
-                    ? "border-gold bg-gold/15 text-gold"
-                    : "text-muted-foreground hover:text-foreground border-white/10 bg-white/5 hover:border-white/20"
-                }`}
+                key={it.id}
+                onClick={editable ? undefined : () => handleClick(it.anchor)}
+                className={cls}
               >
                 <Icon size={13} className="shrink-0" />
-                {navLabel}
+                {it.navLabel}
               </button>
             );
           })}
         </div>
-      </div>
+      </EditableRegion>
 
-      {/* Desktop sticky sidebar */}
-      <div className="bg-surface border-border hidden rounded-3xl border p-6 lg:block">
+      {/* Desktop sticky sidebar — whole card is editable as "sidebar" section */}
+      <EditableRegion
+        as="div"
+        section="sidebar"
+        label={COE_SECTION_LABELS.sidebar}
+        editable={editable}
+        onEditSection={onEditSection}
+        className="bg-surface border-border hidden rounded-3xl border p-6 lg:block"
+      >
         <h3 className="mb-5 border-b border-white/10 pb-4 text-sm font-bold tracking-wider uppercase">
           On This Page
         </h3>
         <nav className="space-y-1">
-          {NAV_SECTIONS.map(({ anchor, navLabel, icon: Icon }) => {
-            const isActive = activeId === anchor;
+          {navItems.map((it) => {
+            const Icon = it.icon;
+            const isActive = !it.customHref && activeId === it.anchor;
+            const cls = `group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all ${
+              isActive
+                ? "bg-gold/15 text-gold"
+                : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+            }`;
+            const iconCls = `shrink-0 transition-colors ${
+              isActive
+                ? "text-gold"
+                : "text-muted-foreground group-hover:text-foreground"
+            }`;
+            if (it.customHref) {
+              return (
+                <Link
+                  key={it.id}
+                  href={it.customHref}
+                  target={it.isExternal ? "_blank" : undefined}
+                  rel={it.isExternal ? "noopener noreferrer" : undefined}
+                  onClick={editable ? (e) => e.preventDefault() : undefined}
+                  className={cls}
+                >
+                  <Icon size={16} className={iconCls} />
+                  <span>{it.navLabel}</span>
+                </Link>
+              );
+            }
             return (
               <button
-                key={anchor}
-                onClick={() => handleClick(anchor)}
-                className={`group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all ${
-                  isActive
-                    ? "bg-gold/15 text-gold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-                }`}
+                key={it.id}
+                onClick={editable ? undefined : () => handleClick(it.anchor)}
+                className={cls}
               >
-                <Icon
-                  size={16}
-                  className={`shrink-0 transition-colors ${
-                    isActive
-                      ? "text-gold"
-                      : "text-muted-foreground group-hover:text-foreground"
-                  }`}
-                />
-                <span>{navLabel}</span>
+                <Icon size={16} className={iconCls} />
+                <span>{it.navLabel}</span>
                 {isActive && (
                   <span className="bg-gold ml-auto h-1.5 w-1.5 rounded-full" />
                 )}
@@ -192,45 +249,36 @@ function CoeSideNav({
           })}
         </nav>
 
-        {/* Quick Facts + CTA — editable as the "sidebar" section */}
-        <EditableRegion
-          as="div"
-          section="sidebar"
-          label={COE_SECTION_LABELS.sidebar}
-          editable={editable}
-          onEditSection={onEditSection}
-        >
-          <div className="mt-6 space-y-4 border-t border-white/10 pt-6">
-            <h3 className="text-sm font-bold tracking-wider uppercase">
-              COE Quick Facts
-            </h3>
-            <div className="space-y-3">
-              {data.sidebar.quickFacts.map((fact, i) => (
-                <div key={i} className="flex flex-col gap-0.5">
-                  <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
-                    {fact.label}
-                  </span>
-                  <span className="text-foreground text-sm font-bold">
-                    {fact.value}
-                  </span>
-                </div>
-              ))}
-            </div>
+        <div className="mt-6 space-y-4 border-t border-white/10 pt-6">
+          <h3 className="text-sm font-bold tracking-wider uppercase">
+            COE Quick Facts
+          </h3>
+          <div className="space-y-3">
+            {data.sidebar.quickFacts.map((fact, i) => (
+              <div key={i} className="flex flex-col gap-0.5">
+                <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+                  {fact.label}
+                </span>
+                <span className="text-foreground text-sm font-bold">
+                  {fact.value}
+                </span>
+              </div>
+            ))}
           </div>
-          {data.sidebar.ctaLabel && (
-            <Link
-              href={data.sidebar.ctaHref || "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={editable ? (e) => e.preventDefault() : undefined}
-              className="bg-gold text-navy mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-center font-bold transition-colors hover:bg-[#e8b84a]"
-            >
-              {data.sidebar.ctaLabel}
-              <ChevronRight size={16} />
-            </Link>
-          )}
-        </EditableRegion>
-      </div>
+        </div>
+        {data.sidebar.ctaLabel && (
+          <Link
+            href={data.sidebar.ctaHref || "#"}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={editable ? (e) => e.preventDefault() : undefined}
+            className="bg-gold text-navy mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-4 text-center font-bold transition-colors hover:bg-[#e8b84a]"
+          >
+            {data.sidebar.ctaLabel}
+            <ChevronRight size={16} />
+          </Link>
+        )}
+      </EditableRegion>
     </>
   );
 }

@@ -7,10 +7,8 @@ import {
   type SectionDef,
 } from "@/components/admin/PageContentShell";
 import {
-  HeaderForm,
   FooterForm,
   FloatingElementsForm,
-  type HeaderVal,
   type FooterVal,
   type FloatingElementsVal,
 } from "@/components/admin/PageContentForms";
@@ -20,16 +18,6 @@ function Inner() {
   const section = params.get("section");
 
   const sections: SectionDef[] = [
-    {
-      id: "header",
-      label: "Header",
-      kind: "form",
-      configKey: "header",
-      defaultValue: {} as HeaderVal,
-      render: (v, onChange) => (
-        <HeaderForm value={(v as HeaderVal) ?? {}} onChange={onChange} />
-      ),
-    },
     {
       id: "footer",
       label: "Footer",
@@ -60,7 +48,7 @@ function Inner() {
   return (
     <PageContentShell
       pageTitle="Global CMS"
-      pageSubtitle="Site-wide header, footer, and floating UI elements shared across all pages."
+      pageSubtitle="Site-wide footer and floating UI elements. Header and navbar are now managed per institution (Engineering / Arts & Science / Polytechnic / Main)."
       sections={sections}
     />
   );

@@ -10,8 +10,13 @@ import {
   ItemsEditor,
   Repeater,
 } from "@/components/admin/inputs";
-import type { CoeEditableSection } from "@/components/layout/CoePageLayout";
+import {
+  COE_NAV_DEFAULTS,
+  type CoeEditableSection,
+} from "@/components/layout/CoePageLayout";
 import type { CoePageValue } from "@/lib/validation";
+import type { SidebarNavItemRaw } from "@/lib/sidebar-nav";
+import { SidebarNavEditor } from "@/components/admin/SidebarNavEditor";
 
 type Governance = CoePageValue["overview"]["governance"][number];
 type Phase = CoePageValue["responsibilities"]["phases"][number];
@@ -322,6 +327,18 @@ export function CoeSectionInspector({
             }
             placeholder="http://erp.jct.ac.in/…"
           />
+          <div className="mt-6">
+            <div className="admin-label mb-2">Sidebar Navigation Items</div>
+            <SidebarNavEditor
+              defaults={COE_NAV_DEFAULTS}
+              value={data.sidebar.navItems as SidebarNavItemRaw[] | undefined}
+              onChange={(navItems) =>
+                patch({
+                  sidebar: { ...data.sidebar, navItems },
+                })
+              }
+            />
+          </div>
         </>
       );
 

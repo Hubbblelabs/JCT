@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronDown as ChevronDownIcon,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import {
   Field,
   ImageUploadInput,
@@ -31,6 +37,7 @@ import {
   HEADER_LIMITS,
   FOOTER_LIMITS,
   FLOATING_ELEMENTS_LIMITS,
+  NAVBAR_LIMITS,
 } from "@/lib/validation";
 
 /* ─── Shared types ─── */
@@ -770,14 +777,110 @@ export function PolytechnicHeroForm({
 
 /* ─── Pamphlet ─── */
 
+type PamphletSlotVal = {
+  image?: string;
+  heading?: string;
+  subheading?: string;
+  body?: string;
+};
+
+type PamphletVirtualTourVal = {
+  enabled?: boolean;
+  label?: string;
+  url?: string;
+};
+
+type PamphletLayoutVal =
+  | "image-image"
+  | "image-text"
+  | "text-image"
+  | "text-text";
+
 export type PamphletVal = {
   enabled?: boolean;
-  images?: string[];
   delayMs?: number;
-  videoUrl?: string;
+  layout?: PamphletLayoutVal;
+  leftSlot?: PamphletSlotVal;
+  rightSlot?: PamphletSlotVal;
+  virtualTour?: PamphletVirtualTourVal;
   applyLabel?: string;
   applyHref?: string;
+  // Legacy — preserved when present so we don't drop data on save.
+  images?: string[];
+  videoUrl?: string;
 };
+
+const LAYOUT_OPTIONS: { value: PamphletLayoutVal; label: string }[] = [
+  { value: "image-image", label: "Image (left) + Image (right)" },
+  { value: "image-text", label: "Image (left) + Text (right)" },
+  { value: "text-image", label: "Text (left) + Image (right)" },
+  { value: "text-text", label: "Text (left) + Text (right)" },
+];
+
+function slotKind(
+  layout: PamphletLayoutVal,
+  side: "left" | "right",
+): "image" | "text" {
+  if (layout === "image-image") return "image";
+  if (layout === "text-text") return "text";
+  if (layout === "image-text") return side === "left" ? "image" : "text";
+  return side === "left" ? "text" : "image";
+}
+
+function PamphletSlotEditor({
+  side,
+  kind,
+  value,
+  onChange,
+}: {
+  side: "Left" | "Right";
+  kind: "image" | "text";
+  value: PamphletSlotVal;
+  onChange: (next: PamphletSlotVal) => void;
+}) {
+  return (
+    <div className="rounded-lg border border-gray-200 p-3">
+      <p className="admin-label mb-2">
+        {side} Slot — {kind === "image" ? "Image" : "Text"}
+      </p>
+      {kind === "image" ? (
+        <ImageUploadInput
+          label=""
+          value={value.image ?? ""}
+          onChange={(url) => onChange({ ...value, image: url })}
+          hideUrlField
+        />
+      ) : (
+        <div className="space-y-2">
+          <TextInput
+            label="Heading"
+            value={value.heading ?? ""}
+            maxLength={LIMITS_pamphlet.headingMax}
+            placeholder="e.g. Admissions Open 2026"
+            onChange={(e) => onChange({ ...value, heading: e.target.value })}
+          />
+          <TextInput
+            label="Subheading"
+            value={value.subheading ?? ""}
+            maxLength={LIMITS_pamphlet.subheadingMax}
+            placeholder="Short tagline"
+            onChange={(e) =>
+              onChange({ ...value, subheading: e.target.value })
+            }
+          />
+          <TextArea
+            label="Description"
+            rows={5}
+            value={value.body ?? ""}
+            maxLength={LIMITS_pamphlet.bodyMax}
+            placeholder="Detail text shown inside the popup"
+            onChange={(e) => onChange({ ...value, body: e.target.value })}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function PamphletForm({
   value,
@@ -794,6 +897,18 @@ export function PamphletForm({
     setRawDelay(String(value.delayMs ?? 2000));
   }, [value.delayMs]);
 
+  const layout: PamphletLayoutVal = value.layout ?? "image-image";
+  const leftSlot = value.leftSlot ?? {};
+  const rightSlot = value.rightSlot ?? {};
+  const virtualTour = value.virtualTour ?? {};
+
+  // First-time backfill: if no leftSlot.image but legacy images[] has data,
+  // surface the legacy data so it's visible in the editor (and persists on save).
+  const legacyImages = Array.isArray(value.images) ? value.images : [];
+  const leftImageDisplay = leftSlot.image || legacyImages[0] || "";
+  const rightImageDisplay = rightSlot.image || legacyImages[1] || "";
+  const tourUrlDisplay = virtualTour.url ?? value.videoUrl ?? "";
+
   return (
     <div className="space-y-4">
       <label className="flex items-center gap-2 text-sm">
@@ -804,6 +919,7 @@ export function PamphletForm({
         />
         Show popup on page load
       </label>
+
       <TextInput
         label="Show after (ms)"
         type="number"
@@ -823,20 +939,87 @@ export function PamphletForm({
         }}
         hint={`Delay in milliseconds before the popup appears (max ${LIMITS_pamphlet.maxDelayMs})`}
       />
-      <ImageList
-        label={`Popup Images (up to ${LIMITS_pamphlet.images} — left and right halves)`}
-        max={LIMITS_pamphlet.images}
-        hint="The pamphlet popup renders exactly two image slots — left and right. Extra images are not displayed."
-        value={value.images ?? []}
-        onChange={(next) => onChange({ ...value, images: next })}
+
+      <Select
+        label="Popup Layout"
+        value={layout}
+        options={LAYOUT_OPTIONS}
+        hint="Choose how the two sides of the popup are filled — images, text, or a mix."
+        onChange={(e) =>
+          onChange({ ...value, layout: e.target.value as PamphletLayoutVal })
+        }
       />
-      <TextInput
-        label="Virtual Tour Video URL"
-        value={value.videoUrl ?? ""}
-        onChange={(e) => onChange({ ...value, videoUrl: e.target.value })}
-        placeholder="https://www.youtube.com/embed/VIDEO_ID"
-        hint="YouTube embed URL — used for the Virtual Tour button inside the popup."
-      />
+
+      <div className="grid gap-3 md:grid-cols-2">
+        <PamphletSlotEditor
+          side="Left"
+          kind={slotKind(layout, "left")}
+          value={{ ...leftSlot, image: leftImageDisplay }}
+          onChange={(next) => onChange({ ...value, leftSlot: next })}
+        />
+        <PamphletSlotEditor
+          side="Right"
+          kind={slotKind(layout, "right")}
+          value={{ ...rightSlot, image: rightImageDisplay }}
+          onChange={(next) => onChange({ ...value, rightSlot: next })}
+        />
+      </div>
+
+      <Field
+        label="Virtual Tour Button"
+        hint="Optional. If the URL is a YouTube/embed link, the button opens an in-popup video player; otherwise it opens the URL in a new tab."
+      >
+        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={virtualTour.enabled === true}
+              onChange={(e) =>
+                onChange({
+                  ...value,
+                  virtualTour: {
+                    ...virtualTour,
+                    enabled: e.target.checked,
+                  },
+                })
+              }
+            />
+            Show Virtual Tour button
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <TextInput
+              label="Button Label"
+              value={virtualTour.label ?? ""}
+              maxLength={LIMITS_pamphlet.virtualTourLabelMax}
+              placeholder="Virtual Tour"
+              onChange={(e) =>
+                onChange({
+                  ...value,
+                  virtualTour: {
+                    ...virtualTour,
+                    label: e.target.value,
+                  },
+                })
+              }
+            />
+            <TextInput
+              label="URL / Video Link"
+              value={tourUrlDisplay}
+              onChange={(e) =>
+                onChange({
+                  ...value,
+                  virtualTour: {
+                    ...virtualTour,
+                    url: e.target.value,
+                  },
+                })
+              }
+              placeholder="https://www.youtube.com/embed/VIDEO_ID"
+            />
+          </div>
+        </div>
+      </Field>
+
       <Field
         label="Apply Now Button"
         hint="Customize the Apply Now button shown inside the pamphlet popup."
@@ -2228,6 +2411,385 @@ export function HeaderForm({
           />
         </div>
       )}
+    </div>
+  );
+}
+
+/* ─── Navbar (per-institution) ─── */
+
+export type NavbarChildVal = {
+  id?: string;
+  label?: string;
+  href?: string;
+  desc?: string;
+  visible?: boolean;
+};
+
+export type NavbarItemVal = {
+  id?: string;
+  label?: string;
+  href?: string;
+  desc?: string;
+  visible?: boolean;
+  inMore?: boolean;
+  children?: NavbarChildVal[];
+};
+
+export type NavbarVal = {
+  moreLabel?: string;
+  items?: NavbarItemVal[];
+};
+
+function moveItem<T>(arr: T[], from: number, to: number): T[] {
+  if (to < 0 || to >= arr.length) return arr;
+  const next = arr.slice();
+  const [v] = next.splice(from, 1);
+  next.splice(to, 0, v);
+  return next;
+}
+
+function ChildEditor({
+  child,
+  onChange,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
+  canUp,
+  canDown,
+}: {
+  child: NavbarChildVal;
+  onChange: (next: NavbarChildVal) => void;
+  onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  canUp: boolean;
+  canDown: boolean;
+}) {
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white p-3">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="text-xs font-medium text-gray-500">Submenu Item</span>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            disabled={!canUp}
+            onClick={onMoveUp}
+            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+            title="Move up"
+          >
+            <ArrowUp size={12} />
+          </button>
+          <button
+            type="button"
+            disabled={!canDown}
+            onClick={onMoveDown}
+            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+            title="Move down"
+          >
+            <ArrowDown size={12} />
+          </button>
+          <button
+            type="button"
+            onClick={onRemove}
+            className="admin-btn admin-btn-danger admin-btn-sm"
+          >
+            <Trash2 size={12} />
+          </button>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="Label"
+          value={child.label ?? ""}
+          maxLength={NAVBAR_LIMITS.labelMax}
+          onChange={(e) => onChange({ ...child, label: e.target.value })}
+        />
+        <TextInput
+          label="URL / Href"
+          value={child.href ?? ""}
+          onChange={(e) => onChange({ ...child, href: e.target.value })}
+          placeholder="/path or https://..."
+        />
+      </div>
+      <TextInput
+        label="Description (optional)"
+        value={child.desc ?? ""}
+        maxLength={NAVBAR_LIMITS.descMax}
+        onChange={(e) => onChange({ ...child, desc: e.target.value })}
+      />
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={child.visible !== false}
+          onChange={(e) => onChange({ ...child, visible: e.target.checked })}
+        />
+        Visible
+      </label>
+    </div>
+  );
+}
+
+function NavbarItemEditor({
+  item,
+  onChange,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
+  canUp,
+  canDown,
+}: {
+  item: NavbarItemVal;
+  onChange: (next: NavbarItemVal) => void;
+  onRemove: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
+  canUp: boolean;
+  canDown: boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const children = Array.isArray(item.children) ? item.children : [];
+  const childAtMax = children.length >= NAVBAR_LIMITS.children;
+  return (
+    <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className="flex items-center gap-2 text-sm font-medium text-gray-800"
+        >
+          <ChevronDownIcon
+            size={14}
+            className={expanded ? "" : "-rotate-90"}
+          />
+          <span>{item.label || "(unnamed item)"}</span>
+          {item.visible === false && (
+            <span className="rounded-full bg-gray-300 px-2 py-0.5 text-[10px] uppercase">
+              Hidden
+            </span>
+          )}
+          {item.inMore && (
+            <span className="rounded-full bg-amber-200 px-2 py-0.5 text-[10px] uppercase text-amber-900">
+              In More
+            </span>
+          )}
+        </button>
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            disabled={!canUp}
+            onClick={onMoveUp}
+            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+            title="Move up"
+          >
+            <ArrowUp size={12} />
+          </button>
+          <button
+            type="button"
+            disabled={!canDown}
+            onClick={onMoveDown}
+            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+            title="Move down"
+          >
+            <ArrowDown size={12} />
+          </button>
+          <button
+            type="button"
+            onClick={onRemove}
+            className="admin-btn admin-btn-danger admin-btn-sm"
+          >
+            <Trash2 size={12} /> Remove
+          </button>
+        </div>
+      </div>
+      {expanded && (
+        <div className="space-y-3 border-t border-gray-200 pt-3">
+          <div className="grid grid-cols-2 gap-3">
+            <TextInput
+              label="Label"
+              value={item.label ?? ""}
+              maxLength={NAVBAR_LIMITS.labelMax}
+              onChange={(e) => onChange({ ...item, label: e.target.value })}
+            />
+            <TextInput
+              label="URL / Href"
+              value={item.href ?? ""}
+              onChange={(e) => onChange({ ...item, href: e.target.value })}
+              placeholder="/path or # for dropdown only"
+            />
+          </div>
+          <TextInput
+            label="Description (optional)"
+            value={item.desc ?? ""}
+            maxLength={NAVBAR_LIMITS.descMax}
+            onChange={(e) => onChange({ ...item, desc: e.target.value })}
+          />
+          <div className="flex flex-wrap gap-4">
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={item.visible !== false}
+                onChange={(e) =>
+                  onChange({ ...item, visible: e.target.checked })
+                }
+              />
+              Visible
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={item.inMore === true}
+                onChange={(e) =>
+                  onChange({ ...item, inMore: e.target.checked })
+                }
+              />
+              Move into &quot;More&quot; dropdown
+            </label>
+          </div>
+          <Field
+            label="Submenu Items"
+            hint="Optional. If present, this item renders as a dropdown of these children."
+          >
+            <div className="space-y-2">
+              {children.map((child, i) => (
+                <ChildEditor
+                  key={i}
+                  child={child}
+                  onChange={(next) =>
+                    onChange({
+                      ...item,
+                      children: children.map((c, j) =>
+                        j === i ? next : c,
+                      ),
+                    })
+                  }
+                  onRemove={() =>
+                    onChange({
+                      ...item,
+                      children: children.filter((_, j) => j !== i),
+                    })
+                  }
+                  onMoveUp={() =>
+                    onChange({
+                      ...item,
+                      children: moveItem(children, i, i - 1),
+                    })
+                  }
+                  onMoveDown={() =>
+                    onChange({
+                      ...item,
+                      children: moveItem(children, i, i + 1),
+                    })
+                  }
+                  canUp={i > 0}
+                  canDown={i < children.length - 1}
+                />
+              ))}
+              <div className="flex items-center justify-between">
+                <button
+                  type="button"
+                  disabled={childAtMax}
+                  onClick={() =>
+                    onChange({
+                      ...item,
+                      children: [
+                        ...children,
+                        { label: "", href: "", visible: true },
+                      ],
+                    })
+                  }
+                  className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <Plus size={12} /> Add Submenu Item
+                </button>
+                <LimitHint
+                  count={children.length}
+                  max={NAVBAR_LIMITS.children}
+                />
+              </div>
+            </div>
+          </Field>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function NavbarForm({
+  value,
+  onChange,
+}: {
+  value: NavbarVal;
+  onChange: (v: NavbarVal) => void;
+}) {
+  const items = Array.isArray(value.items) ? value.items : [];
+  const atMax = items.length >= NAVBAR_LIMITS.items;
+  return (
+    <div className="space-y-4">
+      <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-xs text-amber-800">
+        Reorder, edit, hide, or add navigation items. Items marked
+        &quot;Move into More&quot; collapse into a single &quot;More&quot;
+        dropdown on the public site.
+      </p>
+      <TextInput
+        label="&quot;More&quot; Dropdown Label"
+        value={value.moreLabel ?? "More"}
+        maxLength={NAVBAR_LIMITS.moreLabelMax}
+        onChange={(e) => onChange({ ...value, moreLabel: e.target.value })}
+        hint="Label for the consolidated overflow dropdown on the public navbar."
+      />
+      <div className="space-y-3">
+        {items.map((item, i) => (
+          <NavbarItemEditor
+            key={i}
+            item={item}
+            onChange={(next) =>
+              onChange({
+                ...value,
+                items: items.map((it, j) => (j === i ? next : it)),
+              })
+            }
+            onRemove={() =>
+              onChange({
+                ...value,
+                items: items.filter((_, j) => j !== i),
+              })
+            }
+            onMoveUp={() =>
+              onChange({
+                ...value,
+                items: moveItem(items, i, i - 1),
+              })
+            }
+            onMoveDown={() =>
+              onChange({
+                ...value,
+                items: moveItem(items, i, i + 1),
+              })
+            }
+            canUp={i > 0}
+            canDown={i < items.length - 1}
+          />
+        ))}
+      </div>
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          disabled={atMax}
+          onClick={() =>
+            onChange({
+              ...value,
+              items: [
+                ...items,
+                { label: "", href: "", visible: true },
+              ],
+            })
+          }
+          className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Plus size={14} /> Add Navbar Item
+        </button>
+        <LimitHint count={items.length} max={NAVBAR_LIMITS.items} />
+      </div>
     </div>
   );
 }

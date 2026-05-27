@@ -9,8 +9,13 @@ import {
   ItemsEditor,
   Repeater,
 } from "@/components/admin/inputs";
-import type { AboutEditableSection } from "@/components/layout/AboutPageLayout";
+import {
+  ABOUT_NAV_DEFAULTS,
+  type AboutEditableSection,
+} from "@/components/layout/AboutPageLayout";
 import type { AboutPageValue } from "@/lib/validation";
+import type { SidebarNavItemRaw } from "@/lib/sidebar-nav";
+import { SidebarNavEditor } from "@/components/admin/SidebarNavEditor";
 
 type Stat = AboutPageValue["about"]["stats"][number];
 type MgmtMember = AboutPageValue["management"]["members"][number];
@@ -488,6 +493,18 @@ export function AboutSectionInspector({
             }
             placeholder="https://admissions.jct.ac.in/"
           />
+          <div className="mt-6">
+            <div className="admin-label mb-2">Sidebar Navigation Items</div>
+            <SidebarNavEditor
+              defaults={ABOUT_NAV_DEFAULTS}
+              value={data.sidebar.navItems as SidebarNavItemRaw[] | undefined}
+              onChange={(navItems) =>
+                patch({
+                  sidebar: { ...data.sidebar, navItems },
+                })
+              }
+            />
+          </div>
         </>
       );
 

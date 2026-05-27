@@ -37,22 +37,37 @@ const nextConfig: NextConfig = {
     qualities: [75, 90],
   },
   async headers() {
+    // Only set aggressive caching in production
+    if (process.env.NODE_ENV === "production") {
+      return [
+        {
+          source: "/_next/static/(.*)",
+          headers: [
+            {
+              key: "Cache-Control",
+              value: "public, max-age=31536000, immutable",
+            },
+          ],
+        },
+        {
+          source: "/fonts/(.*)",
+          headers: [
+            {
+              key: "Cache-Control",
+              value: "public, max-age=31536000, immutable",
+            },
+          ],
+        },
+      ];
+    }
+    // In development, explicitly disable caching to prevent stale chunks
     return [
       {
-        source: "/_next/static/(.*)",
+        source: "/(.*)",
         headers: [
           {
             key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
-      {
-        source: "/fonts/(.*)",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
+            value: "no-cache, no-store, must-revalidate",
           },
         ],
       },

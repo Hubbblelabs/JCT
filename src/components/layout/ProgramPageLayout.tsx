@@ -2114,7 +2114,10 @@ export function ProgramPageLayout({
   const visibleTabs = editable
     ? effectiveTabs
     : effectiveTabs.filter(
-        (t) => t.visible !== false && hasContentForTab(t.id, dept),
+        (t) =>
+          t.visible !== false &&
+          // Custom-link entries are always shown; built-in tabs require content.
+          (Boolean(t.href) || hasContentForTab(t.id, dept)),
       );
 
   const [activeTab, setActiveTab] = useState<string>(
@@ -2352,6 +2355,23 @@ export function ProgramPageLayout({
                       tab.label ||
                       DEFAULT_TAB_LABELS[tab.id as TabId] ||
                       tab.id;
+                    if (tab.href) {
+                      const external = /^https?:\/\//i.test(tab.href);
+                      return (
+                        <a
+                          key={tab.id}
+                          href={tab.href}
+                          target={external ? "_blank" : undefined}
+                          rel={
+                            external ? "noopener noreferrer" : undefined
+                          }
+                          className="relative flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 transition-all duration-300 hover:bg-slate-200/50 lg:justify-start lg:px-4 lg:py-3.5 lg:hover:bg-slate-50"
+                        >
+                          <Icon className="h-4 w-4 shrink-0 opacity-60" />
+                          <span className="whitespace-nowrap">{label}</span>
+                        </a>
+                      );
+                    }
                     return (
                       <button
                         key={tab.id}

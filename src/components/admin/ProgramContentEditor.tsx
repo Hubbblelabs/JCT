@@ -157,8 +157,13 @@ const TAB_CONFIG_FIELDS: FieldDef[] = [
   { key: "id", label: "Tab id", placeholder: "overview" },
   { key: "label", label: "Label", placeholder: "Overview" },
   { key: "icon", label: "Icon (optional)", placeholder: "bookOpen" },
+  {
+    key: "href",
+    label: "Custom URL (optional)",
+    placeholder: "/path or https://… — turns this entry into a sidebar link",
+  },
 ];
-const E_TAB_CONFIG: TabConfigItem = { id: "", label: "", icon: "" };
+const E_TAB_CONFIG: TabConfigItem = { id: "", label: "", icon: "", href: "" };
 
 // ─── Read-side helpers (flat first, nested fallback) ────────────────────────
 
