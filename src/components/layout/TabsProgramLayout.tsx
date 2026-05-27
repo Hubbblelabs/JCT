@@ -21,6 +21,7 @@ import {
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { getImageUrl } from "@/lib/utils";
+import { sanitizeHtml } from "@/lib/sanitize-html";
 import type { Section, TabsProgram } from "@/lib/program-tabs";
 
 export type { Section, Tab, TabsProgram } from "@/lib/program-tabs";
@@ -160,7 +161,7 @@ function SectionRenderer({
     return (
       <div
         className="prose prose-slate max-w-none rounded-xl border border-slate-200 bg-white p-6 leading-relaxed"
-        dangerouslySetInnerHTML={{ __html: section.html }}
+        dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.html) }}
       />
     );
   }

@@ -1,5 +1,11 @@
 import { NextRequest } from "next/server";
-import { requireRole, json, badRequest, serverError } from "@/lib/api-helpers";
+import {
+  requireRole,
+  json,
+  badRequest,
+  serverError,
+  enforceUploadRateLimit,
+} from "@/lib/api-helpers";
 import { getPresignedPutUrl } from "@/lib/r2";
 
 const ALLOWED_MIME = ["application/pdf"] as const;
@@ -8,8 +14,11 @@ const MAX_SIZE = 25 * 1024 * 1024;
 export const maxDuration = 30;
 
 export async function POST(req: NextRequest) {
-  const { error } = await requireRole(req, "editor");
+  const { session, error } = await requireRole(req, "editor");
   if (error) return error;
+
+  const limited = enforceUploadRateLimit(req, session!.user?.email ?? "");
+  if (limited) return limited;
 
   try {
     const body = (await req.json()) as {

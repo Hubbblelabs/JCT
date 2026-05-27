@@ -92,20 +92,32 @@ export async function POST(req: NextRequest) {
       continue;
     }
     const schema = SITE_CONFIG_SCHEMAS[key];
-    const parsed = schema.safeParse(entry.value);
-    if (!parsed.success) {
+    const parsedValue = schema.safeParse(entry.value);
+    if (!parsedValue.success) {
       errs.push(
-        `${key}: ${parsed.error.issues.map((i: { message: string }) => i.message).join(", ")}`,
+        `${key}: ${parsedValue.error.issues.map((i: { message: string }) => i.message).join(", ")}`,
       );
       continue;
     }
+    // published_value used to be stored verbatim. That bypassed schema
+    // validation and let a tampered backup inject anything into the public
+    // payload. Re-validate against the same schema; on failure, fall back
+    // to the validated `value`.
+    let publishedValue: unknown = parsedValue.data;
+    if (entry.published_value !== undefined) {
+      const parsedPublished = schema.safeParse(entry.published_value);
+      if (parsedPublished.success) {
+        publishedValue = parsedPublished.data;
+      } else {
+        errs.push(
+          `${key}.published_value: rejected by schema, reverting to draft value`,
+        );
+      }
+    }
     validConfigs.push({
       config_key: key,
-      value: parsed.data,
-      published_value:
-        entry.published_value !== undefined
-          ? entry.published_value
-          : parsed.data,
+      value: parsedValue.data,
+      published_value: publishedValue,
       status: entry.status === "published" ? "published" : "draft",
     });
   }

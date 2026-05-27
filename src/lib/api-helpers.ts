@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import type { ZodIssue, ZodType } from "zod";
 import { auth } from "@/auth";
 import { hasMinRole, type Role } from "@/lib/permissions";
+import {
+  clientIpFromHeaders,
+  consumeUploadAttempt,
+} from "@/lib/rate-limit";
 
 export function json(data: unknown, status = 200) {
   return NextResponse.json(data, { status });
@@ -93,6 +97,30 @@ export function notFound(message = "Not found") {
 
 export function serverError(message = "Internal server error") {
   return json({ error: message }, 500);
+}
+
+export function tooManyRequests(retryAfterSec: number) {
+  return NextResponse.json(
+    { error: "Too many requests" },
+    {
+      status: 429,
+      headers: { "Retry-After": String(Math.max(1, retryAfterSec)) },
+    },
+  );
+}
+
+/**
+ * Apply the upload rate limiter keyed by user email + client IP.
+ * Returns a 429 response when over the limit, or null when allowed.
+ */
+export function enforceUploadRateLimit(
+  req: NextRequest,
+  userKey: string,
+): NextResponse | null {
+  const ip = clientIpFromHeaders(req.headers);
+  const result = consumeUploadAttempt(`${userKey}|${ip}`);
+  if (!result.allowed) return tooManyRequests(result.retryAfterSec);
+  return null;
 }
 
 export async function requireAuth(_req: NextRequest) {

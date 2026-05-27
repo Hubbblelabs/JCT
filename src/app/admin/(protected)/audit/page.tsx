@@ -1,7 +1,10 @@
 export const dynamic = "force-dynamic";
 
+import { redirect } from "next/navigation";
+import { auth } from "@/auth";
 import { connectDB } from "@/lib/mongodb";
 import { AuditLog } from "@/lib/models";
+import { hasMinRole } from "@/lib/permissions";
 
 async function getLogs() {
   try {
@@ -13,6 +16,12 @@ async function getLogs() {
 }
 
 export default async function AuditPage() {
+  const session = await auth();
+  const role = (session?.user as Record<string, unknown> | undefined)
+    ?.role as string | undefined;
+  if (!session?.user || !hasMinRole(role ?? "", "admin")) {
+    redirect("/admin/dashboard");
+  }
   const logs = await getLogs();
 
   return (

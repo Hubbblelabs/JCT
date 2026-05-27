@@ -5,12 +5,37 @@ import { User } from "@/lib/models";
 import {
   requireRole,
   json,
+  badRequest,
   notFound,
   serverError,
   validateBody,
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { UserUpdateSchema } from "@/lib/validation";
+
+function currentUserId(session: unknown): string | null {
+  if (!session || typeof session !== "object") return null;
+  const s = session as { user?: { id?: unknown; email?: unknown } };
+  const id = s.user?.id;
+  return typeof id === "string" ? id : null;
+}
+
+function currentUserEmail(session: unknown): string {
+  if (!session || typeof session !== "object") return "";
+  const s = session as { user?: { email?: unknown } };
+  return typeof s.user?.email === "string" ? s.user.email : "";
+}
+
+async function isLastActiveAdminExcluding(
+  targetId: string,
+): Promise<boolean> {
+  const remaining = await User.countDocuments({
+    role: "admin",
+    is_active: true,
+    _id: { $ne: targetId },
+  });
+  return remaining === 0;
+}
 
 export async function PATCH(
   req: NextRequest,
@@ -26,8 +51,40 @@ export async function PATCH(
   try {
     await connectDB();
     const { id } = await params;
-    const update: Record<string, unknown> = {};
+    const selfId = currentUserId(session);
 
+    // Look up the target up-front to make multi-field guards possible.
+    const target = await User.findById(id).lean<{
+      _id: unknown;
+      role: string;
+      is_active: boolean;
+      email: string;
+    } | null>();
+    if (!target) return notFound("User not found");
+
+    // Self-modification guards: an admin cannot demote themselves or
+    // deactivate themselves — those changes must come from another admin
+    // to avoid accidental lockout.
+    if (selfId && String(target._id) === selfId) {
+      if (body.role && body.role !== target.role) {
+        return badRequest("You cannot change your own role");
+      }
+      if (body.is_active === false) {
+        return badRequest("You cannot deactivate your own account");
+      }
+    }
+
+    // Last-admin guard: don't allow demoting or deactivating the final
+    // active admin — the org would be locked out of the CMS.
+    if (target.role === "admin" && target.is_active) {
+      const willLoseAdmin =
+        (body.role && body.role !== "admin") || body.is_active === false;
+      if (willLoseAdmin && (await isLastActiveAdminExcluding(id))) {
+        return badRequest("Cannot remove the last active admin");
+      }
+    }
+
+    const update: Record<string, unknown> = {};
     if (body.role) {
       update.role = body.role;
       if (body.role === "admin") update.institution = "all";
@@ -50,7 +107,7 @@ export async function PATCH(
     await logAudit(
       "user",
       "updated",
-      session!.user?.email ?? "",
+      currentUserEmail(session),
       `Updated user ${user.email}`,
     );
     return json(user);
@@ -70,6 +127,28 @@ export async function DELETE(
   try {
     await connectDB();
     const { id } = await params;
+    const selfId = currentUserId(session);
+
+    const target = await User.findById(id).lean<{
+      _id: unknown;
+      role: string;
+      is_active: boolean;
+      email: string;
+    } | null>();
+    if (!target) return notFound("User not found");
+
+    if (selfId && String(target._id) === selfId) {
+      return badRequest("You cannot deactivate your own account");
+    }
+
+    if (
+      target.role === "admin" &&
+      target.is_active &&
+      (await isLastActiveAdminExcluding(id))
+    ) {
+      return badRequest("Cannot deactivate the last active admin");
+    }
+
     const user = await User.findByIdAndUpdate(
       id,
       { is_active: false },
@@ -80,7 +159,7 @@ export async function DELETE(
     await logAudit(
       "user",
       "deactivated",
-      session!.user?.email ?? "",
+      currentUserEmail(session),
       `Deactivated user ${user.email}`,
     );
     return json({ message: "Deactivated" });

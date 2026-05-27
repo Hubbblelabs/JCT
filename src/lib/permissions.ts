@@ -9,14 +9,6 @@ export function hasMinRole(userRole: string, minRole: Role): boolean {
   return (ROLE_RANK[userRole as Role] ?? -1) >= ROLE_RANK[minRole];
 }
 
-export function canEdit(_userRole: string): boolean {
-  return true;
-}
-
-export function canPublish(_userRole: string): boolean {
-  return true;
-}
-
 export function canManageUsers(userRole: string): boolean {
   return hasMinRole(userRole, "admin");
 }

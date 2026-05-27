@@ -40,17 +40,15 @@ export async function GET(req: Request) {
 
     if (key) {
       const doc = await SiteConfig.findOne({ config_key: key });
-      if (!doc) return NextResponse.json({ source: "empty", data: null });
-      let value =
-        doc.status === "published" && doc.published_value
-          ? doc.published_value
-          : doc.value;
-
-      // Special handling for homeProspectus to construct full URL
+      // Public endpoint must only ever return published values. Falling back
+      // to `doc.value` leaks unpublished drafts to anonymous visitors.
+      if (!doc || doc.status !== "published" || !doc.published_value) {
+        return NextResponse.json({ source: "empty", data: null });
+      }
+      let value: unknown = doc.published_value;
       if (key === "homeProspectus") {
         value = resolveProspectusUrl(value);
       }
-
       return NextResponse.json({ source: "db", data: value });
     }
 
@@ -61,16 +59,11 @@ export async function GET(req: Request) {
 
     const data: Record<string, unknown> = {};
     for (const doc of docs) {
-      let value =
-        doc.status === "published" && doc.published_value
-          ? doc.published_value
-          : doc.value;
-
-      // Special handling for homeProspectus
+      if (doc.status !== "published" || !doc.published_value) continue;
+      let value: unknown = doc.published_value;
       if (doc.config_key === "homeProspectus") {
         value = resolveProspectusUrl(value);
       }
-
       data[doc.config_key] = value;
     }
 

@@ -4,7 +4,9 @@ import { AuditLog } from "@/lib/models";
 import { requireRole, json, serverError } from "@/lib/api-helpers";
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireRole(req, "editor");
+  // Audit history exposes other users' actions/emails. Editors are
+  // institution-scoped and should not see global admin activity.
+  const { error } = await requireRole(req, "admin");
   if (error) return error;
 
   try {

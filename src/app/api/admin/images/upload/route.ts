@@ -10,6 +10,7 @@ import {
   serverError,
   validateFields,
   validationError,
+  enforceUploadRateLimit,
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import {
@@ -50,11 +51,20 @@ export async function POST(req: NextRequest) {
   const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
+  const limited = enforceUploadRateLimit(req, session!.user?.email ?? "");
+  if (limited) return limited;
+
   try {
     const formData = await req.formData();
     const file = formData.get("file") as File | null;
 
     if (!file) return badRequest("No file provided");
+    // Reject SVG explicitly even if it never appears in the allowlist —
+    // sharp + libvips can parse SVG and the format historically carries
+    // XXE / external-fetch risk. Defense in depth.
+    if (file.type === "image/svg+xml" || /\.svgz?$/i.test(file.name)) {
+      return badRequest("SVG uploads are not supported");
+    }
     if (
       !ALLOWED_MIME_TYPES.includes(
         file.type as (typeof ALLOWED_MIME_TYPES)[number],
@@ -87,8 +97,25 @@ export async function POST(req: NextRequest) {
 
     // Inspect dimensions before resize so per-category rules apply to the
     // user-supplied image, not the post-resize artifact.
-    const sharpInstance = sharp(buffer);
-    const metadata = await sharpInstance.metadata();
+    //
+    // failOn:"error" makes sharp abort on broken/malicious inputs instead
+    // of silently producing partial output. limitInputPixels caps the
+    // decoded surface to ~268 megapixels (the libvips default), so a
+    // ~10MB PNG with absurd dimensions can't OOM the worker.
+    let sharpInstance: ReturnType<typeof sharp>;
+    let metadata: Awaited<ReturnType<ReturnType<typeof sharp>["metadata"]>>;
+    try {
+      sharpInstance = sharp(buffer, {
+        failOn: "error",
+        limitInputPixels: 268_402_689,
+      });
+      metadata = await sharpInstance.metadata();
+    } catch {
+      return badRequest("Could not decode image. Try a different file.");
+    }
+    if (metadata.format === "svg") {
+      return badRequest("SVG uploads are not supported");
+    }
     const origWidth = metadata.width ?? 0;
     const origHeight = metadata.height ?? 0;
     if (origWidth === 0 || origHeight === 0) {
@@ -117,8 +144,12 @@ export async function POST(req: NextRequest) {
     const baseName = file.name
       .replace(/\.[^.]+$/, "")
       .replace(/\s+/g, "-")
-      .replace(/[^a-zA-Z0-9._-]/g, "_");
-    const filename = `${Date.now()}-${baseName}.webp`;
+      .replace(/[^a-zA-Z0-9._-]/g, "_")
+      .slice(0, 80);
+    // Random suffix so concurrent uploads of the same filename don't
+    // collide on the R2 key (Date.now() is not unique under load).
+    const suffix = crypto.randomUUID().slice(0, 8);
+    const filename = `${Date.now()}-${suffix}-${baseName}.webp`;
     const storageKey = `images/${filename}`;
 
     await uploadToR2(storageKey, webpBuffer, "image/webp");

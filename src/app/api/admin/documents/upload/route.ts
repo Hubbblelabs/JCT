@@ -2,7 +2,13 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { DocumentAsset } from "@/lib/models";
 import { uploadToR2, deleteFromR2 } from "@/lib/r2";
-import { requireRole, json, badRequest, serverError } from "@/lib/api-helpers";
+import {
+  requireRole,
+  json,
+  badRequest,
+  serverError,
+  enforceUploadRateLimit,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 
 const ALLOWED_MIME = ["application/pdf"] as const;
@@ -13,6 +19,9 @@ export const maxDuration = 60;
 export async function POST(req: NextRequest) {
   const { session, error } = await requireRole(req, "editor");
   if (error) return error;
+
+  const limited = enforceUploadRateLimit(req, session!.user?.email ?? "");
+  if (limited) return limited;
 
   try {
     const formData = await req.formData();
