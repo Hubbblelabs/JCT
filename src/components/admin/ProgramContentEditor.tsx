@@ -306,7 +306,8 @@ export type ProgramContentSection =
   | "magazine"
   | "participation"
   | "careerProgression"
-  | "feedback";
+  | "feedback"
+  | "tabs";
 
 export const PROGRAM_CONTENT_SECTION_LABELS: Record<
   ProgramContentSection,
@@ -334,6 +335,7 @@ export const PROGRAM_CONTENT_SECTION_LABELS: Record<
   participation: "Participation & clubs",
   careerProgression: "Career progression",
   feedback: "Feedback & improvements",
+  tabs: "Sidebar tabs",
 };
 
 export function ProgramSectionInspector({
@@ -842,6 +844,29 @@ export function ProgramSectionInspector({
             }
             onChange={(v) => setObj("feedback", "recentImprovements", v)}
           />
+        </>
+      );
+    case "tabs":
+      return (
+        <>
+          <p className="mb-3 text-xs text-gray-500">
+            Reorder, rename, hide, or add custom sidebar entries. Set a Custom
+            URL to turn any entry into a direct link instead of a tab.
+          </p>
+          <ItemsEditor
+            items={flatArr<Record<string, unknown>>(content, "tabsConfig")}
+            onChange={(v) => set("tabsConfig", v)}
+            fields={TAB_CONFIG_FIELDS}
+            emptyItem={E_TAB_CONFIG as unknown as Record<string, unknown>}
+            addLabel="Add Tab"
+          />
+          <button
+            type="button"
+            onClick={() => set("tabsConfig", [])}
+            className="admin-btn admin-btn-outline admin-btn-sm mt-2"
+          >
+            Reset to default 6 tabs
+          </button>
         </>
       );
   }

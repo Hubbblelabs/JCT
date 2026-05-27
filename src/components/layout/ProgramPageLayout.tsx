@@ -135,7 +135,8 @@ export type ProgramEditableSection =
   | "magazine"
   | "participation"
   | "careerProgression"
-  | "feedback";
+  | "feedback"
+  | "tabs";
 
 const EDITABLE_SECTION_LABELS: Record<ProgramEditableSection, string> = {
   hero: "Hero",
@@ -160,6 +161,7 @@ const EDITABLE_SECTION_LABELS: Record<ProgramEditableSection, string> = {
   participation: "Participation & clubs",
   careerProgression: "Career progression",
   feedback: "Feedback & improvements",
+  tabs: "Sidebar tabs",
 };
 
 type EditableSectionProps = {
@@ -2342,7 +2344,13 @@ export function ProgramPageLayout({
         <div className="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
             {/* ── Floating Sidebar (Tabs) ──────────────────────────────── */}
-            <aside className="shrink-0 lg:w-72">
+            <EditableRegion
+              as="aside"
+              section="tabs"
+              editable={editable}
+              onEditSection={onEditSection}
+              className="shrink-0 lg:w-72"
+            >
               <div className="sticky top-24 z-40 lg:rounded-2xl lg:border lg:border-slate-200/60 lg:bg-white lg:p-3 lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                 <nav className="grid grid-cols-2 gap-2 pb-4 sm:grid-cols-3 lg:flex lg:flex-col lg:items-stretch lg:gap-1 lg:pb-0">
                   {visibleTabs.map((tab) => {
@@ -2360,11 +2368,14 @@ export function ProgramPageLayout({
                       return (
                         <a
                           key={tab.id}
-                          href={tab.href}
-                          target={external ? "_blank" : undefined}
+                          href={editable ? "#" : tab.href}
+                          target={!editable && external ? "_blank" : undefined}
                           rel={
-                            external ? "noopener noreferrer" : undefined
+                            !editable && external
+                              ? "noopener noreferrer"
+                              : undefined
                           }
+                          onClick={editable ? (e) => e.preventDefault() : undefined}
                           className="relative flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 transition-all duration-300 hover:bg-slate-200/50 lg:justify-start lg:px-4 lg:py-3.5 lg:hover:bg-slate-50"
                         >
                           <Icon className="h-4 w-4 shrink-0 opacity-60" />
@@ -2375,7 +2386,7 @@ export function ProgramPageLayout({
                     return (
                       <button
                         key={tab.id}
-                        onClick={() => setActiveTab(tab.id)}
+                        onClick={editable ? undefined : () => setActiveTab(tab.id)}
                         className={`relative flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-300 lg:justify-start lg:px-4 lg:py-3.5 ${
                           isActive
                             ? ""
@@ -2407,7 +2418,7 @@ export function ProgramPageLayout({
                   })}
                 </nav>
               </div>
-            </aside>
+            </EditableRegion>
 
             {/* ── Tab Content Container ───────────────────────────────── */}
             <div className="min-w-0 flex-1 pb-16">

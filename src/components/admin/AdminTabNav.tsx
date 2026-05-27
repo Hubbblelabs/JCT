@@ -266,6 +266,12 @@ const GLOBAL_CMS_ITEMS: NavItem[] = [
 ];
 
 const ADMIN_ITEMS: NavItem[] = [
+  {
+    label: "Dynamic Pages",
+    href: "/admin/pages",
+    icon: FileEdit,
+    minRole: "editor",
+  },
   { label: "Users", href: "/admin/users", icon: Users, minRole: "admin" },
   {
     label: "Audit Log",
@@ -399,15 +405,6 @@ function TabNavInner() {
               Dashboard
             </Link>
           )}
-
-          {/* Dynamic Pages — top-level for visibility */}
-          <Link
-            href="/admin/pages"
-            className={`admin-nav-trigger ${pathname.startsWith("/admin/pages") ? "active" : ""}`}
-          >
-            <FileEdit size={13} />
-            Pages
-          </Link>
 
           {/* Admin tools dropdown — admin only */}
           {isAdmin && visibleAdminItems.length > 0 && (
