@@ -6,7 +6,6 @@ export const NAVBAR_LIMITS = {
   children: 16,
   labelMax: 60,
   descMax: 160,
-  moreLabelMax: 30,
 } as const;
 
 export const NavbarChildSchema = z.object({
@@ -33,9 +32,6 @@ export const NavbarItemSchema = z.object({
 export type NavbarItem = z.infer<typeof NavbarItemSchema>;
 
 export const NavbarSchema = z.object({
-  moreLabel: zClampedString(1, NAVBAR_LIMITS.moreLabelMax, "More label")
-    .optional()
-    .default("More"),
   items: z
     .array(NavbarItemSchema)
     .max(NAVBAR_LIMITS.items)

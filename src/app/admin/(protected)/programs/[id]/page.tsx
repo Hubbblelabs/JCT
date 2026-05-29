@@ -330,7 +330,7 @@ function ProgramDetailInner() {
 
           {!isNew && prog.slug && (
             <a
-              href={`/institutions/engineering/programs/${prog.slug}`}
+              href={`/institutions/${prog.institution}/programs/${prog.slug}`}
               target="_blank"
               rel="noopener noreferrer"
               className="admin-btn admin-btn-outline admin-btn-sm"

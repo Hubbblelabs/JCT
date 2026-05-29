@@ -21,8 +21,7 @@ import {
   AdmissionsForm,
   LifeAtJctForm,
   MetricsForm,
-  HeaderForm,
-  NavbarForm,
+  HeaderNavbarSection,
   type EngHeroVal,
   type ArtsHeroVal,
   type PolyHeroVal,
@@ -32,7 +31,6 @@ import {
   type GenericAdmissionsVal,
   type LifeAtJctVal,
   type Metric,
-  type HeaderVal,
   type NavbarVal,
 } from "@/components/admin/PageContentForms";
 import {
@@ -58,7 +56,6 @@ function navDefaultFor(college: College): NavbarVal {
         ? artsNavigation
         : polytechnicNavigation;
   return {
-    moreLabel: "More",
     items: src.map((it) => ({
       label: it.name,
       href: it.href,
@@ -74,38 +71,21 @@ function navDefaultFor(college: College): NavbarVal {
   };
 }
 
-const HEADER_DEFAULT: HeaderVal = {
-  phone: "",
-  studentLoginLabel: "",
-  studentLoginUrl: "",
-  showStudentLogin: true,
-};
-
-function headerSection(configKey: string): SectionDef {
-  return {
-    id: "header",
-    label: "Header",
-    kind: "form",
-    configKey,
-    defaultValue: HEADER_DEFAULT,
-    render: (v, onChange) => (
-      <HeaderForm value={(v as HeaderVal) ?? {}} onChange={onChange} />
-    ),
-  };
-}
-
-function navbarSection(
-  configKey: string,
-  defaultValue: NavbarVal,
+function headerNavbarSection(
+  headerConfigKey: string,
+  navbarConfigKey: string,
+  navDefault: NavbarVal,
 ): SectionDef {
   return {
-    id: "navbar",
-    label: "Navbar",
-    kind: "form",
-    configKey,
-    defaultValue,
-    render: (v, onChange) => (
-      <NavbarForm value={(v as NavbarVal) ?? {}} onChange={onChange} />
+    id: "header-navbar",
+    label: "Header & Navbar",
+    kind: "custom",
+    customRender: () => (
+      <HeaderNavbarSection
+        headerConfigKey={headerConfigKey}
+        navbarConfigKey={navbarConfigKey}
+        navDefault={navDefault}
+      />
     ),
   };
 }
@@ -515,8 +495,11 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
 function sectionsFor(college: College): SectionDef[] {
   if (college === "engineering") {
     return [
-      headerSection("engineeringHeader"),
-      navbarSection("engineeringNavbar", navDefaultFor("engineering")),
+      headerNavbarSection(
+        "engineeringHeader",
+        "engineeringNavbar",
+        navDefaultFor("engineering"),
+      ),
       {
         id: "announcement",
         label: "Announcement Bar",
@@ -601,8 +584,11 @@ function sectionsFor(college: College): SectionDef[] {
 
   if (college === "arts-science") {
     return [
-      headerSection("artsScienceHeader"),
-      navbarSection("artsScienceNavbar", navDefaultFor("arts-science")),
+      headerNavbarSection(
+        "artsScienceHeader",
+        "artsScienceNavbar",
+        navDefaultFor("arts-science"),
+      ),
       {
         id: "hero",
         label: "Hero",
@@ -656,8 +642,11 @@ function sectionsFor(college: College): SectionDef[] {
 
   // polytechnic
   return [
-    headerSection("polytechnicHeader"),
-    navbarSection("polytechnicNavbar", navDefaultFor("polytechnic")),
+    headerNavbarSection(
+      "polytechnicHeader",
+      "polytechnicNavbar",
+      navDefaultFor("polytechnic"),
+    ),
     {
       id: "hero",
       label: "Hero",

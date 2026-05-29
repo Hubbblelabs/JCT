@@ -45,7 +45,6 @@ type NavbarConfigItem = {
 };
 
 type NavbarConfig = {
-  moreLabel?: string;
   items?: NavbarConfigItem[];
 };
 
@@ -73,10 +72,10 @@ function staticNavFor(institution: string): NavItem[] {
 function applyNavbarConfig(
   cfg: NavbarConfig | null,
   fallback: NavItem[],
-): { primary: NavItem[]; more: NavItem[]; moreLabel: string } {
+): { primary: NavItem[]; more: NavItem[] } {
   const items = Array.isArray(cfg?.items) ? cfg!.items : [];
   if (items.length === 0) {
-    return { primary: fallback, more: [], moreLabel: cfg?.moreLabel || "More" };
+    return { primary: fallback, more: [] };
   }
   const primary: NavItem[] = [];
   const more: NavItem[] = [];
@@ -98,7 +97,7 @@ function applyNavbarConfig(
     };
     (raw.inMore ? more : primary).push(item);
   }
-  return { primary, more, moreLabel: cfg?.moreLabel || "More" };
+  return { primary, more };
 }
 
 export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
@@ -230,13 +229,13 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   }
 
   const navigationLinks = useMemo<NavItem[]>(() => {
-    const { primary, more, moreLabel } = applyNavbarConfig(
+    const { primary, more } = applyNavbarConfig(
       navbarCfg,
       staticNavFor(institution),
     );
     if (more.length === 0) return primary;
     const moreItem: NavItem = {
-      name: moreLabel,
+      name: "More",
       href: "#",
       children: more.map<NavChild>((it) => ({
         name: it.name,
@@ -445,7 +444,9 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                             transition={{ duration: 0.22, ease: "easeOut" }}
                             className={`rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
                               link.name === "More"
-                                ? "grid w-[600px] grid-cols-2 gap-x-2 gap-y-1"
+                                ? (link.children?.length ?? 0) > 1
+                                  ? "grid w-[600px] grid-cols-2 gap-x-2 gap-y-1"
+                                  : "w-72"
                                 : "w-72"
                             } ${
                               isDropdownSolid

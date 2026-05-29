@@ -2375,7 +2375,10 @@ export function ProgramPageLayout({
                               ? "noopener noreferrer"
                               : undefined
                           }
-                          onClick={editable ? (e) => e.preventDefault() : undefined}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (editable) e.preventDefault();
+                          }}
                           className="relative flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold text-slate-600 transition-all duration-300 hover:bg-slate-200/50 lg:justify-start lg:px-4 lg:py-3.5 lg:hover:bg-slate-50"
                         >
                           <Icon className="h-4 w-4 shrink-0 opacity-60" />
@@ -2386,7 +2389,7 @@ export function ProgramPageLayout({
                     return (
                       <button
                         key={tab.id}
-                        onClick={editable ? undefined : () => setActiveTab(tab.id)}
+                        onClick={(e) => { e.stopPropagation(); setActiveTab(tab.id); }}
                         className={`relative flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-300 lg:justify-start lg:px-4 lg:py-3.5 ${
                           isActive
                             ? ""
