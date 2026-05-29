@@ -309,8 +309,7 @@ export type ProgramContentSection =
   | "participation"
   | "careerProgression"
   | "feedback"
-  | "tabs"
-  | "customBlocks";
+  | "tabs";
 
 export const PROGRAM_CONTENT_SECTION_LABELS: Record<
   ProgramContentSection,
@@ -339,7 +338,6 @@ export const PROGRAM_CONTENT_SECTION_LABELS: Record<
   careerProgression: "Career progression",
   feedback: "Feedback & improvements",
   tabs: "Sidebar tabs",
-  customBlocks: "Custom blocks",
 };
 
 export function ProgramSectionInspector({
@@ -353,7 +351,7 @@ export function ProgramSectionInspector({
   programSlug,
   onProgramSlugChange,
 }: {
-  section: ProgramContentSection;
+  section: string;
   content: RawContent;
   onChange: (next: RawContent) => void;
   programName?: string;
@@ -373,6 +371,46 @@ export function ProgramSectionInspector({
         [sub]: val,
       },
     });
+
+  // Custom content tab: edit its label + content blocks (stored on tabsConfig).
+  if (section.startsWith("tab:")) {
+    const tabId = section.slice("tab:".length);
+    const tabs = Array.isArray(content.tabsConfig)
+      ? (content.tabsConfig as Array<Record<string, unknown>>)
+      : [];
+    const idx = tabs.findIndex((t) => (t.id as string) === tabId);
+    if (idx === -1) {
+      return (
+        <p className="text-sm text-gray-500">
+          This tab no longer exists. Re-open the inspector.
+        </p>
+      );
+    }
+    const tab = tabs[idx];
+    const updateTab = (next: Record<string, unknown>) =>
+      set(
+        "tabsConfig",
+        tabs.map((t, j) => (j === idx ? { ...t, ...next } : t)),
+      );
+    return (
+      <div className="space-y-4">
+        <TextInput
+          label="Tab Label"
+          value={(tab.label as string) ?? ""}
+          placeholder="Name shown in the sidebar"
+          onChange={(e) => updateTab({ label: e.target.value })}
+        />
+        <div>
+          <div className="admin-label mb-2">Content Blocks</div>
+          <PageBodySectionsEditor
+            value={(tab.blocks ?? []) as PageBodySection[]}
+            onChange={(blocks) => updateTab({ blocks })}
+            allowedTypes={["heading", "text", "image", "list", "cards"]}
+          />
+        </div>
+      </div>
+    );
+  }
 
   switch (section) {
     case "hero":
@@ -855,7 +893,9 @@ export function ProgramSectionInspector({
         <>
           <p className="mb-3 text-xs text-gray-500">
             Reorder, rename, hide, or add custom sidebar entries. Set a Custom
-            URL to turn any entry into a direct link instead of a tab.
+            URL to turn any entry into a direct link. For a custom content tab,
+            add an entry with a unique id and no URL, then click that tab in the
+            preview to add its content blocks.
           </p>
           <ItemsEditor
             items={flatArr<Record<string, unknown>>(content, "tabsConfig")}
@@ -872,18 +912,6 @@ export function ProgramSectionInspector({
             Reset to default 6 tabs
           </button>
         </>
-      );
-    case "customBlocks":
-      return (
-        <PageBodySectionsEditor
-          value={
-            (Array.isArray(content.customBlocks)
-              ? content.customBlocks
-              : []) as PageBodySection[]
-          }
-          onChange={(blocks) => set("customBlocks", blocks)}
-          allowedTypes={["heading", "text", "image", "list", "cards"]}
-        />
       );
   }
 }

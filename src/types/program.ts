@@ -54,6 +54,8 @@ export type TabConfigItem = {
   visible?: boolean;
   /** When set, the sidebar entry renders as a link to this URL instead of activating a tab. */
   href?: string;
+  /** Custom content tab: blocks rendered as this tab's page content. */
+  blocks?: import("@/lib/validation").PageBodySection[];
 };
 
 export type OverviewLabels = {
@@ -290,5 +292,4 @@ export type ProgramData = {
   heroMeta?: HeroMetaItem[];
   tabsConfig?: TabConfigItem[];
   labels?: LabelsTree;
-  customBlocks?: import("@/lib/validation").PageBodySection[];
 };

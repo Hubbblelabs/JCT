@@ -114,6 +114,10 @@ function iconFromName(name?: string): ElementType | undefined {
   return ICON_REGISTRY[name];
 }
 
+function isKnownTab(id: string): id is TabId {
+  return (KNOWN_TAB_IDS as readonly string[]).includes(id);
+}
+
 export type ProgramEditableSection =
   | "hero"
   | "stats"
@@ -2120,8 +2124,12 @@ export function ProgramPageLayout({
     : effectiveTabs.filter(
         (t) =>
           t.visible !== false &&
-          // Custom-link entries are always shown; built-in tabs require content.
-          (Boolean(t.href) || hasContentForTab(t.id, dept)),
+          // Custom-link entries always show; built-in tabs require content;
+          // custom content tabs require at least one block.
+          (Boolean(t.href) ||
+            (isKnownTab(t.id)
+              ? hasContentForTab(t.id, dept)
+              : (t.blocks?.length ?? 0) > 0)),
       );
 
   const [activeTab, setActiveTab] = useState<string>(
@@ -2217,25 +2225,26 @@ export function ProgramPageLayout({
             onEditSection={onEditSection}
           />
         );
-      case "custom":
+      default: {
+        // Custom content tab: render its own blocks.
+        const tab = effectiveTabs.find((t) => t.id === activeTab);
+        if (!tab || tab.href) return null;
+        const blocks = tab.blocks ?? [];
+        if (editable && blocks.length === 0) {
+          return (
+            <div className="rounded-xl border-2 border-dashed border-gray-200 py-8 text-center text-sm text-gray-400">
+              No content yet. Add content blocks for this tab in the inspector.
+            </div>
+          );
+        }
         return (
           <div className="space-y-4 py-2">
-            {editable && (!dept.customBlocks || dept.customBlocks.length === 0) ? (
-              <div className="rounded-xl border-2 border-dashed border-gray-200 py-8 text-center text-sm text-gray-400">
-                No custom blocks yet. Click &ldquo;Custom Blocks&rdquo; in the inspector to add content.
-              </div>
-            ) : (
-              <PageBlocksRenderer blocks={dept.customBlocks ?? []} />
-            )}
+            <PageBlocksRenderer blocks={blocks} />
           </div>
         );
-      default:
-        return null;
+      }
     }
   };
-
-  const hasCustomBlocks =
-    editable || (dept.customBlocks && dept.customBlocks.length > 0);
 
   const degreePrefix =
     typeof dept.degreePrefix === "string" ? dept.degreePrefix : "";
@@ -2406,7 +2415,12 @@ export function ProgramPageLayout({
                     return (
                       <button
                         key={tab.id}
-                        onClick={(e) => { e.stopPropagation(); setActiveTab(tab.id); }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setActiveTab(tab.id);
+                          if (editable && !isKnownTab(tab.id))
+                            onEditTab?.(tab.id);
+                        }}
                         className={`relative flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-300 lg:justify-start lg:px-4 lg:py-3.5 ${
                           isActive
                             ? ""
@@ -2436,41 +2450,6 @@ export function ProgramPageLayout({
                       </button>
                     );
                   })}
-                  {hasCustomBlocks && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveTab("custom");
-                        if (editable) onEditTab?.("custom");
-                      }}
-                      className={`relative flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-300 lg:justify-start lg:px-4 lg:py-3.5 ${
-                        activeTab === "custom"
-                          ? ""
-                          : "text-slate-600 hover:bg-slate-200/50 lg:hover:bg-slate-50"
-                      }`}
-                      style={activeTab === "custom" ? { color: ac } : {}}
-                    >
-                      <Layers
-                        className={`h-4 w-4 shrink-0 transition-transform duration-300 ${activeTab === "custom" ? "scale-110" : "opacity-60"}`}
-                      />
-                      <span className="whitespace-nowrap">Custom Blocks</span>
-                      {activeTab === "custom" && (
-                        <motion.div
-                          layoutId="activeTabIndicator"
-                          className="absolute inset-0 z-[-1] rounded-xl"
-                          style={{
-                            backgroundColor: `${ac}12`,
-                            border: `1.5px solid ${ac}25`,
-                          }}
-                          transition={{
-                            type: "spring",
-                            bounce: 0.2,
-                            duration: 0.55,
-                          }}
-                        />
-                      )}
-                    </button>
-                  )}
                 </nav>
               </div>
             </EditableRegion>

@@ -66,7 +66,7 @@ function ProgramDetailInner() {
   });
   const [content, setContent] = useState<Record<string, unknown>>({});
   const [status, setStatus] = useState<string>("draft");
-  const [selectedSection, setSelectedSection] = useState<ProgramContentSection>(
+  const [selectedSection, setSelectedSection] = useState<string>(
     selectedFromUrl && selectedFromUrl in PROGRAM_CONTENT_SECTION_LABELS
       ? selectedFromUrl
       : "hero",
@@ -114,11 +114,24 @@ function ProgramDetailInner() {
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
-  const selectSection = (section: ProgramContentSection) => {
+  const selectSection = (section: string) => {
     setSelectedSection(section);
     setParam({ section });
     setIsInspectorOpen(true);
   };
+
+  const inspectorTitle = selectedSection.startsWith("tab:")
+    ? (() => {
+        const tabId = selectedSection.slice("tab:".length);
+        const tabs = Array.isArray(content.tabsConfig)
+          ? (content.tabsConfig as Array<Record<string, unknown>>)
+          : [];
+        const t = tabs.find((it) => (it.id as string) === tabId);
+        return (t?.label as string)?.trim() || "Custom Tab";
+      })()
+    : (PROGRAM_CONTENT_SECTION_LABELS[
+        selectedSection as ProgramContentSection
+      ] ?? "Section");
 
   const save = async () => {
     setSaving(true);
@@ -422,9 +435,10 @@ function ProgramDetailInner() {
                   facilities: "labs",
                   life: "events",
                   career: "careerProgression",
-                  custom: "customBlocks",
                 };
-                selectSection(defaults[tabId] ?? "hero");
+                // Built-in tabs map to their default section; custom content
+                // tabs open their own block editor (tab:<id>).
+                selectSection(defaults[tabId] ?? `tab:${tabId}`);
               }}
             />
           ) : (
@@ -474,7 +488,7 @@ function ProgramDetailInner() {
                     Inspector
                   </p>
                   <h2 className="mt-0.5 font-semibold text-gray-900">
-                    {PROGRAM_CONTENT_SECTION_LABELS[selectedSection]}
+                    {inspectorTitle}
                   </h2>
                 </div>
                 <button

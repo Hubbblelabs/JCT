@@ -40,11 +40,17 @@ function normalizeTabsConfig(v: unknown): TabConfigItem[] | undefined {
     const label = typeof r.label === "string" ? r.label : "";
     const icon = typeof r.icon === "string" && r.icon ? r.icon : undefined;
     const visible = typeof r.visible === "boolean" ? r.visible : undefined;
+    const href = typeof r.href === "string" && r.href ? r.href : undefined;
+    const blocks = Array.isArray(r.blocks)
+      ? (r.blocks as TabConfigItem["blocks"])
+      : undefined;
     out.push({
       id,
       label,
       ...(icon ? { icon } : {}),
       ...(visible === undefined ? {} : { visible }),
+      ...(href ? { href } : {}),
+      ...(blocks ? { blocks } : {}),
     });
   }
   return out.length > 0 ? out : undefined;
@@ -224,8 +230,5 @@ export function normalizeProgramData(
     heroMeta: normalizeHeroMeta(c.heroMeta),
     tabsConfig: normalizeTabsConfig(c.tabsConfig),
     labels: normalizeLabels(c.labels),
-    customBlocks: Array.isArray(c.customBlocks)
-      ? (c.customBlocks as import("@/lib/validation").PageBodySection[])
-      : undefined,
   };
 }
