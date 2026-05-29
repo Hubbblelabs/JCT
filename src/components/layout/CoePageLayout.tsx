@@ -25,7 +25,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EditableRegion } from "@/components/admin/EditableRegion";
 import { getImageUrl } from "@/lib/utils";
-import type { CoePageValue } from "@/lib/validation";
+import type { CoePageValue, PageBodySection } from "@/lib/validation";
 import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
 import {
   resolveSidebarItems,
@@ -41,8 +41,7 @@ export type CoeEditableSection =
   | "responsibilities"
   | "obe"
   | "downloads"
-  | "sidebar"
-  | "customContent";
+  | "sidebar";
 
 export const COE_SECTION_LABELS: Record<CoeEditableSection, string> = {
   hero: "Hero",
@@ -51,7 +50,6 @@ export const COE_SECTION_LABELS: Record<CoeEditableSection, string> = {
   obe: "Outcome Based Education",
   downloads: "Circulars & Downloads",
   sidebar: "Sidebar (Quick Facts & CTA)",
-  customContent: "Custom Content",
 };
 
 export const COE_SECTION_ORDER: CoeEditableSection[] = [
@@ -61,7 +59,6 @@ export const COE_SECTION_ORDER: CoeEditableSection[] = [
   "obe",
   "downloads",
   "sidebar",
-  "customContent",
 ];
 
 // Position-based icons — cannot be persisted in the DB.
@@ -111,7 +108,7 @@ function CoeSideNav({
   activeId: string;
   setActiveId: (id: string) => void;
   editable?: boolean;
-  onEditSection?: (section: CoeEditableSection) => void;
+  onEditSection?: (section: string) => void;
 }) {
   const navItems: ResolvedSidebarItem[] = resolveSidebarItems(
     COE_NAV_DEFAULTS,
@@ -296,16 +293,29 @@ export function CoePageLayout({
 }: {
   data: CoePageValue;
   editable?: boolean;
-  onEditSection?: (section: CoeEditableSection) => void;
+  onEditSection?: (section: string) => void;
 }) {
   const [activeId, setActiveId] = useState<string>("overview");
 
-  const sectionVis = (anchor: string) =>
+  const resolved = resolveSidebarItems(COE_NAV_DEFAULTS, data.sidebar.navItems);
+  const visibleBuiltins = new Set(
+    resolved
+      .filter((r) => !r.customHref && !r.customSection)
+      .map((r) => r.anchor),
+  );
+  const customSections = resolved.filter((r) => r.customSection);
+
+  const mobileVis = (anchor: string) =>
     editable
       ? "block"
       : activeId === anchor
         ? "block opacity-100"
         : "hidden lg:block lg:opacity-100";
+
+  const sectionVis = (anchor: string) => {
+    if (!editable && !visibleBuiltins.has(anchor)) return "hidden";
+    return mobileVis(anchor);
+  };
 
   const ctrl = data.overview.controller;
 
@@ -588,28 +598,34 @@ export function CoePageLayout({
                 ))}
               </div>
             </EditableRegion>
+
+            {/* Custom in-page sections (admin-defined sidebar items) */}
+            {customSections.map((sec) => (
+              <EditableRegion
+                key={sec.id}
+                as="section"
+                id={sec.anchor}
+                section={`custom:${sec.anchor}`}
+                label={sec.navLabel}
+                editable={editable}
+                onEditSection={onEditSection}
+                className={`scroll-mt-28 transition-all duration-300 ${mobileVis(sec.anchor)}`}
+              >
+                <SectionHeading icon={sec.icon} title={sec.navLabel} />
+                {editable && (!sec.blocks || sec.blocks.length === 0) ? (
+                  <div className="text-muted-foreground rounded-xl border-2 border-dashed border-white/10 py-8 text-center text-sm">
+                    Click to add content blocks
+                  </div>
+                ) : (
+                  <PageBlocksRenderer
+                    blocks={(sec.blocks ?? []) as unknown as PageBodySection[]}
+                  />
+                )}
+              </EditableRegion>
+            ))}
           </div>
         </div>
       </div>
-
-      {/* ── Custom Content ── */}
-      {(editable || (data.customBlocks && data.customBlocks.length > 0)) && (
-        <EditableRegion
-          section="customContent"
-          label="Custom Content"
-          editable={editable}
-          onEditSection={onEditSection}
-          className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8"
-        >
-          {editable && (!data.customBlocks || data.customBlocks.length === 0) ? (
-            <div className="rounded-xl border-2 border-dashed border-gray-200 py-8 text-center text-sm text-gray-400">
-              Click to add custom content blocks
-            </div>
-          ) : (
-            <PageBlocksRenderer blocks={data.customBlocks ?? []} />
-          )}
-        </EditableRegion>
-      )}
 
       {!editable && <Footer />}
     </main>

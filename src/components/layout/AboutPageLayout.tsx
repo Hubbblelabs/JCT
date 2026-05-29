@@ -35,7 +35,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EditableRegion } from "@/components/admin/EditableRegion";
 import { getImageUrl } from "@/lib/utils";
-import type { AboutPageValue } from "@/lib/validation";
+import type { AboutPageValue, PageBodySection } from "@/lib/validation";
 import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
 import {
   resolveSidebarItems,
@@ -59,8 +59,7 @@ export type AboutEditableSection =
   | "accreditations"
   | "campusHighlights"
   | "whyJct"
-  | "sidebar"
-  | "customContent";
+  | "sidebar";
 
 export const ABOUT_SECTION_LABELS: Record<AboutEditableSection, string> = {
   hero: "Hero",
@@ -75,7 +74,6 @@ export const ABOUT_SECTION_LABELS: Record<AboutEditableSection, string> = {
   campusHighlights: "Campus Highlights",
   whyJct: "Why Choose JCT",
   sidebar: "Sidebar (Quick Facts & CTA)",
-  customContent: "Custom Content",
 };
 
 /** Order of editable sections — used by the admin editor's section list. */
@@ -92,7 +90,6 @@ export const ABOUT_SECTION_ORDER: AboutEditableSection[] = [
   "campusHighlights",
   "whyJct",
   "sidebar",
-  "customContent",
 ];
 
 // ─── Theme tokens (static class strings so Tailwind keeps them) ──────────────
@@ -259,7 +256,7 @@ function AboutSideNav({
   activeId: string;
   setActiveId: (id: string) => void;
   editable?: boolean;
-  onEditSection?: (section: AboutEditableSection) => void;
+  onEditSection?: (section: string) => void;
 }) {
   const navItems: ResolvedSidebarItem[] = resolveSidebarItems(
     ABOUT_NAV_DEFAULTS,
@@ -461,19 +458,32 @@ export function AboutPageLayout({
   data: AboutPageValue;
   institution: Institution;
   editable?: boolean;
-  onEditSection?: (section: AboutEditableSection) => void;
+  onEditSection?: (section: string) => void;
 }) {
   const theme = THEME[institution];
   const meta = INSTITUTION_META[institution];
   const [activeId, setActiveId] = useState<string>("about");
 
+  const resolved = resolveSidebarItems(ABOUT_NAV_DEFAULTS, data.sidebar.navItems);
+  const visibleBuiltins = new Set(
+    resolved
+      .filter((r) => !r.customHref && !r.customSection)
+      .map((r) => r.anchor),
+  );
+  const customSections = resolved.filter((r) => r.customSection);
+
   // In editable mode every section stays visible so it can be selected.
-  const sectionVis = (anchor: string) =>
+  const mobileVis = (anchor: string) =>
     editable
       ? "block"
       : activeId === anchor
         ? "block opacity-100"
         : "hidden lg:block lg:opacity-100";
+
+  const sectionVis = (anchor: string) => {
+    if (!editable && !visibleBuiltins.has(anchor)) return "hidden";
+    return mobileVis(anchor);
+  };
 
   return (
     <main
@@ -1002,28 +1012,43 @@ export function AboutPageLayout({
                 ))}
               </div>
             </EditableRegion>
+
+            {/* Custom in-page sections (admin-defined sidebar items) */}
+            {customSections.map((sec) => (
+              <EditableRegion
+                key={sec.id}
+                as="section"
+                id={sec.anchor}
+                section={`custom:${sec.anchor}`}
+                label={sec.navLabel}
+                editable={editable}
+                onEditSection={onEditSection}
+                className={`scroll-mt-28 transition-all duration-300 ${mobileVis(sec.anchor)}`}
+              >
+                <h2
+                  className={`mb-6 flex items-center gap-3 font-serif text-2xl font-bold md:text-3xl`}
+                >
+                  <span
+                    className={`${theme.iconBg20} flex h-10 w-10 shrink-0 items-center justify-center rounded-xl`}
+                  >
+                    <sec.icon size={20} />
+                  </span>
+                  {sec.navLabel}
+                </h2>
+                {editable && (!sec.blocks || sec.blocks.length === 0) ? (
+                  <div className="text-muted-foreground rounded-xl border-2 border-dashed border-white/10 py-8 text-center text-sm">
+                    Click to add content blocks
+                  </div>
+                ) : (
+                  <PageBlocksRenderer
+                    blocks={(sec.blocks ?? []) as unknown as PageBodySection[]}
+                  />
+                )}
+              </EditableRegion>
+            ))}
           </div>
         </div>
       </div>
-
-      {/* ── Custom Content ── */}
-      {(editable || (data.customBlocks && data.customBlocks.length > 0)) && (
-        <EditableRegion
-          section="customContent"
-          label="Custom Content"
-          editable={editable}
-          onEditSection={onEditSection}
-          className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8"
-        >
-          {editable && (!data.customBlocks || data.customBlocks.length === 0) ? (
-            <div className="rounded-xl border-2 border-dashed border-gray-200 py-8 text-center text-sm text-gray-400">
-              Click to add custom content blocks
-            </div>
-          ) : (
-            <PageBlocksRenderer blocks={data.customBlocks ?? []} />
-          )}
-        </EditableRegion>
-      )}
 
       {!editable && <Footer />}
     </main>

@@ -384,7 +384,7 @@ export function PageBodySectionsEditor({
         >
           <div className="mb-2 flex items-center justify-between gap-2">
             <span className="text-sm font-semibold text-gray-700">
-              Section {i + 1} · {sec.type}
+              Block {i + 1} · {sec.name?.trim() || sec.type}
             </span>
             <div className="flex items-center gap-1">
               <button
@@ -413,6 +413,20 @@ export function PageBodySectionsEditor({
                 <Trash2 size={12} /> Remove
               </button>
             </div>
+          </div>
+          <div className="mb-3">
+            <TextInput
+              label="Block name (admin only)"
+              value={sec.name ?? ""}
+              placeholder="Internal label — not shown on the public site"
+              onChange={(e) =>
+                onChange(
+                  sections.map((s, j) =>
+                    j === i ? { ...s, name: e.target.value } : s,
+                  ),
+                )
+              }
+            />
           </div>
           <SectionEditor
             section={sec}

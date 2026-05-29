@@ -35,7 +35,7 @@ function CoeEditorInner() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
-  const [selected, setSelected] = useState<CoeEditableSection>("hero");
+  const [selected, setSelected] = useState<string>("hero");
   const [inspectorOpen, setInspectorOpen] = useState(false);
 
   useEffect(() => {
@@ -67,10 +67,21 @@ function CoeEditorInner() {
     };
   }, []);
 
-  const selectSection = (s: CoeEditableSection) => {
+  const selectSection = (s: string) => {
     setSelected(s);
     setInspectorOpen(true);
   };
+
+  const inspectorTitle = (() => {
+    if (selected.startsWith("custom:")) {
+      const anchor = selected.slice("custom:".length);
+      const item = (draft?.sidebar.navItems ?? []).find(
+        (it) => (it.id || "") === anchor,
+      );
+      return item?.label?.trim() || "Custom Section";
+    }
+    return COE_SECTION_LABELS[selected as CoeEditableSection] ?? "Section";
+  })();
 
   const save = async () => {
     setSaving(true);
@@ -172,7 +183,7 @@ function CoeEditorInner() {
                   Inspector
                 </p>
                 <h2 className="mt-0.5 font-semibold text-gray-900">
-                  {COE_SECTION_LABELS[selected]}
+                  {inspectorTitle}
                 </h2>
               </div>
               <button

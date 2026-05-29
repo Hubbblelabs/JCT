@@ -72,7 +72,7 @@ function AboutEditorInner() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
-  const [selected, setSelected] = useState<AboutEditableSection>("hero");
+  const [selected, setSelected] = useState<string>("hero");
   const [inspectorOpen, setInspectorOpen] = useState(false);
 
   useEffect(() => {
@@ -104,10 +104,21 @@ function AboutEditorInner() {
     };
   }, [configKey, institution]);
 
-  const selectSection = (s: AboutEditableSection) => {
+  const selectSection = (s: string) => {
     setSelected(s);
     setInspectorOpen(true);
   };
+
+  const inspectorTitle = (() => {
+    if (selected.startsWith("custom:")) {
+      const anchor = selected.slice("custom:".length);
+      const item = (draft?.sidebar.navItems ?? []).find(
+        (it) => (it.id || "") === anchor,
+      );
+      return item?.label?.trim() || "Custom Section";
+    }
+    return ABOUT_SECTION_LABELS[selected as AboutEditableSection] ?? "Section";
+  })();
 
   const save = async () => {
     setSaving(true);
@@ -217,7 +228,7 @@ function AboutEditorInner() {
                   Inspector
                 </p>
                 <h2 className="mt-0.5 font-semibold text-gray-900">
-                  {ABOUT_SECTION_LABELS[selected]}
+                  {inspectorTitle}
                 </h2>
               </div>
               <button

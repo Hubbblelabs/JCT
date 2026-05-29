@@ -43,7 +43,15 @@ export type ResolvedSidebarItem = {
   /** Present iff this is a custom link (not a built-in anchor). */
   customHref?: string;
   isExternal?: boolean;
+  /** True iff this is a custom in-page section built from blocks. */
+  customSection?: boolean;
+  /** Blocks rendered by a custom in-page section. */
+  blocks?: SidebarBlock[];
 };
+
+/** Loosely-typed block payload (matches PageBodySection); kept structural to
+ * avoid a hard dependency from this UI helper onto the Zod validation layer. */
+export type SidebarBlock = { type: string; [k: string]: unknown };
 
 export type SidebarNavItemRaw = {
   id?: string;
@@ -52,6 +60,7 @@ export type SidebarNavItemRaw = {
   href?: string;
   icon?: string;
   visible?: boolean;
+  blocks?: SidebarBlock[];
 };
 
 export const SIDEBAR_ICON_OPTIONS = [
@@ -151,13 +160,27 @@ export function resolveSidebarItems(
       continue;
     }
     const builtin = builtinMap.get(o.key ?? "");
-    if (!builtin) continue;
-    out.push({
-      id: `b:${builtin.anchor}`,
-      anchor: builtin.anchor,
-      navLabel: (o.label ?? "").trim() || builtin.navLabel,
-      icon: lookupSidebarIcon(o.icon) ?? builtin.icon,
-    });
+    if (builtin) {
+      out.push({
+        id: `b:${builtin.anchor}`,
+        anchor: builtin.anchor,
+        navLabel: (o.label ?? "").trim() || builtin.navLabel,
+        icon: lookupSidebarIcon(o.icon) ?? builtin.icon,
+      });
+      continue;
+    }
+    // Custom in-page section (has blocks, no href, no matching built-in key).
+    if (Array.isArray(o.blocks)) {
+      const anchor = o.id || `s-${i}`;
+      out.push({
+        id: `s:${idBase}`,
+        anchor,
+        navLabel: (o.label ?? "").trim() || "Untitled Section",
+        icon: lookupSidebarIcon(o.icon) ?? Layers,
+        customSection: true,
+        blocks: o.blocks,
+      });
+    }
   }
   return out;
 }

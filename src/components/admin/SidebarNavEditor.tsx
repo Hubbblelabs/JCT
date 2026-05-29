@@ -54,19 +54,39 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
     ]);
   };
 
+  const addSection = () => {
+    update([
+      ...seeded,
+      {
+        id: `section-${Date.now()}`,
+        label: "",
+        icon: "Layers",
+        visible: true,
+        blocks: [],
+      },
+    ]);
+  };
+
   return (
     <div className="space-y-3">
       <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-        Reorder, rename, hide, or add custom sidebar items. Built-in items
-        scroll to a page section; custom items link to any URL. Removing a
-        built-in here only hides it — toggle visibility instead.
+        Reorder, rename, hide, or add sidebar items. Built-in items scroll to a
+        page section; custom links open any URL; page sections create a new
+        in-page section you fill with content blocks. Removing a built-in only
+        hides it — toggle visibility instead.
       </p>
       <div className="space-y-2">
         {seeded.map((item, i) => {
           const isBuiltin = !!item.key && builtinSet.has(item.key);
+          const isSection = !isBuiltin && Array.isArray(item.blocks);
           const placeholderLabel = isBuiltin
             ? defaults.find((d) => d.anchor === item.key)?.navLabel
             : "Item Label";
+          const kindLabel = isBuiltin
+            ? `Built-in · ${item.key}`
+            : isSection
+              ? "Page Section"
+              : "Custom Link";
           return (
             <div
               key={item.id ?? `${item.key ?? "c"}-${i}`}
@@ -74,7 +94,7 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
             >
               <div className="mb-2 flex items-center justify-between gap-2">
                 <span className="text-xs font-medium text-gray-500">
-                  {isBuiltin ? `Built-in · ${item.key}` : "Custom Link"}
+                  {kindLabel}
                 </span>
                 <div className="flex items-center gap-1">
                   <button
@@ -127,6 +147,12 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                       disabled
                     />
                   </Field>
+                ) : isSection ? (
+                  <Field label="Content">
+                    <p className="flex h-9 items-center text-xs text-gray-500">
+                      Edit blocks by clicking the section in the live preview.
+                    </p>
+                  </Field>
                 ) : (
                   <TextInput
                     label="URL / Href"
@@ -178,13 +204,22 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
           );
         })}
       </div>
-      <button
-        type="button"
-        onClick={addCustom}
-        className="admin-btn admin-btn-outline admin-btn-sm"
-      >
-        <Plus size={14} /> Add Custom Link
-      </button>
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={addCustom}
+          className="admin-btn admin-btn-outline admin-btn-sm"
+        >
+          <Plus size={14} /> Add Custom Link
+        </button>
+        <button
+          type="button"
+          onClick={addSection}
+          className="admin-btn admin-btn-outline admin-btn-sm"
+        >
+          <Plus size={14} /> Add Page Section
+        </button>
+      </div>
     </div>
   );
 }

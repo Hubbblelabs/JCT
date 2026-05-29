@@ -9,10 +9,7 @@ import {
   ItemsEditor,
   Repeater,
 } from "@/components/admin/inputs";
-import {
-  ABOUT_NAV_DEFAULTS,
-  type AboutEditableSection,
-} from "@/components/layout/AboutPageLayout";
+import { ABOUT_NAV_DEFAULTS } from "@/components/layout/AboutPageLayout";
 import type { AboutPageValue } from "@/lib/validation";
 import type { SidebarNavItemRaw } from "@/lib/sidebar-nav";
 import { SidebarNavEditor } from "@/components/admin/SidebarNavEditor";
@@ -33,11 +30,53 @@ export function AboutSectionInspector({
   data,
   onChange,
 }: {
-  section: AboutEditableSection;
+  section: string;
   data: AboutPageValue;
   onChange: (next: AboutPageValue) => void;
 }) {
   const patch = (p: Partial<AboutPageValue>) => onChange({ ...data, ...p });
+
+  // Custom in-page section: edit its sidebar label + content blocks.
+  if (section.startsWith("custom:")) {
+    const anchor = section.slice("custom:".length);
+    const items = data.sidebar.navItems ?? [];
+    const idx = items.findIndex((it) => (it.id || "") === anchor);
+    if (idx === -1) {
+      return (
+        <p className="text-sm text-gray-500">
+          This section no longer exists. Re-open the inspector.
+        </p>
+      );
+    }
+    const item = items[idx];
+    const updateItem = (next: Partial<typeof item>) =>
+      patch({
+        sidebar: {
+          ...data.sidebar,
+          navItems: items.map((it, j) =>
+            j === idx ? { ...it, ...next } : it,
+          ),
+        },
+      });
+    return (
+      <div className="space-y-4">
+        <TextInput
+          label="Sidebar Label"
+          value={item.label ?? ""}
+          placeholder="Section name shown in the sidebar"
+          onChange={(e) => updateItem({ label: e.target.value })}
+        />
+        <div>
+          <div className="admin-label mb-2">Content Blocks</div>
+          <PageBodySectionsEditor
+            value={(item.blocks ?? []) as PageBodySection[]}
+            onChange={(blocks) => updateItem({ blocks })}
+            allowedTypes={["heading", "text", "image", "list", "cards"]}
+          />
+        </div>
+      </div>
+    );
+  }
 
   switch (section) {
     case "hero":
@@ -502,21 +541,15 @@ export function AboutSectionInspector({
               value={data.sidebar.navItems as SidebarNavItemRaw[] | undefined}
               onChange={(navItems) =>
                 patch({
-                  sidebar: { ...data.sidebar, navItems },
+                  sidebar: {
+                    ...data.sidebar,
+                    navItems: navItems as typeof data.sidebar.navItems,
+                  },
                 })
               }
             />
           </div>
         </>
-      );
-
-    case "customContent":
-      return (
-        <PageBodySectionsEditor
-          value={(data.customBlocks ?? []) as PageBodySection[]}
-          onChange={(blocks) => patch({ customBlocks: blocks })}
-          allowedTypes={["heading", "text", "image", "list", "cards"]}
-        />
       );
 
     default:

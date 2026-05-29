@@ -21,7 +21,7 @@ import {
   AdmissionsForm,
   LifeAtJctForm,
   MetricsForm,
-  NavbarForm,
+  NavbarAdminSection,
   type EngHeroVal,
   type ArtsHeroVal,
   type PolyHeroVal,
@@ -72,17 +72,20 @@ function navDefaultFor(college: College): NavbarVal {
 }
 
 function navbarSection(
-  configKey: string,
-  defaultValue: NavbarVal,
+  headerConfigKey: string,
+  navbarConfigKey: string,
+  navDefault: NavbarVal,
 ): SectionDef {
   return {
     id: "navbar",
     label: "Navbar",
-    kind: "form",
-    configKey,
-    defaultValue,
-    render: (v, onChange) => (
-      <NavbarForm value={(v as NavbarVal) ?? {}} onChange={onChange} />
+    kind: "custom",
+    customRender: () => (
+      <NavbarAdminSection
+        headerConfigKey={headerConfigKey}
+        navbarConfigKey={navbarConfigKey}
+        navDefault={navDefault}
+      />
     ),
   };
 }
@@ -492,7 +495,11 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
 function sectionsFor(college: College): SectionDef[] {
   if (college === "engineering") {
     return [
-      navbarSection("engineeringNavbar", navDefaultFor("engineering")),
+      navbarSection(
+        "engineeringHeader",
+        "engineeringNavbar",
+        navDefaultFor("engineering"),
+      ),
       {
         id: "announcement",
         label: "Announcement Bar",
@@ -577,7 +584,11 @@ function sectionsFor(college: College): SectionDef[] {
 
   if (college === "arts-science") {
     return [
-      navbarSection("artsScienceNavbar", navDefaultFor("arts-science")),
+      navbarSection(
+        "artsScienceHeader",
+        "artsScienceNavbar",
+        navDefaultFor("arts-science"),
+      ),
       {
         id: "hero",
         label: "Hero",
@@ -631,7 +642,11 @@ function sectionsFor(college: College): SectionDef[] {
 
   // polytechnic
   return [
-    navbarSection("polytechnicNavbar", navDefaultFor("polytechnic")),
+    navbarSection(
+      "polytechnicHeader",
+      "polytechnicNavbar",
+      navDefaultFor("polytechnic"),
+    ),
     {
       id: "hero",
       label: "Hero",

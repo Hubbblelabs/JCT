@@ -5,7 +5,9 @@ import {
   ArrowDown,
   ArrowUp,
   ChevronDown as ChevronDownIcon,
+  Loader2,
   Plus,
+  Save,
   Trash2,
 } from "lucide-react";
 import {
@@ -2760,6 +2762,119 @@ export function NavbarForm({
           <Plus size={14} /> Add Navbar Item
         </button>
         <LimitHint count={items.length} max={NAVBAR_LIMITS.items} />
+      </div>
+    </div>
+  );
+}
+
+/* ─── Navbar admin section (header bar + nav items in one panel) ─── */
+
+const NAVBAR_HEADER_DEFAULT: HeaderVal = {
+  phone: "",
+  studentLoginLabel: "",
+  studentLoginUrl: "",
+  showStudentLogin: true,
+};
+
+export function NavbarAdminSection({
+  headerConfigKey,
+  navbarConfigKey,
+  navDefault,
+}: {
+  headerConfigKey: string;
+  navbarConfigKey: string;
+  navDefault?: NavbarVal;
+}) {
+  const [headerVal, setHeaderVal] = useState<HeaderVal>(NAVBAR_HEADER_DEFAULT);
+  const [navbarVal, setNavbarVal] = useState<NavbarVal>(navDefault ?? {});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const r = await fetch("/api/admin/site-config");
+        const data: Array<{ config_key: string; value: unknown }> =
+          await r.json();
+        if (cancelled) return;
+        const h = data.find((d) => d.config_key === headerConfigKey);
+        const n = data.find((d) => d.config_key === navbarConfigKey);
+        if (h?.value) setHeaderVal(h.value as HeaderVal);
+        if (n?.value) setNavbarVal(n.value as NavbarVal);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [headerConfigKey, navbarConfigKey]);
+
+  const save = async () => {
+    setSaving(true);
+    setMsg(null);
+    try {
+      const put = (config_key: string, value: unknown) =>
+        fetch("/api/admin/site-config", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ config_key, value }),
+        });
+      const [hr, nr] = await Promise.all([
+        put(headerConfigKey, headerVal),
+        put(navbarConfigKey, navbarVal),
+      ]);
+      const ok = hr.ok && nr.ok;
+      setMsg({ ok, text: ok ? "Saved!" : "Save failed." });
+    } catch {
+      setMsg({ ok: false, text: "Save failed." });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-12">
+        <Loader2 size={24} className="animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      <div className="flex items-center justify-end gap-3">
+        {msg && (
+          <span
+            className={`text-sm font-medium ${msg.ok ? "text-green-600" : "text-red-500"}`}
+          >
+            {msg.text}
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={save}
+          disabled={saving}
+          className="admin-btn admin-btn-gold"
+        >
+          {saving ? (
+            <Loader2 size={15} className="animate-spin" />
+          ) : (
+            <Save size={15} />
+          )}
+          {saving ? "Saving…" : "Save Navbar"}
+        </button>
+      </div>
+      <div>
+        <h3 className="mb-3 font-semibold text-gray-800">Header Bar</h3>
+        <HeaderForm value={headerVal} onChange={setHeaderVal} />
+      </div>
+      <hr className="border-gray-200" />
+      <div>
+        <h3 className="mb-3 font-semibold text-gray-800">Navigation Items</h3>
+        <NavbarForm value={navbarVal} onChange={setNavbarVal} />
       </div>
     </div>
   );

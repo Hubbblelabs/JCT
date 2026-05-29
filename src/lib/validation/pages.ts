@@ -65,14 +65,19 @@ export const PageHeroSchema = z.object({
 export type PageHero = z.infer<typeof PageHeroSchema>;
 
 // ─── Body sections (rich content union) ──────────────────────────────────────
+// `name` is an admin-only identifier for the block; never rendered publicly.
+const zBlockName = zClampedString(0, 120, "Block name").optional();
+
 const HeadingSection = z.object({
   type: z.literal("heading"),
+  name: zBlockName,
   text: zClampedString(0, PAGE_LIMITS.titleMax).default(""),
   level: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
 });
 
 const TextSection = z.object({
   type: z.literal("text"),
+  name: zBlockName,
   paragraphs: z
     .array(zClampedString(0, PAGE_LIMITS.paragraphMax, "Paragraph"))
     .default([]),
@@ -80,6 +85,7 @@ const TextSection = z.object({
 
 const ImageSection = z.object({
   type: z.literal("image"),
+  name: zBlockName,
   src: zUrl.optional().or(z.literal("")),
   alt: zClampedString(0, 200).optional(),
   caption: zClampedString(0, 300).optional(),
@@ -87,6 +93,7 @@ const ImageSection = z.object({
 
 const ListSection = z.object({
   type: z.literal("list"),
+  name: zBlockName,
   ordered: z.boolean().optional(),
   items: z
     .array(zClampedString(0, PAGE_LIMITS.listItemMax, "Item"))
@@ -103,12 +110,14 @@ const CardItem = z.object({
 
 const CardsSection = z.object({
   type: z.literal("cards"),
+  name: zBlockName,
   columns: z.union([z.literal(2), z.literal(3), z.literal(4)]).optional(),
   items: z.array(CardItem).max(PAGE_LIMITS.cardsMax).default([]),
 });
 
 const CtaSection = z.object({
   type: z.literal("cta"),
+  name: zBlockName,
   label: zClampedString(0, PAGE_LIMITS.ctaLabelMax).default(""),
   href: zUrl.optional().or(z.literal("")),
   variant: z.enum(["primary", "secondary"]).optional(),
