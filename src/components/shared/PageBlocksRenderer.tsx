@@ -85,12 +85,13 @@ function Block({ section }: { section: PageBodySection }) {
       return (
         <div className={`my-6 grid grid-cols-1 gap-4 ${grid}`}>
           {section.items.map((c, i) => {
+            const resolvedImage = c.image ? resolveImage(c.image) : "";
             const inner = (
               <div className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md">
-                {c.image && (
+                {resolvedImage && (
                   <div className="relative aspect-video w-full bg-gray-100">
                     <Image
-                      src={resolveImage(c.image)}
+                      src={resolvedImage}
                       alt={c.title}
                       fill
                       sizes="(max-width: 768px) 100vw, 400px"

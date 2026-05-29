@@ -7,6 +7,7 @@ import {
   zOptionalString,
   zNonNegativeInt,
 } from "./_primitives";
+import { PageBodySectionSchema } from "./pages";
 
 export const INSTITUTIONS = [
   "engineering",
@@ -186,6 +187,8 @@ const TabConfigItemSchema = z.object({
   // When `href` is set, this entry renders as a sidebar link (not a tab activator).
   // Used to add external URLs or links to dynamically created pages.
   href: zOptionalString(500).default(""),
+  // Custom content tab: rich blocks rendered as this tab's page content.
+  blocks: z.array(PageBodySectionSchema).optional(),
 });
 
 const sectionTitle = zOptionalString(LIMITS.sectionTitleMax);

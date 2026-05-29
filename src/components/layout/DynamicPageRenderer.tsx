@@ -89,12 +89,13 @@ function BodySection({ section }: { section: PageBodySection }) {
       return (
         <div className={`my-6 grid grid-cols-1 gap-4 ${grid}`}>
           {section.items.map((c, i) => {
+            const resolvedImage = c.image ? resolveImage(c.image) : "";
             const inner = (
               <div className="flex h-full flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm transition-all hover:shadow-md">
-                {c.image && (
+                {resolvedImage && (
                   <div className="relative aspect-video w-full bg-gray-100">
                     <Image
-                      src={resolveImage(c.image)}
+                      src={resolvedImage}
                       alt={c.title}
                       fill
                       sizes="(max-width: 768px) 100vw, 400px"
@@ -182,7 +183,7 @@ function HeroBlock({ content }: { content: PageContent }) {
             </Link>
           )}
         </div>
-        {hero?.image && (
+        {hero?.image && resolveImage(hero.image) && (
           <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-white/10">
             <Image
               src={resolveImage(hero.image)}
@@ -282,27 +283,33 @@ function GalleryLayout({ content }: { content: PageContent }) {
         </p>
       )}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-        {images.map((img, i) => (
-          <figure
-            key={i}
-            className="overflow-hidden rounded-xl border border-gray-200 bg-white"
-          >
-            <div className="relative aspect-square w-full bg-gray-100">
-              <Image
-                src={resolveImage(img.src)}
-                alt={img.alt ?? ""}
-                fill
-                sizes="(max-width: 768px) 50vw, 300px"
-                className="object-cover"
-              />
-            </div>
-            {img.caption && (
-              <figcaption className="border-t border-gray-100 p-2 text-center text-xs text-gray-500">
-                {img.caption}
-              </figcaption>
-            )}
-          </figure>
-        ))}
+        {images
+          .map((img) => ({
+            ...img,
+            resolvedSrc: resolveImage(img.src),
+          }))
+          .filter((img) => img.resolvedSrc)
+          .map((img, i) => (
+            <figure
+              key={i}
+              className="overflow-hidden rounded-xl border border-gray-200 bg-white"
+            >
+              <div className="relative aspect-square w-full bg-gray-100">
+                <Image
+                  src={img.resolvedSrc}
+                  alt={img.alt ?? ""}
+                  fill
+                  sizes="(max-width: 768px) 50vw, 300px"
+                  className="object-cover"
+                />
+              </div>
+              {img.caption && (
+                <figcaption className="border-t border-gray-100 p-2 text-center text-xs text-gray-500">
+                  {img.caption}
+                </figcaption>
+              )}
+            </figure>
+          ))}
       </div>
     </article>
   );
