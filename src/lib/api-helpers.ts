@@ -2,10 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import type { ZodIssue, ZodType } from "zod";
 import { auth } from "@/auth";
 import { hasMinRole, type Role } from "@/lib/permissions";
-import {
-  clientIpFromHeaders,
-  consumeUploadAttempt,
-} from "@/lib/rate-limit";
+import { clientIpFromHeaders, consumeUploadAttempt } from "@/lib/rate-limit";
 
 export function json(data: unknown, status = 200) {
   return NextResponse.json(data, { status });

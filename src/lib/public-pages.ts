@@ -37,11 +37,9 @@ function asPublic(doc: PageLean): PublicPage | null {
   return {
     _id: String(doc._id),
     slug: doc.slug ?? "",
-    institution:
-      (doc.institution as PublicPage["institution"]) ?? "main",
+    institution: (doc.institution as PublicPage["institution"]) ?? "main",
     title: doc.title ?? "",
-    template:
-      (doc.template as PublicPage["template"]) ?? "standard",
+    template: (doc.template as PublicPage["template"]) ?? "standard",
     content: doc.published_content as PageContent,
     version: doc.version ?? 1,
     ...(doc.published_at

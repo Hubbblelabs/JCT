@@ -150,9 +150,7 @@ function SectionEditor({
           <TextInput
             label="Caption (optional)"
             value={section.caption ?? ""}
-            onChange={(e) =>
-              onChange({ ...section, caption: e.target.value })
-            }
+            onChange={(e) => onChange({ ...section, caption: e.target.value })}
           />
         </>
       );
@@ -330,16 +328,12 @@ function SectionEditor({
             <TextInput
               label="Button Label"
               value={section.label}
-              onChange={(e) =>
-                onChange({ ...section, label: e.target.value })
-              }
+              onChange={(e) => onChange({ ...section, label: e.target.value })}
             />
             <TextInput
               label="URL"
               value={section.href ?? ""}
-              onChange={(e) =>
-                onChange({ ...section, href: e.target.value })
-              }
+              onChange={(e) => onChange({ ...section, href: e.target.value })}
               placeholder="/path or https://..."
             />
           </div>
@@ -405,9 +399,7 @@ export function PageBodySectionsEditor({
               </button>
               <button
                 type="button"
-                onClick={() =>
-                  onChange(sections.filter((_, j) => j !== i))
-                }
+                onClick={() => onChange(sections.filter((_, j) => j !== i))}
                 className="admin-btn admin-btn-danger admin-btn-sm"
               >
                 <Trash2 size={12} /> Remove

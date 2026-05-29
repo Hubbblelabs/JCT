@@ -866,9 +866,7 @@ function PamphletSlotEditor({
             value={value.subheading ?? ""}
             maxLength={LIMITS_pamphlet.subheadingMax}
             placeholder="Short tagline"
-            onChange={(e) =>
-              onChange({ ...value, subheading: e.target.value })
-            }
+            onChange={(e) => onChange({ ...value, subheading: e.target.value })}
           />
           <TextArea
             label="Description"
@@ -2557,10 +2555,7 @@ function NavbarItemEditor({
           onClick={() => setExpanded((v) => !v)}
           className="flex items-center gap-2 text-sm font-medium text-gray-800"
         >
-          <ChevronDownIcon
-            size={14}
-            className={expanded ? "" : "-rotate-90"}
-          />
+          <ChevronDownIcon size={14} className={expanded ? "" : "-rotate-90"} />
           <span>{item.label || "(unnamed item)"}</span>
           {item.visible === false && (
             <span className="rounded-full bg-gray-300 px-2 py-0.5 text-[10px] uppercase">
@@ -2642,9 +2637,7 @@ function NavbarItemEditor({
                   onChange={(next) =>
                     onChange({
                       ...item,
-                      children: children.map((c, j) =>
-                        j === i ? next : c,
-                      ),
+                      children: children.map((c, j) => (j === i ? next : c)),
                     })
                   }
                   onRemove={() =>
@@ -2751,10 +2744,7 @@ export function NavbarForm({
           onClick={() =>
             onChange({
               ...value,
-              items: [
-                ...items,
-                { label: "", href: "", visible: true },
-              ],
+              items: [...items, { label: "", href: "", visible: true }],
             })
           }
           className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"

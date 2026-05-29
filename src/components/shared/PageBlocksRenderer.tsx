@@ -16,9 +16,10 @@ function Block({ section }: { section: PageBodySection }) {
   switch (section.type) {
     case "heading": {
       const level = section.level ?? 2;
-      const Tag = (
-        level === 4 ? "h4" : level === 3 ? "h3" : "h2"
-      ) as "h2" | "h3" | "h4";
+      const Tag = (level === 4 ? "h4" : level === 3 ? "h3" : "h2") as
+        | "h2"
+        | "h3"
+        | "h4";
       const cls =
         level === 4
           ? "text-lg font-semibold mt-4"
@@ -33,7 +34,7 @@ function Block({ section }: { section: PageBodySection }) {
           {section.paragraphs.map((p, i) => (
             <p
               key={i}
-              className="whitespace-pre-line text-base leading-relaxed text-gray-700"
+              className="text-base leading-relaxed whitespace-pre-line text-gray-700"
             >
               {p}
             </p>

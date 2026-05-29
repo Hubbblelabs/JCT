@@ -17,8 +17,9 @@ async function getLogs() {
 
 export default async function AuditPage() {
   const session = await auth();
-  const role = (session?.user as Record<string, unknown> | undefined)
-    ?.role as string | undefined;
+  const role = (session?.user as Record<string, unknown> | undefined)?.role as
+    | string
+    | undefined;
   if (!session?.user || !hasMinRole(role ?? "", "admin")) {
     redirect("/admin/dashboard");
   }

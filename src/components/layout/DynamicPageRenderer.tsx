@@ -20,9 +20,10 @@ function BodySection({ section }: { section: PageBodySection }) {
   switch (section.type) {
     case "heading": {
       const level = section.level ?? 2;
-      const Tag = (
-        level === 4 ? "h4" : level === 3 ? "h3" : "h2"
-      ) as "h2" | "h3" | "h4";
+      const Tag = (level === 4 ? "h4" : level === 3 ? "h3" : "h2") as
+        | "h2"
+        | "h3"
+        | "h4";
       const cls =
         level === 4
           ? "text-lg font-semibold mt-4"
@@ -174,9 +175,7 @@ function HeroBlock({ content }: { content: PageContent }) {
             <Link
               href={hero.ctaHref}
               target={isExternal(hero.ctaHref) ? "_blank" : undefined}
-              rel={
-                isExternal(hero.ctaHref) ? "noopener noreferrer" : undefined
-              }
+              rel={isExternal(hero.ctaHref) ? "noopener noreferrer" : undefined}
               className="bg-gold text-navy mt-6 inline-flex items-center gap-2 rounded-full px-6 py-3 font-semibold hover:bg-[#e8b84a]"
             >
               {hero.ctaLabel}
@@ -226,7 +225,7 @@ function SidebarLayout({ content }: { content: PageContent }) {
     (i) => i.visible !== false && i.label,
   );
   return (
-    <div className="container mx-auto grid grid-cols-1 gap-8 px-4 py-10 lg:grid-cols-[280px_1fr] md:px-6 md:py-14">
+    <div className="container mx-auto grid grid-cols-1 gap-8 px-4 py-10 md:px-6 md:py-14 lg:grid-cols-[280px_1fr]">
       <aside className="bg-surface border-border rounded-3xl border p-6">
         <h3 className="mb-5 border-b border-white/10 pb-4 text-sm font-bold tracking-wider uppercase">
           On This Page
@@ -325,7 +324,9 @@ function ContactLayout({ content }: { content: PageContent }) {
         </p>
       )}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {(c?.phone || c?.email || (c?.addressLines && c.addressLines.length > 0)) && (
+        {(c?.phone ||
+          c?.email ||
+          (c?.addressLines && c.addressLines.length > 0)) && (
           <div className="rounded-xl border border-gray-200 bg-white p-5">
             <h3 className="mb-3 text-sm font-bold tracking-wide uppercase">
               Contact
@@ -348,10 +349,7 @@ function ContactLayout({ content }: { content: PageContent }) {
                 <div>
                   <dt className="font-medium text-gray-500">Email</dt>
                   <dd>
-                    <a
-                      href={`mailto:${c.email}`}
-                      className="hover:underline"
-                    >
+                    <a href={`mailto:${c.email}`} className="hover:underline">
                       {c.email}
                     </a>
                   </dd>

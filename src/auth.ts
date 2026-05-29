@@ -143,7 +143,9 @@ function getClientIp(request: unknown): string {
   if (!h) return "unknown";
   const get = (k: string): string | null => {
     if (h instanceof Headers) return h.get(k);
-    const v = (h as Record<string, string>)[k] ?? (h as Record<string, string>)[k.toLowerCase()];
+    const v =
+      (h as Record<string, string>)[k] ??
+      (h as Record<string, string>)[k.toLowerCase()];
     return typeof v === "string" ? v : null;
   };
   const fwd = get("x-forwarded-for");

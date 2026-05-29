@@ -23,10 +23,7 @@ export const NavbarItemSchema = z.object({
   href: zUrl,
   desc: zClampedString(0, NAVBAR_LIMITS.descMax).optional(),
   visible: z.boolean().optional(),
-  children: z
-    .array(NavbarChildSchema)
-    .max(NAVBAR_LIMITS.children)
-    .optional(),
+  children: z.array(NavbarChildSchema).max(NAVBAR_LIMITS.children).optional(),
 });
 export type NavbarItem = z.infer<typeof NavbarItemSchema>;
 

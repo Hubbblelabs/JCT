@@ -149,10 +149,7 @@ function PagesInner() {
                       {row.institution} · /{row.slug} · v{row.version}
                     </p>
                   </div>
-                  <ChevronRight
-                    size={14}
-                    className="shrink-0 text-gray-400"
-                  />
+                  <ChevronRight size={14} className="shrink-0 text-gray-400" />
                 </Link>
                 {row.status === "published" && (
                   <a

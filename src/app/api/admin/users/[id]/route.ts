@@ -26,9 +26,7 @@ function currentUserEmail(session: unknown): string {
   return typeof s.user?.email === "string" ? s.user.email : "";
 }
 
-async function isLastActiveAdminExcluding(
-  targetId: string,
-): Promise<boolean> {
+async function isLastActiveAdminExcluding(targetId: string): Promise<boolean> {
   const remaining = await User.countDocuments({
     role: "admin",
     is_active: true,

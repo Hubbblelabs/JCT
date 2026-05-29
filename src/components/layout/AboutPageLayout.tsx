@@ -464,7 +464,10 @@ export function AboutPageLayout({
   const meta = INSTITUTION_META[institution];
   const [activeId, setActiveId] = useState<string>("about");
 
-  const resolved = resolveSidebarItems(ABOUT_NAV_DEFAULTS, data.sidebar.navItems);
+  const resolved = resolveSidebarItems(
+    ABOUT_NAV_DEFAULTS,
+    data.sidebar.navItems,
+  );
   const visibleBuiltins = new Set(
     resolved
       .filter((r) => !r.customHref && !r.customSection)

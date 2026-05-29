@@ -32,9 +32,6 @@ export const SidebarNavItemSchema = z.object({
 export type SidebarNavItem = z.infer<typeof SidebarNavItemSchema>;
 
 export const SidebarNavOverrideSchema = z.object({
-  items: z
-    .array(SidebarNavItemSchema)
-    .max(SIDEBAR_NAV_LIMITS.items)
-    .optional(),
+  items: z.array(SidebarNavItemSchema).max(SIDEBAR_NAV_LIMITS.items).optional(),
 });
 export type SidebarNavOverride = z.infer<typeof SidebarNavOverrideSchema>;

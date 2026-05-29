@@ -53,9 +53,7 @@ export function AboutSectionInspector({
       patch({
         sidebar: {
           ...data.sidebar,
-          navItems: items.map((it, j) =>
-            j === idx ? { ...it, ...next } : it,
-          ),
+          navItems: items.map((it, j) => (j === idx ? { ...it, ...next } : it)),
         },
       });
     return (

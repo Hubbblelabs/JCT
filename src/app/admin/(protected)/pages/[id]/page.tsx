@@ -200,7 +200,9 @@ function PageEditorInner({ id }: { id: string }) {
     );
   }
 
-  const visibleTabs = TAB_DEFS.filter((t) => t.templates.includes(doc.template));
+  const visibleTabs = TAB_DEFS.filter((t) =>
+    t.templates.includes(doc.template),
+  );
   const hero = (doc.content.hero ?? {}) as PageHero;
   const seo = (doc.content.seo ?? {}) as PageSeo;
   const sidebar = (doc.content.sidebar ?? {}) as SidebarBlock;
@@ -443,8 +445,8 @@ function PageEditorInner({ id }: { id: string }) {
         {activeTab === "sidebar" && (
           <div className="space-y-3">
             <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-              Add a left-side navigation list of links. Body sections render
-              to the right of this sidebar.
+              Add a left-side navigation list of links. Body sections render to
+              the right of this sidebar.
             </p>
             <div className="space-y-2">
               {sidebarItems.map((it, i) => (
@@ -658,9 +660,7 @@ function PageEditorInner({ id }: { id: string }) {
                           gallery: {
                             ...gallery,
                             images: galleryImages.map((x, j) =>
-                              j === i
-                                ? { ...x, caption: e.target.value }
-                                : x,
+                              j === i ? { ...x, caption: e.target.value } : x,
                             ),
                           },
                         })

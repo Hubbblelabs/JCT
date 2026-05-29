@@ -67,8 +67,7 @@ function normalizePamphlet(raw: unknown): PamphletConfig | null {
   };
   const rightSlot: Slot = {
     ...explicitRight,
-    image:
-      explicitRight.image || legacyImages[1] || legacyImages[0] || "",
+    image: explicitRight.image || legacyImages[1] || legacyImages[0] || "",
   };
 
   const allowedLayouts: PamphletLayout[] = [

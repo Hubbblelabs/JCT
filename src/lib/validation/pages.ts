@@ -141,10 +141,7 @@ const SidebarItemSchema = z.object({
 });
 
 export const PageSidebarSchema = z.object({
-  items: z
-    .array(SidebarItemSchema)
-    .max(PAGE_LIMITS.sidebarItemsMax)
-    .optional(),
+  items: z.array(SidebarItemSchema).max(PAGE_LIMITS.sidebarItemsMax).optional(),
   ctaLabel: zClampedString(0, PAGE_LIMITS.ctaLabelMax).optional(),
   ctaHref: zUrl.optional().or(z.literal("")),
 });

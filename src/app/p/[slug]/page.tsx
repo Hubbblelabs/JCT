@@ -28,9 +28,7 @@ export async function generateMetadata({
     title: seo?.metaTitle || page.title,
     description: seo?.metaDescription || undefined,
     keywords: seo?.keywords?.length ? seo.keywords : undefined,
-    openGraph: seo?.ogImage
-      ? { images: [{ url: seo.ogImage }] }
-      : undefined,
+    openGraph: seo?.ogImage ? { images: [{ url: seo.ogImage }] } : undefined,
     robots: seo?.noindex ? { index: false, follow: false } : undefined,
   };
 }
@@ -48,10 +46,7 @@ export default async function MainDynamicPage({ params }: PageParams) {
           subtitle={page.content.seo?.metaDescription}
         />
       )}
-      <DynamicPageRenderer
-        template={page.template}
-        content={page.content}
-      />
+      <DynamicPageRenderer template={page.template} content={page.content} />
       <Footer />
     </main>
   );

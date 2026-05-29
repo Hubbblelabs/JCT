@@ -116,9 +116,7 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                   {!isBuiltin && (
                     <button
                       type="button"
-                      onClick={() =>
-                        update(seeded.filter((_, j) => j !== i))
-                      }
+                      onClick={() => update(seeded.filter((_, j) => j !== i))}
                       className="admin-btn admin-btn-danger admin-btn-sm"
                     >
                       <Trash2 size={12} />
@@ -189,9 +187,7 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                       onChange={(e) =>
                         update(
                           seeded.map((it, j) =>
-                            j === i
-                              ? { ...it, visible: e.target.checked }
-                              : it,
+                            j === i ? { ...it, visible: e.target.checked } : it,
                           ),
                         )
                       }
