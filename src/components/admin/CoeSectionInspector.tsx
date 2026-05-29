@@ -17,6 +17,8 @@ import {
 import type { CoePageValue } from "@/lib/validation";
 import type { SidebarNavItemRaw } from "@/lib/sidebar-nav";
 import { SidebarNavEditor } from "@/components/admin/SidebarNavEditor";
+import { PageBodySectionsEditor } from "@/components/admin/PageBodySectionsEditor";
+import type { PageBodySection } from "@/lib/validation";
 
 type Governance = CoePageValue["overview"]["governance"][number];
 type Phase = CoePageValue["responsibilities"]["phases"][number];
@@ -340,6 +342,15 @@ export function CoeSectionInspector({
             />
           </div>
         </>
+      );
+
+    case "customContent":
+      return (
+        <PageBodySectionsEditor
+          value={(data.customBlocks ?? []) as PageBodySection[]}
+          onChange={(blocks) => patch({ customBlocks: blocks })}
+          allowedTypes={["heading", "text", "image", "list", "cards"]}
+        />
       );
 
     default:

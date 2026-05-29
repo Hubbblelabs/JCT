@@ -5,9 +5,7 @@ import {
   ArrowDown,
   ArrowUp,
   ChevronDown as ChevronDownIcon,
-  Loader2,
   Plus,
-  Save,
   Trash2,
 } from "lucide-react";
 import {
@@ -2433,7 +2431,6 @@ export type NavbarItemVal = {
   href?: string;
   desc?: string;
   visible?: boolean;
-  inMore?: boolean;
   children?: NavbarChildVal[];
 };
 
@@ -2568,11 +2565,6 @@ function NavbarItemEditor({
               Hidden
             </span>
           )}
-          {item.inMore && (
-            <span className="rounded-full bg-amber-200 px-2 py-0.5 text-[10px] uppercase text-amber-900">
-              In More
-            </span>
-          )}
         </button>
         <div className="flex items-center gap-1">
           <button
@@ -2634,16 +2626,6 @@ function NavbarItemEditor({
                 }
               />
               Visible
-            </label>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={item.inMore === true}
-                onChange={(e) =>
-                  onChange({ ...item, inMore: e.target.checked })
-                }
-              />
-              Move into &quot;More&quot; dropdown
             </label>
           </div>
           <Field
@@ -2726,11 +2708,6 @@ export function NavbarForm({
   const atMax = items.length >= NAVBAR_LIMITS.items;
   return (
     <div className="space-y-4">
-      <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-xs text-amber-800">
-        Reorder, edit, hide, or add navigation items. Items marked
-        &quot;Move into More&quot; collapse into a single &quot;More&quot;
-        dropdown on the public site.
-      </p>
       <div className="space-y-3">
         {items.map((item, i) => (
           <NavbarItemEditor
@@ -2783,156 +2760,6 @@ export function NavbarForm({
           <Plus size={14} /> Add Navbar Item
         </button>
         <LimitHint count={items.length} max={NAVBAR_LIMITS.items} />
-      </div>
-    </div>
-  );
-}
-
-/* ─── Header + Navbar combined section ─── */
-
-const HEADER_NAVBAR_DEFAULT: HeaderVal = {
-  phone: "",
-  studentLoginLabel: "",
-  studentLoginUrl: "",
-  showStudentLogin: true,
-};
-
-export function HeaderNavbarSection({
-  headerConfigKey,
-  navbarConfigKey,
-  navDefault,
-}: {
-  headerConfigKey: string;
-  navbarConfigKey: string;
-  navDefault?: NavbarVal;
-}) {
-  const [headerVal, setHeaderVal] = useState<HeaderVal>(HEADER_NAVBAR_DEFAULT);
-  const [navbarVal, setNavbarVal] = useState<NavbarVal>(navDefault ?? {});
-  const [loading, setLoading] = useState(true);
-  const [savingHeader, setSavingHeader] = useState(false);
-  const [savingNavbar, setSavingNavbar] = useState(false);
-  const [headerMsg, setHeaderMsg] = useState<{
-    ok: boolean;
-    text: string;
-  } | null>(null);
-  const [navbarMsg, setNavbarMsg] = useState<{
-    ok: boolean;
-    text: string;
-  } | null>(null);
-
-  useEffect(() => {
-    (async () => {
-      const r = await fetch("/api/admin/site-config");
-      const data: Array<{ config_key: string; value: unknown }> =
-        await r.json();
-      const hData = data.find((d) => d.config_key === headerConfigKey);
-      const nData = data.find((d) => d.config_key === navbarConfigKey);
-      if (hData?.value) setHeaderVal(hData.value as HeaderVal);
-      if (nData?.value) setNavbarVal(nData.value as NavbarVal);
-      setLoading(false);
-    })();
-  }, [headerConfigKey, navbarConfigKey]);
-
-  const saveHeader = async () => {
-    setSavingHeader(true);
-    setHeaderMsg(null);
-    try {
-      const r = await fetch("/api/admin/site-config", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ config_key: headerConfigKey, value: headerVal }),
-      });
-      setHeaderMsg({ ok: r.ok, text: r.ok ? "Saved!" : "Save failed." });
-    } catch {
-      setHeaderMsg({ ok: false, text: "Save failed." });
-    } finally {
-      setSavingHeader(false);
-    }
-  };
-
-  const saveNavbar = async () => {
-    setSavingNavbar(true);
-    setNavbarMsg(null);
-    try {
-      const r = await fetch("/api/admin/site-config", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ config_key: navbarConfigKey, value: navbarVal }),
-      });
-      setNavbarMsg({ ok: r.ok, text: r.ok ? "Saved!" : "Save failed." });
-    } catch {
-      setNavbarMsg({ ok: false, text: "Save failed." });
-    } finally {
-      setSavingNavbar(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center py-12">
-        <Loader2 size={24} className="animate-spin text-gray-400" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-8">
-      <div>
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-semibold text-gray-800">Header</h3>
-          <div className="flex items-center gap-3">
-            {headerMsg && (
-              <span
-                className={`text-sm font-medium ${headerMsg.ok ? "text-green-600" : "text-red-500"}`}
-              >
-                {headerMsg.text}
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={saveHeader}
-              disabled={savingHeader}
-              className="admin-btn admin-btn-gold"
-            >
-              {savingHeader ? (
-                <Loader2 size={15} className="animate-spin" />
-              ) : (
-                <Save size={15} />
-              )}
-              {savingHeader ? "Saving…" : "Save Header"}
-            </button>
-          </div>
-        </div>
-        <HeaderForm value={headerVal} onChange={setHeaderVal} />
-      </div>
-      <hr className="border-gray-200" />
-      <div>
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-semibold text-gray-800">Navbar</h3>
-          <div className="flex items-center gap-3">
-            {navbarMsg && (
-              <span
-                className={`text-sm font-medium ${navbarMsg.ok ? "text-green-600" : "text-red-500"}`}
-              >
-                {navbarMsg.text}
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={saveNavbar}
-              disabled={savingNavbar}
-              className="admin-btn admin-btn-gold"
-            >
-              {savingNavbar ? (
-                <Loader2 size={15} className="animate-spin" />
-              ) : (
-                <Save size={15} />
-              )}
-              {savingNavbar ? "Saving…" : "Save Navbar"}
-            </button>
-          </div>
-        </div>
-        <NavbarForm value={navbarVal} onChange={setNavbarVal} />
       </div>
     </div>
   );

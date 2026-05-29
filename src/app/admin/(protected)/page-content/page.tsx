@@ -21,7 +21,7 @@ import {
   AdmissionsForm,
   LifeAtJctForm,
   MetricsForm,
-  HeaderNavbarSection,
+  NavbarForm,
   type EngHeroVal,
   type ArtsHeroVal,
   type PolyHeroVal,
@@ -71,21 +71,18 @@ function navDefaultFor(college: College): NavbarVal {
   };
 }
 
-function headerNavbarSection(
-  headerConfigKey: string,
-  navbarConfigKey: string,
-  navDefault: NavbarVal,
+function navbarSection(
+  configKey: string,
+  defaultValue: NavbarVal,
 ): SectionDef {
   return {
-    id: "header-navbar",
-    label: "Header & Navbar",
-    kind: "custom",
-    customRender: () => (
-      <HeaderNavbarSection
-        headerConfigKey={headerConfigKey}
-        navbarConfigKey={navbarConfigKey}
-        navDefault={navDefault}
-      />
+    id: "navbar",
+    label: "Navbar",
+    kind: "form",
+    configKey,
+    defaultValue,
+    render: (v, onChange) => (
+      <NavbarForm value={(v as NavbarVal) ?? {}} onChange={onChange} />
     ),
   };
 }
@@ -495,11 +492,7 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
 function sectionsFor(college: College): SectionDef[] {
   if (college === "engineering") {
     return [
-      headerNavbarSection(
-        "engineeringHeader",
-        "engineeringNavbar",
-        navDefaultFor("engineering"),
-      ),
+      navbarSection("engineeringNavbar", navDefaultFor("engineering")),
       {
         id: "announcement",
         label: "Announcement Bar",
@@ -584,11 +577,7 @@ function sectionsFor(college: College): SectionDef[] {
 
   if (college === "arts-science") {
     return [
-      headerNavbarSection(
-        "artsScienceHeader",
-        "artsScienceNavbar",
-        navDefaultFor("arts-science"),
-      ),
+      navbarSection("artsScienceNavbar", navDefaultFor("arts-science")),
       {
         id: "hero",
         label: "Hero",
@@ -642,11 +631,7 @@ function sectionsFor(college: College): SectionDef[] {
 
   // polytechnic
   return [
-    headerNavbarSection(
-      "polytechnicHeader",
-      "polytechnicNavbar",
-      navDefaultFor("polytechnic"),
-    ),
+    navbarSection("polytechnicNavbar", navDefaultFor("polytechnic")),
     {
       id: "hero",
       label: "Hero",

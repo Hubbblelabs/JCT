@@ -224,5 +224,8 @@ export function normalizeProgramData(
     heroMeta: normalizeHeroMeta(c.heroMeta),
     tabsConfig: normalizeTabsConfig(c.tabsConfig),
     labels: normalizeLabels(c.labels),
+    customBlocks: Array.isArray(c.customBlocks)
+      ? (c.customBlocks as import("@/lib/validation").PageBodySection[])
+      : undefined,
   };
 }

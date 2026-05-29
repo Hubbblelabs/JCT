@@ -16,6 +16,8 @@ import {
 import type { AboutPageValue } from "@/lib/validation";
 import type { SidebarNavItemRaw } from "@/lib/sidebar-nav";
 import { SidebarNavEditor } from "@/components/admin/SidebarNavEditor";
+import { PageBodySectionsEditor } from "@/components/admin/PageBodySectionsEditor";
+import type { PageBodySection } from "@/lib/validation";
 
 type Stat = AboutPageValue["about"]["stats"][number];
 type MgmtMember = AboutPageValue["management"]["members"][number];
@@ -506,6 +508,15 @@ export function AboutSectionInspector({
             />
           </div>
         </>
+      );
+
+    case "customContent":
+      return (
+        <PageBodySectionsEditor
+          value={(data.customBlocks ?? []) as PageBodySection[]}
+          onChange={(blocks) => patch({ customBlocks: blocks })}
+          allowedTypes={["heading", "text", "image", "list", "cards"]}
+        />
       );
 
     default:

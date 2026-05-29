@@ -13,7 +13,7 @@ import {
   HomeAdmissionsForm,
   AccreditationsForm,
   StatisticsForm,
-  HeaderNavbarSection,
+  NavbarForm,
   type PamphletVal,
   type LifeAtJctVal,
   type WhyChooseJctVal,
@@ -771,15 +771,13 @@ const MAIN_NAVBAR_DEFAULT: NavbarVal = {
 function Inner() {
   const sections: SectionDef[] = [
     {
-      id: "header-navbar",
-      label: "Header & Navbar",
-      kind: "custom",
-      customRender: () => (
-        <HeaderNavbarSection
-          headerConfigKey="mainHeader"
-          navbarConfigKey="mainNavbar"
-          navDefault={MAIN_NAVBAR_DEFAULT}
-        />
+      id: "navbar",
+      label: "Navbar",
+      kind: "form",
+      configKey: "mainNavbar",
+      defaultValue: MAIN_NAVBAR_DEFAULT,
+      render: (v, onChange) => (
+        <NavbarForm value={(v as NavbarVal) ?? {}} onChange={onChange} />
       ),
     },
     {

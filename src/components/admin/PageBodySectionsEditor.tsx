@@ -365,11 +365,16 @@ function SectionEditor({
 export function PageBodySectionsEditor({
   value,
   onChange,
+  allowedTypes,
 }: {
   value: Section[] | undefined;
   onChange: (next: Section[]) => void;
+  allowedTypes?: Section["type"][];
 }) {
   const sections = Array.isArray(value) ? value : [];
+  const visibleTypes = allowedTypes
+    ? SECTION_TYPES.filter((t) => allowedTypes.includes(t.value))
+    : SECTION_TYPES;
   return (
     <div className="space-y-3">
       {sections.map((sec, i) => (
@@ -417,9 +422,9 @@ export function PageBodySectionsEditor({
           />
         </div>
       ))}
-      <Field label="Add Section">
+      <Field label="Add Block">
         <div className="flex flex-wrap gap-2">
-          {SECTION_TYPES.map((t) => (
+          {visibleTypes.map((t) => (
             <button
               key={t.value}
               type="button"

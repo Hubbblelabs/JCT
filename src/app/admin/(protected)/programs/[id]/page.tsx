@@ -422,6 +422,7 @@ function ProgramDetailInner() {
                   facilities: "labs",
                   life: "events",
                   career: "careerProgression",
+                  custom: "customBlocks",
                 };
                 selectSection(defaults[tabId] ?? "hero");
               }}

@@ -36,6 +36,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EditableRegion } from "@/components/admin/EditableRegion";
 import { getImageUrl } from "@/lib/utils";
 import type { AboutPageValue } from "@/lib/validation";
+import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
 import {
   resolveSidebarItems,
   type ResolvedSidebarItem,
@@ -58,7 +59,8 @@ export type AboutEditableSection =
   | "accreditations"
   | "campusHighlights"
   | "whyJct"
-  | "sidebar";
+  | "sidebar"
+  | "customContent";
 
 export const ABOUT_SECTION_LABELS: Record<AboutEditableSection, string> = {
   hero: "Hero",
@@ -73,6 +75,7 @@ export const ABOUT_SECTION_LABELS: Record<AboutEditableSection, string> = {
   campusHighlights: "Campus Highlights",
   whyJct: "Why Choose JCT",
   sidebar: "Sidebar (Quick Facts & CTA)",
+  customContent: "Custom Content",
 };
 
 /** Order of editable sections — used by the admin editor's section list. */
@@ -89,6 +92,7 @@ export const ABOUT_SECTION_ORDER: AboutEditableSection[] = [
   "campusHighlights",
   "whyJct",
   "sidebar",
+  "customContent",
 ];
 
 // ─── Theme tokens (static class strings so Tailwind keeps them) ──────────────
@@ -1001,6 +1005,25 @@ export function AboutPageLayout({
           </div>
         </div>
       </div>
+
+      {/* ── Custom Content ── */}
+      {(editable || (data.customBlocks && data.customBlocks.length > 0)) && (
+        <EditableRegion
+          section="customContent"
+          label="Custom Content"
+          editable={editable}
+          onEditSection={onEditSection}
+          className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8"
+        >
+          {editable && (!data.customBlocks || data.customBlocks.length === 0) ? (
+            <div className="rounded-xl border-2 border-dashed border-gray-200 py-8 text-center text-sm text-gray-400">
+              Click to add custom content blocks
+            </div>
+          ) : (
+            <PageBlocksRenderer blocks={data.customBlocks ?? []} />
+          )}
+        </EditableRegion>
+      )}
 
       {!editable && <Footer />}
     </main>

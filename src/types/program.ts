@@ -290,4 +290,5 @@ export type ProgramData = {
   heroMeta?: HeroMetaItem[];
   tabsConfig?: TabConfigItem[];
   labels?: LabelsTree;
+  customBlocks?: import("@/lib/validation").PageBodySection[];
 };

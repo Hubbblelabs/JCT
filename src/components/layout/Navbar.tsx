@@ -40,7 +40,6 @@ type NavbarConfigItem = {
   href?: string;
   desc?: string;
   visible?: boolean;
-  inMore?: boolean;
   children?: NavbarConfigChild[];
 };
 
@@ -72,13 +71,10 @@ function staticNavFor(institution: string): NavItem[] {
 function applyNavbarConfig(
   cfg: NavbarConfig | null,
   fallback: NavItem[],
-): { primary: NavItem[]; more: NavItem[] } {
+): NavItem[] {
   const items = Array.isArray(cfg?.items) ? cfg!.items : [];
-  if (items.length === 0) {
-    return { primary: fallback, more: [] };
-  }
-  const primary: NavItem[] = [];
-  const more: NavItem[] = [];
+  if (items.length === 0) return fallback;
+  const result: NavItem[] = [];
   for (const raw of items) {
     if (!raw || raw.visible === false || !raw.label) continue;
     const children = Array.isArray(raw.children)
@@ -90,14 +86,13 @@ function applyNavbarConfig(
             desc: c.desc,
           }))
       : undefined;
-    const item: NavItem = {
+    result.push({
       name: raw.label,
       href: raw.href || "#",
       children: children && children.length > 0 ? children : undefined,
-    };
-    (raw.inMore ? more : primary).push(item);
+    });
   }
-  return { primary, more };
+  return result;
 }
 
 export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
@@ -228,22 +223,10 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
     highlightShadowColor = "shadow-slate-500/10";
   }
 
-  const navigationLinks = useMemo<NavItem[]>(() => {
-    const { primary, more } = applyNavbarConfig(
-      navbarCfg,
-      staticNavFor(institution),
-    );
-    if (more.length === 0) return primary;
-    const moreItem: NavItem = {
-      name: "More",
-      href: "#",
-      children: more.map<NavChild>((it) => ({
-        name: it.name,
-        href: it.href,
-      })),
-    };
-    return [...primary, moreItem];
-  }, [navbarCfg, institution]);
+  const navigationLinks = useMemo<NavItem[]>(
+    () => applyNavbarConfig(navbarCfg, staticNavFor(institution)),
+    [navbarCfg, institution],
+  );
 
   const isSamePageHashLink = (href: string) => {
     return href.startsWith("#") || href.includes("#");
@@ -442,13 +425,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 8, scale: 0.985 }}
                             transition={{ duration: 0.22, ease: "easeOut" }}
-                            className={`rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
-                              link.name === "More"
-                                ? (link.children?.length ?? 0) > 1
-                                  ? "grid w-[600px] grid-cols-2 gap-x-2 gap-y-1"
-                                  : "w-72"
-                                : "w-72"
-                            } ${
+                            className={`w-72 rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
                               isDropdownSolid
                                 ? "border-white/10 bg-[#0a1628]/96"
                                 : "border-white/20 bg-[#0a1628]/70"

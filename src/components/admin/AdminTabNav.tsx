@@ -47,8 +47,8 @@ type NavItem = {
 const COLLEGE_ITEMS: Record<string, NavItem[]> = {
   engineering: [
     {
-      label: "Header & Navbar",
-      href: "/admin/page-content?college=engineering&section=header-navbar",
+      label: "Navbar",
+      href: "/admin/page-content?college=engineering&section=navbar",
       icon: PanelTop,
     },
     {
@@ -99,8 +99,8 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
   ],
   "arts-science": [
     {
-      label: "Header & Navbar",
-      href: "/admin/page-content?college=arts-science&section=header-navbar",
+      label: "Navbar",
+      href: "/admin/page-content?college=arts-science&section=navbar",
       icon: PanelTop,
     },
     {
@@ -136,8 +136,8 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
   ],
   polytechnic: [
     {
-      label: "Header & Navbar",
-      href: "/admin/page-content?college=polytechnic&section=header-navbar",
+      label: "Navbar",
+      href: "/admin/page-content?college=polytechnic&section=navbar",
       icon: PanelTop,
     },
     {
@@ -175,8 +175,8 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
 
 const MAIN_ITEMS: NavItem[] = [
   {
-    label: "Header & Navbar",
-    href: "/admin/main/page-content?section=header-navbar",
+    label: "Navbar",
+    href: "/admin/main/page-content?section=navbar",
     icon: PanelTop,
   },
   {

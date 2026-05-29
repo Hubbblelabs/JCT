@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SidebarNavItemSchema } from "./sidebarNav";
+import { PageBodySectionSchema } from "./pages";
 
 // ─── Shared sub-schemas ──────────────────────────────────────────────────────
 
@@ -135,6 +136,7 @@ export const EngineeringAboutSchema = z.object({
   campusHighlights: z.array(HighlightSchema).default([]),
   whyJct: z.array(s(300)).default([]),
   sidebar: AboutSidebarSchema.default(ABOUT_SIDEBAR_DEFAULT),
+  customBlocks: z.array(PageBodySectionSchema).default([]),
 });
 
 export type EngineeringAboutValue = z.infer<typeof EngineeringAboutSchema>;
@@ -176,6 +178,7 @@ export const ArtsScienceAboutSchema = z.object({
   campusHighlights: z.array(HighlightSchema).default([]),
   whyJct: z.array(s(300)).default([]),
   sidebar: AboutSidebarSchema.default(ABOUT_SIDEBAR_DEFAULT),
+  customBlocks: z.array(PageBodySectionSchema).default([]),
 });
 
 export type ArtsScienceAboutValue = z.infer<typeof ArtsScienceAboutSchema>;
@@ -214,6 +217,7 @@ export const PolytechnicAboutSchema = z.object({
   campusHighlights: z.array(HighlightSchema).default([]),
   whyJct: z.array(s(300)).default([]),
   sidebar: AboutSidebarSchema.default(ABOUT_SIDEBAR_DEFAULT),
+  customBlocks: z.array(PageBodySectionSchema).default([]),
 });
 
 export type PolytechnicAboutValue = z.infer<typeof PolytechnicAboutSchema>;
@@ -304,6 +308,7 @@ export const CoePageSchema = z.object({
       navItems: z.array(SidebarNavItemSchema).optional(),
     })
     .default({ quickFacts: [], ctaLabel: "", ctaHref: "" }),
+  customBlocks: z.array(PageBodySectionSchema).default([]),
 });
 
 export type CoePageValue = z.infer<typeof CoePageSchema>;

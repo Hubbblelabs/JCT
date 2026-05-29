@@ -33,6 +33,8 @@ import {
   type Tab as CustomTab,
 } from "@/components/admin/ProgramTabsEditor";
 import { ProgramLabelsEditor } from "@/components/admin/ProgramLabelsEditor";
+import { PageBodySectionsEditor } from "@/components/admin/PageBodySectionsEditor";
+import type { PageBodySection } from "@/lib/validation";
 import type { HeroMetaItem, LabelsTree, TabConfigItem } from "@/types/program";
 
 // ─── Tab definitions (mirror ProgramPageLayout.tsx) ──────────────────────
@@ -307,7 +309,8 @@ export type ProgramContentSection =
   | "participation"
   | "careerProgression"
   | "feedback"
-  | "tabs";
+  | "tabs"
+  | "customBlocks";
 
 export const PROGRAM_CONTENT_SECTION_LABELS: Record<
   ProgramContentSection,
@@ -336,6 +339,7 @@ export const PROGRAM_CONTENT_SECTION_LABELS: Record<
   careerProgression: "Career progression",
   feedback: "Feedback & improvements",
   tabs: "Sidebar tabs",
+  customBlocks: "Custom blocks",
 };
 
 export function ProgramSectionInspector({
@@ -868,6 +872,18 @@ export function ProgramSectionInspector({
             Reset to default 6 tabs
           </button>
         </>
+      );
+    case "customBlocks":
+      return (
+        <PageBodySectionsEditor
+          value={
+            (Array.isArray(content.customBlocks)
+              ? content.customBlocks
+              : []) as PageBodySection[]
+          }
+          onChange={(blocks) => set("customBlocks", blocks)}
+          allowedTypes={["heading", "text", "image", "list", "cards"]}
+        />
       );
   }
 }
