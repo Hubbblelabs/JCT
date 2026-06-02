@@ -31,7 +31,8 @@ export async function GET(
     }
 
     return NextResponse.json({ source: "db", data: program });
-  } catch {
+  } catch (e) {
+    console.error("[public/programs/slug]", e);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 },

@@ -28,7 +28,10 @@ export async function connectDB(): Promise<typeof mongoose> {
     .connect(uri, {
       bufferCommands: false,
       serverSelectionTimeoutMS: CONNECT_TIMEOUT_MS,
-      maxPoolSize: 10,
+      // Per-instance pool. Lower this (via env) on serverless where many
+      // ephemeral instances each open a pool and can exhaust the Atlas
+      // connection cap; raise it for a single long-lived container.
+      maxPoolSize: Number(process.env.MONGODB_MAX_POOL_SIZE) || 10,
     })
     .then((m) => {
       global._mongooseConn = m;

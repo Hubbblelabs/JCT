@@ -56,7 +56,8 @@ export async function GET() {
     }));
 
     return NextResponse.json({ source: "db", data: transformedRecruiters });
-  } catch {
+  } catch (e) {
+    console.error("[public/recruiters]", e);
     return NextResponse.json({ source: "error", data: [] });
   }
 }

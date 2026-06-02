@@ -4,3 +4,7 @@ onlyBuiltDependencies:
 allowBuilds:
   sharp: true
   unrs-resolver: true
+# Force the transitive postcss (pulled by next) to the patched line that
+# fixes GHSA-qx2v-qp2m-jg93. Overrides live here in pnpm 11+, not package.json.
+overrides:
+  postcss@<8.5.10: ">=8.5.10"

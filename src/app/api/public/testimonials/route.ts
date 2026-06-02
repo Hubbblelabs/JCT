@@ -69,7 +69,8 @@ export async function GET(req: Request) {
     }));
 
     return NextResponse.json({ source: "db", data: transformedTestimonials });
-  } catch {
+  } catch (e) {
+    console.error("[public/testimonials]", e);
     return NextResponse.json({ source: "error", data: [] });
   }
 }

@@ -30,7 +30,12 @@ function LoginForm() {
     if (result?.error) {
       setError("Invalid email or password");
     } else {
-      const callbackUrl = searchParams.get("callbackUrl") ?? "/admin/dashboard";
+      // Only follow same-origin relative paths. A raw callbackUrl would let
+      // `/admin/login?callbackUrl=https://evil.com` (or `//evil.com`) bounce
+      // a freshly-authenticated user off-site — an open redirect.
+      const raw = searchParams.get("callbackUrl") ?? "/admin/dashboard";
+      const callbackUrl =
+        raw.startsWith("/") && !raw.startsWith("//") ? raw : "/admin/dashboard";
       router.push(callbackUrl);
     }
   };

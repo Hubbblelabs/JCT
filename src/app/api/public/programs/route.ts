@@ -20,7 +20,8 @@ export async function GET(req: Request) {
     }
 
     return NextResponse.json({ source: "db", data: programs });
-  } catch {
+  } catch (e) {
+    console.error("[public/programs]", e);
     return NextResponse.json({ source: "error", data: [] });
   }
 }

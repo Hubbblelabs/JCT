@@ -68,7 +68,8 @@ export async function GET(req: Request) {
     }
 
     return NextResponse.json({ source: "db", data });
-  } catch {
+  } catch (e) {
+    console.error("[public/site-config]", e);
     return NextResponse.json({ source: "error", data: {} });
   }
 }

@@ -2,7 +2,13 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { DocumentAsset } from "@/lib/models";
 import { deleteFromR2 } from "@/lib/r2";
-import { requireRole, json, badRequest, serverError } from "@/lib/api-helpers";
+import {
+  requireRole,
+  enforceUploadRateLimit,
+  json,
+  badRequest,
+  serverError,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 
 export const maxDuration = 30;
@@ -10,6 +16,9 @@ export const maxDuration = 30;
 export async function POST(req: NextRequest) {
   const { session, error } = await requireRole(req, "editor");
   if (error) return error;
+
+  const limited = enforceUploadRateLimit(req, session!.user?.email ?? "");
+  if (limited) return limited;
 
   try {
     const body = (await req.json()) as {
@@ -22,6 +31,12 @@ export async function POST(req: NextRequest) {
 
     if (!storage_key || !filename)
       return badRequest("storage_key and filename required");
+
+    // Only accept keys minted by the presign route. Without this an editor
+    // could register a DocumentAsset pointing at any object in the bucket.
+    if (!storage_key.startsWith("documents/")) {
+      return badRequest("Invalid storage_key");
+    }
 
     const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL
       ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${storage_key}`
