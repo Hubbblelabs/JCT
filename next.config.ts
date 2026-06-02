@@ -37,38 +37,51 @@ const nextConfig: NextConfig = {
     qualities: [75, 90],
   },
   async headers() {
-    // Only set aggressive caching in production
-    if (process.env.NODE_ENV === "production") {
+    const isProd = process.env.NODE_ENV === "production";
+
+    // Baseline hardening headers applied to every response. A full
+    // Content-Security-Policy is intentionally omitted here — Tailwind/
+    // framer-motion rely on inline styles, so a CSP needs per-request
+    // nonces to avoid breaking the UI; track that as a follow-up. HSTS is
+    // production-only so it never pins `localhost` during local dev.
+    const securityHeaders = [
+      { key: "X-Content-Type-Options", value: "nosniff" },
+      { key: "X-Frame-Options", value: "DENY" },
+      { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+      {
+        key: "Permissions-Policy",
+        value: "camera=(), microphone=(), geolocation=(), browsing-topics=()",
+      },
+      ...(isProd
+        ? [
+            {
+              key: "Strict-Transport-Security",
+              value: "max-age=63072000; includeSubDomains; preload",
+            },
+          ]
+        : []),
+    ];
+
+    const securityRule = { source: "/(.*)", headers: securityHeaders };
+
+    if (isProd) {
+      const immutable = [
+        { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+      ];
       return [
-        {
-          source: "/_next/static/(.*)",
-          headers: [
-            {
-              key: "Cache-Control",
-              value: "public, max-age=31536000, immutable",
-            },
-          ],
-        },
-        {
-          source: "/fonts/(.*)",
-          headers: [
-            {
-              key: "Cache-Control",
-              value: "public, max-age=31536000, immutable",
-            },
-          ],
-        },
+        securityRule,
+        { source: "/_next/static/(.*)", headers: immutable },
+        { source: "/fonts/(.*)", headers: immutable },
       ];
     }
-    // In development, explicitly disable caching to prevent stale chunks
+
+    // In development, explicitly disable caching to prevent stale chunks.
     return [
+      securityRule,
       {
         source: "/(.*)",
         headers: [
-          {
-            key: "Cache-Control",
-            value: "no-cache, no-store, must-revalidate",
-          },
+          { key: "Cache-Control", value: "no-cache, no-store, must-revalidate" },
         ],
       },
     ];

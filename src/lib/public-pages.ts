@@ -51,18 +51,31 @@ function asPublic(doc: PageLean): PublicPage | null {
 export async function listPublishedPageSlugs(
   institution: PublicPage["institution"],
 ): Promise<{ slug: string }[]> {
-  await connectDB();
-  const docs = await Page.find({
-    institution,
-    status: "published",
-    published_content: { $exists: true, $ne: null },
-  })
-    .select("slug")
-    .lean<{ slug?: string }[]>();
-  return docs
-    .map((d) => d.slug)
-    .filter((s): s is string => typeof s === "string" && s.length > 0)
-    .map((slug) => ({ slug }));
+  // Runs inside generateStaticParams at build time. If the DB is briefly
+  // unreachable during `next build`, degrade to zero prerendered slugs
+  // instead of aborting the entire build — pages still render on demand
+  // via ISR (dynamicParams defaults to true).
+  try {
+    await connectDB();
+    const docs = await Page.find({
+      institution,
+      status: "published",
+      published_content: { $exists: true, $ne: null },
+    })
+      .select("slug")
+      .lean<{ slug?: string }[]>();
+    return docs
+      .map((d) => d.slug)
+      .filter((s): s is string => typeof s === "string" && s.length > 0)
+      .map((slug) => ({ slug }));
+  } catch (err) {
+    console.warn(
+      `[public-pages] listPublishedPageSlugs(${institution}) failed; ` +
+        "falling back to on-demand rendering:",
+      err,
+    );
+    return [];
+  }
 }
 
 export async function getPublishedPageBySlug({

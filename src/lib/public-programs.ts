@@ -124,21 +124,34 @@ export async function listPublicPrograms({
 export async function listPublishedProgramSlugs(
   institution: ProgramInstitution,
 ): Promise<{ slug: string }[]> {
-  await connectDB();
+  // Runs inside generateStaticParams at build time. If the DB is briefly
+  // unreachable during `next build`, degrade to zero prerendered slugs
+  // instead of aborting the entire build — program pages still render on
+  // demand via ISR (dynamicParams defaults to true).
+  try {
+    await connectDB();
 
-  const docs = await Program.find({
-    institution,
-    is_active: true,
-    ...publishedQuery(true),
-  })
-    .select("slug")
-    .sort({ sort_order: 1, name: 1 })
-    .lean<{ slug?: string }[]>();
+    const docs = await Program.find({
+      institution,
+      is_active: true,
+      ...publishedQuery(true),
+    })
+      .select("slug")
+      .sort({ sort_order: 1, name: 1 })
+      .lean<{ slug?: string }[]>();
 
-  return docs
-    .map((doc) => doc.slug)
-    .filter((slug): slug is string => typeof slug === "string" && !!slug)
-    .map((slug) => ({ slug }));
+    return docs
+      .map((doc) => doc.slug)
+      .filter((slug): slug is string => typeof slug === "string" && !!slug)
+      .map((slug) => ({ slug }));
+  } catch (err) {
+    console.warn(
+      `[public-programs] listPublishedProgramSlugs(${institution}) failed; ` +
+        "falling back to on-demand rendering:",
+      err,
+    );
+    return [];
+  }
 }
 
 export async function getPublishedProgramBySlug({
