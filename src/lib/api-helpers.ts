@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { ZodIssue, ZodType } from "zod";
 import { auth } from "@/auth";
-import { hasMinRole, type Role } from "@/lib/permissions";
+import { hasMinRole, canAccessInstitution, type Role } from "@/lib/permissions";
 import { clientIpFromHeaders, consumeUploadAttempt } from "@/lib/rate-limit";
 
 export function json(data: unknown, status = 200) {
@@ -138,4 +138,27 @@ export async function requireRole(req: NextRequest, minRole: Role) {
     return { session: null, error: forbidden() };
   }
   return { session, error: null };
+}
+
+/**
+ * Horizontal access-control guard. Admins act on any institution; editors
+ * may only create/mutate resources belonging to their own `institution`.
+ * Returns a ready-to-return 403 when the caller is out of scope, else null.
+ *
+ * For updates/deletes, pass the resource's *existing* institution, and
+ * re-check separately if the request also tries to change `institution`.
+ * Without this, an editor scoped to one college could mutate another
+ * college's programs/pages/testimonials simply by guessing a document id.
+ */
+export function enforceInstitutionScope(
+  session: { user?: unknown } | null,
+  targetInstitution: string | undefined | null,
+): NextResponse | null {
+  const user = (session?.user ?? {}) as Record<string, unknown>;
+  const role = (user.role as string) ?? "";
+  const userInstitution = (user.institution as string) ?? "";
+  if (!canAccessInstitution(role, userInstitution, targetInstitution ?? "")) {
+    return forbidden();
+  }
+  return null;
 }

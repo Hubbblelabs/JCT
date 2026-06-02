@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { Program } from "@/lib/models";
 import {
   requireRole,
+  enforceInstitutionScope,
   json,
   badRequest,
   serverError,
@@ -52,6 +53,9 @@ export async function POST(req: NextRequest) {
   const parsed = await validateBody(req, ProgramCreateSchema);
   if (!parsed.ok) return parsed.response;
   const body = parsed.data;
+
+  const scope = enforceInstitutionScope(session, body.institution);
+  if (scope) return scope;
 
   try {
     await connectDB();

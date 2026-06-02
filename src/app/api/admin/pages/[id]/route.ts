@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { Page } from "@/lib/models";
 import {
   requireRole,
+  enforceInstitutionScope,
   json,
   notFound,
   serverError,
@@ -68,10 +69,20 @@ export async function PATCH(
     await connectDB();
     const { id } = await params;
 
+    const current = await Page.findById(id).lean();
+    if (!current) return notFound();
+
+    // Editors may only mutate pages within their own institution, and may
+    // not move a page into an institution they can't access.
+    const scope = enforceInstitutionScope(session, current.institution);
+    if (scope) return scope;
+    if (body.institution !== undefined) {
+      const scopeNext = enforceInstitutionScope(session, body.institution);
+      if (scopeNext) return scopeNext;
+    }
+
     // Guard slug uniqueness within institution if slug or institution changes.
     if (body.slug !== undefined || body.institution !== undefined) {
-      const current = await Page.findById(id).lean();
-      if (!current) return notFound();
       const nextSlug = body.slug ?? current.slug;
       const nextInst = body.institution ?? current.institution;
       const collision = await Page.findOne({

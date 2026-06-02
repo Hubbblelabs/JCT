@@ -1,7 +1,13 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Program } from "@/lib/models";
-import { requireRole, json, notFound, serverError } from "@/lib/api-helpers";
+import {
+  requireRole,
+  enforceInstitutionScope,
+  json,
+  notFound,
+  serverError,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 
 type Tab = {
@@ -236,6 +242,9 @@ export async function POST(
     const { id } = await params;
     const doc = await Program.findById(id);
     if (!doc) return notFound("Program not found");
+
+    const scope = enforceInstitutionScope(session, doc.institution);
+    if (scope) return scope;
 
     const existing = (doc.content ?? {}) as Record<string, unknown>;
     if (Array.isArray(existing.tabs) && existing.tabs.length > 0) {

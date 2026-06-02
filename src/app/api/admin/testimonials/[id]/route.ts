@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { Testimonial } from "@/lib/models";
 import {
   requireRole,
+  enforceInstitutionScope,
   json,
   notFound,
   serverError,
@@ -58,11 +59,21 @@ export async function PATCH(
     await connectDB();
     const { id } = await params;
 
-    const oldAvatar =
-      body.avatar !== undefined
-        ? ((await Testimonial.findById(id).select("avatar").lean())?.avatar ??
-          "")
-        : "";
+    // Load existing doc up-front to enforce institution scope and reuse the
+    // avatar key for orphan cleanup in a single query.
+    const existing = await Testimonial.findById(id)
+      .select("institution avatar")
+      .lean<{ institution?: string; avatar?: string } | null>();
+    if (!existing) return notFound();
+
+    const scope = enforceInstitutionScope(session, existing.institution);
+    if (scope) return scope;
+    if (body.institution !== undefined) {
+      const scopeNext = enforceInstitutionScope(session, body.institution);
+      if (scopeNext) return scopeNext;
+    }
+
+    const oldAvatar = body.avatar !== undefined ? (existing.avatar ?? "") : "";
 
     const updateFields = Object.fromEntries(
       Object.entries(body).filter(([, v]) => v !== undefined),

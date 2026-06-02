@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { Testimonial } from "@/lib/models";
 import {
   requireRole,
+  enforceInstitutionScope,
   json,
   serverError,
   validateBody,
@@ -51,6 +52,9 @@ export async function POST(req: NextRequest) {
   const parsed = await validateBody(req, TestimonialCreateSchema);
   if (!parsed.ok) return parsed.response;
   const body = parsed.data;
+
+  const scope = enforceInstitutionScope(session, body.institution);
+  if (scope) return scope;
 
   try {
     await connectDB();

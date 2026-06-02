@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { Program } from "@/lib/models";
 import {
   requireRole,
+  enforceInstitutionScope,
   json,
   notFound,
   serverError,
@@ -61,10 +62,22 @@ export async function PATCH(
     await connectDB();
     const { id } = await params;
 
-    const oldImageKey =
-      body.image !== undefined
-        ? ((await Program.findById(id).select("image").lean())?.image ?? "")
-        : "";
+    // Load the existing doc up-front so we can both enforce institution
+    // scope and reuse its image key for orphan cleanup (one query).
+    const existing = await Program.findById(id)
+      .select("institution image")
+      .lean<{ institution?: string; image?: string } | null>();
+    if (!existing) return notFound();
+
+    const scope = enforceInstitutionScope(session, existing.institution);
+    if (scope) return scope;
+    // Block moving a program into an institution the editor can't access.
+    if (body.institution !== undefined) {
+      const scopeNext = enforceInstitutionScope(session, body.institution);
+      if (scopeNext) return scopeNext;
+    }
+
+    const oldImageKey = body.image !== undefined ? (existing.image ?? "") : "";
 
     const doc = await Program.findByIdAndUpdate(
       id,
