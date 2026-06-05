@@ -446,13 +446,18 @@ export function ProgramLabelsEditor({
                   </label>
                 )}
                 <div className="grid grid-cols-2 gap-3">
-                  {section.fields.map((f) => (
+                  {section.fields.map((f) => {
+                    const fieldId = `pl-${group.key}-${section.key}-${f.key}`;
+                    return (
                     <div
                       key={f.key}
                       className={f.key === "title" ? "col-span-2" : ""}
                     >
-                      <label className="admin-label">{f.label}</label>
+                      <label htmlFor={fieldId} className="admin-label">
+                        {f.label}
+                      </label>
                       <input
+                        id={fieldId}
                         className="admin-input"
                         value={String(current[f.key] ?? "")}
                         placeholder={f.placeholder}
@@ -464,7 +469,8 @@ export function ProgramLabelsEditor({
                         }
                       />
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </Collapsible>
             );

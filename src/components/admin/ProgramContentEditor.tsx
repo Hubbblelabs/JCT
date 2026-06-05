@@ -1582,8 +1582,11 @@ export function ProgramContentEditor({
             placeholder="cse"
           />
           <div>
-            <label className="admin-label">College</label>
+            <label htmlFor="pce-college" className="admin-label">
+              College
+            </label>
             <select
+              id="pce-college"
               className="admin-select"
               value={String(content.college ?? "")}
               onChange={(e) => set("college", e.target.value)}

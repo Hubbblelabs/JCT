@@ -157,8 +157,11 @@ export default function NewPagePage() {
 
       <div className="admin-card mb-4 space-y-4">
         <div>
-          <label className="admin-label">Title</label>
+          <label htmlFor="new-page-title" className="admin-label">
+            Title
+          </label>
           <input
+            id="new-page-title"
             className="admin-input"
             value={title}
             onChange={(e) => onTitleChange(e.target.value)}
@@ -167,8 +170,11 @@ export default function NewPagePage() {
         </div>
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="admin-label">Slug (URL)</label>
+            <label htmlFor="new-page-slug" className="admin-label">
+              Slug (URL)
+            </label>
             <input
+              id="new-page-slug"
               className="admin-input"
               value={slug}
               onChange={(e) => {
@@ -182,8 +188,11 @@ export default function NewPagePage() {
             </p>
           </div>
           <div>
-            <label className="admin-label">Institution</label>
+            <label htmlFor="new-page-institution" className="admin-label">
+              Institution
+            </label>
             <select
+              id="new-page-institution"
               className="admin-select"
               value={institution}
               onChange={(e) => setInstitution(e.target.value as Institution)}
