@@ -50,7 +50,10 @@ export function StickyApplyButton({
           exit={{ opacity: 0, y: 20, scale: 0.9 }}
           transition={{ duration: 0.3 }}
           data-own-fixed
-          className="fixed bottom-5 left-1/2 z-50 -translate-x-1/2 md:bottom-6 md:left-24 md:translate-x-0"
+          // Bottom-left on every breakpoint: stacked above the WhatsApp FAB on
+          // mobile (was bottom-center, which collided with page content and the
+          // bottom-right chat launcher), beside it on desktop.
+          className="fixed bottom-24 left-4 z-50 md:bottom-6 md:left-24"
         >
           <Link
             href={href}
