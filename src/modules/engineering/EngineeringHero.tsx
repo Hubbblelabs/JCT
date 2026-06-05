@@ -117,6 +117,17 @@ export function EngineeringHero() {
       aria-busy={loading}
       className="relative flex min-h-screen items-center overflow-hidden bg-[#07111d] pt-20 lg:pt-24"
     >
+      {loading && (
+        <div className="relative z-10 mx-auto w-full max-w-4xl px-4 text-center">
+          <div className="mx-auto h-16 w-3/4 animate-pulse rounded-2xl bg-white/10 md:h-24" />
+          <div className="mx-auto mt-6 h-6 w-2/3 animate-pulse rounded-lg bg-white/10" />
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <div className="h-14 w-44 animate-pulse rounded-xl bg-white/10" />
+            <div className="h-14 w-44 animate-pulse rounded-xl bg-white/10" />
+          </div>
+        </div>
+      )}
+
       {!loading && hero && (
         <>
           <motion.div

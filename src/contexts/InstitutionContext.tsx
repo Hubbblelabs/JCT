@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { MotionConfig } from "framer-motion";
 
 interface InstitutionContextType {
   institution: "main" | "engineering" | "arts-science" | "polytechnic";
@@ -79,7 +80,9 @@ export function InstitutionProvider({
 
   return (
     <InstitutionContext.Provider value={{ institution, setInstitution }}>
-      {children}
+      {/* reducedMotion="user" makes every Framer Motion animation honor the
+          OS "reduce motion" preference (WCAG 2.3.3) without per-component code. */}
+      <MotionConfig reducedMotion="user">{children}</MotionConfig>
     </InstitutionContext.Provider>
   );
 }

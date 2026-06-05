@@ -24,6 +24,7 @@ export default async function EngineeringPage() {
         className="bg-background text-foreground engineering-theme min-h-screen overflow-x-hidden"
       >
         <Navbar />
+        <div id="main-content" tabIndex={-1} className="outline-none" />
         <EngineeringHero />
         <EngineeringDomains />
         <EngineeringMetrics />

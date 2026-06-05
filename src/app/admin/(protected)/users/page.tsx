@@ -5,6 +5,8 @@ import { TextInput, Select } from "@/components/admin/inputs";
 import { Plus, Pencil, Trash2, X, Loader2, Check, Shield } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 
 interface User {
   _id: string;
@@ -44,6 +46,8 @@ const EDITOR_INSTITUTIONS = [
 ];
 
 export default function UsersPage() {
+  const toast = useToast();
+  const confirm = useConfirm();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [showNew, setShowNew] = useState(false);
@@ -105,6 +109,7 @@ export default function UsersPage() {
     if (r.ok) {
       setShowNew(false);
       setNewForm(EMPTY_NEW);
+      toast.success("User created.");
       await load();
     } else {
       const err = await parseApiError(r);
@@ -134,6 +139,7 @@ export default function UsersPage() {
     });
     if (r.ok) {
       setEditingUser(null);
+      toast.success("User updated.");
       await load();
     } else {
       const err = await parseApiError(r);
@@ -145,8 +151,15 @@ export default function UsersPage() {
   };
 
   const deactivate = async (id: string) => {
-    if (!confirm("Deactivate this user?")) return;
+    const ok = await confirm({
+      title: "Deactivate user",
+      message: "This user will lose access until reactivated. Continue?",
+      confirmLabel: "Deactivate",
+      destructive: true,
+    });
+    if (!ok) return;
     await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
+    toast.success("User deactivated.");
     await load();
   };
 
@@ -169,12 +182,15 @@ export default function UsersPage() {
         </div>
 
         {msg && (
-          <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+          <p
+            role="alert"
+            className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+          >
             {msg}
           </p>
         )}
 
-        <div className="admin-card overflow-hidden p-0">
+        <div className="admin-card overflow-x-auto p-0">
           {loading ? (
             <div className="flex justify-center py-12">
               <Loader2 size={24} className="animate-spin text-gray-400" />

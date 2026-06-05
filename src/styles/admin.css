@@ -112,6 +112,12 @@
   display: block;
 }
 
+/* Keyboard access: focusing the trigger (or any child within) opens the
+   menu, so its links become reachable by Tab. Mirrors the :hover behavior. */
+.admin-nav-item:focus-within .admin-nav-dropdown-menu {
+  display: block;
+}
+
 .admin-nav-dropdown-item {
   display: flex;
   align-items: center;
@@ -225,6 +231,14 @@
 .admin-btn-sm {
   padding: 0.375rem 0.75rem;
   font-size: 0.8125rem;
+}
+
+/* Visible keyboard focus for all admin controls */
+.admin-btn:focus-visible,
+.admin-nav-trigger:focus-visible,
+.admin-nav-dropdown-item:focus-visible {
+  outline: 2px solid var(--admin-gold);
+  outline-offset: 2px;
 }
 
 /* ── Badges ─────────────────────────────────────────── */

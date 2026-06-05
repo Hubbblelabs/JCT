@@ -23,6 +23,7 @@ export default async function HomePage() {
     <SiteConfigProvider configs={configs}>
       <main className="bg-surface text-foreground min-h-screen overflow-x-hidden">
         <Navbar />
+        <div id="main-content" tabIndex={-1} className="outline-none" />
         <Pamphlet />
         <HomeHero />
         <TrustHighlightsRow />

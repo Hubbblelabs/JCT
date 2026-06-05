@@ -10,6 +10,8 @@ import {
   ExternalLink,
   ChevronRight,
 } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 
 type PageRow = {
   _id: string;
@@ -38,6 +40,8 @@ function publicPathFor(institution: string, slug: string): string {
 function PagesInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [rows, setRows] = useState<PageRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -60,15 +64,22 @@ function PagesInner() {
   }, [filter]);
 
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Permanently delete "${title}"? This cannot be undone.`))
-      return;
+    const ok = await confirm({
+      title: "Delete page",
+      message: `Permanently delete "${title}"? This cannot be undone.`,
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     setDeletingId(id);
     try {
       const r = await fetch(`/api/admin/pages/${id}`, { method: "DELETE" });
-      if (r.ok) setRows((prev) => prev.filter((p) => p._id !== id));
-      else alert("Failed to delete page.");
+      if (r.ok) {
+        setRows((prev) => prev.filter((p) => p._id !== id));
+        toast.success(`Deleted "${title}".`);
+      } else toast.error("Failed to delete page.");
     } catch {
-      alert("Failed to delete page.");
+      toast.error("Failed to delete page.");
     } finally {
       setDeletingId(null);
     }
@@ -93,8 +104,14 @@ function PagesInner() {
       </div>
 
       <div className="admin-card mb-4 flex items-center gap-3">
-        <label className="text-sm font-medium text-gray-700">Institution</label>
+        <label
+          htmlFor="pages-institution-filter"
+          className="text-sm font-medium text-gray-700"
+        >
+          Institution
+        </label>
         <select
+          id="pages-institution-filter"
           className="admin-select max-w-xs"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}

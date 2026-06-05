@@ -26,6 +26,8 @@ import {
   DeferredUploadsProvider,
   useDeferredUploads,
 } from "@/lib/deferred-uploads";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 
 interface ProgramFields {
   name: string;
@@ -51,6 +53,8 @@ const EMPTY_PROG: ProgramFields = {
 
 function ProgramDetailInner() {
   const { flush } = useDeferredUploads();
+  const toast = useToast();
+  const confirm = useConfirm();
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -224,22 +228,29 @@ function ProgramDetailInner() {
   };
 
   const deactivate = async () => {
-    if (
-      !confirm(
-        "Deactivate this program? It will be hidden from the public site.",
-      )
-    )
-      return;
+    const ok = await confirm({
+      title: "Deactivate program",
+      message: "It will be hidden from the public site. Continue?",
+      confirmLabel: "Deactivate",
+      destructive: true,
+    });
+    if (!ok) return;
     await fetch(`/api/admin/programs/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ is_active: false }),
     });
+    toast.success("Program deactivated.");
     router.push(`/admin/programs?college=${prog.institution}`);
   };
 
   const activate = async () => {
-    if (!confirm("Activate this program?")) return;
+    const ok = await confirm({
+      title: "Activate program",
+      message: "Make this program active (as a draft)?",
+      confirmLabel: "Activate",
+    });
+    if (!ok) return;
     await fetch(`/api/admin/programs/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -249,12 +260,13 @@ function ProgramDetailInner() {
   };
 
   const remove = async () => {
-    if (
-      !confirm(
-        `Permanently delete "${prog.name || "this program"}"? This removes it completely and cannot be undone.`,
-      )
-    )
-      return;
+    const ok = await confirm({
+      title: "Delete program",
+      message: `Permanently delete "${prog.name || "this program"}"? This removes it completely and cannot be undone.`,
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     setDeleting(true);
     setMsg(null);
     try {

@@ -1,6 +1,8 @@
 "use client";
 
 import { Suspense, useEffect, useState, useCallback, useRef } from "react";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { useSearchParams } from "next/navigation";
 import { Check, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 import {
@@ -276,6 +278,8 @@ function TestimonialFormInner({
 }
 
 function CollegeTestimonialsManager({ institution }: { institution: string }) {
+  const toast = useToast();
+  const confirm = useConfirm();
   const [items, setItems] = useState<TestimonialItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -354,13 +358,20 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this testimonial?")) return;
+    const ok = await confirm({
+      title: "Delete testimonial",
+      message: "This testimonial will be permanently removed. Continue?",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     setDeletingId(id);
     try {
       const r = await fetch(`/api/admin/testimonials/${id}`, {
         method: "DELETE",
       });
       if (!r.ok) throw new Error();
+      toast.success("Testimonial deleted.");
       await load();
     } catch {
       setError("Delete failed.");

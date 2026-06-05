@@ -14,6 +14,8 @@ import {
   RecruitersSectionForm,
   type RecruitersSectionVal,
 } from "@/components/admin/PageContentForms";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 
 interface Recruiter {
   _id: string;
@@ -150,6 +152,8 @@ export default function RecruitersPage() {
 
 function RecruitersPageInner() {
   const { flush, discardAll } = useDeferredUploads();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [recruiters, setRecruiters] = useState<Recruiter[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Recruiter | null>(null);
@@ -217,8 +221,15 @@ function RecruitersPageInner() {
   };
 
   const del = async (id: string) => {
-    if (!confirm("Delete this recruiter?")) return;
+    const ok = await confirm({
+      title: "Delete recruiter",
+      message: "This recruiter will be permanently removed. Continue?",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     await fetch(`/api/admin/recruiters/${id}`, { method: "DELETE" });
+    toast.success("Recruiter deleted.");
     await load();
   };
 
@@ -241,7 +252,7 @@ function RecruitersPageInner() {
 
         <RecruitersSectionPanel />
 
-        <div className="admin-card overflow-hidden p-0">
+        <div className="admin-card overflow-x-auto p-0">
           {loading ? (
             <div className="flex justify-center py-12">
               <Loader2 size={24} className="animate-spin text-gray-400" />

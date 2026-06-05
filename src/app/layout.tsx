@@ -88,6 +88,9 @@ export default function RootLayout({
       <body
         className={`${playfair.variable} ${inter.variable} bg-surface text-foreground flex min-h-screen flex-col antialiased`}
       >
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <InstitutionProvider>
           {children}
           {/* Global elements - conditionally shown based on route */}

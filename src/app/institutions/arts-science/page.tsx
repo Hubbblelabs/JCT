@@ -38,6 +38,7 @@ export default async function ArtsSciencePage() {
         className="bg-background text-foreground arts-science-theme min-h-screen overflow-x-hidden"
       >
         <Navbar />
+        <div id="main-content" tabIndex={-1} className="outline-none" />
         <Hero />
         <UgPrograms />
         <AdmissionProcess />

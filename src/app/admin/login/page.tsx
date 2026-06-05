@@ -44,9 +44,13 @@ function LoginForm() {
     <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="admin-label">Email</label>
+          <label htmlFor="login-email" className="admin-label">
+            Email
+          </label>
           <input
+            id="login-email"
             type="email"
+            autoComplete="email"
             className="admin-input"
             placeholder="admin@jct.ac.in"
             value={email}
@@ -57,9 +61,13 @@ function LoginForm() {
         </div>
 
         <div>
-          <label className="admin-label">Password</label>
+          <label htmlFor="login-password" className="admin-label">
+            Password
+          </label>
           <input
+            id="login-password"
             type="password"
+            autoComplete="current-password"
             className="admin-input"
             placeholder="••••••••"
             value={password}
@@ -69,7 +77,10 @@ function LoginForm() {
         </div>
 
         {error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+          <p
+            role="alert"
+            className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+          >
             {error}
           </p>
         )}

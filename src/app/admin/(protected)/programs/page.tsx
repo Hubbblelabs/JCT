@@ -2,7 +2,9 @@
 
 import { useEffect, useState, Suspense, type MouseEvent } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, ChevronRight, Trash2, Loader2 } from "lucide-react";
+import { Plus, ChevronRight, Trash2, Loader2, Search } from "lucide-react";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 
 interface Program {
   _id: string;
@@ -20,11 +22,14 @@ interface Program {
 function ProgramsPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [creatingNew, setCreatingNew] = useState(false);
   const [filter, setFilter] = useState(() => searchParams.get("college") ?? "");
+  const [query, setQuery] = useState("");
 
   const load = async () => {
     setLoading(true);
@@ -44,12 +49,13 @@ function ProgramsPageInner() {
 
   const handleDelete = async (e: MouseEvent, program: Program) => {
     e.stopPropagation();
-    if (
-      !confirm(
-        `Permanently delete "${program.name}"? This removes it completely and cannot be undone.`,
-      )
-    )
-      return;
+    const ok = await confirm({
+      title: "Delete program",
+      message: `Permanently delete "${program.name}"? This removes it completely and cannot be undone.`,
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     setDeletingId(program._id);
     try {
       const r = await fetch(`/api/admin/programs/${program._id}`, {
@@ -57,11 +63,12 @@ function ProgramsPageInner() {
       });
       if (r.ok) {
         setPrograms((prev) => prev.filter((p) => p._id !== program._id));
+        toast.success(`Deleted "${program.name}".`);
       } else {
-        alert("Failed to delete program.");
+        toast.error("Failed to delete program.");
       }
     } catch {
-      alert("Failed to delete program.");
+      toast.error("Failed to delete program.");
     } finally {
       setDeletingId(null);
     }
@@ -92,17 +99,23 @@ function ProgramsPageInner() {
         const data = await r.json();
         router.push(`/admin/programs/${data._id}?college=${college}`);
       } else {
-        alert("Failed to create program.");
+        toast.error("Failed to create program.");
         setCreatingNew(false);
       }
     } catch {
-      alert("Failed to create program.");
+      toast.error("Failed to create program.");
       setCreatingNew(false);
     }
   };
 
+  const q = query.trim().toLowerCase();
   const filtered = (programs || []).filter(
-    (p) => !filter || p.institution === filter,
+    (p) =>
+      (!filter || p.institution === filter) &&
+      (!q ||
+        p.name.toLowerCase().includes(q) ||
+        p.abbr.toLowerCase().includes(q) ||
+        p.slug.toLowerCase().includes(q)),
   );
 
   const collegeLabel =
@@ -124,6 +137,20 @@ function ProgramsPageInner() {
           </p>
         </div>
         <div className="flex gap-2">
+          <div className="relative">
+            <Search
+              size={15}
+              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              type="search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search programs…"
+              aria-label="Search programs by name, abbreviation, or slug"
+              className="admin-input w-56 pl-9"
+            />
+          </div>
           <button
             onClick={handleCreateNew}
             disabled={creatingNew}
@@ -142,7 +169,7 @@ function ProgramsPageInner() {
         </div>
       </div>
 
-      <div className="admin-card overflow-hidden p-0">
+      <div className="admin-card overflow-x-auto p-0">
         {loading ? (
           <div className="flex justify-center py-12">
             <Loader2 size={24} className="animate-spin text-gray-400" />

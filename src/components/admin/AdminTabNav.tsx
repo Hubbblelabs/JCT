@@ -373,8 +373,8 @@ function TabNavInner() {
           </div>
         </div>
 
-        {/* Nav items */}
-        <nav className="flex items-center gap-0.5">
+        {/* Nav items — scroll horizontally on narrow viewports instead of clipping */}
+        <nav className="scrollbar-hide flex min-w-0 items-center gap-0.5 overflow-x-auto">
           {/* Dashboard — admin only */}
           {isAdmin && (
             <Link

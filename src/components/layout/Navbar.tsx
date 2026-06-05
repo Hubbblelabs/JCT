@@ -125,6 +125,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const [desktopExpanded, setDesktopExpanded] = useState<string | null>(null);
   const [dropdownSolidOverride, setDropdownSolidOverride] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const solidOverrideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -155,6 +156,21 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
       document.body.style.overflow = "unset";
     };
   }, [isOpen]);
+
+  // Escape closes the mobile drawer and any open desktop dropdown, and returns
+  // focus to the menu trigger so keyboard users aren't stranded.
+  useEffect(() => {
+    if (!isOpen && !desktopExpanded) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key !== "Escape") return;
+      if (isOpen) menuButtonRef.current?.focus();
+      setIsOpen(false);
+      setDesktopExpanded(null);
+      setMobileExpanded(null);
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [isOpen, desktopExpanded]);
 
   useEffect(() => {
     if (!isEngineeringPage) return;
@@ -369,9 +385,19 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                     hasDropdown && setDesktopExpanded(link.name)
                   }
                   onMouseLeave={() => hasDropdown && setDesktopExpanded(null)}
+                  onFocus={() => hasDropdown && setDesktopExpanded(link.name)}
+                  onBlur={(e) => {
+                    if (
+                      hasDropdown &&
+                      !e.currentTarget.contains(e.relatedTarget as Node)
+                    )
+                      setDesktopExpanded(null);
+                  }}
                 >
                   {hasDropdown && link.href === "#" ? (
                     <button
+                      aria-haspopup="true"
+                      aria-expanded={isExpanded}
                       onClick={(e) => {
                         e.preventDefault();
                         setDesktopExpanded(isExpanded ? null : link.name);
@@ -395,6 +421,8 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                     <Link
                       href={link.href}
                       onClick={(e) => handleNavClick(e, link.href)}
+                      aria-haspopup={hasDropdown ? "true" : undefined}
+                      aria-expanded={hasDropdown ? isExpanded : undefined}
                       className={`group relative flex items-center justify-center gap-1 px-2 py-2 font-sans text-sm font-medium transition-colors xl:gap-1.5 xl:px-3 xl:text-[14px] 2xl:px-4 2xl:text-[15px] ${
                         isActive
                           ? highlightColor
@@ -532,9 +560,12 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
           </div>
 
           <button
+            ref={menuButtonRef}
             className="z-50 ml-auto p-2 text-white transition-colors hover:text-white/80 xl:hidden"
             onClick={() => setIsOpen(!isOpen)}
-            aria-label="Toggle menu"
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            aria-expanded={isOpen}
+            aria-controls="mobile-menu"
           >
             {isOpen ? (
               <X size={32} strokeWidth={1.5} />
@@ -556,6 +587,10 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               onClick={() => setIsOpen(false)}
             />
             <motion.div
+              id="mobile-menu"
+              role="dialog"
+              aria-modal="true"
+              aria-label="Site menu"
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
@@ -586,7 +621,8 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="rounded-full p-2 text-white/40 transition-colors hover:bg-white/5 hover:text-white"
+                  aria-label="Close menu"
+                  className="rounded-full p-2 text-white/40 transition-colors hover:bg-white/5 hover:text-white focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:outline-none"
                 >
                   <X size={20} />
                 </button>

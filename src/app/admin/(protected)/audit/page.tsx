@@ -37,7 +37,7 @@ export default async function AuditPage() {
           </div>
         </div>
 
-        <div className="admin-card overflow-hidden p-0">
+        <div className="admin-card overflow-x-auto p-0">
           <table className="admin-table">
             <thead>
               <tr>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, type ReactNode } from "react";
+import { useState, useRef, useEffect, useId, type ReactNode } from "react";
 import {
   ChevronDown,
   ChevronRight,
@@ -16,13 +16,15 @@ interface FieldProps {
   label: string;
   required?: boolean;
   hint?: string;
+  /** Associates the label with its control for a11y (screen readers + click-to-focus). */
+  htmlFor?: string;
   children: ReactNode;
 }
 
-export function Field({ label, required, hint, children }: FieldProps) {
+export function Field({ label, required, hint, htmlFor, children }: FieldProps) {
   return (
     <div className="mb-4">
-      <label className="admin-label">
+      <label className="admin-label" htmlFor={htmlFor}>
         {label}
         {required && <span className="ml-1 text-red-500">*</span>}
       </label>
@@ -37,10 +39,12 @@ interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   hint?: string;
 }
 
-export function TextInput({ label, hint, ...props }: TextInputProps) {
+export function TextInput({ label, hint, id, ...props }: TextInputProps) {
+  const generatedId = useId();
+  const fieldId = id ?? generatedId;
   return (
-    <Field label={label} required={props.required} hint={hint}>
-      <input className="admin-input" {...props} />
+    <Field label={label} required={props.required} hint={hint} htmlFor={fieldId}>
+      <input id={fieldId} className="admin-input" {...props} />
     </Field>
   );
 }
@@ -50,10 +54,12 @@ interface NumberInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   hint?: string;
 }
 
-export function NumberInput({ label, hint, ...props }: NumberInputProps) {
+export function NumberInput({ label, hint, id, ...props }: NumberInputProps) {
+  const generatedId = useId();
+  const fieldId = id ?? generatedId;
   return (
-    <Field label={label} required={props.required} hint={hint}>
-      <input type="number" className="admin-input" {...props} />
+    <Field label={label} required={props.required} hint={hint} htmlFor={fieldId}>
+      <input type="number" id={fieldId} className="admin-input" {...props} />
     </Field>
   );
 }
@@ -63,10 +69,12 @@ interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   hint?: string;
 }
 
-export function TextArea({ label, hint, ...props }: TextAreaProps) {
+export function TextArea({ label, hint, id, ...props }: TextAreaProps) {
+  const generatedId = useId();
+  const fieldId = id ?? generatedId;
   return (
-    <Field label={label} required={props.required} hint={hint}>
-      <textarea className="admin-textarea" {...props} />
+    <Field label={label} required={props.required} hint={hint} htmlFor={fieldId}>
+      <textarea id={fieldId} className="admin-textarea" {...props} />
     </Field>
   );
 }
@@ -77,10 +85,12 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   options: { value: string; label: string }[];
 }
 
-export function Select({ label, hint, options, ...props }: SelectProps) {
+export function Select({ label, hint, options, id, ...props }: SelectProps) {
+  const generatedId = useId();
+  const fieldId = id ?? generatedId;
   return (
-    <Field label={label} required={props.required} hint={hint}>
-      <select className="admin-select" {...props}>
+    <Field label={label} required={props.required} hint={hint} htmlFor={fieldId}>
+      <select id={fieldId} className="admin-select" {...props}>
         {options.map((o) => (
           <option key={o.value} value={o.value}>
             {o.label}
@@ -551,6 +561,7 @@ export function ItemsEditor({
   emptyItem: Record<string, unknown>;
   addLabel?: string;
 }) {
+  const baseId = useId();
   const upd = (i: number, key: string, val: unknown) =>
     onChange(items.map((it, idx) => (idx === i ? { ...it, [key]: val } : it)));
   const rem = (i: number) => onChange(items.filter((_, idx) => idx !== i));
@@ -563,11 +574,16 @@ export function ItemsEditor({
           className="rounded-lg border border-gray-200 bg-gray-50/50 p-3"
         >
           <div className="grid grid-cols-2 gap-3">
-            {fields.map((f) => (
+            {fields.map((f) => {
+              const fieldId = `${baseId}-${i}-${f.key}`;
+              return (
               <div key={f.key} className={f.span2 ? "col-span-2" : ""}>
-                <label className="admin-label">{f.label}</label>
+                <label className="admin-label" htmlFor={fieldId}>
+                  {f.label}
+                </label>
                 {f.type === "textarea" ? (
                   <textarea
+                    id={fieldId}
                     className="admin-textarea"
                     rows={2}
                     value={String(item[f.key] ?? "")}
@@ -577,6 +593,7 @@ export function ItemsEditor({
                 ) : (
                   <input
                     type={f.type === "number" ? "number" : "text"}
+                    id={fieldId}
                     className="admin-input"
                     value={String(item[f.key] ?? "")}
                     onChange={(e) =>
@@ -592,7 +609,8 @@ export function ItemsEditor({
                   />
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
           <button
             type="button"

@@ -38,6 +38,7 @@ export default async function PolytechnicPage() {
         className="polytechnic-theme min-h-screen overflow-x-hidden bg-[#F8F9FA] font-sans"
       >
         <Navbar />
+        <div id="main-content" tabIndex={-1} className="outline-none" />
         <Hero />
         <DiplomaPrograms />
         <Admissions />

@@ -108,6 +108,7 @@ export default async function DashboardPage() {
               No activity yet.
             </p>
           ) : (
+            <div className="overflow-x-auto">
             <table className="admin-table">
               <thead>
                 <tr>
@@ -138,6 +139,7 @@ export default async function DashboardPage() {
                 ))}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>

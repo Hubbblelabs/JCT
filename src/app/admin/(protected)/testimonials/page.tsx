@@ -15,6 +15,8 @@ import {
   DeferredUploadsProvider,
   useDeferredUploads,
 } from "@/lib/deferred-uploads";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 
 interface Testimonial {
   _id: string;
@@ -58,6 +60,8 @@ const _INSTITUTIONS = [
 
 function TestimonialsPageInner() {
   const { flush, discardAll } = useDeferredUploads();
+  const toast = useToast();
+  const confirm = useConfirm();
   const searchParams = useSearchParams();
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
@@ -132,8 +136,15 @@ function TestimonialsPageInner() {
   };
 
   const del = async (id: string) => {
-    if (!confirm("Delete this testimonial?")) return;
+    const ok = await confirm({
+      title: "Delete testimonial",
+      message: "This testimonial will be permanently removed. Continue?",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
     await fetch(`/api/admin/testimonials/${id}`, { method: "DELETE" });
+    toast.success("Testimonial deleted.");
     await load();
   };
 
@@ -155,7 +166,7 @@ function TestimonialsPageInner() {
           </div>
         </div>
 
-        <div className="admin-card overflow-hidden p-0">
+        <div className="admin-card overflow-x-auto p-0">
           {loading ? (
             <div className="flex justify-center py-12">
               <Loader2 size={24} className="animate-spin text-gray-400" />

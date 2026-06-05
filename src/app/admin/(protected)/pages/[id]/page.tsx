@@ -25,6 +25,8 @@ import {
   DeferredUploadsProvider,
   useDeferredUploads,
 } from "@/lib/deferred-uploads";
+import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { PageBodySectionsEditor } from "@/components/admin/PageBodySectionsEditor";
 import type {
   PageContent,
@@ -82,6 +84,8 @@ function publicPathFor(institution: Institution, slug: string): string {
 function PageEditorInner({ id }: { id: string }) {
   const router = useRouter();
   const { flush } = useDeferredUploads();
+  const toast = useToast();
+  const confirm = useConfirm();
   const [doc, setDoc] = useState<PageDoc | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -162,12 +166,12 @@ function PageEditorInner({ id }: { id: string }) {
 
   const publish = async () => {
     if (!doc) return;
-    if (
-      !confirm(
-        `Publish "${doc.title}"? The current draft will become the live version.`,
-      )
-    )
-      return;
+    const ok = await confirm({
+      title: "Publish page",
+      message: `Publish "${doc.title}"? The current draft will become the live version.`,
+      confirmLabel: "Publish",
+    });
+    if (!ok) return;
     await save();
     setPublishing(true);
     try {
@@ -757,13 +761,19 @@ function PageEditorInner({ id }: { id: string }) {
 
       <button
         onClick={() => {
-          if (!confirm("Delete this page permanently?")) return;
           (async () => {
+            const ok = await confirm({
+              title: "Delete page",
+              message: "Delete this page permanently? This cannot be undone.",
+              confirmLabel: "Delete",
+              destructive: true,
+            });
+            if (!ok) return;
             const r = await fetch(`/api/admin/pages/${doc._id}`, {
               method: "DELETE",
             });
             if (r.ok) router.push("/admin/pages");
-            else alert("Delete failed.");
+            else toast.error("Delete failed.");
           })();
         }}
         className="admin-btn admin-btn-danger admin-btn-sm"

@@ -92,6 +92,17 @@
   --color-muted-foreground: var(--color-muted-foreground);
   --color-border: var(--color-border);
 
+  /* ─── Radius / Elevation tokens ───
+     Additive (new utility names — `rounded-card`, `shadow-elevated`, …) so they
+     don't override Tailwind's defaults. Adopt incrementally to replace ad-hoc
+     radii/shadows and converge the public + admin surfaces over time. */
+  --radius-card: 0.75rem;
+  --radius-panel: 1rem;
+  --shadow-card:
+    0 1px 3px rgba(10, 22, 40, 0.08), 0 1px 2px rgba(10, 22, 40, 0.05);
+  --shadow-elevated: 0 12px 40px -8px rgba(10, 22, 40, 0.18);
+  --shadow-pop: 0 24px 48px -28px rgba(0, 0, 0, 0.55);
+
   --font-sans:
     var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-serif:
@@ -107,8 +118,10 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ─── Content text justify ─── */
-p {
+/* Opt-in justified text (was a global `p` rule — removed: it created
+   whitespace rivers and hurt readability, especially on mobile). Apply
+   `.text-justify-content` to prose blocks that genuinely want it. */
+.text-justify-content {
   text-align: justify;
 }
 
@@ -334,4 +347,46 @@ body,
 ::selection {
   background-color: var(--color-gold);
   color: var(--color-navy);
+}
+
+/* ─── Skip to main content (keyboard a11y) ─── */
+.skip-link {
+  position: fixed;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  transform: translateY(-150%);
+  transition: transform 0.2s ease;
+  background: var(--color-navy);
+  color: #fff;
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  font-weight: 600;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--color-gold);
+  outline-offset: 2px;
+}
+
+/* ─── Reduced Motion (WCAG 2.3.3) ─── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-scroll-left,
+  .animate-scroll-right,
+  .animate-marquee,
+  .animate-pulse-glow {
+    animation: none !important;
+  }
 }
