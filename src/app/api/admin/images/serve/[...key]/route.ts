@@ -8,6 +8,12 @@ export async function GET(
   const { key } = await params;
   const storageKey = key.join("/");
 
+  // Only serve keys this app generates — images and documents. Without this
+  // an authenticated user could probe arbitrary objects in the bucket.
+  if (!storageKey.startsWith("images/") && !storageKey.startsWith("documents/")) {
+    return new NextResponse("Not found", { status: 404 });
+  }
+
   try {
     const { body, contentType } = await getFromR2(storageKey);
     return new NextResponse(body, {

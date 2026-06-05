@@ -4,6 +4,7 @@ import { ImageAsset } from "@/lib/models";
 import { deleteFromR2 } from "@/lib/r2";
 import {
   requireRole,
+  enforceAssetScope,
   json,
   notFound,
   serverError,
@@ -24,6 +25,9 @@ export async function DELETE(
     const { id } = await params;
     const doc = await ImageAsset.findById(id);
     if (!doc) return notFound();
+
+    const scope = enforceAssetScope(session, doc.institution);
+    if (scope) return scope;
 
     try {
       await deleteFromR2(doc.storage_key);
@@ -59,6 +63,14 @@ export async function PATCH(
   try {
     await connectDB();
     const { id } = await params;
+
+    const existing = await ImageAsset.findById(id)
+      .select("institution")
+      .lean<{ institution?: string } | null>();
+    if (!existing) return notFound();
+    const scope = enforceAssetScope(session, existing.institution);
+    if (scope) return scope;
+
     const update: Record<string, unknown> = {};
     if (body.alt_text !== undefined) update.alt_text = body.alt_text;
     if (body.category !== undefined) update.category = body.category;

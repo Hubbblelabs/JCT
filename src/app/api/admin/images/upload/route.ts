@@ -5,6 +5,7 @@ import { ImageAsset } from "@/lib/models";
 import { uploadToR2, deleteFromR2 } from "@/lib/r2";
 import {
   requireRole,
+  enforceAssetScope,
   json,
   badRequest,
   serverError,
@@ -92,6 +93,11 @@ export async function POST(req: NextRequest) {
     );
     if (!parsed.ok) return parsed.response;
     const { altText, category, institution } = parsed.data;
+
+    // Editors may only tag uploads with their own college or the shared
+    // ("all") pool — not another college's institution.
+    const scope = enforceAssetScope(session, institution);
+    if (scope) return scope;
 
     const buffer = Buffer.from(await file.arrayBuffer());
 

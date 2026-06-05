@@ -3,7 +3,14 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/lib/models";
-import { consumeLoginAttempt } from "@/lib/rate-limit";
+import { consumeLoginAttempt, consumeLoginAttemptByEmail } from "@/lib/rate-limit";
+
+// A fixed bcrypt hash of a random string. Compared against the supplied
+// password when no user is found so the response takes the same ~bcrypt time
+// as the found-user path — closes the timing oracle that would otherwise let
+// an attacker enumerate valid emails.
+const DUMMY_BCRYPT_HASH =
+  "$2b$12$C6UzMDM.H6dfI/f/IKcEeO3iJqM4xK1pV0bq1qVxZ8pQ0e7qkq3Hy";
 
 const SECRET_PLACEHOLDER = "replace-with-32-byte-random-string";
 const authSecret = process.env.NEXTAUTH_SECRET;
@@ -59,10 +66,15 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const email = (credentials.email as string).toLowerCase();
 
           const ip = getClientIp(request);
+          // Per-(ip|email) AND per-email caps. The email-only bucket is the
+          // real guard: the IP component is attacker-controlled via a spoofed
+          // X-Forwarded-For, so an IP-keyed limit alone is bypassable.
           const limit = consumeLoginAttempt(`${ip}|${email}`);
-          if (!limit.allowed) {
+          const emailLimit = consumeLoginAttemptByEmail(email);
+          if (!limit.allowed || !emailLimit.allowed) {
+            const retry = Math.max(limit.retryAfterSec, emailLimit.retryAfterSec);
             console.warn(
-              `[auth] Rate limit exceeded for ${email} from ${ip}; retry in ${limit.retryAfterSec}s`,
+              `[auth] Rate limit exceeded for ${email} from ${ip}; retry in ${retry}s`,
             );
             return null;
           }
@@ -70,9 +82,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const user = await User.findOne({
             email,
             is_active: true,
-          }).lean();
+          })
+            .select("+password_hash")
+            .lean();
 
           if (!user) {
+            // Spend the same time as a real bcrypt compare so response timing
+            // doesn't reveal whether the email exists.
+            await bcrypt.compare(credentials.password as string, DUMMY_BCRYPT_HASH);
             console.error(`[auth] User not found with email: ${email}`);
             return null;
           }

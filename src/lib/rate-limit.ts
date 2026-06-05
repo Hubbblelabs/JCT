@@ -66,6 +66,14 @@ export function consumeLoginAttempt(key: string): RateLimitResult {
   return rateLimit(`login:${key}`, 10, 5 * 60 * 1000);
 }
 
+// Account-level cap, independent of client IP. The (ip|email) limiter above
+// is trivially bypassed by rotating a spoofed X-Forwarded-For, so a per-email
+// bucket is the real guard against a focused password-guessing attack on one
+// account: 20 failed attempts per 15 minutes regardless of source IP.
+export function consumeLoginAttemptByEmail(email: string): RateLimitResult {
+  return rateLimit(`login-email:${email}`, 20, 15 * 60 * 1000);
+}
+
 // 30 uploads per minute per user. Protects sharp / R2.
 export function consumeUploadAttempt(key: string): RateLimitResult {
   return rateLimit(`upload:${key}`, 30, 60 * 1000);

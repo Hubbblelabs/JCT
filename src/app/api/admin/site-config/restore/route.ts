@@ -164,6 +164,11 @@ export async function POST(req: NextRequest) {
 
       for (const meta of imageMeta) {
         try {
+          // Never let a crafted backup write outside the images/ namespace.
+          if (typeof meta.storage_key !== "string" || !meta.storage_key.startsWith("images/")) {
+            warnings.push(`Rejected image with invalid storage_key: ${String(meta.storage_key)}`);
+            continue;
+          }
           const filename = meta.storage_key.replace(/^images\//, "");
           const imgFile = zip.file(`images/${filename}`);
           if (!imgFile) {
@@ -220,6 +225,11 @@ export async function POST(req: NextRequest) {
 
       for (const meta of docMeta) {
         try {
+          // Never let a crafted backup write outside the documents/ namespace.
+          if (typeof meta.storage_key !== "string" || !meta.storage_key.startsWith("documents/")) {
+            warnings.push(`Rejected document with invalid storage_key: ${String(meta.storage_key)}`);
+            continue;
+          }
           const filename = meta.storage_key.replace(/^documents\//, "");
           const docFile = zip.file(`documents/${filename}`);
           if (!docFile) {

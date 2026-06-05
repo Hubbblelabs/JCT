@@ -162,3 +162,26 @@ export function enforceInstitutionScope(
   }
   return null;
 }
+
+/**
+ * Horizontal access-control guard for shared media assets (images/documents).
+ * Differs from `enforceInstitutionScope` in that the cross-college *shared*
+ * pool (`institution === "all"` or unset) is editable by any editor — only
+ * assets tagged to a *specific* other college are off-limits. Admins act on
+ * anything. Returns a ready-to-return 403 when out of scope, else null.
+ *
+ * Without this, an editor scoped to one college could delete or rename
+ * another college's images simply by guessing an asset id or storage key.
+ */
+export function enforceAssetScope(
+  session: { user?: unknown } | null,
+  assetInstitution: string | undefined | null,
+): NextResponse | null {
+  const user = (session?.user ?? {}) as Record<string, unknown>;
+  const role = (user.role as string) ?? "";
+  if (role === "admin") return null;
+  const userInstitution = (user.institution as string) ?? "";
+  const target = assetInstitution ?? "all";
+  if (target === "all" || target === userInstitution) return null;
+  return forbidden();
+}

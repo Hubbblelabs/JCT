@@ -4,6 +4,7 @@ import { ImageAsset } from "@/lib/models";
 import { deleteFromR2 } from "@/lib/r2";
 import {
   requireRole,
+  enforceAssetScope,
   json,
   badRequest,
   notFound,
@@ -53,6 +54,9 @@ export async function DELETE(req: NextRequest) {
     await connectDB();
     const doc = await ImageAsset.findOne({ storage_key: key });
     if (!doc) return notFound("Image asset not found");
+
+    const scope = enforceAssetScope(session, doc.institution);
+    if (scope) return scope;
 
     try {
       await deleteFromR2(key);

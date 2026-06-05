@@ -45,9 +45,13 @@ export async function POST(req: NextRequest) {
       .replace(/\s+/g, "-")
       .replace(/[^a-zA-Z0-9._-]/g, "_");
     const storageKey = `documents/${Date.now()}-${safeName}`;
+    // Pin the byte count into the signature so the actual upload can't exceed
+    // the size we validated above (the limit is otherwise unenforceable).
     const presignedUrl = await getPresignedPutUrl(
       storageKey,
       "application/pdf",
+      300,
+      size,
     );
 
     return json({

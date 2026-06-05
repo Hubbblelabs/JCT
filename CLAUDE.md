@@ -48,12 +48,14 @@ There is **no test framework** configured — no test runner, no test files, no 
 
 - **`src/proxy.ts` is the Next.js 16 middleware** (Next 16 renamed `middleware.ts` → `proxy.ts`). It wraps NextAuth `auth()` and gates `/admin/:path*` + `/api/admin/:path*`: unauthenticated requests redirect to `/admin/login?callbackUrl=...`; an authenticated user hitting the login page is sent to `/admin/dashboard`. This proxy is the real route gate — admin layouts also check the session as defense-in-depth.
 - **`src/auth.ts`** configures NextAuth: Credentials provider only (email + password, bcrypt compare), JWT session with 24h `maxAge`. The session/JWT carries `role`, `institution`, and `programs[]`.
-- **Roles** (`src/lib/permissions.ts`): `viewer` (0) < `editor` (1) < `admin` (2) < `super_admin` (3). Helpers: `hasMinRole`, `canEdit` (editor+), `canPublish` (admin+), `canManageUsers` (super_admin), `canAccessProgram` — editors are scoped to their `institution` and an optional `programs[]` allowlist; admins+ access everything.
+- **Roles** (`src/lib/permissions.ts`): only two — `editor` (0) < `admin` (1). Helpers: `hasMinRole`, `canManageUsers` (admin), `canAccessInstitution`, `canAccessProgram`. Editors are scoped to their `institution`; admins act on everything (and are stored with `institution: "all"`). NOTE: the `programs[]` allowlist is **not** enforced — `canAccessProgram` delegates to `canAccessInstitution` and ignores the program list (the `programs[]` params are dead). Scope is institution-level only. For shared media assets, use `enforceAssetScope` (allows own-institution + the shared `"all"` pool).
 - In API routes, call `requireRole(req, minRole)` from `src/lib/api-helpers.ts`. It returns `{ session, error }`; if `error` is truthy, return it directly.
+- **Editor scope enforcement**: editors with a restricted `institution` must call `enforceInstitutionScope(session, targetInstitution)` in write routes. This prevents an editor scoped to Engineering from writing to Arts & Science data. Call it early after `requireRole` to fail fast.
 
 ### API design
 
 - **Admin routes** (`src/app/api/admin/*`): gate with `requireRole`, parse with `validateBody(req, ZodSchema)` (or `validateFields` for multipart), record `logAudit(...)` (non-fatal), and call `revalidateTargets(...)` after writes. Response/error helpers in `src/lib/api-helpers.ts`: `json`, `badRequest`, `validationError`, `unauthorized`, `forbidden`, `notFound`, `serverError`.
+- **Audit logging**: `logAudit(req, action, targetId, changes)` from `src/lib/api-helpers.ts` records a write to the `AuditLog` collection. It never throws — if logging fails, it's caught and logged but the route response proceeds normally. Always call it even if later operations might fail; it's a best-effort record of intent, not a transactional guarantee.
 - **Public routes** (`src/app/api/public/*`): no auth, `export const revalidate = 3600` (1h ISR). Responses use a `{ source, data }` envelope (`source` is `"db" | "empty" | "error"`).
 - Some admin routes have `seed/` sub-routes for bootstrapping data (`programs`, `recruiters`, `testimonials`, `site-config`).
 
@@ -77,9 +79,33 @@ All three save via `PUT /api/admin/site-config` and revalidate the relevant inst
 There is **no `Department` model** anymore. Rich page content that used to live on a Department now lives on **`Program`** — the `Program.content` field's schema comment notes it "was previously stored on Department.content". If you encounter "department" in older branches/docs, that concept is folded into Program.
 
 - A **`Program`** (`src/lib/models/Program.ts`) has card-level fields (`name`, `abbr`, `slug`, `institution`, `degree`, `duration`, `seats`, `image`, `highlight`, `description`, `outcomes`, `sort_order`, `is_active`) **plus** a rich-content draft/publish pair: `content` (draft, `Mixed`), `published_content` (live snapshot), `status: "draft" | "published" | "archived"`, `version`, `published_at`.
-- **Content shape** (`src/lib/program-tabs.ts`): a `TabsProgram` has `tabs[]`; each `Tab` has `id`, `label`, optional `icon`, and `sections[]`; each `Section` is one of `richText`, `stats`, `list`, `cards`, `image`, `people`.
+- **Content shape** (`src/lib/program-tabs.ts`): a `TabsProgram` has `tabs[]`; each `Tab` has `id`, `label`, optional `icon`, and `sections[]`; each `Section` is one of `richText`, `stats`, `list`, `cards`, `image`, `people`. Example:
+
+```typescript
+{
+  tabs: [
+    {
+      id: "overview",
+      label: "Overview",
+      icon: "BookOpen",
+      sections: [
+        { type: "richText", content: "<p>Program description...</p>" },
+        { type: "stats", items: [{ label: "Duration", value: "4 Years" }] }
+      ]
+    },
+    {
+      id: "curriculum",
+      label: "Curriculum",
+      sections: [
+        { type: "list", items: ["Core Subjects", "Electives"] }
+      ]
+    }
+  ]
+}
+```
 - **The editor** (`src/app/admin/(protected)/programs/[id]/page.tsx` with `ProgramContentEditor`, `ProgramTabsEditor`, `CurriculumEditor`, `ProgramLabelsEditor` in `src/components/admin/`) is a **live-preview builder**: edit content on one side, see the rendered public page on the other.
-- **Publish flow**: `POST /api/admin/programs/[id]/publish` copies `content` → `published_content`, sets `status: "published"`, bumps `version`. `POST /api/admin/programs/[id]/migrate-tabs` upgrades older content shapes to the current tabs format.
+- **Publish flow**: `POST /api/admin/programs/[id]/publish` copies `content` → `published_content`, sets `status: "published"`, bumps `version`.
+- **Migration**: `POST /api/admin/programs/[id]/migrate-tabs` converts legacy content (flat arrays or old section types) into the current `TabsProgram` shape. This is called automatically during publish if content is in an old format, but can also be triggered manually from the admin editor. Idempotent — safe to call on already-migrated content.
 - **Public reads** go through `src/lib/public-programs.ts` (`listPublicPrograms`, `getPublishedProgramBySlug`, `listPublishedProgramSlugs`). These only return docs with `status: "published"` and non-null `published_content`, then run the content through `src/lib/normalize-program-data.ts` to produce the typed `ProgramData` the public pages render.
 
 ### SiteConfig & page content
@@ -101,7 +127,7 @@ There is **no `Department` model** anymore. Rich page content that used to live 
 - Public API routes use 1h ISR (`export const revalidate = 3600`).
 - After a content write, call helpers from `src/lib/revalidate.ts`:
   - `revalidateTargets(...targets)` — targets are `"home" | "engineering" | "arts-science" | "polytechnic" | "all-institutions"`.
-  - `revalidateForConfigKey(key)` — looks up the affected pages via the `SITE_CONFIG_KEY_TARGETS` map and also clears the `/api/public/site-config` route cache.
+  - `revalidateForConfigKey(key)` — looks up the affected pages via the `SITE_CONFIG_KEY_TARGETS` map and also clears the `/api/public/site-config` route cache. When adding a new SiteConfig key in `src/lib/validation/siteConfig.ts`, add an entry to `SITE_CONFIG_KEY_TARGETS` in `src/lib/revalidate.ts` mapping that key to the targets it affects — without this mapping, the cache invalidation will be incomplete.
   - `revalidatePaths(...paths)` — revalidate explicit paths.
 
 ### Frontend structure & state

@@ -39,12 +39,36 @@ const nextConfig: NextConfig = {
   async headers() {
     const isProd = process.env.NODE_ENV === "production";
 
-    // Baseline hardening headers applied to every response. A full
-    // Content-Security-Policy is intentionally omitted here — Tailwind/
-    // framer-motion rely on inline styles, so a CSP needs per-request
-    // nonces to avoid breaking the UI; track that as a follow-up. HSTS is
+    // Content-Security-Policy. script-src/style-src keep 'unsafe-inline'
+    // because Tailwind + framer-motion emit inline styles and Next injects
+    // inline bootstrap scripts without a nonce. Even so, 'self' on script-src
+    // blocks *external* script injection, and object-src/base-uri/form-action/
+    // frame-ancestors close the high-value XSS escalation paths (plugin
+    // injection, <base> hijack, form exfiltration, framing). Follow-up:
+    // move script-src to per-request nonces (requires proxy.ts wiring) and
+    // drop 'unsafe-inline'. Dev adds 'unsafe-eval' + ws: for Turbopack/HMR.
+    const csp = [
+      "default-src 'self'",
+      "base-uri 'self'",
+      "object-src 'none'",
+      "frame-ancestors 'none'",
+      "form-action 'self'",
+      `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
+      "style-src 'self' 'unsafe-inline'",
+      "img-src 'self' data: blob: https:",
+      "font-src 'self' data:",
+      `connect-src 'self' https:${isProd ? "" : " ws: wss:"}`,
+      "media-src 'self' https: data:",
+      "worker-src 'self' blob:",
+      "manifest-src 'self'",
+      "frame-src 'self'",
+      ...(isProd ? ["upgrade-insecure-requests"] : []),
+    ].join("; ");
+
+    // Baseline hardening headers applied to every response. HSTS is
     // production-only so it never pins `localhost` during local dev.
     const securityHeaders = [
+      { key: "Content-Security-Policy", value: csp },
       { key: "X-Content-Type-Options", value: "nosniff" },
       { key: "X-Frame-Options", value: "DENY" },
       { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },

@@ -209,7 +209,11 @@ const SEEDS: Seed[] = [
 ];
 
 export async function POST(req: NextRequest) {
-  const { session, error } = await requireRole(req, "editor");
+  // Admin-only: this route overwrites a fixed set of config keys with `$set`,
+  // including global keys (campusLifePage, homeStats) and other colleges'
+  // About pages. An institution-scoped editor must not be able to reset
+  // content outside their own college — gate it the same as the other seeds.
+  const { session, error } = await requireRole(req, "admin");
   if (error) return error;
 
   try {

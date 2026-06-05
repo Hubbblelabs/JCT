@@ -26,16 +26,23 @@ export async function getPresignedPutUrl(
   key: string,
   contentType: string,
   expiresIn = 300,
+  contentLength?: number,
 ): Promise<string> {
   const client = getR2Client();
   const bucket = process.env.R2_BUCKET_NAME;
   if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+  // When contentLength is provided it becomes a *signed* header, so the client
+  // must upload exactly that many bytes — the presign route's size check is
+  // otherwise advisory (a presigned PUT has no inherent size cap).
   return getSignedUrl(
     client,
     new PutObjectCommand({
       Bucket: bucket,
       Key: key,
       ContentType: contentType,
+      ...(typeof contentLength === "number" && contentLength > 0
+        ? { ContentLength: contentLength }
+        : {}),
     }),
     { expiresIn },
   );

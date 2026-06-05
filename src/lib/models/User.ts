@@ -16,7 +16,10 @@ export interface IUser extends Document {
 const UserSchema = new Schema<IUser>(
   {
     email: { type: String, required: true, unique: true, lowercase: true },
-    password_hash: { type: String, required: true },
+    // select:false — never returned by queries unless explicitly requested
+    // with .select("+password_hash") (see auth.ts). Stops a future
+    // User.find() from leaking the hash by omission.
+    password_hash: { type: String, required: true, select: false },
     full_name: { type: String, required: true },
     role: {
       type: String,
