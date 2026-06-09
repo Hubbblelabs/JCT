@@ -96,6 +96,19 @@
   rotate: 45deg;
 }
 
+/* Right-anchored variant — use on nav items near the right edge */
+.admin-nav-item--right .admin-nav-dropdown-menu {
+  left: auto;
+  right: 0;
+  transform: none;
+}
+
+.admin-nav-item--right .admin-nav-dropdown-menu::before {
+  left: auto;
+  right: 1rem;
+  transform: none;
+}
+
 /* Invisible bridge so hovering the gap between trigger and menu
    keeps .admin-nav-item:hover alive */
 .admin-nav-item::after {

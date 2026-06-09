@@ -374,7 +374,7 @@ function TabNavInner() {
         </div>
 
         {/* Nav items — scroll horizontally on narrow viewports instead of clipping */}
-        <nav className="scrollbar-hide flex min-w-0 items-center gap-0.5 overflow-x-auto">
+        <nav className="scrollbar-hide flex min-w-0 items-center gap-0.5 overflow-x-clip">
           {/* Dashboard — admin only */}
           {isAdmin && (
             <Link
@@ -476,7 +476,7 @@ function TabNavInner() {
             const items = COLLEGE_ITEMS[id];
             const active = isDropdownActive(items, pathname, college);
             return (
-              <div key={id} className="admin-nav-item">
+              <div key={id} className="admin-nav-item admin-nav-item--right">
                 <Link
                   href={`/admin/page-content?college=${id}`}
                   className={`admin-nav-trigger ${active ? "active" : ""}`}
