@@ -12,17 +12,26 @@ export const LIMITS = {
   websiteMax: 300,
 } as const;
 
-export const RecruiterSchema = z.object({
+// Base shape WITHOUT defaults — in Zod 4, `.partial()` of a defaulted field
+// still injects the default for omitted keys, so a partial PATCH would wipe
+// `industry` / `sort_order` on the stored document.
+const RecruiterBaseSchema = z.object({
   name: zClampedString(1, LIMITS.nameMax, "Name"),
   logo: zUrl.optional().or(z.literal("")),
   website: zUrl.optional().or(z.literal("")),
+  industry: zOptionalString(LIMITS.industryMax),
+  is_active: z.boolean(),
+  sort_order: zNonNegativeInt,
+});
+
+export const RecruiterSchema = RecruiterBaseSchema.extend({
   industry: zOptionalString(LIMITS.industryMax).default(""),
   is_active: z.boolean().optional().default(true),
   sort_order: zNonNegativeInt.optional().default(0),
 });
 
 export const RecruiterCreateSchema = RecruiterSchema;
-export const RecruiterUpdateSchema = RecruiterSchema.partial();
+export const RecruiterUpdateSchema = RecruiterBaseSchema.partial();
 
 export type RecruiterValue = z.infer<typeof RecruiterSchema>;
 

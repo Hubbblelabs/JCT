@@ -1,4 +1,5 @@
 import { revalidatePath } from "next/cache";
+import { publicCacheClear } from "@/lib/public-cache";
 
 export type RevalidateTarget =
   | "home"
@@ -83,9 +84,13 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   polytechnicAbout: ["polytechnic"],
   engineeringCoe: ["engineering"],
   campusLifePage: ["home"],
+  // Rendered in the root layout, so it affects every public page. "home"
+  // is included because "all-institutions" doesn't cover /campus-life.
+  floatingElements: ["home", "all-institutions"],
 };
 
 export function revalidateTargets(...targets: RevalidateTarget[]): void {
+  publicCacheClear();
   const paths = new Set<string>();
   for (const t of targets) {
     for (const p of TARGET_PATHS[t] ?? []) paths.add(p);
@@ -100,6 +105,7 @@ export function revalidateTargets(...targets: RevalidateTarget[]): void {
 }
 
 export function revalidatePaths(...paths: string[]): void {
+  publicCacheClear();
   for (const path of paths) {
     try {
       revalidatePath(path);
@@ -110,12 +116,10 @@ export function revalidatePaths(...paths: string[]): void {
 }
 
 export function revalidateForConfigKey(key: string): void {
+  // Clear the in-memory public API cache so client-side fetches get fresh
+  // data (the /api/public/* routes are dynamic — revalidatePath can't
+  // invalidate them).
+  publicCacheClear();
   const targets = SITE_CONFIG_KEY_TARGETS[key];
   if (targets?.length) revalidateTargets(...targets);
-  // Also clear the public API route cache so client-side fetches get fresh data
-  try {
-    revalidatePath("/api/public/site-config");
-  } catch {
-    /* non-fatal */
-  }
 }

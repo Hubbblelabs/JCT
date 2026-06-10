@@ -26,6 +26,12 @@ const fullName = name || "Admin User";
 const uri = process.env.MONGODB_URI;
 
 if (!email || !password) usage();
+if (String(password).length < 8) {
+  // Match the API's zPasswordMin8 policy so seeded accounts aren't weaker
+  // than ones created through the admin UI.
+  console.error("Password must be at least 8 characters.");
+  process.exit(1);
+}
 if (!uri) {
   console.error("Environment variable MONGODB_URI is required.");
   process.exit(1);

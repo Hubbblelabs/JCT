@@ -81,13 +81,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // When the caller doesn't tag an institution (e.g. deferred uploads from
+    // the inspector editors), default editors' uploads to their own college
+    // instead of the shared pool so asset scoping stays meaningful.
+    const sessionUser = session!.user as Record<string, unknown>;
+    const defaultInstitution =
+      (sessionUser.role as string) === "admin"
+        ? "all"
+        : ((sessionUser.institution as string) || "all");
+
     // Validate non-file fields against the schema so unknown categories
     // and over-long alt text are rejected at the boundary too.
     const parsed = validateFields(
       {
         altText: (formData.get("altText") as string) ?? "",
         category: (formData.get("category") as string) ?? "other",
-        institution: (formData.get("institution") as string) ?? "all",
+        institution:
+          (formData.get("institution") as string) ?? defaultInstitution,
       },
       ImageUploadFieldsSchema,
     );

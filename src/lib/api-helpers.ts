@@ -164,6 +164,24 @@ export function enforceInstitutionScope(
 }
 
 /**
+ * Mongo filter limiting *reads* to the caller's scope: admins see everything;
+ * editors see only their own institution's documents (drafts included), and
+ * optionally the shared `"all"` pool. Spread this AFTER any client-supplied
+ * filter so the scope always wins.
+ */
+export function institutionReadFilter(
+  session: { user?: unknown } | null,
+  opts: { includeShared?: boolean } = {},
+): Record<string, unknown> {
+  const user = (session?.user ?? {}) as Record<string, unknown>;
+  if ((user.role as string) === "admin") return {};
+  const inst = (user.institution as string) ?? "";
+  return opts.includeShared
+    ? { institution: { $in: [inst, "all"] } }
+    : { institution: inst };
+}
+
+/**
  * Horizontal access-control guard for shared media assets (images/documents).
  * Differs from `enforceInstitutionScope` in that the cross-college *shared*
  * pool (`institution === "all"` or unset) is editable by any editor — only

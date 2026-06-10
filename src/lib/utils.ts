@@ -19,18 +19,21 @@ export function getImageUrl(
     return imageUrl;
   }
 
+  // Site-relative paths (e.g. "/campus-life-assets/x.webp") point at files in
+  // /public — serve them as-is. Rewriting them to R2 (or the R2 proxy route,
+  // which only serves "images/"/"documents/" keys) breaks the image.
+  if (imageUrl.startsWith("/")) {
+    return imageUrl;
+  }
+
   // If it's a storage key, construct the full URL
-  if (imageUrl.includes("/") || imageUrl.startsWith("uploads/")) {
+  if (imageUrl.includes("/")) {
     const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
-    // Remove leading slash from imageUrl if present to avoid double slashes
-    const normalizedKey = imageUrl.startsWith("/")
-      ? imageUrl.slice(1)
-      : imageUrl;
     if (publicUrl) {
-      return `${publicUrl}/${normalizedKey}`;
+      return `${publicUrl}/${imageUrl}`;
     }
     // Fallback: public proxy route that fetches from R2 server-side (no auth required)
-    return `/api/public/images/${normalizedKey}`;
+    return `/api/public/images/${imageUrl}`;
   }
 
   return imageUrl;

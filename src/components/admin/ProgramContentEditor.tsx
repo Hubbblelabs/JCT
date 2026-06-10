@@ -340,6 +340,15 @@ export const PROGRAM_CONTENT_SECTION_LABELS: Record<
   tabs: "Sidebar tabs",
 };
 
+/** Card-level display fields rendered on the public program cards. */
+export interface ProgramCardExtras {
+  degree: string;
+  duration: string;
+  seats: number;
+  highlight: string;
+  description: string;
+}
+
 export function ProgramSectionInspector({
   section,
   content,
@@ -350,6 +359,8 @@ export function ProgramSectionInspector({
   onProgramAbbrChange,
   programSlug,
   onProgramSlugChange,
+  programCard,
+  onProgramCardChange,
 }: {
   section: string;
   content: RawContent;
@@ -360,6 +371,8 @@ export function ProgramSectionInspector({
   onProgramAbbrChange?: (abbr: string) => void;
   programSlug?: string;
   onProgramSlugChange?: (slug: string) => void;
+  programCard?: ProgramCardExtras;
+  onProgramCardChange?: (patch: Partial<ProgramCardExtras>) => void;
 }) {
   const set = (key: string, val: unknown) =>
     onChange({ ...content, [key]: val });
@@ -464,6 +477,55 @@ export function ProgramSectionInspector({
               onChange={(url) => set("heroImage", url)}
               hideUrlField
             />
+            {programCard && onProgramCardChange && (
+              <>
+                <TextInput
+                  label="Degree"
+                  value={programCard.degree}
+                  onChange={(e) =>
+                    onProgramCardChange({ degree: e.target.value })
+                  }
+                  placeholder="e.g., B.E, B.Sc, M.Tech, Diploma"
+                  hint="Shown on program cards; also splits UG/PG listings."
+                />
+                <TextInput
+                  label="Duration"
+                  value={programCard.duration}
+                  onChange={(e) =>
+                    onProgramCardChange({ duration: e.target.value })
+                  }
+                  placeholder="e.g., 4 Years"
+                />
+                <NumberInput
+                  label="Seats"
+                  value={programCard.seats || ""}
+                  min={0}
+                  onChange={(e) =>
+                    onProgramCardChange({
+                      seats: Math.max(0, parseInt(e.target.value, 10) || 0),
+                    })
+                  }
+                  placeholder="e.g., 60"
+                />
+                <TextInput
+                  label="Card Highlight"
+                  value={programCard.highlight}
+                  onChange={(e) =>
+                    onProgramCardChange({ highlight: e.target.value })
+                  }
+                  placeholder="e.g., NBA Accredited"
+                />
+                <TextArea
+                  label="Card Description"
+                  value={programCard.description}
+                  rows={3}
+                  onChange={(e) =>
+                    onProgramCardChange({ description: e.target.value })
+                  }
+                  placeholder="Short summary shown on the program card"
+                />
+              </>
+            )}
           </div>
           <ItemsEditor
             items={flatArr<Record<string, unknown>>(content, "heroMeta")}

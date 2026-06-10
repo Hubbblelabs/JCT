@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **JCT Institutions** is a Next.js 16 app that combines a **public marketing/admissions website** and an **admin CMS** for three colleges (Engineering, Arts & Science, Polytechnic) in Coimbatore.
 
-- **Public site** (`/`, `/institutions/*`, `/campus-life`, `/research`): institution landing pages, program listings, dynamic per-program detail pages, campus life, research. Server-rendered with ISR caching.
+- **Public site** (`/`, `/institutions/*`, `/campus-life`): institution landing pages, program listings, dynamic per-program detail pages, campus life. Server-rendered with ISR caching.
 - **Admin CMS** (`/admin/*`): manage programs (via a live-preview content builder), users, images, documents, testimonials, recruiters, page content, and site-wide config.
 
 Persistence is **MongoDB Atlas** (Mongoose), auth is **NextAuth.js**, image/document storage is **Cloudflare R2** (S3-compatible).
@@ -46,22 +46,22 @@ There is **no test framework** configured — no test runner, no test files, no 
 
 ### Authentication & authorization
 
-- **`src/proxy.ts` is the Next.js 16 middleware** (Next 16 renamed `middleware.ts` → `proxy.ts`). It wraps NextAuth `auth()` and gates `/admin/:path*` + `/api/admin/:path*`: unauthenticated requests redirect to `/admin/login?callbackUrl=...`; an authenticated user hitting the login page is sent to `/admin/dashboard`. This proxy is the real route gate — admin layouts also check the session as defense-in-depth.
+- **`src/proxy.ts` is the Next.js 16 middleware** (Next 16 renamed `middleware.ts` → `proxy.ts`). It wraps NextAuth `auth()` and gates `/admin/:path*` + `/api/admin/:path*`: unauthenticated page requests redirect to `/admin/login?callbackUrl=...`, unauthenticated `/api/admin/*` requests get a JSON 401 (a redirect would hand `fetch()` callers login-page HTML with status 200); an authenticated user hitting the login page is sent to `/admin/dashboard`. This proxy is the real route gate — admin layouts also check the session as defense-in-depth.
 - **`src/auth.ts`** configures NextAuth: Credentials provider only (email + password, bcrypt compare), JWT session with 24h `maxAge`. The session/JWT carries `role`, `institution`, and `programs[]`.
 - **Roles** (`src/lib/permissions.ts`): only two — `editor` (0) < `admin` (1). Helpers: `hasMinRole`, `canManageUsers` (admin), `canAccessInstitution`, `canAccessProgram`. Editors are scoped to their `institution`; admins act on everything (and are stored with `institution: "all"`). NOTE: the `programs[]` allowlist is **not** enforced — `canAccessProgram` delegates to `canAccessInstitution` and ignores the program list (the `programs[]` params are dead). Scope is institution-level only. For shared media assets, use `enforceAssetScope` (allows own-institution + the shared `"all"` pool).
 - In API routes, call `requireRole(req, minRole)` from `src/lib/api-helpers.ts`. It returns `{ session, error }`; if `error` is truthy, return it directly.
-- **Editor scope enforcement**: editors with a restricted `institution` must call `enforceInstitutionScope(session, targetInstitution)` in write routes. This prevents an editor scoped to Engineering from writing to Arts & Science data. Call it early after `requireRole` to fail fast.
+- **Editor scope enforcement**: editors with a restricted `institution` must call `enforceInstitutionScope(session, targetInstitution)` in write routes. This prevents an editor scoped to Engineering from writing to Arts & Science data. Call it early after `requireRole` to fail fast. **Reads are scoped too**: list GETs merge `institutionReadFilter(session)` into the Mongo query and detail GETs re-check `enforceInstitutionScope` — admin list/detail responses include draft content, which must not leak across colleges.
 
 ### API design
 
 - **Admin routes** (`src/app/api/admin/*`): gate with `requireRole`, parse with `validateBody(req, ZodSchema)` (or `validateFields` for multipart), record `logAudit(...)` (non-fatal), and call `revalidateTargets(...)` after writes. Response/error helpers in `src/lib/api-helpers.ts`: `json`, `badRequest`, `validationError`, `unauthorized`, `forbidden`, `notFound`, `serverError`.
-- **Audit logging**: `logAudit(req, action, targetId, changes)` from `src/lib/api-helpers.ts` records a write to the `AuditLog` collection. It never throws — if logging fails, it's caught and logged but the route response proceeds normally. Always call it even if later operations might fail; it's a best-effort record of intent, not a transactional guarantee.
-- **Public routes** (`src/app/api/public/*`): no auth, `export const revalidate = 3600` (1h ISR). Responses use a `{ source, data }` envelope (`source` is `"db" | "empty" | "error"`).
-- Some admin routes have `seed/` sub-routes for bootstrapping data (`programs`, `recruiters`, `testimonials`, `site-config`).
+- **Audit logging**: `logAudit(entityType, action, userEmail, summary)` from `src/lib/audit.ts` records a write to the `AuditLog` collection (entries expire after 1 year via a TTL index). It never throws — if logging fails, it's caught and logged but the route response proceeds normally. Always call it even if later operations might fail; it's a best-effort record of intent, not a transactional guarantee.
+- **Public routes** (`src/app/api/public/*`): no auth. Responses use a `{ source, data }` envelope (`source` is `"db" | "empty" | "error"`). These handlers read query params, which makes them **dynamic** — route-level `export const revalidate` is inert on them. Instead they serve from the in-memory TTL cache in `src/lib/public-cache.ts` (1h TTL), which `revalidateTargets` / `revalidatePaths` / `revalidateForConfigKey` clear on every admin write. Same single-instance assumption as the rate limiter.
+- Some admin routes have `seed/` sub-routes for bootstrapping data (`recruiters`, `testimonials`, `site-config`).
 
 ### Database & connection
 
-- **`connectDB()`** (`src/lib/mongodb.ts`): a globally cached Mongoose connection (`global._mongooseConn`), guarded by `readyState === 1`, with a 10s connect-timeout race and `bufferCommands: false`. Call it at the start of any route that touches the DB.
+- **`connectDB()`** (`src/lib/mongodb.ts`): a globally cached Mongoose connection (`global._mongooseConn`), guarded by `readyState === 1`, with a 15s server-selection timeout and `bufferCommands: false`. Call it at the start of any route that touches the DB.
 - Models use the singleton guard `mongoose.models.X ?? mongoose.model(...)` to survive hot reload. Exported from `src/lib/models/index.ts`: `User`, `SiteConfig`, `ImageAsset`, `Program`, `Recruiter`, `Testimonial`, `AuditLog`.
 
 ### Visual page editors
@@ -105,7 +105,7 @@ There is **no `Department` model** anymore. Rich page content that used to live 
 ```
 - **The editor** (`src/app/admin/(protected)/programs/[id]/page.tsx` with `ProgramContentEditor`, `ProgramTabsEditor`, `CurriculumEditor`, `ProgramLabelsEditor` in `src/components/admin/`) is a **live-preview builder**: edit content on one side, see the rendered public page on the other.
 - **Publish flow**: `POST /api/admin/programs/[id]/publish` copies `content` → `published_content`, sets `status: "published"`, bumps `version`.
-- **Migration**: `POST /api/admin/programs/[id]/migrate-tabs` converts legacy content (flat arrays or old section types) into the current `TabsProgram` shape. This is called automatically during publish if content is in an old format, but can also be triggered manually from the admin editor. Idempotent — safe to call on already-migrated content.
+- **Migration**: `POST /api/admin/programs/[id]/migrate-tabs` converts legacy content (flat arrays or old section types) into the current `TabsProgram` shape. It is a standalone manual endpoint — nothing calls it automatically (publish does **not** migrate). Idempotent — it no-ops when `tabs` already exist.
 - **Public reads** go through `src/lib/public-programs.ts` (`listPublicPrograms`, `getPublishedProgramBySlug`, `listPublishedProgramSlugs`). These only return docs with `status: "published"` and non-null `published_content`, then run the content through `src/lib/normalize-program-data.ts` to produce the typed `ProgramData` the public pages render.
 
 ### SiteConfig & page content
@@ -119,21 +119,21 @@ There is **no `Department` model** anymore. Rich page content that used to live 
 
 - **Images**: uploaded via `POST /api/admin/images/upload` (FormData) → validated for mime/size → stored in R2 via `src/lib/r2.ts` → an `ImageAsset` doc records metadata (url, alt text, category, institution). If R2 env vars are absent, images fall back to local serving via `/api/public/images/[...path]` or `/api/admin/images/serve/[...key]`.
 - **Documents**: `POST /api/admin/documents/upload` handles non-image assets (e.g. prospectus/pamphlet PDFs).
-- **R2 key tracking**: `extractR2Keys(value)` in `src/lib/r2.ts` recursively walks any JSON value and collects strings that look like R2 storage keys (`images/…` or `documents/…`). Use it before deleting a Program or SiteConfig value to find and delete the associated R2 objects and avoid orphaned files.
+- **R2 key tracking**: `extractR2Keys(value)` in `src/lib/r2.ts` recursively walks any JSON value and collects strings that look like R2 storage keys (`images/…` or `documents/…`). Pass the collected keys to `cleanupStorageKeys(keys, context)` from `src/lib/asset-cleanup.ts` when content is deleted or replaced — it removes **both** the R2 object and its `ImageAsset`/`DocumentAsset` tracking row (deleting only the blob leaves the media library full of broken entries). It's fire-and-forget and never blocks the route response.
 - `next.config.ts` `images.remotePatterns` allowlists external hosts (unsplash, pravatar, wikimedia, companieslogo, the R2 public domain) and applies a strict CSP that sandboxes SVGs.
 
 ### Caching & revalidation
 
-- Public API routes use 1h ISR (`export const revalidate = 3600`).
-- After a content write, call helpers from `src/lib/revalidate.ts`:
-  - `revalidateTargets(...targets)` — targets are `"home" | "engineering" | "arts-science" | "polytechnic" | "all-institutions"`.
-  - `revalidateForConfigKey(key)` — looks up the affected pages via the `SITE_CONFIG_KEY_TARGETS` map and also clears the `/api/public/site-config` route cache. When adding a new SiteConfig key in `src/lib/validation/siteConfig.ts`, add an entry to `SITE_CONFIG_KEY_TARGETS` in `src/lib/revalidate.ts` mapping that key to the targets it affects — without this mapping, the cache invalidation will be incomplete.
+- Public **pages** use 1h ISR (`export const revalidate = 3600` in page files). Public **API routes** read query params, which makes them dynamic — they are served from the in-memory cache in `src/lib/public-cache.ts` instead (see "API design").
+- After a content write, call helpers from `src/lib/revalidate.ts`. All of them also clear the public API cache:
+  - `revalidateTargets(...targets)` — targets are `"home" | "engineering" | "arts-science" | "polytechnic" | "all-institutions"`. Note `all-institutions` does **not** include `/campus-life`; only `home` does.
+  - `revalidateForConfigKey(key)` — looks up the affected pages via the `SITE_CONFIG_KEY_TARGETS` map. When adding a new SiteConfig key in `src/lib/validation/siteConfig.ts`, add an entry to `SITE_CONFIG_KEY_TARGETS` in `src/lib/revalidate.ts` mapping that key to the targets it affects — without this mapping, the cache invalidation will be incomplete.
   - `revalidatePaths(...paths)` — revalidate explicit paths.
 
 ### Frontend structure & state
 
 - **`src/modules/<inst>/`** holds per-institution public page **section components** (e.g. `EngineeringHero`, `EngineeringMetrics`, `EngineeringDomains`, `Admissions`, `Testimonials`), composed by the institution `page.tsx` files. Reusable layout/UI components live in `src/components/layout`, `src/components/shared`, `src/components/ui`.
-- **`src/data/`** holds static content not in the CMS: `site.ts`, `home.ts`, `engineering.ts`, `*-programs.ts`, `all-navigations.ts`, and `chatbot/` (data for the Meritto chatbot wired through `/api/chat`).
+- **`src/data/`** holds static content not in the CMS — currently only `all-navigations.ts`. (The Meritto chatbot is an external third-party script loaded by `src/components/layout/MerittoScript.tsx`; there is no `/api/chat` route. Its host must stay allowlisted in the CSP `script-src`/`frame-src` in `next.config.ts`.)
 - **`InstitutionContext`** (`src/contexts/InstitutionContext.tsx`): client context tracking the current section (`main | engineering | arts-science | polytechnic`). Auto-detected from the pathname and mirrored to `sessionStorage`.
 - Server Components are the default; `"use client"` only for interactive UI (forms, the program builder, context consumers).
 
@@ -181,7 +181,7 @@ Zod schemas define every entity shape. They live in `src/lib/validation/` and ar
 2. Zod schemas (+ `LIMITS`) in `src/lib/validation/newtype.ts`; re-export from the validation barrel.
 3. Admin API: `src/app/api/admin/newtype/route.ts` (GET/POST) and `[id]/route.ts` (PATCH/DELETE) — gate with `requireRole`, validate, audit, revalidate.
 4. Admin UI: `src/app/admin/(protected)/newtype/page.tsx`.
-5. Public API (if needed): `src/app/api/public/newtype/route.ts` with `revalidate = 3600`.
+5. Public API (if needed): `src/app/api/public/newtype/route.ts` — serve through `publicCacheGet`/`publicCacheSet` from `src/lib/public-cache.ts` (route-level `revalidate` is inert once the handler reads query params).
 6. If it affects public pages, extend `src/lib/revalidate.ts`.
 
 ### Publish draft content
@@ -212,6 +212,7 @@ The codebase is indexed using ccc. Use ccc for codebase knowledge.
 - Always run:
   pnpm run build
   pnpm run typecheck
+- If `pnpm run typecheck` fails with "Cannot find module" errors inside `.next/types` or `.next/dev/types`, those are stale generated validators referencing deleted routes — delete the `.next` directory and re-run.
 
 ## Next.js 16
 
@@ -222,6 +223,7 @@ The codebase is indexed using ccc. Use ccc for codebase knowledge.
 
 - Avoid .default({})
 - Use explicit schema shape or function defaults
+- **Never `.partial()` a schema whose fields carry `.default()`** for PATCH payloads — Zod 4 still injects the defaults for omitted keys, so a `$set` spread wipes stored values (e.g. `{ is_active: false }` resetting `sort_order`/`outcomes`). Keep a defaults-free base schema, `.partial()` that for updates, and `.extend()` the defaults onto the create schema only (see `programs.ts`, `recruiters.ts`, `testimonials.ts`).
 
 ## CMS Conventions
 

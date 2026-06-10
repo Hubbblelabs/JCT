@@ -19,6 +19,10 @@ export const LIMITS = {
   // Card-level limits
   nameMax: 120,
   abbrMax: 16,
+  degreeMax: 60,
+  durationMax: 60,
+  highlightMax: 160,
+  cardDescriptionTextMax: 600,
   outcomesMax: 12,
   outcomeItemMax: 240,
 
@@ -54,12 +58,35 @@ export const LIMITS = {
 
 // ── Card-level Program (top-level row fields) ───────────────────────────────
 
-export const ProgramSchema = z.object({
+// Base shape WITHOUT defaults. In Zod 4, `.partial()` of a defaulted field
+// still injects the default when the key is omitted, so a partial PATCH like
+// `{ is_active: false }` would silently reset `outcomes` / `sort_order` on
+// the stored document. Defaults therefore live only on the create-side
+// ProgramSchema below (same pattern as TestimonialUpdateSchema).
+const ProgramBaseSchema = z.object({
   name: zClampedString(1, LIMITS.nameMax, "Name"),
   abbr: zClampedString(1, LIMITS.abbrMax, "Abbreviation"),
   slug: zSlug,
   institution: zEnum(INSTITUTIONS),
+  degree: zOptionalString(LIMITS.degreeMax),
+  duration: zOptionalString(LIMITS.durationMax),
+  seats: zNonNegativeInt,
+  highlight: zOptionalString(LIMITS.highlightMax),
+  description: zOptionalString(LIMITS.cardDescriptionTextMax),
   image: zUrl.optional().or(z.literal("")),
+  outcomes: z
+    .array(zClampedString(0, LIMITS.outcomeItemMax, "Outcome"))
+    .max(LIMITS.outcomesMax),
+  is_active: z.boolean(),
+  sort_order: zNonNegativeInt,
+});
+
+export const ProgramSchema = ProgramBaseSchema.extend({
+  degree: zOptionalString(LIMITS.degreeMax).default(""),
+  duration: zOptionalString(LIMITS.durationMax).default(""),
+  seats: zNonNegativeInt.optional().default(0),
+  highlight: zOptionalString(LIMITS.highlightMax).default(""),
+  description: zOptionalString(LIMITS.cardDescriptionTextMax).default(""),
   outcomes: z
     .array(zClampedString(0, LIMITS.outcomeItemMax, "Outcome"))
     .max(LIMITS.outcomesMax)
@@ -69,7 +96,7 @@ export const ProgramSchema = z.object({
   sort_order: zNonNegativeInt.optional().default(0),
 });
 
-export const ProgramUpdateSchema = ProgramSchema.partial();
+export const ProgramUpdateSchema = ProgramBaseSchema.partial();
 
 export type ProgramValue = z.infer<typeof ProgramSchema>;
 
@@ -413,10 +440,15 @@ export const ProgramCreateSchema = ProgramSchema.extend({
 /**
  * Full update payload accepted by PATCH /api/admin/programs/[id]: any subset
  * of card-level fields plus an optional new `content` object.
+ *
+ * `status` deliberately excludes "published" — publishing must go through
+ * POST /api/admin/programs/[id]/publish (admin-only), which also snapshots
+ * `content` into `published_content`. Allowing it here would let editors
+ * flip a program live and bypass that flow.
  */
-export const ProgramFullUpdateSchema = ProgramSchema.partial().extend({
+export const ProgramFullUpdateSchema = ProgramBaseSchema.partial().extend({
   content: ProgramContentSchema.optional(),
-  status: z.enum(["draft", "published", "archived"]).optional(),
+  status: z.enum(["draft", "archived"]).optional(),
 });
 
 export type ProgramContentValue = z.infer<typeof ProgramContentSchema>;

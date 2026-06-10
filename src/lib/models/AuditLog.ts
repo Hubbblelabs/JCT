@@ -20,6 +20,12 @@ const AuditLogSchema = new Schema<IAuditLog>(
 
 AuditLogSchema.index({ entity_type: 1 });
 AuditLogSchema.index({ created_at: -1 });
+// TTL: expire audit entries after 1 year so the collection can't grow
+// unbounded. Adjust expireAfterSeconds if a longer retention is required.
+AuditLogSchema.index(
+  { created_at: 1 },
+  { expireAfterSeconds: 365 * 24 * 60 * 60 },
+);
 
 export const AuditLog =
   mongoose.models.AuditLog ??

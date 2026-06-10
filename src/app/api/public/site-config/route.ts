@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { SiteConfig } from "@/lib/models";
+import { publicCacheGet, publicCacheSet } from "@/lib/public-cache";
 
-export const revalidate = 3600;
+// Reading query params makes this handler dynamic, so route-level ISR
+// (`export const revalidate`) does not apply — responses are instead served
+// from the in-memory public cache, invalidated on every admin write.
 
 function resolveProspectusUrl(value: unknown): unknown {
   if (!value || typeof value !== "object") return value;
@@ -31,9 +34,15 @@ function resolveProspectusUrl(value: unknown): unknown {
   return v;
 }
 
+type Envelope = { source: "db" | "empty"; data: unknown };
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const key = searchParams.get("key");
+
+  const cacheKey = `site-config:${key ?? "*"}`;
+  const cached = publicCacheGet<Envelope>(cacheKey);
+  if (cached) return NextResponse.json(cached);
 
   try {
     await connectDB();
@@ -42,19 +51,25 @@ export async function GET(req: Request) {
       const doc = await SiteConfig.findOne({ config_key: key });
       // Public endpoint must only ever return published values. Falling back
       // to `doc.value` leaks unpublished drafts to anonymous visitors.
+      let payload: Envelope;
       if (!doc || doc.status !== "published" || !doc.published_value) {
-        return NextResponse.json({ source: "empty", data: null });
+        payload = { source: "empty", data: null };
+      } else {
+        let value: unknown = doc.published_value;
+        if (key === "homeProspectus") {
+          value = resolveProspectusUrl(value);
+        }
+        payload = { source: "db", data: value };
       }
-      let value: unknown = doc.published_value;
-      if (key === "homeProspectus") {
-        value = resolveProspectusUrl(value);
-      }
-      return NextResponse.json({ source: "db", data: value });
+      publicCacheSet(cacheKey, payload);
+      return NextResponse.json(payload);
     }
 
     const docs = await SiteConfig.find();
     if (docs.length === 0) {
-      return NextResponse.json({ source: "empty", data: {} });
+      const payload: Envelope = { source: "empty", data: {} };
+      publicCacheSet(cacheKey, payload);
+      return NextResponse.json(payload);
     }
 
     const data: Record<string, unknown> = {};
@@ -67,7 +82,9 @@ export async function GET(req: Request) {
       data[doc.config_key] = value;
     }
 
-    return NextResponse.json({ source: "db", data });
+    const payload: Envelope = { source: "db", data };
+    publicCacheSet(cacheKey, payload);
+    return NextResponse.json(payload);
   } catch (e) {
     console.error("[public/site-config]", e);
     return NextResponse.json({ source: "error", data: {} });

@@ -53,7 +53,10 @@ const nextConfig: NextConfig = {
       "object-src 'none'",
       "frame-ancestors 'none'",
       "form-action 'self'",
-      `script-src 'self' 'unsafe-inline'${isProd ? "" : " 'unsafe-eval'"}`,
+      // The Meritto/NoPaperForms chatbot (MerittoScript.tsx) loads its widget
+      // from *.nopaperforms.com — without this allowance the CSP silently
+      // blocks the chatbot in production.
+      `script-src 'self' 'unsafe-inline' https://*.nopaperforms.com${isProd ? "" : " 'unsafe-eval'"}`,
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
@@ -61,7 +64,7 @@ const nextConfig: NextConfig = {
       "media-src 'self' https: data:",
       "worker-src 'self' blob:",
       "manifest-src 'self'",
-      "frame-src 'self'",
+      "frame-src 'self' https://*.nopaperforms.com",
       ...(isProd ? ["upgrade-insecure-requests"] : []),
     ].join("; ");
 

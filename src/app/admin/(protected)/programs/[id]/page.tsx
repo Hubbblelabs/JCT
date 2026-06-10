@@ -34,6 +34,11 @@ interface ProgramFields {
   abbr: string;
   slug: string;
   institution: string;
+  degree: string;
+  duration: string;
+  seats: number;
+  highlight: string;
+  description: string;
   image: string;
   outcomes: string[];
   is_active: boolean;
@@ -45,6 +50,11 @@ const EMPTY_PROG: ProgramFields = {
   abbr: "",
   slug: "",
   institution: "engineering",
+  degree: "",
+  duration: "",
+  seats: 0,
+  highlight: "",
+  description: "",
   image: "",
   outcomes: [],
   is_active: true,
@@ -522,6 +532,16 @@ function ProgramDetailInner() {
                   onProgramAbbrChange={(abbr) => setP("abbr", abbr)}
                   programSlug={prog.slug}
                   onProgramSlugChange={(slug) => setP("slug", slug)}
+                  programCard={{
+                    degree: prog.degree,
+                    duration: prog.duration,
+                    seats: prog.seats,
+                    highlight: prog.highlight,
+                    description: prog.description,
+                  }}
+                  onProgramCardChange={(patch) =>
+                    setProg((f) => ({ ...f, ...patch }))
+                  }
                 />
               </div>
             </aside>

@@ -1,32 +1,24 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Recruiter } from "@/lib/models";
+import { getImageUrl } from "@/lib/utils";
+import { publicCacheGet, publicCacheSet } from "@/lib/public-cache";
 
-export const revalidate = 3600; // 1 hour
-
-// Helper to convert storage key to full URL
-function getImageUrl(imageUrl: string | null | undefined): string | null {
-  if (!imageUrl) return null;
-
-  // If it's already a full URL, return as-is
-  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
-    return imageUrl;
-  }
-
-  // If it's a storage key, construct the full URL
-  if (imageUrl.includes("/") || imageUrl.startsWith("uploads/")) {
-    const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
-    if (publicUrl) {
-      return `${publicUrl}/${imageUrl}`;
-    }
-    // Fallback to API serve endpoint if no public URL is configured
-    return `/api/admin/images/serve/${imageUrl}`;
-  }
-
-  return imageUrl;
-}
+// Served from the in-memory public cache (invalidated on every admin write)
+// rather than route-level ISR — revalidatePath never targeted this API path,
+// so ISR kept logos stale for an hour after recruiter edits.
+//
+// Logo URLs resolve through the shared getImageUrl, which serves storage
+// keys via the *public* image proxy — the previous local copy fell back to
+// the admin-gated /api/admin/images/serve route that anonymous visitors
+// cannot load.
+export const dynamic = "force-dynamic";
 
 export async function GET() {
+  const cacheKey = "recruiters:*";
+  const cached = publicCacheGet<{ source: string; data: unknown }>(cacheKey);
+  if (cached) return NextResponse.json(cached);
+
   try {
     await connectDB();
     const recruiters = await Recruiter.find({ is_active: true })
@@ -44,8 +36,10 @@ export async function GET() {
       >();
 
     if (recruiters.length === 0) {
-      // Return null to trigger static fallback on the client
-      return NextResponse.json({ source: "empty", data: [] });
+      // Return empty to trigger static fallback on the client
+      const payload = { source: "empty", data: [] };
+      publicCacheSet(cacheKey, payload);
+      return NextResponse.json(payload);
     }
 
     // Transform logos to full URLs
@@ -55,7 +49,9 @@ export async function GET() {
       logo: getImageUrl(r.logo),
     }));
 
-    return NextResponse.json({ source: "db", data: transformedRecruiters });
+    const payload = { source: "db", data: transformedRecruiters };
+    publicCacheSet(cacheKey, payload);
+    return NextResponse.json(payload);
   } catch (e) {
     console.error("[public/recruiters]", e);
     return NextResponse.json({ source: "error", data: [] });

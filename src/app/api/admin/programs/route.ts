@@ -4,6 +4,7 @@ import { Program } from "@/lib/models";
 import {
   requireRole,
   enforceInstitutionScope,
+  institutionReadFilter,
   json,
   badRequest,
   serverError,
@@ -24,7 +25,7 @@ function institutionTarget(inst: string): RevalidateTarget | null {
 }
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireRole(req, "editor");
+  const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
   try {
@@ -34,7 +35,12 @@ export async function GET(req: NextRequest) {
     const filter: Record<string, unknown> = {};
     if (institution) filter.institution = institution;
 
-    const docs = await Program.find(filter).sort({
+    const docs = await Program.find({
+      ...filter,
+      // Editors only see their own college's programs — list responses
+      // include full draft content, which must not leak across colleges.
+      ...institutionReadFilter(session),
+    }).sort({
       institution: 1,
       sort_order: 1,
       name: 1,

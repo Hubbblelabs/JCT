@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { DocumentAsset } from "@/lib/models";
-import { deleteFromR2 } from "@/lib/r2";
+import { deleteFromR2, headR2Object } from "@/lib/r2";
 import {
   requireRole,
   enforceUploadRateLimit,
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
       size?: number;
       mime_type?: string;
     };
-    const { storage_key, filename, size, mime_type } = body;
+    const { storage_key, filename, mime_type } = body;
 
     if (!storage_key || !filename)
       return badRequest("storage_key and filename required");
@@ -38,18 +38,35 @@ export async function POST(req: NextRequest) {
       return badRequest("Invalid storage_key");
     }
 
+    // The client-supplied size/mime are advisory — confirm against the
+    // actual uploaded object. This also rejects confirms for keys that were
+    // presigned but never uploaded.
+    const head = await headR2Object(storage_key);
+    if (!head || head.size === 0) {
+      return badRequest("Upload not found in storage — upload the file first");
+    }
+
     const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL
       ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${storage_key}`
       : `/api/public/images/${storage_key}`;
 
     try {
       await connectDB();
+
+      // A storage key is single-use: double-registering would create two
+      // DocumentAsset rows whose deletes pull the object out from under
+      // each other.
+      const existing = await DocumentAsset.findOne({ storage_key }).lean();
+      if (existing) {
+        return badRequest("This upload is already registered");
+      }
+
       await DocumentAsset.create({
         filename,
         storage_key,
         url: publicUrl,
-        mime_type: mime_type ?? "application/pdf",
-        file_size: size ?? 0,
+        mime_type: head.contentType || mime_type || "application/pdf",
+        file_size: head.size,
         uploaded_by: session!.user?.email ?? "",
       });
     } catch (dbErr) {
@@ -73,7 +90,13 @@ export async function POST(req: NextRequest) {
     );
 
     return json(
-      { url: publicUrl, storage_key, filename, size, mime_type },
+      {
+        url: publicUrl,
+        storage_key,
+        filename,
+        size: head.size,
+        mime_type: head.contentType || mime_type,
+      },
       201,
     );
   } catch (e) {

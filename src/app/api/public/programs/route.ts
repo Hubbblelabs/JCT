@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { listPublicPrograms } from "@/lib/public-programs";
+import { publicCacheGet, publicCacheSet } from "@/lib/public-cache";
 
-export const revalidate = 3600;
+// Reading query params makes this handler dynamic, so route-level ISR
+// (`export const revalidate`) does not apply — responses are instead served
+// from the in-memory public cache, invalidated on every admin write.
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -9,17 +12,22 @@ export async function GET(req: Request) {
   const degree = searchParams.get("degree");
   const publishedOnly = searchParams.get("published") === "true";
 
+  const cacheKey = `programs:${institution ?? "*"}:${degree ?? "*"}:${publishedOnly}`;
+  const cached = publicCacheGet<{ source: string; data: unknown }>(cacheKey);
+  if (cached) return NextResponse.json(cached);
+
   try {
     const programs = await listPublicPrograms({
       institution,
       degree,
       publishedOnly,
     });
-    if (programs.length === 0) {
-      return NextResponse.json({ source: "empty", data: [] });
-    }
-
-    return NextResponse.json({ source: "db", data: programs });
+    const payload =
+      programs.length === 0
+        ? { source: "empty", data: [] }
+        : { source: "db", data: programs };
+    publicCacheSet(cacheKey, payload);
+    return NextResponse.json(payload);
   } catch (e) {
     console.error("[public/programs]", e);
     return NextResponse.json({ source: "error", data: [] });

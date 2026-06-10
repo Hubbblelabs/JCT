@@ -4,6 +4,7 @@ import { Page } from "@/lib/models";
 import {
   requireRole,
   enforceInstitutionScope,
+  institutionReadFilter,
   json,
   badRequest,
   serverError,
@@ -25,7 +26,7 @@ function institutionTarget(inst: string): RevalidateTarget | null {
 }
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireRole(req, "editor");
+  const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
   try {
@@ -37,7 +38,12 @@ export async function GET(req: NextRequest) {
     if (institution) filter.institution = institution;
     if (status) filter.status = status;
 
-    const docs = await Page.find(filter).sort({
+    const docs = await Page.find({
+      ...filter,
+      // Editors only see their own college's pages — list responses include
+      // full draft content, which must not leak across colleges.
+      ...institutionReadFilter(session),
+    }).sort({
       institution: 1,
       updated_at: -1,
     });

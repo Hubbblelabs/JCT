@@ -11,7 +11,7 @@ import {
 import { logAudit } from "@/lib/audit";
 import { RecruiterUpdateSchema } from "@/lib/validation";
 import { revalidateTargets } from "@/lib/revalidate";
-import { deleteFromR2 } from "@/lib/r2";
+import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 
 export async function GET(
   req: NextRequest,
@@ -59,13 +59,8 @@ export async function PATCH(
     );
     if (!doc) return notFound();
 
-    if (oldLogo && oldLogo !== body.logo && oldLogo.startsWith("images/")) {
-      deleteFromR2(oldLogo).catch((err) =>
-        console.warn(
-          `[recruiters/patch] R2 cleanup failed for "${oldLogo}":`,
-          err,
-        ),
-      );
+    if (oldLogo && oldLogo !== body.logo) {
+      cleanupStorageKeys([oldLogo], "recruiters/patch");
     }
 
     revalidateTargets("home");
@@ -95,13 +90,8 @@ export async function DELETE(
     const doc = await Recruiter.findByIdAndDelete(id);
     if (!doc) return notFound();
 
-    if (doc.logo?.startsWith("images/")) {
-      deleteFromR2(doc.logo).catch((err) =>
-        console.warn(
-          `[recruiters/delete] R2 cleanup failed for "${doc.logo}":`,
-          err,
-        ),
-      );
+    if (doc.logo) {
+      cleanupStorageKeys([doc.logo], "recruiters/delete");
     }
 
     revalidateTargets("home");

@@ -17,7 +17,8 @@ import {
   revalidatePaths,
   type RevalidateTarget,
 } from "@/lib/revalidate";
-import { extractR2Keys, deleteFromR2 } from "@/lib/r2";
+import { extractR2Keys } from "@/lib/r2";
+import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 
 function institutionTarget(inst: string): RevalidateTarget | null {
   if (inst === "main") return "home";
@@ -39,7 +40,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { error } = await requireRole(req, "editor");
+  const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
   try {
@@ -47,6 +48,9 @@ export async function GET(
     const { id } = await params;
     const doc = await Page.findById(id);
     if (!doc) return notFound();
+    // Reads expose draft content — keep them institution-scoped like writes.
+    const scope = enforceInstitutionScope(session, doc.institution);
+    if (scope) return scope;
     return json(doc);
   } catch (e) {
     console.error(e);
@@ -139,11 +143,7 @@ export async function DELETE(
       content: doc.content,
       published_content: doc.published_content,
     });
-    for (const key of r2Keys) {
-      deleteFromR2(key).catch((err) =>
-        console.warn(`[pages/delete] R2 cleanup failed for "${key}":`, err),
-      );
-    }
+    cleanupStorageKeys(r2Keys, "pages/delete");
 
     const target = institutionTarget(doc.institution);
     if (target) {

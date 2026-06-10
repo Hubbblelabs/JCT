@@ -3,6 +3,7 @@ import {
   PutObjectCommand,
   DeleteObjectCommand,
   GetObjectCommand,
+  HeadObjectCommand,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -68,6 +69,30 @@ export async function uploadToR2(
 
   const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
   return publicUrl ? `${publicUrl}/${key}` : `/api/public/images/${key}`;
+}
+
+/**
+ * HEAD an object to confirm it exists and read its true size/type without
+ * downloading the body. Returns null when the object doesn't exist.
+ */
+export async function headR2Object(
+  key: string,
+): Promise<{ size: number; contentType: string } | null> {
+  const client = getR2Client();
+  const bucket = process.env.R2_BUCKET_NAME;
+  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+
+  try {
+    const res = await client.send(
+      new HeadObjectCommand({ Bucket: bucket, Key: key }),
+    );
+    return {
+      size: res.ContentLength ?? 0,
+      contentType: res.ContentType ?? "application/octet-stream",
+    };
+  } catch {
+    return null;
+  }
 }
 
 export async function deleteFromR2(key: string): Promise<void> {

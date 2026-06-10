@@ -12,7 +12,7 @@ import {
 import { logAudit } from "@/lib/audit";
 import { TestimonialUpdateSchema } from "@/lib/validation";
 import { revalidateTargets, type RevalidateTarget } from "@/lib/revalidate";
-import { deleteFromR2 } from "@/lib/r2";
+import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 
 function targetsForInstitution(inst?: string): RevalidateTarget[] {
   const targets: RevalidateTarget[] = ["home"];
@@ -29,7 +29,7 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { error } = await requireRole(req, "editor");
+  const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
   try {
@@ -37,6 +37,12 @@ export async function GET(
     const { id } = await params;
     const doc = await Testimonial.findById(id);
     if (!doc) return notFound();
+    // Shared ("all") testimonials are readable by any editor; another
+    // college's testimonials are not.
+    if (doc.institution !== "all") {
+      const scope = enforceInstitutionScope(session, doc.institution);
+      if (scope) return scope;
+    }
     return json(doc);
   } catch (e) {
     console.error(e);
@@ -85,17 +91,8 @@ export async function PATCH(
     );
     if (!doc) return notFound();
 
-    if (
-      oldAvatar &&
-      oldAvatar !== body.avatar &&
-      oldAvatar.startsWith("images/")
-    ) {
-      deleteFromR2(oldAvatar).catch((err) =>
-        console.warn(
-          `[testimonials/patch] R2 cleanup failed for "${oldAvatar}":`,
-          err,
-        ),
-      );
+    if (oldAvatar && oldAvatar !== body.avatar) {
+      cleanupStorageKeys([oldAvatar], "testimonials/patch");
     }
 
     revalidateTargets(...targetsForInstitution(doc.institution));
@@ -125,13 +122,8 @@ export async function DELETE(
     const doc = await Testimonial.findByIdAndDelete(id);
     if (!doc) return notFound();
 
-    if (doc.avatar?.startsWith("images/")) {
-      deleteFromR2(doc.avatar).catch((err) =>
-        console.warn(
-          `[testimonials/delete] R2 cleanup failed for "${doc.avatar}":`,
-          err,
-        ),
-      );
+    if (doc.avatar) {
+      cleanupStorageKeys([doc.avatar], "testimonials/delete");
     }
 
     revalidateTargets(...targetsForInstitution(doc.institution));

@@ -102,6 +102,23 @@ export async function PATCH(
     ).select("-password_hash");
     if (!user) return notFound("User not found");
 
+    // Compensating check for the race window between the last-admin guard
+    // above and the update: if a concurrent change left the org with no
+    // active admin, revert this update instead of locking everyone out.
+    if (target.role === "admin" && target.is_active) {
+      const remaining = await User.countDocuments({
+        role: "admin",
+        is_active: true,
+      });
+      if (remaining === 0) {
+        await User.updateOne(
+          { _id: id },
+          { $set: { role: "admin", is_active: true, institution: "all" } },
+        );
+        return badRequest("Cannot remove the last active admin");
+      }
+    }
+
     await logAudit(
       "user",
       "updated",
@@ -153,6 +170,18 @@ export async function DELETE(
       { new: true },
     ).select("-password_hash");
     if (!user) return notFound("User not found");
+
+    // Compensating check — see PATCH above.
+    if (target.role === "admin" && target.is_active) {
+      const remaining = await User.countDocuments({
+        role: "admin",
+        is_active: true,
+      });
+      if (remaining === 0) {
+        await User.updateOne({ _id: id }, { $set: { is_active: true } });
+        return badRequest("Cannot deactivate the last active admin");
+      }
+    }
 
     await logAudit(
       "user",

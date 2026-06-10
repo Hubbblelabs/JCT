@@ -11,13 +11,17 @@ export default auth((req) => {
   // Allow auth routes
   if (isApiAuthRoute) return NextResponse.next();
 
+  // Unauthenticated API calls get a JSON 401 — a redirect would be silently
+  // followed by fetch(), handing the caller login-page HTML with status 200.
+  if (isAdminApi && !req.auth) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   // Redirect unauthenticated users to login
-  if ((isAdminRoute && !isLoginPage) || isAdminApi) {
-    if (!req.auth) {
-      const loginUrl = new URL("/admin/login", req.url);
-      loginUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(loginUrl);
-    }
+  if (isAdminRoute && !isLoginPage && !req.auth) {
+    const loginUrl = new URL("/admin/login", req.url);
+    loginUrl.searchParams.set("callbackUrl", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   // Redirect already-authenticated users away from login

@@ -6,6 +6,11 @@ export interface IProgram extends Document {
   abbr: string;
   slug: string;
   institution: "engineering" | "arts-science" | "polytechnic";
+  degree: string;
+  duration: string;
+  seats: number;
+  highlight: string;
+  description: string;
   image: string;
   outcomes: string[];
   is_active: boolean;
@@ -33,6 +38,15 @@ const ProgramSchema = new Schema<IProgram>(
       required: true,
       enum: ["engineering", "arts-science", "polytechnic"],
     },
+    // Card-level display fields rendered by the public program cards
+    // (degree also drives the UG/PG split on the engineering domains page).
+    // These existed on legacy documents; without schema entries Mongoose
+    // strict mode silently drops writes and they become uneditable.
+    degree: { type: String, default: "" },
+    duration: { type: String, default: "" },
+    seats: { type: Number, default: 0 },
+    highlight: { type: String, default: "" },
+    description: { type: String, default: "" },
     image: { type: String, default: "" },
     outcomes: { type: [String], default: [] },
     is_active: { type: Boolean, default: true },

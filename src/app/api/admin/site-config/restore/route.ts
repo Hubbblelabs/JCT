@@ -9,7 +9,7 @@ import {
   SITE_CONFIG_SCHEMAS,
   type SiteConfigKey,
 } from "@/lib/validation/siteConfig";
-import { revalidateTargets } from "@/lib/revalidate";
+import { revalidateTargets, revalidateForConfigKey } from "@/lib/revalidate";
 import { uploadToR2 } from "@/lib/r2";
 
 interface ImageMeta {
@@ -144,6 +144,9 @@ export async function POST(req: NextRequest) {
         },
         { upsert: true },
       );
+      // Per-key revalidation: covers paths "all-institutions" misses
+      // (e.g. /campus-life) and clears the public API cache.
+      revalidateForConfigKey(cfg.config_key);
     }
     revalidateTargets("all-institutions");
 

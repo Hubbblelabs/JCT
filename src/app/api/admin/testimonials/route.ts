@@ -4,6 +4,7 @@ import { Testimonial } from "@/lib/models";
 import {
   requireRole,
   enforceInstitutionScope,
+  institutionReadFilter,
   json,
   serverError,
   validateBody,
@@ -24,7 +25,7 @@ function targetsForInstitution(inst?: string): RevalidateTarget[] {
 }
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireRole(req, "editor");
+  const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
   try {
@@ -34,7 +35,12 @@ export async function GET(req: NextRequest) {
     const filter: Record<string, unknown> = {};
     if (institution) filter.institution = institution;
 
-    const docs = await Testimonial.find(filter).sort({
+    const docs = await Testimonial.find({
+      ...filter,
+      // Editors see their own college's testimonials plus the shared "all"
+      // pool (read-only for them — writes stay institution-scoped).
+      ...institutionReadFilter(session, { includeShared: true }),
+    }).sort({
       sort_order: 1,
       created_at: -1,
     });
