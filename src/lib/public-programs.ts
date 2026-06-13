@@ -24,6 +24,7 @@ type ProgramLean = {
   version?: number;
   published_at?: Date | string;
   published_content?: unknown;
+  content?: unknown;
 };
 
 export type PublicProgramCard = {
@@ -67,7 +68,19 @@ function publicImageUrl(imageUrl: string | null | undefined): string | null {
   return imageUrl;
 }
 
+function heroImageFrom(content: unknown): string | null {
+  if (content && typeof content === "object" && !Array.isArray(content)) {
+    const hero = (content as Record<string, unknown>).heroImage;
+    if (typeof hero === "string" && hero.trim().length > 0) return hero;
+  }
+  return null;
+}
+
 function asCard(doc: ProgramLean): PublicProgramCard {
+  // Card image mirrors the program-detail hero image; fall back to the
+  // card-level `image` when no hero image is set.
+  const heroImage =
+    heroImageFrom(doc.published_content) ?? heroImageFrom(doc.content);
   return {
     _id: String(doc._id),
     name: doc.name ?? "",
@@ -77,7 +90,7 @@ function asCard(doc: ProgramLean): PublicProgramCard {
     degree: doc.degree ?? "",
     duration: doc.duration ?? "",
     seats: doc.seats ?? 0,
-    image: publicImageUrl(doc.image),
+    image: publicImageUrl(heroImage ?? doc.image),
     highlight: doc.highlight ?? "",
     description: doc.description ?? "",
     outcomes: Array.isArray(doc.outcomes) ? doc.outcomes : [],
@@ -113,7 +126,7 @@ export async function listPublicPrograms({
 
   const docs = await Program.find(query)
     .select(
-      "name abbr slug institution degree duration seats image highlight description outcomes sort_order",
+      "name abbr slug institution degree duration seats image highlight description outcomes sort_order published_content.heroImage content.heroImage",
     )
     .sort({ sort_order: 1, name: 1 })
     .lean<ProgramLean[]>();
