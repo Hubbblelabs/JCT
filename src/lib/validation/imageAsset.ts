@@ -30,6 +30,14 @@ export const ALLOWED_MIME_TYPES = [
 
 export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
+// Images are POSTed straight through the serverless function (they need
+// server-side sharp processing, so they can't use the presigned direct-to-R2
+// path documents use). Vercel caps a function request body at ~4.5 MB, so a
+// larger image is rejected by the platform with a 413 ("FUNCTION_PAYLOAD_TOO_LARGE")
+// before our route runs. Validate against this on the client so the user gets a
+// clear "file too large" message instead of an opaque "Upload failed".
+export const MAX_DIRECT_UPLOAD_SIZE = 4 * 1024 * 1024; // 4 MB (headroom under 4.5)
+
 // Per-category target width + dimension constraints (run after sharp metadata).
 // Soft caps on dimensions only — the upload route also resizes to targetWidth
 // to keep payloads small. minWidth is a quality floor (reject tiny avatars).

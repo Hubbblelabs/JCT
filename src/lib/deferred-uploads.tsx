@@ -111,6 +111,14 @@ async function doUpload(
     body: fd,
   });
   if (!r.ok) {
+    // Vercel rejects a >~4.5 MB function body with a 413 whose body is not JSON
+    // ("FUNCTION_PAYLOAD_TOO_LARGE"). Surface a clear message instead of the
+    // generic "Upload failed" that the JSON-parse fallback would produce.
+    if (r.status === 413) {
+      throw new Error(
+        "Image too large to upload (limit 4 MB). Please choose a smaller image.",
+      );
+    }
     const body = (await r.json().catch(() => ({}))) as Record<string, unknown>;
     const detail = Array.isArray(body.details)
       ? (body.details as Array<{ message: string }>)[0]?.message

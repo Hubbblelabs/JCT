@@ -11,11 +11,19 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
-import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from "@/lib/validation/imageAsset";
+import {
+  ALLOWED_MIME_TYPES,
+  MAX_DIRECT_UPLOAD_SIZE,
+} from "@/lib/validation/imageAsset";
 
 // Mirrors /api/admin/documents/upload + /presign (kept in sync by hand —
 // there is no shared client-safe constant for the document limit).
 const DOC_MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
+
+// Shown when the platform rejects the request body before our route runs
+// (Vercel 413 / FUNCTION_PAYLOAD_TOO_LARGE) — that response is not JSON, so no
+// message can be parsed out of it.
+const PAYLOAD_TOO_LARGE_MSG = `File too large to upload (limit ${MAX_DIRECT_UPLOAD_SIZE / 1024 / 1024} MB). Please choose a smaller file.`;
 
 const asMb = (bytes: number) => (bytes / 1024 / 1024).toFixed(1);
 
@@ -31,8 +39,8 @@ function validateImageFile(file: File): string | null {
     )
   )
     return `Invalid file type${file.type ? ` "${file.type}"` : ""}. Allowed: JPEG, PNG, WebP, GIF.`;
-  if (file.size > MAX_FILE_SIZE)
-    return `File too large (${asMb(file.size)}MB). Max is ${MAX_FILE_SIZE / 1024 / 1024}MB.`;
+  if (file.size > MAX_DIRECT_UPLOAD_SIZE)
+    return `File too large (${asMb(file.size)} MB). Max is ${MAX_DIRECT_UPLOAD_SIZE / 1024 / 1024} MB.`;
   return null;
 }
 
@@ -268,6 +276,8 @@ export function ImageUploadInput({
       if (r.ok) {
         const data = (await r.json()) as Record<string, string>;
         onChange(data.url || data.storage_key);
+      } else if (r.status === 413) {
+        setUploadError(PAYLOAD_TOO_LARGE_MSG);
       } else {
         const body = (await r.json().catch(() => ({}))) as Record<
           string,
@@ -503,6 +513,8 @@ export function DocumentUploadInput({
       if (r.ok) {
         const data = (await r.json()) as Record<string, string>;
         onChange(data.storage_key ?? data.url ?? "");
+      } else if (r.status === 413) {
+        setUploadError(PAYLOAD_TOO_LARGE_MSG);
       } else {
         const body = (await r.json().catch(() => ({}))) as Record<
           string,
