@@ -11,6 +11,38 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
+import { ALLOWED_MIME_TYPES, MAX_FILE_SIZE } from "@/lib/validation/imageAsset";
+
+// Mirrors /api/admin/documents/upload + /presign (kept in sync by hand —
+// there is no shared client-safe constant for the document limit).
+const DOC_MAX_FILE_SIZE = 25 * 1024 * 1024; // 25 MB
+
+const asMb = (bytes: number) => (bytes / 1024 / 1024).toFixed(1);
+
+// Pre-flight validation so size/type errors surface the instant a file is
+// picked — including the deferred-upload path, where the server only rejects
+// the file later, at save time. Rules mirror the upload routes.
+function validateImageFile(file: File): string | null {
+  if (file.type === "image/svg+xml" || /\.svgz?$/i.test(file.name))
+    return "SVG uploads are not supported.";
+  if (
+    !ALLOWED_MIME_TYPES.includes(
+      file.type as (typeof ALLOWED_MIME_TYPES)[number],
+    )
+  )
+    return `Invalid file type${file.type ? ` "${file.type}"` : ""}. Allowed: JPEG, PNG, WebP, GIF.`;
+  if (file.size > MAX_FILE_SIZE)
+    return `File too large (${asMb(file.size)}MB). Max is ${MAX_FILE_SIZE / 1024 / 1024}MB.`;
+  return null;
+}
+
+function validateDocumentFile(file: File): string | null {
+  if (file.type !== "application/pdf")
+    return `Invalid file type${file.type ? ` "${file.type}"` : ""}. Only PDF files are accepted.`;
+  if (file.size > DOC_MAX_FILE_SIZE)
+    return `File too large (${asMb(file.size)} MB). Max is ${DOC_MAX_FILE_SIZE / 1024 / 1024} MB.`;
+  return null;
+}
 
 interface FieldProps {
   label: string;
@@ -208,6 +240,14 @@ export function ImageUploadInput({
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const validationMsg = validateImageFile(file);
+    if (validationMsg) {
+      setUploadError(validationMsg);
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
+    setUploadError(null);
 
     if (deferred) {
       const id = Math.random().toString(36).slice(2);
@@ -430,6 +470,14 @@ export function DocumentUploadInput({
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    const validationMsg = validateDocumentFile(file);
+    if (validationMsg) {
+      setUploadError(validationMsg);
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
+    setUploadError(null);
 
     if (deferred) {
       const id = Math.random().toString(36).slice(2);

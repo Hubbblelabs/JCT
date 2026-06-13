@@ -8,3 +8,9 @@ allowBuilds:
 # fixes GHSA-qx2v-qp2m-jg93. Overrides live here in pnpm 11+, not package.json.
 overrides:
   postcss@<8.5.10: ">=8.5.10"
+  # Pin sharp to the version Next 16 bundles for its image optimizer so the
+  # whole tree resolves ONE sharp + ONE libvips. Two copies (Next's 0.34.5 +
+  # a direct 0.35.x) made the /api/admin/images/upload binding dlopen a
+  # libvips .so that Vercel's Next file-tracing never bundled:
+  # "ERR_DLOPEN_FAILED: libvips-cpp.so.8.18.3: cannot open shared object file".
+  sharp: 0.34.5
