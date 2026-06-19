@@ -27,11 +27,16 @@ export function MerittoScript() {
     window.addEventListener("keydown", trigger, opts);
     window.addEventListener("scroll", trigger, opts);
 
+    // Fallback: load after 2 s even with no user interaction so the launcher
+    // is present when the ChatbotNotification bubble appears at 3 s.
+    const fallback = setTimeout(trigger, 2000);
+
     return () => {
       window.removeEventListener("mousemove", trigger);
       window.removeEventListener("touchstart", trigger);
       window.removeEventListener("keydown", trigger);
       window.removeEventListener("scroll", trigger);
+      clearTimeout(fallback);
     };
   }, [isAdmin, mtEnabled]);
 

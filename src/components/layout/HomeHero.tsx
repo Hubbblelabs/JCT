@@ -54,16 +54,24 @@ function normalizeHero(raw: unknown): HeroContent | null {
         })
         .filter((x): x is HeroCta => x !== null)
     : [];
+  const INSTITUTION_HREFS = [
+    "/institutions/engineering",
+    "/institutions/arts-science",
+    "/institutions/polytechnic",
+  ];
+
   const cards = Array.isArray(r.cards)
     ? r.cards
-        .map((c) => {
+        .map((c, index) => {
           const o = (c ?? {}) as Record<string, unknown>;
           const title = typeof o.title === "string" ? o.title : null;
           if (!title) return null;
+          const storedHref =
+            typeof o.href === "string" && o.href.trim() ? o.href.trim() : null;
           return {
             title,
             description: typeof o.description === "string" ? o.description : "",
-            href: typeof o.href === "string" ? o.href : "#",
+            href: storedHref ?? INSTITUTION_HREFS[index] ?? "#",
             icon: typeof o.icon === "string" ? o.icon : "engineering",
             ctaLabel: typeof o.ctaLabel === "string" ? o.ctaLabel : "Explore",
             highlights: typeof o.highlights === "string" ? o.highlights : "",

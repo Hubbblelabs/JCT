@@ -40,23 +40,39 @@ export function MerittoPositioner() {
         // Skip full-screen overlays / backdrops
         if (rect.width > vw * 0.9 || rect.height > vh * 0.9) return;
 
-        // Only care about elements in the bottom-right quadrant
-        if (rect.right <= vw * 0.5) return;
+        // Only care about elements anchored near the bottom of the viewport.
+        // We intentionally do NOT restrict to the right half: Meritto drops the
+        // launcher in the bottom-LEFT by default, and we want to detect it there
+        // so we can relocate it to the bottom-right. Our own bottom-left FABs
+        // (WhatsApp / Apply) carry data-own-fixed and are excluded above.
         if (rect.bottom <= vh * 0.5) return;
 
         // --- Classify by size ---
 
-        // Launcher icon: roughly square and small (≤ 90 px in each axis)
-        const isLauncher = rect.width <= 90 && rect.height <= 90;
+        // Launcher icon: roughly square and small (≤ 120 px in each axis).
+        // Use 120 instead of 90 to tolerate widget updates that render slightly
+        // larger icons. Aspect-ratio guard (< 3) prevents wide notification
+        // bubbles from being mistaken for a launcher.
+        const aspectRatio = rect.width / rect.height;
+        const isLauncher =
+          rect.width <= 120 && rect.height <= 120 && aspectRatio < 3;
 
-        // Notification bubble: short but wider than a launcher
+        // Notification bubble: wide (> 150 px) and short (≤ 140 px).
         // Meritto's popup is typically 200–320 px wide and 60–130 px tall.
-        const isNotification = !isLauncher && rect.height <= 140;
+        const isNotification =
+          !isLauncher && rect.height <= 140 && rect.width > 150;
 
         if (isLauncher) {
-          // Move launcher to the bottom-right
+          // Move launcher to the bottom-right and ensure it's always on top.
+          // top:auto so a top-anchored default can't fight the bottom anchor.
           el.style.setProperty("right", "16px", "important");
           el.style.setProperty("left", "auto", "important");
+          el.style.setProperty("bottom", "20px", "important");
+          el.style.setProperty("top", "auto", "important");
+          el.style.setProperty("z-index", "9999", "important");
+          el.style.setProperty("opacity", "1", "important");
+          el.style.setProperty("visibility", "visible", "important");
+          el.style.setProperty("pointer-events", "auto", "important");
         } else if (isNotification) {
           // Suppress Meritto's native notification — we show our own
           suppressed.add(el);

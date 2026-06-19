@@ -11,12 +11,13 @@ function clickMerittoLauncher() {
     const style = window.getComputedStyle(el);
     if (style.position !== "fixed") continue;
     const rect = el.getBoundingClientRect();
-    // Launcher is small, square-ish, at bottom-left after repositioning
+    // Launcher is small and square-ish; the positioner has moved it to the
+    // bottom-right. Size guard (≤120) mirrors MerittoPositioner's isLauncher.
     if (
       rect.width > 0 &&
-      rect.width <= 90 &&
-      rect.height <= 90 &&
-      rect.right > window.innerWidth - 120 &&
+      rect.width <= 120 &&
+      rect.height <= 120 &&
+      rect.right > window.innerWidth - 140 &&
       rect.bottom > window.innerHeight * 0.5
     ) {
       el.click();
@@ -62,7 +63,7 @@ export function ChatbotNotification() {
           exit={{ opacity: 0, x: -8, scale: 0.96 }}
           transition={{ duration: 0.22, ease: "easeOut" }}
           // Sits just to the left of the launcher icon (16px right + ~64px icon + 8px gap)
-          className="pointer-events-auto fixed bottom-5 z-[9997] hidden md:block"
+          className="pointer-events-auto fixed bottom-20 z-[9998] sm:bottom-5"
           style={{ right: "88px" }}
           data-own-fixed
         >

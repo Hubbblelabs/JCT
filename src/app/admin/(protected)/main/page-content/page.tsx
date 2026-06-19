@@ -105,14 +105,17 @@ function CarouselSpeedInput({
 const BG_LIMIT = 6;
 const TITLE_COUNT = 3;
 
-const DEFAULT_CARD: HeroCard = {
-  title: "",
-  description: "",
-  href: "",
-  icon: "engineering",
-  ctaLabel: "Explore",
-  highlights: "",
-};
+const CARD_DEFAULTS: HeroCard[] = [
+  { title: "", description: "", href: "/institutions/engineering", icon: "engineering", ctaLabel: "Explore", highlights: "" },
+  { title: "", description: "", href: "/institutions/arts-science", icon: "arts", ctaLabel: "Explore", highlights: "" },
+  { title: "", description: "", href: "/institutions/polytechnic", icon: "polytechnic", ctaLabel: "Explore", highlights: "" },
+];
+
+const CARD_HREF_PLACEHOLDERS = [
+  "/institutions/engineering",
+  "/institutions/arts-science",
+  "/institutions/polytechnic",
+];
 
 function HomeHeroForm({
   value,
@@ -132,7 +135,7 @@ function HomeHeroForm({
   const rawCards = value.cards ?? [];
   const cards = Array.from(
     { length: 3 },
-    (_, i) => rawCards[i] ?? { ...DEFAULT_CARD },
+    (_, i) => rawCards[i] ?? { ...CARD_DEFAULTS[i] },
   );
 
   const setTitles = (next: string[]) =>
@@ -255,6 +258,17 @@ function HomeHeroForm({
                   next[i] = { ...card, title: e.target.value };
                   setCards(next);
                 }}
+              />
+              <TextInput
+                label="Link URL"
+                value={card.href}
+                onChange={(e) => {
+                  const next = [...cards];
+                  next[i] = { ...card, href: e.target.value };
+                  setCards(next);
+                }}
+                placeholder={CARD_HREF_PLACEHOLDERS[i]}
+                hint="Root-relative path to the institution page"
               />
               <TextArea
                 label="Description"
