@@ -91,10 +91,10 @@ export function ChatbotNotification() {
 
             <div className="min-w-0 flex-1">
               <p className="text-[12.5px] leading-tight font-bold text-[#0a1628]">
-                Hey! I&apos;m Jagannath
+                Hey! I&apos;m Lumina -AI
               </p>
               <p className="mt-0.5 text-[11.5px] leading-snug text-slate-500">
-                Your admission assistant
+                Your Intelligent Academic Assistant
               </p>
             </div>
 
