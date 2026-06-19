@@ -29,6 +29,7 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "upload.wikimedia.org" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "i.pravatar.cc" },
+      { protocol: "https" as const, hostname: "*.r2.dev" },
       ...(r2Host ? [{ protocol: "https" as const, hostname: r2Host }] : []),
     ],
     formats: ["image/avif", "image/webp"],
@@ -56,7 +57,7 @@ const nextConfig: NextConfig = {
       "media-src 'self' https: data:",
       "worker-src 'self' blob:",
       "manifest-src 'self'",
-      "frame-src 'self' https://*.nopaperforms.com",
+      "frame-src 'self' https://*.nopaperforms.com https://www.google.com",
     ].join("; ");
 
     const securityHeaders = [

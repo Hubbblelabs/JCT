@@ -163,11 +163,55 @@ export default function SettingsPage() {
     setRestoring(true);
     setRestoreStatus(null);
     try {
-      const body = new FormData();
-      body.append("file", restoreFile);
+      // Parse the ZIP client-side — send only structured JSON to avoid
+      // nginx body size limits that break large multipart/binary uploads.
+      const buffer = await restoreFile.arrayBuffer();
+      const zip = await JSZip.loadAsync(buffer);
+
+      const configFile = zip.file("site-config.json");
+      if (!configFile) {
+        setRestoreStatus({
+          type: "error",
+          message: "Invalid backup — missing site-config.json",
+        });
+        return;
+      }
+      const configData = JSON.parse(await configFile.async("string")) as {
+        configs?: unknown[];
+      };
+
+      let imageMeta: unknown[] | undefined;
+      const imageMetaFile = zip.file("images/_metadata.json");
+      if (imageMetaFile) {
+        try {
+          imageMeta = JSON.parse(
+            await imageMetaFile.async("string"),
+          ) as unknown[];
+        } catch {
+          // non-fatal: image metadata missing or malformed
+        }
+      }
+
+      let docMeta: unknown[] | undefined;
+      const docMetaFile = zip.file("documents/_metadata.json");
+      if (docMetaFile) {
+        try {
+          docMeta = JSON.parse(
+            await docMetaFile.async("string"),
+          ) as unknown[];
+        } catch {
+          // non-fatal: document metadata missing or malformed
+        }
+      }
+
       const res = await fetch("/api/admin/site-config/restore", {
         method: "POST",
-        body,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          configs: configData.configs ?? [],
+          imageMeta,
+          docMeta,
+        }),
       });
       const data = (await res.json()) as Record<string, unknown>;
       if (!res.ok) {
