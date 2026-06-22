@@ -57,7 +57,7 @@ const nextConfig: NextConfig = {
       "media-src 'self' https: data:",
       "worker-src 'self' blob:",
       "manifest-src 'self'",
-      "frame-src 'self' https://*.nopaperforms.com https://www.google.com",
+      "frame-src 'self' https://*.nopaperforms.com https://www.google.com https://www.gstatic.com https://www.youtube.com",
     ].join("; ");
 
     const securityHeaders = [
