@@ -3250,6 +3250,7 @@ export type RecruitersSectionStat = {
   label: string;
 };
 export type RecruitersSectionVal = {
+  show_section?: boolean;
   eyebrow?: string;
   title?: string;
   titleHighlight?: string;
@@ -3268,6 +3269,17 @@ export function RecruitersSectionForm({
   const atMax = stats.length >= RECRUITERS_SECTION_LIMITS.statsMax;
   return (
     <div className="space-y-4">
+      <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 p-3">
+        <input
+          type="checkbox"
+          checked={value.show_section !== false}
+          onChange={(e) => onChange({ ...value, show_section: e.target.checked })}
+          className="h-4 w-4 rounded border-gray-300 accent-amber-500"
+        />
+        <span className="text-sm font-medium text-gray-700">
+          Show Placement Highlights section on public pages
+        </span>
+      </label>
       <div className="grid grid-cols-2 gap-3">
         <TextInput
           label="Eyebrow"

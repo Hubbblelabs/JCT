@@ -51,6 +51,7 @@ export const RECRUITERS_SECTION_LIMITS = {
 } as const;
 
 export const RecruitersSectionSchema = z.object({
+  show_section: z.boolean().default(true),
   eyebrow: zOptionalString(RECRUITERS_SECTION_LIMITS.eyebrowMax).default(""),
   title: zOptionalString(RECRUITERS_SECTION_LIMITS.titleMax).default(""),
   titleHighlight: zOptionalString(

@@ -153,9 +153,9 @@ export function AdmissionProcess() {
                     {block.title}
                   </h4>
                   <ul className="space-y-3">
-                    {block.items.map((item) => (
+                    {block.items.map((item, index) => (
                       <li
-                        key={item}
+                        key={`${item}-${index}`}
                         className="flex items-start gap-2.5 text-[0.925rem] leading-relaxed text-slate-600"
                       >
                         <CheckCircle2

@@ -11,6 +11,7 @@ import { useSiteConfig } from "@/lib/use-site-config";
 type Company = { name: string; logo: string };
 type SectionStat = { icon: string; value: string; label: string };
 type RecruitersSection = {
+  show_section: boolean;
   eyebrow: string;
   title: string;
   titleHighlight: string;
@@ -37,6 +38,7 @@ function normalizeSection(raw: unknown): RecruitersSection | null {
         .filter((x): x is SectionStat => x !== null)
     : [];
   return {
+    show_section: r.show_section !== false,
     eyebrow: typeof r.eyebrow === "string" ? r.eyebrow : "",
     title: typeof r.title === "string" ? r.title : "",
     titleHighlight:
@@ -106,7 +108,7 @@ export function Placements() {
     );
   }
 
-  if (!section) return null;
+  if (!section || !section.show_section) return null;
 
   return (
     <section
