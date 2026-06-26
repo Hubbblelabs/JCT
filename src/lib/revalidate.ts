@@ -9,7 +9,7 @@ export type RevalidateTarget =
   | "all-institutions";
 
 const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
-  home: ["/", "/campus-life"],
+  home: ["/", "/campus-life", "/about-us"],
   engineering: [
     "/institutions/engineering",
     "/institutions/engineering/programs",
@@ -79,6 +79,7 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   polytechnicHero: ["polytechnic"],
   polytechnicCampusLife: ["polytechnic"],
   polytechnicAdmissions: ["polytechnic"],
+  mainAbout: ["home"],
   engineeringAbout: ["engineering"],
   artsScienceAbout: ["arts-science"],
   polytechnicAbout: ["polytechnic"],

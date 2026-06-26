@@ -43,7 +43,7 @@ import {
   type SidebarNavDefault,
 } from "@/lib/sidebar-nav";
 
-type Institution = "engineering" | "arts-science" | "polytechnic";
+type Institution = "main" | "engineering" | "arts-science" | "polytechnic";
 
 // ─── Editable sections ───────────────────────────────────────────────────────
 
@@ -110,6 +110,20 @@ type ThemeTokens = {
 };
 
 const THEME: Record<Institution, ThemeTokens> = {
+  main: {
+    themeClass: "",
+    accentText: "text-gold",
+    iconBg20: "bg-gold/20 text-gold",
+    iconBg15: "bg-gold/15 text-gold",
+    softBg5: "bg-gold/5",
+    border20: "border-gold/20",
+    border50: "border-gold/50",
+    valueHover: "hover:border-gold/20 hover:bg-gold/5",
+    navActive: "bg-gold/15 text-gold",
+    navActivePill: "border-gold bg-gold/15 text-gold",
+    accentDot: "bg-gold",
+    ctaBtn: "bg-gold text-navy hover:bg-[#e8b84a]",
+  },
   engineering: {
     themeClass: "",
     accentText: "text-gold",
@@ -160,6 +174,11 @@ const INSTITUTION_META: Record<
   Institution,
   { label: string; breadcrumbHref: string; whyTitle: string }
 > = {
+  main: {
+    label: "JCT Institutions",
+    breadcrumbHref: "/",
+    whyTitle: "Why Choose JCT?",
+  },
   engineering: {
     label: "Engineering",
     breadcrumbHref: "/institutions/engineering",
@@ -506,11 +525,15 @@ export function AboutPageLayout({
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
         <Breadcrumb
-          items={[
-            { label: "Institutions", href: "/institutions" },
-            { label: meta.label, href: meta.breadcrumbHref },
-            { label: "About" },
-          ]}
+          items={
+            institution === "main"
+              ? [{ label: "Home", href: "/" }, { label: "About Us" }]
+              : [
+                  { label: "Institutions", href: "/institutions" },
+                  { label: meta.label, href: meta.breadcrumbHref },
+                  { label: "About" },
+                ]
+          }
         />
 
         <div id="mobile-nav-container" className="mt-8 lg:hidden">

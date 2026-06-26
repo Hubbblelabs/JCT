@@ -218,6 +218,46 @@ export const PolytechnicAboutSchema = z.object({
 
 export type PolytechnicAboutValue = z.infer<typeof PolytechnicAboutSchema>;
 
+// ─── Main (JCT Group) About ──────────────────────────────────────────────────
+// Same shape as institution About pages — sections like HOD and Governing
+// Council will simply be empty and hidden on the public page.
+
+export const MainAboutSchema = z.object({
+  hero: z
+    .object({
+      title: s(200),
+      subtitle: s(500),
+    })
+    .default({ title: "", subtitle: "" }),
+  about: InstitutionInfoSchema.default({ paragraphs: [], stats: [] }),
+  visionMission: VisionMissionSchema.default({
+    visionText: "",
+    missionPoints: [],
+    qualityPolicy: "",
+  }),
+  principal: PrincipalSchema.default({
+    name: "",
+    role: "",
+    institution: "",
+    image: "",
+    quote: "",
+    messages: [],
+  }),
+  management: ManagementSchema.default({ description: "", members: [] }),
+  hod: HodSchema.default({ description: "", members: [] }),
+  governingCouncil: GoverningCouncilSchema.default({
+    description: "",
+    members: [],
+  }),
+  coreValues: z.array(ValueItemSchema).default([]),
+  accreditations: z.array(AccreditationSchema).default([]),
+  campusHighlights: z.array(HighlightSchema).default([]),
+  whyJct: z.array(s(300)).default([]),
+  sidebar: AboutSidebarSchema.default(ABOUT_SIDEBAR_DEFAULT),
+});
+
+export type MainAboutValue = z.infer<typeof MainAboutSchema>;
+
 // ─── COE Page ─────────────────────────────────────────────────────────────────
 
 const CoePhaseSchema = z.object({

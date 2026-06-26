@@ -13,6 +13,7 @@ import {
   EngineeringAboutSchema,
   ArtsScienceAboutSchema,
   PolytechnicAboutSchema,
+  MainAboutSchema,
 } from "@/lib/validation";
 import type { AboutPageValue } from "@/lib/validation";
 import {
@@ -20,7 +21,7 @@ import {
   useDeferredUploads,
 } from "@/lib/deferred-uploads";
 
-type Institution = "engineering" | "arts-science" | "polytechnic";
+type Institution = "main" | "engineering" | "arts-science" | "polytechnic";
 
 const INSTITUTION_MAP: Record<
   string,
@@ -31,6 +32,12 @@ const INSTITUTION_MAP: Record<
     label: string;
   }
 > = {
+  main: {
+    institution: "main",
+    configKey: "mainAbout",
+    publicPath: "/about-us",
+    label: "JCT Institutions",
+  },
   engineering: {
     institution: "engineering",
     configKey: "engineeringAbout",
@@ -52,6 +59,8 @@ const INSTITUTION_MAP: Record<
 };
 
 function getDefaultDraft(institution: Institution): AboutPageValue {
+  if (institution === "main")
+    return MainAboutSchema.parse({}) as AboutPageValue;
   if (institution === "arts-science")
     return ArtsScienceAboutSchema.parse({}) as AboutPageValue;
   if (institution === "polytechnic")

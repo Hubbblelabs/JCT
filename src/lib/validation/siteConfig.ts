@@ -12,6 +12,7 @@ import {
   EngineeringAboutSchema,
   ArtsScienceAboutSchema,
   PolytechnicAboutSchema,
+  MainAboutSchema,
   CoePageSchema,
 } from "./aboutPage";
 import { AnnouncementSchema } from "./announcement";
@@ -84,6 +85,7 @@ export const SITE_CONFIG_SCHEMAS = {
   polytechnicNavbar: NavbarSchema,
   footer: FooterSchema,
   floatingElements: FloatingElementsSchema,
+  mainAbout: MainAboutSchema,
   engineeringAbout: EngineeringAboutSchema,
   artsScienceAbout: ArtsScienceAboutSchema,
   polytechnicAbout: PolytechnicAboutSchema,

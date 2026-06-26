@@ -230,12 +230,14 @@ export {
   EngineeringAboutSchema,
   ArtsScienceAboutSchema,
   PolytechnicAboutSchema,
+  MainAboutSchema,
   CoePageSchema,
 } from "./aboutPage";
 export type {
   EngineeringAboutValue,
   ArtsScienceAboutValue,
   PolytechnicAboutValue,
+  MainAboutValue,
   CoePageValue,
   AboutPageValue,
 } from "./aboutPage";

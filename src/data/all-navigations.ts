@@ -40,10 +40,10 @@ export const mainNavigation: NavItem[] = [
       },
     ],
   },
+  { name: "About Us", href: "/about-us" },
   { name: "Admissions", href: "/#admissions" },
   { name: "Placements", href: "/#placements" },
   { name: "Life @ JCT", href: "/#campus-life" },
- 
 ];
 
 export const engineeringNavigation: NavItem[] = [

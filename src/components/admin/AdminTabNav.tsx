@@ -225,6 +225,11 @@ const MAIN_ITEMS: NavItem[] = [
     icon: ClipboardList,
   },
   {
+    label: "About Us",
+    href: "/admin/about?college=main",
+    icon: Info,
+  },
+  {
     label: "Campus Life",
     href: "/admin/campus-life",
     icon: TreePalm,
