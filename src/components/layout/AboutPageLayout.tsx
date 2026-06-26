@@ -487,11 +487,6 @@ export function AboutPageLayout({
     ABOUT_NAV_DEFAULTS,
     data.sidebar.navItems,
   );
-  const visibleBuiltins = new Set(
-    resolved
-      .filter((r) => !r.customHref && !r.customSection)
-      .map((r) => r.anchor),
-  );
   const customSections = resolved.filter((r) => r.customSection);
 
   // In editable mode every section stays visible so it can be selected.
@@ -501,6 +496,44 @@ export function AboutPageLayout({
       : activeId === anchor
         ? "block opacity-100"
         : "hidden lg:block lg:opacity-100";
+
+  const sectionHasContent = (anchor: string): boolean => {
+    switch (anchor) {
+      case "about":
+        return data.about.paragraphs.some((p) => p.trim() !== "");
+      case "vision":
+        return (
+          data.visionMission.visionText.trim() !== "" ||
+          data.visionMission.missionPoints.length > 0
+        );
+      case "principal":
+        return data.principal.name.trim() !== "";
+      case "management":
+        return data.management.members.length > 0;
+      case "hod":
+        return data.hod.members.length > 0;
+      case "governing-council":
+        return data.governingCouncil.members.length > 0;
+      case "core-values":
+        return data.coreValues.length > 0;
+      case "accreditations":
+        return data.accreditations.length > 0;
+      case "campus":
+        return data.campusHighlights.length > 0;
+      case "why-jct":
+        return data.whyJct.length > 0;
+      default:
+        return true;
+    }
+  };
+
+  // Anchors the sidebar nav will show — filtered by content in view mode.
+  const visibleBuiltins = new Set(
+    resolved
+      .filter((r) => !r.customHref && !r.customSection)
+      .filter((r) => editable || sectionHasContent(r.anchor))
+      .map((r) => r.anchor),
+  );
 
   const sectionVis = (anchor: string) => {
     if (!editable && !visibleBuiltins.has(anchor)) return "hidden";
