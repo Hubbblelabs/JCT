@@ -220,18 +220,25 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     for (const seed of SEEDS) {
-      const set: Record<string, unknown> = {
+      const fields: Record<string, unknown> = {
         value: seed.value,
         updated_by: session!.user?.email ?? "",
         status: seed.publish ? "published" : "draft",
       };
-      if (seed.publish) set.published_value = seed.value;
+      if (seed.publish) fields.published_value = seed.value;
 
-      await SiteConfig.findOneAndUpdate(
-        { config_key: seed.config_key },
-        { $set: set, $inc: { version: 1 } },
-        { upsert: true, new: true },
-      );
+      // publish:true  → always overwrite (admin is explicitly re-seeding live content)
+      // publish:false → only insert if the doc is missing; never clobber published content
+      const update = seed.publish
+        ? { $set: fields, $inc: { version: 1 } }
+        : {
+            $setOnInsert: { config_key: seed.config_key, version: 1, ...fields },
+          };
+
+      await SiteConfig.findOneAndUpdate({ config_key: seed.config_key }, update, {
+        upsert: true,
+        new: true,
+      });
       revalidateForConfigKey(seed.config_key);
     }
 
