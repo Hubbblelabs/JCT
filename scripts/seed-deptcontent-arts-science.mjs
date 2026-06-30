@@ -49,16 +49,66 @@ if (!uri) {
 // ─── Shared UG programme outcomes (Programme Outcomes per NEP/NAAC pattern) ──
 
 const UG_POS = [
-  { code: "PO1", title: "Disciplinary Knowledge", description: "Capability of demonstrating comprehensive knowledge of the discipline and an understanding of one or more domains which form part of an interdisciplinary field of study." },
-  { code: "PO2", title: "Critical Thinking", description: "Capability to apply analytic thought to a body of knowledge; analyse and evaluate evidence, arguments, claims, beliefs on the basis of empirical evidence; identify relevant assumptions or implications; formulate coherent arguments; critically evaluate practices, policies and theories by following scientific approach to knowledge development." },
-  { code: "PO3", title: "Problem Solving", description: "Capacity to extrapolate from what one has learned and apply their competencies to solve different kinds of non-familiar problems, rather than replicate curriculum content knowledge." },
-  { code: "PO4", title: "Analytical Reasoning", description: "Ability to evaluate the reliability and relevance of evidence; identify logical flaws and holes in the arguments of others; analyze and synthesize data from a variety of sources; draw valid conclusions and support them with evidence and examples and addressing opposing viewpoints." },
-  { code: "PO5", title: "Research-related Skills", description: "A sense of inquiry and capability for asking relevant/appropriate questions, problematising, synthesising and articulating; ability to recognise cause-and-effect relationships, define problems, formulate hypotheses, test hypotheses, analyse, interpret and draw conclusions from data; predict cause-and-effect relationships; ability to plan, execute and report the results of an experiment or investigation." },
-  { code: "PO6", title: "Transdisciplinary", description: "Ability to identify, evaluate, and apply theories, methodologies and frameworks developed across disciplines." },
-  { code: "PO7", title: "Personal and Professional Competence", description: "Ability to lead and work in teams, to manage projects and to communicate effectively." },
-  { code: "PO8", title: "Communication Skills", description: "Ability to express thoughts and ideas effectively in writing and orally; communicate with others using appropriate media; confidently share one's views and express herself/himself." },
-  { code: "PO9", title: "Moral and Ethical Awareness/Reasoning", description: "Ability to embrace moral/ethical values in conducting one's life, formulate a position/argument about an ethical issue from multiple perspectives, and use ethical practices in all work." },
-  { code: "PO10", title: "Lifelong Learning", description: "Ability to acquire knowledge and skills, including 'learning how to learn', that are necessary for participating in learning activities throughout life, through self-paced and self-directed learning aimed at personal development, meeting economic, social and cultural objectives." },
+  {
+    code: "PO1",
+    title: "Disciplinary Knowledge",
+    description:
+      "Capability of demonstrating comprehensive knowledge of the discipline and an understanding of one or more domains which form part of an interdisciplinary field of study.",
+  },
+  {
+    code: "PO2",
+    title: "Critical Thinking",
+    description:
+      "Capability to apply analytic thought to a body of knowledge; analyse and evaluate evidence, arguments, claims, beliefs on the basis of empirical evidence; identify relevant assumptions or implications; formulate coherent arguments; critically evaluate practices, policies and theories by following scientific approach to knowledge development.",
+  },
+  {
+    code: "PO3",
+    title: "Problem Solving",
+    description:
+      "Capacity to extrapolate from what one has learned and apply their competencies to solve different kinds of non-familiar problems, rather than replicate curriculum content knowledge.",
+  },
+  {
+    code: "PO4",
+    title: "Analytical Reasoning",
+    description:
+      "Ability to evaluate the reliability and relevance of evidence; identify logical flaws and holes in the arguments of others; analyze and synthesize data from a variety of sources; draw valid conclusions and support them with evidence and examples and addressing opposing viewpoints.",
+  },
+  {
+    code: "PO5",
+    title: "Research-related Skills",
+    description:
+      "A sense of inquiry and capability for asking relevant/appropriate questions, problematising, synthesising and articulating; ability to recognise cause-and-effect relationships, define problems, formulate hypotheses, test hypotheses, analyse, interpret and draw conclusions from data; predict cause-and-effect relationships; ability to plan, execute and report the results of an experiment or investigation.",
+  },
+  {
+    code: "PO6",
+    title: "Transdisciplinary",
+    description:
+      "Ability to identify, evaluate, and apply theories, methodologies and frameworks developed across disciplines.",
+  },
+  {
+    code: "PO7",
+    title: "Personal and Professional Competence",
+    description:
+      "Ability to lead and work in teams, to manage projects and to communicate effectively.",
+  },
+  {
+    code: "PO8",
+    title: "Communication Skills",
+    description:
+      "Ability to express thoughts and ideas effectively in writing and orally; communicate with others using appropriate media; confidently share one's views and express herself/himself.",
+  },
+  {
+    code: "PO9",
+    title: "Moral and Ethical Awareness/Reasoning",
+    description:
+      "Ability to embrace moral/ethical values in conducting one's life, formulate a position/argument about an ethical issue from multiple perspectives, and use ethical practices in all work.",
+  },
+  {
+    code: "PO10",
+    title: "Lifelong Learning",
+    description:
+      "Ability to acquire knowledge and skills, including 'learning how to learn', that are necessary for participating in learning activities throughout life, through self-paced and self-directed learning aimed at personal development, meeting economic, social and cultural objectives.",
+  },
 ];
 
 // ─── Program data ─────────────────────────────────────────────────────────────
@@ -123,8 +173,18 @@ const PROGRAMS = [
 
       programOutcomes: [
         ...UG_POS,
-        { code: "PSO1", title: "Core CS Competency", description: "Graduates will demonstrate proficiency in programming, data structures, algorithms, databases and software development practices." },
-        { code: "PSO2", title: "Technology Adaptation", description: "Graduates will be able to apply current and emerging computing technologies to solve real-world problems." },
+        {
+          code: "PSO1",
+          title: "Core CS Competency",
+          description:
+            "Graduates will demonstrate proficiency in programming, data structures, algorithms, databases and software development practices.",
+        },
+        {
+          code: "PSO2",
+          title: "Technology Adaptation",
+          description:
+            "Graduates will be able to apply current and emerging computing technologies to solve real-world problems.",
+        },
       ],
 
       advisoryBoard: [],
@@ -134,11 +194,36 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "Programming Laboratory", description: "Facilities for programming in C, C++, Java, Python with modern IDEs.", equipment: [] },
-        { name: "Database Laboratory", description: "Oracle, MySQL and PostgreSQL for relational database management and SQL practice.", equipment: [] },
-        { name: "Web Technology Laboratory", description: "HTML, CSS, JavaScript, PHP and frameworks for full-stack web development.", equipment: [] },
-        { name: "Network Laboratory", description: "Networking devices and simulation software for computer network experiments.", equipment: [] },
-        { name: "Project Laboratory", description: "Dedicated computing resources for final year project development and testing.", equipment: [] },
+        {
+          name: "Programming Laboratory",
+          description:
+            "Facilities for programming in C, C++, Java, Python with modern IDEs.",
+          equipment: [],
+        },
+        {
+          name: "Database Laboratory",
+          description:
+            "Oracle, MySQL and PostgreSQL for relational database management and SQL practice.",
+          equipment: [],
+        },
+        {
+          name: "Web Technology Laboratory",
+          description:
+            "HTML, CSS, JavaScript, PHP and frameworks for full-stack web development.",
+          equipment: [],
+        },
+        {
+          name: "Network Laboratory",
+          description:
+            "Networking devices and simulation software for computer network experiments.",
+          equipment: [],
+        },
+        {
+          name: "Project Laboratory",
+          description:
+            "Dedicated computing resources for final year project development and testing.",
+          equipment: [],
+        },
       ],
 
       teachingLearning: { overview: "", methods: [], tools: [], practices: [] },
@@ -149,16 +234,36 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["TCS", "Infosys", "Wipro", "Cognizant", "HCL Technologies", "Tech Mahindra"],
-        higherStudies: ["M.Sc. Computer Science", "MCA", "MBA", "M.Tech. (Lateral Entry)"],
+        topRecruiters: [
+          "TCS",
+          "Infosys",
+          "Wipro",
+          "Cognizant",
+          "HCL Technologies",
+          "Tech Mahindra",
+        ],
+        higherStudies: [
+          "M.Sc. Computer Science",
+          "MCA",
+          "MBA",
+          "M.Tech. (Lateral Entry)",
+        ],
         averagePackage: "3 LPA",
         placementRate: "85%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2014" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Bharathiar University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Bharathiar University",
+        },
         { icon: "Clock", label: "Duration", value: "3 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "85%" },
@@ -226,8 +331,18 @@ const PROGRAMS = [
 
       programOutcomes: [
         ...UG_POS,
-        { code: "PSO1", title: "AI/ML Application", description: "Graduates will apply machine learning algorithms, statistical tools and AI frameworks to analyse data and build intelligent systems." },
-        { code: "PSO2", title: "Data-Driven Problem Solving", description: "Graduates will use data science methodologies to identify patterns, extract insights and deliver solutions across various industry domains." },
+        {
+          code: "PSO1",
+          title: "AI/ML Application",
+          description:
+            "Graduates will apply machine learning algorithms, statistical tools and AI frameworks to analyse data and build intelligent systems.",
+        },
+        {
+          code: "PSO2",
+          title: "Data-Driven Problem Solving",
+          description:
+            "Graduates will use data science methodologies to identify patterns, extract insights and deliver solutions across various industry domains.",
+        },
       ],
 
       advisoryBoard: [],
@@ -237,14 +352,44 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "Machine Learning Laboratory", description: "Python, TensorFlow, PyTorch and scikit-learn for building and evaluating ML models.", equipment: ["Python", "TensorFlow", "PyTorch", "scikit-learn"] },
-        { name: "Data Analytics Laboratory", description: "R, Pandas, NumPy and Jupyter notebooks for data analysis and visualization.", equipment: ["R", "Pandas", "NumPy", "Jupyter"] },
-        { name: "Deep Learning Laboratory", description: "GPU-enabled workstations for training deep neural networks.", equipment: [] },
-        { name: "Natural Language Processing Laboratory", description: "Tools and corpora for NLP, sentiment analysis and text classification.", equipment: [] },
-        { name: "Big Data Laboratory", description: "Hadoop, Spark and cloud computing platforms for large-scale data processing.", equipment: ["Hadoop", "Spark"] },
+        {
+          name: "Machine Learning Laboratory",
+          description:
+            "Python, TensorFlow, PyTorch and scikit-learn for building and evaluating ML models.",
+          equipment: ["Python", "TensorFlow", "PyTorch", "scikit-learn"],
+        },
+        {
+          name: "Data Analytics Laboratory",
+          description:
+            "R, Pandas, NumPy and Jupyter notebooks for data analysis and visualization.",
+          equipment: ["R", "Pandas", "NumPy", "Jupyter"],
+        },
+        {
+          name: "Deep Learning Laboratory",
+          description:
+            "GPU-enabled workstations for training deep neural networks.",
+          equipment: [],
+        },
+        {
+          name: "Natural Language Processing Laboratory",
+          description:
+            "Tools and corpora for NLP, sentiment analysis and text classification.",
+          equipment: [],
+        },
+        {
+          name: "Big Data Laboratory",
+          description:
+            "Hadoop, Spark and cloud computing platforms for large-scale data processing.",
+          equipment: ["Hadoop", "Spark"],
+        },
       ],
 
-      teachingLearning: { overview: "", methods: [], tools: ["Python", "TensorFlow", "R", "Jupyter"], practices: [] },
+      teachingLearning: {
+        overview: "",
+        methods: [],
+        tools: ["Python", "TensorFlow", "R", "Jupyter"],
+        practices: [],
+      },
       valueAddedCourses: [],
       events: [],
       studentParticipation: { clubs: [], highlights: [] },
@@ -252,16 +397,37 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["Amazon", "Google", "Microsoft", "Zoho", "Freshworks", "Analytics Companies", "Healthcare IT Firms"],
-        higherStudies: ["M.Sc. Data Science / AI", "M.Tech. Machine Learning", "MBA Analytics", "PhD in AI/ML"],
+        topRecruiters: [
+          "Amazon",
+          "Google",
+          "Microsoft",
+          "Zoho",
+          "Freshworks",
+          "Analytics Companies",
+          "Healthcare IT Firms",
+        ],
+        higherStudies: [
+          "M.Sc. Data Science / AI",
+          "M.Tech. Machine Learning",
+          "MBA Analytics",
+          "PhD in AI/ML",
+        ],
         averagePackage: "4 LPA",
         placementRate: "88%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2021" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Bharathiar University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Bharathiar University",
+        },
         { icon: "Clock", label: "Duration", value: "3 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "88%" },
@@ -328,8 +494,18 @@ const PROGRAMS = [
 
       programOutcomes: [
         ...UG_POS,
-        { code: "PSO1", title: "Application Development", description: "Graduates will design, develop and test software applications using industry-standard programming languages, frameworks and tools." },
-        { code: "PSO2", title: "IT Problem Solving", description: "Graduates will apply knowledge of data structures, databases and networking to analyse and solve problems in real-world IT environments." },
+        {
+          code: "PSO1",
+          title: "Application Development",
+          description:
+            "Graduates will design, develop and test software applications using industry-standard programming languages, frameworks and tools.",
+        },
+        {
+          code: "PSO2",
+          title: "IT Problem Solving",
+          description:
+            "Graduates will apply knowledge of data structures, databases and networking to analyse and solve problems in real-world IT environments.",
+        },
       ],
 
       advisoryBoard: [],
@@ -339,14 +515,44 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "C & C++ Programming Laboratory", description: "Facilities for structured programming and object-oriented programming practice.", equipment: [] },
-        { name: "Java Laboratory", description: "Java SE/EE programming, applets and enterprise application development.", equipment: [] },
-        { name: "Database Management Laboratory", description: "SQL, PL/SQL and database design experiments using Oracle/MySQL.", equipment: [] },
-        { name: "Networking Laboratory", description: "LAN configuration, protocol analysis and network simulation tools.", equipment: [] },
-        { name: "Web Development Laboratory", description: "HTML, CSS, JavaScript, PHP for front-end and back-end web development.", equipment: [] },
+        {
+          name: "C & C++ Programming Laboratory",
+          description:
+            "Facilities for structured programming and object-oriented programming practice.",
+          equipment: [],
+        },
+        {
+          name: "Java Laboratory",
+          description:
+            "Java SE/EE programming, applets and enterprise application development.",
+          equipment: [],
+        },
+        {
+          name: "Database Management Laboratory",
+          description:
+            "SQL, PL/SQL and database design experiments using Oracle/MySQL.",
+          equipment: [],
+        },
+        {
+          name: "Networking Laboratory",
+          description:
+            "LAN configuration, protocol analysis and network simulation tools.",
+          equipment: [],
+        },
+        {
+          name: "Web Development Laboratory",
+          description:
+            "HTML, CSS, JavaScript, PHP for front-end and back-end web development.",
+          equipment: [],
+        },
       ],
 
-      teachingLearning: { overview: "", methods: [], tools: ["Java", "C/C++", "MySQL"], practices: [] },
+      teachingLearning: {
+        overview: "",
+        methods: [],
+        tools: ["Java", "C/C++", "MySQL"],
+        practices: [],
+      },
       valueAddedCourses: [],
       events: [],
       studentParticipation: { clubs: [], highlights: [] },
@@ -354,16 +560,37 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["TCS", "Infosys", "Wipro", "Cognizant", "HCL", "Capgemini", "NIIT Technologies"],
-        higherStudies: ["MCA", "M.Sc. Computer Science", "M.Tech. (Lateral Entry)", "MBA"],
+        topRecruiters: [
+          "TCS",
+          "Infosys",
+          "Wipro",
+          "Cognizant",
+          "HCL",
+          "Capgemini",
+          "NIIT Technologies",
+        ],
+        higherStudies: [
+          "MCA",
+          "M.Sc. Computer Science",
+          "M.Tech. (Lateral Entry)",
+          "MBA",
+        ],
         averagePackage: "3 LPA",
         placementRate: "85%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2014" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Bharathiar University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Bharathiar University",
+        },
         { icon: "Clock", label: "Duration", value: "3 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "85%" },
@@ -431,8 +658,18 @@ const PROGRAMS = [
 
       programOutcomes: [
         ...UG_POS,
-        { code: "PSO1", title: "Commerce & Finance Competency", description: "Graduates will demonstrate knowledge of accounting, finance, auditing, taxation and business laws applicable in diverse commercial settings." },
-        { code: "PSO2", title: "Logistics & SCM Expertise", description: "Graduates will apply logistics and supply chain management principles supported by IT tools to optimise business operations." },
+        {
+          code: "PSO1",
+          title: "Commerce & Finance Competency",
+          description:
+            "Graduates will demonstrate knowledge of accounting, finance, auditing, taxation and business laws applicable in diverse commercial settings.",
+        },
+        {
+          code: "PSO2",
+          title: "Logistics & SCM Expertise",
+          description:
+            "Graduates will apply logistics and supply chain management principles supported by IT tools to optimise business operations.",
+        },
       ],
 
       advisoryBoard: [],
@@ -442,12 +679,31 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "Tally Laboratory", description: "Tally ERP for accounting, inventory and GST practice.", equipment: ["Tally ERP"] },
-        { name: "Commerce Computing Laboratory", description: "MS Office, Excel and business software tools for commerce applications.", equipment: ["MS Excel", "MS Word"] },
-        { name: "Logistics Simulation Lab", description: "Supply chain simulation and logistics planning software.", equipment: [] },
+        {
+          name: "Tally Laboratory",
+          description: "Tally ERP for accounting, inventory and GST practice.",
+          equipment: ["Tally ERP"],
+        },
+        {
+          name: "Commerce Computing Laboratory",
+          description:
+            "MS Office, Excel and business software tools for commerce applications.",
+          equipment: ["MS Excel", "MS Word"],
+        },
+        {
+          name: "Logistics Simulation Lab",
+          description:
+            "Supply chain simulation and logistics planning software.",
+          equipment: [],
+        },
       ],
 
-      teachingLearning: { overview: "", methods: [], tools: ["Tally ERP", "MS Excel"], practices: [] },
+      teachingLearning: {
+        overview: "",
+        methods: [],
+        tools: ["Tally ERP", "MS Excel"],
+        practices: [],
+      },
       valueAddedCourses: [],
       events: [],
       studentParticipation: { clubs: [], highlights: [] },
@@ -455,16 +711,37 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["DHL", "FedEx", "Maersk", "Container Corporation of India", "Flipkart", "Amazon Logistics", "Local Trading Firms"],
-        higherStudies: ["M.Com.", "MBA (Logistics / Finance)", "PGDM", "CA / CMA (Foundation)"],
+        topRecruiters: [
+          "DHL",
+          "FedEx",
+          "Maersk",
+          "Container Corporation of India",
+          "Flipkart",
+          "Amazon Logistics",
+          "Local Trading Firms",
+        ],
+        higherStudies: [
+          "M.Com.",
+          "MBA (Logistics / Finance)",
+          "PGDM",
+          "CA / CMA (Foundation)",
+        ],
         averagePackage: "3 LPA",
         placementRate: "83%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2014" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Bharathiar University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Bharathiar University",
+        },
         { icon: "Clock", label: "Duration", value: "3 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "83%" },
@@ -532,8 +809,18 @@ const PROGRAMS = [
 
       programOutcomes: [
         ...UG_POS,
-        { code: "PSO1", title: "Logistics Management", description: "Graduates will plan, design and manage logistics operations including transportation, warehousing, inventory and supply chain coordination." },
-        { code: "PSO2", title: "Business Decision-Making", description: "Graduates will apply management principles, analytical tools and research methodologies to make effective decisions in business and logistics contexts." },
+        {
+          code: "PSO1",
+          title: "Logistics Management",
+          description:
+            "Graduates will plan, design and manage logistics operations including transportation, warehousing, inventory and supply chain coordination.",
+        },
+        {
+          code: "PSO2",
+          title: "Business Decision-Making",
+          description:
+            "Graduates will apply management principles, analytical tools and research methodologies to make effective decisions in business and logistics contexts.",
+        },
       ],
 
       advisoryBoard: [],
@@ -543,11 +830,26 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "Business Computing Laboratory", description: "MS Office, ERP and business intelligence tools for management applications.", equipment: ["MS Office", "ERP Software"] },
-        { name: "Logistics Simulation Laboratory", description: "Supply chain and logistics planning simulation software and case study materials.", equipment: [] },
+        {
+          name: "Business Computing Laboratory",
+          description:
+            "MS Office, ERP and business intelligence tools for management applications.",
+          equipment: ["MS Office", "ERP Software"],
+        },
+        {
+          name: "Logistics Simulation Laboratory",
+          description:
+            "Supply chain and logistics planning simulation software and case study materials.",
+          equipment: [],
+        },
       ],
 
-      teachingLearning: { overview: "", methods: [], tools: ["MS Office", "ERP Software"], practices: [] },
+      teachingLearning: {
+        overview: "",
+        methods: [],
+        tools: ["MS Office", "ERP Software"],
+        practices: [],
+      },
       valueAddedCourses: [],
       events: [],
       studentParticipation: { clubs: [], highlights: [] },
@@ -555,16 +857,38 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["DHL", "Maersk", "Blue Dart", "Delhivery", "DTDC", "Amazon Logistics", "Flipkart", "Local Logistics Firms"],
-        higherStudies: ["MBA (Logistics / Operations)", "PGDM", "M.Com.", "MBA Marketing / HR"],
+        topRecruiters: [
+          "DHL",
+          "Maersk",
+          "Blue Dart",
+          "Delhivery",
+          "DTDC",
+          "Amazon Logistics",
+          "Flipkart",
+          "Local Logistics Firms",
+        ],
+        higherStudies: [
+          "MBA (Logistics / Operations)",
+          "PGDM",
+          "M.Com.",
+          "MBA Marketing / HR",
+        ],
         averagePackage: "3 LPA",
         placementRate: "82%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2014" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Bharathiar University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Bharathiar University",
+        },
         { icon: "Clock", label: "Duration", value: "3 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "82%" },
@@ -576,14 +900,18 @@ const PROGRAMS = [
 // ─── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log(`\nArts & Science Dept Content Seed — ${DRY_RUN ? "DRY RUN" : "LIVE"}`);
+  console.log(
+    `\nArts & Science Dept Content Seed — ${DRY_RUN ? "DRY RUN" : "LIVE"}`,
+  );
   console.log(`Target slugs: ${PROGRAMS.map((p) => p.slug).join(", ")}\n`);
 
   if (DRY_RUN) {
     console.log("Dry-run mode: no changes will be written to the database.");
     console.log("Re-run without --dry-run to apply.\n");
     for (const p of PROGRAMS) {
-      console.log(`  • ${p.name} (slug: ${p.slug}, degree: ${p.degree}, seats: ${p.seats})`);
+      console.log(
+        `  • ${p.name} (slug: ${p.slug}, degree: ${p.degree}, seats: ${p.seats})`,
+      );
     }
     return;
   }

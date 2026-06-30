@@ -3,7 +3,10 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/mongodb";
 import { User } from "@/lib/models";
-import { consumeLoginAttempt, consumeLoginAttemptByEmail } from "@/lib/rate-limit";
+import {
+  consumeLoginAttempt,
+  consumeLoginAttemptByEmail,
+} from "@/lib/rate-limit";
 
 // A fixed bcrypt hash of a random string. Compared against the supplied
 // password when no user is found so the response takes the same ~bcrypt time
@@ -72,7 +75,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           const limit = consumeLoginAttempt(`${ip}|${email}`);
           const emailLimit = consumeLoginAttemptByEmail(email);
           if (!limit.allowed || !emailLimit.allowed) {
-            const retry = Math.max(limit.retryAfterSec, emailLimit.retryAfterSec);
+            const retry = Math.max(
+              limit.retryAfterSec,
+              emailLimit.retryAfterSec,
+            );
             console.warn(
               `[auth] Rate limit exceeded for ${email} from ${ip}; retry in ${retry}s`,
             );
@@ -89,7 +95,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           if (!user) {
             // Spend the same time as a real bcrypt compare so response timing
             // doesn't reveal whether the email exists.
-            await bcrypt.compare(credentials.password as string, DUMMY_BCRYPT_HASH);
+            await bcrypt.compare(
+              credentials.password as string,
+              DUMMY_BCRYPT_HASH,
+            );
             console.error(`[auth] User not found with email: ${email}`);
             return null;
           }

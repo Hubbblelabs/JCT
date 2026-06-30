@@ -5,7 +5,9 @@ import type { AboutPageValue } from "@/lib/validation";
 
 export const revalidate = 86400;
 
-const DEFAULT: AboutPageValue = EngineeringAboutSchema.parse({}) as AboutPageValue;
+const DEFAULT: AboutPageValue = EngineeringAboutSchema.parse(
+  {},
+) as AboutPageValue;
 
 export default async function EngineeringAboutPage() {
   const value = await getPublishedConfigValue("engineeringAbout");

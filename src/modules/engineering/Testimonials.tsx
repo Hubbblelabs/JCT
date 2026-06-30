@@ -29,8 +29,7 @@ function normalizeDb(raw: unknown): Item[] {
           course ||
           (typeof r.batch === "string" ? `Batch ${r.batch}` : "");
 
-    const image =
-      (typeof r.avatar === "string" && r.avatar) || "/avatars/male_avatar.png";
+    const image = (typeof r.avatar === "string" && r.avatar) || "";
     const tag = typeof r.category === "string" ? r.category : "Alumni";
 
     out.push({ quote, name, role, image, tag });

@@ -196,9 +196,7 @@ export default function SettingsPage() {
       const docMetaFile = zip.file("documents/_metadata.json");
       if (docMetaFile) {
         try {
-          docMeta = JSON.parse(
-            await docMetaFile.async("string"),
-          ) as unknown[];
+          docMeta = JSON.parse(await docMetaFile.async("string")) as unknown[];
         } catch {
           // non-fatal: document metadata missing or malformed
         }

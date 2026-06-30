@@ -449,26 +449,26 @@ export function ProgramLabelsEditor({
                   {section.fields.map((f) => {
                     const fieldId = `pl-${group.key}-${section.key}-${f.key}`;
                     return (
-                    <div
-                      key={f.key}
-                      className={f.key === "title" ? "col-span-2" : ""}
-                    >
-                      <label htmlFor={fieldId} className="admin-label">
-                        {f.label}
-                      </label>
-                      <input
-                        id={fieldId}
-                        className="admin-input"
-                        value={String(current[f.key] ?? "")}
-                        placeholder={f.placeholder}
-                        onChange={(e) =>
-                          setSection(group.key, section.key, {
-                            ...current,
-                            [f.key]: e.target.value,
-                          })
-                        }
-                      />
-                    </div>
+                      <div
+                        key={f.key}
+                        className={f.key === "title" ? "col-span-2" : ""}
+                      >
+                        <label htmlFor={fieldId} className="admin-label">
+                          {f.label}
+                        </label>
+                        <input
+                          id={fieldId}
+                          className="admin-input"
+                          value={String(current[f.key] ?? "")}
+                          placeholder={f.placeholder}
+                          onChange={(e) =>
+                            setSection(group.key, section.key, {
+                              ...current,
+                              [f.key]: e.target.value,
+                            })
+                          }
+                        />
+                      </div>
                     );
                   })}
                 </div>

@@ -106,9 +106,30 @@ const BG_LIMIT = 6;
 const TITLE_COUNT = 3;
 
 const CARD_DEFAULTS: HeroCard[] = [
-  { title: "", description: "", href: "/institutions/engineering", icon: "engineering", ctaLabel: "Explore", highlights: "" },
-  { title: "", description: "", href: "/institutions/arts-science", icon: "arts", ctaLabel: "Explore", highlights: "" },
-  { title: "", description: "", href: "/institutions/polytechnic", icon: "polytechnic", ctaLabel: "Explore", highlights: "" },
+  {
+    title: "",
+    description: "",
+    href: "/institutions/engineering",
+    icon: "engineering",
+    ctaLabel: "Explore",
+    highlights: "",
+  },
+  {
+    title: "",
+    description: "",
+    href: "/institutions/arts-science",
+    icon: "arts",
+    ctaLabel: "Explore",
+    highlights: "",
+  },
+  {
+    title: "",
+    description: "",
+    href: "/institutions/polytechnic",
+    icon: "polytechnic",
+    ctaLabel: "Explore",
+    highlights: "",
+  },
 ];
 
 const CARD_HREF_PLACEHOLDERS = [

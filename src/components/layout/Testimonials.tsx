@@ -31,7 +31,7 @@ export function Testimonials() {
               course: String(t.course ?? ""),
               company: String(t.company ?? ""),
               quote: String(t.quote ?? ""),
-              avatar: String(t.avatar ?? "/avatars/male_avatar.png"),
+              avatar: String(t.avatar ?? ""),
               category: String(t.category ?? "Alumni"),
             })),
           );

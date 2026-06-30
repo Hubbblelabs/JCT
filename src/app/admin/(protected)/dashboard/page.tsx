@@ -109,36 +109,38 @@ export default async function DashboardPage() {
             </p>
           ) : (
             <div className="overflow-x-auto">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Type</th>
-                  <th>Action</th>
-                  <th>By</th>
-                  <th>Summary</th>
-                  <th>When</th>
-                </tr>
-              </thead>
-              <tbody>
-                {logs.map((log: Record<string, unknown>) => (
-                  <tr key={String(log._id)}>
-                    <td>
-                      <span className="admin-badge admin-badge-gray capitalize">
-                        {String(log.entity_type)}
-                      </span>
-                    </td>
-                    <td className="capitalize">{String(log.action)}</td>
-                    <td className="text-gray-500">{String(log.user_email)}</td>
-                    <td className="text-gray-600">{String(log.summary)}</td>
-                    <td className="text-xs text-gray-400">
-                      {new Date(log.created_at as string).toLocaleString(
-                        "en-IN",
-                      )}
-                    </td>
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Action</th>
+                    <th>By</th>
+                    <th>Summary</th>
+                    <th>When</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {logs.map((log: Record<string, unknown>) => (
+                    <tr key={String(log._id)}>
+                      <td>
+                        <span className="admin-badge admin-badge-gray capitalize">
+                          {String(log.entity_type)}
+                        </span>
+                      </td>
+                      <td className="capitalize">{String(log.action)}</td>
+                      <td className="text-gray-500">
+                        {String(log.user_email)}
+                      </td>
+                      <td className="text-gray-600">{String(log.summary)}</td>
+                      <td className="text-xs text-gray-400">
+                        {new Date(log.created_at as string).toLocaleString(
+                          "en-IN",
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </div>

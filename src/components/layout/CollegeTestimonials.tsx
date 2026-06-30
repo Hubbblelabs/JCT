@@ -261,15 +261,15 @@ export function CollegeTestimonials({
                         className="mt-4 flex items-center gap-4 border-t border-gray-100/80 pt-4"
                       >
                         <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-gray-100">
-                          <Image
-                            src={
-                              getImageUrl(activeItem.image) ?? activeItem.image
-                            }
-                            alt={activeItem.name}
-                            fill
-                            sizes="48px"
-                            className="object-cover"
-                          />
+                          {getImageUrl(activeItem.image) && (
+                            <Image
+                              src={getImageUrl(activeItem.image) as string}
+                              alt={activeItem.name}
+                              fill
+                              sizes="48px"
+                              className="object-cover"
+                            />
+                          )}
                         </div>
                         <div>
                           <h3 className="text-navy font-serif text-lg font-bold">

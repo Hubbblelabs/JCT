@@ -49,13 +49,48 @@ if (!uri) {
 // ─── Shared diploma-level program outcomes (all 6 depts use same POs) ────────
 
 const DIPLOMA_POS = [
-  { code: "PO1", title: "Basic and Discipline Specific Knowledge", description: "Apply knowledge of basic mathematics, science and engineering fundamentals and engineering specialization to solve the engineering problems." },
-  { code: "PO2", title: "Problem Analysis", description: "Identify and analyze well-defined engineering problems using codified standard methods." },
-  { code: "PO3", title: "Design / Development of Solutions", description: "Design solutions for well-defined technical problems and assist with the design of systems components or processes to meet specified needs." },
-  { code: "PO4", title: "Engineering Tools, Experimentation and Testing", description: "Apply modern engineering tools and appropriate technique to conduct standard tests and measurements." },
-  { code: "PO5", title: "Engineering Practices for Society, Sustainability and Environment", description: "Apply appropriate technology in context of society, sustainability, environment and ethical practices." },
-  { code: "PO6", title: "Project Management", description: "Use engineering management principles individually, as a team member or a leader to manage projects and effectively communicate about well-defined engineering activities." },
-  { code: "PO7", title: "Life-long Learning", description: "Ability to analyze individual needs and engage in updating in the context of technological changes." },
+  {
+    code: "PO1",
+    title: "Basic and Discipline Specific Knowledge",
+    description:
+      "Apply knowledge of basic mathematics, science and engineering fundamentals and engineering specialization to solve the engineering problems.",
+  },
+  {
+    code: "PO2",
+    title: "Problem Analysis",
+    description:
+      "Identify and analyze well-defined engineering problems using codified standard methods.",
+  },
+  {
+    code: "PO3",
+    title: "Design / Development of Solutions",
+    description:
+      "Design solutions for well-defined technical problems and assist with the design of systems components or processes to meet specified needs.",
+  },
+  {
+    code: "PO4",
+    title: "Engineering Tools, Experimentation and Testing",
+    description:
+      "Apply modern engineering tools and appropriate technique to conduct standard tests and measurements.",
+  },
+  {
+    code: "PO5",
+    title: "Engineering Practices for Society, Sustainability and Environment",
+    description:
+      "Apply appropriate technology in context of society, sustainability, environment and ethical practices.",
+  },
+  {
+    code: "PO6",
+    title: "Project Management",
+    description:
+      "Use engineering management principles individually, as a team member or a leader to manage projects and effectively communicate about well-defined engineering activities.",
+  },
+  {
+    code: "PO7",
+    title: "Life-long Learning",
+    description:
+      "Ability to analyze individual needs and engage in updating in the context of technological changes.",
+  },
 ];
 
 // ─── Program data ─────────────────────────────────────────────────────────────
@@ -119,9 +154,24 @@ const PROGRAMS = [
 
       programOutcomes: [
         ...DIPLOMA_POS,
-        { code: "PEO1", title: "Productive Careers", description: "Shall have productive careers in private and government organizations at the national and international level or become successful entrepreneurs." },
-        { code: "PEO2", title: "Social Contribution", description: "Shall contribute towards the development of society by providing solutions through research and higher studies." },
-        { code: "PEO3", title: "Communication and Teamwork", description: "Shall have good communication skills, team work and lifelong learning attitude." },
+        {
+          code: "PEO1",
+          title: "Productive Careers",
+          description:
+            "Shall have productive careers in private and government organizations at the national and international level or become successful entrepreneurs.",
+        },
+        {
+          code: "PEO2",
+          title: "Social Contribution",
+          description:
+            "Shall contribute towards the development of society by providing solutions through research and higher studies.",
+        },
+        {
+          code: "PEO3",
+          title: "Communication and Teamwork",
+          description:
+            "Shall have good communication skills, team work and lifelong learning attitude.",
+        },
       ],
 
       advisoryBoard: [],
@@ -131,11 +181,35 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "Computer Hardware Laboratory", description: "Hands-on training in computer assembly, troubleshooting and maintenance.", equipment: [] },
-        { name: "Programming Laboratory", description: "Facilities for practicing programming in C, C++, Java and Python.", equipment: [] },
-        { name: "Networking Laboratory", description: "Equipped with networking devices for LAN/WAN configuration and troubleshooting.", equipment: [] },
-        { name: "Web Technology Laboratory", description: "Training in HTML, CSS, JavaScript and web development frameworks.", equipment: [] },
-        { name: "Database Management Laboratory", description: "Practical sessions on RDBMS, SQL and database design.", equipment: [] },
+        {
+          name: "Computer Hardware Laboratory",
+          description:
+            "Hands-on training in computer assembly, troubleshooting and maintenance.",
+          equipment: [],
+        },
+        {
+          name: "Programming Laboratory",
+          description:
+            "Facilities for practicing programming in C, C++, Java and Python.",
+          equipment: [],
+        },
+        {
+          name: "Networking Laboratory",
+          description:
+            "Equipped with networking devices for LAN/WAN configuration and troubleshooting.",
+          equipment: [],
+        },
+        {
+          name: "Web Technology Laboratory",
+          description:
+            "Training in HTML, CSS, JavaScript and web development frameworks.",
+          equipment: [],
+        },
+        {
+          name: "Database Management Laboratory",
+          description: "Practical sessions on RDBMS, SQL and database design.",
+          equipment: [],
+        },
       ],
 
       teachingLearning: { overview: "", methods: [], tools: [], practices: [] },
@@ -146,16 +220,35 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["TCS", "Infosys", "Wipro", "HCL Technologies", "Tech Mahindra", "Local IT Companies"],
-        higherStudies: ["B.E. / B.Tech in Computer Science", "BCA / B.Sc Computer Science", "Lateral Entry to Degree Programs"],
+        topRecruiters: [
+          "TCS",
+          "Infosys",
+          "Wipro",
+          "HCL Technologies",
+          "Tech Mahindra",
+          "Local IT Companies",
+        ],
+        higherStudies: [
+          "B.E. / B.Tech in Computer Science",
+          "BCA / B.Sc Computer Science",
+          "Lateral Entry to Degree Programs",
+        ],
         averagePackage: "2.5 LPA",
         placementRate: "85%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2014" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "DOTE, Tamil Nadu" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "DOTE, Tamil Nadu",
+        },
         { icon: "Clock", label: "Duration", value: "3 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE, DOTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "85%" },
@@ -216,9 +309,24 @@ const PROGRAMS = [
 
       programOutcomes: [
         ...DIPLOMA_POS,
-        { code: "PEO1", title: "Productive Careers", description: "Shall have productive careers in private and government organizations at the national and international level or become successful entrepreneurs." },
-        { code: "PEO2", title: "Social Contribution", description: "Shall contribute towards the development of society by providing solutions through research and higher studies." },
-        { code: "PEO3", title: "Communication and Teamwork", description: "Shall have good communication skills, team work and lifelong learning attitude." },
+        {
+          code: "PEO1",
+          title: "Productive Careers",
+          description:
+            "Shall have productive careers in private and government organizations at the national and international level or become successful entrepreneurs.",
+        },
+        {
+          code: "PEO2",
+          title: "Social Contribution",
+          description:
+            "Shall contribute towards the development of society by providing solutions through research and higher studies.",
+        },
+        {
+          code: "PEO3",
+          title: "Communication and Teamwork",
+          description:
+            "Shall have good communication skills, team work and lifelong learning attitude.",
+        },
       ],
 
       advisoryBoard: [],
@@ -228,11 +336,36 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "Farm Machinery Laboratory", description: "Equipped with tractors, tillers, ploughs and modern farm machinery for hands-on training.", equipment: [] },
-        { name: "Soil and Water Engineering Laboratory", description: "Facilities for soil testing, irrigation and drainage experiments.", equipment: [] },
-        { name: "Agricultural Structures Laboratory", description: "Training in design and construction of farm buildings and storage structures.", equipment: [] },
-        { name: "Post-Harvest Technology Laboratory", description: "Equipped for food processing, grain storage and post-harvest management.", equipment: [] },
-        { name: "Testing Fields", description: "Full-fledged support of farm machinery and testing fields for practical agricultural training.", equipment: [] },
+        {
+          name: "Farm Machinery Laboratory",
+          description:
+            "Equipped with tractors, tillers, ploughs and modern farm machinery for hands-on training.",
+          equipment: [],
+        },
+        {
+          name: "Soil and Water Engineering Laboratory",
+          description:
+            "Facilities for soil testing, irrigation and drainage experiments.",
+          equipment: [],
+        },
+        {
+          name: "Agricultural Structures Laboratory",
+          description:
+            "Training in design and construction of farm buildings and storage structures.",
+          equipment: [],
+        },
+        {
+          name: "Post-Harvest Technology Laboratory",
+          description:
+            "Equipped for food processing, grain storage and post-harvest management.",
+          equipment: [],
+        },
+        {
+          name: "Testing Fields",
+          description:
+            "Full-fledged support of farm machinery and testing fields for practical agricultural training.",
+          equipment: [],
+        },
       ],
 
       teachingLearning: { overview: "", methods: [], tools: [], practices: [] },
@@ -243,16 +376,34 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["Food Corporation of India", "State Agriculture Departments", "Agro Industries", "Farm Equipment Companies", "Rural Development Organizations"],
-        higherStudies: ["B.E. / B.Tech in Agricultural Engineering", "B.Sc Agriculture", "Lateral Entry to Degree Programs"],
+        topRecruiters: [
+          "Food Corporation of India",
+          "State Agriculture Departments",
+          "Agro Industries",
+          "Farm Equipment Companies",
+          "Rural Development Organizations",
+        ],
+        higherStudies: [
+          "B.E. / B.Tech in Agricultural Engineering",
+          "B.Sc Agriculture",
+          "Lateral Entry to Degree Programs",
+        ],
         averagePackage: "2.5 LPA",
         placementRate: "80%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2014" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "DOTE, Tamil Nadu" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "DOTE, Tamil Nadu",
+        },
         { icon: "Clock", label: "Duration", value: "3 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE, DOTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "80%" },
@@ -320,12 +471,41 @@ const PROGRAMS = [
 
       programOutcomes: [
         ...DIPLOMA_POS,
-        { code: "PEO1", title: "Petrochemical Careers", description: "Successful in their careers in the diversified sectors of the Petrochemical Engineering." },
-        { code: "PEO2", title: "Entrepreneurship", description: "A successful entrepreneur, manager or occupy higher positions." },
-        { code: "PEO3", title: "Higher Studies", description: "Pursuing higher studies in India or Abroad." },
-        { code: "PSO1", title: "Technology Application", description: "Students will be able to apply and use the modern engineering skills and software tools to analyze petrochemical technology problems." },
-        { code: "PSO2", title: "Industry Management", description: "Students will be able to apply principles of management and economics for the effective functioning in Petrochemical and allied Industries." },
-        { code: "PSO3", title: "Lifelong Learning", description: "Students will engage in lifelong learning towards continuous skills development." },
+        {
+          code: "PEO1",
+          title: "Petrochemical Careers",
+          description:
+            "Successful in their careers in the diversified sectors of the Petrochemical Engineering.",
+        },
+        {
+          code: "PEO2",
+          title: "Entrepreneurship",
+          description:
+            "A successful entrepreneur, manager or occupy higher positions.",
+        },
+        {
+          code: "PEO3",
+          title: "Higher Studies",
+          description: "Pursuing higher studies in India or Abroad.",
+        },
+        {
+          code: "PSO1",
+          title: "Technology Application",
+          description:
+            "Students will be able to apply and use the modern engineering skills and software tools to analyze petrochemical technology problems.",
+        },
+        {
+          code: "PSO2",
+          title: "Industry Management",
+          description:
+            "Students will be able to apply principles of management and economics for the effective functioning in Petrochemical and allied Industries.",
+        },
+        {
+          code: "PSO3",
+          title: "Lifelong Learning",
+          description:
+            "Students will engage in lifelong learning towards continuous skills development.",
+        },
       ],
 
       advisoryBoard: [],
@@ -335,18 +515,65 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "Distillate Testing Practical – I", description: "Laboratory for testing and characterization of petroleum distillate products.", equipment: [] },
-        { name: "Mechanical Engineering Practical", description: "Practical training in mechanical operations relevant to petrochemical plants.", equipment: [] },
-        { name: "Electrical and Electronics Engineering Practical", description: "Hands-on training in electrical systems used in petrochemical industry.", equipment: [] },
-        { name: "Computer Applications Practical", description: "AutoCAD and software applications for petrochemical engineering.", equipment: ["AUTOCAD"] },
-        { name: "Mechanical Operations Practical", description: "Experiments in unit operations like mixing, filtration and size reduction.", equipment: [] },
-        { name: "Momentum Transfer Practical", description: "Fluid mechanics and momentum transfer experiments.", equipment: [] },
-        { name: "Technical Analysis Practical", description: "Chemical analysis and quality testing of petrochemical samples.", equipment: [] },
-        { name: "Chemical Process Measurement and Control Practical", description: "Instrumentation and process control experiments.", equipment: [] },
-        { name: "Heat Transfer Practical", description: "Heat exchanger and thermal process experiments.", equipment: [] },
+        {
+          name: "Distillate Testing Practical – I",
+          description:
+            "Laboratory for testing and characterization of petroleum distillate products.",
+          equipment: [],
+        },
+        {
+          name: "Mechanical Engineering Practical",
+          description:
+            "Practical training in mechanical operations relevant to petrochemical plants.",
+          equipment: [],
+        },
+        {
+          name: "Electrical and Electronics Engineering Practical",
+          description:
+            "Hands-on training in electrical systems used in petrochemical industry.",
+          equipment: [],
+        },
+        {
+          name: "Computer Applications Practical",
+          description:
+            "AutoCAD and software applications for petrochemical engineering.",
+          equipment: ["AUTOCAD"],
+        },
+        {
+          name: "Mechanical Operations Practical",
+          description:
+            "Experiments in unit operations like mixing, filtration and size reduction.",
+          equipment: [],
+        },
+        {
+          name: "Momentum Transfer Practical",
+          description: "Fluid mechanics and momentum transfer experiments.",
+          equipment: [],
+        },
+        {
+          name: "Technical Analysis Practical",
+          description:
+            "Chemical analysis and quality testing of petrochemical samples.",
+          equipment: [],
+        },
+        {
+          name: "Chemical Process Measurement and Control Practical",
+          description: "Instrumentation and process control experiments.",
+          equipment: [],
+        },
+        {
+          name: "Heat Transfer Practical",
+          description: "Heat exchanger and thermal process experiments.",
+          equipment: [],
+        },
       ],
 
-      teachingLearning: { overview: "", methods: [], tools: ["AUTOCAD"], practices: [] },
+      teachingLearning: {
+        overview: "",
+        methods: [],
+        tools: ["AUTOCAD"],
+        practices: [],
+      },
       valueAddedCourses: [],
       events: [],
       studentParticipation: { clubs: [], highlights: [] },
@@ -354,16 +581,35 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["Indian Oil Corporation (IOCL)", "ONGC", "Reliance Industries", "Bharat Petroleum", "Chemplast Sanmar", "Cochin Refineries", "IG Petrochemicals"],
-        higherStudies: ["B.E. / B.Tech in Petrochemical / Chemical Engineering", "Lateral Entry to Degree Programs"],
+        topRecruiters: [
+          "Indian Oil Corporation (IOCL)",
+          "ONGC",
+          "Reliance Industries",
+          "Bharat Petroleum",
+          "Chemplast Sanmar",
+          "Cochin Refineries",
+          "IG Petrochemicals",
+        ],
+        higherStudies: [
+          "B.E. / B.Tech in Petrochemical / Chemical Engineering",
+          "Lateral Entry to Degree Programs",
+        ],
         averagePackage: "2.5 LPA",
         placementRate: "85%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2014" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "DOTE, Tamil Nadu" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "DOTE, Tamil Nadu",
+        },
         { icon: "Clock", label: "Duration", value: "3 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE, DOTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "85%" },
@@ -430,11 +676,36 @@ const PROGRAMS = [
 
       programOutcomes: [
         ...DIPLOMA_POS,
-        { code: "PEO1", title: "Core Knowledge", description: "Have strong knowledge in core and allied engineering of mechanical engineering." },
-        { code: "PEO2", title: "Career and Higher Studies", description: "Have successful careers or pursue higher education or become entrepreneurs." },
-        { code: "PEO3", title: "Professional Skills", description: "Exhibit managerial skills with ethical values, team spirit and leadership skills." },
-        { code: "PSO1", title: "Domain Knowledge", description: "Students shall have domain knowledge manufacturing, thermal, fluid sciences to solve engineering and societal problems." },
-        { code: "PSO2", title: "Modern Tools", description: "Students shall use the modern tools and latest software to design and develop solutions to solve societal problems." },
+        {
+          code: "PEO1",
+          title: "Core Knowledge",
+          description:
+            "Have strong knowledge in core and allied engineering of mechanical engineering.",
+        },
+        {
+          code: "PEO2",
+          title: "Career and Higher Studies",
+          description:
+            "Have successful careers or pursue higher education or become entrepreneurs.",
+        },
+        {
+          code: "PEO3",
+          title: "Professional Skills",
+          description:
+            "Exhibit managerial skills with ethical values, team spirit and leadership skills.",
+        },
+        {
+          code: "PSO1",
+          title: "Domain Knowledge",
+          description:
+            "Students shall have domain knowledge manufacturing, thermal, fluid sciences to solve engineering and societal problems.",
+        },
+        {
+          code: "PSO2",
+          title: "Modern Tools",
+          description:
+            "Students shall use the modern tools and latest software to design and develop solutions to solve societal problems.",
+        },
       ],
 
       advisoryBoard: [],
@@ -444,19 +715,74 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "Lathe and Drilling Lab", description: "Equipped with lathes, drilling machines and turning operations for machining practice.", equipment: [] },
-        { name: "Thermal and Automobile Lab", description: "Equipped with engines, refrigeration units and automobile systems for thermal experiments.", equipment: [] },
-        { name: "Computer Application and CAD Lab", description: "AutoCAD, CNC simulation software and PLC software for design and manufacturing.", equipment: ["AUTOCAD", "CNC Simulation Software", "PLC Software"] },
-        { name: "Foundry and Welding Lab", description: "Facilities for casting, pattern making, and various welding techniques.", equipment: [] },
-        { name: "Special Machine Lab", description: "Special purpose machines for advanced machining operations.", equipment: [] },
-        { name: "Process Automation Lab", description: "PLC-based automation and pneumatic/hydraulic systems training.", equipment: [] },
-        { name: "Metrology and Metallography Lab", description: "Precision measurement instruments and metallographic testing equipment.", equipment: [] },
-        { name: "Refrigeration and Air-Conditioning Lab", description: "Refrigeration cycles, compressors and air-conditioning systems experiments.", equipment: [] },
-        { name: "Machine Tool Testing and Maintenance Lab", description: "Tools and equipment for machine tool calibration and maintenance.", equipment: [] },
-        { name: "CAD/CAM Practical", description: "Integrated computer aided design and manufacturing practical sessions.", equipment: [] },
+        {
+          name: "Lathe and Drilling Lab",
+          description:
+            "Equipped with lathes, drilling machines and turning operations for machining practice.",
+          equipment: [],
+        },
+        {
+          name: "Thermal and Automobile Lab",
+          description:
+            "Equipped with engines, refrigeration units and automobile systems for thermal experiments.",
+          equipment: [],
+        },
+        {
+          name: "Computer Application and CAD Lab",
+          description:
+            "AutoCAD, CNC simulation software and PLC software for design and manufacturing.",
+          equipment: ["AUTOCAD", "CNC Simulation Software", "PLC Software"],
+        },
+        {
+          name: "Foundry and Welding Lab",
+          description:
+            "Facilities for casting, pattern making, and various welding techniques.",
+          equipment: [],
+        },
+        {
+          name: "Special Machine Lab",
+          description:
+            "Special purpose machines for advanced machining operations.",
+          equipment: [],
+        },
+        {
+          name: "Process Automation Lab",
+          description:
+            "PLC-based automation and pneumatic/hydraulic systems training.",
+          equipment: [],
+        },
+        {
+          name: "Metrology and Metallography Lab",
+          description:
+            "Precision measurement instruments and metallographic testing equipment.",
+          equipment: [],
+        },
+        {
+          name: "Refrigeration and Air-Conditioning Lab",
+          description:
+            "Refrigeration cycles, compressors and air-conditioning systems experiments.",
+          equipment: [],
+        },
+        {
+          name: "Machine Tool Testing and Maintenance Lab",
+          description:
+            "Tools and equipment for machine tool calibration and maintenance.",
+          equipment: [],
+        },
+        {
+          name: "CAD/CAM Practical",
+          description:
+            "Integrated computer aided design and manufacturing practical sessions.",
+          equipment: [],
+        },
       ],
 
-      teachingLearning: { overview: "", methods: [], tools: ["AUTOCAD", "CNC Simulation Software", "PLC Software"], practices: [] },
+      teachingLearning: {
+        overview: "",
+        methods: [],
+        tools: ["AUTOCAD", "CNC Simulation Software", "PLC Software"],
+        practices: [],
+      },
       valueAddedCourses: [],
       events: [],
       studentParticipation: { clubs: [], highlights: [] },
@@ -464,16 +790,36 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["TVS Group", "RANE Group", "Wipro Infrastructure Engineering", "Sundaram Auto Components", "ROOTS Industries", "LMW", "Precot Mills", "Local Manufacturing Industries"],
-        higherStudies: ["B.E. / B.Tech in Mechanical Engineering", "Lateral Entry to Degree Programs"],
+        topRecruiters: [
+          "TVS Group",
+          "RANE Group",
+          "Wipro Infrastructure Engineering",
+          "Sundaram Auto Components",
+          "ROOTS Industries",
+          "LMW",
+          "Precot Mills",
+          "Local Manufacturing Industries",
+        ],
+        higherStudies: [
+          "B.E. / B.Tech in Mechanical Engineering",
+          "Lateral Entry to Degree Programs",
+        ],
         averagePackage: "2.5 LPA",
         placementRate: "88%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2014" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "DOTE, Tamil Nadu" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "DOTE, Tamil Nadu",
+        },
         { icon: "Clock", label: "Duration", value: "3 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE, DOTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "88%" },
@@ -540,11 +886,35 @@ const PROGRAMS = [
 
       programOutcomes: [
         ...DIPLOMA_POS,
-        { code: "PEO1", title: "Productive Careers", description: "Shall have productive careers in private and government organizations at the national and International level or become successful entrepreneurs." },
-        { code: "PEO2", title: "Social Contribution", description: "Shall contribute towards the development of society by providing solutions through research and higher studies." },
-        { code: "PEO3", title: "Communication and Teamwork", description: "Shall have good communication skills, team work and lifelong learning attitude." },
-        { code: "PSO1", title: "Simulation and Automation", description: "Students shall be able to use MATLAB/PLC/SCADA." },
-        { code: "PSO2", title: "System Design", description: "Students shall be able to design and develop electrical/electronic systems and appliances as per society/industry requirements." },
+        {
+          code: "PEO1",
+          title: "Productive Careers",
+          description:
+            "Shall have productive careers in private and government organizations at the national and International level or become successful entrepreneurs.",
+        },
+        {
+          code: "PEO2",
+          title: "Social Contribution",
+          description:
+            "Shall contribute towards the development of society by providing solutions through research and higher studies.",
+        },
+        {
+          code: "PEO3",
+          title: "Communication and Teamwork",
+          description:
+            "Shall have good communication skills, team work and lifelong learning attitude.",
+        },
+        {
+          code: "PSO1",
+          title: "Simulation and Automation",
+          description: "Students shall be able to use MATLAB/PLC/SCADA.",
+        },
+        {
+          code: "PSO2",
+          title: "System Design",
+          description:
+            "Students shall be able to design and develop electrical/electronic systems and appliances as per society/industry requirements.",
+        },
       ],
 
       advisoryBoard: [],
@@ -554,18 +924,62 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "Electrical Circuits and Machines Laboratory", description: "Experiments in AC/DC circuits, motors and generators.", equipment: [] },
-        { name: "Electronic Devices and Circuits Lab", description: "Semiconductor device characterization and amplifier circuit experiments.", equipment: [] },
-        { name: "Electrical Machines and Instrumentation Lab", description: "Transformer, motor and instrumentation testing experiments.", equipment: [] },
-        { name: "Integrated Circuits Lab", description: "Analog and digital IC experiments using IC kits.", equipment: [] },
-        { name: "Microcontroller Lab", description: "8051/ARM microcontroller programming and interfacing.", equipment: [] },
-        { name: "Control of Electrical Machines Laboratory", description: "Speed control of DC and AC motors using drives.", equipment: [] },
-        { name: "Electrical Circuits Simulation Laboratory", description: "MATLAB-based circuit simulation and analysis.", equipment: ["MATLAB"] },
-        { name: "Power Electronics Laboratory", description: "Converters, inverters and power semiconductor device experiments.", equipment: [] },
-        { name: "Computer Aided Electrical Drawing Laboratory", description: "AutoCAD-based electrical drawing and schematic design.", equipment: ["AUTOCAD"] },
+        {
+          name: "Electrical Circuits and Machines Laboratory",
+          description: "Experiments in AC/DC circuits, motors and generators.",
+          equipment: [],
+        },
+        {
+          name: "Electronic Devices and Circuits Lab",
+          description:
+            "Semiconductor device characterization and amplifier circuit experiments.",
+          equipment: [],
+        },
+        {
+          name: "Electrical Machines and Instrumentation Lab",
+          description:
+            "Transformer, motor and instrumentation testing experiments.",
+          equipment: [],
+        },
+        {
+          name: "Integrated Circuits Lab",
+          description: "Analog and digital IC experiments using IC kits.",
+          equipment: [],
+        },
+        {
+          name: "Microcontroller Lab",
+          description: "8051/ARM microcontroller programming and interfacing.",
+          equipment: [],
+        },
+        {
+          name: "Control of Electrical Machines Laboratory",
+          description: "Speed control of DC and AC motors using drives.",
+          equipment: [],
+        },
+        {
+          name: "Electrical Circuits Simulation Laboratory",
+          description: "MATLAB-based circuit simulation and analysis.",
+          equipment: ["MATLAB"],
+        },
+        {
+          name: "Power Electronics Laboratory",
+          description:
+            "Converters, inverters and power semiconductor device experiments.",
+          equipment: [],
+        },
+        {
+          name: "Computer Aided Electrical Drawing Laboratory",
+          description: "AutoCAD-based electrical drawing and schematic design.",
+          equipment: ["AUTOCAD"],
+        },
       ],
 
-      teachingLearning: { overview: "", methods: [], tools: ["MATLAB", "PLC", "AUTOCAD"], practices: [] },
+      teachingLearning: {
+        overview: "",
+        methods: [],
+        tools: ["MATLAB", "PLC", "AUTOCAD"],
+        practices: [],
+      },
       valueAddedCourses: [],
       events: [],
       studentParticipation: { clubs: [], highlights: [] },
@@ -573,16 +987,35 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["TNEB", "BSNL", "BEL", "Siemens", "ABB", "Private Electrical Companies", "SHREE TECHNOLOGY (MOU Partner)"],
-        higherStudies: ["B.E. / B.Tech in Electrical and Electronics Engineering", "Lateral Entry to Degree Programs"],
+        topRecruiters: [
+          "TNEB",
+          "BSNL",
+          "BEL",
+          "Siemens",
+          "ABB",
+          "Private Electrical Companies",
+          "SHREE TECHNOLOGY (MOU Partner)",
+        ],
+        higherStudies: [
+          "B.E. / B.Tech in Electrical and Electronics Engineering",
+          "Lateral Entry to Degree Programs",
+        ],
         averagePackage: "2.5 LPA",
         placementRate: "85%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2014" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "DOTE, Tamil Nadu" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "DOTE, Tamil Nadu",
+        },
         { icon: "Clock", label: "Duration", value: "3 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE, DOTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "85%" },
@@ -649,11 +1082,36 @@ const PROGRAMS = [
 
       programOutcomes: [
         ...DIPLOMA_POS,
-        { code: "PEO1", title: "Productive Careers", description: "Shall have productive careers in private and government organizations at the national and international level or become successful entrepreneurs." },
-        { code: "PEO2", title: "Social Contribution", description: "Shall contribute towards the development of society by providing solutions through research and higher studies." },
-        { code: "PEO3", title: "Communication and Teamwork", description: "Shall have good communication skills, team work and lifelong learning attitude." },
-        { code: "PSO1", title: "Civil Project Execution", description: "Students will have ability to Plan, analyze, design, prepare cost estimates and execute all kinds of Civil Engineering Projects." },
-        { code: "PSO2", title: "Modern Construction", description: "Students will have an ability to apply modern construction techniques, equipment and management tools." },
+        {
+          code: "PEO1",
+          title: "Productive Careers",
+          description:
+            "Shall have productive careers in private and government organizations at the national and international level or become successful entrepreneurs.",
+        },
+        {
+          code: "PEO2",
+          title: "Social Contribution",
+          description:
+            "Shall contribute towards the development of society by providing solutions through research and higher studies.",
+        },
+        {
+          code: "PEO3",
+          title: "Communication and Teamwork",
+          description:
+            "Shall have good communication skills, team work and lifelong learning attitude.",
+        },
+        {
+          code: "PSO1",
+          title: "Civil Project Execution",
+          description:
+            "Students will have ability to Plan, analyze, design, prepare cost estimates and execute all kinds of Civil Engineering Projects.",
+        },
+        {
+          code: "PSO2",
+          title: "Modern Construction",
+          description:
+            "Students will have an ability to apply modern construction techniques, equipment and management tools.",
+        },
       ],
 
       advisoryBoard: [],
@@ -663,15 +1121,49 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "Material Testing Laboratory", description: "Testing of construction materials like cement, concrete, steel and bricks.", equipment: [] },
-        { name: "Surveying Practice", description: "Hands-on training with total stations, levels, theodolites and GPS instruments.", equipment: [] },
-        { name: "CAD in Civil Engineering Drawing", description: "AutoCAD-based civil engineering drawing and planning.", equipment: ["AUTOCAD"] },
-        { name: "Construction Practice Laboratory", description: "Practical training in masonry, plastering, carpentry and finishing works.", equipment: [] },
-        { name: "Hydraulics and Plumbing Laboratory", description: "Fluid mechanics experiments and plumbing installation practice.", equipment: [] },
-        { name: "Computer Application in Civil Engineering Laboratory", description: "Software applications for structural analysis and design.", equipment: [] },
+        {
+          name: "Material Testing Laboratory",
+          description:
+            "Testing of construction materials like cement, concrete, steel and bricks.",
+          equipment: [],
+        },
+        {
+          name: "Surveying Practice",
+          description:
+            "Hands-on training with total stations, levels, theodolites and GPS instruments.",
+          equipment: [],
+        },
+        {
+          name: "CAD in Civil Engineering Drawing",
+          description: "AutoCAD-based civil engineering drawing and planning.",
+          equipment: ["AUTOCAD"],
+        },
+        {
+          name: "Construction Practice Laboratory",
+          description:
+            "Practical training in masonry, plastering, carpentry and finishing works.",
+          equipment: [],
+        },
+        {
+          name: "Hydraulics and Plumbing Laboratory",
+          description:
+            "Fluid mechanics experiments and plumbing installation practice.",
+          equipment: [],
+        },
+        {
+          name: "Computer Application in Civil Engineering Laboratory",
+          description:
+            "Software applications for structural analysis and design.",
+          equipment: [],
+        },
       ],
 
-      teachingLearning: { overview: "", methods: [], tools: ["AUTOCAD"], practices: [] },
+      teachingLearning: {
+        overview: "",
+        methods: [],
+        tools: ["AUTOCAD"],
+        practices: [],
+      },
       valueAddedCourses: [],
       events: [],
       studentParticipation: { clubs: [], highlights: [] },
@@ -679,16 +1171,33 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["L&T Constructions", "Government PWD", "TNHB", "Local Construction Firms", "Infrastructure Companies"],
-        higherStudies: ["B.E. / B.Tech in Civil Engineering", "Lateral Entry to Degree Programs"],
+        topRecruiters: [
+          "L&T Constructions",
+          "Government PWD",
+          "TNHB",
+          "Local Construction Firms",
+          "Infrastructure Companies",
+        ],
+        higherStudies: [
+          "B.E. / B.Tech in Civil Engineering",
+          "Lateral Entry to Degree Programs",
+        ],
         averagePackage: "2.5 LPA",
         placementRate: "85%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2014" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "DOTE, Tamil Nadu" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "DOTE, Tamil Nadu",
+        },
         { icon: "Clock", label: "Duration", value: "3 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE, DOTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "85%" },
@@ -700,14 +1209,18 @@ const PROGRAMS = [
 // ─── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log(`\nPolytechnic Dept Content Seed — ${DRY_RUN ? "DRY RUN" : "LIVE"}`);
+  console.log(
+    `\nPolytechnic Dept Content Seed — ${DRY_RUN ? "DRY RUN" : "LIVE"}`,
+  );
   console.log(`Target slugs: ${PROGRAMS.map((p) => p.slug).join(", ")}\n`);
 
   if (DRY_RUN) {
     console.log("Dry-run mode: no changes will be written to the database.");
     console.log("Re-run without --dry-run to apply.\n");
     for (const p of PROGRAMS) {
-      console.log(`  • ${p.name} (slug: ${p.slug}, degree: ${p.degree}, seats: ${p.seats})`);
+      console.log(
+        `  • ${p.name} (slug: ${p.slug}, degree: ${p.degree}, seats: ${p.seats})`,
+      );
     }
     return;
   }

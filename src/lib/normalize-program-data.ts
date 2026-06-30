@@ -125,12 +125,9 @@ export function normalizeProgramData(
       : college === "polytechnic"
         ? "#1a3a2a"
         : "#800020";
-  const defaultHero =
-    college === "engineering"
-      ? "/site_assests/engineering.jpeg"
-      : college === "polytechnic"
-        ? "/site_assests/polytechnic.jpeg"
-        : "/site_assests/arts.jpeg";
+  // No local fallback hero — images come only from R2/CMS. Empty heroImage is
+  // guarded at the render site (ProgramPageLayout), so the banner is hidden.
+  const defaultHero = "";
 
   const paragraphs = [str(c.about1), str(c.about2), str(c.about3)].filter(
     Boolean,

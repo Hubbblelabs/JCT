@@ -21,9 +21,7 @@ function BodySection({ section }: { section: PageBodySection }) {
     case "heading": {
       const level = section.level ?? 2;
       const Tag = (level === 4 ? "h4" : level === 3 ? "h3" : "h2") as
-        | "h2"
-        | "h3"
-        | "h4";
+        "h2" | "h3" | "h4";
       const cls =
         level === 4
           ? "text-lg font-semibold mt-4"

@@ -793,10 +793,7 @@ type PamphletVirtualTourVal = {
 };
 
 type PamphletLayoutVal =
-  | "image-image"
-  | "image-text"
-  | "text-image"
-  | "text-text";
+  "image-image" | "image-text" | "text-image" | "text-text";
 
 export type PamphletVal = {
   enabled?: boolean;
@@ -3273,7 +3270,9 @@ export function RecruitersSectionForm({
         <input
           type="checkbox"
           checked={value.show_section !== false}
-          onChange={(e) => onChange({ ...value, show_section: e.target.checked })}
+          onChange={(e) =>
+            onChange({ ...value, show_section: e.target.checked })
+          }
           className="h-4 w-4 rounded border-gray-300 accent-amber-500"
         />
         <span className="text-sm font-medium text-gray-700">

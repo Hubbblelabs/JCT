@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
     const defaultInstitution =
       (sessionUser.role as string) === "admin"
         ? "all"
-        : ((sessionUser.institution as string) || "all");
+        : (sessionUser.institution as string) || "all";
 
     // Validate non-file fields against the schema so unknown categories
     // and over-long alt text are rejected at the boundary too.

@@ -31,6 +31,15 @@ pnpm build     # Production build (output: "standalone")
 pnpm start     # Run the production build
 pnpm lint      # ESLint — NOTE: this script always runs with --fix
 pnpm format    # Prettier (with Tailwind class sorting)
+pnpm typecheck # tsc --noEmit (run alongside build to verify changes)
+```
+
+Data seeding scripts (bootstrap a fresh DB; `:dry` variants preview without writing):
+
+```bash
+pnpm seed:admin                       # create initial admin user
+pnpm seed:programs:engineering        # seed Program card rows
+pnpm seed:deptcontent:<inst>[:dry]    # seed rich Program.content per institution
 ```
 
 There is **no test framework** configured — no test runner, no test files, no `test` script. Verify changes with `pnpm build` + `pnpm lint` and by exercising the feature in the browser.
@@ -41,8 +50,9 @@ There is **no test framework** configured — no test runner, no test files, no 
 
 `src/app/` is the App Router root. The app has two halves:
 
-- **`src/app/admin/`** — the CMS. `(protected)/` is a route group whose `layout.tsx` does a session check; `login/` is public. Key admin pages: `dashboard/`, `programs/`, `users/`, `testimonials/`, `recruiters/`, `about/`, `coe/`, `page-content/`, `main/page-content/`, `global/page-content/`, `settings/`, `audit/`.
-- **`src/app/institutions/<inst>/`** — public pages for each of `engineering`, `arts-science`, `polytechnic`. Each has `page.tsx` (landing), `about/`, `courses/`, `programs/` + `programs/[slug]/` (DB-driven program detail pages), and a legacy `[course]/` dynamic route. Engineering also has `coe/` (Centre of Excellence).
+- **`src/app/admin/`** — the CMS. `(protected)/` is a route group whose `layout.tsx` does a session check; `login/` is public. Key admin pages: `dashboard/`, `programs/`, `pages/`, `users/`, `testimonials/`, `recruiters/`, `about/`, `coe/`, `campus-life/`, `page-content/`, `main/page-content/`, `global/page-content/`, `settings/`, `audit/`.
+- **`src/app/institutions/<inst>/`** — public pages for each of `engineering`, `arts-science`, `polytechnic`. Each has `page.tsx` (landing), `about/`, `courses/`, `programs/` + `programs/[slug]/` (DB-driven program detail pages), `p/[slug]/` (generic CMS Page renderer, see Page CMS below), and a legacy `[course]/` dynamic route. Engineering also has `coe/` (Centre of Excellence).
+- **Top-level public routes**: `src/app/page.tsx` (home), `campus-life/`, `about-us/`, and `p/[slug]/` (institution-agnostic `main` CMS pages).
 
 ### Authentication & authorization
 
@@ -62,7 +72,7 @@ There is **no test framework** configured — no test runner, no test files, no 
 ### Database & connection
 
 - **`connectDB()`** (`src/lib/mongodb.ts`): a globally cached Mongoose connection (`global._mongooseConn`), guarded by `readyState === 1`, with a 15s server-selection timeout and `bufferCommands: false`. Call it at the start of any route that touches the DB.
-- Models use the singleton guard `mongoose.models.X ?? mongoose.model(...)` to survive hot reload. Exported from `src/lib/models/index.ts`: `User`, `SiteConfig`, `ImageAsset`, `Program`, `Recruiter`, `Testimonial`, `AuditLog`.
+- Models use the singleton guard `mongoose.models.X ?? mongoose.model(...)` to survive hot reload. Exported from `src/lib/models/index.ts`: `User`, `SiteConfig`, `ImageAsset`, `DocumentAsset`, `Program`, `Page`, `Recruiter`, `Testimonial`, `AuditLog`.
 
 ### Visual page editors
 
@@ -90,23 +100,26 @@ There is **no `Department` model** anymore. Rich page content that used to live 
       icon: "BookOpen",
       sections: [
         { type: "richText", content: "<p>Program description...</p>" },
-        { type: "stats", items: [{ label: "Duration", value: "4 Years" }] }
-      ]
+        { type: "stats", items: [{ label: "Duration", value: "4 Years" }] },
+      ],
     },
     {
       id: "curriculum",
       label: "Curriculum",
-      sections: [
-        { type: "list", items: ["Core Subjects", "Electives"] }
-      ]
-    }
-  ]
+      sections: [{ type: "list", items: ["Core Subjects", "Electives"] }],
+    },
+  ];
 }
 ```
+
 - **The editor** (`src/app/admin/(protected)/programs/[id]/page.tsx` with `ProgramContentEditor`, `ProgramTabsEditor`, `CurriculumEditor`, `ProgramLabelsEditor` in `src/components/admin/`) is a **live-preview builder**: edit content on one side, see the rendered public page on the other.
 - **Publish flow**: `POST /api/admin/programs/[id]/publish` copies `content` → `published_content`, sets `status: "published"`, bumps `version`.
 - **Migration**: `POST /api/admin/programs/[id]/migrate-tabs` converts legacy content (flat arrays or old section types) into the current `TabsProgram` shape. It is a standalone manual endpoint — nothing calls it automatically (publish does **not** migrate). Idempotent — it no-ops when `tabs` already exist.
 - **Public reads** go through `src/lib/public-programs.ts` (`listPublicPrograms`, `getPublishedProgramBySlug`, `listPublishedProgramSlugs`). These only return docs with `status: "published"` and non-null `published_content`, then run the content through `src/lib/normalize-program-data.ts` to produce the typed `ProgramData` the public pages render.
+
+### Page CMS — generic standalone pages
+
+Separate from Program content, the **`Page`** model (`src/lib/models/Page.ts`) backs free-standing CMS pages (admin `/admin/pages`, API `/api/admin/pages`). Same draft/publish pair as Program (`content`/`published_content`, `status`, `version`). A page is scoped by `institution` (`main | engineering | arts-science | polytechnic`) and a `template` (`standard | hero-content | sidebar | gallery | contact`). The `(institution, slug)` index is unique — different institutions can reuse a slug. Public renderers: `/p/[slug]` (the `main` scope) and `/institutions/<inst>/p/[slug]` (per-institution), both reading published content only.
 
 ### SiteConfig & page content
 

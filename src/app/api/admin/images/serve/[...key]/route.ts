@@ -10,7 +10,10 @@ export async function GET(
 
   // Only serve keys this app generates — images and documents. Without this
   // an authenticated user could probe arbitrary objects in the bucket.
-  if (!storageKey.startsWith("images/") && !storageKey.startsWith("documents/")) {
+  if (
+    !storageKey.startsWith("images/") &&
+    !storageKey.startsWith("documents/")
+  ) {
     return new NextResponse("Not found", { status: 404 });
   }
 

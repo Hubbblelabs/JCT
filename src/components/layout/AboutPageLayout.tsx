@@ -237,7 +237,9 @@ export const ABOUT_NAV_DEFAULTS: SidebarNavDefault[] = [
   { anchor: "why-jct", navLabel: "Why JCT?", icon: Star },
 ];
 
-const imgUrl = (v: string) => getImageUrl(v) || v || "/avatars/male_avatar.png";
+// Images come only from R2/CMS. Empty value -> "" so the call site skips the
+// <Image> and the neutral wrapper (bg-white/5 etc.) shows as the placeholder.
+const imgUrl = (v: string) => getImageUrl(v) || "";
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
 
@@ -724,13 +726,15 @@ export function AboutPageLayout({
                 <div className="flex flex-col gap-6 p-5 sm:flex-row sm:items-start md:p-8">
                   <div className="flex flex-col items-center gap-3 sm:w-44 sm:shrink-0">
                     <div className="relative h-48 w-36 overflow-hidden rounded-2xl border border-white/10 bg-white/5 sm:h-56 sm:w-44">
-                      <Image
-                        src={imgUrl(data.principal.image)}
-                        alt={data.principal.name}
-                        fill
-                        className="object-cover object-top"
-                        sizes="(max-width: 640px) 144px, 176px"
-                      />
+                      {imgUrl(data.principal.image) && (
+                        <Image
+                          src={imgUrl(data.principal.image)}
+                          alt={data.principal.name}
+                          fill
+                          className="object-cover object-top"
+                          sizes="(max-width: 640px) 144px, 176px"
+                        />
+                      )}
                     </div>
                     <div className="text-center">
                       <p className="text-foreground font-bold">
@@ -789,13 +793,15 @@ export function AboutPageLayout({
                   >
                     <div className="flex items-center gap-4">
                       <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/10">
-                        <Image
-                          src={imgUrl(person.image)}
-                          alt={person.name}
-                          fill
-                          className="object-cover object-top"
-                          sizes="64px"
-                        />
+                        {imgUrl(person.image) && (
+                          <Image
+                            src={imgUrl(person.image)}
+                            alt={person.name}
+                            fill
+                            className="object-cover object-top"
+                            sizes="64px"
+                          />
+                        )}
                       </div>
                       <div>
                         <p className="text-foreground text-sm font-bold md:text-base">
@@ -841,13 +847,15 @@ export function AboutPageLayout({
                     className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 transition-all hover:bg-white/10"
                   >
                     <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-full border border-white/10 bg-white/10">
-                      <Image
-                        src={imgUrl(d.avatar)}
-                        alt={d.name}
-                        fill
-                        className="object-cover"
-                        sizes="56px"
-                      />
+                      {imgUrl(d.avatar) && (
+                        <Image
+                          src={imgUrl(d.avatar)}
+                          alt={d.name}
+                          fill
+                          className="object-cover"
+                          sizes="56px"
+                        />
+                      )}
                     </div>
                     <div>
                       <h4 className="text-foreground text-sm leading-tight font-bold">
@@ -982,13 +990,15 @@ export function AboutPageLayout({
                     className="bg-surface border-border flex flex-col items-center justify-center gap-2 rounded-2xl border p-4 text-center transition-shadow hover:shadow-md"
                   >
                     <div className="relative h-10 w-full">
-                      <Image
-                        src={imgUrl(acc.logo)}
-                        alt={acc.name}
-                        fill
-                        className="object-contain"
-                        sizes="120px"
-                      />
+                      {imgUrl(acc.logo) && (
+                        <Image
+                          src={imgUrl(acc.logo)}
+                          alt={acc.name}
+                          fill
+                          className="object-contain"
+                          sizes="120px"
+                        />
+                      )}
                     </div>
                     <div>
                       <h3 className="text-foreground text-xs font-bold">

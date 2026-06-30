@@ -581,7 +581,11 @@ const PROGRAMS = [
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2009" },
         { icon: "Users", label: "Intake", value: "120 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE, NBA" },
         { icon: "Briefcase", label: "Placement Rate", value: "98%" },
@@ -957,7 +961,11 @@ const PROGRAMS = [
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2011" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "90%" },
@@ -1361,7 +1369,11 @@ const PROGRAMS = [
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2013" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "85%" },

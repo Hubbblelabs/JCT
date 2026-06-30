@@ -232,13 +232,21 @@ export async function POST(req: NextRequest) {
       const update = seed.publish
         ? { $set: fields, $inc: { version: 1 } }
         : {
-            $setOnInsert: { config_key: seed.config_key, version: 1, ...fields },
+            $setOnInsert: {
+              config_key: seed.config_key,
+              version: 1,
+              ...fields,
+            },
           };
 
-      await SiteConfig.findOneAndUpdate({ config_key: seed.config_key }, update, {
-        upsert: true,
-        new: true,
-      });
+      await SiteConfig.findOneAndUpdate(
+        { config_key: seed.config_key },
+        update,
+        {
+          upsert: true,
+          new: true,
+        },
+      );
       revalidateForConfigKey(seed.config_key);
     }
 

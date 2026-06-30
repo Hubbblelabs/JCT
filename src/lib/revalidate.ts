@@ -2,11 +2,7 @@ import { revalidatePath } from "next/cache";
 import { publicCacheClear } from "@/lib/public-cache";
 
 export type RevalidateTarget =
-  | "home"
-  | "engineering"
-  | "arts-science"
-  | "polytechnic"
-  | "all-institutions";
+  "home" | "engineering" | "arts-science" | "polytechnic" | "all-institutions";
 
 const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
   home: ["/", "/campus-life", "/about-us"],

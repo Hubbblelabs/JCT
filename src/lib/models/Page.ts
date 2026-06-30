@@ -1,17 +1,10 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export type PageInstitution =
-  | "main"
-  | "engineering"
-  | "arts-science"
-  | "polytechnic";
+  "main" | "engineering" | "arts-science" | "polytechnic";
 
 export type PageTemplate =
-  | "standard"
-  | "hero-content"
-  | "sidebar"
-  | "gallery"
-  | "contact";
+  "standard" | "hero-content" | "sidebar" | "gallery" | "contact";
 
 export type PageStatus = "draft" | "published" | "archived";
 

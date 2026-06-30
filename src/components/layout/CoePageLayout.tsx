@@ -36,12 +36,7 @@ import {
 // ─── Editable sections ───────────────────────────────────────────────────────
 
 export type CoeEditableSection =
-  | "hero"
-  | "overview"
-  | "responsibilities"
-  | "obe"
-  | "downloads"
-  | "sidebar";
+  "hero" | "overview" | "responsibilities" | "obe" | "downloads" | "sidebar";
 
 export const COE_SECTION_LABELS: Record<CoeEditableSection, string> = {
   hero: "Hero",
@@ -76,7 +71,9 @@ export const COE_NAV_DEFAULTS: SidebarNavDefault[] = [
   { anchor: "downloads", navLabel: "Circulars & Downloads", icon: Download },
 ];
 
-const imgUrl = (v: string) => getImageUrl(v) || v || "/avatars/male_avatar.png";
+// Images come only from R2/CMS. Empty value -> "" so the call site skips the
+// <Image> and the neutral wrapper (bg-white/5) shows as the placeholder.
+const imgUrl = (v: string) => getImageUrl(v) || "";
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
 
@@ -389,13 +386,15 @@ export function CoePageLayout({
                 <div className="flex flex-col gap-6 p-5 sm:flex-row sm:items-start md:p-8">
                   <div className="flex flex-col items-center gap-3 sm:w-44 sm:shrink-0">
                     <div className="relative h-48 w-36 overflow-hidden rounded-2xl border border-white/10 bg-white/5 sm:h-56 sm:w-44">
-                      <Image
-                        src={imgUrl(ctrl.image)}
-                        alt={ctrl.name}
-                        fill
-                        className="object-cover object-top"
-                        sizes="(max-width: 640px) 144px, 176px"
-                      />
+                      {imgUrl(ctrl.image) && (
+                        <Image
+                          src={imgUrl(ctrl.image)}
+                          alt={ctrl.name}
+                          fill
+                          className="object-cover object-top"
+                          sizes="(max-width: 640px) 144px, 176px"
+                        />
+                      )}
                     </div>
                     <div className="text-center">
                       <p className="text-foreground font-bold">{ctrl.name}</p>

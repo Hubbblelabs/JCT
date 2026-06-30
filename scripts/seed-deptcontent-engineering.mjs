@@ -107,12 +107,42 @@ const PROGRAMS = [
       mission: [],
 
       programOutcomes: [
-        { code: "PSO1", title: "Business Analyst", description: "Ability to analyze business data and provide actionable insights." },
-        { code: "PSO2", title: "Data Analyst", description: "Proficiency in data collection, processing and statistical analysis." },
-        { code: "PSO3", title: "Intelligence Analyst", description: "Skills to extract intelligence from large datasets using AI techniques." },
-        { code: "PSO4", title: "Data Manager", description: "Competency in managing and organizing large-scale data repositories." },
-        { code: "PSO5", title: "Information Security Analyst", description: "Understanding of data security principles and their applications." },
-        { code: "PSO6", title: "Risk Analyst", description: "Ability to identify and quantify risks using data-driven approaches." },
+        {
+          code: "PSO1",
+          title: "Business Analyst",
+          description:
+            "Ability to analyze business data and provide actionable insights.",
+        },
+        {
+          code: "PSO2",
+          title: "Data Analyst",
+          description:
+            "Proficiency in data collection, processing and statistical analysis.",
+        },
+        {
+          code: "PSO3",
+          title: "Intelligence Analyst",
+          description:
+            "Skills to extract intelligence from large datasets using AI techniques.",
+        },
+        {
+          code: "PSO4",
+          title: "Data Manager",
+          description:
+            "Competency in managing and organizing large-scale data repositories.",
+        },
+        {
+          code: "PSO5",
+          title: "Information Security Analyst",
+          description:
+            "Understanding of data security principles and their applications.",
+        },
+        {
+          code: "PSO6",
+          title: "Risk Analyst",
+          description:
+            "Ability to identify and quantify risks using data-driven approaches.",
+        },
       ],
 
       advisoryBoard: [],
@@ -121,21 +151,111 @@ const PROGRAMS = [
       curriculum: [],
 
       faculty: [
-        { name: "Dr. Jethose V", designation: "Associate Professor", qualification: "M.E., Ph.D", experience: "10+ Years", specialization: "Machine Learning" },
-        { name: "Mr. Rajkumar K", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Deep Learning" },
-        { name: "Ms. Greeshma K", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Cloud Computing" },
-        { name: "Mrs. Anju P", designation: "Assistant Professor", qualification: "M.Tech", experience: "4+ Years", specialization: "Operating Systems" },
-        { name: "Mrs. Misha Mathew", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Fundamentals of Data Science" },
-        { name: "Mrs. Pavithra M S", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Ethics and AI" },
-        { name: "Mrs. Reshma M C", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Computer Networks" },
-        { name: "Mrs. Shahanaz S H", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Data Science and Analytics" },
-        { name: "Mr. Sivanesan A", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Design and Analysis of Algorithms" },
-        { name: "Ms. Radhika A", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Artificial Intelligence" },
-        { name: "Mr. Ramkumar K", designation: "Assistant Professor (POP)", qualification: "B.E.", experience: "3+ Years", specialization: "Network Security" },
-        { name: "Mr. Manikandan K", designation: "Assistant Professor (POP)", qualification: "B.E.", experience: "3+ Years", specialization: "Computer Networks" },
-        { name: "Mrs. Sasirekha C", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Data Exploration and Visualization" },
-        { name: "Mrs. Aiswariya P S", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Design and Analysis of Algorithms" },
-        { name: "Mrs. Deepika A", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Knowledge Engineering" },
+        {
+          name: "Dr. Jethose V",
+          designation: "Associate Professor",
+          qualification: "M.E., Ph.D",
+          experience: "10+ Years",
+          specialization: "Machine Learning",
+        },
+        {
+          name: "Mr. Rajkumar K",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Deep Learning",
+        },
+        {
+          name: "Ms. Greeshma K",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Cloud Computing",
+        },
+        {
+          name: "Mrs. Anju P",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "4+ Years",
+          specialization: "Operating Systems",
+        },
+        {
+          name: "Mrs. Misha Mathew",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Fundamentals of Data Science",
+        },
+        {
+          name: "Mrs. Pavithra M S",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Ethics and AI",
+        },
+        {
+          name: "Mrs. Reshma M C",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Computer Networks",
+        },
+        {
+          name: "Mrs. Shahanaz S H",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Data Science and Analytics",
+        },
+        {
+          name: "Mr. Sivanesan A",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Design and Analysis of Algorithms",
+        },
+        {
+          name: "Ms. Radhika A",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Artificial Intelligence",
+        },
+        {
+          name: "Mr. Ramkumar K",
+          designation: "Assistant Professor (POP)",
+          qualification: "B.E.",
+          experience: "3+ Years",
+          specialization: "Network Security",
+        },
+        {
+          name: "Mr. Manikandan K",
+          designation: "Assistant Professor (POP)",
+          qualification: "B.E.",
+          experience: "3+ Years",
+          specialization: "Computer Networks",
+        },
+        {
+          name: "Mrs. Sasirekha C",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Data Exploration and Visualization",
+        },
+        {
+          name: "Mrs. Aiswariya P S",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Design and Analysis of Algorithms",
+        },
+        {
+          name: "Mrs. Deepika A",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Knowledge Engineering",
+        },
       ],
 
       labs: [],
@@ -147,16 +267,39 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["Google", "Microsoft", "Amazon", "Flipkart", "Infosys", "TCS", "Wipro", "HCL Technologies"],
-        higherStudies: ["M.Tech / M.E. in AI & Data Science", "MBA (Data Analytics)", "GATE Qualified – IITs and NITs", "Ph.D Research Programs", "MS Abroad"],
+        topRecruiters: [
+          "Google",
+          "Microsoft",
+          "Amazon",
+          "Flipkart",
+          "Infosys",
+          "TCS",
+          "Wipro",
+          "HCL Technologies",
+        ],
+        higherStudies: [
+          "M.Tech / M.E. in AI & Data Science",
+          "MBA (Data Analytics)",
+          "GATE Qualified – IITs and NITs",
+          "Ph.D Research Programs",
+          "MS Abroad",
+        ],
         averagePackage: "4 LPA",
         placementRate: "90%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2021" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "90%" },
@@ -226,16 +369,76 @@ const PROGRAMS = [
       curriculum: [],
 
       faculty: [
-        { name: "Dr. Selvakumar K V", designation: "Professor and Head", qualification: "M.E., Ph.D", experience: "15+ Years", specialization: "Chemical Engineering, Biotechnology" },
-        { name: "Dr. Gnanavel G", designation: "Professor", qualification: "M.Tech, Ph.D", experience: "12+ Years", specialization: "Chemical Engineering, Biotechnology" },
-        { name: "Dr. Chandra Mohan A", designation: "Assistant Professor", qualification: "M.Tech, Ph.D", experience: "8+ Years", specialization: "Biochemistry, Biotechnology" },
-        { name: "Dr. David Annaraj P", designation: "Assistant Professor", qualification: "M.Tech, Ph.D", experience: "8+ Years", specialization: "Biotechnology, Biopharmaceutical Technology" },
-        { name: "Dr. Alwin Johnnie D", designation: "Assistant Professor", qualification: "M.Tech, Ph.D", experience: "8+ Years", specialization: "Biotechnology, Bioprocess Engineering" },
-        { name: "Ms. Swetha E", designation: "Assistant Professor", qualification: "M.Tech", experience: "4+ Years", specialization: "Biotechnology" },
-        { name: "Mrs. Athira P Anand", designation: "Assistant Professor", qualification: "M.Tech", experience: "4+ Years", specialization: "Biotechnology" },
-        { name: "Mrs. Saranya T", designation: "Assistant Professor", qualification: "M.Tech", experience: "4+ Years", specialization: "Biotechnology" },
-        { name: "Mr. Rohan J", designation: "Assistant Professor", qualification: "M.Tech", experience: "3+ Years", specialization: "Biotechnology" },
-        { name: "Ms. Preethi S", designation: "Assistant Professor", qualification: "M.Tech", experience: "3+ Years", specialization: "Biotechnology" },
+        {
+          name: "Dr. Selvakumar K V",
+          designation: "Professor and Head",
+          qualification: "M.E., Ph.D",
+          experience: "15+ Years",
+          specialization: "Chemical Engineering, Biotechnology",
+        },
+        {
+          name: "Dr. Gnanavel G",
+          designation: "Professor",
+          qualification: "M.Tech, Ph.D",
+          experience: "12+ Years",
+          specialization: "Chemical Engineering, Biotechnology",
+        },
+        {
+          name: "Dr. Chandra Mohan A",
+          designation: "Assistant Professor",
+          qualification: "M.Tech, Ph.D",
+          experience: "8+ Years",
+          specialization: "Biochemistry, Biotechnology",
+        },
+        {
+          name: "Dr. David Annaraj P",
+          designation: "Assistant Professor",
+          qualification: "M.Tech, Ph.D",
+          experience: "8+ Years",
+          specialization: "Biotechnology, Biopharmaceutical Technology",
+        },
+        {
+          name: "Dr. Alwin Johnnie D",
+          designation: "Assistant Professor",
+          qualification: "M.Tech, Ph.D",
+          experience: "8+ Years",
+          specialization: "Biotechnology, Bioprocess Engineering",
+        },
+        {
+          name: "Ms. Swetha E",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "4+ Years",
+          specialization: "Biotechnology",
+        },
+        {
+          name: "Mrs. Athira P Anand",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "4+ Years",
+          specialization: "Biotechnology",
+        },
+        {
+          name: "Mrs. Saranya T",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "4+ Years",
+          specialization: "Biotechnology",
+        },
+        {
+          name: "Mr. Rohan J",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "3+ Years",
+          specialization: "Biotechnology",
+        },
+        {
+          name: "Ms. Preethi S",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "3+ Years",
+          specialization: "Biotechnology",
+        },
       ],
 
       labs: [],
@@ -247,16 +450,39 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["Biocon", "Dr. Reddy's Laboratories", "Sun Pharmaceutical", "Cipla", "Piramal Enterprises", "ITC Foods", "Nestlé", "Britannia"],
-        higherStudies: ["M.Tech / M.E. in Biotechnology / Chemical Engineering", "MBA", "GATE Qualified – IITs and NITs", "Ph.D Research Programs", "MS Abroad"],
+        topRecruiters: [
+          "Biocon",
+          "Dr. Reddy's Laboratories",
+          "Sun Pharmaceutical",
+          "Cipla",
+          "Piramal Enterprises",
+          "ITC Foods",
+          "Nestlé",
+          "Britannia",
+        ],
+        higherStudies: [
+          "M.Tech / M.E. in Biotechnology / Chemical Engineering",
+          "MBA",
+          "GATE Qualified – IITs and NITs",
+          "Ph.D Research Programs",
+          "MS Abroad",
+        ],
         averagePackage: "3.5 LPA",
         placementRate: "85%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2011" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "85%" },
@@ -326,41 +552,166 @@ const PROGRAMS = [
       ],
 
       programOutcomes: [
-        { code: "PEO1", title: "Professional Excellence", description: "Graduates will excel as successful civil engineers, academicians and researchers." },
-        { code: "PEO2", title: "Professionalism", description: "Graduates will exhibit professionalism, ethical attitude, communication and managerial skills, team work and social responsibility." },
-        { code: "PEO3", title: "Lifelong Learning", description: "Graduates shall adapt to current trends by engaging in lifelong learning." },
+        {
+          code: "PEO1",
+          title: "Professional Excellence",
+          description:
+            "Graduates will excel as successful civil engineers, academicians and researchers.",
+        },
+        {
+          code: "PEO2",
+          title: "Professionalism",
+          description:
+            "Graduates will exhibit professionalism, ethical attitude, communication and managerial skills, team work and social responsibility.",
+        },
+        {
+          code: "PEO3",
+          title: "Lifelong Learning",
+          description:
+            "Graduates shall adapt to current trends by engaging in lifelong learning.",
+        },
       ],
 
       advisoryBoard: [
-        { name: "Thiru. R. Durga Shankar", designation: "Secretary", organization: "JCT Group of Institutions, Coimbatore", role: "Chairman" },
-        { name: "Dr. V. J. Arulkarthick", designation: "Principal", organization: "JCT College of Engineering and Technology, Coimbatore", role: "Member" },
-        { name: "Mr. A. Chandrahasan", designation: "Administrative Officer", organization: "JCT Group of Institutions, Coimbatore", role: "Member" },
+        {
+          name: "Thiru. R. Durga Shankar",
+          designation: "Secretary",
+          organization: "JCT Group of Institutions, Coimbatore",
+          role: "Chairman",
+        },
+        {
+          name: "Dr. V. J. Arulkarthick",
+          designation: "Principal",
+          organization: "JCT College of Engineering and Technology, Coimbatore",
+          role: "Member",
+        },
+        {
+          name: "Mr. A. Chandrahasan",
+          designation: "Administrative Officer",
+          organization: "JCT Group of Institutions, Coimbatore",
+          role: "Member",
+        },
       ],
       pac: [],
       bos: [],
       curriculum: [],
 
       faculty: [
-        { name: "Dr. V. Murugesh", designation: "Associate Professor and Head", qualification: "Ph.D, PDF", experience: "15+ Years", specialization: "Structural Engineering" },
-        { name: "Dr. Murugan A", designation: "Professor", qualification: "Ph.D", experience: "15+ Years", specialization: "Structural Engineering" },
-        { name: "Mr. Hari G S", designation: "Assistant Professor", qualification: "M.E. (Ph.D)", experience: "8+ Years", specialization: "Structural Engineering" },
-        { name: "Mr. M. Sadhasivam", designation: "Assistant Professor", qualification: "M.E. (Ph.D)", experience: "7+ Years", specialization: "Geotechnical Engineering" },
-        { name: "Mr. Arul Ganapathy D", designation: "Assistant Professor", qualification: "M.E.", experience: "6+ Years", specialization: "Environmental Engineering" },
-        { name: "Ms. Reshma P D", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Structural Engineering" },
-        { name: "Ms. R. Jagedeswari", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Structural Engineering" },
-        { name: "Ms. Vidhya B", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Construction Engineering and Management" },
-        { name: "Ms. Nandhini S", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Structural Engineering" },
-        { name: "Ms. Maloothin Margrat Nisha", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Construction Management" },
+        {
+          name: "Dr. V. Murugesh",
+          designation: "Associate Professor and Head",
+          qualification: "Ph.D, PDF",
+          experience: "15+ Years",
+          specialization: "Structural Engineering",
+        },
+        {
+          name: "Dr. Murugan A",
+          designation: "Professor",
+          qualification: "Ph.D",
+          experience: "15+ Years",
+          specialization: "Structural Engineering",
+        },
+        {
+          name: "Mr. Hari G S",
+          designation: "Assistant Professor",
+          qualification: "M.E. (Ph.D)",
+          experience: "8+ Years",
+          specialization: "Structural Engineering",
+        },
+        {
+          name: "Mr. M. Sadhasivam",
+          designation: "Assistant Professor",
+          qualification: "M.E. (Ph.D)",
+          experience: "7+ Years",
+          specialization: "Geotechnical Engineering",
+        },
+        {
+          name: "Mr. Arul Ganapathy D",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "6+ Years",
+          specialization: "Environmental Engineering",
+        },
+        {
+          name: "Ms. Reshma P D",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Structural Engineering",
+        },
+        {
+          name: "Ms. R. Jagedeswari",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Structural Engineering",
+        },
+        {
+          name: "Ms. Vidhya B",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Construction Engineering and Management",
+        },
+        {
+          name: "Ms. Nandhini S",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Structural Engineering",
+        },
+        {
+          name: "Ms. Maloothin Margrat Nisha",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Construction Management",
+        },
       ],
 
       labs: [
-        { name: "Hydraulics Engineering Laboratory", description: "Equipped with instruments for fluid flow, open channel, pipe flow experiments.", equipment: [] },
-        { name: "Structural Engineering Laboratory", description: "Facilities for testing concrete, steel and masonry structural members.", equipment: [] },
-        { name: "Environmental Engineering Laboratory", description: "Equipped for water quality testing, waste water treatment analysis.", equipment: [] },
-        { name: "Soil Mechanics Laboratory", description: "Facilities for soil classification, compaction, permeability and shear strength tests.", equipment: [] },
-        { name: "Concrete Technology Laboratory", description: "Equipped for concrete mix design, compressive strength and durability testing.", equipment: [] },
-        { name: "Transportation Engineering Laboratory", description: "Facilities for bitumen, aggregate and pavement material testing.", equipment: [] },
-        { name: "Surveying Laboratory", description: "Equipped with total stations, levels, theodolites and GPS instruments.", equipment: [] },
+        {
+          name: "Hydraulics Engineering Laboratory",
+          description:
+            "Equipped with instruments for fluid flow, open channel, pipe flow experiments.",
+          equipment: [],
+        },
+        {
+          name: "Structural Engineering Laboratory",
+          description:
+            "Facilities for testing concrete, steel and masonry structural members.",
+          equipment: [],
+        },
+        {
+          name: "Environmental Engineering Laboratory",
+          description:
+            "Equipped for water quality testing, waste water treatment analysis.",
+          equipment: [],
+        },
+        {
+          name: "Soil Mechanics Laboratory",
+          description:
+            "Facilities for soil classification, compaction, permeability and shear strength tests.",
+          equipment: [],
+        },
+        {
+          name: "Concrete Technology Laboratory",
+          description:
+            "Equipped for concrete mix design, compressive strength and durability testing.",
+          equipment: [],
+        },
+        {
+          name: "Transportation Engineering Laboratory",
+          description:
+            "Facilities for bitumen, aggregate and pavement material testing.",
+          equipment: [],
+        },
+        {
+          name: "Surveying Laboratory",
+          description:
+            "Equipped with total stations, levels, theodolites and GPS instruments.",
+          equipment: [],
+        },
       ],
 
       teachingLearning: { overview: "", methods: [], tools: [], practices: [] },
@@ -371,16 +722,39 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["L&T Constructions", "DLF Building India", "HCC Infrastructure", "Afcons India Pvt. Ltd.", "NCC Ltd", "Indian Railways", "TNPSC Government Departments", "URC Constructions"],
-        higherStudies: ["M.E. / M.Tech in Structural / Environmental / Geotechnical Engineering", "MBA (Construction Management)", "GATE Qualified – IITs and NITs", "Ph.D Research Programs", "MS Abroad"],
+        topRecruiters: [
+          "L&T Constructions",
+          "DLF Building India",
+          "HCC Infrastructure",
+          "Afcons India Pvt. Ltd.",
+          "NCC Ltd",
+          "Indian Railways",
+          "TNPSC Government Departments",
+          "URC Constructions",
+        ],
+        higherStudies: [
+          "M.E. / M.Tech in Structural / Environmental / Geotechnical Engineering",
+          "MBA (Construction Management)",
+          "GATE Qualified – IITs and NITs",
+          "Ph.D Research Programs",
+          "MS Abroad",
+        ],
         averagePackage: "3.5 LPA",
         placementRate: "90%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2009" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "90%" },
@@ -449,16 +823,76 @@ const PROGRAMS = [
       curriculum: [],
 
       faculty: [
-        { name: "Mrs. Malarvizhi K", designation: "Associate Professor and Head", qualification: "M.E. (Ph.D)", experience: "10+ Years", specialization: "Software Engineering" },
-        { name: "Mrs. Bhuvaneshwari R", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Mr. K. Karthikumar", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. Agnes Princy", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Communication Systems" },
-        { name: "Mr. Dhakshina Murthy R", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. Kanaga Priya P", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. Sowmya R", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. Siva Ranjani R", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Mrs. M. S. Vinu", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Mr. K. Baheerathan", designation: "Assistant Professor (POP)", qualification: "B.E.", experience: "3+ Years", specialization: "Computer Science and Engineering" },
+        {
+          name: "Mrs. Malarvizhi K",
+          designation: "Associate Professor and Head",
+          qualification: "M.E. (Ph.D)",
+          experience: "10+ Years",
+          specialization: "Software Engineering",
+        },
+        {
+          name: "Mrs. Bhuvaneshwari R",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Mr. K. Karthikumar",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. Agnes Princy",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Communication Systems",
+        },
+        {
+          name: "Mr. Dhakshina Murthy R",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. Kanaga Priya P",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. Sowmya R",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. Siva Ranjani R",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Mrs. M. S. Vinu",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Mr. K. Baheerathan",
+          designation: "Assistant Professor (POP)",
+          qualification: "B.E.",
+          experience: "3+ Years",
+          specialization: "Computer Science and Engineering",
+        },
       ],
 
       labs: [],
@@ -470,16 +904,39 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["TCS", "Infosys", "Wipro", "Accenture", "Cognizant", "HCL Technologies", "Capgemini", "Amazon"],
-        higherStudies: ["M.Tech / M.E. in Computer Science / Business Systems", "MBA", "GATE Qualified – IITs and NITs", "Ph.D Research Programs", "MS Abroad"],
+        topRecruiters: [
+          "TCS",
+          "Infosys",
+          "Wipro",
+          "Accenture",
+          "Cognizant",
+          "HCL Technologies",
+          "Capgemini",
+          "Amazon",
+        ],
+        higherStudies: [
+          "M.Tech / M.E. in Computer Science / Business Systems",
+          "MBA",
+          "GATE Qualified – IITs and NITs",
+          "Ph.D Research Programs",
+          "MS Abroad",
+        ],
         averagePackage: "4 LPA",
         placementRate: "92%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2020" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "92%" },
@@ -550,56 +1007,290 @@ const PROGRAMS = [
       ],
 
       programOutcomes: [
-        { code: "PEO1", title: "Technical Innovation", description: "Graduates will apply foundational knowledge and modern tools of Computer Science and Engineering to develop innovative solutions, pursue higher studies, and adapt to evolving technologies in professional environments." },
-        { code: "PEO2", title: "Ethics and Leadership", description: "Graduates will demonstrate ethical behavior, leadership, and social responsibility while addressing technological and societal challenges, and will leverage their technical knowledge and creativity to drive innovation, initiate start-ups, or make meaningful contributions in industry or academia." },
-        { code: "PEO3", title: "Lifelong Learning", description: "Graduates will demonstrate a commitment to continuous learning, acquire relevant certifications, and collaborate effectively with multidisciplinary teams in diverse professional settings." },
-        { code: "PSO1", title: "Core Computing Proficiency", description: "Graduates will be able to apply the fundamentals of computer science, including data structures, algorithms, database systems, computer networks and computer architecture, to develop efficient computing solutions." },
-        { code: "PSO2", title: "Emerging Technologies and Research", description: "Graduates will be able to explore and apply emerging technologies such as Artificial Intelligence, Machine Learning, Cloud Computing, IoT, and Cyber security to solve real-world problems and pursue research." },
+        {
+          code: "PEO1",
+          title: "Technical Innovation",
+          description:
+            "Graduates will apply foundational knowledge and modern tools of Computer Science and Engineering to develop innovative solutions, pursue higher studies, and adapt to evolving technologies in professional environments.",
+        },
+        {
+          code: "PEO2",
+          title: "Ethics and Leadership",
+          description:
+            "Graduates will demonstrate ethical behavior, leadership, and social responsibility while addressing technological and societal challenges, and will leverage their technical knowledge and creativity to drive innovation, initiate start-ups, or make meaningful contributions in industry or academia.",
+        },
+        {
+          code: "PEO3",
+          title: "Lifelong Learning",
+          description:
+            "Graduates will demonstrate a commitment to continuous learning, acquire relevant certifications, and collaborate effectively with multidisciplinary teams in diverse professional settings.",
+        },
+        {
+          code: "PSO1",
+          title: "Core Computing Proficiency",
+          description:
+            "Graduates will be able to apply the fundamentals of computer science, including data structures, algorithms, database systems, computer networks and computer architecture, to develop efficient computing solutions.",
+        },
+        {
+          code: "PSO2",
+          title: "Emerging Technologies and Research",
+          description:
+            "Graduates will be able to explore and apply emerging technologies such as Artificial Intelligence, Machine Learning, Cloud Computing, IoT, and Cyber security to solve real-world problems and pursue research.",
+        },
       ],
 
       advisoryBoard: [
-        { name: "Thiru. R. Durga Shankar", designation: "Secretary", organization: "JCT Group of Institutions, Coimbatore", role: "Chairman" },
-        { name: "Dr. V. J. Arulkarthick", designation: "Principal", organization: "JCT College of Engineering and Technology, Coimbatore", role: "Member" },
-        { name: "Mr. A. Chandrahasan", designation: "Administrative Officer", organization: "JCT Group of Institutions, Coimbatore", role: "Member" },
-        { name: "Dr. S. Balamurugan", designation: "Director – Research and Development", organization: "Mindnotix Technologies, Coimbatore", role: "Industry Expert" },
-        { name: "Dr. M. Rajalakshmi", designation: "Associate Professor, Dept of CSE & IT", organization: "Coimbatore Institute of Technology, Coimbatore", role: "Senior Academician" },
-        { name: "Dr. G. Rajiv SureshKumar", designation: "Head of the Department", organization: "JCT College of Engineering and Technology, Coimbatore", role: "HOD" },
-        { name: "Prof. K. Malarvizhi", designation: "Associate Professor", organization: "JCT College of Engineering and Technology, Coimbatore", role: "Senior Faculty" },
+        {
+          name: "Thiru. R. Durga Shankar",
+          designation: "Secretary",
+          organization: "JCT Group of Institutions, Coimbatore",
+          role: "Chairman",
+        },
+        {
+          name: "Dr. V. J. Arulkarthick",
+          designation: "Principal",
+          organization: "JCT College of Engineering and Technology, Coimbatore",
+          role: "Member",
+        },
+        {
+          name: "Mr. A. Chandrahasan",
+          designation: "Administrative Officer",
+          organization: "JCT Group of Institutions, Coimbatore",
+          role: "Member",
+        },
+        {
+          name: "Dr. S. Balamurugan",
+          designation: "Director – Research and Development",
+          organization: "Mindnotix Technologies, Coimbatore",
+          role: "Industry Expert",
+        },
+        {
+          name: "Dr. M. Rajalakshmi",
+          designation: "Associate Professor, Dept of CSE & IT",
+          organization: "Coimbatore Institute of Technology, Coimbatore",
+          role: "Senior Academician",
+        },
+        {
+          name: "Dr. G. Rajiv SureshKumar",
+          designation: "Head of the Department",
+          organization: "JCT College of Engineering and Technology, Coimbatore",
+          role: "HOD",
+        },
+        {
+          name: "Prof. K. Malarvizhi",
+          designation: "Associate Professor",
+          organization: "JCT College of Engineering and Technology, Coimbatore",
+          role: "Senior Faculty",
+        },
       ],
       pac: [],
       bos: [],
       curriculum: [],
 
       faculty: [
-        { name: "Dr. R. Venkatesh", designation: "Professor", qualification: "Ph.D", experience: "18+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Dr. P. D. R. Vijayakumar", designation: "Professor", qualification: "Ph.D", experience: "16+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Dr. S. Sakthi Vinayagam", designation: "Associate Professor", qualification: "Ph.D", experience: "14+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Dr. T. Rajendran", designation: "Associate Professor", qualification: "Ph.D", experience: "12+ Years", specialization: "Information and Communication Engineering" },
-        { name: "Dr. D. Kalaiselvi", designation: "Associate Professor", qualification: "Ph.D", experience: "12+ Years", specialization: "Information and Communication Engineering" },
-        { name: "Mr. G. Elavarasan", designation: "Assistant Professor", qualification: "Ph.D", experience: "8+ Years", specialization: "Information and Communication Engineering" },
-        { name: "Ms. R. Yesodha", designation: "Assistant Professor", qualification: "Ph.D", experience: "8+ Years", specialization: "Computer Applications" },
-        { name: "Ms. K. Lalithambigai", designation: "Assistant Professor", qualification: "M.E.", experience: "7+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Mr. J. Arun", designation: "Assistant Professor", qualification: "M.E.", experience: "6+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. A. Asha", designation: "Assistant Professor", qualification: "M.E.", experience: "6+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. V. P. Leena", designation: "Assistant Professor", qualification: "M.E.", experience: "6+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. S. Sandhya", designation: "Assistant Professor", qualification: "M.E.", experience: "6+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. K. Haritha", designation: "Assistant Professor", qualification: "M.E.", experience: "6+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. Rincy M. Rafi", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. K. Rincy", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. T. Revathi", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. S. Rajeswari", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Mr. P. Prabu", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Software Engineering" },
-        { name: "Mr. V. Ashok Kumar", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Mr. H. Vinothkumar", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. A. Sindhuja", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Mr. K. Sudhir", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Mr. K. Elangovan", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Mr. S. Sathya", designation: "Assistant Professor", qualification: "M.Tech", experience: "4+ Years", specialization: "Information Technology" },
-        { name: "Mr. G. Saravanan", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Mr. A. Divya", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Mr. B. Raj Kumar", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Ms. E. Annal Sheeba Rani", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Computer Science and Engineering" },
-        { name: "Mr. A. Ajith Kumar", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "Computer Science and Engineering" },
+        {
+          name: "Dr. R. Venkatesh",
+          designation: "Professor",
+          qualification: "Ph.D",
+          experience: "18+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Dr. P. D. R. Vijayakumar",
+          designation: "Professor",
+          qualification: "Ph.D",
+          experience: "16+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Dr. S. Sakthi Vinayagam",
+          designation: "Associate Professor",
+          qualification: "Ph.D",
+          experience: "14+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Dr. T. Rajendran",
+          designation: "Associate Professor",
+          qualification: "Ph.D",
+          experience: "12+ Years",
+          specialization: "Information and Communication Engineering",
+        },
+        {
+          name: "Dr. D. Kalaiselvi",
+          designation: "Associate Professor",
+          qualification: "Ph.D",
+          experience: "12+ Years",
+          specialization: "Information and Communication Engineering",
+        },
+        {
+          name: "Mr. G. Elavarasan",
+          designation: "Assistant Professor",
+          qualification: "Ph.D",
+          experience: "8+ Years",
+          specialization: "Information and Communication Engineering",
+        },
+        {
+          name: "Ms. R. Yesodha",
+          designation: "Assistant Professor",
+          qualification: "Ph.D",
+          experience: "8+ Years",
+          specialization: "Computer Applications",
+        },
+        {
+          name: "Ms. K. Lalithambigai",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "7+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Mr. J. Arun",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "6+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. A. Asha",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "6+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. V. P. Leena",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "6+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. S. Sandhya",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "6+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. K. Haritha",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "6+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. Rincy M. Rafi",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. K. Rincy",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. T. Revathi",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. S. Rajeswari",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Mr. P. Prabu",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Software Engineering",
+        },
+        {
+          name: "Mr. V. Ashok Kumar",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Mr. H. Vinothkumar",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. A. Sindhuja",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Mr. K. Sudhir",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Mr. K. Elangovan",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Mr. S. Sathya",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "4+ Years",
+          specialization: "Information Technology",
+        },
+        {
+          name: "Mr. G. Saravanan",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Mr. A. Divya",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Mr. B. Raj Kumar",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Ms. E. Annal Sheeba Rani",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Computer Science and Engineering",
+        },
+        {
+          name: "Mr. A. Ajith Kumar",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "Computer Science and Engineering",
+        },
       ],
 
       labs: [],
@@ -611,16 +1302,43 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["Google", "Microsoft", "Amazon", "Infosys", "TCS", "Wipro", "Accenture", "IBM", "Oracle", "HCL Technologies", "Cognizant", "Capgemini"],
-        higherStudies: ["M.E. / M.Tech in Computer Science", "MBA", "GATE Qualified – IITs and NITs", "Ph.D Research Programs", "MS Abroad (USA, UK, Germany)"],
+        topRecruiters: [
+          "Google",
+          "Microsoft",
+          "Amazon",
+          "Infosys",
+          "TCS",
+          "Wipro",
+          "Accenture",
+          "IBM",
+          "Oracle",
+          "HCL Technologies",
+          "Cognizant",
+          "Capgemini",
+        ],
+        higherStudies: [
+          "M.E. / M.Tech in Computer Science",
+          "MBA",
+          "GATE Qualified – IITs and NITs",
+          "Ph.D Research Programs",
+          "MS Abroad (USA, UK, Germany)",
+        ],
         averagePackage: "4.5 LPA",
         placementRate: "95%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2009" },
         { icon: "Users", label: "Intake", value: "180 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE, NBA" },
         { icon: "Briefcase", label: "Placement Rate", value: "95%" },
@@ -690,54 +1408,249 @@ const PROGRAMS = [
       ],
 
       programOutcomes: [
-        { code: "PEO1", title: "Technical Foundation", description: "Graduates will possess a strong foundation in Electrical and Electronics Engineering, enabling them to solve real-world problems, contribute to advanced research, and engage in innovative development." },
-        { code: "PEO2", title: "Professional Skills", description: "Graduates will demonstrate technical proficiency, leadership, and teamwork in multidisciplinary environments, fulfilling industry and societal needs." },
-        { code: "PEO3", title: "Ethics and Innovation", description: "Graduates will exhibit ethical behavior, social responsibility and a commitment to continuous learning and innovation throughout their career." },
-        { code: "PSO1", title: "Electrical Systems Design", description: "Develop electrical and electronic systems by applying knowledge of machines, circuits, control systems, and embedded technologies to solve real-world engineering challenges." },
-        { code: "PSO2", title: "Innovation in Energy", description: "Engage in problem-solving and innovation in areas such as electric vehicles, renewable energy systems, and embedded technologies, aligning with current and future industry trends." },
+        {
+          code: "PEO1",
+          title: "Technical Foundation",
+          description:
+            "Graduates will possess a strong foundation in Electrical and Electronics Engineering, enabling them to solve real-world problems, contribute to advanced research, and engage in innovative development.",
+        },
+        {
+          code: "PEO2",
+          title: "Professional Skills",
+          description:
+            "Graduates will demonstrate technical proficiency, leadership, and teamwork in multidisciplinary environments, fulfilling industry and societal needs.",
+        },
+        {
+          code: "PEO3",
+          title: "Ethics and Innovation",
+          description:
+            "Graduates will exhibit ethical behavior, social responsibility and a commitment to continuous learning and innovation throughout their career.",
+        },
+        {
+          code: "PSO1",
+          title: "Electrical Systems Design",
+          description:
+            "Develop electrical and electronic systems by applying knowledge of machines, circuits, control systems, and embedded technologies to solve real-world engineering challenges.",
+        },
+        {
+          code: "PSO2",
+          title: "Innovation in Energy",
+          description:
+            "Engage in problem-solving and innovation in areas such as electric vehicles, renewable energy systems, and embedded technologies, aligning with current and future industry trends.",
+        },
       ],
 
       advisoryBoard: [
-        { name: "Dr. S. Manoharan", designation: "Principal", organization: "JCT College of Engineering and Technology, Coimbatore", role: "Member" },
-        { name: "Mr. A. Chandrahassan", designation: "Administrative Officer", organization: "JCT Group of Institutions, Coimbatore", role: "Member" },
-        { name: "Dr. B. Balraj", designation: "Dean/Academics, Professor and Head/EEE", organization: "JCT College of Engineering and Technology, Coimbatore", role: "HOD" },
-        { name: "Dr. P. Maruthupandi", designation: "Associate Professor/EEE", organization: "Government College of Technology, Coimbatore", role: "Senior Academician" },
-        { name: "Dr. Shriram K V", designation: "Lead – Technology Evangelist, Asia Pacific and Japan Region", organization: "Intel India Pvt. Limited, Bengaluru", role: "Industry Expert" },
-        { name: "Ms. V. Anjana Sree", designation: "Alumni, Assistant Engineer", organization: "Kerala State Electricity Board Limited, Palakkad", role: "Alumni Representative" },
+        {
+          name: "Dr. S. Manoharan",
+          designation: "Principal",
+          organization: "JCT College of Engineering and Technology, Coimbatore",
+          role: "Member",
+        },
+        {
+          name: "Mr. A. Chandrahassan",
+          designation: "Administrative Officer",
+          organization: "JCT Group of Institutions, Coimbatore",
+          role: "Member",
+        },
+        {
+          name: "Dr. B. Balraj",
+          designation: "Dean/Academics, Professor and Head/EEE",
+          organization: "JCT College of Engineering and Technology, Coimbatore",
+          role: "HOD",
+        },
+        {
+          name: "Dr. P. Maruthupandi",
+          designation: "Associate Professor/EEE",
+          organization: "Government College of Technology, Coimbatore",
+          role: "Senior Academician",
+        },
+        {
+          name: "Dr. Shriram K V",
+          designation:
+            "Lead – Technology Evangelist, Asia Pacific and Japan Region",
+          organization: "Intel India Pvt. Limited, Bengaluru",
+          role: "Industry Expert",
+        },
+        {
+          name: "Ms. V. Anjana Sree",
+          designation: "Alumni, Assistant Engineer",
+          organization: "Kerala State Electricity Board Limited, Palakkad",
+          role: "Alumni Representative",
+        },
       ],
       pac: [],
       bos: [],
       curriculum: [],
 
       faculty: [
-        { name: "Manoharan Subramanian", designation: "Professor", qualification: "Ph.D", experience: "18+ Years", specialization: "Electrical Machines" },
-        { name: "Balraj Baskaran", designation: "Professor", qualification: "Ph.D", experience: "16+ Years", specialization: "Instrumentation Engineering" },
-        { name: "S. Karthikumar", designation: "Professor", qualification: "Ph.D", experience: "15+ Years", specialization: "Applied Electronics" },
-        { name: "Vimalraj Shanmugam", designation: "Professor", qualification: "Ph.D", experience: "14+ Years", specialization: "Applied Electronics" },
-        { name: "Ganesh Ramanathan Meenashi", designation: "Associate Professor", qualification: "Ph.D", experience: "12+ Years", specialization: "Control and Instrumentation Engineering" },
-        { name: "Saravanan Masakkalipalayam", designation: "Assistant Professor", qualification: "M.E.", experience: "7+ Years", specialization: "Power Electronics and Drives" },
-        { name: "Nagarajan Duraisamy", designation: "Assistant Professor", qualification: "M.E.", experience: "7+ Years", specialization: "Power Electronics and Drives" },
-        { name: "Gowtham Srinivasan Balakrishnan", designation: "Assistant Professor", qualification: "M.E.", experience: "6+ Years", specialization: "Power Electronics and Drives" },
-        { name: "Satheesh Ramalingam", designation: "Assistant Professor", qualification: "M.E.", experience: "6+ Years", specialization: "Power Electronics and Drives" },
-        { name: "Shobana Selvaraj", designation: "Assistant Professor", qualification: "M.E.", experience: "6+ Years", specialization: "Power System Engineering" },
-        { name: "Dhamodharan Shanmugam", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Power Electronics and Drives" },
-        { name: "Shanthi Madasamy", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Control and Instrumentation Engineering" },
-        { name: "Ramya Peramiyagounder", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Power Electronics and Drives" },
-        { name: "Saravanan Vasudevan", designation: "Assistant Professor", qualification: "M.E.", experience: "5+ Years", specialization: "Power Electronics and Drives" },
-        { name: "Greeshma Chamakkad Sivanandan", designation: "Assistant Professor", qualification: "M.E.", experience: "4+ Years", specialization: "VLSI Design" },
+        {
+          name: "Manoharan Subramanian",
+          designation: "Professor",
+          qualification: "Ph.D",
+          experience: "18+ Years",
+          specialization: "Electrical Machines",
+        },
+        {
+          name: "Balraj Baskaran",
+          designation: "Professor",
+          qualification: "Ph.D",
+          experience: "16+ Years",
+          specialization: "Instrumentation Engineering",
+        },
+        {
+          name: "S. Karthikumar",
+          designation: "Professor",
+          qualification: "Ph.D",
+          experience: "15+ Years",
+          specialization: "Applied Electronics",
+        },
+        {
+          name: "Vimalraj Shanmugam",
+          designation: "Professor",
+          qualification: "Ph.D",
+          experience: "14+ Years",
+          specialization: "Applied Electronics",
+        },
+        {
+          name: "Ganesh Ramanathan Meenashi",
+          designation: "Associate Professor",
+          qualification: "Ph.D",
+          experience: "12+ Years",
+          specialization: "Control and Instrumentation Engineering",
+        },
+        {
+          name: "Saravanan Masakkalipalayam",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "7+ Years",
+          specialization: "Power Electronics and Drives",
+        },
+        {
+          name: "Nagarajan Duraisamy",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "7+ Years",
+          specialization: "Power Electronics and Drives",
+        },
+        {
+          name: "Gowtham Srinivasan Balakrishnan",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "6+ Years",
+          specialization: "Power Electronics and Drives",
+        },
+        {
+          name: "Satheesh Ramalingam",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "6+ Years",
+          specialization: "Power Electronics and Drives",
+        },
+        {
+          name: "Shobana Selvaraj",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "6+ Years",
+          specialization: "Power System Engineering",
+        },
+        {
+          name: "Dhamodharan Shanmugam",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Power Electronics and Drives",
+        },
+        {
+          name: "Shanthi Madasamy",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Control and Instrumentation Engineering",
+        },
+        {
+          name: "Ramya Peramiyagounder",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Power Electronics and Drives",
+        },
+        {
+          name: "Saravanan Vasudevan",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "5+ Years",
+          specialization: "Power Electronics and Drives",
+        },
+        {
+          name: "Greeshma Chamakkad Sivanandan",
+          designation: "Assistant Professor",
+          qualification: "M.E.",
+          experience: "4+ Years",
+          specialization: "VLSI Design",
+        },
       ],
 
       labs: [
-        { name: "Electric Circuits Lab", description: "Equipped for fundamental circuit analysis, AC/DC circuit experiments.", equipment: [] },
-        { name: "Electronics Devices and Circuits Lab", description: "Facilities for semiconductor device characterization and amplifier circuits.", equipment: [] },
-        { name: "Engineering Practice Lab", description: "Practical training in basic electrical engineering and safety.", equipment: [] },
-        { name: "Power Electronics Lab", description: "Equipped with converters, inverters, and power semiconductor devices.", equipment: [] },
-        { name: "Power System Simulation Lab", description: "Simulation software for power system analysis and load flow studies.", equipment: [] },
-        { name: "Electrical Machines Lab", description: "Equipped with DC and AC motors, generators, and transformers for testing.", equipment: [] },
-        { name: "Measurement and Instrumentation Lab", description: "Instruments for measuring electrical quantities and calibration.", equipment: [] },
-        { name: "Control Systems Lab", description: "Facilities for closed-loop and open-loop control system experiments.", equipment: [] },
-        { name: "Electronics Design Lab", description: "Advanced lab for circuit design and PCB prototyping.", equipment: [] },
-        { name: "Electric Drives and Control Lab", description: "Equipped with motor drives and control systems for EV applications.", equipment: [] },
+        {
+          name: "Electric Circuits Lab",
+          description:
+            "Equipped for fundamental circuit analysis, AC/DC circuit experiments.",
+          equipment: [],
+        },
+        {
+          name: "Electronics Devices and Circuits Lab",
+          description:
+            "Facilities for semiconductor device characterization and amplifier circuits.",
+          equipment: [],
+        },
+        {
+          name: "Engineering Practice Lab",
+          description:
+            "Practical training in basic electrical engineering and safety.",
+          equipment: [],
+        },
+        {
+          name: "Power Electronics Lab",
+          description:
+            "Equipped with converters, inverters, and power semiconductor devices.",
+          equipment: [],
+        },
+        {
+          name: "Power System Simulation Lab",
+          description:
+            "Simulation software for power system analysis and load flow studies.",
+          equipment: [],
+        },
+        {
+          name: "Electrical Machines Lab",
+          description:
+            "Equipped with DC and AC motors, generators, and transformers for testing.",
+          equipment: [],
+        },
+        {
+          name: "Measurement and Instrumentation Lab",
+          description:
+            "Instruments for measuring electrical quantities and calibration.",
+          equipment: [],
+        },
+        {
+          name: "Control Systems Lab",
+          description:
+            "Facilities for closed-loop and open-loop control system experiments.",
+          equipment: [],
+        },
+        {
+          name: "Electronics Design Lab",
+          description: "Advanced lab for circuit design and PCB prototyping.",
+          equipment: [],
+        },
+        {
+          name: "Electric Drives and Control Lab",
+          description:
+            "Equipped with motor drives and control systems for EV applications.",
+          equipment: [],
+        },
       ],
 
       teachingLearning: { overview: "", methods: [], tools: [], practices: [] },
@@ -748,16 +1661,41 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["ONGC", "BHEL", "SAIL", "GAIL", "Siemens", "BEL", "ISRO", "DRDO", "TNEB", "Steel Authority of India"],
-        higherStudies: ["M.E. / M.Tech in Power Electronics / Electrical Engineering", "MBA", "GATE Qualified – IITs and NITs", "Ph.D Research Programs", "MS Abroad"],
+        topRecruiters: [
+          "ONGC",
+          "BHEL",
+          "SAIL",
+          "GAIL",
+          "Siemens",
+          "BEL",
+          "ISRO",
+          "DRDO",
+          "TNEB",
+          "Steel Authority of India",
+        ],
+        higherStudies: [
+          "M.E. / M.Tech in Power Electronics / Electrical Engineering",
+          "MBA",
+          "GATE Qualified – IITs and NITs",
+          "Ph.D Research Programs",
+          "MS Abroad",
+        ],
         averagePackage: "3.5 LPA",
         placementRate: "88%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2010" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "88%" },
@@ -829,43 +1767,191 @@ const PROGRAMS = [
       programOutcomes: [],
 
       advisoryBoard: [
-        { name: "Thiru. R. Durga Shankar", designation: "Secretary", organization: "JCT Institutions, Coimbatore", role: "Chairman" },
-        { name: "Dr. V. J. Arulkarthick", designation: "Principal", organization: "JCTCET, Coimbatore", role: "Member" },
-        { name: "Mr. A. Chandrahasan", designation: "Administrative Officer", organization: "JCT Institutions, Coimbatore", role: "Member" },
-        { name: "Dr. S. Uma Maheswari", designation: "Professor, Department of ECE", organization: "Coimbatore Institute of Technology, Coimbatore", role: "Senior Academician" },
-        { name: "Dr. Pushpavalli", designation: "Associate Professor, Department of ECE", organization: "Bannari Amman College of Technology, Sathyamangalam", role: "Senior Academician" },
-        { name: "Mr. L. Jegadheesan", designation: "Chief Executive Officer", organization: "Aristats e-Solutions, Trichy", role: "Industry Expert" },
-        { name: "Mrs. Deepika Ramalingam", designation: "Verification Engineer", organization: "Maxvy Technologies, Bengaluru", role: "Alumni Representative" },
+        {
+          name: "Thiru. R. Durga Shankar",
+          designation: "Secretary",
+          organization: "JCT Institutions, Coimbatore",
+          role: "Chairman",
+        },
+        {
+          name: "Dr. V. J. Arulkarthick",
+          designation: "Principal",
+          organization: "JCTCET, Coimbatore",
+          role: "Member",
+        },
+        {
+          name: "Mr. A. Chandrahasan",
+          designation: "Administrative Officer",
+          organization: "JCT Institutions, Coimbatore",
+          role: "Member",
+        },
+        {
+          name: "Dr. S. Uma Maheswari",
+          designation: "Professor, Department of ECE",
+          organization: "Coimbatore Institute of Technology, Coimbatore",
+          role: "Senior Academician",
+        },
+        {
+          name: "Dr. Pushpavalli",
+          designation: "Associate Professor, Department of ECE",
+          organization: "Bannari Amman College of Technology, Sathyamangalam",
+          role: "Senior Academician",
+        },
+        {
+          name: "Mr. L. Jegadheesan",
+          designation: "Chief Executive Officer",
+          organization: "Aristats e-Solutions, Trichy",
+          role: "Industry Expert",
+        },
+        {
+          name: "Mrs. Deepika Ramalingam",
+          designation: "Verification Engineer",
+          organization: "Maxvy Technologies, Bengaluru",
+          role: "Alumni Representative",
+        },
       ],
       pac: [],
       bos: [],
       curriculum: [],
 
       faculty: [
-        { name: "Dr. G. Emayavaramban", designation: "Associate Professor and Head", qualification: "M.E./M.Tech, Ph.D", experience: "14+ Years", specialization: "Applied Electronics" },
-        { name: "D. Vedha Vinodha", designation: "Assistant Professor", qualification: "M.E./M.Tech", experience: "7+ Years", specialization: "Communication Systems" },
-        { name: "Thahseen Thahir", designation: "Assistant Professor", qualification: "M.E./M.Tech", experience: "6+ Years", specialization: "VLSI Design" },
-        { name: "A. Sindhu", designation: "Assistant Professor", qualification: "M.E./M.Tech", experience: "6+ Years", specialization: "VLSI Design" },
-        { name: "E. Pavithra", designation: "Assistant Professor", qualification: "M.E./M.Tech", experience: "5+ Years", specialization: "VLSI Design" },
-        { name: "S. Silpa", designation: "Assistant Professor", qualification: "M.E./M.Tech", experience: "5+ Years", specialization: "VLSI Design" },
-        { name: "M. Sownthara", designation: "Assistant Professor", qualification: "M.E./M.Tech", experience: "5+ Years", specialization: "VLSI Design" },
-        { name: "K. Kumar", designation: "Assistant Professor", qualification: "M.S.", experience: "5+ Years", specialization: "Micro Electronics" },
-        { name: "B. Manikandan", designation: "Assistant Professor", qualification: "M.E./M.Tech", experience: "5+ Years", specialization: "VLSI Design" },
-        { name: "M. Chandrasekaran", designation: "Assistant Professor", qualification: "M.E./M.Tech", experience: "5+ Years", specialization: "Applied Electronics" },
-        { name: "K. Babu", designation: "Assistant Professor", qualification: "M.E./M.Tech", experience: "4+ Years", specialization: "Communication Systems" },
-        { name: "S. Mohanapriya", designation: "Assistant Professor", qualification: "M.E./M.Tech", experience: "4+ Years", specialization: "Communication Systems" },
+        {
+          name: "Dr. G. Emayavaramban",
+          designation: "Associate Professor and Head",
+          qualification: "M.E./M.Tech, Ph.D",
+          experience: "14+ Years",
+          specialization: "Applied Electronics",
+        },
+        {
+          name: "D. Vedha Vinodha",
+          designation: "Assistant Professor",
+          qualification: "M.E./M.Tech",
+          experience: "7+ Years",
+          specialization: "Communication Systems",
+        },
+        {
+          name: "Thahseen Thahir",
+          designation: "Assistant Professor",
+          qualification: "M.E./M.Tech",
+          experience: "6+ Years",
+          specialization: "VLSI Design",
+        },
+        {
+          name: "A. Sindhu",
+          designation: "Assistant Professor",
+          qualification: "M.E./M.Tech",
+          experience: "6+ Years",
+          specialization: "VLSI Design",
+        },
+        {
+          name: "E. Pavithra",
+          designation: "Assistant Professor",
+          qualification: "M.E./M.Tech",
+          experience: "5+ Years",
+          specialization: "VLSI Design",
+        },
+        {
+          name: "S. Silpa",
+          designation: "Assistant Professor",
+          qualification: "M.E./M.Tech",
+          experience: "5+ Years",
+          specialization: "VLSI Design",
+        },
+        {
+          name: "M. Sownthara",
+          designation: "Assistant Professor",
+          qualification: "M.E./M.Tech",
+          experience: "5+ Years",
+          specialization: "VLSI Design",
+        },
+        {
+          name: "K. Kumar",
+          designation: "Assistant Professor",
+          qualification: "M.S.",
+          experience: "5+ Years",
+          specialization: "Micro Electronics",
+        },
+        {
+          name: "B. Manikandan",
+          designation: "Assistant Professor",
+          qualification: "M.E./M.Tech",
+          experience: "5+ Years",
+          specialization: "VLSI Design",
+        },
+        {
+          name: "M. Chandrasekaran",
+          designation: "Assistant Professor",
+          qualification: "M.E./M.Tech",
+          experience: "5+ Years",
+          specialization: "Applied Electronics",
+        },
+        {
+          name: "K. Babu",
+          designation: "Assistant Professor",
+          qualification: "M.E./M.Tech",
+          experience: "4+ Years",
+          specialization: "Communication Systems",
+        },
+        {
+          name: "S. Mohanapriya",
+          designation: "Assistant Professor",
+          qualification: "M.E./M.Tech",
+          experience: "4+ Years",
+          specialization: "Communication Systems",
+        },
       ],
 
       labs: [
-        { name: "Basic Electronics Laboratory", description: "Fundamentals of electronic components and basic circuit experiments.", equipment: [] },
-        { name: "Analog and Digital Electronics Laboratory", description: "Experiments in analog and digital circuit design.", equipment: [] },
-        { name: "Circuit Simulation and Linear Integrated Circuits Laboratory", description: "Simulation tools and LIC experiments.", equipment: [] },
-        { name: "Communication Systems Laboratory", description: "Experiments in AM/FM modulation, demodulation and communication.", equipment: [] },
-        { name: "Digital Signal Processing Laboratory", description: "DSP processor kits and MATLAB-based signal processing.", equipment: [] },
-        { name: "Microprocessor and Microcontroller Laboratory", description: "8085/8086 kits and ARM-based microcontroller experiments.", equipment: [] },
-        { name: "VLSI Laboratory", description: "FPGA boards and VHDL/Verilog simulation tools.", equipment: [] },
-        { name: "Optical and Microwave Laboratory", description: "Optical fiber experiments and microwave transmission setups.", equipment: [] },
-        { name: "Embedded Laboratory", description: "Embedded systems kits for IoT and real-time application development.", equipment: [] },
+        {
+          name: "Basic Electronics Laboratory",
+          description:
+            "Fundamentals of electronic components and basic circuit experiments.",
+          equipment: [],
+        },
+        {
+          name: "Analog and Digital Electronics Laboratory",
+          description: "Experiments in analog and digital circuit design.",
+          equipment: [],
+        },
+        {
+          name: "Circuit Simulation and Linear Integrated Circuits Laboratory",
+          description: "Simulation tools and LIC experiments.",
+          equipment: [],
+        },
+        {
+          name: "Communication Systems Laboratory",
+          description:
+            "Experiments in AM/FM modulation, demodulation and communication.",
+          equipment: [],
+        },
+        {
+          name: "Digital Signal Processing Laboratory",
+          description: "DSP processor kits and MATLAB-based signal processing.",
+          equipment: [],
+        },
+        {
+          name: "Microprocessor and Microcontroller Laboratory",
+          description:
+            "8085/8086 kits and ARM-based microcontroller experiments.",
+          equipment: [],
+        },
+        {
+          name: "VLSI Laboratory",
+          description: "FPGA boards and VHDL/Verilog simulation tools.",
+          equipment: [],
+        },
+        {
+          name: "Optical and Microwave Laboratory",
+          description:
+            "Optical fiber experiments and microwave transmission setups.",
+          equipment: [],
+        },
+        {
+          name: "Embedded Laboratory",
+          description:
+            "Embedded systems kits for IoT and real-time application development.",
+          equipment: [],
+        },
       ],
 
       teachingLearning: { overview: "", methods: [], tools: [], practices: [] },
@@ -876,16 +1962,46 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["DMRC", "Siemens", "Motorola", "Intel", "Texas Instruments", "BEL", "ISRO", "DRDO", "Accenture", "Wipro", "HCL Technologies", "Nvidia", "Samsung", "Tech Mahindra", "TCS"],
-        higherStudies: ["M.E. / M.Tech in ECE / VLSI / Embedded Systems", "MBA", "GATE Qualified – IITs and NITs", "Ph.D Research Programs", "MS Abroad"],
+        topRecruiters: [
+          "DMRC",
+          "Siemens",
+          "Motorola",
+          "Intel",
+          "Texas Instruments",
+          "BEL",
+          "ISRO",
+          "DRDO",
+          "Accenture",
+          "Wipro",
+          "HCL Technologies",
+          "Nvidia",
+          "Samsung",
+          "Tech Mahindra",
+          "TCS",
+        ],
+        higherStudies: [
+          "M.E. / M.Tech in ECE / VLSI / Embedded Systems",
+          "MBA",
+          "GATE Qualified – IITs and NITs",
+          "Ph.D Research Programs",
+          "MS Abroad",
+        ],
         averagePackage: "4 LPA",
         placementRate: "92%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2009" },
         { icon: "Users", label: "Intake", value: "120 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "92%" },
@@ -956,9 +2072,24 @@ const PROGRAMS = [
       ],
 
       programOutcomes: [
-        { code: "PEO1", title: "Industry Career", description: "Graduates will have successful career in food and allied industries at various levels of management." },
-        { code: "PEO2", title: "Technical Excellence", description: "Graduates will have the core technical skills and knowledge that will empower them to pursue lifelong learning and research." },
-        { code: "PEO3", title: "Innovation and Ethics", description: "Graduates will deliver innovative solutions and services to address industrial and societal challenges, upholding ethical principles and social responsibility." },
+        {
+          code: "PEO1",
+          title: "Industry Career",
+          description:
+            "Graduates will have successful career in food and allied industries at various levels of management.",
+        },
+        {
+          code: "PEO2",
+          title: "Technical Excellence",
+          description:
+            "Graduates will have the core technical skills and knowledge that will empower them to pursue lifelong learning and research.",
+        },
+        {
+          code: "PEO3",
+          title: "Innovation and Ethics",
+          description:
+            "Graduates will deliver innovative solutions and services to address industrial and societal challenges, upholding ethical principles and social responsibility.",
+        },
       ],
 
       advisoryBoard: [],
@@ -967,28 +2098,127 @@ const PROGRAMS = [
       curriculum: [],
 
       faculty: [
-        { name: "Dr. P. Balamurugan", designation: "Professor and Head", qualification: "Ph.D", experience: "15+ Years", specialization: "Chemical Engineering" },
-        { name: "Dr. A. Allwyn Sundarraj", designation: "Associate Professor", qualification: "Ph.D", experience: "10+ Years", specialization: "Food Technology" },
-        { name: "Ms. Priyanga J", designation: "Assistant Professor", qualification: "M.Tech", experience: "4+ Years", specialization: "Food Technology" },
-        { name: "Ms. Jamuna Sri N", designation: "Assistant Professor", qualification: "M.Tech", experience: "4+ Years", specialization: "Biotechnology" },
-        { name: "Ms. Sneha Mahesh", designation: "Assistant Professor", qualification: "M.Tech", experience: "3+ Years", specialization: "Food Technology" },
-        { name: "Ms. Anvy S Isaac", designation: "Assistant Professor", qualification: "M.Tech", experience: "3+ Years", specialization: "Food Technology" },
-        { name: "Ms. Subasree T V", designation: "Assistant Professor", qualification: "M.Tech", experience: "3+ Years", specialization: "Food Technology" },
-        { name: "Ms. Pavithra S", designation: "Assistant Professor", qualification: "M.Tech", experience: "3+ Years", specialization: "Food Technology" },
-        { name: "Mr. Sridhar A", designation: "Assistant Professor", qualification: "M.Tech", experience: "3+ Years", specialization: "Biotechnology" },
+        {
+          name: "Dr. P. Balamurugan",
+          designation: "Professor and Head",
+          qualification: "Ph.D",
+          experience: "15+ Years",
+          specialization: "Chemical Engineering",
+        },
+        {
+          name: "Dr. A. Allwyn Sundarraj",
+          designation: "Associate Professor",
+          qualification: "Ph.D",
+          experience: "10+ Years",
+          specialization: "Food Technology",
+        },
+        {
+          name: "Ms. Priyanga J",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "4+ Years",
+          specialization: "Food Technology",
+        },
+        {
+          name: "Ms. Jamuna Sri N",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "4+ Years",
+          specialization: "Biotechnology",
+        },
+        {
+          name: "Ms. Sneha Mahesh",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "3+ Years",
+          specialization: "Food Technology",
+        },
+        {
+          name: "Ms. Anvy S Isaac",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "3+ Years",
+          specialization: "Food Technology",
+        },
+        {
+          name: "Ms. Subasree T V",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "3+ Years",
+          specialization: "Food Technology",
+        },
+        {
+          name: "Ms. Pavithra S",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "3+ Years",
+          specialization: "Food Technology",
+        },
+        {
+          name: "Mr. Sridhar A",
+          designation: "Assistant Professor",
+          qualification: "M.Tech",
+          experience: "3+ Years",
+          specialization: "Biotechnology",
+        },
       ],
 
       labs: [
-        { name: "Food Microbiology Laboratory", description: "Facilities for microbial analysis of food products.", equipment: [] },
-        { name: "Food Chemistry Laboratory", description: "Equipped for chemical analysis of food components.", equipment: [] },
-        { name: "Food Analysis Laboratory", description: "Instruments for quality analysis and testing of food products.", equipment: [] },
-        { name: "Chemical Engineering Laboratory", description: "Unit operations equipment for food processing.", equipment: [] },
-        { name: "Bioprocess Laboratory", description: "Facilities for fermentation and bioprocess studies.", equipment: [] },
-        { name: "Food Production Analysis Laboratory", description: "Equipment for production quality control and analysis.", equipment: [] },
-        { name: "Bakery and Confectionery Laboratory", description: "Equipped for practical training in baked goods and confectionery production.", equipment: [] },
-        { name: "Food Production and Preservation Laboratory", description: "Facilities for food preservation and production techniques.", equipment: [] },
-        { name: "Skills for New Product Development Laboratory", description: "Innovation lab for developing and testing new food products.", equipment: [] },
-        { name: "Dairy Process Laboratory", description: "Equipped for dairy processing and analysis experiments.", equipment: [] },
+        {
+          name: "Food Microbiology Laboratory",
+          description: "Facilities for microbial analysis of food products.",
+          equipment: [],
+        },
+        {
+          name: "Food Chemistry Laboratory",
+          description: "Equipped for chemical analysis of food components.",
+          equipment: [],
+        },
+        {
+          name: "Food Analysis Laboratory",
+          description:
+            "Instruments for quality analysis and testing of food products.",
+          equipment: [],
+        },
+        {
+          name: "Chemical Engineering Laboratory",
+          description: "Unit operations equipment for food processing.",
+          equipment: [],
+        },
+        {
+          name: "Bioprocess Laboratory",
+          description: "Facilities for fermentation and bioprocess studies.",
+          equipment: [],
+        },
+        {
+          name: "Food Production Analysis Laboratory",
+          description: "Equipment for production quality control and analysis.",
+          equipment: [],
+        },
+        {
+          name: "Bakery and Confectionery Laboratory",
+          description:
+            "Equipped for practical training in baked goods and confectionery production.",
+          equipment: [],
+        },
+        {
+          name: "Food Production and Preservation Laboratory",
+          description:
+            "Facilities for food preservation and production techniques.",
+          equipment: [],
+        },
+        {
+          name: "Skills for New Product Development Laboratory",
+          description:
+            "Innovation lab for developing and testing new food products.",
+          equipment: [],
+        },
+        {
+          name: "Dairy Process Laboratory",
+          description:
+            "Equipped for dairy processing and analysis experiments.",
+          equipment: [],
+        },
       ],
 
       teachingLearning: { overview: "", methods: [], tools: [], practices: [] },
@@ -999,16 +2229,41 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["Food Corporation of India", "ITC Foods", "Nestlé", "Britannia", "Amul", "Haldiram's", "PepsiCo", "Hindustan Unilever", "Benchmark Tea Factory", "Meenalakshmi Farm Products"],
-        higherStudies: ["M.Tech / M.E. in Food Technology", "MBA (Food Business Management)", "GATE Qualified", "Ph.D Research Programs", "MS Abroad"],
+        topRecruiters: [
+          "Food Corporation of India",
+          "ITC Foods",
+          "Nestlé",
+          "Britannia",
+          "Amul",
+          "Haldiram's",
+          "PepsiCo",
+          "Hindustan Unilever",
+          "Benchmark Tea Factory",
+          "Meenalakshmi Farm Products",
+        ],
+        higherStudies: [
+          "M.Tech / M.E. in Food Technology",
+          "MBA (Food Business Management)",
+          "GATE Qualified",
+          "Ph.D Research Programs",
+          "MS Abroad",
+        ],
         averagePackage: "3.5 LPA",
         placementRate: "85%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2011" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "85%" },
@@ -1088,16 +2343,30 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["L&T Constructions", "DRDO", "Research Organizations", "Government PWD", "Consulting Firms"],
+        topRecruiters: [
+          "L&T Constructions",
+          "DRDO",
+          "Research Organizations",
+          "Government PWD",
+          "Consulting Firms",
+        ],
         higherStudies: ["Ph.D Research Programs"],
         averagePackage: "5 LPA",
         placementRate: "90%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2009" },
         { icon: "Users", label: "Intake", value: "18 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "2 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "90%" },
@@ -1177,16 +2446,32 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["BHEL", "ONGC", "Siemens", "ABB", "ISRO", "DRDO", "Renewable Energy Companies"],
+        topRecruiters: [
+          "BHEL",
+          "ONGC",
+          "Siemens",
+          "ABB",
+          "ISRO",
+          "DRDO",
+          "Renewable Energy Companies",
+        ],
         higherStudies: ["Ph.D Research Programs"],
         averagePackage: "5 LPA",
         placementRate: "90%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2012" },
         { icon: "Users", label: "Intake", value: "18 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "2 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "90%" },
@@ -1259,16 +2544,33 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["Google", "Microsoft", "Amazon", "IBM Research", "Adobe", "Nvidia", "Intel", "Data Science Companies"],
+        topRecruiters: [
+          "Google",
+          "Microsoft",
+          "Amazon",
+          "IBM Research",
+          "Adobe",
+          "Nvidia",
+          "Intel",
+          "Data Science Companies",
+        ],
         higherStudies: ["Ph.D Research Programs"],
         averagePackage: "6 LPA",
         placementRate: "90%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2021" },
         { icon: "Users", label: "Intake", value: "18 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "2 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "90%" },
@@ -1324,7 +2626,8 @@ const PROGRAMS = [
       hodExperience: "Instrumentation Engineering",
       hodMessage: [],
 
-      vision: "Emerging as a Center of Excellence in Electrical and Electronics Engineering education for studies and research.",
+      vision:
+        "Emerging as a Center of Excellence in Electrical and Electronics Engineering education for studies and research.",
       mission: [
         "To create state-of-art facilities for teaching, learning, laboratory practices and research.",
         "To develop competent engineers through value addition programs and research mentorship.",
@@ -1345,16 +2648,30 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["IITs and NITs as Faculty", "DRDO", "ISRO", "TNEB Research Wing", "Industry R&D Centers"],
+        topRecruiters: [
+          "IITs and NITs as Faculty",
+          "DRDO",
+          "ISRO",
+          "TNEB Research Wing",
+          "Industry R&D Centers",
+        ],
         higherStudies: ["Post-Doctoral Research", "Academic Positions"],
         averagePackage: "8 LPA",
         placementRate: "95%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2010" },
         { icon: "Users", label: "Intake", value: "10 Scholars" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "3-5 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "95%" },
@@ -1420,11 +2737,36 @@ const PROGRAMS = [
       ],
 
       programOutcomes: [
-        { code: "PEO1", title: "Professional Excellence", description: "Graduates will work as competent Mechanical Engineers in industry, government organizations and research institutions." },
-        { code: "PEO2", title: "Higher Studies", description: "Graduates will pursue higher education in India and abroad, demonstrating research aptitude and lifelong learning." },
-        { code: "PEO3", title: "Ethics and Leadership", description: "Graduates will exhibit professionalism, ethical attitude, communication and managerial skills with social responsibility." },
-        { code: "PSO1", title: "Core Mechanical Design", description: "Graduates will apply principles of design, manufacturing, thermal and fluid engineering to solve industrial problems." },
-        { code: "PSO2", title: "Modern Tools", description: "Graduates will use modern CAD/CAM software, simulation tools and manufacturing technologies to develop engineering solutions." },
+        {
+          code: "PEO1",
+          title: "Professional Excellence",
+          description:
+            "Graduates will work as competent Mechanical Engineers in industry, government organizations and research institutions.",
+        },
+        {
+          code: "PEO2",
+          title: "Higher Studies",
+          description:
+            "Graduates will pursue higher education in India and abroad, demonstrating research aptitude and lifelong learning.",
+        },
+        {
+          code: "PEO3",
+          title: "Ethics and Leadership",
+          description:
+            "Graduates will exhibit professionalism, ethical attitude, communication and managerial skills with social responsibility.",
+        },
+        {
+          code: "PSO1",
+          title: "Core Mechanical Design",
+          description:
+            "Graduates will apply principles of design, manufacturing, thermal and fluid engineering to solve industrial problems.",
+        },
+        {
+          code: "PSO2",
+          title: "Modern Tools",
+          description:
+            "Graduates will use modern CAD/CAM software, simulation tools and manufacturing technologies to develop engineering solutions.",
+        },
       ],
 
       advisoryBoard: [],
@@ -1434,19 +2776,73 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "Engineering Practices Laboratory", description: "Basic machining, fitting, welding and carpentry practices.", equipment: [] },
-        { name: "Fluid Mechanics and Machinery Laboratory", description: "Experiments on pumps, turbines, pipe flow and fluid properties.", equipment: [] },
-        { name: "Thermal Engineering Laboratory", description: "IC engines, refrigeration and heat transfer experiments.", equipment: [] },
-        { name: "Strength of Materials Laboratory", description: "Testing of tensile, compression, torsion and hardness of materials.", equipment: [] },
-        { name: "Manufacturing Technology Laboratory", description: "Lathe, milling, grinding and CNC machining operations.", equipment: [] },
-        { name: "Metrology and Measurements Laboratory", description: "Precision measuring instruments and surface finish measurement.", equipment: [] },
-        { name: "CAD/CAM Laboratory", description: "AutoCAD, CATIA, SolidWorks and CNC programming software.", equipment: ["AutoCAD", "CATIA", "SolidWorks"] },
-        { name: "Dynamics Laboratory", description: "Experiments in vibrations, balancing and dynamics of machinery.", equipment: [] },
-        { name: "Heat Transfer Laboratory", description: "Conduction, convection and radiation heat transfer experiments.", equipment: [] },
-        { name: "Mechatronics and Control Systems Laboratory", description: "PLC, pneumatics and hydraulics for automation experiments.", equipment: ["PLC"] },
+        {
+          name: "Engineering Practices Laboratory",
+          description:
+            "Basic machining, fitting, welding and carpentry practices.",
+          equipment: [],
+        },
+        {
+          name: "Fluid Mechanics and Machinery Laboratory",
+          description:
+            "Experiments on pumps, turbines, pipe flow and fluid properties.",
+          equipment: [],
+        },
+        {
+          name: "Thermal Engineering Laboratory",
+          description:
+            "IC engines, refrigeration and heat transfer experiments.",
+          equipment: [],
+        },
+        {
+          name: "Strength of Materials Laboratory",
+          description:
+            "Testing of tensile, compression, torsion and hardness of materials.",
+          equipment: [],
+        },
+        {
+          name: "Manufacturing Technology Laboratory",
+          description: "Lathe, milling, grinding and CNC machining operations.",
+          equipment: [],
+        },
+        {
+          name: "Metrology and Measurements Laboratory",
+          description:
+            "Precision measuring instruments and surface finish measurement.",
+          equipment: [],
+        },
+        {
+          name: "CAD/CAM Laboratory",
+          description:
+            "AutoCAD, CATIA, SolidWorks and CNC programming software.",
+          equipment: ["AutoCAD", "CATIA", "SolidWorks"],
+        },
+        {
+          name: "Dynamics Laboratory",
+          description:
+            "Experiments in vibrations, balancing and dynamics of machinery.",
+          equipment: [],
+        },
+        {
+          name: "Heat Transfer Laboratory",
+          description:
+            "Conduction, convection and radiation heat transfer experiments.",
+          equipment: [],
+        },
+        {
+          name: "Mechatronics and Control Systems Laboratory",
+          description:
+            "PLC, pneumatics and hydraulics for automation experiments.",
+          equipment: ["PLC"],
+        },
       ],
 
-      teachingLearning: { overview: "", methods: [], tools: ["AutoCAD", "CATIA", "SolidWorks", "ANSYS"], practices: [] },
+      teachingLearning: {
+        overview: "",
+        methods: [],
+        tools: ["AutoCAD", "CATIA", "SolidWorks", "ANSYS"],
+        practices: [],
+      },
       valueAddedCourses: [],
       events: [],
       studentParticipation: { clubs: [], highlights: [] },
@@ -1454,16 +2850,43 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["Mercedes Benz", "Tata Motors", "Volkswagen Group", "BMW", "Maruti Suzuki", "Mahindra", "L&T", "BHEL", "Thermax", "Suzlon", "DRDO", "ISRO"],
-        higherStudies: ["M.E. / M.Tech in Mechanical / Manufacturing / Thermal Engineering", "MBA", "GATE Qualified – IITs and NITs", "Ph.D Research Programs", "MS Abroad"],
+        topRecruiters: [
+          "Mercedes Benz",
+          "Tata Motors",
+          "Volkswagen Group",
+          "BMW",
+          "Maruti Suzuki",
+          "Mahindra",
+          "L&T",
+          "BHEL",
+          "Thermax",
+          "Suzlon",
+          "DRDO",
+          "ISRO",
+        ],
+        higherStudies: [
+          "M.E. / M.Tech in Mechanical / Manufacturing / Thermal Engineering",
+          "MBA",
+          "GATE Qualified – IITs and NITs",
+          "Ph.D Research Programs",
+          "MS Abroad",
+        ],
         averagePackage: "3.5 LPA",
         placementRate: "88%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2009" },
         { icon: "Users", label: "Intake", value: "120 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "88%" },
@@ -1530,11 +2953,36 @@ const PROGRAMS = [
       ],
 
       programOutcomes: [
-        { code: "PEO1", title: "Industry Career", description: "Graduates will have successful careers in refineries, petrochemical plants and allied industries." },
-        { code: "PEO2", title: "Research & Higher Studies", description: "Graduates will pursue higher education and research in chemical and petrochemical engineering." },
-        { code: "PEO3", title: "Professional Ethics", description: "Graduates will demonstrate ethical behavior, teamwork and social responsibility in professional practice." },
-        { code: "PSO1", title: "Process Design", description: "Graduates will apply chemical engineering and petrochemical process knowledge to design and optimize industrial operations." },
-        { code: "PSO2", title: "Simulation and Safety", description: "Graduates will use process simulation tools and apply HSE (Health, Safety, Environment) standards in petrochemical operations." },
+        {
+          code: "PEO1",
+          title: "Industry Career",
+          description:
+            "Graduates will have successful careers in refineries, petrochemical plants and allied industries.",
+        },
+        {
+          code: "PEO2",
+          title: "Research & Higher Studies",
+          description:
+            "Graduates will pursue higher education and research in chemical and petrochemical engineering.",
+        },
+        {
+          code: "PEO3",
+          title: "Professional Ethics",
+          description:
+            "Graduates will demonstrate ethical behavior, teamwork and social responsibility in professional practice.",
+        },
+        {
+          code: "PSO1",
+          title: "Process Design",
+          description:
+            "Graduates will apply chemical engineering and petrochemical process knowledge to design and optimize industrial operations.",
+        },
+        {
+          code: "PSO2",
+          title: "Simulation and Safety",
+          description:
+            "Graduates will use process simulation tools and apply HSE (Health, Safety, Environment) standards in petrochemical operations.",
+        },
       ],
 
       advisoryBoard: [],
@@ -1544,16 +2992,55 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "Chemical Engineering Laboratory", description: "Unit operations experiments including distillation, absorption and extraction.", equipment: [] },
-        { name: "Petroleum Refining Laboratory", description: "Distillation of crude fractions, characterization of petroleum products.", equipment: [] },
-        { name: "Polymer Technology Laboratory", description: "Experiments in polymer synthesis, characterization and processing.", equipment: [] },
-        { name: "Process Simulation Laboratory", description: "HYSYS, Aspen Plus for chemical process simulation.", equipment: ["HYSYS", "Aspen Plus"] },
-        { name: "Instrumental Analysis Laboratory", description: "GC, HPLC, spectroscopy for analysis of petrochemical samples.", equipment: ["GC", "HPLC"] },
-        { name: "Reaction Engineering Laboratory", description: "Fixed bed, fluidized bed reactor experiments and kinetics studies.", equipment: [] },
-        { name: "Quality Control Laboratory", description: "Physical and chemical testing of petroleum and polymer products.", equipment: [] },
+        {
+          name: "Chemical Engineering Laboratory",
+          description:
+            "Unit operations experiments including distillation, absorption and extraction.",
+          equipment: [],
+        },
+        {
+          name: "Petroleum Refining Laboratory",
+          description:
+            "Distillation of crude fractions, characterization of petroleum products.",
+          equipment: [],
+        },
+        {
+          name: "Polymer Technology Laboratory",
+          description:
+            "Experiments in polymer synthesis, characterization and processing.",
+          equipment: [],
+        },
+        {
+          name: "Process Simulation Laboratory",
+          description: "HYSYS, Aspen Plus for chemical process simulation.",
+          equipment: ["HYSYS", "Aspen Plus"],
+        },
+        {
+          name: "Instrumental Analysis Laboratory",
+          description:
+            "GC, HPLC, spectroscopy for analysis of petrochemical samples.",
+          equipment: ["GC", "HPLC"],
+        },
+        {
+          name: "Reaction Engineering Laboratory",
+          description:
+            "Fixed bed, fluidized bed reactor experiments and kinetics studies.",
+          equipment: [],
+        },
+        {
+          name: "Quality Control Laboratory",
+          description:
+            "Physical and chemical testing of petroleum and polymer products.",
+          equipment: [],
+        },
       ],
 
-      teachingLearning: { overview: "", methods: [], tools: ["HYSYS", "Aspen Plus"], practices: [] },
+      teachingLearning: {
+        overview: "",
+        methods: [],
+        tools: ["HYSYS", "Aspen Plus"],
+        practices: [],
+      },
       valueAddedCourses: [],
       events: [],
       studentParticipation: { clubs: [], highlights: [] },
@@ -1561,16 +3048,39 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["Indian Oil Corporation (IOCL)", "Bharat Petroleum (BPCL)", "Hindustan Petroleum (HPCL)", "Reliance Industries", "ONGC", "Chemplast Sanmar", "SPIC", "IG Petrochemicals"],
-        higherStudies: ["M.Tech / M.E. in Chemical / Petrochemical Engineering", "MBA (Oil & Gas Management)", "GATE Qualified – IITs and NITs", "Ph.D Research Programs", "MS Abroad"],
+        topRecruiters: [
+          "Indian Oil Corporation (IOCL)",
+          "Bharat Petroleum (BPCL)",
+          "Hindustan Petroleum (HPCL)",
+          "Reliance Industries",
+          "ONGC",
+          "Chemplast Sanmar",
+          "SPIC",
+          "IG Petrochemicals",
+        ],
+        higherStudies: [
+          "M.Tech / M.E. in Chemical / Petrochemical Engineering",
+          "MBA (Oil & Gas Management)",
+          "GATE Qualified – IITs and NITs",
+          "Ph.D Research Programs",
+          "MS Abroad",
+        ],
         averagePackage: "3.5 LPA",
         placementRate: "85%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2011" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "85%" },
@@ -1637,11 +3147,36 @@ const PROGRAMS = [
       ],
 
       programOutcomes: [
-        { code: "PEO1", title: "Industry Career", description: "Graduates will have successful careers in oil exploration, drilling, production and oilfield services companies." },
-        { code: "PEO2", title: "Research & Higher Studies", description: "Graduates will pursue advanced studies and research in petroleum, reservoir or chemical engineering." },
-        { code: "PEO3", title: "Professional Ethics", description: "Graduates will exhibit ethical behavior, environmental responsibility and professionalism in petroleum operations." },
-        { code: "PSO1", title: "Upstream Operations", description: "Graduates will apply drilling, reservoir and production engineering principles to upstream petroleum field operations." },
-        { code: "PSO2", title: "Simulation and Analysis", description: "Graduates will use reservoir simulation, well logging analysis and petroleum economics tools for decision-making." },
+        {
+          code: "PEO1",
+          title: "Industry Career",
+          description:
+            "Graduates will have successful careers in oil exploration, drilling, production and oilfield services companies.",
+        },
+        {
+          code: "PEO2",
+          title: "Research & Higher Studies",
+          description:
+            "Graduates will pursue advanced studies and research in petroleum, reservoir or chemical engineering.",
+        },
+        {
+          code: "PEO3",
+          title: "Professional Ethics",
+          description:
+            "Graduates will exhibit ethical behavior, environmental responsibility and professionalism in petroleum operations.",
+        },
+        {
+          code: "PSO1",
+          title: "Upstream Operations",
+          description:
+            "Graduates will apply drilling, reservoir and production engineering principles to upstream petroleum field operations.",
+        },
+        {
+          code: "PSO2",
+          title: "Simulation and Analysis",
+          description:
+            "Graduates will use reservoir simulation, well logging analysis and petroleum economics tools for decision-making.",
+        },
       ],
 
       advisoryBoard: [],
@@ -1651,16 +3186,56 @@ const PROGRAMS = [
       faculty: [],
 
       labs: [
-        { name: "Drilling Engineering Laboratory", description: "Equipment for drilling fluid preparation, filter press tests and viscosity measurements.", equipment: [] },
-        { name: "Reservoir Engineering Laboratory", description: "Core flooding apparatus, permeability measurement and fluid saturation experiments.", equipment: [] },
-        { name: "Well Logging and Petrophysics Laboratory", description: "Log interpretation software and petrophysical analysis tools.", equipment: [] },
-        { name: "Petroleum Production Laboratory", description: "Experiments in well testing, artificial lift and production optimization.", equipment: [] },
-        { name: "Reservoir Simulation Laboratory", description: "Eclipse, CMG or Petrel simulation software for reservoir modelling.", equipment: ["Eclipse"] },
-        { name: "Mud Engineering Laboratory", description: "Drilling mud formulation, testing and contamination studies.", equipment: [] },
-        { name: "Petroleum Geology Laboratory", description: "Rock and fluid sample analysis, thin section microscopy and basin analysis.", equipment: [] },
+        {
+          name: "Drilling Engineering Laboratory",
+          description:
+            "Equipment for drilling fluid preparation, filter press tests and viscosity measurements.",
+          equipment: [],
+        },
+        {
+          name: "Reservoir Engineering Laboratory",
+          description:
+            "Core flooding apparatus, permeability measurement and fluid saturation experiments.",
+          equipment: [],
+        },
+        {
+          name: "Well Logging and Petrophysics Laboratory",
+          description:
+            "Log interpretation software and petrophysical analysis tools.",
+          equipment: [],
+        },
+        {
+          name: "Petroleum Production Laboratory",
+          description:
+            "Experiments in well testing, artificial lift and production optimization.",
+          equipment: [],
+        },
+        {
+          name: "Reservoir Simulation Laboratory",
+          description:
+            "Eclipse, CMG or Petrel simulation software for reservoir modelling.",
+          equipment: ["Eclipse"],
+        },
+        {
+          name: "Mud Engineering Laboratory",
+          description:
+            "Drilling mud formulation, testing and contamination studies.",
+          equipment: [],
+        },
+        {
+          name: "Petroleum Geology Laboratory",
+          description:
+            "Rock and fluid sample analysis, thin section microscopy and basin analysis.",
+          equipment: [],
+        },
       ],
 
-      teachingLearning: { overview: "", methods: [], tools: ["Eclipse", "Petrel"], practices: [] },
+      teachingLearning: {
+        overview: "",
+        methods: [],
+        tools: ["Eclipse", "Petrel"],
+        practices: [],
+      },
       valueAddedCourses: [],
       events: [],
       studentParticipation: { clubs: [], highlights: [] },
@@ -1668,16 +3243,39 @@ const PROGRAMS = [
       facultyAchievements: [],
       facultyParticipation: { conferences: [], workshops: [] },
       careerProgression: {
-        topRecruiters: ["ONGC", "Oil India Limited", "Schlumberger", "Halliburton", "Baker Hughes", "Reliance Industries", "Cairn India", "GAIL"],
-        higherStudies: ["M.Tech in Petroleum / Reservoir Engineering", "MBA (Oil & Gas Management)", "GATE Qualified – IITs and NITs", "Ph.D Research Programs", "MS Abroad (USA, UK, Norway)"],
+        topRecruiters: [
+          "ONGC",
+          "Oil India Limited",
+          "Schlumberger",
+          "Halliburton",
+          "Baker Hughes",
+          "Reliance Industries",
+          "Cairn India",
+          "GAIL",
+        ],
+        higherStudies: [
+          "M.Tech in Petroleum / Reservoir Engineering",
+          "MBA (Oil & Gas Management)",
+          "GATE Qualified – IITs and NITs",
+          "Ph.D Research Programs",
+          "MS Abroad (USA, UK, Norway)",
+        ],
         averagePackage: "4 LPA",
         placementRate: "85%",
       },
-      feedback: { curriculumProcess: [], facilityProcess: [], recentImprovements: [] },
+      feedback: {
+        curriculumProcess: [],
+        facilityProcess: [],
+        recentImprovements: [],
+      },
       heroMeta: [
         { icon: "Calendar", label: "Established", value: "2011" },
         { icon: "Users", label: "Intake", value: "60 Students" },
-        { icon: "GraduationCap", label: "Affiliation", value: "Anna University" },
+        {
+          icon: "GraduationCap",
+          label: "Affiliation",
+          value: "Anna University",
+        },
         { icon: "Clock", label: "Duration", value: "4 Years" },
         { icon: "Award", label: "Accreditation", value: "AICTE" },
         { icon: "Briefcase", label: "Placement Rate", value: "85%" },
@@ -1689,14 +3287,18 @@ const PROGRAMS = [
 // ─── Main ──────────────────────────────────────────────────────────────────────
 
 async function main() {
-  console.log(`\nEngineering Dept Content Seed — ${DRY_RUN ? "DRY RUN" : "LIVE"}`);
+  console.log(
+    `\nEngineering Dept Content Seed — ${DRY_RUN ? "DRY RUN" : "LIVE"}`,
+  );
   console.log(`Target slugs: ${PROGRAMS.map((p) => p.slug).join(", ")}\n`);
 
   if (DRY_RUN) {
     console.log("Dry-run mode: no changes will be written to the database.");
     console.log("Re-run without --dry-run to apply.\n");
     for (const p of PROGRAMS) {
-      console.log(`  • ${p.name} (slug: ${p.slug}, degree: ${p.degree}, seats: ${p.seats})`);
+      console.log(
+        `  • ${p.name} (slug: ${p.slug}, degree: ${p.degree}, seats: ${p.seats})`,
+      );
     }
     return;
   }

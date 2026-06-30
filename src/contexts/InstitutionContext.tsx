@@ -44,11 +44,7 @@ export function InstitutionProvider({
 
     if (initialPathInst === null) {
       const stored = sessionStorage.getItem("currentInstitution") as
-        | "main"
-        | "engineering"
-        | "arts-science"
-        | "polytechnic"
-        | null;
+        "main" | "engineering" | "arts-science" | "polytechnic" | null;
       if (
         stored &&
         ["main", "engineering", "arts-science", "polytechnic"].includes(stored)
