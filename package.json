@@ -9,7 +9,14 @@
     "lint": "eslint . --fix",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "seed:admin": "node scripts/seed-admin.js"
+    "seed:admin": "node scripts/seed-admin.js",
+    "seed:programs:engineering": "node scripts/seed-programs-engineering.js",
+    "seed:deptcontent:engineering": "node scripts/seed-deptcontent-engineering.mjs",
+    "seed:deptcontent:engineering:dry": "node scripts/seed-deptcontent-engineering.mjs --dry-run",
+    "seed:deptcontent:polytechnic": "node scripts/seed-deptcontent-polytechnic.mjs",
+    "seed:deptcontent:polytechnic:dry": "node scripts/seed-deptcontent-polytechnic.mjs --dry-run",
+    "seed:deptcontent:arts-science": "node scripts/seed-deptcontent-arts-science.mjs",
+    "seed:deptcontent:arts-science:dry": "node scripts/seed-deptcontent-arts-science.mjs --dry-run"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1075.0",
