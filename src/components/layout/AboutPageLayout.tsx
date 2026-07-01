@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -27,8 +27,12 @@ import {
   Rocket,
   Briefcase,
   ChevronRight,
+  Mail,
+  X,
+  User,
   type LucideIcon,
 } from "lucide-react";
+import { FaLinkedinIn } from "react-icons/fa";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
@@ -44,6 +48,17 @@ import {
 } from "@/lib/sidebar-nav";
 
 type Institution = "main" | "engineering" | "arts-science" | "polytechnic";
+
+type PersonModalData = {
+  name: string;
+  role: string;
+  image: string;
+  linkedin?: string;
+  email?: string;
+  quote?: string;
+  messages?: string[];
+  bio?: string;
+};
 
 // ─── Editable sections ───────────────────────────────────────────────────────
 
@@ -484,6 +499,24 @@ export function AboutPageLayout({
   const theme = THEME[institution];
   const meta = INSTITUTION_META[institution];
   const [activeId, setActiveId] = useState<string>("about");
+  const [activePerson, setActivePerson] = useState<PersonModalData | null>(
+    null,
+  );
+
+  useEffect(() => {
+    if (!activePerson) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setActivePerson(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [activePerson]);
+
+  const openPerson = (person: PersonModalData, e: MouseEvent) => {
+    if (editable) return;
+    e.stopPropagation();
+    setActivePerson(person);
+  };
 
   const resolved = resolveSidebarItems(
     ABOUT_NAV_DEFAULTS,
@@ -540,6 +573,17 @@ export function AboutPageLayout({
   const sectionVis = (anchor: string) => {
     if (!editable && !visibleBuiltins.has(anchor)) return "hidden";
     return mobileVis(anchor);
+  };
+
+  // Like sectionVis, but visible if ANY of the given anchors qualifies —
+  // used for elements (e.g. a shared heading) that span multiple sections.
+  const sectionVisAny = (...anchors: string[]) => {
+    if (!editable && !anchors.some((a) => visibleBuiltins.has(a))) {
+      return "hidden";
+    }
+    if (editable) return "block";
+    if (anchors.some((a) => activeId === a)) return "block opacity-100";
+    return "hidden lg:block lg:opacity-100";
   };
 
   return (
@@ -707,7 +751,24 @@ export function AboutPageLayout({
               )}
             </EditableRegion>
 
-            {/* 3. Principal's Message */}
+            {/* 3. Leadership heading (shared by Principal + Management) */}
+            <div
+              className={`text-center transition-all duration-300 ${sectionVisAny("principal", "management")}`}
+            >
+              <h2
+                className={`${theme.accentText} font-serif text-xl font-black tracking-wide uppercase md:text-2xl`}
+              >
+                {data.management.tagline ||
+                  "Great Minds. Passionate Leaders. One Vision."}
+              </h2>
+              <div className="mt-3 flex items-center justify-center gap-1.5">
+                <span className={`h-1 w-16 rounded-full bg-current ${theme.accentText}`} />
+                <span className={`h-1 w-6 rounded-full bg-current opacity-70 ${theme.accentText}`} />
+                <span className={`h-1.5 w-1.5 rounded-full bg-current opacity-50 ${theme.accentText}`} />
+              </div>
+            </div>
+
+            {/* 4. Principal */}
             <EditableRegion
               as="section"
               id="principal"
@@ -717,57 +778,102 @@ export function AboutPageLayout({
               onEditSection={onEditSection}
               className={`scroll-mt-28 transition-all duration-300 ${sectionVis("principal")}`}
             >
-              <SectionHeading
-                icon={MessageSquareQuote}
-                title="Principal's Message"
-                theme={theme}
-              />
-              <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
-                <div className="flex flex-col gap-6 p-5 sm:flex-row sm:items-start md:p-8">
-                  <div className="flex flex-col items-center gap-3 sm:w-44 sm:shrink-0">
-                    <div className="relative h-48 w-36 overflow-hidden rounded-2xl border border-white/10 bg-white/5 sm:h-56 sm:w-44">
-                      {imgUrl(data.principal.image) && (
-                        <Image
-                          src={imgUrl(data.principal.image)}
-                          alt={data.principal.name}
-                          fill
-                          className="object-cover object-top"
-                          sizes="(max-width: 640px) 144px, 176px"
-                        />
-                      )}
-                    </div>
-                    <div className="text-center">
-                      <p className="text-foreground font-bold">
-                        {data.principal.name}
-                      </p>
-                      <p className="text-muted-foreground text-sm">
-                        {data.principal.role}
-                      </p>
-                      <p className="text-muted-foreground mt-0.5 text-xs">
+              <div
+                className={`${theme.softBg5} ${theme.border20} rounded-3xl border p-6 md:p-10`}
+              >
+                <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:items-center sm:text-left md:gap-10">
+                  <div className="relative h-48 w-40 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/5 shadow-lg sm:h-60 sm:w-48 md:h-64 md:w-52">
+                    {imgUrl(data.principal.image) ? (
+                      <Image
+                        src={imgUrl(data.principal.image)}
+                        alt={data.principal.name}
+                        fill
+                        className="object-cover object-top"
+                        sizes="(max-width: 640px) 160px, 208px"
+                      />
+                    ) : (
+                      <div className="text-muted-foreground flex h-full w-full items-center justify-center">
+                        <User size={48} />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex flex-1 flex-col items-center sm:items-start">
+                    <p className="text-foreground text-2xl font-bold md:text-3xl">
+                      {data.principal.name}
+                    </p>
+                    <p
+                      className={`${theme.accentText} mt-1 text-base font-semibold md:text-lg`}
+                    >
+                      {data.principal.role}
+                    </p>
+                    {data.principal.institution && (
+                      <p className="text-muted-foreground mt-0.5 text-sm">
                         {data.principal.institution}
                       </p>
-                    </div>
-                  </div>
-                  <div className="flex-1 space-y-4">
-                    <blockquote
-                      className={`text-foreground/90 ${theme.border50} border-l-4 pl-5 text-base leading-relaxed italic md:text-lg`}
-                    >
-                      &quot;{data.principal.quote}&quot;
-                    </blockquote>
-                    {data.principal.messages.map((msg, i) => (
-                      <p
-                        key={i}
-                        className="text-muted-foreground text-sm leading-relaxed md:text-base"
+                    )}
+                    {(data.principal.linkedin || data.principal.email) && (
+                      <div className="mt-4 flex items-center gap-2">
+                        {data.principal.linkedin && (
+                          <a
+                            href={data.principal.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            aria-label={`${data.principal.name} on LinkedIn`}
+                            className={`${theme.accentText} flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 transition hover:bg-white/10`}
+                          >
+                            <FaLinkedinIn size={16} />
+                          </a>
+                        )}
+                        {data.principal.email && (
+                          <a
+                            href={`mailto:${data.principal.email}`}
+                            onClick={(e) => e.stopPropagation()}
+                            aria-label={`Email ${data.principal.name}`}
+                            className={`${theme.accentText} flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 transition hover:bg-white/10`}
+                          >
+                            <Mail size={16} />
+                          </a>
+                        )}
+                      </div>
+                    )}
+                    {data.principal.quote && (
+                      <blockquote
+                        className={`text-foreground/80 ${theme.border50} mt-4 line-clamp-2 border-l-4 pl-4 text-sm leading-relaxed italic md:text-base`}
                       >
-                        {msg}
-                      </p>
-                    ))}
+                        &quot;{data.principal.quote}&quot;
+                      </blockquote>
+                    )}
+                    {(data.principal.quote ||
+                      data.principal.messages.length > 0) && (
+                      <button
+                        type="button"
+                        onClick={(e) =>
+                          openPerson(
+                            {
+                              name: data.principal.name,
+                              role: `${data.principal.role}${data.principal.institution ? ` · ${data.principal.institution}` : ""}`,
+                              image: data.principal.image,
+                              linkedin: data.principal.linkedin,
+                              email: data.principal.email,
+                              quote: data.principal.quote,
+                              messages: data.principal.messages,
+                            },
+                            e,
+                          )
+                        }
+                        className={`${theme.accentText} mt-4 flex items-center gap-1 self-center text-sm font-semibold hover:underline sm:self-end`}
+                      >
+                        Know more
+                        <ChevronRight size={16} />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
             </EditableRegion>
 
-            {/* 4. Management */}
+            {/* 5. Management */}
             <EditableRegion
               as="section"
               id="management"
@@ -777,52 +883,66 @@ export function AboutPageLayout({
               onEditSection={onEditSection}
               className={`scroll-mt-28 transition-all duration-300 ${sectionVis("management")}`}
             >
-              <SectionHeading
-                icon={Briefcase}
-                title="Management"
-                theme={theme}
-              />
-              <p className="text-muted-foreground mb-8 text-sm leading-relaxed md:text-base">
-                {data.management.description}
-              </p>
-              <div className="grid gap-6 sm:grid-cols-2">
+              {data.management.description && (
+                <p className="text-muted-foreground mb-6 text-center text-sm leading-relaxed md:text-base">
+                  {data.management.description}
+                </p>
+              )}
+              <div className="grid grid-cols-2 gap-4 md:gap-8">
                 {data.management.members.map((person, i) => (
                   <div
                     key={i}
-                    className="flex flex-col gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 md:p-6"
+                    className="group flex flex-col items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-4 text-center transition-all hover:bg-white/10 md:p-6"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/10">
-                        {imgUrl(person.image) && (
-                          <Image
-                            src={imgUrl(person.image)}
-                            alt={person.name}
-                            fill
-                            className="object-cover object-top"
-                            sizes="64px"
-                          />
-                        )}
-                      </div>
-                      <div>
-                        <p className="text-foreground text-sm font-bold md:text-base">
-                          {person.name}
-                        </p>
-                        <p
-                          className={`${theme.accentText} text-xs font-medium md:text-sm`}
-                        >
-                          {person.role}
-                        </p>
-                      </div>
+                    <div className="relative aspect-square w-full shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/10 transition-transform group-hover:scale-[1.02]">
+                      {imgUrl(person.image) ? (
+                        <Image
+                          src={imgUrl(person.image)}
+                          alt={person.name}
+                          fill
+                          className="object-cover object-top"
+                          sizes="(max-width: 768px) 45vw, 320px"
+                        />
+                      ) : (
+                        <div className="text-muted-foreground flex h-full w-full items-center justify-center">
+                          <User size={48} />
+                        </div>
+                      )}
                     </div>
-                    <p className="text-muted-foreground text-xs leading-relaxed md:text-sm">
-                      {person.bio}
-                    </p>
+                    <div>
+                      <p className="text-foreground text-base font-bold md:text-lg">
+                        {person.name}
+                      </p>
+                      <p
+                        className={`${theme.accentText} mt-0.5 text-xs font-medium md:text-sm`}
+                      >
+                        {person.role}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) =>
+                        openPerson(
+                          {
+                            name: person.name,
+                            role: person.role,
+                            image: person.image,
+                            bio: person.bio,
+                          },
+                          e,
+                        )
+                      }
+                      className={`${theme.accentText} flex items-center gap-1 self-end text-sm font-semibold hover:underline`}
+                    >
+                      Know more
+                      <ChevronRight size={16} />
+                    </button>
                   </div>
                 ))}
               </div>
             </EditableRegion>
 
-            {/* 5. Administration — HOD */}
+            {/* 6. Administration — HOD */}
             <EditableRegion
               as="section"
               id="hod"
@@ -1120,6 +1240,98 @@ export function AboutPageLayout({
       </div>
 
       {!editable && <Footer />}
+
+      {activePerson && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/70 p-3 backdrop-blur-sm md:p-6"
+          onClick={() => setActivePerson(null)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            onClick={(e) => e.stopPropagation()}
+            className="bg-surface relative flex max-h-[90vh] w-full max-w-lg flex-col items-center overflow-y-auto rounded-2xl border border-white/10 p-6 text-center shadow-xl md:max-w-xl md:p-8"
+          >
+            <button
+              type="button"
+              onClick={() => setActivePerson(null)}
+              aria-label="Close"
+              className="text-muted-foreground hover:text-foreground absolute top-3 right-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-black/40 backdrop-blur-sm transition hover:bg-black/60 md:top-4 md:right-4"
+            >
+              <X size={18} />
+            </button>
+            <div className="relative h-40 w-40 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/5 md:h-48 md:w-48">
+              {imgUrl(activePerson.image) ? (
+                <Image
+                  src={imgUrl(activePerson.image)}
+                  alt={activePerson.name}
+                  fill
+                  className="object-cover object-top"
+                  sizes="192px"
+                />
+              ) : (
+                <div className="text-muted-foreground flex h-full w-full items-center justify-center">
+                  <User size={56} />
+                </div>
+              )}
+            </div>
+            <div className="mt-4">
+              <p className="text-foreground text-xl font-bold md:text-2xl">
+                {activePerson.name}
+              </p>
+              <p className={`${theme.accentText} text-sm font-medium md:text-base`}>
+                {activePerson.role}
+              </p>
+            </div>
+            {(activePerson.linkedin || activePerson.email) && (
+              <div className="mt-3 flex items-center gap-2">
+                {activePerson.linkedin && (
+                  <a
+                    href={activePerson.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${activePerson.name} on LinkedIn`}
+                    className={`${theme.accentText} flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 transition hover:bg-white/10`}
+                  >
+                    <FaLinkedinIn size={16} />
+                  </a>
+                )}
+                {activePerson.email && (
+                  <a
+                    href={`mailto:${activePerson.email}`}
+                    aria-label={`Email ${activePerson.name}`}
+                    className={`${theme.accentText} flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 transition hover:bg-white/10`}
+                  >
+                    <Mail size={16} />
+                  </a>
+                )}
+              </div>
+            )}
+            <div className="mt-6 w-full space-y-4 text-left">
+              {activePerson.quote && (
+                <blockquote
+                  className={`text-foreground/90 ${theme.border50} border-l-4 pl-5 text-base leading-relaxed italic md:text-lg`}
+                >
+                  &quot;{activePerson.quote}&quot;
+                </blockquote>
+              )}
+              {activePerson.messages?.map((msg, i) => (
+                <p
+                  key={i}
+                  className="text-muted-foreground text-sm leading-relaxed md:text-base"
+                >
+                  {msg}
+                </p>
+              ))}
+              {activePerson.bio && (
+                <p className="text-muted-foreground text-sm leading-relaxed md:text-base">
+                  {activePerson.bio}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

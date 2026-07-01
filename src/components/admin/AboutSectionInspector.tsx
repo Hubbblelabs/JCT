@@ -207,6 +207,26 @@ export function AboutSectionInspector({
             }
             hideUrlField
           />
+          <TextInput
+            label="LinkedIn URL"
+            value={data.principal.linkedin}
+            placeholder="https://linkedin.com/in/…"
+            onChange={(e) =>
+              patch({
+                principal: { ...data.principal, linkedin: e.target.value },
+              })
+            }
+          />
+          <TextInput
+            label="Email"
+            value={data.principal.email}
+            placeholder="principal@jct.ac.in"
+            onChange={(e) =>
+              patch({
+                principal: { ...data.principal, email: e.target.value },
+              })
+            }
+          />
           <TextArea
             label="Pull Quote"
             rows={3}
@@ -231,6 +251,16 @@ export function AboutSectionInspector({
     case "management":
       return (
         <>
+          <TextInput
+            label="Heading"
+            value={data.management.tagline}
+            placeholder="Great Minds. Passionate Leaders. One Vision."
+            onChange={(e) =>
+              patch({
+                management: { ...data.management, tagline: e.target.value },
+              })
+            }
+          />
           <TextArea
             label="Section Description"
             rows={3}

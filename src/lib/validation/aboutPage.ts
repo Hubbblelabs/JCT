@@ -64,9 +64,12 @@ const PrincipalSchema = z.object({
   image: s(500),
   quote: s(1000),
   messages: z.array(s(2000)).default([]),
+  linkedin: s(300),
+  email: s(150),
 });
 
 const ManagementSchema = z.object({
+  tagline: s(200),
   description: s(1000),
   members: z.array(PersonWithBioSchema).default([]),
 });
@@ -123,8 +126,14 @@ export const EngineeringAboutSchema = z.object({
     image: "",
     quote: "",
     messages: [],
+    linkedin: "",
+    email: "",
   }),
-  management: ManagementSchema.default({ description: "", members: [] }),
+  management: ManagementSchema.default({
+    tagline: "",
+    description: "",
+    members: [],
+  }),
   hod: HodSchema.default({ description: "", members: [] }),
   governingCouncil: GoverningCouncilSchema.default({
     description: "",
@@ -164,8 +173,14 @@ export const ArtsScienceAboutSchema = z.object({
     image: "",
     quote: "",
     messages: [],
+    linkedin: "",
+    email: "",
   }),
-  management: ManagementSchema.default({ description: "", members: [] }),
+  management: ManagementSchema.default({
+    tagline: "",
+    description: "",
+    members: [],
+  }),
   hod: HodSchema.default({ description: "", members: [] }),
   governingCouncil: GoverningCouncilSchema.default({
     description: "",
@@ -202,8 +217,14 @@ export const PolytechnicAboutSchema = z.object({
     image: "",
     quote: "",
     messages: [],
+    linkedin: "",
+    email: "",
   }),
-  management: ManagementSchema.default({ description: "", members: [] }),
+  management: ManagementSchema.default({
+    tagline: "",
+    description: "",
+    members: [],
+  }),
   hod: HodSchema.default({ description: "", members: [] }),
   governingCouncil: GoverningCouncilSchema.default({
     description: "",
@@ -242,8 +263,14 @@ export const MainAboutSchema = z.object({
     image: "",
     quote: "",
     messages: [],
+    linkedin: "",
+    email: "",
   }),
-  management: ManagementSchema.default({ description: "", members: [] }),
+  management: ManagementSchema.default({
+    tagline: "",
+    description: "",
+    members: [],
+  }),
   hod: HodSchema.default({ description: "", members: [] }),
   governingCouncil: GoverningCouncilSchema.default({
     description: "",
