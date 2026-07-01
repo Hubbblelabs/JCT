@@ -16,7 +16,9 @@
     "seed:deptcontent:polytechnic": "node scripts/seed-deptcontent-polytechnic.mjs",
     "seed:deptcontent:polytechnic:dry": "node scripts/seed-deptcontent-polytechnic.mjs --dry-run",
     "seed:deptcontent:arts-science": "node scripts/seed-deptcontent-arts-science.mjs",
-    "seed:deptcontent:arts-science:dry": "node scripts/seed-deptcontent-arts-science.mjs --dry-run"
+    "seed:deptcontent:arts-science:dry": "node scripts/seed-deptcontent-arts-science.mjs --dry-run",
+    "seed:faculty": "node scripts/seed-faculty.mjs",
+    "seed:faculty:dry": "node scripts/seed-faculty.mjs --dry-run"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1075.0",
