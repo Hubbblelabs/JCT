@@ -4,9 +4,16 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Camera, ArrowRight, X } from "lucide-react";
+import { Camera, Calendar, ArrowRight, X } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
 import { useSiteConfig } from "@/lib/use-site-config";
+
+export type CampusEventCard = {
+  title: string;
+  href: string;
+  image: string;
+  date: string;
+};
 
 type Photo = {
   src: string;
@@ -55,7 +62,7 @@ function normalizeLifeAtJct(raw: unknown): LifeAtJctConfig | null {
   };
 }
 
-export function CampusLife() {
+export function CampusLife({ events = [] }: { events?: CampusEventCard[] }) {
   const { data, loading } = useSiteConfig("lifeAtJct");
   const config = normalizeLifeAtJct(data);
 
@@ -63,7 +70,13 @@ export function CampusLife() {
   const [showAllPhotos, setShowAllPhotos] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
 
-  const categories = useMemo(() => config?.categories ?? [], [config]);
+  const categories = useMemo(() => {
+    const base = config?.categories ?? [];
+    if (base.length > 0 && events.length > 0 && !base.includes("Events")) {
+      return [...base, "Events"];
+    }
+    return base;
+  }, [config, events]);
   const photos = useMemo(() => config?.photos ?? [], [config]);
   const videoUrl = config?.videoUrl ?? "";
 
@@ -73,6 +86,10 @@ export function CampusLife() {
     }
   }, [categories, activeFilter]);
 
+  // CMS events take over the "Events" filter; the static lifeAtJct photos
+  // remain the fallback when no events are published.
+  const showingEvents = activeFilter === "Events" && events.length > 0;
+
   const filtered = useMemo(
     () =>
       activeFilter === "All"
@@ -80,6 +97,8 @@ export function CampusLife() {
         : photos.filter((p) => p.category === activeFilter),
     [photos, activeFilter],
   );
+
+  const visibleCount = showingEvents ? events.length : filtered.length;
 
   if (loading) {
     return (
@@ -180,37 +199,68 @@ export function CampusLife() {
           layout
           className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4"
         >
-          {filtered.map((photo, i) => (
-            <motion.div
-              key={`${photo.caption}-${i}`}
-              layout
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-              transition={{ duration: 0.4, delay: i * 0.05 }}
-              className={`group relative cursor-pointer overflow-hidden rounded-2xl ${i === 0 ? "md:col-span-2 md:row-span-2" : ""} aspect-4/3 ${!showAllPhotos && i >= 4 ? "hidden md:block" : ""}`}
-            >
-              <Image
-                src={getImageUrl(photo.src) ?? photo.src}
-                alt={photo.caption}
-                fill
-                sizes="(min-width: 768px) 50vw, 100vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 flex items-end bg-linear-to-t from-black/70 via-black/10 to-transparent p-3 transition-opacity duration-300 md:p-5 md:opacity-0 md:group-hover:opacity-100">
-                <div className="flex items-center gap-2">
-                  <Camera size={14} className="text-gold" />
-                  <span className="font-sans text-sm font-medium text-white">
-                    {photo.caption}
-                  </span>
+          {showingEvents &&
+            events.map((event, i) => (
+              <motion.div
+                key={event.href}
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+                className={`group relative overflow-hidden rounded-2xl ${i === 0 ? "md:col-span-2 md:row-span-2" : ""} aspect-4/3 ${!showAllPhotos && i >= 4 ? "hidden md:block" : ""}`}
+              >
+                <Link href={event.href} className="block h-full w-full">
+                  <Image
+                    src={getImageUrl(event.image) ?? event.image}
+                    alt={event.title}
+                    fill
+                    sizes="(min-width: 768px) 50vw, 100vw"
+                    className="object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 flex flex-col justify-end bg-linear-to-t from-black/80 via-black/20 to-transparent p-3 md:p-5">
+                    <span className="text-gold mb-1 flex items-center gap-1.5 font-sans text-[11px] font-semibold tracking-wide uppercase">
+                      <Calendar size={12} /> {event.date}
+                    </span>
+                    <span className="line-clamp-2 font-sans text-sm font-medium text-white md:text-base">
+                      {event.title}
+                    </span>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          {!showingEvents &&
+            filtered.map((photo, i) => (
+              <motion.div
+                key={`${photo.caption}-${i}`}
+                layout
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+                className={`group relative cursor-pointer overflow-hidden rounded-2xl ${i === 0 ? "md:col-span-2 md:row-span-2" : ""} aspect-4/3 ${!showAllPhotos && i >= 4 ? "hidden md:block" : ""}`}
+              >
+                <Image
+                  src={getImageUrl(photo.src) ?? photo.src}
+                  alt={photo.caption}
+                  fill
+                  sizes="(min-width: 768px) 50vw, 100vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 flex items-end bg-linear-to-t from-black/70 via-black/10 to-transparent p-3 transition-opacity duration-300 md:p-5 md:opacity-0 md:group-hover:opacity-100">
+                  <div className="flex items-center gap-2">
+                    <Camera size={14} className="text-gold" />
+                    <span className="font-sans text-sm font-medium text-white">
+                      {photo.caption}
+                    </span>
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          ))}
+              </motion.div>
+            ))}
         </motion.div>
 
         {/* Mobile Show More */}
-        {!showAllPhotos && filtered.length > 4 && (
+        {!showAllPhotos && visibleCount > 4 && (
           <div className="mt-6 text-center md:hidden">
             <button
               onClick={() => setShowAllPhotos(true)}
@@ -241,6 +291,14 @@ export function CampusLife() {
           >
             Explore Campus Life <ArrowRight size={16} />
           </Link>
+          {showingEvents && (
+            <Link
+              href="/events"
+              className="group inline-flex h-12 items-center gap-3 rounded-full border border-white/15 bg-white/5 px-8 font-sans text-sm font-semibold text-white transition-all hover:border-white/30 hover:bg-white/10"
+            >
+              View All Events <ArrowRight size={16} />
+            </Link>
+          )}
         </motion.div>
       </div>
     </section>
