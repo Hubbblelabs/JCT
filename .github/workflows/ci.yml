@@ -13,9 +13,14 @@ jobs:
       # on-demand ISR, and the NEXTAUTH_SECRET check only warns during the
       # build phase. These placeholders just satisfy any module-load env
       # reads — they are never used to serve traffic.
+      #
+      # MONGODB_URI is deliberately NOT set: connectDB() then throws its
+      # clear "MONGODB_URI environment variable is not set" error instantly,
+      # which every build-time caller catches and degrades from. A localhost
+      # placeholder URI would instead burn the 15s server-selection timeout
+      # on every cold connection attempt.
       NEXTAUTH_SECRET: ci-placeholder-secret-not-used-in-production-000
       NEXTAUTH_URL: http://localhost:3000
-      MONGODB_URI: mongodb://127.0.0.1:27017/ci
     steps:
       - uses: actions/checkout@v4
 
