@@ -76,6 +76,15 @@ export {
 export type { TestimonialValue } from "./testimonials";
 
 export {
+  EventCreateSchema,
+  EventUpdateSchema,
+  EVENT_CATEGORY_SUGGESTIONS,
+  INSTITUTIONS as EVENT_INSTITUTIONS,
+  LIMITS as LIMITS_event,
+} from "./events";
+export type { EventCreateValue, EventUpdateValue } from "./events";
+
+export {
   RecruiterSchema,
   RecruiterCreateSchema,
   RecruiterUpdateSchema,

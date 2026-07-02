@@ -1,0 +1,77 @@
+import { z } from "zod";
+import {
+  zEnum,
+  zSlug,
+  zUrl,
+  zClampedString,
+  zOptionalString,
+  zNonNegativeInt,
+} from "./_primitives";
+
+// Must match the Event model enum.
+export const INSTITUTIONS = [
+  "engineering",
+  "arts-science",
+  "polytechnic",
+  "all",
+] as const;
+
+// Suggested categories for the admin UI — the field itself is free text so
+// editors can introduce new badges without a schema change.
+export const EVENT_CATEGORY_SUGGESTIONS = [
+  "Achievement",
+  "Partnership",
+  "Campus Life",
+  "Accreditation",
+  "Academic",
+  "Sports",
+  "Cultural",
+  "Workshop",
+  "Placement",
+] as const;
+
+export const LIMITS = {
+  titleMax: 160,
+  excerptMax: 300,
+  descriptionMax: 20000,
+  categoryMax: 40,
+  locationMax: 120,
+} as const;
+
+const zEventDate = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format")
+  .refine((v) => !Number.isNaN(Date.parse(v)), "Must be a valid date");
+
+// Defaults-free base — .partial()-safe for PATCH payloads (see CLAUDE.md:
+// Zod 4 injects .default() values for omitted keys, wiping stored fields).
+const EventBaseSchema = z.object({
+  title: zClampedString(1, LIMITS.titleMax, "Title"),
+  slug: zSlug,
+  excerpt: zOptionalString(LIMITS.excerptMax),
+  description: zOptionalString(LIMITS.descriptionMax),
+  category: zClampedString(1, LIMITS.categoryMax, "Category"),
+  event_date: zEventDate,
+  location: zOptionalString(LIMITS.locationMax),
+  image: zUrl.optional().or(z.literal("")),
+  institution: zEnum(INSTITUTIONS),
+  is_active: z.boolean(),
+  sort_order: zNonNegativeInt,
+});
+
+export const EventCreateSchema = EventBaseSchema.extend({
+  excerpt: zOptionalString(LIMITS.excerptMax).default(""),
+  description: zOptionalString(LIMITS.descriptionMax).default(""),
+  category: zClampedString(1, LIMITS.categoryMax, "Category").default(
+    "Campus Life",
+  ),
+  location: zOptionalString(LIMITS.locationMax).default(""),
+  institution: zEnum(INSTITUTIONS).default("all"),
+  is_active: z.boolean().optional().default(true),
+  sort_order: zNonNegativeInt.optional().default(0),
+});
+
+export const EventUpdateSchema = EventBaseSchema.partial();
+
+export type EventCreateValue = z.infer<typeof EventCreateSchema>;
+export type EventUpdateValue = z.infer<typeof EventUpdateSchema>;

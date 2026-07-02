@@ -32,6 +32,7 @@ import {
   Info,
   ScrollText,
   TreePalm,
+  CalendarDays,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Suspense } from "react";
@@ -87,6 +88,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: MessageSquare,
     },
     {
+      label: "News & Events",
+      href: "/admin/events?college=engineering",
+      icon: CalendarDays,
+    },
+    {
       label: "About Us",
       href: "/admin/about?college=engineering",
       icon: Info,
@@ -129,6 +135,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: MessageSquare,
     },
     {
+      label: "News & Events",
+      href: "/admin/events?college=arts-science",
+      icon: CalendarDays,
+    },
+    {
       label: "About Us",
       href: "/admin/about?college=arts-science",
       icon: Info,
@@ -164,6 +175,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       label: "Testimonials",
       href: "/admin/page-content?college=polytechnic&section=testimonials",
       icon: MessageSquare,
+    },
+    {
+      label: "News & Events",
+      href: "/admin/events?college=polytechnic",
+      icon: CalendarDays,
     },
     {
       label: "About Us",
@@ -218,6 +234,11 @@ const MAIN_ITEMS: NavItem[] = [
     label: "Testimonials",
     href: "/admin/main/page-content?section=testimonials",
     icon: MessageSquare,
+  },
+  {
+    label: "News & Events",
+    href: "/admin/events",
+    icon: CalendarDays,
   },
   {
     label: "Admissions",

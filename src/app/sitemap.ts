@@ -29,6 +29,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/placements/career-development",
     "/placements/industry-mous",
     "/placements/alumni-stories",
+    "/events",
     "/campus-life",
     "/campus-life/facilities",
     "/campus-life/hostel",

@@ -6,6 +6,21 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Formats an ISO date string as e.g. "04 Mar 2026" for event cards.
+ * Returns "" for missing/invalid input.
+ */
+export function formatEventDate(iso: string): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+/**
  * Converts a storage key to a full image URL
  * Handles both storage keys and full URLs
  */
