@@ -42,7 +42,7 @@ export default async function PolytechnicPage() {
         <Hero />
         <DiplomaPrograms />
         <Admissions />
-        <Placements />
+        <Placements institution="polytechnic" />
         <CampusLife />
         <Testimonials />
         <Footer />

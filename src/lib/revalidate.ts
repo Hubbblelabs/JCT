@@ -11,16 +11,19 @@ const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
     "/institutions/engineering/programs",
     "/institutions/engineering/about",
     "/institutions/engineering/coe",
+    "/institutions/engineering/placements",
   ],
   "arts-science": [
     "/institutions/arts-science",
     "/institutions/arts-science/programs",
     "/institutions/arts-science/about",
+    "/institutions/arts-science/placements",
   ],
   polytechnic: [
     "/institutions/polytechnic",
     "/institutions/polytechnic/programs",
     "/institutions/polytechnic/about",
+    "/institutions/polytechnic/placements",
   ],
   "all-institutions": [
     "/",
@@ -28,12 +31,15 @@ const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
     "/institutions/engineering/programs",
     "/institutions/engineering/about",
     "/institutions/engineering/coe",
+    "/institutions/engineering/placements",
     "/institutions/arts-science",
     "/institutions/arts-science/programs",
     "/institutions/arts-science/about",
+    "/institutions/arts-science/placements",
     "/institutions/polytechnic",
     "/institutions/polytechnic/programs",
     "/institutions/polytechnic/about",
+    "/institutions/polytechnic/placements",
   ],
 };
 

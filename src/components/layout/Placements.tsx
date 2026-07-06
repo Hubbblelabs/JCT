@@ -2,7 +2,8 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { Building } from "lucide-react";
+import Link from "next/link";
+import { Building, ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 import { getImageUrl } from "@/lib/utils";
 import { resolveIcon } from "@/lib/lucide-icon";
@@ -68,7 +69,12 @@ function CompanyCard({ company }: { company: Company }) {
   );
 }
 
-export function Placements() {
+type PlacementsProps = {
+  /** When set, shows a "View Placements" link to that college's dedicated page. */
+  institution?: "engineering" | "arts-science" | "polytechnic";
+};
+
+export function Placements({ institution }: PlacementsProps = {}) {
   const { data: sectionData, loading } = useSiteConfig("recruitersSection");
   const section = normalizeSection(sectionData);
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -153,6 +159,23 @@ export function Placements() {
             >
               {section.description}
             </motion.p>
+          )}
+          {institution && (
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+              className="mt-6"
+            >
+              <Link
+                href={`/institutions/${institution}/placements`}
+                className="text-accent hover:text-navy inline-flex items-center gap-2 text-sm font-bold tracking-wide uppercase transition-colors"
+              >
+                View Placement Details
+                <ArrowRight size={16} />
+              </Link>
+            </motion.div>
           )}
         </div>
       </div>

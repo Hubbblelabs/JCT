@@ -29,7 +29,7 @@ export default async function EngineeringPage() {
         <EngineeringDomains />
         <EngineeringMetrics />
         <Admissions />
-        <Placements />
+        <Placements institution="engineering" />
         <CampusLife />
         <Testimonials />
         <div id="footer">

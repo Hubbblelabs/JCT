@@ -73,6 +73,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: BarChart3,
     },
     {
+      label: "Placements",
+      href: "/admin/placements?college=engineering",
+      icon: Briefcase,
+    },
+    {
       label: "Admissions",
       href: "/admin/page-content?college=engineering&section=admissions",
       icon: ClipboardList,
@@ -120,6 +125,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: GraduationCap,
     },
     {
+      label: "Placements",
+      href: "/admin/placements?college=arts-science",
+      icon: Briefcase,
+    },
+    {
       label: "Admissions",
       href: "/admin/page-content?college=arts-science&section=admissions",
       icon: ClipboardList,
@@ -160,6 +170,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       label: "Programs",
       href: "/admin/programs?college=polytechnic",
       icon: GraduationCap,
+    },
+    {
+      label: "Placements",
+      href: "/admin/placements?college=polytechnic",
+      icon: Briefcase,
     },
     {
       label: "Admissions",

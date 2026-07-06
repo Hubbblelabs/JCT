@@ -85,6 +85,19 @@ export {
 export type { EventCreateValue, EventUpdateValue } from "./events";
 
 export {
+  PlacementCreateSchema,
+  PlacementUpdateSchema,
+  INSTITUTIONS as PLACEMENT_INSTITUTIONS,
+  LIMITS as LIMITS_placement,
+} from "./placements";
+export type {
+  PlacementCreateValue,
+  PlacementUpdateValue,
+  TopRecruiterValue,
+  NotablePlacementValue,
+} from "./placements";
+
+export {
   RecruiterSchema,
   RecruiterCreateSchema,
   RecruiterUpdateSchema,

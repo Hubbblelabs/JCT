@@ -42,7 +42,7 @@ export default async function ArtsSciencePage() {
         <Hero />
         <UgPrograms />
         <AdmissionProcess />
-        <Placements />
+        <Placements institution="arts-science" />
         <CampusLife />
         <Testimonials />
         <Footer />

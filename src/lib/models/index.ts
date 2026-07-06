@@ -8,5 +8,11 @@ export type { IPage, PageInstitution, PageTemplate, PageStatus } from "./Page";
 export { Recruiter } from "./Recruiter";
 export { Event } from "./Event";
 export type { IEvent } from "./Event";
+export { Placement } from "./Placement";
+export type {
+  IPlacement,
+  ITopRecruiter,
+  INotablePlacement,
+} from "./Placement";
 export { Testimonial } from "./Testimonial";
 export { AuditLog } from "./AuditLog";
