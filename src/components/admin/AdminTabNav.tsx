@@ -103,6 +103,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: Info,
     },
     {
+      label: "Accreditations",
+      href: "/admin/accreditations?college=engineering",
+      icon: Award,
+    },
+    {
       label: "COE",
       href: "/admin/coe",
       icon: ScrollText,
@@ -154,6 +159,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       href: "/admin/about?college=arts-science",
       icon: Info,
     },
+    {
+      label: "Accreditations",
+      href: "/admin/accreditations?college=arts-science",
+      icon: Award,
+    },
   ],
   polytechnic: [
     {
@@ -201,6 +211,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       href: "/admin/about?college=polytechnic",
       icon: Info,
     },
+    {
+      label: "Accreditations",
+      href: "/admin/accreditations?college=polytechnic",
+      icon: Award,
+    },
   ],
 };
 
@@ -221,7 +236,7 @@ const MAIN_ITEMS: NavItem[] = [
     icon: FileEdit,
   },
   {
-    label: "Accreditations",
+    label: "Accreditation Logos",
     href: "/admin/main/page-content?section=accreditations",
     icon: Award,
   },
@@ -264,6 +279,11 @@ const MAIN_ITEMS: NavItem[] = [
     label: "About Us",
     href: "/admin/about?college=main",
     icon: Info,
+  },
+  {
+    label: "Accreditations",
+    href: "/admin/accreditations?college=main",
+    icon: Award,
   },
   {
     label: "Campus Life",

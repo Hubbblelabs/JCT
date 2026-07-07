@@ -5,25 +5,28 @@ export type RevalidateTarget =
   "home" | "engineering" | "arts-science" | "polytechnic" | "all-institutions";
 
 const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
-  home: ["/", "/campus-life", "/about-us"],
+  home: ["/", "/campus-life", "/about-us", "/accreditations"],
   engineering: [
     "/institutions/engineering",
     "/institutions/engineering/programs",
     "/institutions/engineering/about",
     "/institutions/engineering/coe",
     "/institutions/engineering/placements",
+    "/institutions/engineering/accreditations",
   ],
   "arts-science": [
     "/institutions/arts-science",
     "/institutions/arts-science/programs",
     "/institutions/arts-science/about",
     "/institutions/arts-science/placements",
+    "/institutions/arts-science/accreditations",
   ],
   polytechnic: [
     "/institutions/polytechnic",
     "/institutions/polytechnic/programs",
     "/institutions/polytechnic/about",
     "/institutions/polytechnic/placements",
+    "/institutions/polytechnic/accreditations",
   ],
   "all-institutions": [
     "/",
@@ -32,14 +35,17 @@ const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
     "/institutions/engineering/about",
     "/institutions/engineering/coe",
     "/institutions/engineering/placements",
+    "/institutions/engineering/accreditations",
     "/institutions/arts-science",
     "/institutions/arts-science/programs",
     "/institutions/arts-science/about",
     "/institutions/arts-science/placements",
+    "/institutions/arts-science/accreditations",
     "/institutions/polytechnic",
     "/institutions/polytechnic/programs",
     "/institutions/polytechnic/about",
     "/institutions/polytechnic/placements",
+    "/institutions/polytechnic/accreditations",
   ],
 };
 
@@ -87,6 +93,10 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   polytechnicAbout: ["polytechnic"],
   engineeringCoe: ["engineering"],
   campusLifePage: ["home"],
+  mainAccreditations: ["home"],
+  engineeringAccreditations: ["engineering"],
+  artsScienceAccreditations: ["arts-science"],
+  polytechnicAccreditations: ["polytechnic"],
   // Rendered in the root layout, so it affects every public page. "home"
   // is included because "all-institutions" doesn't cover /campus-life.
   floatingElements: ["home", "all-institutions"],

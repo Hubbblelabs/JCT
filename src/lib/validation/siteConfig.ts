@@ -42,6 +42,7 @@ import { RecruitersSectionSchema } from "./recruiters";
 import { HeaderSchema, FooterSchema } from "./globalCms";
 import { FloatingElementsSchema } from "./floatingElements";
 import { CampusLifePageSchema } from "./campusLifePage";
+import { AccreditationsPageSchema } from "./accreditationsPage";
 import { NavbarSchema } from "./navbar";
 
 // Every site-config key the admin UI writes must have an entry below.
@@ -91,6 +92,10 @@ export const SITE_CONFIG_SCHEMAS = {
   polytechnicAbout: PolytechnicAboutSchema,
   engineeringCoe: CoePageSchema,
   campusLifePage: CampusLifePageSchema,
+  mainAccreditations: AccreditationsPageSchema,
+  engineeringAccreditations: AccreditationsPageSchema,
+  artsScienceAccreditations: AccreditationsPageSchema,
+  polytechnicAccreditations: AccreditationsPageSchema,
 } as const;
 
 export type SiteConfigKey = keyof typeof SITE_CONFIG_SCHEMAS;
@@ -152,6 +157,9 @@ export const SITE_CONFIG_KEY_INSTITUTION: Partial<
   polytechnicAbout: "polytechnic",
   polytechnicHeader: "polytechnic",
   polytechnicNavbar: "polytechnic",
+  engineeringAccreditations: "engineering",
+  artsScienceAccreditations: "arts-science",
+  polytechnicAccreditations: "polytechnic",
 };
 
 export function validateSiteConfigValue(key: SiteConfigKey, value: unknown) {

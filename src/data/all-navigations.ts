@@ -41,6 +41,7 @@ export const mainNavigation: NavItem[] = [
     ],
   },
   { name: "About Us", href: "/about-us" },
+  { name: "Accreditations", href: "/accreditations" },
   { name: "Admissions", href: "/#admissions" },
   { name: "Placements", href: "/#placements" },
   { name: "Life @ JCT", href: "/#campus-life" },
@@ -77,6 +78,10 @@ export const engineeringNavigation: NavItem[] = [
   {
     name: "About Us",
     href: "/institutions/engineering/about",
+  },
+  {
+    name: "Accreditations",
+    href: "/institutions/engineering/accreditations",
   },
   {
     name: "Admissions",
@@ -129,6 +134,10 @@ export const artsNavigation: NavItem[] = [
     href: "/institutions/arts-science/about",
   },
   {
+    name: "Accreditations",
+    href: "/institutions/arts-science/accreditations",
+  },
+  {
     name: "Admissions",
     href: "/institutions/arts-science#admissions",
   },
@@ -174,6 +183,10 @@ export const polytechnicNavigation: NavItem[] = [
   {
     name: "About Us",
     href: "/institutions/polytechnic/about",
+  },
+  {
+    name: "Accreditations",
+    href: "/institutions/polytechnic/accreditations",
   },
   {
     name: "Admissions",

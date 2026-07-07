@@ -266,3 +266,12 @@ export type {
 
 export { CampusLifePageSchema, CAMPUS_LIFE_LIMITS } from "./campusLifePage";
 export type { CampusLifePageValue } from "./campusLifePage";
+
+export {
+  AccreditationsPageSchema,
+  ACCREDITATIONS_PAGE_LIMITS,
+} from "./accreditationsPage";
+export type {
+  AccreditationsPageValue,
+  AccreditationItemValue,
+} from "./accreditationsPage";
