@@ -26,7 +26,7 @@ export function EventsPageLayout({ events }: { events: PublicEventCard[] }) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: Math.min(i % 3, 2) * 0.08 }}
-                className="group border-border bg-background flex flex-col overflow-hidden rounded-2xl border shadow-card transition-shadow hover:shadow-elevated"
+                className="group border-border bg-background shadow-card hover:shadow-elevated flex flex-col overflow-hidden rounded-2xl border transition-shadow"
               >
                 <Link
                   href={`/events/${event.slug}`}

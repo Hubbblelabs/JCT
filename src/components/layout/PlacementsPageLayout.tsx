@@ -47,7 +47,10 @@ function gradientFor(name: string): string {
 }
 
 function initials(name: string): string {
-  const words = name.replace(/[^a-zA-Z0-9\s]/g, " ").trim().split(/\s+/);
+  const words = name
+    .replace(/[^a-zA-Z0-9\s]/g, " ")
+    .trim()
+    .split(/\s+/);
   if (words.length === 0 || !words[0]) return "•";
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();
@@ -62,7 +65,12 @@ type StatDef = {
 
 // Headline stats shown as big cards for the current year.
 const HEADLINE_STATS: StatDef[] = [
-  { key: "placement_percentage", label: "Placement Rate", icon: TrendingUp, suffix: "%" },
+  {
+    key: "placement_percentage",
+    label: "Placement Rate",
+    icon: TrendingUp,
+    suffix: "%",
+  },
   { key: "students_placed", label: "Students Placed", icon: Users },
   { key: "offers_made", label: "Offers Made", icon: Briefcase },
   { key: "companies_visited", label: "Companies Visited", icon: Building2 },
@@ -164,13 +172,7 @@ function CurrentYear({ record }: { record: PublicPlacement }) {
   );
 }
 
-function Monogram({
-  name,
-  className,
-}: {
-  name: string;
-  className: string;
-}) {
+function Monogram({ name, className }: { name: string; className: string }) {
   return (
     <div
       className={`flex items-center justify-center bg-gradient-to-br ${gradientFor(
@@ -291,8 +293,7 @@ export function PlacementsPageLayout({
   // arrive sorted is_current desc, then year desc).
   const current = records.find((r) => r.is_current) ?? records[0] ?? null;
   const [selectedId, setSelectedId] = useState<string>(current?._id ?? "");
-  const active =
-    records.find((r) => r._id === selectedId) ?? current ?? null;
+  const active = records.find((r) => r._id === selectedId) ?? current ?? null;
 
   return (
     <main className="bg-background text-foreground min-h-screen overflow-x-hidden">

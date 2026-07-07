@@ -12,7 +12,5 @@ export const metadata: Metadata = {
 
 export default async function ArtsSciencePlacementsPage() {
   const records = await listPublicPlacements("arts-science");
-  return (
-    <PlacementsPageLayout institution="arts-science" records={records} />
-  );
+  return <PlacementsPageLayout institution="arts-science" records={records} />;
 }

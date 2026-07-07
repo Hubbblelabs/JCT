@@ -762,9 +762,15 @@ export function AboutPageLayout({
                   "Great Minds. Passionate Leaders. One Vision."}
               </h2>
               <div className="mt-3 flex items-center justify-center gap-1.5">
-                <span className={`h-1 w-16 rounded-full bg-current ${theme.accentText}`} />
-                <span className={`h-1 w-6 rounded-full bg-current opacity-70 ${theme.accentText}`} />
-                <span className={`h-1.5 w-1.5 rounded-full bg-current opacity-50 ${theme.accentText}`} />
+                <span
+                  className={`h-1 w-16 rounded-full bg-current ${theme.accentText}`}
+                />
+                <span
+                  className={`h-1 w-6 rounded-full bg-current opacity-70 ${theme.accentText}`}
+                />
+                <span
+                  className={`h-1.5 w-1.5 rounded-full bg-current opacity-50 ${theme.accentText}`}
+                />
               </div>
             </div>
 
@@ -1279,7 +1285,9 @@ export function AboutPageLayout({
               <p className="text-foreground text-xl font-bold md:text-2xl">
                 {activePerson.name}
               </p>
-              <p className={`${theme.accentText} text-sm font-medium md:text-base`}>
+              <p
+                className={`${theme.accentText} text-sm font-medium md:text-base`}
+              >
                 {activePerson.role}
               </p>
             </div>

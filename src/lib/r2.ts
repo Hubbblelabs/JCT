@@ -112,6 +112,7 @@ export async function deleteFromR2(key: string): Promise<void> {
 export function extractR2Keys(
   value: unknown,
   out = new Set<string>(),
+  visited = new WeakSet<object>(),
 ): Set<string> {
   if (typeof value === "string") {
     if (
@@ -120,11 +121,34 @@ export function extractR2Keys(
     ) {
       out.add(value);
     }
-  } else if (Array.isArray(value)) {
-    for (const item of value) extractR2Keys(item, out);
-  } else if (value !== null && typeof value === "object") {
-    for (const v of Object.values(value as Record<string, unknown>)) {
-      extractR2Keys(v, out);
+  } else if (value && typeof value === "object") {
+    if (visited.has(value)) {
+      return out;
+    }
+    visited.add(value);
+
+    // If it has a toObject function (like Mongoose documents), convert to plain object/array
+    if (
+      "toObject" in value &&
+      typeof (value as { toObject: unknown }).toObject === "function"
+    ) {
+      try {
+        const plain = (value as { toObject: () => unknown }).toObject();
+        extractR2Keys(plain, out, visited);
+        return out;
+      } catch {
+        // Fall back to traversing directly if toObject fails
+      }
+    }
+
+    if (Array.isArray(value)) {
+      for (const item of value) {
+        extractR2Keys(item, out, visited);
+      }
+    } else {
+      for (const v of Object.values(value as Record<string, unknown>)) {
+        extractR2Keys(v, out, visited);
+      }
     }
   }
   return out;

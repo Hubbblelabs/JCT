@@ -29,7 +29,9 @@ function loadUri() {
   if (process.env.MONGODB_URI) return process.env.MONGODB_URI.trim();
   const envPath = path.join(__dirname, "..", ".env");
   if (fs.existsSync(envPath)) {
-    const m = fs.readFileSync(envPath, "utf8").match(/^\s*MONGODB_URI\s*=\s*(.+)\s*$/m);
+    const m = fs
+      .readFileSync(envPath, "utf8")
+      .match(/^\s*MONGODB_URI\s*=\s*(.+)\s*$/m);
     if (m) return m[1].trim().replace(/^["']|["']$/g, "");
   }
   return null;

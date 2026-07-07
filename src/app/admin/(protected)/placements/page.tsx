@@ -94,12 +94,7 @@ const INSTITUTION_LABELS: Record<string, string> = {
   polytechnic: "Polytechnic",
 };
 
-type SectionKey =
-  | "general"
-  | "packages"
-  | "counts"
-  | "recruiters"
-  | "notable";
+type SectionKey = "general" | "packages" | "counts" | "recruiters" | "notable";
 
 const SECTIONS: { key: SectionKey; label: string; icon: typeof Info }[] = [
   { key: "general", label: "General", icon: Info },
@@ -499,7 +494,9 @@ function PlacementsPageInner() {
                         <ImageUploadInput
                           label="Logo"
                           value={item.logo}
-                          onChange={(url) => onItemChange({ ...item, logo: url })}
+                          onChange={(url) =>
+                            onItemChange({ ...item, logo: url })
+                          }
                           hideUrlField
                         />
                       </div>

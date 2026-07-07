@@ -3,58 +3,16 @@
     {
       "year": "2024-2025",
       "is_current": true,
+      "summary": "In 2024-2025, JCT Engineering recorded an 80% placement rate — 346 offers to a graduating batch of 434 students — with 46 companies recruiting on campus.",
       "companies_visited": 46,
-      "highest_package": "9 LPA",
-      "average_package": "4.3 LPA",
-      "median_package": "3.9 LPA",
-      "students_placed": 486,
-      "total_students": 560,
-      "placement_percentage": 87,
-      "offers_made": 542,
-      "notable_placements": [
-        {
-          "name": "Karthik Raja S",
-          "program": "B.E. Computer Science & Engineering",
-          "company": "Zoho",
-          "package": "9 LPA",
-          "image": "https://i.pravatar.cc/320?img=12"
-        },
-        {
-          "name": "Priya Dharshini M",
-          "program": "B.E. Information Technology",
-          "company": "Tata Consultancy Services",
-          "package": "7 LPA",
-          "image": "https://i.pravatar.cc/320?img=45"
-        },
-        {
-          "name": "Aravind Kumar R",
-          "program": "B.E. Mechanical Engineering",
-          "company": "Ashok Leyland",
-          "package": "5.5 LPA",
-          "image": "https://i.pravatar.cc/320?img=33"
-        },
-        {
-          "name": "Sneha Lakshmi V",
-          "program": "B.E. Electronics & Communication",
-          "company": "Tech Mahindra",
-          "package": "6.2 LPA",
-          "image": "https://i.pravatar.cc/320?img=47"
-        },
-        {
-          "name": "Mohammed Irfan A",
-          "program": "B.E. Civil Engineering",
-          "company": "Larsen & Toubro",
-          "package": "5 LPA",
-          "image": "https://i.pravatar.cc/320?img=15"
-        },
-        {
-          "name": "Divya Bharathi K",
-          "program": "B.E. Electrical & Electronics",
-          "company": "Siemens",
-          "package": "6 LPA",
-          "image": "https://i.pravatar.cc/320?img=44"
-        }
-      ],
+      "highest_package": "",
+      "average_package": "",
+      "median_package": "",
+      "students_placed": 346,
+      "total_students": 434,
+      "placement_percentage": 80,
+      "offers_made": 0,
+      "notable_placements": [],
       "top_recruiters": [
         "Tata Consultancy Services",
         "Cognizant Technology Solution",
@@ -107,14 +65,15 @@
     {
       "year": "2023-2024",
       "is_current": false,
+      "summary": "202 offers were made to a batch of 263 students in 2023-2024 — a 77% placement rate — across 43 recruiting companies.",
       "companies_visited": 43,
-      "highest_package": "7.5 LPA",
-      "average_package": "4 LPA",
-      "median_package": "3.6 LPA",
-      "students_placed": 452,
-      "total_students": 540,
-      "placement_percentage": 84,
-      "offers_made": 498,
+      "highest_package": "",
+      "average_package": "",
+      "median_package": "",
+      "students_placed": 202,
+      "total_students": 263,
+      "placement_percentage": 77,
+      "offers_made": 0,
       "notable_placements": [],
       "top_recruiters": [
         "Amigos Builders And Developers",
@@ -165,14 +124,15 @@
     {
       "year": "2022-2023",
       "is_current": false,
+      "summary": "The 2022-2023 batch of 271 students received 206 offers — a 76% placement rate — from 54 companies visiting campus.",
       "companies_visited": 54,
-      "highest_package": "7 LPA",
-      "average_package": "3.8 LPA",
-      "median_package": "3.4 LPA",
-      "students_placed": 421,
-      "total_students": 520,
-      "placement_percentage": 81,
-      "offers_made": 470,
+      "highest_package": "",
+      "average_package": "",
+      "median_package": "",
+      "students_placed": 206,
+      "total_students": 271,
+      "placement_percentage": 76,
+      "offers_made": 0,
       "notable_placements": [],
       "top_recruiters": [
         "Airtel",
@@ -233,14 +193,15 @@
     {
       "year": "2021-2022",
       "is_current": false,
+      "summary": "In 2021-2022, 226 offers were made to a batch of 334 students — a 68% placement rate — with 60+ companies recruiting on campus.",
       "companies_visited": 60,
-      "highest_package": "6.5 LPA",
-      "average_package": "3.5 LPA",
-      "median_package": "3.2 LPA",
-      "students_placed": 390,
-      "total_students": 500,
-      "placement_percentage": 78,
-      "offers_made": 512,
+      "highest_package": "",
+      "average_package": "",
+      "median_package": "",
+      "students_placed": 226,
+      "total_students": 334,
+      "placement_percentage": 68,
+      "offers_made": 0,
       "notable_placements": [],
       "top_recruiters": [
         "6d Technologies",
@@ -304,50 +265,37 @@
         "Wipro",
         "Zoho"
       ]
+    },
+    {
+      "year": "2020-2021",
+      "is_current": false,
+      "summary": "The 2020-2021 batch of 440 students received 279 offers — a 63% placement rate.",
+      "companies_visited": 0,
+      "highest_package": "",
+      "average_package": "",
+      "median_package": "",
+      "students_placed": 279,
+      "total_students": 440,
+      "placement_percentage": 63,
+      "offers_made": 0,
+      "notable_placements": [],
+      "top_recruiters": []
     }
   ],
   "polytechnic": [
     {
       "year": "2024-2025",
       "is_current": true,
+      "summary": "Companies that recruited from JCT Polytechnic during the 2024-2025 placement season, across the Mechanical, Civil, EEE and Computer diploma streams.",
       "companies_visited": 34,
-      "highest_package": "4.2 LPA",
-      "average_package": "2.4 LPA",
-      "median_package": "2.2 LPA",
-      "students_placed": 258,
-      "total_students": 320,
-      "placement_percentage": 81,
-      "offers_made": 290,
-      "notable_placements": [
-        {
-          "name": "Vignesh S",
-          "program": "Diploma in Mechanical Engineering",
-          "company": "CRI Pumps",
-          "package": "4.2 LPA",
-          "image": "https://i.pravatar.cc/320?img=51"
-        },
-        {
-          "name": "Ramya P",
-          "program": "Diploma in Civil Engineering",
-          "company": "Larsen & Toubro",
-          "package": "3 LPA",
-          "image": "https://i.pravatar.cc/320?img=5"
-        },
-        {
-          "name": "Sathish Kumar M",
-          "program": "Diploma in Electrical & Electronics",
-          "company": "Windcare India",
-          "package": "3.4 LPA",
-          "image": "https://i.pravatar.cc/320?img=13"
-        },
-        {
-          "name": "Keerthana R",
-          "program": "Diploma in Computer Engineering",
-          "company": "Avalon Technologies",
-          "package": "3.6 LPA",
-          "image": "https://i.pravatar.cc/320?img=9"
-        }
-      ],
+      "highest_package": "",
+      "average_package": "",
+      "median_package": "",
+      "students_placed": 0,
+      "total_students": 0,
+      "placement_percentage": 0,
+      "offers_made": 0,
+      "notable_placements": [],
       "top_recruiters": [
         "Cadd Technologies",
         "Amutham Builders",
@@ -375,97 +323,6 @@
         "Shivam Tech Bangalore",
         "SPIC Tuticorin",
         "San Mar Specialty Chemicals"
-      ]
-    }
-  ],
-  "arts-science": [
-    {
-      "year": "2024-2025",
-      "is_current": true,
-      "companies_visited": 38,
-      "highest_package": "6.5 LPA",
-      "average_package": "3.6 LPA",
-      "median_package": "3.2 LPA",
-      "students_placed": 512,
-      "total_students": 620,
-      "placement_percentage": 83,
-      "offers_made": 560,
-      "notable_placements": [
-        {
-          "name": "Harini S",
-          "program": "B.Sc. Computer Science",
-          "company": "Cognizant",
-          "package": "5 LPA",
-          "image": "https://i.pravatar.cc/320?img=25"
-        },
-        {
-          "name": "Naveen Raj K",
-          "program": "B.Com.",
-          "company": "HDFC Bank",
-          "package": "4 LPA",
-          "image": "https://i.pravatar.cc/320?img=52"
-        },
-        {
-          "name": "Deepika M",
-          "program": "BCA",
-          "company": "Zoho",
-          "package": "6.5 LPA",
-          "image": "https://i.pravatar.cc/320?img=32"
-        },
-        {
-          "name": "Surya Prakash R",
-          "program": "B.Sc. Information Technology",
-          "company": "Wipro",
-          "package": "4.5 LPA",
-          "image": "https://i.pravatar.cc/320?img=8"
-        },
-        {
-          "name": "Anitha V",
-          "program": "M.Com.",
-          "company": "ICICI Bank",
-          "package": "4.2 LPA",
-          "image": "https://i.pravatar.cc/320?img=49"
-        }
-      ],
-      "top_recruiters": [
-        "Tata Consultancy Services",
-        "Cognizant Technology Solution",
-        "Zoho",
-        "Wipro",
-        "HCL Technologies",
-        "HDFC Bank",
-        "ICICI Bank",
-        "Sutherland Global Services",
-        "Hinduja Global Solutions",
-        "WNS Global Services",
-        "KGISL",
-        "Photon Infotech",
-        "Federal Bank",
-        "Muthoot Finance",
-        "Sundaram Finance",
-        "Just Dial",
-        "Byju's",
-        "Kaar Technologies",
-        "Aspire Systems",
-        "Payoda Technologies",
-        "Bahwan Cybertek",
-        "Ramco Systems",
-        "Value Labs",
-        "Sagilit",
-        "Deloitte Support Services",
-        "Karvy",
-        "Ford Business Services",
-        "Amazon",
-        "Airtel",
-        "TVS Credit Services",
-        "Apollo Pharmacy",
-        "Titan",
-        "iOPEX Technologies",
-        "Movate",
-        "Startek",
-        "Congruent Solutions",
-        "Athenahealth",
-        "Vuram"
       ]
     }
   ]

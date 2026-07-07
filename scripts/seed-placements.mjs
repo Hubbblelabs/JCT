@@ -119,7 +119,10 @@ const FEMALE_FIRST_NAMES = new Set([
 async function buildAssetResolvers(db) {
   const assets = await db
     .collection("imageassets")
-    .find({}, { projection: { storage_key: 1, filename: 1 } })
+    .find(
+      {},
+      { projection: { storage_key: 1, filename: 1, category: 1, alt_text: 1 } },
+    )
     .toArray();
   const index = assets.map((a) => ({
     key: a.storage_key,
@@ -132,7 +135,21 @@ async function buildAssetResolvers(db) {
     return hit ? hit.key : "";
   };
 
-  const male = index.filter((a) => a.fn.includes("male_avatar")).map((a) => a.key);
+  // Recruiter-category assets uploaded by seed-recruiter-logos.mjs are keyed by
+  // the exact company name in alt_text — index them so favicon logos survive a
+  // re-run of this seed instead of being reset to "".
+  const byRecruiterName = new Map();
+  for (const a of assets) {
+    if (a.category === "recruiter" && a.alt_text)
+      byRecruiterName.set(
+        String(a.alt_text).toLowerCase().trim(),
+        a.storage_key,
+      );
+  }
+
+  const male = index
+    .filter((a) => a.fn.includes("male_avatar"))
+    .map((a) => a.key);
   const female = index
     .filter((a) => a.fn.includes("female_avatar"))
     .map((a) => a.key);
@@ -144,7 +161,8 @@ async function buildAssetResolvers(db) {
       for (const [kw, stem] of LOGO_MATCHES) {
         if (n.includes(kw)) return findByStem(stem);
       }
-      return "";
+      // Fall back to a favicon logo previously seeded for this exact name.
+      return byRecruiterName.get(n.trim()) ?? "";
     },
     pickAvatar(name) {
       const first = String(name ?? "")
@@ -210,10 +228,7 @@ async function main() {
   }
   const dataset = loadDataset();
   const institutions = Object.keys(dataset);
-  const totalRecords = institutions.reduce(
-    (a, k) => a + dataset[k].length,
-    0,
-  );
+  const totalRecords = institutions.reduce((a, k) => a + dataset[k].length, 0);
   console.log(
     `[seed-placements] ${DRY ? "DRY-RUN — " : ""}seeding ${totalRecords} placement record(s) across ${institutions.length} college(s).`,
   );
