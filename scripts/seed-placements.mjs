@@ -49,33 +49,154 @@ function loadDataset() {
   return JSON.parse(fs.readFileSync(file, "utf8"));
 }
 
-function toDoc(institution, record) {
+// Keyword (found in the recruiter name, lowercased) → the distinctive stem of
+// a logo file already uploaded to R2 and tracked in the `imageassets`
+// collection (filenames look like `<timestamp>-<stem>.webp`). The seed resolves
+// each stem to that asset's real R2 storage key so the public page and the
+// admin editor both render the exact same DB-hosted logo. Recruiters with no
+// matching asset get an empty logo and fall back to a designed monogram tile —
+// never a broken image.
+const LOGO_MATCHES = [
+  ["tata consultancy", "tcs"],
+  ["cognizant", "cognizant"],
+  ["zoho", "zoho"],
+  ["alstom", "alstom"],
+  ["ashok leyland", "ashok-leyland"],
+  ["cri pump", "cri-pumps"],
+  ["face prep", "face-prep"],
+  ["parle", "parle-agro"],
+  ["tagros", "tagros"],
+  ["tech mahindra", "tech-mahindra"],
+  ["tvs", "tvs"],
+  ["windcare", "windcare"],
+  ["niyata", "niyata"],
+  ["trika", "trika"],
+  ["triotics", "trioticz"],
+  ["trioticz", "trioticz"],
+  ["san mar", "sanmar"],
+  ["sanmar", "sanmar"],
+  ["spic", "spic.ns"],
+  ["larsen", "lt"],
+  ["l&t", "lt"],
+  ["infosys", "infosys"],
+  ["salzer", "salzer"],
+  ["v-guard", "v-gaurd"],
+  ["v guard", "v-gaurd"],
+  ["vermeer", "vermeer"],
+  ["caterpillar", "caterpillar"],
+  ["genpact", "genpact"],
+  ["force motors", "force-motors"],
+  ["murugappa", "murugappa"],
+  ["aditya birla", "aditya-birla-group"],
+  ["petrofac", "petrofac"],
+  ["poornam", "poornam"],
+  ["popcorn", "popcornapps"],
+  ["sakava", "sakava"],
+  ["sharda", "sharda"],
+  ["thirumalai", "thirumalai-chemicals"],
+  ["tudip", "tudip"],
+  ["abiba", "abiba"],
+  ["ais", "ais-india-glass"],
+  ["ionix", "ionix"],
+  ["infoview", "infoview"],
+];
+
+// First names of the seeded notable-placement students that are female, used to
+// pick a matching stock avatar asset from the media library.
+const FEMALE_FIRST_NAMES = new Set([
+  "priya",
+  "sneha",
+  "divya",
+  "ramya",
+  "keerthana",
+  "harini",
+  "deepika",
+  "anitha",
+]);
+
+// Build lookups from the imageassets already in the DB. Returns resolver
+// closures that turn a recruiter name / student name into a real R2 storage key.
+async function buildAssetResolvers(db) {
+  const assets = await db
+    .collection("imageassets")
+    .find({}, { projection: { storage_key: 1, filename: 1 } })
+    .toArray();
+  const index = assets.map((a) => ({
+    key: a.storage_key,
+    fn: String(a.filename || a.storage_key).toLowerCase(),
+  }));
+
+  const findByStem = (stem) => {
+    const needle = `-${stem}.webp`;
+    const hit = index.find((a) => a.fn.endsWith(needle));
+    return hit ? hit.key : "";
+  };
+
+  const male = index.filter((a) => a.fn.includes("male_avatar")).map((a) => a.key);
+  const female = index
+    .filter((a) => a.fn.includes("female_avatar"))
+    .map((a) => a.key);
+  const counters = { male: 0, female: 0 };
+
+  return {
+    resolveLogo(name) {
+      const n = String(name ?? "").toLowerCase();
+      for (const [kw, stem] of LOGO_MATCHES) {
+        if (n.includes(kw)) return findByStem(stem);
+      }
+      return "";
+    },
+    pickAvatar(name) {
+      const first = String(name ?? "")
+        .trim()
+        .split(/\s+/)[0]
+        .toLowerCase();
+      const isFemale = FEMALE_FIRST_NAMES.has(first);
+      const pool = isFemale ? female : male;
+      if (pool.length === 0) return "";
+      const bucket = isFemale ? "female" : "male";
+      const key = pool[counters[bucket] % pool.length];
+      counters[bucket]++;
+      return key;
+    },
+  };
+}
+
+function toDoc(institution, record, resolvers) {
   const topRecruiters = (record.top_recruiters ?? []).map((name) => ({
     name,
-    logo: "",
+    logo: resolvers.resolveLogo(name),
   }));
+  const notablePlacements = (record.notable_placements ?? []).map((p) => ({
+    name: p.name ?? "",
+    program: p.program ?? "",
+    company: p.company ?? "",
+    package: p.package ?? "",
+    image: resolvers.pickAvatar(p.name),
+  }));
+  const collegeLabel =
+    institution === "arts-science"
+      ? "Arts & Science"
+      : institution[0].toUpperCase() + institution.slice(1);
   return {
     institution,
     year: record.year,
     is_current: record.is_current === true,
     summary:
-      topRecruiters.length > 0
-        ? `Companies that visited the JCT ${
-            institution === "arts-science"
-              ? "Arts & Science"
-              : institution[0].toUpperCase() + institution.slice(1)
-          } campus during ${record.year}.`
-        : "",
-    highest_package: "",
-    average_package: "",
-    median_package: "",
-    students_placed: 0,
-    total_students: 0,
-    placement_percentage: 0,
-    offers_made: 0,
+      record.summary ??
+      (topRecruiters.length > 0
+        ? `${topRecruiters.length} companies visited the JCT ${collegeLabel} campus during ${record.year}, offering roles across core and IT domains.`
+        : ""),
+    highest_package: record.highest_package ?? "",
+    average_package: record.average_package ?? "",
+    median_package: record.median_package ?? "",
+    students_placed: record.students_placed ?? 0,
+    total_students: record.total_students ?? 0,
+    placement_percentage: record.placement_percentage ?? 0,
+    offers_made: record.offers_made ?? 0,
     companies_visited: record.companies_visited ?? topRecruiters.length,
     top_recruiters: topRecruiters,
-    notable_placements: [],
+    notable_placements: notablePlacements,
     is_active: true,
     sort_order: 0,
   };
@@ -98,16 +219,19 @@ async function main() {
   );
 
   await mongoose.connect(uri, { serverSelectionTimeoutMS: 15000 });
-  const placements = mongoose.connection.db.collection("placements");
+  const db = mongoose.connection.db;
+  const placements = db.collection("placements");
+  const resolvers = await buildAssetResolvers(db);
   const now = new Date();
   let upserted = 0;
 
   for (const institution of institutions) {
     for (const record of dataset[institution]) {
-      const doc = toDoc(institution, record);
+      const doc = toDoc(institution, record, resolvers);
+      const withLogos = doc.top_recruiters.filter((r) => r.logo).length;
       console.log(
         `  ${DRY ? "[would upsert]" : "[upsert]"} ${institution} / ${record.year} ` +
-          `(${doc.top_recruiters.length} recruiters, current=${doc.is_current})`,
+          `(${doc.top_recruiters.length} recruiters, ${withLogos} with DB logos, current=${doc.is_current})`,
       );
       if (DRY) continue;
       await placements.updateOne(

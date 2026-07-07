@@ -10,8 +10,6 @@ import {
   Users,
   Briefcase,
   Building2,
-  GraduationCap,
-  ChevronDown,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
@@ -24,6 +22,36 @@ const INSTITUTION_LABELS: Record<string, string> = {
   "arts-science": "Arts & Science",
   polytechnic: "Polytechnic",
 };
+
+// Deterministic brand-ish gradients for recruiter/notable monograms so a card
+// without a logo/photo still reads as a designed element, never a broken image.
+const MONOGRAM_GRADIENTS = [
+  "from-blue-500 to-indigo-600",
+  "from-emerald-500 to-teal-600",
+  "from-amber-500 to-orange-600",
+  "from-rose-500 to-pink-600",
+  "from-violet-500 to-purple-600",
+  "from-cyan-500 to-blue-600",
+  "from-fuchsia-500 to-rose-600",
+  "from-lime-500 to-emerald-600",
+];
+
+function hashString(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function gradientFor(name: string): string {
+  return MONOGRAM_GRADIENTS[hashString(name) % MONOGRAM_GRADIENTS.length];
+}
+
+function initials(name: string): string {
+  const words = name.replace(/[^a-zA-Z0-9\s]/g, " ").trim().split(/\s+/);
+  if (words.length === 0 || !words[0]) return "•";
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
 
 type StatDef = {
   key: keyof PublicPlacement;
@@ -47,9 +75,7 @@ const PACKAGE_STATS: StatDef[] = [
 ];
 
 function CurrentYear({ record }: { record: PublicPlacement }) {
-  const headline = HEADLINE_STATS.filter(
-    (s) => Number(record[s.key]) > 0,
-  );
+  const headline = HEADLINE_STATS.filter((s) => Number(record[s.key]) > 0);
   const packages = PACKAGE_STATS.filter((s) => String(record[s.key]).trim());
 
   return (
@@ -57,10 +83,10 @@ function CurrentYear({ record }: { record: PublicPlacement }) {
       <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
         <div>
           <span className="text-accent text-sm font-bold tracking-[0.2em] uppercase">
-            Latest Results
+            {record.is_current ? "Latest Results" : "Placement Record"}
           </span>
           <h2 className="text-navy mt-1 font-serif text-3xl font-bold md:text-4xl">
-            {record.year}
+            Class of {record.year}
           </h2>
         </div>
         {record.total_students > 0 && (
@@ -78,7 +104,7 @@ function CurrentYear({ record }: { record: PublicPlacement }) {
       )}
 
       {headline.length > 0 && (
-        <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+        <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
           {headline.map((stat, i) => {
             const Icon = stat.icon;
             return (
@@ -88,18 +114,19 @@ function CurrentYear({ record }: { record: PublicPlacement }) {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.08 }}
-                className="border-border rounded-2xl border bg-white p-5 text-center shadow-sm md:p-6"
+                className="from-navy to-navy/85 relative overflow-hidden rounded-2xl bg-gradient-to-br p-5 text-center shadow-lg md:p-6"
               >
+                <div className="bg-accent/20 absolute -top-6 -right-6 h-20 w-20 rounded-full blur-2xl" />
                 <Icon
                   size={22}
-                  className="text-accent mx-auto mb-2"
+                  className="text-accent relative mx-auto mb-2"
                   strokeWidth={1.5}
                 />
-                <span className="text-navy block font-sans text-3xl font-bold md:text-4xl">
+                <span className="relative block font-sans text-3xl font-bold text-white md:text-4xl">
                   {String(record[stat.key])}
                   {stat.suffix}
                 </span>
-                <span className="text-muted-foreground mt-1 block text-xs font-bold tracking-wider uppercase">
+                <span className="relative mt-1 block text-xs font-bold tracking-wider text-white/70 uppercase">
                   {stat.label}
                 </span>
               </motion.div>
@@ -115,7 +142,7 @@ function CurrentYear({ record }: { record: PublicPlacement }) {
             return (
               <div
                 key={stat.key}
-                className="border-border flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm"
+                className="border-border flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
               >
                 <div className="bg-accent/10 flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
                   <Icon size={22} className="text-accent" strokeWidth={1.5} />
@@ -137,156 +164,117 @@ function CurrentYear({ record }: { record: PublicPlacement }) {
   );
 }
 
+function Monogram({
+  name,
+  className,
+}: {
+  name: string;
+  className: string;
+}) {
+  return (
+    <div
+      className={`flex items-center justify-center bg-gradient-to-br ${gradientFor(
+        name,
+      )} font-bold text-white shadow-sm ${className}`}
+    >
+      {initials(name)}
+    </div>
+  );
+}
+
+function RecruiterTile({ name, logo }: { name: string; logo: string | null }) {
+  // Brand logos come from an external CDN and aren't guaranteed to exist for
+  // every recruiter — if one 404s, fall back to a designed monogram so the
+  // grid never shows a broken image.
+  const [failed, setFailed] = useState(false);
+  const showLogo = logo && !failed;
+  return (
+    <div className="border-border group flex h-28 flex-col items-center justify-center gap-2.5 rounded-2xl border bg-white p-3 text-center shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+      {showLogo ? (
+        <div className="relative h-11 w-full">
+          <Image
+            src={logo}
+            alt={name}
+            fill
+            sizes="160px"
+            className="object-contain"
+            loading="lazy"
+            onError={() => setFailed(true)}
+          />
+        </div>
+      ) : (
+        <Monogram name={name} className="h-11 w-11 rounded-xl text-sm" />
+      )}
+      <span className="line-clamp-2 text-[11px] leading-tight font-semibold text-stone-500">
+        {name}
+      </span>
+    </div>
+  );
+}
+
 function TopRecruiters({ record }: { record: PublicPlacement }) {
   if (record.top_recruiters.length === 0) return null;
   return (
     <div className="mt-16">
-      <h3 className="text-navy mb-6 font-serif text-2xl font-bold md:text-3xl">
-        Top Recruiters
-      </h3>
+      <div className="mb-6 flex items-end justify-between gap-3">
+        <h3 className="text-navy font-serif text-2xl font-bold md:text-3xl">
+          Our Recruiters
+        </h3>
+        <span className="text-sm text-stone-500">
+          {record.top_recruiters.length} companies
+        </span>
+      </div>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
         {record.top_recruiters.map((r, i) => (
-          <div
-            key={`${r.name}-${i}`}
-            className="border-border flex h-24 flex-col items-center justify-center gap-2 rounded-xl border bg-white p-3 text-center transition-shadow hover:shadow-md"
+          <RecruiterTile key={`${r.name}-${i}`} name={r.name} logo={r.logo} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Year switcher pinned at the top of the page — lets visitors jump straight to
+// any year's record (current or previous) instead of hunting through an
+// accordion at the bottom.
+function YearSwitcher({
+  records,
+  selectedId,
+  onSelect,
+}: {
+  records: PublicPlacement[];
+  selectedId: string;
+  onSelect: (id: string) => void;
+}) {
+  if (records.length <= 1) return null;
+  return (
+    <div className="mb-10 flex flex-wrap gap-2">
+      {records.map((r) => {
+        const active = r._id === selectedId;
+        return (
+          <button
+            key={r._id}
+            type="button"
+            onClick={() => onSelect(r._id)}
+            aria-pressed={active}
+            className={`rounded-full border px-4 py-2 text-sm font-bold transition-colors ${
+              active
+                ? "border-navy bg-navy text-white shadow-sm"
+                : "border-border text-navy bg-white hover:bg-stone-50"
+            }`}
           >
-            {r.logo ? (
-              <div className="relative h-10 w-full">
-                <Image
-                  src={r.logo}
-                  alt={r.name}
-                  fill
-                  sizes="160px"
-                  className="object-contain"
-                  loading="lazy"
-                />
-              </div>
-            ) : (
-              <Building2 size={22} className="text-stone-300" />
-            )}
-            {r.name && (
-              <span className="text-[11px] font-semibold text-stone-500">
-                {r.name}
+            {r.year}
+            {r.is_current && (
+              <span
+                className={`ml-2 rounded-full px-1.5 py-0.5 text-[10px] font-bold tracking-wide uppercase ${
+                  active ? "bg-accent text-white" : "bg-accent/10 text-accent"
+                }`}
+              >
+                Latest
               </span>
             )}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function NotablePlacements({ record }: { record: PublicPlacement }) {
-  if (record.notable_placements.length === 0) return null;
-  return (
-    <div className="mt-16">
-      <h3 className="text-navy mb-6 font-serif text-2xl font-bold md:text-3xl">
-        Notable Placements
-      </h3>
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {record.notable_placements.map((p, i) => (
-          <div
-            key={`${p.name}-${i}`}
-            className="border-border flex gap-4 rounded-2xl border bg-white p-5 shadow-sm"
-          >
-            <div className="bg-navy/5 relative h-16 w-16 shrink-0 overflow-hidden rounded-full">
-              {p.image ? (
-                <Image
-                  src={p.image}
-                  alt={p.name}
-                  fill
-                  sizes="64px"
-                  className="object-cover"
-                  loading="lazy"
-                />
-              ) : (
-                <span className="text-navy/40 flex h-full w-full items-center justify-center">
-                  <GraduationCap size={24} />
-                </span>
-              )}
-            </div>
-            <div className="min-w-0">
-              <p className="text-navy font-bold">{p.name}</p>
-              {p.program && (
-                <p className="text-xs text-stone-500">{p.program}</p>
-              )}
-              {p.company && (
-                <p className="text-accent mt-1 text-sm font-semibold">
-                  {p.company}
-                </p>
-              )}
-              {p.package && (
-                <p className="text-sm font-bold text-stone-700">{p.package}</p>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function PastYear({ record }: { record: PublicPlacement }) {
-  const [open, setOpen] = useState(false);
-  const rows: { label: string; value: string }[] = [
-    { label: "Placement Rate", value: record.placement_percentage ? `${record.placement_percentage}%` : "" },
-    { label: "Students Placed", value: record.students_placed ? String(record.students_placed) : "" },
-    { label: "Offers Made", value: record.offers_made ? String(record.offers_made) : "" },
-    { label: "Companies Visited", value: record.companies_visited ? String(record.companies_visited) : "" },
-    { label: "Highest Package", value: record.highest_package },
-    { label: "Average Package", value: record.average_package },
-    { label: "Median Package", value: record.median_package },
-  ].filter((r) => r.value);
-
-  return (
-    <div className="border-border overflow-hidden rounded-2xl border bg-white">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between px-5 py-4 text-left"
-      >
-        <span className="text-navy font-serif text-xl font-bold">
-          {record.year}
-        </span>
-        <span className="flex items-center gap-3 text-sm text-stone-500">
-          {record.placement_percentage > 0 && (
-            <span className="text-accent font-bold">
-              {record.placement_percentage}% placed
-            </span>
-          )}
-          <ChevronDown
-            size={18}
-            className={`transition-transform ${open ? "rotate-180" : ""}`}
-          />
-        </span>
-      </button>
-      {open && (
-        <div className="border-border border-t px-5 py-4">
-          {record.summary && (
-            <p className="mb-4 text-sm text-stone-600">{record.summary}</p>
-          )}
-          {rows.length > 0 && (
-            <dl className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-              {rows.map((r) => (
-                <div key={r.label}>
-                  <dt className="text-muted-foreground text-xs font-bold tracking-wider uppercase">
-                    {r.label}
-                  </dt>
-                  <dd className="text-navy mt-1 text-lg font-bold">
-                    {r.value}
-                  </dd>
-                </div>
-              ))}
-            </dl>
-          )}
-          {record.top_recruiters.length > 0 && (
-            <p className="mt-4 text-sm text-stone-500">
-              <span className="font-semibold text-stone-700">Recruiters: </span>
-              {record.top_recruiters.map((r) => r.name).filter(Boolean).join(", ")}
-            </p>
-          )}
-        </div>
-      )}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -302,7 +290,9 @@ export function PlacementsPageLayout({
   // The current record is the one flagged is_current, else the newest (records
   // arrive sorted is_current desc, then year desc).
   const current = records.find((r) => r.is_current) ?? records[0] ?? null;
-  const past = records.filter((r) => r !== current);
+  const [selectedId, setSelectedId] = useState<string>(current?._id ?? "");
+  const active =
+    records.find((r) => r._id === selectedId) ?? current ?? null;
 
   return (
     <main className="bg-background text-foreground min-h-screen overflow-x-hidden">
@@ -313,7 +303,7 @@ export function PlacementsPageLayout({
       />
       <div className="section-padding bg-surface">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="mb-10">
+          <div className="mb-8">
             <Breadcrumb
               items={[
                 { label, href: `/institutions/${institution}` },
@@ -322,7 +312,7 @@ export function PlacementsPageLayout({
             />
           </div>
 
-          {records.length === 0 ? (
+          {records.length === 0 || !active ? (
             <div className="border-border rounded-2xl border border-dashed bg-white py-20 text-center">
               <Briefcase size={32} className="mx-auto mb-3 text-stone-300" />
               <p className="text-stone-500">
@@ -331,26 +321,13 @@ export function PlacementsPageLayout({
             </div>
           ) : (
             <>
-              {current && (
-                <>
-                  <CurrentYear record={current} />
-                  <TopRecruiters record={current} />
-                  <NotablePlacements record={current} />
-                </>
-              )}
-
-              {past.length > 0 && (
-                <div className="mt-20">
-                  <h2 className="text-navy mb-6 font-serif text-3xl font-bold md:text-4xl">
-                    Previous Years
-                  </h2>
-                  <div className="space-y-3">
-                    {past.map((r) => (
-                      <PastYear key={r._id} record={r} />
-                    ))}
-                  </div>
-                </div>
-              )}
+              <YearSwitcher
+                records={records}
+                selectedId={active._id}
+                onSelect={setSelectedId}
+              />
+              <CurrentYear record={active} />
+              <TopRecruiters record={active} />
             </>
           )}
         </div>
