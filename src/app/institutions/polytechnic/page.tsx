@@ -7,13 +7,14 @@ import {
   getPublishedConfigs,
   POLYTECHNIC_CONFIG_KEYS,
 } from "@/lib/site-config-server";
+import { getCampusEvents } from "@/lib/public-events";
 
 export const revalidate = 86400;
 
 import { DiplomaPrograms } from "@/modules/polytechnic/DiplomaPrograms";
 import { Admissions } from "@/modules/polytechnic/Admissions";
 import { Placements } from "@/components/layout/Placements";
-import { CampusLife } from "@/modules/polytechnic/CampusLife";
+import { CampusLife } from "@/components/layout/CampusLife";
 import { Testimonials } from "@/modules/polytechnic/Testimonials";
 
 export const metadata: Metadata = {
@@ -29,7 +30,10 @@ export const metadata: Metadata = {
 };
 
 export default async function PolytechnicPage() {
-  const configs = await getPublishedConfigs([...POLYTECHNIC_CONFIG_KEYS]);
+  const [configs, events] = await Promise.all([
+    getPublishedConfigs([...POLYTECHNIC_CONFIG_KEYS]),
+    getCampusEvents("polytechnic"),
+  ]);
 
   return (
     <SiteConfigProvider configs={configs}>
@@ -43,7 +47,7 @@ export default async function PolytechnicPage() {
         <DiplomaPrograms />
         <Admissions />
         <Placements institution="polytechnic" />
-        <CampusLife />
+        <CampusLife events={events} />
         <Testimonials />
         <Footer />
       </main>

@@ -14,10 +14,17 @@ import { logAudit } from "@/lib/audit";
 import { EventCreateSchema } from "@/lib/validation";
 import { revalidatePaths } from "@/lib/revalidate";
 
-// Events render on the home-page overview, the /events listing, and their
-// own detail page.
+// Events render in the "Life at JCT" grid on the home page and all three
+// institution landing pages, in the /events listing, and on their own detail
+// page. An event's institution can change, so refresh every landing page.
 function revalidateEventPages(slug?: string) {
-  const paths = ["/", "/events"];
+  const paths = [
+    "/",
+    "/events",
+    "/institutions/engineering",
+    "/institutions/arts-science",
+    "/institutions/polytechnic",
+  ];
   if (slug) paths.push(`/events/${slug}`);
   revalidatePaths(...paths);
 }

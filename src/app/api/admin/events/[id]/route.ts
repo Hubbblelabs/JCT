@@ -15,10 +15,18 @@ import { EventUpdateSchema } from "@/lib/validation";
 import { revalidatePaths } from "@/lib/revalidate";
 import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 
-// Events render on the home-page overview, the /events listing, and their
-// own detail page. Pass both slugs when a rename changes the URL.
+// Events render in the "Life at JCT" grid on the home page and all three
+// institution landing pages, in the /events listing, and on their own detail
+// page. An event's institution can change, so refresh every landing page.
+// Pass both slugs when a rename changes the URL.
 function revalidateEventPages(...slugs: (string | undefined)[]) {
-  const paths = new Set(["/", "/events"]);
+  const paths = new Set([
+    "/",
+    "/events",
+    "/institutions/engineering",
+    "/institutions/arts-science",
+    "/institutions/polytechnic",
+  ]);
   for (const slug of slugs) if (slug) paths.add(`/events/${slug}`);
   revalidatePaths(...paths);
 }

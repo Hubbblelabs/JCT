@@ -7,13 +7,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Camera, Calendar, ArrowRight, X } from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
 import { useSiteConfig } from "@/lib/use-site-config";
+import type { CampusEventCard } from "@/lib/public-events";
 
-export type CampusEventCard = {
-  title: string;
-  href: string;
-  image: string;
-  date: string;
-};
+export type { CampusEventCard };
 
 type Photo = {
   src: string;

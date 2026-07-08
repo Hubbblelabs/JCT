@@ -6,6 +6,7 @@ import {
   getPublishedConfigs,
   ENGINEERING_CONFIG_KEYS,
 } from "@/lib/site-config-server";
+import { getCampusEvents } from "@/lib/public-events";
 
 import { EngineeringHero } from "./EngineeringHero";
 import { EngineeringDomains } from "./EngineeringDomains";
@@ -15,7 +16,10 @@ import { CampusLife } from "@/components/layout/CampusLife";
 import { Testimonials } from "./Testimonials";
 
 export default async function EngineeringPage() {
-  const configs = await getPublishedConfigs([...ENGINEERING_CONFIG_KEYS]);
+  const [configs, events] = await Promise.all([
+    getPublishedConfigs([...ENGINEERING_CONFIG_KEYS]),
+    getCampusEvents("engineering"),
+  ]);
 
   return (
     <SiteConfigProvider configs={configs}>
@@ -30,7 +34,7 @@ export default async function EngineeringPage() {
         <EngineeringMetrics />
         <Admissions />
         <Placements institution="engineering" />
-        <CampusLife />
+        <CampusLife events={events} />
         <Testimonials />
         <div id="footer">
           <Footer />

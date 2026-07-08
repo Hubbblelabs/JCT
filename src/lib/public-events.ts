@@ -1,6 +1,6 @@
 import { connectDB } from "@/lib/mongodb";
 import { Event } from "@/lib/models";
-import { getImageUrl } from "@/lib/utils";
+import { getImageUrl, formatEventDate } from "@/lib/utils";
 import { sanitizeHtml } from "@/lib/sanitize-html";
 
 type EventLean = {
@@ -107,4 +107,40 @@ export async function getPublicEventBySlug(
     ...asCard(doc),
     descriptionHtml: sanitizeHtml(doc.description),
   };
+}
+
+// Card shape consumed by the "Life at JCT" grid (`CampusLife`) on the home
+// page and the three institution landing pages.
+export type CampusEventCard = {
+  title: string;
+  href: string;
+  image: string;
+  date: string;
+};
+
+/**
+ * Build the "Life at JCT" event cards for a page. Pass an `institution` to
+ * scope to that college (plus site-wide "all" events); omit it for the home
+ * page to include every college. Degrades to an empty list — and the grid's
+ * static photo fallback — instead of failing the page when the DB is down.
+ */
+export async function getCampusEvents(
+  institution?: string | null,
+  limit = 8,
+): Promise<CampusEventCard[]> {
+  try {
+    const events = await listPublicEvents({ institution, limit });
+    return events.map((e) => ({
+      title: e.title,
+      href: `/events/${e.slug}`,
+      image: e.image ?? "/assets/jct-life13.webp",
+      date: formatEventDate(e.date),
+    }));
+  } catch (err) {
+    console.warn(
+      "[public-events] getCampusEvents failed; using fallback items:",
+      err,
+    );
+    return [];
+  }
 }

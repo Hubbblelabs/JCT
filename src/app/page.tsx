@@ -6,42 +6,22 @@ import { Testimonials } from "@/components/layout/Testimonials";
 import { AdmissionsCTA } from "@/components/layout/AdmissionsCTA";
 import { Footer } from "@/components/layout/Footer";
 import { WhyJCT } from "@/components/layout/WhyJCT";
-import {
-  CampusLife,
-  type CampusEventCard,
-} from "@/components/layout/CampusLife";
+import { CampusLife } from "@/components/layout/CampusLife";
 import { Pamphlet } from "@/components/layout/Pamphlet";
 import { SiteConfigProvider } from "@/contexts/SiteConfigContext";
 import {
   getPublishedConfigs,
   HOME_CONFIG_KEYS,
 } from "@/lib/site-config-server";
-import { listPublicEvents } from "@/lib/public-events";
-import { formatEventDate } from "@/lib/utils";
+import { getCampusEvents } from "@/lib/public-events";
 
 export const revalidate = 86400;
-
-async function getHomeEvents(): Promise<CampusEventCard[]> {
-  // Degrade to the Life at JCT static photo fallback instead of failing
-  // the whole home page when the DB is unreachable.
-  try {
-    const events = await listPublicEvents({ limit: 8 });
-    return events.map((e) => ({
-      title: e.title,
-      href: `/events/${e.slug}`,
-      image: e.image ?? "/assets/jct-life13.webp",
-      date: formatEventDate(e.date),
-    }));
-  } catch (err) {
-    console.warn("[home] listPublicEvents failed; using fallback items:", err);
-    return [];
-  }
-}
 
 export default async function HomePage() {
   const [configs, events] = await Promise.all([
     getPublishedConfigs([...HOME_CONFIG_KEYS]),
-    getHomeEvents(),
+    // Home shows events from every college (no institution scope).
+    getCampusEvents(),
   ]);
 
   return (
