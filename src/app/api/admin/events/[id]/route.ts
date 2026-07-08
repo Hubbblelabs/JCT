@@ -24,8 +24,11 @@ function revalidateEventPages(...slugs: (string | undefined)[]) {
     "/",
     "/events",
     "/institutions/engineering",
+    "/institutions/engineering/events",
     "/institutions/arts-science",
+    "/institutions/arts-science/events",
     "/institutions/polytechnic",
+    "/institutions/polytechnic/events",
   ]);
   for (const slug of slugs) if (slug) paths.add(`/events/${slug}`);
   revalidatePaths(...paths);
@@ -51,12 +54,9 @@ export async function GET(
     const { id } = await params;
     const doc = await Event.findById(id);
     if (!doc) return notFound();
-    // Shared ("all") events are readable by any editor; another college's
-    // events are not.
-    if (doc.institution !== "all") {
-      const scope = enforceInstitutionScope(session, doc.institution);
-      if (scope) return scope;
-    }
+    // Events are college-scoped — an editor may only read their own college's.
+    const scope = enforceInstitutionScope(session, doc.institution);
+    if (scope) return scope;
     return json(doc);
   } catch (e) {
     console.error(e);

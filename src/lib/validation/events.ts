@@ -8,12 +8,12 @@ import {
   zNonNegativeInt,
 } from "./_primitives";
 
-// Must match the Event model enum.
+// Must match the Event model enum. Events are scoped to a single college —
+// there is no site-wide "all" pool.
 export const INSTITUTIONS = [
   "engineering",
   "arts-science",
   "polytechnic",
-  "all",
 ] as const;
 
 // Suggested categories for the admin UI — the field itself is free text so
@@ -66,7 +66,6 @@ export const EventCreateSchema = EventBaseSchema.extend({
     "Campus Life",
   ),
   location: zOptionalString(LIMITS.locationMax).default(""),
-  institution: zEnum(INSTITUTIONS).default("all"),
   is_active: z.boolean().optional().default(true),
   sort_order: zNonNegativeInt.optional().default(0),
 });

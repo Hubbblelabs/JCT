@@ -13,16 +13,11 @@ import {
   getPublishedConfigs,
   HOME_CONFIG_KEYS,
 } from "@/lib/site-config-server";
-import { getCampusEvents } from "@/lib/public-events";
 
 export const revalidate = 86400;
 
 export default async function HomePage() {
-  const [configs, events] = await Promise.all([
-    getPublishedConfigs([...HOME_CONFIG_KEYS]),
-    // Home shows events from every college (no institution scope).
-    getCampusEvents(),
-  ]);
+  const configs = await getPublishedConfigs([...HOME_CONFIG_KEYS]);
 
   return (
     <SiteConfigProvider configs={configs}>
@@ -35,9 +30,9 @@ export default async function HomePage() {
         <WhyJCT />
         <Placements />
         <CampusLife
-          events={events}
           configKey="lifeAtJct"
           campusLifeHref="/campus-life"
+          eventsHref="/events"
         />
         <Testimonials />
         <AdmissionsCTA />

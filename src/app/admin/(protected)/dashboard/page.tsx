@@ -1,26 +1,26 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { connectDB } from "@/lib/mongodb";
-import { Program, Recruiter, Testimonial, AuditLog } from "@/lib/models";
+import { Program, Placement, Testimonial, AuditLog } from "@/lib/models";
 import { GraduationCap, Send, Briefcase, MessageSquare } from "lucide-react";
 
 async function getStats() {
   try {
     await connectDB();
-    const [programs, published, recruiters, testimonials, logs] =
+    const [programs, published, placements, testimonials, logs] =
       await Promise.all([
         Program.countDocuments({ is_active: true }),
         Program.countDocuments({ status: "published" }),
-        Recruiter.countDocuments({ is_active: true }),
+        Placement.countDocuments({ is_active: true }),
         Testimonial.countDocuments({ is_active: true }),
         AuditLog.find().sort({ created_at: -1 }).limit(10),
       ]);
-    return { programs, published, recruiters, testimonials, logs };
+    return { programs, published, placements, testimonials, logs };
   } catch {
     return {
       programs: 0,
       published: 0,
-      recruiters: 0,
+      placements: 0,
       testimonials: 0,
       logs: [],
     };
@@ -37,7 +37,7 @@ export default async function DashboardPage() {
     redirect(`/admin/page-content?college=${institution || "engineering"}`);
   }
 
-  const { programs, published, recruiters, testimonials, logs } =
+  const { programs, published, placements, testimonials, logs } =
     await getStats();
 
   const statCards = [
@@ -54,10 +54,10 @@ export default async function DashboardPage() {
       href: "/admin/programs",
     },
     {
-      label: "Recruiters",
-      value: recruiters,
+      label: "Placement Records",
+      value: placements,
       icon: Briefcase,
-      href: "/admin/recruiters",
+      href: "/admin/placements",
     },
     {
       label: "Testimonials",

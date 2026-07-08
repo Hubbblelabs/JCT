@@ -5,7 +5,6 @@ export { DocumentAsset } from "./DocumentAsset";
 export { Program } from "./Program";
 export { Page } from "./Page";
 export type { IPage, PageInstitution, PageTemplate, PageStatus } from "./Page";
-export { Recruiter } from "./Recruiter";
 export { Event } from "./Event";
 export type { IEvent } from "./Event";
 export { Placement } from "./Placement";

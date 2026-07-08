@@ -81,7 +81,12 @@ export function Placements({ institution }: PlacementsProps = {}) {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/public/recruiters")
+    // Scope logos to this college's placement records; the home page (no
+    // institution) gets the union of every college's recruiters.
+    const url = institution
+      ? `/api/public/recruiters?college=${institution}`
+      : "/api/public/recruiters";
+    fetch(url)
       .then((r) => r.json())
       .then((res) => {
         if (cancelled) return;
@@ -100,7 +105,7 @@ export function Placements({ institution }: PlacementsProps = {}) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [institution]);
 
   if (loading) {
     return (

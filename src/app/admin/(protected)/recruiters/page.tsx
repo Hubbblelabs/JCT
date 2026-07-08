@@ -1,47 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { TextInput, ImageUploadInput } from "@/components/admin/inputs";
-import {
-  Plus,
-  Pencil,
-  Trash2,
-  X,
-  Loader2,
-  Check,
-  Download,
-} from "lucide-react";
-import { getImageUrl } from "@/lib/utils";
+import { Loader2, Check } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
-import {
-  DeferredUploadsProvider,
-  useDeferredUploads,
-} from "@/lib/deferred-uploads";
 import {
   RecruitersSectionForm,
   type RecruitersSectionVal,
 } from "@/components/admin/PageContentForms";
-import { useToast } from "@/components/ui/Toast";
-import { useConfirm } from "@/components/ui/ConfirmDialog";
 
-interface Recruiter {
-  _id: string;
-  name: string;
-  logo: string;
-  website: string;
-  industry: string;
-  is_active: boolean;
-}
-
-const EMPTY: Omit<Recruiter, "_id"> = {
-  name: "",
-  logo: "",
-  website: "",
-  industry: "",
-  is_active: true,
-};
-
+// Company logos are no longer stored in a separate registry — they come from
+// each college's Placement.top_recruiters records (managed on the Placements
+// admin page). This screen only edits the shared "Placement Highlights"
+// section copy (heading, description, and stat cards) shown above the carousel.
 function RecruitersSectionPanel() {
   const [value, setValue] = useState<RecruitersSectionVal>({});
   const [loading, setLoading] = useState(true);
@@ -105,7 +76,8 @@ function RecruitersSectionPanel() {
           </h2>
           <p className="text-xs text-gray-500">
             Heading, description, and stat cards for the recruiters section on
-            the home page.
+            the home and institution pages. Company logos are managed per
+            college on the Placements page.
           </p>
         </div>
         <button
@@ -152,308 +124,17 @@ function RecruitersSectionPanel() {
 
 export default function RecruitersPage() {
   return (
-    <DeferredUploadsProvider>
-      <RecruitersPageInner />
-    </DeferredUploadsProvider>
-  );
-}
-
-function RecruitersPageInner() {
-  const { flush, discardAll } = useDeferredUploads();
-  const toast = useToast();
-  const confirm = useConfirm();
-  const [recruiters, setRecruiters] = useState<Recruiter[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [editing, setEditing] = useState<Recruiter | null>(null);
-  const [form, setForm] = useState<Omit<Recruiter, "_id">>(EMPTY);
-  const [saving, setSaving] = useState(false);
-  const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
-  const [importing, setImporting] = useState(false);
-
-  const load = async () => {
-    setLoading(true);
-    const r = await fetch("/api/admin/recruiters");
-    setRecruiters(await r.json());
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const importFromPlacements = async () => {
-    setImporting(true);
-    try {
-      const r = await fetch("/api/admin/recruiters/import-from-placements", {
-        method: "POST",
-      });
-      if (r.ok) {
-        const data = await r.json();
-        if (data.imported > 0) {
-          toast.success(
-            `Imported ${data.imported} compan${data.imported === 1 ? "y" : "ies"} from placement records.`,
-          );
-          await load();
-        } else {
-          toast.success("Nothing to import — everything is already synced.");
-        }
-      } else {
-        toast.error("Import failed.");
-      }
-    } catch {
-      toast.error("Import failed.");
-    }
-    setImporting(false);
-  };
-
-  const openNew = () => {
-    setEditing({ _id: "", ...EMPTY });
-    setForm(EMPTY);
-    setApiError(null);
-  };
-  const openEdit = (r: Recruiter) => {
-    setEditing(r);
-    setForm({ ...r });
-    setApiError(null);
-  };
-  const close = () => {
-    discardAll();
-    setEditing(null);
-    setForm(EMPTY);
-    setApiError(null);
-  };
-  const set = (key: string, val: unknown) =>
-    setForm((f) => ({ ...f, [key]: val }));
-
-  const save = async () => {
-    setSaving(true);
-    setApiError(null);
-    try {
-      const flushedForm = await flush(form);
-      setForm(flushedForm as Omit<Recruiter, "_id">);
-      const isNew = !editing?._id;
-      const url = isNew
-        ? "/api/admin/recruiters"
-        : `/api/admin/recruiters/${editing!._id}`;
-      const r = await fetch(url, {
-        method: isNew ? "POST" : "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(flushedForm),
-      });
-      if (r.ok) {
-        await load();
-        close();
-      } else {
-        setApiError(await parseApiError(r));
-      }
-    } catch (err) {
-      setApiError({
-        error: err instanceof Error ? err.message : "Upload failed",
-      } as ApiErrorPayload);
-    }
-    setSaving(false);
-  };
-
-  const del = async (id: string) => {
-    const ok = await confirm({
-      title: "Delete recruiter",
-      message: "This recruiter will be permanently removed. Continue?",
-      confirmLabel: "Delete",
-      destructive: true,
-    });
-    if (!ok) return;
-    await fetch(`/api/admin/recruiters/${id}`, { method: "DELETE" });
-    toast.success("Recruiter deleted.");
-    await load();
-  };
-
-  return (
-    <>
-      <div className="admin-content">
-        <div className="admin-page-header">
-          <div>
-            <h1 className="admin-page-title">Recruiters & Company Partners</h1>
-            <p className="admin-page-subtitle">
-              {recruiters.filter((r) => r.is_active).length} active companies
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button
-              onClick={importFromPlacements}
-              disabled={importing}
-              className="admin-btn admin-btn-outline"
-              title="Add companies that only exist on a placement year's Top Recruiters list to this registry"
-            >
-              {importing ? (
-                <Loader2 size={16} className="animate-spin" />
-              ) : (
-                <Download size={16} />
-              )}
-              Import from Placements
-            </button>
-            <button onClick={openNew} className="admin-btn admin-btn-primary">
-              <Plus size={16} /> Add Recruiter
-            </button>
-          </div>
-        </div>
-
-        <RecruitersSectionPanel />
-
-        <div className="admin-card overflow-x-auto p-0">
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 size={24} className="animate-spin text-gray-400" />
-            </div>
-          ) : (
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Logo</th>
-                  <th>Name</th>
-                  <th>Industry</th>
-                  <th>Website</th>
-                  <th>Status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {recruiters.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="py-10 text-center text-gray-400">
-                      No recruiters yet. Seed from data files or add manually.
-                    </td>
-                  </tr>
-                )}
-                {recruiters.map((r) => (
-                  <tr key={r._id}>
-                    <td>
-                      {r.logo ? (
-                        <div className="h-8 w-20">
-                          <img
-                            src={getImageUrl(r.logo) || ""}
-                            alt={r.name}
-                            className="h-full w-full object-contain"
-                          />
-                        </div>
-                      ) : (
-                        <span className="text-xs text-gray-300">No logo</span>
-                      )}
-                    </td>
-                    <td className="font-medium">{r.name}</td>
-                    <td className="text-sm text-gray-500">
-                      {r.industry || "—"}
-                    </td>
-                    <td className="text-sm text-gray-500">
-                      {r.website || "—"}
-                    </td>
-                    <td>
-                      <span
-                        className={`admin-badge ${r.is_active ? "admin-badge-green" : "admin-badge-red"}`}
-                      >
-                        {r.is_active ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => openEdit(r)}
-                          className="admin-btn admin-btn-outline admin-btn-sm"
-                        >
-                          <Pencil size={13} />
-                        </button>
-                        <button
-                          onClick={() => del(r._id)}
-                          className="admin-btn admin-btn-danger admin-btn-sm"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
+    <div className="admin-content">
+      <div className="admin-page-header">
+        <div>
+          <h1 className="admin-page-title">Placement Highlights</h1>
+          <p className="admin-page-subtitle">
+            Section copy for the recruiters carousel. Logos come from each
+            college&apos;s placement records.
+          </p>
         </div>
       </div>
-
-      {editing && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <h2 className="font-semibold text-gray-900">
-                {editing._id ? "Edit Recruiter" : "New Recruiter"}
-              </h2>
-              <button
-                onClick={close}
-                className="admin-btn admin-btn-outline admin-btn-sm"
-              >
-                <X size={14} />
-              </button>
-            </div>
-            <div className="space-y-1 p-6">
-              {apiError && (
-                <ValidationErrors
-                  error={apiError.message ?? apiError.error}
-                  details={apiError.details}
-                />
-              )}
-              <TextInput
-                label="Company Name"
-                value={form.name}
-                onChange={(e) => set("name", e.target.value)}
-                required
-              />
-              <ImageUploadInput
-                label="Logo"
-                value={form.logo}
-                onChange={(url) => set("logo", url)}
-                hideUrlField
-              />
-              <TextInput
-                label="Website"
-                value={form.website}
-                onChange={(e) => set("website", e.target.value)}
-                placeholder="https://tcs.com"
-              />
-              <TextInput
-                label="Industry"
-                value={form.industry}
-                onChange={(e) => set("industry", e.target.value)}
-                placeholder="IT Services"
-              />
-              <div className="flex items-center gap-2 pt-1">
-                <input
-                  type="checkbox"
-                  id="is_active"
-                  checked={form.is_active}
-                  onChange={(e) => set("is_active", e.target.checked)}
-                />
-                <label htmlFor="is_active" className="text-sm text-gray-700">
-                  Active (shown on website)
-                </label>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
-              <button onClick={close} className="admin-btn admin-btn-outline">
-                Cancel
-              </button>
-              <button
-                onClick={save}
-                disabled={saving}
-                className="admin-btn admin-btn-gold"
-              >
-                {saving ? (
-                  <Loader2 size={15} className="animate-spin" />
-                ) : (
-                  <Check size={15} />
-                )}
-                {saving ? "Saving…" : "Save"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
+      <RecruitersSectionPanel />
+    </div>
   );
 }

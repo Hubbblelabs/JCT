@@ -22,8 +22,11 @@ function revalidateEventPages(slug?: string) {
     "/",
     "/events",
     "/institutions/engineering",
+    "/institutions/engineering/events",
     "/institutions/arts-science",
+    "/institutions/arts-science/events",
     "/institutions/polytechnic",
+    "/institutions/polytechnic/events",
   ];
   if (slug) paths.push(`/events/${slug}`);
   revalidatePaths(...paths);

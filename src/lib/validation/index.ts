@@ -92,14 +92,10 @@ export type {
 } from "./placements";
 
 export {
-  RecruiterSchema,
-  RecruiterCreateSchema,
-  RecruiterUpdateSchema,
   RecruitersSectionSchema,
-  LIMITS as LIMITS_recruiter,
   RECRUITERS_SECTION_LIMITS,
 } from "./recruiters";
-export type { RecruiterValue, RecruitersSectionValue } from "./recruiters";
+export type { RecruitersSectionValue } from "./recruiters";
 
 export {
   ProgramSchema,

@@ -7,7 +7,6 @@ import {
   getPublishedConfigs,
   POLYTECHNIC_CONFIG_KEYS,
 } from "@/lib/site-config-server";
-import { getCampusEvents } from "@/lib/public-events";
 
 export const revalidate = 86400;
 
@@ -30,10 +29,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PolytechnicPage() {
-  const [configs, events] = await Promise.all([
-    getPublishedConfigs([...POLYTECHNIC_CONFIG_KEYS]),
-    getCampusEvents("polytechnic"),
-  ]);
+  const configs = await getPublishedConfigs([...POLYTECHNIC_CONFIG_KEYS]);
 
   return (
     <SiteConfigProvider configs={configs}>
@@ -47,7 +43,10 @@ export default async function PolytechnicPage() {
         <DiplomaPrograms />
         <Admissions />
         <Placements institution="polytechnic" />
-        <CampusLife events={events} configKey="polytechnicLifeAtJct" />
+        <CampusLife
+          configKey="polytechnicLifeAtJct"
+          eventsHref="/institutions/polytechnic/events"
+        />
         <Testimonials />
         <Footer />
       </main>

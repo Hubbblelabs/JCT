@@ -6,7 +6,6 @@ import {
   getPublishedConfigs,
   ARTS_SCIENCE_CONFIG_KEYS,
 } from "@/lib/site-config-server";
-import { getCampusEvents } from "@/lib/public-events";
 
 export const revalidate = 86400;
 
@@ -30,10 +29,7 @@ import { Testimonials } from "@/modules/arts-science/Testimonials";
 import { Placements } from "@/components/layout/Placements";
 
 export default async function ArtsSciencePage() {
-  const [configs, events] = await Promise.all([
-    getPublishedConfigs([...ARTS_SCIENCE_CONFIG_KEYS]),
-    getCampusEvents("arts-science"),
-  ]);
+  const configs = await getPublishedConfigs([...ARTS_SCIENCE_CONFIG_KEYS]);
 
   return (
     <SiteConfigProvider configs={configs}>
@@ -47,7 +43,10 @@ export default async function ArtsSciencePage() {
         <UgPrograms />
         <AdmissionProcess />
         <Placements institution="arts-science" />
-        <CampusLife events={events} configKey="artsScienceLifeAtJct" />
+        <CampusLife
+          configKey="artsScienceLifeAtJct"
+          eventsHref="/institutions/arts-science/events"
+        />
         <Testimonials />
         <Footer />
       </main>

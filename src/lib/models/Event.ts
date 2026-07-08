@@ -11,7 +11,7 @@ export interface IEvent extends Document {
   event_date: Date;
   location: string;
   image: string;
-  institution: "engineering" | "arts-science" | "polytechnic" | "all";
+  institution: "engineering" | "arts-science" | "polytechnic";
   is_active: boolean;
   sort_order: number;
   created_at: Date;
@@ -31,8 +31,8 @@ const EventSchema = new Schema<IEvent>(
     image: { type: String, default: "" },
     institution: {
       type: String,
-      enum: ["engineering", "arts-science", "polytechnic", "all"],
-      default: "all",
+      enum: ["engineering", "arts-science", "polytechnic"],
+      required: true,
     },
     is_active: { type: Boolean, default: true },
     sort_order: { type: Number, default: 0 },

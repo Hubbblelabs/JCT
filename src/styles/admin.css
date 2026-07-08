@@ -121,13 +121,11 @@
   pointer-events: auto;
 }
 
-.admin-nav-item:hover .admin-nav-dropdown-menu {
-  display: block;
-}
-
-/* Keyboard access: focusing the trigger (or any child within) opens the
-   menu, so its links become reachable by Tab. Mirrors the :hover behavior. */
-.admin-nav-item:focus-within .admin-nav-dropdown-menu {
+/* Open state is JS-controlled (hover, focus, and click all funnel through a
+   single `openMenu` key in AdminTabNav) so only one dropdown can ever show at
+   once — pure CSS :hover + :focus-within could leave two menus open and
+   overlapping. */
+.admin-nav-dropdown-menu.open {
   display: block;
 }
 

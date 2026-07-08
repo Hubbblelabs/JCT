@@ -44,13 +44,12 @@ const EMPTY: Omit<EventItem, "_id"> = {
   event_date: "",
   location: "",
   image: "",
-  institution: "all",
+  institution: "engineering",
   is_active: true,
   sort_order: 0,
 };
 
 const INSTITUTIONS = [
-  { value: "all", label: "All / Site-wide" },
   { value: "engineering", label: "Engineering" },
   { value: "arts-science", label: "Arts & Science" },
   { value: "polytechnic", label: "Polytechnic" },
@@ -107,7 +106,7 @@ function EventsPageInner() {
     setEditing({ _id: "", ...EMPTY });
     setForm({
       ...EMPTY,
-      institution: filterInst || "all",
+      institution: filterInst || "engineering",
       event_date: new Date().toISOString().slice(0, 10),
     });
     setSlugTouched(false);
@@ -187,7 +186,7 @@ function EventsPageInner() {
             <h1 className="admin-page-title">News & Events</h1>
             <p className="admin-page-subtitle">
               {events.filter((e) => e.is_active).length} active events — shown
-              on the home page and /events
+              on each college&apos;s News &amp; Events page
             </p>
           </div>
           <div className="flex gap-2">

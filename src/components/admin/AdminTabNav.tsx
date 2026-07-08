@@ -35,7 +35,7 @@ import {
   CalendarDays,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { hasMinRole } from "@/lib/permissions";
 
 type NavItem = {
@@ -88,14 +88,14 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: Camera,
     },
     {
-      label: "Testimonials",
-      href: "/admin/page-content?college=engineering&section=testimonials",
-      icon: MessageSquare,
-    },
-    {
       label: "News & Events",
       href: "/admin/events?college=engineering",
       icon: CalendarDays,
+    },
+    {
+      label: "Testimonials",
+      href: "/admin/page-content?college=engineering&section=testimonials",
+      icon: MessageSquare,
     },
     {
       label: "About Us",
@@ -145,14 +145,14 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: Camera,
     },
     {
-      label: "Testimonials",
-      href: "/admin/page-content?college=arts-science&section=testimonials",
-      icon: MessageSquare,
-    },
-    {
       label: "News & Events",
       href: "/admin/events?college=arts-science",
       icon: CalendarDays,
+    },
+    {
+      label: "Testimonials",
+      href: "/admin/page-content?college=arts-science&section=testimonials",
+      icon: MessageSquare,
     },
     {
       label: "About Us",
@@ -197,14 +197,14 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: Camera,
     },
     {
-      label: "Testimonials",
-      href: "/admin/page-content?college=polytechnic&section=testimonials",
-      icon: MessageSquare,
-    },
-    {
       label: "News & Events",
       href: "/admin/events?college=polytechnic",
       icon: CalendarDays,
+    },
+    {
+      label: "Testimonials",
+      href: "/admin/page-content?college=polytechnic&section=testimonials",
+      icon: MessageSquare,
     },
     {
       label: "About Us",
@@ -261,14 +261,14 @@ const MAIN_ITEMS: NavItem[] = [
     icon: Camera,
   },
   {
-    label: "Testimonials",
-    href: "/admin/main/page-content?section=testimonials",
-    icon: MessageSquare,
-  },
-  {
     label: "News & Events",
     href: "/admin/events",
     icon: CalendarDays,
+  },
+  {
+    label: "Testimonials",
+    href: "/admin/main/page-content?section=testimonials",
+    icon: MessageSquare,
   },
   {
     label: "Admissions",
@@ -298,7 +298,11 @@ const GLOBAL_CMS_ITEMS: NavItem[] = [
     href: "/admin/global/page-content?section=footer",
     icon: PanelBottom,
   },
-  { label: "Recruiters", href: "/admin/recruiters", icon: Briefcase },
+  {
+    label: "Placement Highlights",
+    href: "/admin/recruiters",
+    icon: Briefcase,
+  },
   {
     label: "Floating Elements",
     href: "/admin/global/page-content?section=floatingElements",
@@ -383,6 +387,26 @@ function TabNavInner() {
   const college = searchParams.get("college");
   const section = searchParams.get("section");
 
+  // Only one dropdown may be open at a time. Hover, keyboard focus, and click
+  // all drive a single `openMenu` key so a click-opened menu can't linger open
+  // while another is hovered (which produced overlapping menus). Pure CSS
+  // :hover + :focus-within could show two menus simultaneously.
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const menuProps = (key: string) => ({
+    onMouseEnter: () => setOpenMenu(key),
+    onMouseLeave: () =>
+      setOpenMenu((cur) => (cur === key ? null : cur)),
+    onFocus: () => setOpenMenu(key),
+    onBlur: (e: React.FocusEvent<HTMLDivElement>) => {
+      if (!e.currentTarget.contains(e.relatedTarget as Node)) {
+        setOpenMenu((cur) => (cur === key ? null : cur));
+      }
+    },
+    onClick: () => setOpenMenu(null),
+  });
+  const menuClass = (key: string) =>
+    `admin-nav-dropdown-menu ${openMenu === key ? "open" : ""}`;
+
   const userRole =
     ((session?.user as Record<string, unknown>)?.role as string) ?? "editor";
   const userInstitution =
@@ -449,7 +473,7 @@ function TabNavInner() {
 
           {/* Admin tools dropdown — admin only */}
           {isAdmin && visibleAdminItems.length > 0 && (
-            <div className="admin-nav-item">
+            <div className="admin-nav-item" {...menuProps("admin")}>
               <button
                 className={`admin-nav-trigger ${adminMenuActive ? "active" : ""}`}
               >
@@ -457,7 +481,7 @@ function TabNavInner() {
                 Admin
                 <ChevronDown size={11} />
               </button>
-              <div className="admin-nav-dropdown-menu">
+              <div className={menuClass("admin")}>
                 {visibleAdminItems.map((item) => (
                   <Link
                     key={item.href}
@@ -474,7 +498,7 @@ function TabNavInner() {
 
           {/* Global CMS — admin only */}
           {isAdmin && (
-            <div className="admin-nav-item">
+            <div className="admin-nav-item" {...menuProps("global")}>
               <Link
                 href="/admin/global/page-content"
                 className={`admin-nav-trigger ${globalCmsActive ? "active" : ""}`}
@@ -483,7 +507,7 @@ function TabNavInner() {
                 Global CMS
                 <ChevronDown size={11} />
               </Link>
-              <div className="admin-nav-dropdown-menu">
+              <div className={menuClass("global")}>
                 {GLOBAL_CMS_ITEMS.map((item) => (
                   <Link
                     key={item.href}
@@ -504,7 +528,7 @@ function TabNavInner() {
 
           {/* Main (landing page) — admin only */}
           {isAdmin && (
-            <div className="admin-nav-item">
+            <div className="admin-nav-item" {...menuProps("main")}>
               <Link
                 href="/admin/main/page-content"
                 className={`admin-nav-trigger ${mainActive ? "active" : ""}`}
@@ -513,7 +537,7 @@ function TabNavInner() {
                 Main
                 <ChevronDown size={11} />
               </Link>
-              <div className="admin-nav-dropdown-menu">
+              <div className={menuClass("main")}>
                 {MAIN_ITEMS.map((item) => (
                   <Link
                     key={item.href}
@@ -537,7 +561,11 @@ function TabNavInner() {
             const items = COLLEGE_ITEMS[id];
             const active = isDropdownActive(items, pathname, college);
             return (
-              <div key={id} className="admin-nav-item admin-nav-item--right">
+              <div
+                key={id}
+                className="admin-nav-item admin-nav-item--right"
+                {...menuProps(`college:${id}`)}
+              >
                 <Link
                   href={`/admin/page-content?college=${id}`}
                   className={`admin-nav-trigger ${active ? "active" : ""}`}
@@ -545,7 +573,7 @@ function TabNavInner() {
                   {label}
                   <ChevronDown size={11} />
                 </Link>
-                <div className="admin-nav-dropdown-menu">
+                <div className={menuClass(`college:${id}`)}>
                   {items.map((item) => (
                     <Link
                       key={item.href}

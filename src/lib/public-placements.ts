@@ -1,5 +1,5 @@
 import { connectDB } from "@/lib/mongodb";
-import { Placement, Recruiter } from "@/lib/models";
+import { Placement } from "@/lib/models";
 import { getImageUrl } from "@/lib/utils";
 
 type PlacementLean = {
@@ -53,29 +53,10 @@ export type PublicPlacement = {
   notable_placements: PublicNotablePlacement[];
 };
 
-// Top recruiter logos are entered per placement-year record, so the same
-// company can drift out of sync (or lose its logo entirely) between years.
-// The Recruiter collection is the single source of truth for a company's
-// logo (it also backs the homepage recruiter carousel) — resolve each
-// top-recruiter's logo from there by name so it's always in sync, and dedupe
-// so a company only ever appears once per year's list.
-async function loadRecruiterLogoMap(): Promise<Map<string, string>> {
-  const recruiters = await Recruiter.find({ is_active: true })
-    .select("name logo")
-    .lean<{ name?: string; logo?: string }[]>();
-  const map = new Map<string, string>();
-  for (const r of recruiters) {
-    const name = r.name?.trim().toLowerCase();
-    if (!name || !r.logo) continue;
-    map.set(name, r.logo);
-  }
-  return map;
-}
-
-function normalize(
-  doc: PlacementLean,
-  recruiterLogoMap: Map<string, string>,
-): PublicPlacement {
+// Top recruiter name + logo live directly on each placement-year record — the
+// carousel and this page share that single per-college source. Dedupe so a
+// company only ever appears once per year's list.
+function normalize(doc: PlacementLean): PublicPlacement {
   const seenRecruiters = new Set<string>();
   const top_recruiters: PublicTopRecruiter[] = [];
   for (const r of doc.top_recruiters ?? []) {
@@ -84,8 +65,7 @@ function normalize(
     const key = name.toLowerCase();
     if (seenRecruiters.has(key)) continue;
     seenRecruiters.add(key);
-    const logo = getImageUrl(recruiterLogoMap.get(key) ?? r.logo);
-    if (!name && !logo) continue;
+    const logo = getImageUrl(r.logo);
     top_recruiters.push({ name, logo });
   }
 
@@ -124,13 +104,10 @@ export async function listPublicPlacements(
 ): Promise<PublicPlacement[]> {
   try {
     await connectDB();
-    const [docs, recruiterLogoMap] = await Promise.all([
-      Placement.find({ institution, is_active: true })
-        .sort({ is_current: -1, sort_order: 1, year: -1 })
-        .lean<PlacementLean[]>(),
-      loadRecruiterLogoMap(),
-    ]);
-    return docs.map((doc) => normalize(doc, recruiterLogoMap));
+    const docs = await Placement.find({ institution, is_active: true })
+      .sort({ is_current: -1, sort_order: 1, year: -1 })
+      .lean<PlacementLean[]>();
+    return docs.map((doc) => normalize(doc));
   } catch (err) {
     console.warn(
       "[public-placements] listPublicPlacements failed; " +
