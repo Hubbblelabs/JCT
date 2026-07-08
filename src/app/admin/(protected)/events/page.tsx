@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
+import Link from "next/link";
 import {
   TextInput,
   TextArea,
@@ -9,7 +10,15 @@ import {
   NumberInput,
   ImageUploadInput,
 } from "@/components/admin/inputs";
-import { Plus, Pencil, Trash2, X, Loader2, Check } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  X,
+  Loader2,
+  Check,
+  ExternalLink,
+} from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 import {
@@ -55,6 +64,12 @@ const INSTITUTIONS = [
   { value: "polytechnic", label: "Polytechnic" },
 ];
 
+const INSTITUTION_LABELS: Record<string, string> = {
+  engineering: "Engineering",
+  "arts-science": "Arts & Science",
+  polytechnic: "Polytechnic",
+};
+
 function slugify(value: string): string {
   return value
     .toLowerCase()
@@ -87,6 +102,11 @@ function EventsPageInner() {
   const [saving, setSaving] = useState(false);
   const [filterInst] = useState(() => searchParams.get("college") ?? "");
   const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
+  // Main view (?scope=main, no college) is a read-only aggregate of every
+  // college's events. Authoring only happens inside a college scope.
+  const isMain = !filterInst;
+  const editParam = searchParams.get("edit");
+  const [editHandled, setEditHandled] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -101,6 +121,19 @@ function EventsPageInner() {
   useEffect(() => {
     load();
   }, [filterInst, load]);
+
+  // Click-through from the main aggregate lands here as ?college=X&edit=<id>;
+  // auto-open that event's editor once its record has loaded.
+  useEffect(() => {
+    if (editHandled || isMain || !editParam || loading) return;
+    const target = events.find((e) => e._id === editParam);
+    if (target) {
+      openEdit(target);
+      setEditHandled(true);
+    }
+    // openEdit is a stable local closure; deps intentionally omit it.
+     
+  }, [editParam, events, loading, editHandled, isMain]);
 
   const openNew = () => {
     setEditing({ _id: "", ...EMPTY });
@@ -183,17 +216,32 @@ function EventsPageInner() {
       <div className="admin-content">
         <div className="admin-page-header">
           <div>
-            <h1 className="admin-page-title">News & Events</h1>
+            <h1 className="admin-page-title">
+              News &amp; Events
+              {filterInst ? ` — ${INSTITUTION_LABELS[filterInst]}` : " — Latest"}
+            </h1>
             <p className="admin-page-subtitle">
-              {events.filter((e) => e.is_active).length} active events — shown
-              on each college&apos;s News &amp; Events page
+              {isMain ? (
+                <>
+                  Latest events across all colleges (read-only). Click an event
+                  to edit it in its college.
+                </>
+              ) : (
+                <>
+                  {events.filter((e) => e.is_active).length} active events —
+                  shown on the {INSTITUTION_LABELS[filterInst]} News &amp; Events
+                  page
+                </>
+              )}
             </p>
           </div>
-          <div className="flex gap-2">
-            <button onClick={openNew} className="admin-btn admin-btn-primary">
-              <Plus size={16} /> Add Event
-            </button>
-          </div>
+          {!isMain && (
+            <div className="flex gap-2">
+              <button onClick={openNew} className="admin-btn admin-btn-primary">
+                <Plus size={16} /> Add Event
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="admin-card overflow-x-auto p-0">
@@ -248,20 +296,30 @@ function EventsPageInner() {
                       </span>
                     </td>
                     <td>
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => openEdit(e)}
+                      {isMain ? (
+                        <Link
+                          href={`/admin/events?college=${e.institution}&edit=${e._id}`}
                           className="admin-btn admin-btn-outline admin-btn-sm"
                         >
-                          <Pencil size={13} />
-                        </button>
-                        <button
-                          onClick={() => del(e._id)}
-                          className="admin-btn admin-btn-danger admin-btn-sm"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
+                          <ExternalLink size={13} /> Edit in{" "}
+                          {INSTITUTION_LABELS[e.institution] ?? e.institution}
+                        </Link>
+                      ) : (
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => openEdit(e)}
+                            className="admin-btn admin-btn-outline admin-btn-sm"
+                          >
+                            <Pencil size={13} />
+                          </button>
+                          <button
+                            onClick={() => del(e._id)}
+                            className="admin-btn admin-btn-danger admin-btn-sm"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -341,6 +399,7 @@ function EventsPageInner() {
                   value={form.institution}
                   options={INSTITUTIONS}
                   onChange={(e) => set("institution", e.target.value)}
+                  disabled={!!filterInst}
                 />
                 <NumberInput
                   label="Sort order"

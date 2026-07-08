@@ -12,7 +12,36 @@ type Seed = {
   publish?: boolean;
 };
 
+const PLACEMENT_HIGHLIGHTS_DEFAULT = {
+  show_section: true,
+  eyebrow: "Career Outcomes",
+  title: "Our Students Work At",
+  titleHighlight: "World-Class Companies",
+  description:
+    "Top recruiters visit our campus every year, offering our graduates rewarding careers across industries.",
+  stats: [
+    { icon: "Briefcase", value: "500+", label: "Recruiters" },
+    { icon: "TrendingUp", value: "45 LPA", label: "Highest Package" },
+    { icon: "Users", value: "95%", label: "Placement Rate" },
+    { icon: "Award", value: "8.5 LPA", label: "Average Package" },
+  ],
+};
+
+const PLACEMENT_HIGHLIGHTS_KEYS = [
+  "mainPlacementHighlights",
+  "engineeringPlacementHighlights",
+  "artsSciencePlacementHighlights",
+  "polytechnicPlacementHighlights",
+] as const;
+
 const SEEDS: Seed[] = [
+  // Placement Highlights section copy — one per scope. publish:false so an
+  // existing (or migrated) value is never clobbered when re-seeding.
+  ...PLACEMENT_HIGHLIGHTS_KEYS.map((config_key) => ({
+    config_key,
+    value: PLACEMENT_HIGHLIGHTS_DEFAULT,
+    publish: false,
+  })),
   {
     config_key: "homeStats",
     value: {
@@ -218,6 +247,29 @@ export async function POST(req: NextRequest) {
 
   try {
     await connectDB();
+
+    // Migration: the old single global `recruitersSection` copy is now split
+    // into 4 per-scope keys. Clone its value into any new key that doesn't yet
+    // exist so no edited copy is lost. Published so it shows immediately.
+    const legacy = await SiteConfig.findOne({
+      config_key: "recruitersSection",
+    }).lean<{ value?: unknown; published_value?: unknown } | null>();
+    const legacyValue = legacy?.published_value ?? legacy?.value;
+    if (legacyValue) {
+      for (const key of PLACEMENT_HIGHLIGHTS_KEYS) {
+        const exists = await SiteConfig.exists({ config_key: key });
+        if (exists) continue;
+        await SiteConfig.create({
+          config_key: key,
+          value: legacyValue,
+          published_value: legacyValue,
+          status: "published",
+          version: 1,
+          updated_by: session!.user?.email ?? "",
+        });
+        revalidateForConfigKey(key);
+      }
+    }
 
     for (const seed of SEEDS) {
       const fields: Record<string, unknown> = {

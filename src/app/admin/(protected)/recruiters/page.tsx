@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Loader2, Check } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
@@ -11,9 +12,23 @@ import {
 
 // Company logos are no longer stored in a separate registry — they come from
 // each college's Placement.top_recruiters records (managed on the Placements
-// admin page). This screen only edits the shared "Placement Highlights"
-// section copy (heading, description, and stat cards) shown above the carousel.
-function RecruitersSectionPanel() {
+// admin page). This screen edits the "Placement Highlights" section copy
+// (heading, description, and stat cards) shown above the carousel. The copy is
+// scoped per college (?college=) and per home (?scope=main).
+const SCOPE_CONFIG_KEY: Record<string, string> = {
+  engineering: "engineeringPlacementHighlights",
+  "arts-science": "artsSciencePlacementHighlights",
+  polytechnic: "polytechnicPlacementHighlights",
+};
+
+const SCOPE_LABEL: Record<string, string> = {
+  engineering: "Engineering",
+  "arts-science": "Arts & Science",
+  polytechnic: "Polytechnic",
+  main: "Home",
+};
+
+function RecruitersSectionPanel({ configKey }: { configKey: string }) {
   const [value, setValue] = useState<RecruitersSectionVal>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -22,23 +37,26 @@ function RecruitersSectionPanel() {
   );
   const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
 
-  const load = async () => {
-    setLoading(true);
-    try {
-      const r = await fetch("/api/admin/site-config");
-      const data: { config_key: string; value: unknown }[] = await r.json();
-      const found = data.find((d) => d.config_key === "recruitersSection");
-      setValue((found?.value as RecruitersSectionVal) ?? {});
-    } catch {
-      setMsg({ kind: "err", text: "Failed to load section content." });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    load();
-  }, []);
+    let cancelled = false;
+    setLoading(true);
+    (async () => {
+      try {
+        const r = await fetch("/api/admin/site-config");
+        const data: { config_key: string; value: unknown }[] = await r.json();
+        const found = data.find((d) => d.config_key === configKey);
+        if (!cancelled) setValue((found?.value as RecruitersSectionVal) ?? {});
+      } catch {
+        if (!cancelled)
+          setMsg({ kind: "err", text: "Failed to load section content." });
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [configKey]);
 
   const save = async () => {
     setSaving(true);
@@ -48,7 +66,7 @@ function RecruitersSectionPanel() {
       const r = await fetch("/api/admin/site-config", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ config_key: "recruitersSection", value }),
+        body: JSON.stringify({ config_key: configKey, value }),
       });
       if (r.ok) {
         setMsg({ kind: "ok", text: "Section content saved!" });
@@ -122,19 +140,37 @@ function RecruitersSectionPanel() {
   );
 }
 
-export default function RecruitersPage() {
+function RecruitersPageInner() {
+  const searchParams = useSearchParams();
+  const college = searchParams.get("college") ?? "";
+  // Home (main) uses ?scope=main; each college uses ?college=<id>. Default to
+  // main when no college is passed.
+  const resolvedScope = college || "main";
+  const configKey = SCOPE_CONFIG_KEY[college] ?? "mainPlacementHighlights";
+  const label = SCOPE_LABEL[resolvedScope] ?? "Home";
+
   return (
     <div className="admin-content">
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title">Placement Highlights</h1>
+          <h1 className="admin-page-title">Placement Highlights — {label}</h1>
           <p className="admin-page-subtitle">
-            Section copy for the recruiters carousel. Logos come from each
-            college&apos;s placement records.
+            Section copy for the placement carousel on the {label} page. Company
+            logos come from{" "}
+            {college ? "this college" : "every college"}&apos;s placement
+            records.
           </p>
         </div>
       </div>
-      <RecruitersSectionPanel />
+      <RecruitersSectionPanel configKey={configKey} />
     </div>
+  );
+}
+
+export default function RecruitersPage() {
+  return (
+    <Suspense fallback={null}>
+      <RecruitersPageInner />
+    </Suspense>
   );
 }

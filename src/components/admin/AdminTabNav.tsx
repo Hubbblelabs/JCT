@@ -78,6 +78,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: Briefcase,
     },
     {
+      label: "Placement Highlights",
+      href: "/admin/recruiters?college=engineering",
+      icon: Award,
+    },
+    {
       label: "Admissions",
       href: "/admin/page-content?college=engineering&section=admissions",
       icon: ClipboardList,
@@ -135,6 +140,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: Briefcase,
     },
     {
+      label: "Placement Highlights",
+      href: "/admin/recruiters?college=arts-science",
+      icon: Award,
+    },
+    {
       label: "Admissions",
       href: "/admin/page-content?college=arts-science&section=admissions",
       icon: ClipboardList,
@@ -185,6 +195,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       label: "Placements",
       href: "/admin/placements?college=polytechnic",
       icon: Briefcase,
+    },
+    {
+      label: "Placement Highlights",
+      href: "/admin/recruiters?college=polytechnic",
+      icon: Award,
     },
     {
       label: "Admissions",
@@ -256,13 +271,18 @@ const MAIN_ITEMS: NavItem[] = [
     icon: LayoutGrid,
   },
   {
+    label: "Placement Highlights",
+    href: "/admin/recruiters?scope=main",
+    icon: Award,
+  },
+  {
     label: "Life at JCT",
     href: "/admin/main/page-content?section=lifeAtJct",
     icon: Camera,
   },
   {
     label: "News & Events",
-    href: "/admin/events",
+    href: "/admin/events?scope=main",
     icon: CalendarDays,
   },
   {
@@ -299,11 +319,6 @@ const GLOBAL_CMS_ITEMS: NavItem[] = [
     icon: PanelBottom,
   },
   {
-    label: "Placement Highlights",
-    href: "/admin/recruiters",
-    icon: Briefcase,
-  },
-  {
     label: "Floating Elements",
     href: "/admin/global/page-content?section=floatingElements",
     icon: MousePointerClick,
@@ -338,12 +353,20 @@ const ALL_COLLEGES = [
   { id: "polytechnic", label: "Polytechnic" },
 ] as const;
 
-function isItemActive(
-  href: string,
-  pathname: string,
-  college: string | null,
-  section: string | null,
-): boolean {
+type NavScope = {
+  college: string | null;
+  section: string | null;
+  scope: string | null;
+};
+
+// Scoping params compared with strict null-aware equality: an item that omits a
+// param must NOT match a URL that carries it (and vice-versa). This is what
+// keeps the bare `/admin/events` (Main) item from lighting up on every
+// college's `/admin/events?college=X` page — the collision the old asymmetric
+// check produced.
+const SCOPE_PARAMS = ["college", "section", "scope"] as const;
+
+function isItemActive(href: string, pathname: string, url: NavScope): boolean {
   const qIdx = href.indexOf("?");
   const itemPath = qIdx >= 0 ? href.slice(0, qIdx) : href;
   const itemQuery = qIdx >= 0 ? href.slice(qIdx + 1) : "";
@@ -351,33 +374,20 @@ function isItemActive(
   const pathMatch =
     pathname === itemPath || pathname.startsWith(itemPath + "/");
   if (!pathMatch) return false;
-  if (!itemQuery) return true;
 
   const params = new URLSearchParams(itemQuery);
-  const wantedCollege = params.get("college");
-  const wantedSection = params.get("section");
-
-  if (wantedCollege && wantedCollege !== college) return false;
-  if (wantedSection && wantedSection !== section) return false;
+  for (const key of SCOPE_PARAMS) {
+    if ((params.get(key) ?? null) !== (url[key] ?? null)) return false;
+  }
   return true;
 }
 
 function isDropdownActive(
   items: NavItem[],
   pathname: string,
-  college: string | null,
+  url: NavScope,
 ): boolean {
-  return items.some((item) => {
-    const qIdx = item.href.indexOf("?");
-    const itemPath = qIdx >= 0 ? item.href.slice(0, qIdx) : item.href;
-    const itemQuery = qIdx >= 0 ? item.href.slice(qIdx + 1) : "";
-    const pathMatch =
-      pathname === itemPath || pathname.startsWith(itemPath + "/");
-    if (!pathMatch) return false;
-    if (!itemQuery) return true;
-    const wantedCollege = new URLSearchParams(itemQuery).get("college");
-    return !wantedCollege || wantedCollege === college;
-  });
+  return items.some((item) => isItemActive(item.href, pathname, url));
 }
 
 function TabNavInner() {
@@ -386,6 +396,8 @@ function TabNavInner() {
   const { data: session } = useSession();
   const college = searchParams.get("college");
   const section = searchParams.get("section");
+  const scope = searchParams.get("scope");
+  const url: NavScope = { college, section, scope };
 
   // Only one dropdown may be open at a time. Hover, keyboard focus, and click
   // all drive a single `openMenu` key so a click-opened menu can't linger open
@@ -423,9 +435,9 @@ function TabNavInner() {
     : ALL_COLLEGES.filter((c) => c.id === userInstitution);
 
   const dashActive = pathname === "/admin/dashboard" || pathname === "/admin";
-  const adminMenuActive = isDropdownActive(visibleAdminItems, pathname, null);
-  const mainActive = isDropdownActive(MAIN_ITEMS, pathname, null);
-  const globalCmsActive = isDropdownActive(GLOBAL_CMS_ITEMS, pathname, null);
+  const adminMenuActive = isDropdownActive(visibleAdminItems, pathname, url);
+  const mainActive = isDropdownActive(MAIN_ITEMS, pathname, url);
+  const globalCmsActive = isDropdownActive(GLOBAL_CMS_ITEMS, pathname, url);
 
   if (
     pathname.startsWith("/admin/programs/") &&
@@ -513,7 +525,7 @@ function TabNavInner() {
                     key={item.href}
                     href={item.href}
                     className={`admin-nav-dropdown-item ${
-                      isItemActive(item.href, pathname, null, section)
+                      isItemActive(item.href, pathname, url)
                         ? "active"
                         : ""
                     }`}
@@ -543,7 +555,7 @@ function TabNavInner() {
                     key={item.href}
                     href={item.href}
                     className={`admin-nav-dropdown-item ${
-                      isItemActive(item.href, pathname, null, section)
+                      isItemActive(item.href, pathname, url)
                         ? "active"
                         : ""
                     }`}
@@ -559,7 +571,7 @@ function TabNavInner() {
           {/* College dropdowns — editors see only their assigned college */}
           {visibleColleges.map(({ id, label }) => {
             const items = COLLEGE_ITEMS[id];
-            const active = isDropdownActive(items, pathname, college);
+            const active = isDropdownActive(items, pathname, url);
             return (
               <div
                 key={id}
@@ -579,7 +591,7 @@ function TabNavInner() {
                       key={item.href}
                       href={item.href}
                       className={`admin-nav-dropdown-item ${
-                        isItemActive(item.href, pathname, college, section)
+                        isItemActive(item.href, pathname, url)
                           ? "active"
                           : ""
                       }`}

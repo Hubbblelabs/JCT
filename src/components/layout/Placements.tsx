@@ -74,8 +74,20 @@ type PlacementsProps = {
   institution?: "engineering" | "arts-science" | "polytechnic";
 };
 
+const PLACEMENT_HIGHLIGHTS_KEY: Record<string, string> = {
+  engineering: "engineeringPlacementHighlights",
+  "arts-science": "artsSciencePlacementHighlights",
+  polytechnic: "polytechnicPlacementHighlights",
+};
+
 export function Placements({ institution }: PlacementsProps = {}) {
-  const { data: sectionData, loading } = useSiteConfig("recruitersSection");
+  // Section copy is scoped per college; the home page (no institution) reads
+  // its own `mainPlacementHighlights` key. Logos are still per-college (union
+  // on home) via /api/public/recruiters below.
+  const configKey = institution
+    ? (PLACEMENT_HIGHLIGHTS_KEY[institution] ?? "mainPlacementHighlights")
+    : "mainPlacementHighlights";
+  const { data: sectionData, loading } = useSiteConfig(configKey);
   const section = normalizeSection(sectionData);
   const [companies, setCompanies] = useState<Company[]>([]);
 
