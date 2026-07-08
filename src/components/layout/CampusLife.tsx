@@ -287,7 +287,7 @@ export function CampusLife({ events = [] }: { events?: CampusEventCard[] }) {
           >
             Explore Campus Life <ArrowRight size={16} />
           </Link>
-          {showingEvents && (
+          {events.length > 0 && (
             <Link
               href="/events"
               className="group inline-flex h-12 items-center gap-3 rounded-full border border-white/15 bg-white/5 px-8 font-sans text-sm font-semibold text-white transition-all hover:border-white/30 hover:bg-white/10"
