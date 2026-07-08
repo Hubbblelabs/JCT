@@ -1,8 +1,28 @@
 import type { MetadataRoute } from "next";
+import { listPublishedProgramSlugs } from "@/lib/public-programs";
+import { listPublishedPageSlugs } from "@/lib/public-pages";
+import { listPublicEventSlugs } from "@/lib/public-events";
 
 const BASE_URL = "https://jct.ac.in";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+const INSTITUTIONS = ["engineering", "arts-science", "polytechnic"] as const;
+
+function toEntry(
+  route: string,
+  { changeFrequency, priority }: Pick<
+    MetadataRoute.Sitemap[number],
+    "changeFrequency" | "priority"
+  >,
+): MetadataRoute.Sitemap[number] {
+  return {
+    url: `${BASE_URL}${route}`,
+    lastModified: new Date(),
+    changeFrequency,
+    priority,
+  };
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticRoutes = [
     "/",
     "/about-us",
@@ -27,24 +47,64 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "/institutions/polytechnic/placements",
   ];
 
-  return staticRoutes.map((route) => {
+  const staticEntries = staticRoutes.map((route) => {
     const isHome = route === "/";
     const isMainSection = route.split("/").length <= 2;
-
-    let priority: number;
-    if (isHome) {
-      priority = 1;
-    } else if (isMainSection) {
-      priority = 0.8;
-    } else {
-      priority = 0.6;
-    }
-
-    return {
-      url: `${BASE_URL}${route}`,
-      lastModified: new Date(),
+    const priority = isHome ? 1 : isMainSection ? 0.8 : 0.6;
+    return toEntry(route, {
       changeFrequency: isHome ? "weekly" : "monthly",
       priority,
-    };
+    });
   });
+
+  const [programSlugsByInstitution, pageSlugsByInstitution, eventSlugs] =
+    await Promise.all([
+      Promise.all(
+        INSTITUTIONS.map((institution) =>
+          listPublishedProgramSlugs(institution),
+        ),
+      ),
+      Promise.all(
+        (["main", ...INSTITUTIONS] as const).map((institution) =>
+          listPublishedPageSlugs(institution),
+        ),
+      ),
+      listPublicEventSlugs(),
+    ]);
+
+  const programEntries = INSTITUTIONS.flatMap((institution, i) =>
+    programSlugsByInstitution[i].map(({ slug }) =>
+      toEntry(`/institutions/${institution}/programs/${slug}`, {
+        changeFrequency: "monthly",
+        priority: 0.7,
+      }),
+    ),
+  );
+
+  const [mainPageSlugs, ...institutionPageSlugs] = pageSlugsByInstitution;
+
+  const mainPageEntries = mainPageSlugs.map(({ slug }) =>
+    toEntry(`/p/${slug}`, { changeFrequency: "monthly", priority: 0.5 }),
+  );
+
+  const institutionPageEntries = INSTITUTIONS.flatMap((institution, i) =>
+    institutionPageSlugs[i].map(({ slug }) =>
+      toEntry(`/institutions/${institution}/p/${slug}`, {
+        changeFrequency: "monthly",
+        priority: 0.5,
+      }),
+    ),
+  );
+
+  const eventEntries = eventSlugs.map(({ slug }) =>
+    toEntry(`/events/${slug}`, { changeFrequency: "monthly", priority: 0.5 }),
+  );
+
+  return [
+    ...staticEntries,
+    ...programEntries,
+    ...mainPageEntries,
+    ...institutionPageEntries,
+    ...eventEntries,
+  ];
 }
