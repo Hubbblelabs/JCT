@@ -34,7 +34,11 @@ export default async function HomePage() {
         <TrustHighlightsRow />
         <WhyJCT />
         <Placements />
-        <CampusLife events={events} />
+        <CampusLife
+          events={events}
+          configKey="lifeAtJct"
+          campusLifeHref="/campus-life"
+        />
         <Testimonials />
         <AdmissionsCTA />
         <Footer />

@@ -17,7 +17,6 @@ import {
 } from "./aboutPage";
 import { AnnouncementSchema } from "./announcement";
 import { LifeAtJctSchema } from "./lifeAtJct";
-import { CampusLifeCarouselSchema } from "./campusLifeCarousel";
 import { PolytechnicAdmissionsSchema } from "./polytechnicAdmissions";
 import {
   MetricsSchema,
@@ -67,12 +66,13 @@ export const SITE_CONFIG_SCHEMAS = {
   engineeringFacilities: FacilitiesSchema,
   engineeringResearchHighlights: ResearchHighlightsSchema,
   engineeringAdmissions: AdmissionsSchema,
+  engineeringLifeAtJct: LifeAtJctSchema,
   artsScienceHero: ArtsScienceHeroSchema,
   artsScienceHeroStats: HeroStatsListSchema,
-  artsScienceCampusLife: CampusLifeCarouselSchema,
+  artsScienceLifeAtJct: LifeAtJctSchema,
   artsScienceAdmissions: AdmissionsSchema,
   polytechnicHero: PolytechnicHeroSchema,
-  polytechnicCampusLife: CampusLifeCarouselSchema,
+  polytechnicLifeAtJct: LifeAtJctSchema,
   polytechnicAdmissions: PolytechnicAdmissionsSchema,
   recruitersSection: RecruitersSectionSchema,
   header: HeaderSchema,
@@ -144,15 +144,16 @@ export const SITE_CONFIG_KEY_INSTITUTION: Partial<
   engineeringCoe: "engineering",
   engineeringHeader: "engineering",
   engineeringNavbar: "engineering",
+  engineeringLifeAtJct: "engineering",
   artsScienceHero: "arts-science",
   artsScienceHeroStats: "arts-science",
-  artsScienceCampusLife: "arts-science",
+  artsScienceLifeAtJct: "arts-science",
   artsScienceAdmissions: "arts-science",
   artsScienceAbout: "arts-science",
   artsScienceHeader: "arts-science",
   artsScienceNavbar: "arts-science",
   polytechnicHero: "polytechnic",
-  polytechnicCampusLife: "polytechnic",
+  polytechnicLifeAtJct: "polytechnic",
   polytechnicAdmissions: "polytechnic",
   polytechnicAbout: "polytechnic",
   polytechnicHeader: "polytechnic",

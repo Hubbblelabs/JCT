@@ -45,12 +45,6 @@ export { LifeAtJctSchema, LIMITS as LIMITS_lifeAtJct } from "./lifeAtJct";
 export type { LifeAtJctValue } from "./lifeAtJct";
 
 export {
-  CampusLifeCarouselSchema,
-  LIMITS as LIMITS_campusLifeCarousel,
-} from "./campusLifeCarousel";
-export type { CampusLifeCarouselValue } from "./campusLifeCarousel";
-
-export {
   PolytechnicAdmissionsSchema,
   LIMITS as LIMITS_polytechnicAdmissions,
 } from "./polytechnicAdmissions";

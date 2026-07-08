@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense, useRef } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
-import { Plus, Trash2, Loader2, Pencil, X, Check } from "lucide-react";
+import { Plus, Trash2, Loader2, Pencil, X, Check, Save } from "lucide-react";
 import {
   PageContentShell,
   type SectionDef,
@@ -572,6 +572,143 @@ function TestimonialFormInner({
   );
 }
 
+const LIFE_AT_JCT_DEFAULT: LifeAtJctVal = {
+  categories: ["All", "Labs", "Sports", "Events", "Clubs"],
+  photos: [],
+};
+
+const LIFE_AT_JCT_INSTITUTIONS = [
+  { key: "engineeringLifeAtJct", label: "Engineering" },
+  { key: "artsScienceLifeAtJct", label: "Arts & Science" },
+  { key: "polytechnicLifeAtJct", label: "Polytechnic" },
+] as const;
+
+function LifeAtJctMainEditor() {
+  const toast = useToast();
+  const { flush } = useDeferredUploads();
+  const [value, setValue] = useState<LifeAtJctVal>(LIFE_AT_JCT_DEFAULT);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [applyTo, setApplyTo] = useState<Record<string, boolean>>({});
+
+  const load = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const r = await fetch("/api/admin/site-config");
+      const data: { config_key: string; value: unknown }[] = await r.json();
+      const found = data.find((d) => d.config_key === "lifeAtJct");
+      setValue((found?.value as LifeAtJctVal) ?? LIFE_AT_JCT_DEFAULT);
+    } catch {
+      setError("Failed to load configuration.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const putConfig = async (configKey: string, val: unknown) => {
+    const r = await fetch("/api/admin/site-config", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ config_key: configKey, value: val }),
+    });
+    if (!r.ok) {
+      const body = await r.json().catch(() => null);
+      throw new Error(
+        `${configKey}: ${body?.message ?? body?.error ?? "Save failed"}`,
+      );
+    }
+  };
+
+  const save = async () => {
+    setSaving(true);
+    setError(null);
+    try {
+      const flushed = (await flush(value)) as LifeAtJctVal;
+      setValue(flushed);
+      const targetKeys = LIFE_AT_JCT_INSTITUTIONS.filter(
+        ({ key }) => applyTo[key],
+      ).map(({ key }) => key);
+
+      await putConfig("lifeAtJct", flushed);
+      for (const key of targetKeys) await putConfig(key, flushed);
+
+      toast.success(
+        targetKeys.length > 0
+          ? `Saved and applied to ${targetKeys.length} institution${targetKeys.length > 1 ? "s" : ""}.`
+          : "Saved!",
+      );
+      setApplyTo({});
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Save failed.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-8">
+        <Loader2 size={20} className="animate-spin text-gray-400" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      {error && (
+        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+          {error}
+        </p>
+      )}
+      <LifeAtJctForm value={value} onChange={(next) => setValue(next)} />
+      <div className="rounded-lg border border-gray-200 p-4">
+        <p className="mb-2 text-sm font-medium text-gray-700">
+          Also apply this content to:
+        </p>
+        <div className="space-y-2">
+          {LIFE_AT_JCT_INSTITUTIONS.map(({ key, label }) => (
+            <label key={key} className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={Boolean(applyTo[key])}
+                onChange={(e) =>
+                  setApplyTo((prev) => ({ ...prev, [key]: e.target.checked }))
+                }
+              />
+              {label}
+            </label>
+          ))}
+        </div>
+        <p className="mt-2 text-xs text-gray-500">
+          Overwrites the checked institution&apos;s own Life at JCT content
+          with what&apos;s shown above on save. Each institution stays
+          independently editable afterward.
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={save}
+        disabled={saving}
+        className="admin-btn admin-btn-gold"
+      >
+        {saving ? (
+          <Loader2 size={15} className="animate-spin" />
+        ) : (
+          <Save size={15} />
+        )}
+        {saving ? "Saving…" : "Save"}
+      </button>
+    </div>
+  );
+}
+
 function VoicesInlineManager() {
   const toast = useToast();
   const confirm = useConfirm();
@@ -909,24 +1046,8 @@ function Inner() {
     {
       id: "lifeAtJct",
       label: "Life at JCT",
-      kind: "form",
-      configKey: "lifeAtJct",
-      defaultValue: {
-        categories: ["All", "Labs", "Sports", "Events", "Clubs"],
-        photos: [],
-      } as LifeAtJctVal,
-      render: (v, onChange) => (
-        <>
-          <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
-            Changes here also update the Engineering college page, and vice
-            versa.
-          </p>
-          <LifeAtJctForm
-            value={(v as LifeAtJctVal) ?? {}}
-            onChange={(next) => onChange(next)}
-          />
-        </>
-      ),
+      kind: "custom",
+      customRender: () => <LifeAtJctMainEditor />,
     },
     {
       id: "testimonials",

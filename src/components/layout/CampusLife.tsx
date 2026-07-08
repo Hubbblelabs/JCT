@@ -58,8 +58,18 @@ function normalizeLifeAtJct(raw: unknown): LifeAtJctConfig | null {
   };
 }
 
-export function CampusLife({ events = [] }: { events?: CampusEventCard[] }) {
-  const { data, loading } = useSiteConfig("lifeAtJct");
+export function CampusLife({
+  events = [],
+  configKey = "lifeAtJct",
+  campusLifeHref,
+}: {
+  events?: CampusEventCard[];
+  /** SiteConfig key backing this grid's photos/categories/video — unique per institution. */
+  configKey?: string;
+  /** Href for the "Explore Campus Life" button. Omit to hide the button (institution pages). */
+  campusLifeHref?: string;
+}) {
+  const { data, loading } = useSiteConfig(configKey);
   const config = normalizeLifeAtJct(data);
 
   const [activeFilter, setActiveFilter] = useState<string>("All");
@@ -281,12 +291,14 @@ export function CampusLife({ events = [] }: { events?: CampusEventCard[] }) {
               Take a Virtual Campus Tour
             </button>
           )}
-          <Link
-            href="/campus-life"
-            className="group border-gold/30 bg-gold/10 text-gold hover:border-gold/50 hover:bg-gold/20 inline-flex h-12 items-center gap-3 rounded-full border px-8 font-sans text-sm font-semibold transition-all"
-          >
-            Explore Campus Life <ArrowRight size={16} />
-          </Link>
+          {campusLifeHref && (
+            <Link
+              href={campusLifeHref}
+              className="group border-gold/30 bg-gold/10 text-gold hover:border-gold/50 hover:bg-gold/20 inline-flex h-12 items-center gap-3 rounded-full border px-8 font-sans text-sm font-semibold transition-all"
+            >
+              Explore Campus Life <ArrowRight size={16} />
+            </Link>
+          )}
           {events.length > 0 && (
             <Link
               href="/events"

@@ -140,8 +140,8 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: ClipboardList,
     },
     {
-      label: "Campus Life",
-      href: "/admin/page-content?college=arts-science&section=campusLife",
+      label: "Life at JCT",
+      href: "/admin/page-content?college=arts-science&section=lifeAtJct",
       icon: Camera,
     },
     {
@@ -192,8 +192,8 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: ClipboardList,
     },
     {
-      label: "Campus Life",
-      href: "/admin/page-content?college=polytechnic&section=campusLife",
+      label: "Life at JCT",
+      href: "/admin/page-content?college=polytechnic&section=lifeAtJct",
       icon: Camera,
     },
     {

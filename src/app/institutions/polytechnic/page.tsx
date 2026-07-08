@@ -47,7 +47,7 @@ export default async function PolytechnicPage() {
         <DiplomaPrograms />
         <Admissions />
         <Placements institution="polytechnic" />
-        <CampusLife events={events} />
+        <CampusLife events={events} configKey="polytechnicLifeAtJct" />
         <Testimonials />
         <Footer />
       </main>

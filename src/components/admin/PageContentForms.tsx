@@ -24,7 +24,6 @@ import {
   ARTS_HERO_LIMITS,
   POLY_HERO_LIMITS,
   LIMITS_lifeAtJct,
-  LIMITS_campusLifeCarousel,
   LIMITS_polytechnicAdmissions,
   METRICS_LIMITS,
   FACILITIES_LIMITS,
@@ -1234,64 +1233,6 @@ export function LifeAtJctForm({
         placeholder="https://www.youtube.com/embed/..."
         hint="YouTube embed URL — used for the 'Take a Virtual Campus Tour' button."
       />
-    </div>
-  );
-}
-
-/* ─── Campus Life carousel (arts / polytechnic) ─── */
-
-export type CampusLifeCarouselVal = {
-  photos?: string[];
-  cta?: { label: string; href: string };
-};
-
-export function CampusLifeCarouselForm({
-  value,
-  onChange,
-}: {
-  value: CampusLifeCarouselVal;
-  onChange: (v: CampusLifeCarouselVal) => void;
-}) {
-  return (
-    <div className="space-y-4">
-      <ImageList
-        label="Carousel Photos"
-        max={LIMITS_campusLifeCarousel.photos}
-        value={value.photos ?? []}
-        onChange={(next) => onChange({ ...value, photos: next })}
-      />
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Button Label"
-          value={value.cta?.label ?? ""}
-          maxLength={LIMITS_campusLifeCarousel.ctaLabelMax}
-          onChange={(e) =>
-            onChange({
-              ...value,
-              cta: {
-                ...(value.cta ?? { label: "", href: "" }),
-                label: e.target.value,
-              },
-            })
-          }
-          placeholder="Explore Full Campus Life"
-        />
-        <TextInput
-          label="Button Href"
-          value={value.cta?.href ?? ""}
-          maxLength={500}
-          onChange={(e) =>
-            onChange({
-              ...value,
-              cta: {
-                ...(value.cta ?? { label: "", href: "" }),
-                href: e.target.value,
-              },
-            })
-          }
-          placeholder="/campus-life"
-        />
-      </div>
     </div>
   );
 }

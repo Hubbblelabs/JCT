@@ -34,7 +34,7 @@ export default async function EngineeringPage() {
         <EngineeringMetrics />
         <Admissions />
         <Placements institution="engineering" />
-        <CampusLife events={events} />
+        <CampusLife events={events} configKey="engineeringLifeAtJct" />
         <Testimonials />
         <div id="footer">
           <Footer />

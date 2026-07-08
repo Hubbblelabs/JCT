@@ -22,7 +22,9 @@
     "seed:placements": "node scripts/seed-placements.mjs",
     "seed:placements:dry": "node scripts/seed-placements.mjs --dry-run",
     "seed:accreditations": "node scripts/seed-accreditations.mjs",
-    "seed:accreditations:dry": "node scripts/seed-accreditations.mjs --dry-run"
+    "seed:accreditations:dry": "node scripts/seed-accreditations.mjs --dry-run",
+    "seed:lifeatjct": "node scripts/seed-life-at-jct.mjs",
+    "seed:lifeatjct:dry": "node scripts/seed-life-at-jct.mjs --dry-run"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1076.0",

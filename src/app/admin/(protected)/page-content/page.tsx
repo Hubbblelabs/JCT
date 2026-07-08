@@ -17,7 +17,6 @@ import {
   EngineeringHeroForm,
   ArtsScienceHeroForm,
   PolytechnicHeroForm,
-  CampusLifeCarouselForm,
   AnnouncementForm,
   PolytechnicAdmissionsForm,
   AdmissionsForm,
@@ -27,7 +26,6 @@ import {
   type EngHeroVal,
   type ArtsHeroVal,
   type PolyHeroVal,
-  type CampusLifeCarouselVal,
   type AnnouncementVal,
   type AdmissionsVal,
   type GenericAdmissionsVal,
@@ -565,21 +563,16 @@ function sectionsFor(college: College): SectionDef[] {
         id: "lifeAtJct",
         label: "Life at JCT",
         kind: "form",
-        configKey: "lifeAtJct",
+        configKey: "engineeringLifeAtJct",
         defaultValue: {
           categories: ["All", "Labs", "Sports", "Events", "Clubs"],
           photos: [],
         } as LifeAtJctVal,
         render: (v, onChange) => (
-          <>
-            <p className="mb-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800">
-              Changes here also update the main landing page, and vice versa.
-            </p>
-            <LifeAtJctForm
-              value={(v as LifeAtJctVal) ?? {}}
-              onChange={onChange}
-            />
-          </>
+          <LifeAtJctForm
+            value={(v as LifeAtJctVal) ?? {}}
+            onChange={onChange}
+          />
         ),
       },
       {
@@ -628,14 +621,17 @@ function sectionsFor(college: College): SectionDef[] {
         ),
       },
       {
-        id: "campusLife",
-        label: "Campus Life",
+        id: "lifeAtJct",
+        label: "Life at JCT",
         kind: "form",
-        configKey: "artsScienceCampusLife",
-        defaultValue: {} as CampusLifeCarouselVal,
+        configKey: "artsScienceLifeAtJct",
+        defaultValue: {
+          categories: ["All", "Labs", "Sports", "Events", "Clubs"],
+          photos: [],
+        } as LifeAtJctVal,
         render: (v, onChange) => (
-          <CampusLifeCarouselForm
-            value={(v as CampusLifeCarouselVal) ?? {}}
+          <LifeAtJctForm
+            value={(v as LifeAtJctVal) ?? {}}
             onChange={onChange}
           />
         ),
@@ -685,16 +681,16 @@ function sectionsFor(college: College): SectionDef[] {
       ),
     },
     {
-      id: "campusLife",
-      label: "Campus Life",
+      id: "lifeAtJct",
+      label: "Life at JCT",
       kind: "form",
-      configKey: "polytechnicCampusLife",
-      defaultValue: {} as CampusLifeCarouselVal,
+      configKey: "polytechnicLifeAtJct",
+      defaultValue: {
+        categories: ["All", "Labs", "Sports", "Events", "Clubs"],
+        photos: [],
+      } as LifeAtJctVal,
       render: (v, onChange) => (
-        <CampusLifeCarouselForm
-          value={(v as CampusLifeCarouselVal) ?? {}}
-          onChange={onChange}
-        />
+        <LifeAtJctForm value={(v as LifeAtJctVal) ?? {}} onChange={onChange} />
       ),
     },
     {

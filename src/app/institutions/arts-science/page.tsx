@@ -47,7 +47,7 @@ export default async function ArtsSciencePage() {
         <UgPrograms />
         <AdmissionProcess />
         <Placements institution="arts-science" />
-        <CampusLife events={events} />
+        <CampusLife events={events} configKey="artsScienceLifeAtJct" />
         <Testimonials />
         <Footer />
       </main>
