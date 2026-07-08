@@ -2,6 +2,7 @@
 
 import { useEffect, useState, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
+import Image from "next/image";
 import {
   TextInput,
   TextArea,
@@ -31,8 +32,13 @@ import {
 } from "@/lib/deferred-uploads";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { getImageUrl } from "@/lib/utils";
 
 interface TopRecruiter {
+  name: string;
+  logo: string;
+}
+interface RecruiterOption {
   name: string;
   logo: string;
 }
@@ -117,6 +123,32 @@ function PlacementsPageInner() {
   const [saving, setSaving] = useState(false);
   const [filterInst] = useState(() => searchParams.get("college") ?? "");
   const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
+  const [recruiters, setRecruiters] = useState<RecruiterOption[]>([]);
+
+  useEffect(() => {
+    fetch("/api/admin/recruiters")
+      .then((r) => r.json())
+      .then((docs) => {
+        if (!Array.isArray(docs)) return;
+        setRecruiters(
+          docs
+            .map((d: Record<string, unknown>) => ({
+              name: typeof d.name === "string" ? d.name : "",
+              logo: typeof d.logo === "string" ? d.logo : "",
+            }))
+            .filter((r: RecruiterOption) => r.name),
+        );
+      })
+      .catch(() => {});
+  }, []);
+
+  const findRecruiter = useCallback(
+    (name: string) =>
+      recruiters.find(
+        (r) => r.name.trim().toLowerCase() === name.trim().toLowerCase(),
+      ),
+    [recruiters],
+  );
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -474,34 +506,84 @@ function PlacementsPageInner() {
                 )}
 
                 {section === "recruiters" && (
-                  <Repeater<TopRecruiter>
-                    label="Top Recruiters"
-                    items={form.top_recruiters}
-                    onChange={(v) => set("top_recruiters", v)}
-                    onItemRemove={(item) => {
-                      if (item.logo.startsWith("pending:")) discardAll();
-                    }}
-                    newItem={() => ({ name: "", logo: "" })}
-                    renderItem={(item, _i, onItemChange) => (
-                      <div className="grid grid-cols-1 gap-3 pr-8 sm:grid-cols-2">
-                        <TextInput
-                          label="Company Name"
-                          value={item.name}
-                          onChange={(e) =>
-                            onItemChange({ ...item, name: e.target.value })
-                          }
-                        />
-                        <ImageUploadInput
-                          label="Logo"
-                          value={item.logo}
-                          onChange={(url) =>
-                            onItemChange({ ...item, logo: url })
-                          }
-                          hideUrlField
-                        />
-                      </div>
-                    )}
-                  />
+                  <div>
+                    <p className="mb-3 text-xs text-gray-500">
+                      Type a company name — if it matches an entry in the{" "}
+                      <a
+                        href="/admin/recruiters"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-accent underline"
+                      >
+                        Recruiters
+                      </a>{" "}
+                      registry, its logo is used automatically and stays in
+                      sync across every year. Add new companies there first so
+                      the same logo shows up everywhere.
+                    </p>
+                    <datalist id="recruiter-names">
+                      {recruiters.map((r) => (
+                        <option key={r.name} value={r.name} />
+                      ))}
+                    </datalist>
+                    <Repeater<TopRecruiter>
+                      label="Top Recruiters"
+                      items={form.top_recruiters}
+                      onChange={(v) => set("top_recruiters", v)}
+                      onItemRemove={(item) => {
+                        if (item.logo.startsWith("pending:")) discardAll();
+                      }}
+                      newItem={() => ({ name: "", logo: "" })}
+                      renderItem={(item, _i, onItemChange) => {
+                        const matched = findRecruiter(item.name);
+                        return (
+                          <div className="grid grid-cols-1 gap-3 pr-8 sm:grid-cols-2">
+                            <TextInput
+                              label="Company Name"
+                              list="recruiter-names"
+                              value={item.name}
+                              onChange={(e) => {
+                                const name = e.target.value;
+                                const match = findRecruiter(name);
+                                onItemChange({
+                                  name,
+                                  logo: match ? match.logo : item.logo,
+                                });
+                              }}
+                            />
+                            {matched ? (
+                              <div>
+                                <span className="admin-label">Logo</span>
+                                <div className="flex items-center gap-2 rounded-lg border border-gray-200 p-2">
+                                  {matched.logo && (
+                                    <Image
+                                      src={getImageUrl(matched.logo) ?? ""}
+                                      alt={matched.name}
+                                      width={32}
+                                      height={32}
+                                      className="h-8 w-8 rounded object-contain"
+                                    />
+                                  )}
+                                  <span className="text-xs text-gray-500">
+                                    Synced from Recruiters registry
+                                  </span>
+                                </div>
+                              </div>
+                            ) : (
+                              <ImageUploadInput
+                                label="Logo"
+                                value={item.logo}
+                                onChange={(url) =>
+                                  onItemChange({ ...item, logo: url })
+                                }
+                                hideUrlField
+                              />
+                            )}
+                          </div>
+                        );
+                      }}
+                    />
+                  </div>
                 )}
 
                 {section === "notable" && (

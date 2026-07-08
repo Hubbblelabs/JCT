@@ -2,7 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { TextInput, ImageUploadInput } from "@/components/admin/inputs";
-import { Plus, Pencil, Trash2, X, Loader2, Check } from "lucide-react";
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  X,
+  Loader2,
+  Check,
+  Download,
+} from "lucide-react";
 import { getImageUrl } from "@/lib/utils";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
@@ -160,6 +168,7 @@ function RecruitersPageInner() {
   const [form, setForm] = useState<Omit<Recruiter, "_id">>(EMPTY);
   const [saving, setSaving] = useState(false);
   const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
+  const [importing, setImporting] = useState(false);
 
   const load = async () => {
     setLoading(true);
@@ -171,6 +180,31 @@ function RecruitersPageInner() {
   useEffect(() => {
     load();
   }, []);
+
+  const importFromPlacements = async () => {
+    setImporting(true);
+    try {
+      const r = await fetch("/api/admin/recruiters/import-from-placements", {
+        method: "POST",
+      });
+      if (r.ok) {
+        const data = await r.json();
+        if (data.imported > 0) {
+          toast.success(
+            `Imported ${data.imported} compan${data.imported === 1 ? "y" : "ies"} from placement records.`,
+          );
+          await load();
+        } else {
+          toast.success("Nothing to import — everything is already synced.");
+        }
+      } else {
+        toast.error("Import failed.");
+      }
+    } catch {
+      toast.error("Import failed.");
+    }
+    setImporting(false);
+  };
 
   const openNew = () => {
     setEditing({ _id: "", ...EMPTY });
@@ -244,6 +278,19 @@ function RecruitersPageInner() {
             </p>
           </div>
           <div className="flex gap-2">
+            <button
+              onClick={importFromPlacements}
+              disabled={importing}
+              className="admin-btn admin-btn-outline"
+              title="Add companies that only exist on a placement year's Top Recruiters list to this registry"
+            >
+              {importing ? (
+                <Loader2 size={16} className="animate-spin" />
+              ) : (
+                <Download size={16} />
+              )}
+              Import from Placements
+            </button>
             <button onClick={openNew} className="admin-btn admin-btn-primary">
               <Plus size={16} /> Add Recruiter
             </button>
