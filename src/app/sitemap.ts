@@ -5,65 +5,35 @@ const BASE_URL = "https://jct.ac.in";
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes = [
     "/",
-    "/about",
-    "/about/institution",
-    "/about/vision-mission",
-    "/about/chairmans-message",
-    "/about/principals-message",
-    "/about/history",
-    "/about/leadership",
-    "/about/organizational-structure",
-    "/about/governing-council",
-    "/about/strategic-plan",
-    "/institutions",
+    "/about-us",
+    "/campus-life",
+    "/events",
+    "/accreditations",
     "/institutions/engineering",
+    "/institutions/engineering/about",
+    "/institutions/engineering/courses",
+    "/institutions/engineering/coe",
+    "/institutions/engineering/accreditations",
     "/institutions/engineering/placements",
     "/institutions/arts-science",
-    "/institutions/arts-science/admissions",
+    "/institutions/arts-science/about",
+    "/institutions/arts-science/courses",
+    "/institutions/arts-science/accreditations",
     "/institutions/arts-science/placements",
     "/institutions/polytechnic",
+    "/institutions/polytechnic/about",
+    "/institutions/polytechnic/courses",
+    "/institutions/polytechnic/accreditations",
     "/institutions/polytechnic/placements",
-    "/admissions",
-    "/alumni",
-    "/placements",
-    "/placements/statistics",
-    "/placements/recruiters",
-    "/placements/internships",
-    "/placements/career-development",
-    "/placements/industry-mous",
-    "/placements/alumni-stories",
-    "/events",
-    "/campus-life",
-    "/campus-life/facilities",
-    "/campus-life/hostel",
-    "/campus-life/library",
-    "/campus-life/laboratories",
-    "/campus-life/sports",
-    "/campus-life/clubs",
-    "/campus-life/activities",
-    "/campus-life/gallery",
-    "/campus-life/news-events",
-    "/governance",
-    "/quality",
-    "/mandatory-disclosure",
-    "/contact",
-    "/about",
-    "/careers",
-    "/leadership",
-    "/media",
-    "/apply-now",
   ];
 
   return staticRoutes.map((route) => {
     const isHome = route === "/";
-    const isAdmissions = route.startsWith("/admissions");
     const isMainSection = route.split("/").length <= 2;
 
     let priority: number;
     if (isHome) {
       priority = 1;
-    } else if (isAdmissions) {
-      priority = 0.9;
     } else if (isMainSection) {
       priority = 0.8;
     } else {
