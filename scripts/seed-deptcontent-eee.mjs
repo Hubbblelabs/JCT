@@ -1406,31 +1406,31 @@ const PROGRAM = {
     // ── Placement ───────────────────────────────────────────────────────────────
     // Top Recruiters — actual employers of placed EEE graduates (2021–2024
     // batches), from the department's published placement records.
-    careerProgression: {
-      topRecruiters: [
-        "Tvs Brakes India Limited",
-        "Sundaram Auto Components Limited",
-        "Triemp Technology Service Pvt Limited",
-        "Puma Technovation India Pvt Limited",
-        "Seros Energy Pvt Ltd",
-        "Co Apps",
-        "VEL Technologies",
-        "H2O Innovation Tech",
-        "Gateway Software Solutions",
-        "GESCO",
-      ],
-      higherStudies: [
-        "M.E. / M.Tech in Power Electronics / Electrical Engineering",
-        "MBA",
-        "GATE Qualified – IITs and NITs",
-        "Ph.D Research Programs",
-        "MS Abroad",
-      ],
-      // No published overall placement % or average package figure specific
-      // to EEE was found in the source — TODO: department to supply.
-      averagePackage: "",
-      placementRate: "",
-    },
+    // NOTE: flat keys, not nested under careerProgression — both the admin
+    // editor and normalize-program-data.ts read/write these at the top level.
+    topRecruiters: [
+      "Tvs Brakes India Limited",
+      "Sundaram Auto Components Limited",
+      "Triemp Technology Service Pvt Limited",
+      "Puma Technovation India Pvt Limited",
+      "Seros Energy Pvt Ltd",
+      "Co Apps",
+      "VEL Technologies",
+      "H2O Innovation Tech",
+      "Gateway Software Solutions",
+      "GESCO",
+    ],
+    higherStudies: [
+      "M.E. / M.Tech in Power Electronics / Electrical Engineering",
+      "MBA",
+      "GATE Qualified – IITs and NITs",
+      "Ph.D Research Programs",
+      "MS Abroad",
+    ],
+    // No published overall placement % or average package figure specific
+    // to EEE was found in the source — TODO: department to supply.
+    averagePackage: "",
+    placementRate: "",
 
     feedback: {
       curriculumProcess: [],
