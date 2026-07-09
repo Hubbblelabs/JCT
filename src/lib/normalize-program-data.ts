@@ -4,6 +4,7 @@ import type {
   LabelsTree,
   TabConfigItem,
 } from "@/types/program";
+import type { PageBodySection } from "@/lib/validation";
 
 const KNOWN_LABEL_KEYS = [
   "overview",
@@ -54,6 +55,30 @@ function normalizeTabsConfig(v: unknown): TabConfigItem[] | undefined {
     });
   }
   return out.length > 0 ? out : undefined;
+}
+
+function normalizeSectionBlocks(
+  v: unknown,
+): Record<string, PageBodySection[]> | undefined {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return undefined;
+  const out: Record<string, PageBodySection[]> = {};
+  for (const [key, val] of Object.entries(v as Record<string, unknown>)) {
+    if (Array.isArray(val) && val.length > 0) {
+      out[key] = val as PageBodySection[];
+    }
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
+}
+
+function normalizeSectionBlocksPosition(
+  v: unknown,
+): Record<string, "before" | "after"> | undefined {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return undefined;
+  const out: Record<string, "before" | "after"> = {};
+  for (const [key, val] of Object.entries(v as Record<string, unknown>)) {
+    if (val === "before" || val === "after") out[key] = val;
+  }
+  return Object.keys(out).length > 0 ? out : undefined;
 }
 
 function normalizeLabels(v: unknown): LabelsTree | undefined {
@@ -227,5 +252,9 @@ export function normalizeProgramData(
     heroMeta: normalizeHeroMeta(c.heroMeta),
     tabsConfig: normalizeTabsConfig(c.tabsConfig),
     labels: normalizeLabels(c.labels),
+    sectionBlocks: normalizeSectionBlocks(c.sectionBlocks),
+    sectionBlocksPosition: normalizeSectionBlocksPosition(
+      c.sectionBlocksPosition,
+    ),
   };
 }

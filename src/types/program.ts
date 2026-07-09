@@ -292,4 +292,14 @@ export type ProgramData = {
   heroMeta?: HeroMetaItem[];
   tabsConfig?: TabConfigItem[];
   labels?: LabelsTree;
+
+  /**
+   * Free-form content blocks appended to a built-in section, keyed by
+   * section id (e.g. "about", "events"). Lets the admin add extra
+   * paragraphs/images/lists/cards alongside a section's structured fields,
+   * the same way a custom tab's blocks work.
+   */
+  sectionBlocks?: Record<string, import("@/lib/validation").PageBodySection[]>;
+  /** Where each section's extra blocks render relative to its fixed content. Default: "after". */
+  sectionBlocksPosition?: Record<string, "before" | "after">;
 };

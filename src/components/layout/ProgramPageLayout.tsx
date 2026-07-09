@@ -179,12 +179,15 @@ function EditableRegion({
   section,
   editable,
   onEditSection,
+  dept,
   className = "",
   style,
   children,
 }: EditableSectionProps & {
   as?: ElementType;
   section: ProgramEditableSection;
+  /** When provided, renders that section's extra content blocks before/after `children`. */
+  dept?: ProgramData;
   className?: string;
   style?: React.CSSProperties;
   children: React.ReactNode;
@@ -193,6 +196,10 @@ function EditableRegion({
   const handleSelect = () => {
     if (editable) onEditSection?.(section);
   };
+
+  const extraBlocks = dept?.sectionBlocks?.[section];
+  const hasExtraBlocks = !!extraBlocks && extraBlocks.length > 0;
+  const extraPosition = dept?.sectionBlocksPosition?.[section] ?? "after";
 
   return (
     <Component
@@ -224,7 +231,13 @@ function EditableRegion({
           Edit
         </span>
       )}
+      {hasExtraBlocks && extraPosition === "before" && (
+        <PageBlocksRenderer blocks={extraBlocks!} className="mb-8" />
+      )}
       {children}
+      {hasExtraBlocks && extraPosition === "after" && (
+        <PageBlocksRenderer blocks={extraBlocks!} className="mt-8" />
+      )}
     </Component>
   );
 }
@@ -702,6 +715,7 @@ function OverviewTab({
           <EditableRegion
             as="div"
             section="stats"
+            dept={dept}
             editable={editable}
             onEditSection={onEditSection}
             className="grid grid-cols-2 gap-3 md:grid-cols-4"
@@ -738,6 +752,7 @@ function OverviewTab({
       {showAbout && (
         <EditableRegion
           section="about"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -762,6 +777,7 @@ function OverviewTab({
       {showHod && (
         <EditableRegion
           section="hod"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -837,6 +853,7 @@ function OverviewTab({
       {showVisionMission && (
         <EditableRegion
           section="visionMission"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -903,6 +920,7 @@ function OverviewTab({
       {showPOs && (
         <EditableRegion
           section="programOutcomes"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -986,6 +1004,7 @@ function AcademicsTab({
       {showCurriculum && (
         <EditableRegion
           section="curriculum"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -1115,6 +1134,7 @@ function AcademicsTab({
       {showTeachingLearning && (
         <EditableRegion
           section="teachingLearning"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -1192,6 +1212,7 @@ function AcademicsTab({
       {showValueAdded && (
         <EditableRegion
           section="valueAddedCourses"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -1266,6 +1287,7 @@ function FacultyTab({
       {showCore && (
         <EditableRegion
           section="faculty"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -1381,6 +1403,7 @@ function FacultyTab({
       {showAdvisory && (
         <EditableRegion
           section="advisoryBoard"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -1405,6 +1428,7 @@ function FacultyTab({
       {showPac && (
         <EditableRegion
           section="pac"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -1423,6 +1447,7 @@ function FacultyTab({
       {showBos && (
         <EditableRegion
           section="bos"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -1464,6 +1489,7 @@ function FacilitiesTab({
       {showLabs && (
         <EditableRegion
           section="labs"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -1524,6 +1550,7 @@ function FacilitiesTab({
       {showLibrary && (
         <EditableRegion
           section="library"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -1627,6 +1654,7 @@ function LifeTab({
         {showEvents && (
           <EditableRegion
             section="events"
+            dept={dept}
             editable={editable}
             onEditSection={onEditSection}
           >
@@ -1682,6 +1710,7 @@ function LifeTab({
           {showStudentAch && (
             <EditableRegion
               section="studentAchievements"
+              dept={dept}
               editable={editable}
               onEditSection={onEditSection}
             >
@@ -1732,6 +1761,7 @@ function LifeTab({
           {showFacultyAch && (
             <EditableRegion
               section="facultyAchievements"
+              dept={dept}
               editable={editable}
               onEditSection={onEditSection}
             >
@@ -1780,6 +1810,7 @@ function LifeTab({
           {showMagazine && dept.magazine && (
             <EditableRegion
               section="magazine"
+              dept={dept}
               editable={editable}
               onEditSection={onEditSection}
             >
@@ -1858,6 +1889,7 @@ function LifeTab({
       {showParticipation && (
         <EditableRegion
           section="participation"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -1935,6 +1967,7 @@ function CareerTab({
       {showCareer && (
         <EditableRegion
           section="careerProgression"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >
@@ -2016,6 +2049,7 @@ function CareerTab({
       {showFeedback && (
         <EditableRegion
           section="feedback"
+          dept={dept}
           editable={editable}
           onEditSection={onEditSection}
         >

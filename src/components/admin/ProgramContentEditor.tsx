@@ -425,557 +425,671 @@ export function ProgramSectionInspector({
     );
   }
 
-  switch (section) {
-    case "hero":
-      return (
-        <div className="space-y-4">
+  const sectionBody = (() => {
+    switch (section) {
+      case "hero":
+        return (
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-3">
+              <TextInput
+                label="Program Name"
+                value={
+                  onProgramNameChange
+                    ? (programName ?? "")
+                    : String(content.name ?? "")
+                }
+                onChange={(e) =>
+                  onProgramNameChange
+                    ? onProgramNameChange(e.target.value)
+                    : set("name", e.target.value)
+                }
+              />
+              <TextInput
+                label="Abbreviation"
+                value={
+                  onProgramAbbrChange
+                    ? (programAbbr ?? "")
+                    : String(content.abbr ?? "")
+                }
+                onChange={(e) =>
+                  onProgramAbbrChange
+                    ? onProgramAbbrChange(e.target.value)
+                    : set("abbr", e.target.value)
+                }
+                placeholder="e.g., CSE, ECE"
+              />
+              <TextInput
+                label="Slug"
+                value={
+                  onProgramSlugChange
+                    ? (programSlug ?? "")
+                    : String(content.slug ?? "")
+                }
+                onChange={(e) =>
+                  onProgramSlugChange
+                    ? onProgramSlugChange(e.target.value)
+                    : set("slug", e.target.value)
+                }
+                placeholder="e.g., computer-science"
+              />
+              <ImageUploadInput
+                label="Hero Image"
+                value={String(content.heroImage ?? "")}
+                onChange={(url) => set("heroImage", url)}
+                hideUrlField
+              />
+              {programCard && onProgramCardChange && (
+                <>
+                  <TextInput
+                    label="Degree"
+                    value={programCard.degree}
+                    onChange={(e) =>
+                      onProgramCardChange({ degree: e.target.value })
+                    }
+                    placeholder="e.g., B.E, B.Sc, M.Tech, Diploma"
+                    hint="Shown on program cards; also splits UG/PG listings."
+                  />
+                  <TextInput
+                    label="Duration"
+                    value={programCard.duration}
+                    onChange={(e) =>
+                      onProgramCardChange({ duration: e.target.value })
+                    }
+                    placeholder="e.g., 4 Years"
+                  />
+                  <NumberInput
+                    label="Seats"
+                    value={programCard.seats || ""}
+                    min={0}
+                    onChange={(e) =>
+                      onProgramCardChange({
+                        seats: Math.max(0, parseInt(e.target.value, 10) || 0),
+                      })
+                    }
+                    placeholder="e.g., 60"
+                  />
+                  <TextInput
+                    label="Card Highlight"
+                    value={programCard.highlight}
+                    onChange={(e) =>
+                      onProgramCardChange({ highlight: e.target.value })
+                    }
+                    placeholder="e.g., NBA Accredited"
+                  />
+                  <TextArea
+                    label="Card Description"
+                    value={programCard.description}
+                    rows={3}
+                    onChange={(e) =>
+                      onProgramCardChange({ description: e.target.value })
+                    }
+                    placeholder="Short summary shown on the program card"
+                  />
+                </>
+              )}
+            </div>
+            <ItemsEditor
+              items={flatArr<Record<string, unknown>>(content, "heroMeta")}
+              onChange={(v) => set("heroMeta", v)}
+              fields={HERO_META_FIELDS}
+              emptyItem={E_HERO_META as unknown as Record<string, unknown>}
+              addLabel="Add Pill"
+            />
+          </div>
+        );
+      case "stats":
+        return (
           <div className="grid grid-cols-1 gap-3">
             <TextInput
-              label="Program Name"
-              value={
-                onProgramNameChange
-                  ? (programName ?? "")
-                  : String(content.name ?? "")
-              }
-              onChange={(e) =>
-                onProgramNameChange
-                  ? onProgramNameChange(e.target.value)
-                  : set("name", e.target.value)
-              }
+              label="Established"
+              value={flatStr(content, "established", "about.established")}
+              onChange={(e) => set("established", e.target.value)}
             />
             <TextInput
-              label="Abbreviation"
-              value={
-                onProgramAbbrChange
-                  ? (programAbbr ?? "")
-                  : String(content.abbr ?? "")
-              }
-              onChange={(e) =>
-                onProgramAbbrChange
-                  ? onProgramAbbrChange(e.target.value)
-                  : set("abbr", e.target.value)
-              }
-              placeholder="e.g., CSE, ECE"
+              label="Intake"
+              value={flatStr(content, "intake", "about.intake")}
+              onChange={(e) => set("intake", e.target.value)}
             />
             <TextInput
-              label="Slug"
-              value={
-                onProgramSlugChange
-                  ? (programSlug ?? "")
-                  : String(content.slug ?? "")
-              }
-              onChange={(e) =>
-                onProgramSlugChange
-                  ? onProgramSlugChange(e.target.value)
-                  : set("slug", e.target.value)
-              }
-              placeholder="e.g., computer-science"
+              label="Accreditation"
+              value={flatStr(content, "accreditation", "about.accreditation")}
+              onChange={(e) => set("accreditation", e.target.value)}
             />
-            <ImageUploadInput
-              label="Hero Image"
-              value={String(content.heroImage ?? "")}
-              onChange={(url) => set("heroImage", url)}
-              hideUrlField
+            <TextInput
+              label="Affiliation"
+              value={flatStr(content, "affiliation", "about.affiliation")}
+              onChange={(e) => set("affiliation", e.target.value)}
             />
-            {programCard && onProgramCardChange && (
-              <>
-                <TextInput
-                  label="Degree"
-                  value={programCard.degree}
-                  onChange={(e) =>
-                    onProgramCardChange({ degree: e.target.value })
-                  }
-                  placeholder="e.g., B.E, B.Sc, M.Tech, Diploma"
-                  hint="Shown on program cards; also splits UG/PG listings."
-                />
-                <TextInput
-                  label="Duration"
-                  value={programCard.duration}
-                  onChange={(e) =>
-                    onProgramCardChange({ duration: e.target.value })
-                  }
-                  placeholder="e.g., 4 Years"
-                />
-                <NumberInput
-                  label="Seats"
-                  value={programCard.seats || ""}
-                  min={0}
-                  onChange={(e) =>
-                    onProgramCardChange({
-                      seats: Math.max(0, parseInt(e.target.value, 10) || 0),
-                    })
-                  }
-                  placeholder="e.g., 60"
-                />
-                <TextInput
-                  label="Card Highlight"
-                  value={programCard.highlight}
-                  onChange={(e) =>
-                    onProgramCardChange({ highlight: e.target.value })
-                  }
-                  placeholder="e.g., NBA Accredited"
-                />
-                <TextArea
-                  label="Card Description"
-                  value={programCard.description}
-                  rows={3}
-                  onChange={(e) =>
-                    onProgramCardChange({ description: e.target.value })
-                  }
-                  placeholder="Short summary shown on the program card"
-                />
-              </>
-            )}
           </div>
-          <ItemsEditor
-            items={flatArr<Record<string, unknown>>(content, "heroMeta")}
-            onChange={(v) => set("heroMeta", v)}
-            fields={HERO_META_FIELDS}
-            emptyItem={E_HERO_META as unknown as Record<string, unknown>}
-            addLabel="Add Pill"
-          />
-        </div>
-      );
-    case "stats":
-      return (
-        <div className="grid grid-cols-1 gap-3">
-          <TextInput
-            label="Established"
-            value={flatStr(content, "established", "about.established")}
-            onChange={(e) => set("established", e.target.value)}
-          />
-          <TextInput
-            label="Intake"
-            value={flatStr(content, "intake", "about.intake")}
-            onChange={(e) => set("intake", e.target.value)}
-          />
-          <TextInput
-            label="Accreditation"
-            value={flatStr(content, "accreditation", "about.accreditation")}
-            onChange={(e) => set("accreditation", e.target.value)}
-          />
-          <TextInput
-            label="Affiliation"
-            value={flatStr(content, "affiliation", "about.affiliation")}
-            onChange={(e) => set("affiliation", e.target.value)}
-          />
-        </div>
-      );
-    case "about":
-      return (
-        <>
-          {[1, 2, 3].map((idx) => (
+        );
+      case "about":
+        return (
+          <>
+            {[1, 2, 3].map((idx) => (
+              <TextArea
+                key={idx}
+                label={`Paragraph ${idx}`}
+                value={readAboutParagraph(content, idx as 1 | 2 | 3)}
+                onChange={(e) => set(`about${idx}`, e.target.value)}
+                rows={4}
+              />
+            ))}
+          </>
+        );
+      case "hod":
+        return (
+          <>
+            <div className="grid grid-cols-1 gap-3">
+              <TextInput
+                label="HOD Name"
+                value={flatStr(content, "hodName", "hod.name")}
+                onChange={(e) => set("hodName", e.target.value)}
+              />
+              <TextInput
+                label="Designation"
+                value={flatStr(content, "hodDesignation", "hod.designation")}
+                onChange={(e) => set("hodDesignation", e.target.value)}
+              />
+              <TextInput
+                label="Qualification"
+                value={flatStr(
+                  content,
+                  "hodQualification",
+                  "hod.qualification",
+                )}
+                onChange={(e) => set("hodQualification", e.target.value)}
+              />
+              <TextInput
+                label="Experience"
+                value={flatStr(content, "hodExperience", "hod.experience")}
+                onChange={(e) => set("hodExperience", e.target.value)}
+              />
+              <ImageUploadInput
+                label="Photo"
+                value={flatStr(content, "hodPhoto", "hod.photo")}
+                onChange={(url) => set("hodPhoto", url)}
+                hideUrlField
+              />
+            </div>
             <TextArea
-              key={idx}
-              label={`Paragraph ${idx}`}
-              value={readAboutParagraph(content, idx as 1 | 2 | 3)}
-              onChange={(e) => set(`about${idx}`, e.target.value)}
-              rows={4}
+              label="HOD Message"
+              value={flatMultilineStr(content, "hodMessage", "hod.message")}
+              onChange={(e) => set("hodMessage", e.target.value)}
+              rows={5}
             />
-          ))}
-        </>
-      );
-    case "hod":
-      return (
-        <>
-          <div className="grid grid-cols-1 gap-3">
-            <TextInput
-              label="HOD Name"
-              value={flatStr(content, "hodName", "hod.name")}
-              onChange={(e) => set("hodName", e.target.value)}
+          </>
+        );
+      case "visionMission":
+        return (
+          <>
+            <TextArea
+              label="Vision"
+              value={flatStr(content, "vision", "visionMission.vision")}
+              onChange={(e) => set("vision", e.target.value)}
+              rows={3}
             />
-            <TextInput
-              label="Designation"
-              value={flatStr(content, "hodDesignation", "hod.designation")}
-              onChange={(e) => set("hodDesignation", e.target.value)}
-            />
-            <TextInput
-              label="Qualification"
-              value={flatStr(content, "hodQualification", "hod.qualification")}
-              onChange={(e) => set("hodQualification", e.target.value)}
-            />
-            <TextInput
-              label="Experience"
-              value={flatStr(content, "hodExperience", "hod.experience")}
-              onChange={(e) => set("hodExperience", e.target.value)}
-            />
-            <ImageUploadInput
-              label="Photo"
-              value={flatStr(content, "hodPhoto", "hod.photo")}
-              onChange={(url) => set("hodPhoto", url)}
-              hideUrlField
-            />
-          </div>
-          <TextArea
-            label="HOD Message"
-            value={flatMultilineStr(content, "hodMessage", "hod.message")}
-            onChange={(e) => set("hodMessage", e.target.value)}
-            rows={5}
-          />
-        </>
-      );
-    case "visionMission":
-      return (
-        <>
-          <TextArea
-            label="Vision"
-            value={flatStr(content, "vision", "visionMission.vision")}
-            onChange={(e) => set("vision", e.target.value)}
-            rows={3}
-          />
-          <TextArea
-            label="Mission (one point per line)"
-            value={flatMultilineStr(
-              content,
-              "mission",
-              "visionMission.mission",
-            )}
-            onChange={(e) => set("mission", e.target.value)}
-            rows={5}
-          />
-        </>
-      );
-    case "programOutcomes":
-      return (
-        <ItemsEditor
-          items={flatArr<Record<string, unknown>>(content, "programOutcomes")}
-          onChange={(v) => set("programOutcomes", v)}
-          fields={PO_FIELDS}
-          emptyItem={E_PO}
-          addLabel="Add Outcome"
-        />
-      );
-    case "curriculum":
-      return (
-        <CurriculumEditor
-          value={
-            (content.curriculum as CurriculumRegulation[] | undefined) ?? []
-          }
-          onChange={(v) => set("curriculum", v)}
-        />
-      );
-    case "teachingLearning":
-      return (
-        <>
-          <TextArea
-            label="Overview"
-            value={String(flatObj(content, "teachingLearning").overview ?? "")}
-            onChange={(e) =>
-              setObj("teachingLearning", "overview", e.target.value)
-            }
-            rows={3}
-          />
-          <StringList
-            label="Teaching Methods"
-            values={
-              (flatObj(content, "teachingLearning").methods as string[]) ?? []
-            }
-            onChange={(v) => setObj("teachingLearning", "methods", v)}
-          />
-          <StringList
-            label="Tools & Technologies"
-            values={
-              (flatObj(content, "teachingLearning").tools as string[]) ?? []
-            }
-            onChange={(v) => setObj("teachingLearning", "tools", v)}
-          />
-          <StringList
-            label="Best Practices"
-            values={
-              (flatObj(content, "teachingLearning").practices as string[]) ?? []
-            }
-            onChange={(v) => setObj("teachingLearning", "practices", v)}
-          />
-        </>
-      );
-    case "valueAddedCourses":
-      return (
-        <ItemsEditor
-          items={flatArr<Record<string, unknown>>(content, "valueAddedCourses")}
-          onChange={(v) => set("valueAddedCourses", v)}
-          fields={VAC_FIELDS}
-          emptyItem={E_VAC}
-          addLabel="Add Course"
-        />
-      );
-    case "faculty":
-      return (
-        <ItemsEditor
-          items={flatArr<Record<string, unknown>>(content, "faculty")}
-          onChange={(v) => set("faculty", v)}
-          fields={FACULTY_FIELDS}
-          emptyItem={E_FACULTY}
-          addLabel="Add Faculty Member"
-        />
-      );
-    case "advisoryBoard":
-    case "pac":
-    case "bos":
-      return (
-        <ItemsEditor
-          items={flatArr<Record<string, unknown>>(content, section)}
-          onChange={(v) => set(section, v)}
-          fields={BOARD_FIELDS}
-          emptyItem={E_BOARD}
-          addLabel="Add Member"
-        />
-      );
-    case "labs":
-      return (
-        <LabsEditor
-          labs={(content.labs as LabItem[] | undefined) ?? []}
-          onChange={(v) => set("labs", v)}
-        />
-      );
-    case "library":
-      return (
-        <>
-          <TextArea
-            label="Description"
-            value={String(flatObj(content, "library").description ?? "")}
-            onChange={(e) => setObj("library", "description", e.target.value)}
-            rows={3}
-          />
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <NumberInput
-              label="Books / Volumes"
-              value={Number(flatObj(content, "library").books ?? 0)}
-              min={0}
-              onChange={(e) =>
-                setObj("library", "books", Number(e.target.value))
-              }
-            />
-            <NumberInput
-              label="Journals"
-              value={Number(flatObj(content, "library").journals ?? 0)}
-              min={0}
-              onChange={(e) =>
-                setObj("library", "journals", Number(e.target.value))
-              }
-            />
-            <NumberInput
-              label="Magazines"
-              value={Number(flatObj(content, "library").magazines ?? 0)}
-              min={0}
-              onChange={(e) =>
-                setObj("library", "magazines", Number(e.target.value))
-              }
-            />
-          </div>
-          <StringList
-            label="Digital Access / Online Resources"
-            values={
-              (flatObj(content, "library").digitalAccess as string[]) ?? []
-            }
-            onChange={(v) => setObj("library", "digitalAccess", v)}
-          />
-        </>
-      );
-    case "events":
-      return (
-        <ItemsEditor
-          items={flatArr<Record<string, unknown>>(content, "events")}
-          onChange={(v) => set("events", v)}
-          fields={EVENT_FIELDS}
-          emptyItem={E_EVENT}
-          addLabel="Add Event"
-        />
-      );
-    case "studentAchievements":
-    case "facultyAchievements":
-      return (
-        <ItemsEditor
-          items={flatArr<Record<string, unknown>>(content, section)}
-          onChange={(v) => set(section, v)}
-          fields={ACHIEV_FIELDS}
-          emptyItem={E_ACHIEV}
-          addLabel="Add Achievement"
-        />
-      );
-    case "magazine":
-      return (
-        <>
-          <div className="grid grid-cols-1 gap-3">
-            <TextInput
-              label="Name"
-              value={String(flatObj(content, "magazine").name ?? "")}
-              onChange={(e) => setObj("magazine", "name", e.target.value)}
-            />
-            <TextInput
-              label="Frequency"
-              value={String(flatObj(content, "magazine").frequency ?? "")}
-              onChange={(e) => setObj("magazine", "frequency", e.target.value)}
-            />
-            <TextInput
-              label="Latest Issue"
-              value={String(flatObj(content, "magazine").latestIssue ?? "")}
-              onChange={(e) =>
-                setObj("magazine", "latestIssue", e.target.value)
-              }
-            />
-          </div>
-          <TextArea
-            label="Description"
-            value={String(flatObj(content, "magazine").description ?? "")}
-            onChange={(e) => setObj("magazine", "description", e.target.value)}
-            rows={3}
-          />
-          <StringList
-            label="Highlights"
-            values={(flatObj(content, "magazine").highlights as string[]) ?? []}
-            onChange={(v) => setObj("magazine", "highlights", v)}
-          />
-        </>
-      );
-    case "participation":
-      return (
-        <>
-          <StringList
-            label="Student Clubs"
-            values={
-              (flatObj(content, "studentParticipation").clubs as string[]) ?? []
-            }
-            onChange={(v) => setObj("studentParticipation", "clubs", v)}
-          />
-          <ItemsEditor
-            items={
-              (flatObj(content, "studentParticipation").highlights as Record<
-                string,
-                unknown
-              >[]) ?? []
-            }
-            onChange={(v) => setObj("studentParticipation", "highlights", v)}
-            fields={SP_HL_FIELDS}
-            emptyItem={E_SP_HL}
-            addLabel="Add Highlight"
-          />
-          <StringList
-            label="Faculty Workshops"
-            values={
-              (flatObj(content, "facultyParticipation")
-                .workshops as string[]) ?? []
-            }
-            onChange={(v) => setObj("facultyParticipation", "workshops", v)}
-          />
-          <ItemsEditor
-            items={
-              (flatObj(content, "facultyParticipation").conferences as Record<
-                string,
-                unknown
-              >[]) ?? []
-            }
-            onChange={(v) => setObj("facultyParticipation", "conferences", v)}
-            fields={FP_CONF_FIELDS}
-            emptyItem={E_FP_CONF}
-            addLabel="Add Conference"
-          />
-        </>
-      );
-    case "careerProgression":
-      return (
-        <>
-          <div className="grid grid-cols-1 gap-3">
-            <TextInput
-              label="Placement Rate"
-              value={flatStr(
+            <TextArea
+              label="Mission (one point per line)"
+              value={flatMultilineStr(
                 content,
-                "placementRate",
-                "careerProgression.placementRate",
+                "mission",
+                "visionMission.mission",
               )}
-              onChange={(e) => set("placementRate", e.target.value)}
+              onChange={(e) => set("mission", e.target.value)}
+              rows={5}
             />
-            <TextInput
-              label="Average Package"
-              value={flatStr(
-                content,
-                "averagePackage",
-                "careerProgression.averagePackage",
-              )}
-              onChange={(e) => set("averagePackage", e.target.value)}
-            />
-            <TextInput
-              label="Highest Package"
-              value={flatStr(
-                content,
-                "highestPackage",
-                "careerProgression.highestPackage",
-              )}
-              onChange={(e) => set("highestPackage", e.target.value)}
-            />
-          </div>
-          <StringList
-            label="Top Recruiters"
-            values={flatArr<string>(
-              content,
-              "topRecruiters",
-              "careerProgression.topRecruiters",
-            )}
-            onChange={(v) => set("topRecruiters", v)}
-          />
-          <StringList
-            label="Higher Studies Paths"
-            values={flatArr<string>(
-              content,
-              "higherStudies",
-              "careerProgression.higherStudies",
-            )}
-            onChange={(v) => set("higherStudies", v)}
-          />
-        </>
-      );
-    case "feedback":
-      return (
-        <>
-          <StringList
-            label="Curriculum Feedback Process"
-            values={
-              (flatObj(content, "feedback").curriculumProcess as string[]) ?? []
-            }
-            onChange={(v) => setObj("feedback", "curriculumProcess", v)}
-          />
-          <StringList
-            label="Facility Feedback Process"
-            values={
-              (flatObj(content, "feedback").facilityProcess as string[]) ?? []
-            }
-            onChange={(v) => setObj("feedback", "facilityProcess", v)}
-          />
-          <StringList
-            label="Recent Improvements"
-            values={
-              (flatObj(content, "feedback").recentImprovements as string[]) ??
-              []
-            }
-            onChange={(v) => setObj("feedback", "recentImprovements", v)}
-          />
-        </>
-      );
-    case "tabs":
-      return (
-        <>
-          <p className="mb-3 text-xs text-gray-500">
-            Reorder, rename, hide, or add custom sidebar entries. Set a Custom
-            URL to turn any entry into a direct link. For a custom content tab,
-            add an entry with a unique id and no URL, then click that tab in the
-            preview to add its content blocks.
-          </p>
+          </>
+        );
+      case "programOutcomes":
+        return (
           <ItemsEditor
-            items={flatArr<Record<string, unknown>>(content, "tabsConfig")}
-            onChange={(v) => set("tabsConfig", v)}
-            fields={TAB_CONFIG_FIELDS}
-            emptyItem={E_TAB_CONFIG as unknown as Record<string, unknown>}
-            addLabel="Add Tab"
+            items={flatArr<Record<string, unknown>>(content, "programOutcomes")}
+            onChange={(v) => set("programOutcomes", v)}
+            fields={PO_FIELDS}
+            emptyItem={E_PO}
+            addLabel="Add Outcome"
           />
-          <button
-            type="button"
-            onClick={() => set("tabsConfig", [])}
-            className="admin-btn admin-btn-outline admin-btn-sm mt-2"
+        );
+      case "curriculum":
+        return (
+          <CurriculumEditor
+            value={
+              (content.curriculum as CurriculumRegulation[] | undefined) ?? []
+            }
+            onChange={(v) => set("curriculum", v)}
+          />
+        );
+      case "teachingLearning":
+        return (
+          <>
+            <TextArea
+              label="Overview"
+              value={String(
+                flatObj(content, "teachingLearning").overview ?? "",
+              )}
+              onChange={(e) =>
+                setObj("teachingLearning", "overview", e.target.value)
+              }
+              rows={3}
+            />
+            <StringList
+              label="Teaching Methods"
+              values={
+                (flatObj(content, "teachingLearning").methods as string[]) ?? []
+              }
+              onChange={(v) => setObj("teachingLearning", "methods", v)}
+            />
+            <StringList
+              label="Tools & Technologies"
+              values={
+                (flatObj(content, "teachingLearning").tools as string[]) ?? []
+              }
+              onChange={(v) => setObj("teachingLearning", "tools", v)}
+            />
+            <StringList
+              label="Best Practices"
+              values={
+                (flatObj(content, "teachingLearning").practices as string[]) ??
+                []
+              }
+              onChange={(v) => setObj("teachingLearning", "practices", v)}
+            />
+          </>
+        );
+      case "valueAddedCourses":
+        return (
+          <ItemsEditor
+            items={flatArr<Record<string, unknown>>(
+              content,
+              "valueAddedCourses",
+            )}
+            onChange={(v) => set("valueAddedCourses", v)}
+            fields={VAC_FIELDS}
+            emptyItem={E_VAC}
+            addLabel="Add Course"
+          />
+        );
+      case "faculty":
+        return (
+          <ItemsEditor
+            items={flatArr<Record<string, unknown>>(content, "faculty")}
+            onChange={(v) => set("faculty", v)}
+            fields={FACULTY_FIELDS}
+            emptyItem={E_FACULTY}
+            addLabel="Add Faculty Member"
+          />
+        );
+      case "advisoryBoard":
+      case "pac":
+      case "bos":
+        return (
+          <ItemsEditor
+            items={flatArr<Record<string, unknown>>(content, section)}
+            onChange={(v) => set(section, v)}
+            fields={BOARD_FIELDS}
+            emptyItem={E_BOARD}
+            addLabel="Add Member"
+          />
+        );
+      case "labs":
+        return (
+          <LabsEditor
+            labs={(content.labs as LabItem[] | undefined) ?? []}
+            onChange={(v) => set("labs", v)}
+          />
+        );
+      case "library":
+        return (
+          <>
+            <TextArea
+              label="Description"
+              value={String(flatObj(content, "library").description ?? "")}
+              onChange={(e) => setObj("library", "description", e.target.value)}
+              rows={3}
+            />
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+              <NumberInput
+                label="Books / Volumes"
+                value={Number(flatObj(content, "library").books ?? 0)}
+                min={0}
+                onChange={(e) =>
+                  setObj("library", "books", Number(e.target.value))
+                }
+              />
+              <NumberInput
+                label="Journals"
+                value={Number(flatObj(content, "library").journals ?? 0)}
+                min={0}
+                onChange={(e) =>
+                  setObj("library", "journals", Number(e.target.value))
+                }
+              />
+              <NumberInput
+                label="Magazines"
+                value={Number(flatObj(content, "library").magazines ?? 0)}
+                min={0}
+                onChange={(e) =>
+                  setObj("library", "magazines", Number(e.target.value))
+                }
+              />
+            </div>
+            <StringList
+              label="Digital Access / Online Resources"
+              values={
+                (flatObj(content, "library").digitalAccess as string[]) ?? []
+              }
+              onChange={(v) => setObj("library", "digitalAccess", v)}
+            />
+          </>
+        );
+      case "events":
+        return (
+          <ItemsEditor
+            items={flatArr<Record<string, unknown>>(content, "events")}
+            onChange={(v) => set("events", v)}
+            fields={EVENT_FIELDS}
+            emptyItem={E_EVENT}
+            addLabel="Add Event"
+          />
+        );
+      case "studentAchievements":
+      case "facultyAchievements":
+        return (
+          <ItemsEditor
+            items={flatArr<Record<string, unknown>>(content, section)}
+            onChange={(v) => set(section, v)}
+            fields={ACHIEV_FIELDS}
+            emptyItem={E_ACHIEV}
+            addLabel="Add Achievement"
+          />
+        );
+      case "magazine":
+        return (
+          <>
+            <div className="grid grid-cols-1 gap-3">
+              <TextInput
+                label="Name"
+                value={String(flatObj(content, "magazine").name ?? "")}
+                onChange={(e) => setObj("magazine", "name", e.target.value)}
+              />
+              <TextInput
+                label="Frequency"
+                value={String(flatObj(content, "magazine").frequency ?? "")}
+                onChange={(e) =>
+                  setObj("magazine", "frequency", e.target.value)
+                }
+              />
+              <TextInput
+                label="Latest Issue"
+                value={String(flatObj(content, "magazine").latestIssue ?? "")}
+                onChange={(e) =>
+                  setObj("magazine", "latestIssue", e.target.value)
+                }
+              />
+            </div>
+            <TextArea
+              label="Description"
+              value={String(flatObj(content, "magazine").description ?? "")}
+              onChange={(e) =>
+                setObj("magazine", "description", e.target.value)
+              }
+              rows={3}
+            />
+            <StringList
+              label="Highlights"
+              values={
+                (flatObj(content, "magazine").highlights as string[]) ?? []
+              }
+              onChange={(v) => setObj("magazine", "highlights", v)}
+            />
+          </>
+        );
+      case "participation":
+        return (
+          <>
+            <StringList
+              label="Student Clubs"
+              values={
+                (flatObj(content, "studentParticipation").clubs as string[]) ??
+                []
+              }
+              onChange={(v) => setObj("studentParticipation", "clubs", v)}
+            />
+            <ItemsEditor
+              items={
+                (flatObj(content, "studentParticipation").highlights as Record<
+                  string,
+                  unknown
+                >[]) ?? []
+              }
+              onChange={(v) => setObj("studentParticipation", "highlights", v)}
+              fields={SP_HL_FIELDS}
+              emptyItem={E_SP_HL}
+              addLabel="Add Highlight"
+            />
+            <StringList
+              label="Faculty Workshops"
+              values={
+                (flatObj(content, "facultyParticipation")
+                  .workshops as string[]) ?? []
+              }
+              onChange={(v) => setObj("facultyParticipation", "workshops", v)}
+            />
+            <ItemsEditor
+              items={
+                (flatObj(content, "facultyParticipation").conferences as Record<
+                  string,
+                  unknown
+                >[]) ?? []
+              }
+              onChange={(v) => setObj("facultyParticipation", "conferences", v)}
+              fields={FP_CONF_FIELDS}
+              emptyItem={E_FP_CONF}
+              addLabel="Add Conference"
+            />
+          </>
+        );
+      case "careerProgression":
+        return (
+          <>
+            <div className="grid grid-cols-1 gap-3">
+              <TextInput
+                label="Placement Rate"
+                value={flatStr(
+                  content,
+                  "placementRate",
+                  "careerProgression.placementRate",
+                )}
+                onChange={(e) => set("placementRate", e.target.value)}
+              />
+              <TextInput
+                label="Average Package"
+                value={flatStr(
+                  content,
+                  "averagePackage",
+                  "careerProgression.averagePackage",
+                )}
+                onChange={(e) => set("averagePackage", e.target.value)}
+              />
+              <TextInput
+                label="Highest Package"
+                value={flatStr(
+                  content,
+                  "highestPackage",
+                  "careerProgression.highestPackage",
+                )}
+                onChange={(e) => set("highestPackage", e.target.value)}
+              />
+            </div>
+            <StringList
+              label="Top Recruiters"
+              values={flatArr<string>(
+                content,
+                "topRecruiters",
+                "careerProgression.topRecruiters",
+              )}
+              onChange={(v) => set("topRecruiters", v)}
+            />
+            <StringList
+              label="Higher Studies Paths"
+              values={flatArr<string>(
+                content,
+                "higherStudies",
+                "careerProgression.higherStudies",
+              )}
+              onChange={(v) => set("higherStudies", v)}
+            />
+          </>
+        );
+      case "feedback":
+        return (
+          <>
+            <StringList
+              label="Curriculum Feedback Process"
+              values={
+                (flatObj(content, "feedback").curriculumProcess as string[]) ??
+                []
+              }
+              onChange={(v) => setObj("feedback", "curriculumProcess", v)}
+            />
+            <StringList
+              label="Facility Feedback Process"
+              values={
+                (flatObj(content, "feedback").facilityProcess as string[]) ?? []
+              }
+              onChange={(v) => setObj("feedback", "facilityProcess", v)}
+            />
+            <StringList
+              label="Recent Improvements"
+              values={
+                (flatObj(content, "feedback").recentImprovements as string[]) ??
+                []
+              }
+              onChange={(v) => setObj("feedback", "recentImprovements", v)}
+            />
+          </>
+        );
+      case "tabs":
+        return (
+          <>
+            <p className="mb-3 text-xs text-gray-500">
+              Reorder, rename, hide, or add custom sidebar entries. Set a Custom
+              URL to turn any entry into a direct link. For a custom content
+              tab, add an entry with a unique id and no URL, then click that tab
+              in the preview to add its content blocks.
+            </p>
+            <ItemsEditor
+              items={flatArr<Record<string, unknown>>(content, "tabsConfig")}
+              onChange={(v) => set("tabsConfig", v)}
+              fields={TAB_CONFIG_FIELDS}
+              emptyItem={E_TAB_CONFIG as unknown as Record<string, unknown>}
+              addLabel="Add Tab"
+            />
+            <button
+              type="button"
+              onClick={() => set("tabsConfig", [])}
+              className="admin-btn admin-btn-outline admin-btn-sm mt-2"
+            >
+              Reset to default 6 tabs
+            </button>
+          </>
+        );
+    }
+  })();
+
+  const showBlocksEditor = section !== "hero" && section !== "tabs";
+
+  return (
+    <div className="space-y-6">
+      {sectionBody}
+      {showBlocksEditor && (
+        <SectionBlocksEditor
+          section={section}
+          content={content}
+          onChange={onChange}
+        />
+      )}
+    </div>
+  );
+}
+
+/**
+ * Appended to every built-in section's inspector. Lets the admin add
+ * free-form blocks (heading/text/image/list/cards/CTA) alongside a
+ * section's structured fields — the same mechanism custom tabs use — and
+ * choose whether they render before or after the section's fixed content.
+ */
+function SectionBlocksEditor({
+  section,
+  content,
+  onChange,
+}: {
+  section: string;
+  content: RawContent;
+  onChange: (next: RawContent) => void;
+}) {
+  const allBlocks =
+    (content.sectionBlocks as Record<string, PageBodySection[]> | undefined) ??
+    {};
+  const allPositions =
+    (content.sectionBlocksPosition as
+      Record<string, "before" | "after"> | undefined) ?? {};
+  const blocks = allBlocks[section] ?? [];
+  const position = allPositions[section] ?? "after";
+
+  const setBlocks = (next: PageBodySection[]) =>
+    onChange({
+      ...content,
+      sectionBlocks: { ...allBlocks, [section]: next },
+    });
+
+  const setPosition = (next: "before" | "after") =>
+    onChange({
+      ...content,
+      sectionBlocksPosition: { ...allPositions, [section]: next },
+    });
+
+  return (
+    <Accordion
+      title={
+        <span className="flex items-center gap-2">
+          Additional Content Blocks
+          {blocks.length > 0 && (
+            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium tracking-wide text-gray-500">
+              {blocks.length}
+            </span>
+          )}
+        </span>
+      }
+      defaultOpen={blocks.length > 0}
+    >
+      <p className="mb-3 text-xs text-gray-500">
+        Add extra paragraphs, images, lists, cards, or a call-to-action button
+        alongside this section&apos;s fields above — the same block types
+        available on custom tabs.
+      </p>
+      {blocks.length > 0 && (
+        <div className="mb-3">
+          <label
+            className="admin-label mb-1 block"
+            htmlFor={`blocks-position-${section}`}
           >
-            Reset to default 6 tabs
-          </button>
-        </>
-      );
-  }
+            Position
+          </label>
+          <select
+            id={`blocks-position-${section}`}
+            className="admin-select"
+            value={position}
+            onChange={(e) => setPosition(e.target.value as "before" | "after")}
+          >
+            <option value="after">After this section&apos;s content</option>
+            <option value="before">Before this section&apos;s content</option>
+          </select>
+        </div>
+      )}
+      <PageBodySectionsEditor value={blocks} onChange={setBlocks} />
+    </Accordion>
+  );
 }
 
 export function ProgramContentEditor({
