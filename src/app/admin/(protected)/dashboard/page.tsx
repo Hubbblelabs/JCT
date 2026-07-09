@@ -1,29 +1,155 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { connectDB } from "@/lib/mongodb";
-import { Program, Placement, Testimonial, AuditLog } from "@/lib/models";
-import { GraduationCap, Send, Briefcase, MessageSquare } from "lucide-react";
+import {
+  AuditLog,
+  Event,
+  ImageAsset,
+  Placement,
+  Program,
+  Testimonial,
+} from "@/lib/models";
+import { DashboardClient } from "@/components/admin/dashboard/DashboardClient";
+import type { DashboardData } from "@/components/admin/dashboard/types";
+import { getImageUrl } from "@/lib/utils";
 
-async function getStats() {
+type Doc = Record<string, unknown>;
+
+const str = (v: unknown): string => (v == null ? "" : String(v));
+const num = (v: unknown): number => (typeof v === "number" ? v : 0);
+
+function toIso(v: unknown): string {
+  const d = v instanceof Date ? v : new Date(str(v));
+  return Number.isNaN(d.getTime()) ? "" : d.toISOString();
+}
+
+const EMPTY: Omit<DashboardData, "storage"> = {
+  dbOk: false,
+  stats: {
+    programs: 0,
+    published: 0,
+    drafts: 0,
+    placements: 0,
+    testimonials: 0,
+    events: 0,
+    images: 0,
+  },
+  weekly: {},
+  activity: [],
+  uploads: [],
+  events: [],
+  placementRecords: [],
+  latestTestimonials: [],
+};
+
+async function getDashboardData(): Promise<DashboardData> {
+  const storage: DashboardData["storage"] =
+    process.env.R2_ACCOUNT_ID && process.env.R2_BUCKET_NAME ? "r2" : "local";
   try {
     await connectDB();
-    const [programs, published, placements, testimonials, logs] =
-      await Promise.all([
-        Program.countDocuments({ is_active: true }),
-        Program.countDocuments({ status: "published" }),
-        Placement.countDocuments({ is_active: true }),
-        Testimonial.countDocuments({ is_active: true }),
-        AuditLog.find().sort({ created_at: -1 }).limit(10),
-      ]);
-    return { programs, published, placements, testimonials, logs };
-  } catch {
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    const [
+      programs,
+      published,
+      drafts,
+      placements,
+      testimonials,
+      events,
+      images,
+      logs,
+      weeklyRaw,
+      uploadDocs,
+      eventDocs,
+      placementDocs,
+      testimonialDocs,
+    ] = await Promise.all([
+      Program.countDocuments({ is_active: true }),
+      Program.countDocuments({ status: "published" }),
+      Program.countDocuments({ status: "draft" }),
+      Placement.countDocuments({ is_active: true }),
+      Testimonial.countDocuments({ is_active: true }),
+      Event.countDocuments({ is_active: true }),
+      ImageAsset.countDocuments(),
+      AuditLog.find().sort({ created_at: -1 }).limit(12).lean(),
+      AuditLog.aggregate([
+        { $match: { created_at: { $gte: weekAgo } } },
+        { $group: { _id: "$entity_type", count: { $sum: 1 } } },
+      ]),
+      ImageAsset.find().sort({ created_at: -1 }).limit(4).lean(),
+      Event.find({ is_active: true }).sort({ event_date: -1 }).limit(4).lean(),
+      Placement.find({ is_active: true })
+        .sort({ is_current: -1, year: -1 })
+        .limit(3)
+        .lean(),
+      Testimonial.find({ is_active: true })
+        .sort({ created_at: -1 })
+        .limit(3)
+        .lean(),
+    ]);
+
     return {
-      programs: 0,
-      published: 0,
-      placements: 0,
-      testimonials: 0,
-      logs: [],
+      dbOk: true,
+      storage,
+      stats: {
+        programs,
+        published,
+        drafts,
+        placements,
+        testimonials,
+        events,
+        images,
+      },
+      weekly: Object.fromEntries(
+        (weeklyRaw as Array<{ _id: unknown; count: unknown }>).map((w) => [
+          str(w._id),
+          num(w.count),
+        ]),
+      ),
+      activity: (logs as Doc[]).map((log) => ({
+        id: str(log._id),
+        entityType: str(log.entity_type),
+        action: str(log.action),
+        userEmail: str(log.user_email),
+        summary: str(log.summary),
+        createdAt: toIso(log.created_at),
+      })),
+      uploads: (uploadDocs as Doc[]).map((img) => ({
+        id: str(img._id),
+        filename: str(img.filename),
+        url: getImageUrl(str(img.url)) ?? "",
+        altText: str(img.alt_text),
+        category: str(img.category),
+        createdAt: toIso(img.created_at),
+      })),
+      events: (eventDocs as Doc[]).map((event) => ({
+        id: str(event._id),
+        title: str(event.title),
+        category: str(event.category),
+        institution: str(event.institution),
+        eventDate: toIso(event.event_date),
+        location: str(event.location),
+      })),
+      placementRecords: (placementDocs as Doc[]).map((p) => ({
+        id: str(p._id),
+        institution: str(p.institution),
+        year: str(p.year),
+        studentsPlaced: num(p.students_placed),
+        placementPercentage: num(p.placement_percentage),
+        highestPackage: str(p.highest_package),
+        isCurrent: Boolean(p.is_current),
+      })),
+      latestTestimonials: (testimonialDocs as Doc[]).map((t) => ({
+        id: str(t._id),
+        name: str(t.name),
+        batch: str(t.batch),
+        category: str(t.category),
+        institution: str(t.institution),
+        quote: str(t.quote),
+        avatar: getImageUrl(str(t.avatar)) ?? "",
+      })),
     };
+  } catch {
+    return { ...EMPTY, storage };
   }
 }
 
@@ -37,114 +163,16 @@ export default async function DashboardPage() {
     redirect(`/admin/page-content?college=${institution || "engineering"}`);
   }
 
-  const { programs, published, placements, testimonials, logs } =
-    await getStats();
-
-  const statCards = [
-    {
-      label: "Active Programs",
-      value: programs,
-      icon: GraduationCap,
-      href: "/admin/programs",
-    },
-    {
-      label: "Published Programs",
-      value: published,
-      icon: Send,
-      href: "/admin/programs",
-    },
-    {
-      label: "Placement Records",
-      value: placements,
-      icon: Briefcase,
-      href: "/admin/placements",
-    },
-    {
-      label: "Testimonials",
-      value: testimonials,
-      icon: MessageSquare,
-      href: "/admin/testimonials",
-    },
-  ];
+  const data = await getDashboardData();
 
   return (
-    <>
-      <div className="admin-content">
-        <div className="admin-page-header">
-          <div>
-            <h1 className="admin-page-title">
-              Welcome, {session?.user?.name?.split(" ")[0] ?? "Admin"}
-            </h1>
-            <p className="admin-page-subtitle">
-              Here&apos;s what&apos;s happening across JCT Institutions.
-            </p>
-          </div>
-        </div>
-
-        {/* Stats */}
-        <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
-          {statCards.map((s) => (
-            <a
-              key={s.label}
-              href={s.href}
-              className="admin-card flex items-center gap-4 no-underline transition-shadow hover:shadow-md"
-            >
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#0a1628]/8">
-                <s.icon size={20} className="text-[#0a1628]" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{s.value}</p>
-                <p className="text-xs text-gray-500">{s.label}</p>
-              </div>
-            </a>
-          ))}
-        </div>
-
-        {/* Recent activity */}
-        <div className="admin-card">
-          <h2 className="mb-4 font-semibold text-gray-800">Recent Activity</h2>
-          {logs.length === 0 ? (
-            <p className="py-8 text-center text-sm text-gray-400">
-              No activity yet.
-            </p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="admin-table">
-                <thead>
-                  <tr>
-                    <th>Type</th>
-                    <th>Action</th>
-                    <th>By</th>
-                    <th>Summary</th>
-                    <th>When</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {logs.map((log: Record<string, unknown>) => (
-                    <tr key={String(log._id)}>
-                      <td>
-                        <span className="admin-badge admin-badge-gray capitalize">
-                          {String(log.entity_type)}
-                        </span>
-                      </td>
-                      <td className="capitalize">{String(log.action)}</td>
-                      <td className="text-gray-500">
-                        {String(log.user_email)}
-                      </td>
-                      <td className="text-gray-600">{String(log.summary)}</td>
-                      <td className="text-xs text-gray-400">
-                        {new Date(log.created_at as string).toLocaleString(
-                          "en-IN",
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </div>
-    </>
+    <DashboardClient
+      data={data}
+      user={{
+        name: session?.user?.name ?? "",
+        email: session?.user?.email ?? "",
+        role: role ?? "admin",
+      }}
+    />
   );
 }

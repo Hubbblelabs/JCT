@@ -12,7 +12,6 @@ import {
   ClipboardList,
   Users,
   LogOut,
-  User,
   ChevronDown,
   Wrench,
   FileEdit,
@@ -406,8 +405,7 @@ function TabNavInner() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const menuProps = (key: string) => ({
     onMouseEnter: () => setOpenMenu(key),
-    onMouseLeave: () =>
-      setOpenMenu((cur) => (cur === key ? null : cur)),
+    onMouseLeave: () => setOpenMenu((cur) => (cur === key ? null : cur)),
     onFocus: () => setOpenMenu(key),
     onBlur: (e: React.FocusEvent<HTMLDivElement>) => {
       if (!e.currentTarget.contains(e.relatedTarget as Node)) {
@@ -478,7 +476,7 @@ function TabNavInner() {
               href="/admin/dashboard"
               className={`admin-nav-trigger ${dashActive ? "active" : ""}`}
             >
-              <LayoutDashboard size={13} />
+              <LayoutDashboard size={14} />
               Dashboard
             </Link>
           )}
@@ -489,9 +487,9 @@ function TabNavInner() {
               <button
                 className={`admin-nav-trigger ${adminMenuActive ? "active" : ""}`}
               >
-                <Wrench size={13} />
+                <Wrench size={14} />
                 Admin
-                <ChevronDown size={11} />
+                <ChevronDown size={12} />
               </button>
               <div className={menuClass("admin")}>
                 {visibleAdminItems.map((item) => (
@@ -515,9 +513,9 @@ function TabNavInner() {
                 href="/admin/global/page-content"
                 className={`admin-nav-trigger ${globalCmsActive ? "active" : ""}`}
               >
-                <Globe size={13} />
+                <Globe size={14} />
                 Global CMS
-                <ChevronDown size={11} />
+                <ChevronDown size={12} />
               </Link>
               <div className={menuClass("global")}>
                 {GLOBAL_CMS_ITEMS.map((item) => (
@@ -525,9 +523,7 @@ function TabNavInner() {
                     key={item.href}
                     href={item.href}
                     className={`admin-nav-dropdown-item ${
-                      isItemActive(item.href, pathname, url)
-                        ? "active"
-                        : ""
+                      isItemActive(item.href, pathname, url) ? "active" : ""
                     }`}
                   >
                     <item.icon size={14} />
@@ -545,9 +541,9 @@ function TabNavInner() {
                 href="/admin/main/page-content"
                 className={`admin-nav-trigger ${mainActive ? "active" : ""}`}
               >
-                <Home size={13} />
+                <Home size={14} />
                 Main
-                <ChevronDown size={11} />
+                <ChevronDown size={12} />
               </Link>
               <div className={menuClass("main")}>
                 {MAIN_ITEMS.map((item) => (
@@ -555,9 +551,7 @@ function TabNavInner() {
                     key={item.href}
                     href={item.href}
                     className={`admin-nav-dropdown-item ${
-                      isItemActive(item.href, pathname, url)
-                        ? "active"
-                        : ""
+                      isItemActive(item.href, pathname, url) ? "active" : ""
                     }`}
                   >
                     <item.icon size={14} />
@@ -583,7 +577,7 @@ function TabNavInner() {
                   className={`admin-nav-trigger ${active ? "active" : ""}`}
                 >
                   {label}
-                  <ChevronDown size={11} />
+                  <ChevronDown size={12} />
                 </Link>
                 <div className={menuClass(`college:${id}`)}>
                   {items.map((item) => (
@@ -591,9 +585,7 @@ function TabNavInner() {
                       key={item.href}
                       href={item.href}
                       className={`admin-nav-dropdown-item ${
-                        isItemActive(item.href, pathname, url)
-                          ? "active"
-                          : ""
+                        isItemActive(item.href, pathname, url) ? "active" : ""
                       }`}
                     >
                       <item.icon size={14} />
@@ -607,26 +599,26 @@ function TabNavInner() {
         </nav>
 
         {/* User info + sign out */}
-        <div className="flex shrink-0 items-center gap-3">
-          <div className="flex items-center gap-2 text-sm text-white/75">
-            <User size={14} />
-            <span className="hidden md:inline">
-              {session?.user?.name ?? session?.user?.email}
+        <div className="flex shrink-0 items-center gap-2.5">
+          <div className="admin-user-chip">
+            <span className="admin-user-avatar" aria-hidden>
+              {(session?.user?.name ?? session?.user?.email ?? "A")
+                .trim()
+                .charAt(0)}
             </span>
-            <span className="admin-badge admin-badge-blue text-[11px] capitalize">
-              {userRole}
+            <span className="hidden flex-col leading-tight md:flex">
+              <span className="admin-user-name">
+                {session?.user?.name ?? session?.user?.email}
+              </span>
+              <span className="admin-user-role">{userRole}</span>
             </span>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/admin/login" })}
-            className="admin-btn admin-btn-sm"
-            style={{
-              background: "transparent",
-              border: "1px solid rgba(255,255,255,0.25)",
-              color: "rgba(255,255,255,0.78)",
-            }}
+            className="admin-btn admin-btn-sm admin-signout-btn"
+            aria-label="Sign out"
           >
-            <LogOut size={13} />
+            <LogOut size={14} />
             <span className="hidden sm:inline">Sign out</span>
           </button>
         </div>
