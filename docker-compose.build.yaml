@@ -1,0 +1,29 @@
+# Build machine
+#
+# Build and push:
+#   docker compose -f docker-compose.build.yaml build
+#   docker compose -f docker-compose.build.yaml push
+#
+# or
+#
+#   docker compose -f docker-compose.build.yaml build --push
+#
+# Requires:
+#   docker login
+#
+# MONGODB_URI is taken from .env using a BuildKit secret and is
+# available only during build.
+
+services:
+  jct:
+    image: kavinnandha/jct:latest
+
+    build:
+      context: .
+      dockerfile: dockerfile
+      secrets:
+        - mongodb_uri
+
+secrets:
+  mongodb_uri:
+    environment: MONGODB_URI

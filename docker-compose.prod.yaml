@@ -1,0 +1,14 @@
+services:
+  jct:
+    image: kavinnandha/jct:latest
+    container_name: jct
+
+    restart: unless-stopped
+
+    ports:
+      - "3000:3000"
+
+    env_file:
+      - .env
+
+    pull_policy: always

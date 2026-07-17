@@ -14,7 +14,13 @@ RUN corepack enable pnpm
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY . .
-RUN pnpm build
+# MONGODB_URI is injected as a BuildKit secret (never persisted in the image
+# layers) so `next build` can reach MongoDB and prerender the public ISR pages
+# with real content. Without it, DB-backed pages (campus-life, coe, about,
+# events, placements, accreditations) bake as 404/empty and only recover after
+# an admin Save force-revalidates. Optional at build: if absent, pnpm build
+# still succeeds and those pages degrade to their empty/404 fallbacks.
+RUN --mount=type=secret,id=mongodb_uri,env=MONGODB_URI pnpm build
 
 # ---------- Runner ----------
 FROM node:26-slim AS runner
