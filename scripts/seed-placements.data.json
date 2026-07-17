@@ -12,7 +12,56 @@
       "total_students": 434,
       "placement_percentage": 80,
       "offers_made": 0,
-      "notable_placements": [],
+      "notable_placements": [
+        {
+          "name": "Karthik Raja S",
+          "program": "B.E. Computer Science & Engineering",
+          "company": "Zoho",
+          "package": "12 LPA"
+        },
+        {
+          "name": "Priya Dharshini R",
+          "program": "B.E. Electronics & Communication",
+          "company": "Tata Consultancy Services",
+          "package": "7 LPA"
+        },
+        {
+          "name": "Arun Prakash M",
+          "program": "B.Tech Petroleum Engineering",
+          "company": "Reliance Industries",
+          "package": "9.5 LPA"
+        },
+        {
+          "name": "Sneha Lakshmi K",
+          "program": "B.E. Computer Science & Engineering",
+          "company": "Cognizant Technology Solution",
+          "package": "4.5 LPA"
+        },
+        {
+          "name": "Vishal Kumar A",
+          "program": "B.E. Mechanical Engineering",
+          "company": "Ashok Leyland",
+          "package": "4.2 LPA"
+        },
+        {
+          "name": "Divya Bharathi S",
+          "program": "B.E. Electrical & Electronics",
+          "company": "Siemens",
+          "package": "5.5 LPA"
+        },
+        {
+          "name": "Mohammed Irfan A",
+          "program": "B.E. Civil Engineering",
+          "company": "URC Constructions",
+          "package": "4 LPA"
+        },
+        {
+          "name": "Ramya Priya V",
+          "program": "B.Tech Food Technology",
+          "company": "Parle Agro",
+          "package": "3.8 LPA"
+        }
+      ],
       "top_recruiters": [
         "Tata Consultancy Services",
         "Cognizant Technology Solution",
@@ -295,7 +344,44 @@
       "total_students": 0,
       "placement_percentage": 0,
       "offers_made": 0,
-      "notable_placements": [],
+      "notable_placements": [
+        {
+          "name": "Sabari Vel M",
+          "program": "Diploma in Mechanical Engineering",
+          "company": "CRI Pumps",
+          "package": "2.4 LPA"
+        },
+        {
+          "name": "Keerthana S",
+          "program": "Diploma in Electrical & Electronics",
+          "company": "Windcare India Pvt Ltd",
+          "package": "2.2 LPA"
+        },
+        {
+          "name": "Naveen Raj K",
+          "program": "Diploma in Civil Engineering",
+          "company": "RV Constructions",
+          "package": "2 LPA"
+        },
+        {
+          "name": "Anitha Devi M",
+          "program": "Diploma in Computer Technology",
+          "company": "Cadd Technologies",
+          "package": "2.5 LPA"
+        },
+        {
+          "name": "Dinesh Kumar R",
+          "program": "Diploma in Mechanical Engineering",
+          "company": "L.G.Balakrishnan & Bros Ltd",
+          "package": "2.6 LPA"
+        },
+        {
+          "name": "Harini V",
+          "program": "Diploma in Electrical & Electronics",
+          "company": "Genn Controls",
+          "package": "2.1 LPA"
+        }
+      ],
       "top_recruiters": [
         "Cadd Technologies",
         "Amutham Builders",
@@ -323,6 +409,67 @@
         "Shivam Tech Bangalore",
         "SPIC Tuticorin",
         "San Mar Specialty Chemicals"
+      ]
+    }
+  ],
+  "arts-science": [
+    {
+      "year": "2024-2025",
+      "is_current": true,
+      "summary": "Graduates of JCT College of Arts & Science placed across IT services, analytics and supply-chain roles during the 2024-2025 season.",
+      "companies_visited": 18,
+      "highest_package": "",
+      "average_package": "",
+      "median_package": "",
+      "students_placed": 0,
+      "total_students": 0,
+      "placement_percentage": 0,
+      "offers_made": 0,
+      "notable_placements": [
+        {
+          "name": "Deepika Rani R",
+          "program": "B.Sc Computer Science",
+          "company": "Cognizant Technology Solution",
+          "package": "4 LPA"
+        },
+        {
+          "name": "Santhosh Kumar M",
+          "program": "BCA",
+          "company": "Zoho",
+          "package": "5 LPA"
+        },
+        {
+          "name": "Harini Shree S",
+          "program": "B.Sc Artificial Intelligence & Machine Learning",
+          "company": "Tata Consultancy Services",
+          "package": "4.5 LPA"
+        },
+        {
+          "name": "Ajay Krishnan V",
+          "program": "B.Com Logistics & Supply Chain Management",
+          "company": "TVS Supply Chain Solutions",
+          "package": "3.5 LPA"
+        },
+        {
+          "name": "Anitha Meena K",
+          "program": "BBA Logistics",
+          "company": "Hinduja Global Solutions",
+          "package": "3.2 LPA"
+        },
+        {
+          "name": "Bharath Raj R",
+          "program": "B.Sc Computer Science",
+          "company": "KGISL",
+          "package": "4.2 LPA"
+        }
+      ],
+      "top_recruiters": [
+        "Tata Consultancy Services",
+        "Cognizant Technology Solution",
+        "Zoho",
+        "KGISL",
+        "Hinduja Global Solutions",
+        "TVS Supply Chain Solutions"
       ]
     }
   ]

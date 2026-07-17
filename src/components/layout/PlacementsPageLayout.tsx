@@ -15,7 +15,10 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
-import type { PublicPlacement } from "@/lib/public-placements";
+import type {
+  PublicPlacement,
+  PublicNotablePlacement,
+} from "@/lib/public-placements";
 
 const INSTITUTION_LABELS: Record<string, string> = {
   engineering: "Engineering",
@@ -214,6 +217,92 @@ function RecruiterTile({ name, logo }: { name: string; logo: string | null }) {
   );
 }
 
+function StudentCard({ student }: { student: PublicNotablePlacement }) {
+  // Photo comes from the media library; if it's missing or 404s, fall back to a
+  // designed monogram so the card never shows a broken image.
+  const [failed, setFailed] = useState(false);
+  const showPhoto = student.image && !failed;
+  return (
+    <div className="border-border group flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+      <div className="relative flex aspect-square items-center justify-center bg-stone-50">
+        {showPhoto ? (
+          <Image
+            src={student.image!}
+            alt={student.name}
+            fill
+            sizes="(max-width: 640px) 50vw, 240px"
+            className="object-cover"
+            loading="lazy"
+            onError={() => setFailed(true)}
+          />
+        ) : (
+          <Monogram
+            name={student.name}
+            className="h-20 w-20 rounded-2xl text-2xl"
+          />
+        )}
+        {student.package && (
+          <span className="bg-navy absolute right-2 bottom-2 rounded-full px-2.5 py-1 text-xs font-bold text-white shadow-md">
+            {student.package}
+          </span>
+        )}
+      </div>
+      <div className="flex flex-1 flex-col p-4">
+        <h4 className="text-navy line-clamp-1 font-serif text-base font-bold">
+          {student.name}
+        </h4>
+        {student.program && (
+          <p className="mt-0.5 line-clamp-1 text-xs text-stone-500">
+            {student.program}
+          </p>
+        )}
+        {student.company && (
+          <div className="mt-auto flex items-center gap-1.5 pt-3">
+            <Building2 size={13} className="text-accent shrink-0" />
+            <span className="text-navy line-clamp-1 text-sm font-semibold">
+              {student.company}
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function PlacedStudents({ record }: { record: PublicPlacement }) {
+  if (record.notable_placements.length === 0) return null;
+  return (
+    <div className="mt-16">
+      <div className="mb-6 flex items-end justify-between gap-3">
+        <div>
+          <span className="text-accent text-sm font-bold tracking-[0.2em] uppercase">
+            Our Achievers
+          </span>
+          <h3 className="text-navy mt-1 font-serif text-2xl font-bold md:text-3xl">
+            Placed Students
+          </h3>
+        </div>
+        <span className="text-sm text-stone-500">
+          {record.notable_placements.length} students
+        </span>
+      </div>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-4">
+        {record.notable_placements.map((s, i) => (
+          <motion.div
+            key={`${s.name}-${i}`}
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: (i % 4) * 0.06 }}
+          >
+            <StudentCard student={s} />
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function TopRecruiters({ record }: { record: PublicPlacement }) {
   if (record.top_recruiters.length === 0) return null;
   return (
@@ -328,6 +417,7 @@ export function PlacementsPageLayout({
                 onSelect={setSelectedId}
               />
               <CurrentYear record={active} />
+              <PlacedStudents record={active} />
               <TopRecruiters record={active} />
             </>
           )}
