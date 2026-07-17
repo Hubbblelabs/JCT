@@ -64,6 +64,7 @@ export async function PATCH(
       institution?: string;
       top_recruiters?: unknown;
       notable_placements?: unknown;
+      company_placements?: unknown;
     } | null>();
     if (!existing) return notFound();
 
@@ -81,6 +82,8 @@ export async function PATCH(
       extractR2Keys(existing.top_recruiters, oldKeys);
     if (body.notable_placements !== undefined)
       extractR2Keys(existing.notable_placements, oldKeys);
+    if (body.company_placements !== undefined)
+      extractR2Keys(existing.company_placements, oldKeys);
 
     const updateFields: Record<string, unknown> = Object.fromEntries(
       Object.entries(body).filter(([, v]) => v !== undefined),
@@ -98,6 +101,7 @@ export async function PATCH(
       const stillUsed = new Set<string>();
       extractR2Keys(doc.top_recruiters, stillUsed);
       extractR2Keys(doc.notable_placements, stillUsed);
+      extractR2Keys(doc.company_placements, stillUsed);
       const removed = [...oldKeys].filter((k) => !stillUsed.has(k));
       if (removed.length > 0) cleanupStorageKeys(removed, "placements/patch");
     }
@@ -145,6 +149,7 @@ export async function DELETE(
     const keys = new Set<string>();
     extractR2Keys(doc.top_recruiters, keys);
     extractR2Keys(doc.notable_placements, keys);
+    extractR2Keys(doc.company_placements, keys);
     if (keys.size > 0) cleanupStorageKeys(keys, "placements/delete");
 
     revalidateTargets(doc.institution as RevalidateTarget);

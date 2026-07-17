@@ -18,6 +18,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import type {
   PublicPlacement,
   PublicNotablePlacement,
+  PublicCompanyPlacement,
 } from "@/lib/public-placements";
 
 const INSTITUTION_LABELS: Record<string, string> = {
@@ -223,14 +224,14 @@ function StudentCard({ student }: { student: PublicNotablePlacement }) {
   const [failed, setFailed] = useState(false);
   const showPhoto = student.image && !failed;
   return (
-    <div className="border-border group flex flex-col overflow-hidden rounded-2xl border bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+    <div className="border-border group flex flex-col overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
       <div className="relative flex aspect-square items-center justify-center bg-stone-50">
         {showPhoto ? (
           <Image
             src={student.image!}
             alt={student.name}
             fill
-            sizes="(max-width: 640px) 50vw, 240px"
+            sizes="(max-width: 640px) 33vw, 160px"
             className="object-cover"
             loading="lazy"
             onError={() => setFailed(true)}
@@ -238,28 +239,28 @@ function StudentCard({ student }: { student: PublicNotablePlacement }) {
         ) : (
           <Monogram
             name={student.name}
-            className="h-20 w-20 rounded-2xl text-2xl"
+            className="h-12 w-12 rounded-xl text-base"
           />
         )}
         {student.package && (
-          <span className="bg-navy absolute right-2 bottom-2 rounded-full px-2.5 py-1 text-xs font-bold text-white shadow-md">
+          <span className="bg-navy absolute right-1.5 bottom-1.5 rounded-full px-2 py-0.5 text-[10px] font-bold text-white shadow-md">
             {student.package}
           </span>
         )}
       </div>
-      <div className="flex flex-1 flex-col p-4">
-        <h4 className="text-navy line-clamp-1 font-serif text-base font-bold">
+      <div className="flex flex-1 flex-col p-2.5">
+        <h4 className="text-navy line-clamp-1 text-sm font-bold">
           {student.name}
         </h4>
         {student.program && (
-          <p className="mt-0.5 line-clamp-1 text-xs text-stone-500">
+          <p className="mt-0.5 line-clamp-1 text-[11px] text-stone-500">
             {student.program}
           </p>
         )}
         {student.company && (
-          <div className="mt-auto flex items-center gap-1.5 pt-3">
-            <Building2 size={13} className="text-accent shrink-0" />
-            <span className="text-navy line-clamp-1 text-sm font-semibold">
+          <div className="mt-auto flex items-center gap-1 pt-2">
+            <Building2 size={11} className="text-accent shrink-0" />
+            <span className="text-navy line-clamp-1 text-xs font-semibold">
               {student.company}
             </span>
           </div>
@@ -286,14 +287,14 @@ function PlacedStudents({ record }: { record: PublicPlacement }) {
           {record.notable_placements.length} students
         </span>
       </div>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:gap-6 lg:grid-cols-4">
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:gap-4 lg:grid-cols-6">
         {record.notable_placements.map((s, i) => (
           <motion.div
             key={`${s.name}-${i}`}
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: (i % 4) * 0.06 }}
+            transition={{ delay: (i % 6) * 0.05 }}
           >
             <StudentCard student={s} />
           </motion.div>
@@ -318,6 +319,102 @@ function TopRecruiters({ record }: { record: PublicPlacement }) {
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
         {record.top_recruiters.map((r, i) => (
           <RecruiterTile key={`${r.name}-${i}`} name={r.name} logo={r.logo} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CompanyLogo({ company }: { company: PublicCompanyPlacement }) {
+  const [failed, setFailed] = useState(false);
+  const showLogo = company.logo && !failed;
+  return showLogo ? (
+    <div className="relative h-9 w-9 shrink-0">
+      <Image
+        src={company.logo!}
+        alt={company.company}
+        fill
+        sizes="40px"
+        className="rounded-lg object-contain"
+        loading="lazy"
+        onError={() => setFailed(true)}
+      />
+    </div>
+  ) : (
+    <Monogram
+      name={company.company}
+      className="h-9 w-9 shrink-0 rounded-lg text-xs"
+    />
+  );
+}
+
+// Company-wise placed students: one card per recruiter, listing every student
+// it hired with their program and package. Sits alongside the recruiter grid so
+// visitors can see who was placed where.
+function CompanyPlacements({ record }: { record: PublicPlacement }) {
+  if (record.company_placements.length === 0) return null;
+  const totalStudents = record.company_placements.reduce(
+    (sum, c) => sum + c.students.length,
+    0,
+  );
+  return (
+    <div className="mt-16">
+      <div className="mb-6 flex items-end justify-between gap-3">
+        <div>
+          <span className="text-accent text-sm font-bold tracking-[0.2em] uppercase">
+            Company-wise
+          </span>
+          <h3 className="text-navy mt-1 font-serif text-2xl font-bold md:text-3xl">
+            Placements by Company
+          </h3>
+        </div>
+        <span className="text-sm text-stone-500">
+          {totalStudents} students · {record.company_placements.length} companies
+        </span>
+      </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {record.company_placements.map((c, i) => (
+          <div
+            key={`${c.company}-${i}`}
+            className="border-border flex flex-col rounded-2xl border bg-white p-5 shadow-sm"
+          >
+            <div className="mb-3 flex items-center gap-3 border-b border-stone-100 pb-3">
+              <CompanyLogo company={c} />
+              <div className="min-w-0">
+                <h4 className="text-navy line-clamp-1 font-serif text-base font-bold">
+                  {c.company}
+                </h4>
+                <span className="text-xs text-stone-400">
+                  {c.students.length}{" "}
+                  {c.students.length === 1 ? "student" : "students"} placed
+                </span>
+              </div>
+            </div>
+            <ul className="space-y-2.5">
+              {c.students.map((s, j) => (
+                <li
+                  key={`${s.name}-${j}`}
+                  className="flex items-center justify-between gap-2"
+                >
+                  <div className="min-w-0">
+                    <p className="text-navy line-clamp-1 text-sm font-semibold">
+                      {s.name}
+                    </p>
+                    {s.program && (
+                      <p className="line-clamp-1 text-[11px] text-stone-500">
+                        {s.program}
+                      </p>
+                    )}
+                  </div>
+                  {s.package && (
+                    <span className="bg-accent/10 text-accent shrink-0 rounded-full px-2.5 py-1 text-xs font-bold">
+                      {s.package}
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
         ))}
       </div>
     </div>
@@ -417,8 +514,9 @@ export function PlacementsPageLayout({
                 onSelect={setSelectedId}
               />
               <CurrentYear record={active} />
-              <PlacedStudents record={active} />
               <TopRecruiters record={active} />
+              <PlacedStudents record={active} />
+              <CompanyPlacements record={active} />
             </>
           )}
         </div>

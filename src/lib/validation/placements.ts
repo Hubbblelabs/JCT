@@ -24,6 +24,8 @@ export const LIMITS = {
   programMax: 120,
   topRecruitersMax: 60,
   notablePlacementsMax: 40,
+  companyPlacementsMax: 80,
+  companyStudentsMax: 60,
 } as const;
 
 const TopRecruiterSchema = z.object({
@@ -37,6 +39,21 @@ const NotablePlacementSchema = z.object({
   company: zOptionalString(LIMITS.companyMax).default(""),
   package: zOptionalString(LIMITS.packageMax).default(""),
   image: zUrl.optional().or(z.literal("")).default(""),
+});
+
+const CompanyStudentSchema = z.object({
+  name: zOptionalString(LIMITS.nameMax).default(""),
+  program: zOptionalString(LIMITS.programMax).default(""),
+  package: zOptionalString(LIMITS.packageMax).default(""),
+});
+
+const CompanyPlacementSchema = z.object({
+  company: zOptionalString(LIMITS.companyMax).default(""),
+  logo: zUrl.optional().or(z.literal("")).default(""),
+  students: z
+    .array(CompanyStudentSchema)
+    .max(LIMITS.companyStudentsMax)
+    .default([]),
 });
 
 // Defaults-free base — .partial()-safe for PATCH payloads (see CLAUDE.md:
@@ -58,6 +75,9 @@ const PlacementBaseSchema = z.object({
   notable_placements: z
     .array(NotablePlacementSchema)
     .max(LIMITS.notablePlacementsMax),
+  company_placements: z
+    .array(CompanyPlacementSchema)
+    .max(LIMITS.companyPlacementsMax),
   is_active: z.boolean(),
   sort_order: zNonNegativeInt,
 });
@@ -83,6 +103,11 @@ export const PlacementCreateSchema = PlacementBaseSchema.extend({
     .max(LIMITS.notablePlacementsMax)
     .optional()
     .default([]),
+  company_placements: z
+    .array(CompanyPlacementSchema)
+    .max(LIMITS.companyPlacementsMax)
+    .optional()
+    .default([]),
   is_active: z.boolean().optional().default(true),
   sort_order: zNonNegativeInt.optional().default(0),
 });
@@ -93,3 +118,5 @@ export type PlacementCreateValue = z.infer<typeof PlacementCreateSchema>;
 export type PlacementUpdateValue = z.infer<typeof PlacementUpdateSchema>;
 export type TopRecruiterValue = z.infer<typeof TopRecruiterSchema>;
 export type NotablePlacementValue = z.infer<typeof NotablePlacementSchema>;
+export type CompanyPlacementValue = z.infer<typeof CompanyPlacementSchema>;
+export type CompanyStudentValue = z.infer<typeof CompanyStudentSchema>;

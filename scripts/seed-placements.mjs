@@ -192,6 +192,15 @@ function toDoc(institution, record, resolvers) {
     package: p.package ?? "",
     image: resolvers.pickAvatar(p.name),
   }));
+  const companyPlacements = (record.company_placements ?? []).map((c) => ({
+    company: c.company ?? "",
+    logo: resolvers.resolveLogo(c.company ?? ""),
+    students: (c.students ?? []).map((s) => ({
+      name: s.name ?? "",
+      program: s.program ?? "",
+      package: s.package ?? "",
+    })),
+  }));
   const collegeLabel =
     institution === "arts-science"
       ? "Arts & Science"
@@ -215,6 +224,7 @@ function toDoc(institution, record, resolvers) {
     companies_visited: record.companies_visited ?? topRecruiters.length,
     top_recruiters: topRecruiters,
     notable_placements: notablePlacements,
+    company_placements: companyPlacements,
     is_active: true,
     sort_order: 0,
   };

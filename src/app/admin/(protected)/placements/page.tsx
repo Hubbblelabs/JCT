@@ -22,6 +22,7 @@ import {
   Users,
   Building2,
   GraduationCap,
+  Briefcase,
 } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
@@ -43,6 +44,16 @@ interface NotablePlacement {
   package: string;
   image: string;
 }
+interface CompanyStudent {
+  name: string;
+  program: string;
+  package: string;
+}
+interface CompanyPlacement {
+  company: string;
+  logo: string;
+  students: CompanyStudent[];
+}
 interface PlacementItem {
   _id: string;
   institution: string;
@@ -59,6 +70,7 @@ interface PlacementItem {
   companies_visited: number;
   top_recruiters: TopRecruiter[];
   notable_placements: NotablePlacement[];
+  company_placements: CompanyPlacement[];
   is_active: boolean;
   sort_order: number;
 }
@@ -78,6 +90,7 @@ const EMPTY: Omit<PlacementItem, "_id"> = {
   companies_visited: 0,
   top_recruiters: [],
   notable_placements: [],
+  company_placements: [],
   is_active: true,
   sort_order: 0,
 };
@@ -94,7 +107,13 @@ const INSTITUTION_LABELS: Record<string, string> = {
   polytechnic: "Polytechnic",
 };
 
-type SectionKey = "general" | "packages" | "counts" | "recruiters" | "notable";
+type SectionKey =
+  | "general"
+  | "packages"
+  | "counts"
+  | "recruiters"
+  | "notable"
+  | "company";
 
 const SECTIONS: { key: SectionKey; label: string; icon: typeof Info }[] = [
   { key: "general", label: "General", icon: Info },
@@ -102,6 +121,7 @@ const SECTIONS: { key: SectionKey; label: string; icon: typeof Info }[] = [
   { key: "counts", label: "Placement Counts", icon: Users },
   { key: "recruiters", label: "Top Recruiters", icon: Building2 },
   { key: "notable", label: "Notable Placements", icon: GraduationCap },
+  { key: "company", label: "Company Placements", icon: Briefcase },
 ];
 
 function PlacementsPageInner() {
@@ -145,6 +165,7 @@ function PlacementsPageInner() {
       ...e,
       top_recruiters: e.top_recruiters ?? [],
       notable_placements: e.notable_placements ?? [],
+      company_placements: e.company_placements ?? [],
     });
     setSection("general");
     setApiError(null);
@@ -575,6 +596,101 @@ function PlacementsPageInner() {
                       </div>
                     )}
                   />
+                )}
+
+                {section === "company" && (
+                  <div>
+                    <p className="mb-3 text-xs text-gray-500">
+                      Group placed students under the company that hired them.
+                      Add a company, then add each student with their program and
+                      package. Shown as a company-wise breakdown on the public
+                      placements page.
+                    </p>
+                    <Repeater<CompanyPlacement>
+                      label="Company Placements"
+                      items={form.company_placements}
+                      onChange={(v) => set("company_placements", v)}
+                      onItemRemove={(item) => {
+                        if (item.logo.startsWith("pending:")) discardAll();
+                      }}
+                      newItem={() => ({ company: "", logo: "", students: [] })}
+                      renderItem={(item, _i, onItemChange) => (
+                        <div className="space-y-3 pr-8">
+                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                            <TextInput
+                              label="Company Name"
+                              value={item.company}
+                              onChange={(e) =>
+                                onItemChange({
+                                  ...item,
+                                  company: e.target.value,
+                                })
+                              }
+                              placeholder="Tata Consultancy Services"
+                            />
+                            <ImageUploadInput
+                              label="Company Logo"
+                              value={item.logo}
+                              onChange={(url) =>
+                                onItemChange({ ...item, logo: url })
+                              }
+                              hideUrlField
+                            />
+                          </div>
+                          <div className="rounded-lg border border-gray-100 bg-gray-50/60 p-3">
+                            <Repeater<CompanyStudent>
+                              label="Placed Students"
+                              items={item.students}
+                              onChange={(students) =>
+                                onItemChange({ ...item, students })
+                              }
+                              newItem={() => ({
+                                name: "",
+                                program: "",
+                                package: "",
+                              })}
+                              renderItem={(stu, _si, onStuChange) => (
+                                <div className="grid grid-cols-1 gap-3 pr-8 sm:grid-cols-3">
+                                  <TextInput
+                                    label="Student Name"
+                                    value={stu.name}
+                                    onChange={(e) =>
+                                      onStuChange({
+                                        ...stu,
+                                        name: e.target.value,
+                                      })
+                                    }
+                                  />
+                                  <TextInput
+                                    label="Program"
+                                    value={stu.program}
+                                    onChange={(e) =>
+                                      onStuChange({
+                                        ...stu,
+                                        program: e.target.value,
+                                      })
+                                    }
+                                    placeholder="B.E. CSE"
+                                  />
+                                  <TextInput
+                                    label="Package"
+                                    value={stu.package}
+                                    onChange={(e) =>
+                                      onStuChange({
+                                        ...stu,
+                                        package: e.target.value,
+                                      })
+                                    }
+                                    placeholder="6 LPA"
+                                  />
+                                </div>
+                              )}
+                            />
+                          </div>
+                        </div>
+                      )}
+                    />
+                  </div>
                 )}
               </div>
             </div>

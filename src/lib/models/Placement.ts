@@ -13,6 +13,22 @@ export interface ITopRecruiter {
   logo: string;
 }
 
+// A single student placed at a given company (used inside ICompanyPlacement).
+export interface ICompanyStudent {
+  name: string;
+  program: string;
+  package: string;
+}
+
+// Company-wise placement: one company and every student it hired, each with
+// their own package. Complements the flat notable_placements list — this groups
+// placed students under the recruiter that hired them.
+export interface ICompanyPlacement {
+  company: string;
+  logo: string;
+  students: ICompanyStudent[];
+}
+
 // One document = one academic year's placement record for one college.
 // The public placement page lists these year-wise (current year highlighted,
 // past years below). Rich page content that used to live on Department now
@@ -36,6 +52,7 @@ export interface IPlacement extends Document {
   companies_visited: number;
   top_recruiters: ITopRecruiter[];
   notable_placements: INotablePlacement[];
+  company_placements: ICompanyPlacement[];
   is_active: boolean;
   sort_order: number;
   created_at: Date;
@@ -62,6 +79,24 @@ const NotablePlacementSchema = new Schema<INotablePlacement>(
   { _id: false },
 );
 
+const CompanyStudentSchema = new Schema<ICompanyStudent>(
+  {
+    name: { type: String, default: "" },
+    program: { type: String, default: "" },
+    package: { type: String, default: "" },
+  },
+  { _id: false },
+);
+
+const CompanyPlacementSchema = new Schema<ICompanyPlacement>(
+  {
+    company: { type: String, default: "" },
+    logo: { type: String, default: "" },
+    students: { type: [CompanyStudentSchema], default: [] },
+  },
+  { _id: false },
+);
+
 const PlacementSchema = new Schema<IPlacement>(
   {
     institution: {
@@ -82,6 +117,7 @@ const PlacementSchema = new Schema<IPlacement>(
     companies_visited: { type: Number, default: 0 },
     top_recruiters: { type: [TopRecruiterSchema], default: [] },
     notable_placements: { type: [NotablePlacementSchema], default: [] },
+    company_placements: { type: [CompanyPlacementSchema], default: [] },
     is_active: { type: Boolean, default: true },
     sort_order: { type: Number, default: 0 },
     updated_by: String,

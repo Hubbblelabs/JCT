@@ -24,6 +24,11 @@ type PlacementLean = {
     package?: string;
     image?: string;
   }[];
+  company_placements?: {
+    company?: string;
+    logo?: string;
+    students?: { name?: string; program?: string; package?: string }[];
+  }[];
 };
 
 export type PublicTopRecruiter = { name: string; logo: string | null };
@@ -33,6 +38,17 @@ export type PublicNotablePlacement = {
   company: string;
   package: string;
   image: string | null;
+};
+
+export type PublicCompanyStudent = {
+  name: string;
+  program: string;
+  package: string;
+};
+export type PublicCompanyPlacement = {
+  company: string;
+  logo: string | null;
+  students: PublicCompanyStudent[];
 };
 
 export type PublicPlacement = {
@@ -51,6 +67,7 @@ export type PublicPlacement = {
   companies_visited: number;
   top_recruiters: PublicTopRecruiter[];
   notable_placements: PublicNotablePlacement[];
+  company_placements: PublicCompanyPlacement[];
 };
 
 // Top recruiter name + logo live directly on each placement-year record — the
@@ -93,6 +110,19 @@ function normalize(doc: PlacementLean): PublicPlacement {
         image: getImageUrl(p.image),
       }))
       .filter((p) => p.name || p.company),
+    company_placements: (doc.company_placements ?? [])
+      .map((c) => ({
+        company: (c.company ?? "").trim(),
+        logo: getImageUrl(c.logo),
+        students: (c.students ?? [])
+          .map((s) => ({
+            name: (s.name ?? "").trim(),
+            program: (s.program ?? "").trim(),
+            package: (s.package ?? "").trim(),
+          }))
+          .filter((s) => s.name),
+      }))
+      .filter((c) => c.company && c.students.length > 0),
   };
 }
 
