@@ -7,6 +7,7 @@ export {
   PamphletSchema,
   PamphletSlotSchema,
   PamphletVirtualTourSchema,
+  PamphletCallNowSchema,
   PamphletLayoutSchema,
   PAMPHLET_LAYOUTS,
   LIMITS as LIMITS_pamphlet,
@@ -15,6 +16,7 @@ export type {
   PamphletValue,
   PamphletSlot,
   PamphletVirtualTour,
+  PamphletCallNow,
   PamphletLayout,
 } from "./pamphlet";
 

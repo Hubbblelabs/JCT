@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight, Play } from "lucide-react";
+import { X, ArrowRight, Play, Phone } from "lucide-react";
 import Link from "next/link";
 import { getImageUrl } from "@/lib/utils";
 import { useSiteConfig } from "@/lib/use-site-config";
@@ -22,6 +22,12 @@ type VirtualTour = {
   url: string;
 };
 
+type CallNow = {
+  enabled: boolean;
+  label: string;
+  phone: string;
+};
+
 type PamphletConfig = {
   enabled: boolean;
   delayMs: number;
@@ -29,6 +35,8 @@ type PamphletConfig = {
   leftSlot: Slot;
   rightSlot: Slot;
   virtualTour: VirtualTour;
+  callNow: CallNow;
+  applyEnabled: boolean;
   applyLabel: string;
   applyHref: string;
 };
@@ -100,6 +108,13 @@ function normalizePamphlet(raw: unknown): PamphletConfig | null {
         url: legacyVideoUrl,
       };
 
+  const cn = (r.callNow ?? null) as Record<string, unknown> | null;
+  const callNow: CallNow = {
+    enabled: Boolean(cn?.enabled),
+    label: (cn && asString(cn.label)) || "Call Now",
+    phone: (cn && asString(cn.phone)) || "",
+  };
+
   return {
     enabled: r.enabled !== false,
     delayMs: typeof r.delayMs === "number" ? r.delayMs : 2000,
@@ -107,6 +122,8 @@ function normalizePamphlet(raw: unknown): PamphletConfig | null {
     leftSlot,
     rightSlot,
     virtualTour,
+    callNow,
+    applyEnabled: r.applyEnabled !== false,
     applyLabel: asString(r.applyLabel) || "Apply Now",
     applyHref: asString(r.applyHref) || "https://admissions.jct.ac.in",
   };
@@ -200,6 +217,12 @@ export function Pamphlet() {
     label: "Virtual Tour",
     url: "",
   };
+  const callNow = config?.callNow ?? {
+    enabled: false,
+    label: "Call Now",
+    phone: "",
+  };
+  const applyEnabled = config?.applyEnabled ?? true;
   const applyLabel = config?.applyLabel ?? "Apply Now";
   const applyHref = config?.applyHref ?? "https://admissions.jct.ac.in";
   const delayMs = config?.delayMs ?? 2000;
@@ -228,6 +251,8 @@ export function Pamphlet() {
 
   const showVirtualTour = virtualTour.enabled && Boolean(virtualTour.url);
   const tourEmbeds = showVirtualTour && isEmbeddableVideo(virtualTour.url);
+  const showCallNow = callNow.enabled && Boolean(callNow.phone);
+  const showApply = applyEnabled && Boolean(applyHref);
 
   const leftSplit = layout === "image-text" ? "md:w-[45%]" : "md:w-1/2";
   const rightSplit = layout === "image-text" ? "md:w-[55%]" : "md:w-1/2";
@@ -304,19 +329,31 @@ export function Pamphlet() {
                     {virtualTour.label}
                   </a>
                 )}
-                <Link
-                  href={applyHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={handleClose}
-                  className="group bg-gold flex items-center gap-3 rounded-full px-10 py-4 text-base font-bold text-black shadow-[0_20px_40px_-10px_rgba(212,160,36,0.6)] transition-all hover:scale-105 hover:bg-white active:scale-95 sm:px-12 sm:text-lg"
-                >
-                  {applyLabel}{" "}
-                  <ArrowRight
-                    size={22}
-                    className="transition-transform group-hover:translate-x-1"
-                  />
-                </Link>
+                {showCallNow && (
+                  <a
+                    href={`tel:${callNow.phone.replace(/[^0-9+]/g, "")}`}
+                    onClick={handleClose}
+                    className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:px-10"
+                  >
+                    <Phone size={20} />
+                    {callNow.label}
+                  </a>
+                )}
+                {showApply && (
+                  <Link
+                    href={applyHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handleClose}
+                    className="group bg-gold flex items-center gap-3 rounded-full px-10 py-4 text-base font-bold text-black shadow-[0_20px_40px_-10px_rgba(212,160,36,0.6)] transition-all hover:scale-105 hover:bg-white active:scale-95 sm:px-12 sm:text-lg"
+                  >
+                    {applyLabel}{" "}
+                    <ArrowRight
+                      size={22}
+                      className="transition-transform group-hover:translate-x-1"
+                    />
+                  </Link>
+                )}
               </div>
             </div>
 

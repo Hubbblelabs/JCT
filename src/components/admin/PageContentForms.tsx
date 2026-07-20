@@ -791,6 +791,12 @@ type PamphletVirtualTourVal = {
   url?: string;
 };
 
+type PamphletCallNowVal = {
+  enabled?: boolean;
+  label?: string;
+  phone?: string;
+};
+
 type PamphletLayoutVal =
   "image-image" | "image-text" | "text-image" | "text-text";
 
@@ -801,6 +807,8 @@ export type PamphletVal = {
   leftSlot?: PamphletSlotVal;
   rightSlot?: PamphletSlotVal;
   virtualTour?: PamphletVirtualTourVal;
+  callNow?: PamphletCallNowVal;
+  applyEnabled?: boolean;
   applyLabel?: string;
   applyHref?: string;
   // Legacy — preserved when present so we don't drop data on save.
@@ -897,6 +905,7 @@ export function PamphletForm({
   const leftSlot = value.leftSlot ?? {};
   const rightSlot = value.rightSlot ?? {};
   const virtualTour = value.virtualTour ?? {};
+  const callNow = value.callNow ?? {};
 
   // First-time backfill: if no leftSlot.image but legacy images[] has data,
   // surface the legacy data so it's visible in the editor (and persists on save).
@@ -1017,24 +1026,83 @@ export function PamphletForm({
       </Field>
 
       <Field
+        label="Call Now Button"
+        hint="Optional. Shows a call button that dials the given phone number on tap."
+      >
+        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={callNow.enabled === true}
+              onChange={(e) =>
+                onChange({
+                  ...value,
+                  callNow: { ...callNow, enabled: e.target.checked },
+                })
+              }
+            />
+            Show Call Now button
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <TextInput
+              label="Button Label"
+              value={callNow.label ?? ""}
+              maxLength={LIMITS_pamphlet.callNowLabelMax}
+              placeholder="Call Now"
+              onChange={(e) =>
+                onChange({
+                  ...value,
+                  callNow: { ...callNow, label: e.target.value },
+                })
+              }
+            />
+            <TextInput
+              label="Phone Number"
+              value={callNow.phone ?? ""}
+              maxLength={LIMITS_pamphlet.callNowPhoneMax}
+              placeholder="+91 98765 43210"
+              onChange={(e) =>
+                onChange({
+                  ...value,
+                  callNow: { ...callNow, phone: e.target.value },
+                })
+              }
+            />
+          </div>
+        </div>
+      </Field>
+
+      <Field
         label="Apply Now Button"
         hint="Customize the Apply Now button shown inside the pamphlet popup."
       >
-        <div className="grid grid-cols-2 gap-3">
-          <TextInput
-            label="Button Label"
-            value={value.applyLabel ?? ""}
-            maxLength={LIMITS_pamphlet.applyLabelMax}
-            onChange={(e) => onChange({ ...value, applyLabel: e.target.value })}
-            placeholder="Apply Now"
-          />
-          <TextInput
-            label="Button Link"
-            value={value.applyHref ?? ""}
-            maxLength={LIMITS_pamphlet.applyHrefMax}
-            onChange={(e) => onChange({ ...value, applyHref: e.target.value })}
-            placeholder="https://admissions.jct.ac.in"
-          />
+        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={value.applyEnabled !== false}
+              onChange={(e) =>
+                onChange({ ...value, applyEnabled: e.target.checked })
+              }
+            />
+            Show Apply Now button
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <TextInput
+              label="Button Label"
+              value={value.applyLabel ?? ""}
+              maxLength={LIMITS_pamphlet.applyLabelMax}
+              onChange={(e) => onChange({ ...value, applyLabel: e.target.value })}
+              placeholder="Apply Now"
+            />
+            <TextInput
+              label="Button Link"
+              value={value.applyHref ?? ""}
+              maxLength={LIMITS_pamphlet.applyHrefMax}
+              onChange={(e) => onChange({ ...value, applyHref: e.target.value })}
+              placeholder="https://admissions.jct.ac.in"
+            />
+          </div>
         </div>
       </Field>
     </div>

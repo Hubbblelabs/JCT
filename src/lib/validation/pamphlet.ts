@@ -13,7 +13,16 @@ export const LIMITS = {
   subheadingMax: 160,
   bodyMax: 600,
   virtualTourLabelMax: 40,
+  callNowLabelMax: 40,
+  callNowPhoneMax: 20,
 } as const;
+
+const zPhone = z
+  .string()
+  .max(LIMITS.callNowPhoneMax, `Phone must be at most ${LIMITS.callNowPhoneMax} characters`)
+  .regex(/^[0-9+\-() ]*$/, "Phone may only contain digits, spaces, +, -, ( )")
+  .optional()
+  .or(z.literal(""));
 
 export const PAMPHLET_LAYOUTS = [
   "image-image",
@@ -44,6 +53,13 @@ export const PamphletVirtualTourSchema = z.object({
 });
 export type PamphletVirtualTour = z.infer<typeof PamphletVirtualTourSchema>;
 
+export const PamphletCallNowSchema = z.object({
+  enabled: z.boolean().optional(),
+  label: zClampedString(0, LIMITS.callNowLabelMax, "Call Now label").optional(),
+  phone: zPhone,
+});
+export type PamphletCallNow = z.infer<typeof PamphletCallNowSchema>;
+
 export const PamphletSchema = z.object({
   enabled: z.boolean().optional().default(true),
   delayMs: z
@@ -57,6 +73,8 @@ export const PamphletSchema = z.object({
   leftSlot: PamphletSlotSchema.optional(),
   rightSlot: PamphletSlotSchema.optional(),
   virtualTour: PamphletVirtualTourSchema.optional(),
+  callNow: PamphletCallNowSchema.optional(),
+  applyEnabled: z.boolean().optional().default(true),
   applyLabel: zClampedString(0, LIMITS.applyLabelMax, "Apply label").default(
     "Apply Now",
   ),
