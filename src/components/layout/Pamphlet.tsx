@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowRight } from "lucide-react";
+import { X, ArrowRight, Play } from "lucide-react";
 import Link from "next/link";
 import { getImageUrl } from "@/lib/utils";
 import { useSiteConfig } from "@/lib/use-site-config";
@@ -289,6 +289,7 @@ export function Pamphlet() {
                     onClick={() => setIsVideoOpen(true)}
                     className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:px-10"
                   >
+                    <Play size={20} className="fill-current" />{" "}
                     {virtualTour.label}
                   </button>
                 )}
@@ -299,6 +300,7 @@ export function Pamphlet() {
                     rel="noopener noreferrer"
                     className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:px-10"
                   >
+                    <Play size={20} className="fill-current" />{" "}
                     {virtualTour.label}
                   </a>
                 )}
