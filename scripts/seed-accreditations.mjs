@@ -226,13 +226,6 @@ const INTRO = {
   ],
 };
 
-const INSTITUTION_OF = {
-  engineeringAccreditations: "engineering",
-  artsScienceAccreditations: "arts-science",
-  polytechnicAccreditations: "polytechnic",
-  mainAccreditations: "all",
-};
-
 async function main() {
   const env = loadEnv();
   const uri = env.MONGODB_URI;
