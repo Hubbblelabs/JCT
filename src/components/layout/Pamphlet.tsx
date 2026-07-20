@@ -308,13 +308,13 @@ export function Pamphlet() {
                 )}
               </div>
 
-              <div className="absolute right-6 bottom-4 z-50 flex flex-wrap items-center justify-end gap-3 md:right-8 md:bottom-6">
+              <div className="absolute inset-x-3 bottom-3 z-50 flex flex-wrap items-center justify-center gap-2 sm:inset-x-auto sm:right-6 sm:bottom-4 sm:justify-end sm:gap-3 md:right-8 md:bottom-6">
                 {showVirtualTour && tourEmbeds && (
                   <button
                     onClick={() => setIsVideoOpen(true)}
-                    className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:px-10"
+                    className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
                   >
-                    <Play size={20} className="fill-current" />{" "}
+                    <Play size={18} className="fill-current sm:size-5" />{" "}
                     {virtualTour.label}
                   </button>
                 )}
@@ -323,9 +323,9 @@ export function Pamphlet() {
                     href={virtualTour.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:px-10"
+                    className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
                   >
-                    <Play size={20} className="fill-current" />{" "}
+                    <Play size={18} className="fill-current sm:size-5" />{" "}
                     {virtualTour.label}
                   </a>
                 )}
@@ -333,9 +333,9 @@ export function Pamphlet() {
                   <a
                     href={`tel:${callNow.phone.replace(/[^0-9+]/g, "")}`}
                     onClick={handleClose}
-                    className="group flex items-center gap-3 rounded-full bg-white px-8 py-4 text-base font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:px-10"
+                    className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
                   >
-                    <Phone size={20} />
+                    <Phone size={18} className="sm:size-5" />
                     {callNow.label}
                   </a>
                 )}
@@ -345,12 +345,12 @@ export function Pamphlet() {
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={handleClose}
-                    className="group bg-gold flex items-center gap-3 rounded-full px-10 py-4 text-base font-bold text-black shadow-[0_20px_40px_-10px_rgba(212,160,36,0.6)] transition-all hover:scale-105 hover:bg-white active:scale-95 sm:px-12 sm:text-lg"
+                    className="group bg-gold flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-black shadow-[0_20px_40px_-10px_rgba(212,160,36,0.6)] transition-all hover:scale-105 hover:bg-white active:scale-95 sm:gap-3 sm:px-10 sm:py-4 sm:text-base md:px-12 md:text-lg"
                   >
                     {applyLabel}{" "}
                     <ArrowRight
-                      size={22}
-                      className="transition-transform group-hover:translate-x-1"
+                      size={18}
+                      className="transition-transform group-hover:translate-x-1 sm:size-[22px]"
                     />
                   </Link>
                 )}
