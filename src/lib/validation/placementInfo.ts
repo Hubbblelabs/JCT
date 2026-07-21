@@ -78,6 +78,10 @@ export const PlacementInfoSchema = z.object({
           email: s(150),
         })
         .default({ address: "", phone: "", email: "" }),
+      // Officer photos are optional in practice — when the college has none
+      // (or doesn't want them public), turning this off drops the avatar
+      // column instead of filling the cards with monograms.
+      showPhotos: z.boolean().default(true),
       contacts: z
         .array(TpoContactSchema)
         .max(PLACEMENT_INFO_LIMITS.contactsMax)
@@ -87,6 +91,7 @@ export const PlacementInfoSchema = z.object({
       heading: "",
       description: "",
       office: { address: "", phone: "", email: "" },
+      showPhotos: true,
       contacts: [],
     }),
   process: z

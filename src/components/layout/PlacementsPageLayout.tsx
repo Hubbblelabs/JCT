@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Award,
+  Check,
   TrendingUp,
   BarChart3,
   Users,
@@ -20,6 +21,7 @@ import {
   GraduationCap,
   CheckCircle2,
   CalendarDays,
+  ChevronDown,
   ExternalLink,
   type LucideIcon,
 } from "lucide-react";
@@ -28,6 +30,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
+import { EditableRegion } from "@/components/admin/EditableRegion";
 import { getImageUrl } from "@/lib/utils";
 import {
   resolveSidebarItems,
@@ -46,6 +49,38 @@ const INSTITUTION_LABELS: Record<string, string> = {
   "arts-science": "Arts & Science",
   polytechnic: "Polytechnic",
 };
+
+// Sections the admin editor can select. The year-wise data (stats, recruiters,
+// students, company-wise) is not here — it lives on the Placement records and
+// is edited under /admin/placements.
+export type PlacementEditableSection =
+  "process" | "tpo" | "mou" | "why-recruit" | "sidebar";
+
+export const PLACEMENT_SECTION_LABELS: Record<
+  PlacementEditableSection,
+  string
+> = {
+  process: "Placement Process",
+  tpo: "TPO Contacts",
+  mou: "MoUs & Collaborations",
+  "why-recruit": "Why Recruit at JCT",
+  sidebar: "Sidebar Navigation",
+};
+
+type EditProps = {
+  editable?: boolean;
+  onEditSection?: (section: string) => void;
+};
+
+// In the editor an empty section still has to be clickable — otherwise there's
+// no way to add its first entry.
+function EmptyHint({ children }: { children: string }) {
+  return (
+    <div className="rounded-xl border-2 border-dashed border-stone-200 py-8 text-center text-sm text-stone-400">
+      {children}
+    </div>
+  );
+}
 
 // Sidebar entries in the order the page renders them. Admins can relabel,
 // reorder, hide, or extend this list via the `sidebar.navItems` override on the
@@ -185,6 +220,8 @@ function PlacementSideNav({
   records,
   selectedId,
   onSelectYear,
+  editable,
+  onEditSection,
 }: {
   items: ResolvedSidebarItem[];
   activeId: string;
@@ -192,7 +229,7 @@ function PlacementSideNav({
   records: PublicPlacement[];
   selectedId: string;
   onSelectYear: (id: string) => void;
-}) {
+} & EditProps) {
   // The year list is the entry point to the year-wise data: the current year is
   // selected by default (records arrive is_current-first) and past years sit
   // under it, so visitors switch years from the sidebar instead of a separate
@@ -242,38 +279,37 @@ function PlacementSideNav({
         </div>
       </div>
 
-      {/* Mobile: year pills, directly under the section pills */}
-      {records.length > 1 && (
-        <div className="-mx-4 mt-2 w-full overflow-x-auto px-4 pb-2 lg:hidden">
-          <div className="flex w-max items-center gap-2">
-            <span className="text-xs font-bold tracking-wider text-stone-400 uppercase">
-              Year
-            </span>
-            {records.map((r) => {
-              const active = r._id === selectedId;
-              return (
-                <button
-                  key={r._id}
-                  type="button"
-                  onClick={() => onSelectYear(r._id)}
-                  aria-pressed={active}
-                  className={`rounded-full border px-3.5 py-2 text-xs font-bold whitespace-nowrap transition-colors ${
-                    active
-                      ? "border-accent bg-accent/10 text-accent"
-                      : "border-border text-navy bg-white hover:bg-stone-50"
-                  }`}
-                >
-                  {r.year}
-                  {r.is_current && " · Latest"}
-                </button>
-              );
-            })}
-          </div>
+      {/* Mobile: current year + past-year dropdown */}
+      {records.length > 0 && (
+        <div className="mt-3 flex flex-wrap items-center gap-2 lg:hidden">
+          {currentYears.map((r) => (
+            <YearButton
+              key={r._id}
+              record={r}
+              active={r._id === selectedId}
+              onSelect={onSelectYear}
+              className="w-auto"
+            />
+          ))}
+          {pastYears.length > 0 && (
+            <PastYearSelect
+              records={pastYears}
+              selectedId={selectedId}
+              onSelect={onSelectYear}
+            />
+          )}
         </div>
       )}
 
       {/* Desktop: sticky "On This Page" card */}
-      <nav className="border-border hidden rounded-2xl border bg-white p-5 shadow-sm lg:block">
+      <EditableRegion
+        as="nav"
+        section="sidebar"
+        label={PLACEMENT_SECTION_LABELS.sidebar}
+        editable={editable}
+        onEditSection={onEditSection}
+        className="border-border hidden rounded-2xl border bg-white p-5 shadow-sm lg:block"
+      >
         <h3 className="text-navy border-border mb-4 border-b pb-3 text-xs font-bold tracking-[0.15em] uppercase">
           On This Page
         </h3>
@@ -340,25 +376,17 @@ function PlacementSideNav({
               ))}
             </div>
             {pastYears.length > 0 && (
-              <>
-                <p className="mt-4 mb-2 text-[11px] font-bold tracking-wider text-stone-400 uppercase">
-                  View Past Years
-                </p>
-                <div className="space-y-1">
-                  {pastYears.map((r) => (
-                    <YearButton
-                      key={r._id}
-                      record={r}
-                      active={r._id === selectedId}
-                      onSelect={onSelectYear}
-                    />
-                  ))}
-                </div>
-              </>
+              <div className="mt-3">
+                <PastYearSelect
+                  records={pastYears}
+                  selectedId={selectedId}
+                  onSelect={onSelectYear}
+                />
+              </div>
             )}
           </div>
         )}
-      </nav>
+      </EditableRegion>
     </>
   );
 }
@@ -367,20 +395,22 @@ function YearButton({
   record,
   active,
   onSelect,
+  className = "w-full",
 }: {
   record: PublicPlacement;
   active: boolean;
   onSelect: (id: string) => void;
+  className?: string;
 }) {
   return (
     <button
       type="button"
       onClick={() => onSelect(record._id)}
       aria-pressed={active}
-      className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors ${
+      className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors ${className} ${
         active
           ? "bg-accent/10 text-accent ring-accent/30 ring-1"
-          : "text-navy hover:bg-stone-50"
+          : "border-border text-navy border hover:bg-stone-50"
       }`}
     >
       <CalendarDays
@@ -401,11 +431,206 @@ function YearButton({
   );
 }
 
+// Past years collapse into a dropdown so the sidebar stays short no matter how
+// many academic years accumulate. Hand-rolled rather than a native <select> so
+// each year can carry its placement rate — and so it matches the page's card
+// styling instead of the OS widget. Implements the listbox keyboard contract
+// (arrows / Home / End / Enter / Escape) that <select> would have given us.
+function PastYearSelect({
+  records,
+  selectedId,
+  onSelect,
+}: {
+  records: PublicPlacement[];
+  selectedId: string;
+  onSelect: (id: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  // Opens upward when the panel wouldn't fit below — the sidebar sits low on
+  // the page once it's pinned.
+  const [dropUp, setDropUp] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  const selectedIdx = records.findIndex((r) => r._id === selectedId);
+  const selected = selectedIdx >= 0 ? records[selectedIdx] : null;
+
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e: MouseEvent) => {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, [open]);
+
+  const panelHeight = Math.min(records.length * 52 + 16, 264);
+
+  const openPanel = () => {
+    const rect = triggerRef.current?.getBoundingClientRect();
+    if (rect) {
+      const below = window.innerHeight - rect.bottom;
+      setDropUp(below < panelHeight + 16 && rect.top > below);
+    }
+    setActiveIndex(selectedIdx >= 0 ? selectedIdx : 0);
+    setOpen(true);
+  };
+
+  const commit = (i: number) => {
+    const record = records[i];
+    if (!record) return;
+    onSelect(record._id);
+    setOpen(false);
+    triggerRef.current?.focus();
+  };
+
+  const onKeyDown = (e: React.KeyboardEvent) => {
+    if (!open) {
+      if (e.key === "ArrowDown" || e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openPanel();
+      }
+      return;
+    }
+    switch (e.key) {
+      case "Escape":
+        e.preventDefault();
+        setOpen(false);
+        triggerRef.current?.focus();
+        break;
+      case "ArrowDown":
+        e.preventDefault();
+        setActiveIndex((i) => (i + 1) % records.length);
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setActiveIndex((i) => (i - 1 + records.length) % records.length);
+        break;
+      case "Home":
+        e.preventDefault();
+        setActiveIndex(0);
+        break;
+      case "End":
+        e.preventDefault();
+        setActiveIndex(records.length - 1);
+        break;
+      case "Enter":
+      case " ":
+        e.preventDefault();
+        commit(activeIndex);
+        break;
+    }
+  };
+
+  return (
+    <div ref={rootRef} className="relative" onKeyDown={onKeyDown}>
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={() => (open ? setOpen(false) : openPanel())}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className={`group flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all ${
+          selected
+            ? "border-accent/40 bg-accent/10 text-accent"
+            : "border-border text-navy bg-white hover:border-stone-300 hover:bg-stone-50"
+        } ${open ? "ring-accent/20 ring-2" : ""}`}
+      >
+        <CalendarDays
+          size={16}
+          className={`shrink-0 ${selected ? "text-accent" : "text-stone-400"}`}
+        />
+        <span className="min-w-0 flex-1">
+          <span className="block text-[10px] font-bold tracking-[0.14em] text-stone-400 uppercase">
+            Past Years
+          </span>
+          <span className="block text-sm font-semibold">
+            {selected ? selected.year : `${records.length} earlier batches`}
+          </span>
+        </span>
+        <ChevronDown
+          size={15}
+          className={`shrink-0 text-stone-400 transition-transform duration-200 ${
+            open ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            role="listbox"
+            aria-label="Past years"
+            initial={{ opacity: 0, y: dropUp ? 6 : -6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: dropUp ? 4 : -4, scale: 0.98 }}
+            transition={{ duration: 0.14, ease: "easeOut" }}
+            style={{ maxHeight: panelHeight }}
+            className={`border-border absolute right-0 left-0 z-30 overflow-y-auto rounded-xl border bg-white p-1.5 shadow-xl ${
+              dropUp ? "bottom-full mb-2" : "top-full mt-2"
+            }`}
+          >
+            {records.map((r, i) => {
+              const isSelected = r._id === selectedId;
+              const isActive = i === activeIndex;
+              return (
+                <li key={r._id} role="option" aria-selected={isSelected}>
+                  <button
+                    type="button"
+                    onClick={() => commit(i)}
+                    onMouseEnter={() => setActiveIndex(i)}
+                    className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
+                      isSelected
+                        ? "bg-accent/10 text-accent"
+                        : isActive
+                          ? "text-navy bg-stone-100"
+                          : "text-navy"
+                    }`}
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold">
+                        {r.year}
+                      </span>
+                      {r.placement_percentage > 0 && (
+                        <span className="block text-[11px] text-stone-400">
+                          {r.placement_percentage}% placed
+                          {r.students_placed > 0 &&
+                            ` · ${r.students_placed} students`}
+                        </span>
+                      )}
+                    </span>
+                    {isSelected && (
+                      <Check size={15} className="text-accent shrink-0" />
+                    )}
+                  </button>
+                </li>
+              );
+            })}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 // ─── CMS-backed sections ─────────────────────────────────────────────────────
 
-function MouSection({ data }: { data: PlacementInfoValue["mou"] }) {
+function MouSection({
+  data,
+  editable,
+  onEditSection,
+}: { data: PlacementInfoValue["mou"] } & EditProps) {
   return (
-    <section id="mou" className="scroll-mt-28">
+    <EditableRegion
+      as="section"
+      id="mou"
+      section="mou"
+      label={PLACEMENT_SECTION_LABELS.mou}
+      editable={editable}
+      onEditSection={onEditSection}
+      className="scroll-mt-28"
+    >
       <SectionHeading
         icon={FileText}
         eyebrow="Industry Partnerships"
@@ -420,6 +645,9 @@ function MouSection({ data }: { data: PlacementInfoValue["mou"] }) {
         <p className="mb-8 max-w-3xl text-base leading-relaxed text-stone-600">
           {data.description}
         </p>
+      )}
+      {data.items.length === 0 && editable && (
+        <EmptyHint>Click to add MoUs</EmptyHint>
       )}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         {data.items.map((m, i) => {
@@ -489,19 +717,29 @@ function MouSection({ data }: { data: PlacementInfoValue["mou"] }) {
           );
         })}
       </div>
-    </section>
+    </EditableRegion>
   );
 }
 
 function WhyRecruitSection({
   data,
   label,
+  editable,
+  onEditSection,
 }: {
   data: PlacementInfoValue["whyRecruit"];
   label: string;
-}) {
+} & EditProps) {
   return (
-    <section id="why-recruit" className="scroll-mt-28">
+    <EditableRegion
+      as="section"
+      id="why-recruit"
+      section="why-recruit"
+      label={PLACEMENT_SECTION_LABELS["why-recruit"]}
+      editable={editable}
+      onEditSection={onEditSection}
+      className="scroll-mt-28"
+    >
       <SectionHeading
         icon={Star}
         eyebrow="For Recruiters"
@@ -511,6 +749,9 @@ function WhyRecruitSection({
         <p className="mb-8 max-w-3xl text-base leading-relaxed text-stone-600">
           {data.description}
         </p>
+      )}
+      {data.points.length === 0 && editable && (
+        <EmptyHint>Click to add reasons to recruit here</EmptyHint>
       )}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {data.points.map((p, i) => (
@@ -536,15 +777,27 @@ function WhyRecruitSection({
           </motion.div>
         ))}
       </div>
-    </section>
+    </EditableRegion>
   );
 }
 
-function TpoSection({ data }: { data: PlacementInfoValue["tpo"] }) {
+function TpoSection({
+  data,
+  editable,
+  onEditSection,
+}: { data: PlacementInfoValue["tpo"] } & EditProps) {
   const { office } = data;
   const hasOffice = !!(office.address || office.phone || office.email);
   return (
-    <section id="tpo" className="scroll-mt-28">
+    <EditableRegion
+      as="section"
+      id="tpo"
+      section="tpo"
+      label={PLACEMENT_SECTION_LABELS.tpo}
+      editable={editable}
+      onEditSection={onEditSection}
+      className="scroll-mt-28"
+    >
       <SectionHeading
         icon={Phone}
         eyebrow="Get In Touch"
@@ -606,6 +859,9 @@ function TpoSection({ data }: { data: PlacementInfoValue["tpo"] }) {
         </div>
       )}
 
+      {data.contacts.length === 0 && editable && (
+        <EmptyHint>Click to add placement officers</EmptyHint>
+      )}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {data.contacts.map((c, i) => {
           const photo = getImageUrl(c.image);
@@ -614,23 +870,24 @@ function TpoSection({ data }: { data: PlacementInfoValue["tpo"] }) {
               key={`${c.name}-${i}`}
               className="border-border flex items-center gap-4 rounded-2xl border bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
             >
-              {photo ? (
-                <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-stone-50">
-                  <Image
-                    src={photo}
-                    alt={c.name}
-                    fill
-                    sizes="56px"
-                    className="object-cover"
-                    loading="lazy"
+              {data.showPhotos &&
+                (photo ? (
+                  <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-stone-50">
+                    <Image
+                      src={photo}
+                      alt={c.name}
+                      fill
+                      sizes="56px"
+                      className="object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                ) : (
+                  <Monogram
+                    name={c.name || "TPO"}
+                    className="h-14 w-14 shrink-0 rounded-xl text-base"
                   />
-                </div>
-              ) : (
-                <Monogram
-                  name={c.name || "TPO"}
-                  className="h-14 w-14 shrink-0 rounded-xl text-base"
-                />
-              )}
+                ))}
               <div className="min-w-0">
                 <h3 className="text-navy text-sm font-bold">{c.name}</h3>
                 {c.designation && (
@@ -661,13 +918,25 @@ function TpoSection({ data }: { data: PlacementInfoValue["tpo"] }) {
           );
         })}
       </div>
-    </section>
+    </EditableRegion>
   );
 }
 
-function ProcessSection({ data }: { data: PlacementInfoValue["process"] }) {
+function ProcessSection({
+  data,
+  editable,
+  onEditSection,
+}: { data: PlacementInfoValue["process"] } & EditProps) {
   return (
-    <section id="process" className="scroll-mt-28">
+    <EditableRegion
+      as="section"
+      id="process"
+      section="process"
+      label={PLACEMENT_SECTION_LABELS.process}
+      editable={editable}
+      onEditSection={onEditSection}
+      className="scroll-mt-28"
+    >
       <SectionHeading
         icon={ClipboardList}
         eyebrow="How It Works"
@@ -678,6 +947,9 @@ function ProcessSection({ data }: { data: PlacementInfoValue["process"] }) {
         <p className="mb-8 max-w-3xl text-base leading-relaxed text-stone-600">
           {data.description}
         </p>
+      )}
+      {data.steps.length === 0 && editable && (
+        <EmptyHint>Click to add the placement process steps</EmptyHint>
       )}
       <ol className="relative space-y-4 border-l-2 border-dashed border-stone-200 pl-6 md:pl-8">
         {data.steps.map((step, i) => (
@@ -703,7 +975,7 @@ function ProcessSection({ data }: { data: PlacementInfoValue["process"] }) {
           </motion.li>
         ))}
       </ol>
-    </section>
+    </EditableRegion>
   );
 }
 
@@ -1019,11 +1291,13 @@ export function PlacementsPageLayout({
   institution,
   records,
   info,
+  editable = false,
+  onEditSection,
 }: {
   institution: string;
   records: PublicPlacement[];
   info: PlacementInfoValue;
-}) {
+} & EditProps) {
   const label = INSTITUTION_LABELS[institution] ?? "JCT";
   // The current record is the one flagged is_current, else the newest (records
   // arrive sorted is_current desc, then year desc).
@@ -1034,18 +1308,21 @@ export function PlacementsPageLayout({
   // A built-in nav entry only appears once its section actually has content —
   // an empty MoU list or a college with no placement records must not leave a
   // dead anchor in the sidebar.
+  // In the admin editor every CMS section is always shown, empty or not —
+  // otherwise there'd be nothing to click to fill it in.
   const present = useMemo(() => {
     const set = new Set<string>();
-    if (info.mou.items.length > 0) set.add("mou");
-    if (info.whyRecruit.points.length > 0) set.add("why-recruit");
+    if (editable || info.mou.items.length > 0) set.add("mou");
+    if (editable || info.whyRecruit.points.length > 0) set.add("why-recruit");
     if (
+      editable ||
       info.tpo.contacts.length > 0 ||
       info.tpo.office.address ||
       info.tpo.office.phone ||
       info.tpo.office.email
     )
       set.add("tpo");
-    if (info.process.steps.length > 0) set.add("process");
+    if (editable || info.process.steps.length > 0) set.add("process");
     if (active) {
       set.add("overview");
       if (active.top_recruiters.length > 0) set.add("recruiters");
@@ -1053,7 +1330,7 @@ export function PlacementsPageLayout({
       if (active.company_placements.length > 0) set.add("company-wise");
     }
     return set;
-  }, [info, active]);
+  }, [info, active, editable]);
 
   const navItems = useMemo(
     () =>
@@ -1113,9 +1390,12 @@ export function PlacementsPageLayout({
 
   const isEmpty = records.length === 0 && present.size === 0;
 
+  // No `overflow-x-hidden` here: `overflow-x: hidden` computes overflow-y to
+  // `auto`, which makes <main> the sticky sidebar's scroll container — the
+  // sidebar would then scroll away with the page instead of pinning.
   return (
-    <main className="bg-background text-foreground min-h-screen overflow-x-hidden">
-      <Navbar />
+    <main className="bg-background text-foreground min-h-screen">
+      {!editable && <Navbar />}
       <PageHero
         title="Placements"
         subtitle={`Career outcomes at JCT ${label}`}
@@ -1148,31 +1428,56 @@ export function PlacementsPageLayout({
                   records={records}
                   selectedId={active?._id ?? ""}
                   onSelectYear={handleSelectYear}
+                  editable={editable}
+                  onEditSection={onEditSection}
                 />
               </div>
 
-              <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-10 xl:grid-cols-[300px_1fr] xl:gap-12">
-                <div className="hidden lg:block">
-                  <div className="sticky top-28">
-                    <PlacementSideNav
-                      items={navItems}
-                      activeId={activeId}
-                      onNavigate={handleNavigate}
-                      records={records}
-                      selectedId={active?._id ?? ""}
-                      onSelectYear={handleSelectYear}
-                    />
-                  </div>
+              <div className="lg:grid lg:grid-cols-[280px_1fr] lg:items-start lg:gap-10 xl:grid-cols-[300px_1fr] xl:gap-12">
+                {/* `sticky` needs the grid item to be its own box, not stretched
+                    to the row height — hence `items-start` above. */}
+                <div className="sticky top-24 hidden lg:block">
+                  <PlacementSideNav
+                    items={navItems}
+                    activeId={activeId}
+                    onNavigate={handleNavigate}
+                    records={records}
+                    selectedId={active?._id ?? ""}
+                    onSelectYear={handleSelectYear}
+                    editable={editable}
+                    onEditSection={onEditSection}
+                  />
                 </div>
 
                 <div className="min-w-0 space-y-16">
                   {present.has("process") && (
-                    <ProcessSection data={info.process} />
+                    <ProcessSection
+                      data={info.process}
+                      editable={editable}
+                      onEditSection={onEditSection}
+                    />
                   )}
-                  {present.has("tpo") && <TpoSection data={info.tpo} />}
-                  {present.has("mou") && <MouSection data={info.mou} />}
+                  {present.has("tpo") && (
+                    <TpoSection
+                      data={info.tpo}
+                      editable={editable}
+                      onEditSection={onEditSection}
+                    />
+                  )}
+                  {present.has("mou") && (
+                    <MouSection
+                      data={info.mou}
+                      editable={editable}
+                      onEditSection={onEditSection}
+                    />
+                  )}
                   {present.has("why-recruit") && (
-                    <WhyRecruitSection data={info.whyRecruit} label={label} />
+                    <WhyRecruitSection
+                      data={info.whyRecruit}
+                      label={label}
+                      editable={editable}
+                      onEditSection={onEditSection}
+                    />
                   )}
 
                   {active && (
@@ -1194,18 +1499,27 @@ export function PlacementsPageLayout({
 
                   {/* Custom in-page sections defined by admins in the sidebar editor */}
                   {customSections.map((sec) => (
-                    <section
+                    <EditableRegion
                       key={sec.id}
+                      as="section"
                       id={sec.anchor}
+                      section={`custom:${sec.anchor}`}
+                      label={sec.navLabel}
+                      editable={editable}
+                      onEditSection={onEditSection}
                       className="scroll-mt-28"
                     >
                       <SectionHeading icon={sec.icon} title={sec.navLabel} />
-                      <PageBlocksRenderer
-                        blocks={
-                          (sec.blocks ?? []) as unknown as PageBodySection[]
-                        }
-                      />
-                    </section>
+                      {editable && (sec.blocks?.length ?? 0) === 0 ? (
+                        <EmptyHint>Click to add content blocks</EmptyHint>
+                      ) : (
+                        <PageBlocksRenderer
+                          blocks={
+                            (sec.blocks ?? []) as unknown as PageBodySection[]
+                          }
+                        />
+                      )}
+                    </EditableRegion>
                   ))}
                 </div>
               </div>
@@ -1213,9 +1527,11 @@ export function PlacementsPageLayout({
           )}
         </div>
       </div>
-      <div id="footer">
-        <Footer />
-      </div>
+      {!editable && (
+        <div id="footer">
+          <Footer />
+        </div>
+      )}
     </main>
   );
 }

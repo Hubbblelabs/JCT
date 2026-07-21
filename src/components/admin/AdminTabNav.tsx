@@ -79,7 +79,7 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
     },
     {
       label: "Placements Page",
-      href: "/admin/page-content?college=engineering&section=placementInfo",
+      href: "/admin/placements-page?college=engineering",
       icon: ScrollText,
     },
     {
@@ -146,7 +146,7 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
     },
     {
       label: "Placements Page",
-      href: "/admin/page-content?college=arts-science&section=placementInfo",
+      href: "/admin/placements-page?college=arts-science",
       icon: ScrollText,
     },
     {
@@ -208,7 +208,7 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
     },
     {
       label: "Placements Page",
-      href: "/admin/page-content?college=polytechnic&section=placementInfo",
+      href: "/admin/placements-page?college=polytechnic",
       icon: ScrollText,
     },
     {
