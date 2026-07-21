@@ -108,12 +108,7 @@ const INSTITUTION_LABELS: Record<string, string> = {
 };
 
 type SectionKey =
-  | "general"
-  | "packages"
-  | "counts"
-  | "recruiters"
-  | "notable"
-  | "company";
+  "general" | "packages" | "counts" | "recruiters" | "notable" | "company";
 
 const SECTIONS: { key: SectionKey; label: string; icon: typeof Info }[] = [
   { key: "general", label: "General", icon: Info },
@@ -602,9 +597,9 @@ function PlacementsPageInner() {
                   <div>
                     <p className="mb-3 text-xs text-gray-500">
                       Group placed students under the company that hired them.
-                      Add a company, then add each student with their program and
-                      package. Shown as a company-wise breakdown on the public
-                      placements page.
+                      Add a company, then add each student with their program
+                      and package. Shown as a company-wise breakdown on the
+                      public placements page.
                     </p>
                     <Repeater<CompanyPlacement>
                       label="Company Placements"

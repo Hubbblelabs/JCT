@@ -1,7 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { Award, BadgeCheck, CalendarRange, Download, FileText } from "lucide-react";
+import {
+  Award,
+  BadgeCheck,
+  CalendarRange,
+  Download,
+  FileText,
+} from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";

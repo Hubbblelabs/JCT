@@ -19,7 +19,10 @@ export const LIMITS = {
 
 const zPhone = z
   .string()
-  .max(LIMITS.callNowPhoneMax, `Phone must be at most ${LIMITS.callNowPhoneMax} characters`)
+  .max(
+    LIMITS.callNowPhoneMax,
+    `Phone must be at most ${LIMITS.callNowPhoneMax} characters`,
+  )
   .regex(/^[0-9+\-() ]*$/, "Phone may only contain digits, spaces, +, -, ( )")
   .optional()
   .or(z.literal(""));

@@ -4,10 +4,18 @@ import { useState, useEffect, useRef, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X, ChevronDown, Phone, ArrowRight } from "lucide-react";
+import {
+  Menu,
+  X,
+  ChevronDown,
+  Phone,
+  ArrowRight,
+  FileText,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useInstitution } from "@/contexts/InstitutionContext";
 import { useSiteConfig } from "@/lib/use-site-config";
+import { getImageUrl } from "@/lib/utils";
 import {
   mainNavigation,
   engineeringNavigation,
@@ -31,6 +39,7 @@ type HeaderConfig = {
 type NavbarConfigChild = {
   label?: string;
   href?: string;
+  file?: string;
   desc?: string;
   visible?: boolean;
 };
@@ -38,6 +47,7 @@ type NavbarConfigChild = {
 type NavbarConfigItem = {
   label?: string;
   href?: string;
+  file?: string;
   desc?: string;
   visible?: boolean;
   children?: NavbarConfigChild[];
@@ -68,6 +78,20 @@ function staticNavFor(institution: string): NavItem[] {
   return mainNavigation;
 }
 
+/**
+ * A nav entry can point at an uploaded PDF instead of a route. The CMS stores
+ * that as an R2 storage key, so resolve it to a public URL and flag it — file
+ * links open in a new tab and get a document icon.
+ */
+function resolveNavTarget(raw: { href?: string; file?: string }): {
+  href: string;
+  isFile: boolean;
+} {
+  const file = raw.file?.trim();
+  if (file) return { href: getImageUrl(file) ?? file, isFile: true };
+  return { href: raw.href || "#", isFile: false };
+}
+
 function applyNavbarConfig(
   cfg: NavbarConfig | null,
   fallback: NavItem[],
@@ -79,16 +103,24 @@ function applyNavbarConfig(
     if (!raw || raw.visible === false || !raw.label) continue;
     const children = Array.isArray(raw.children)
       ? raw.children
-          .filter((c) => c && c.visible !== false && c.label && c.href)
-          .map<NavChild>((c) => ({
-            name: c.label!,
-            href: c.href!,
-            desc: c.desc,
-          }))
+          .filter(
+            (c) => c && c.visible !== false && c.label && (c.href || c.file),
+          )
+          .map<NavChild>((c) => {
+            const target = resolveNavTarget(c);
+            return {
+              name: c.label!,
+              href: target.href,
+              desc: c.desc,
+              isFile: target.isFile,
+            };
+          })
       : undefined;
+    const target = resolveNavTarget(raw);
     result.push({
       name: raw.label,
-      href: raw.href || "#",
+      href: target.href,
+      isFile: target.isFile,
       children: children && children.length > 0 ? children : undefined,
     });
   }
@@ -366,16 +398,21 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             className="hidden items-center justify-center whitespace-nowrap xl:flex"
             ref={dropdownRef}
           >
-            {navigationLinks.map((link) => {
+            {navigationLinks.map((link, index) => {
               const basePath = link.href.split("#")[0];
               const isHashLink = link.href.includes("#");
               const isActive =
+                !link.isFile &&
                 !isHashLink &&
                 (link.name === "Home" || link.href === "/"
                   ? pathname === basePath
                   : pathname.startsWith(basePath) && basePath !== "/");
               const hasDropdown = !!link.children;
               const isExpanded = desktopExpanded === link.name;
+              // Items past the midpoint sit close to the right edge, so their
+              // panel is right-anchored; earlier ones open to the right. Without
+              // this the panel spills outside the viewport at narrower widths.
+              const alignRight = index >= navigationLinks.length / 2;
 
               return (
                 <div
@@ -421,6 +458,8 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                     <Link
                       href={link.href}
                       onClick={(e) => handleNavClick(e, link.href)}
+                      target={link.isFile ? "_blank" : undefined}
+                      rel={link.isFile ? "noopener noreferrer" : undefined}
                       aria-haspopup={hasDropdown ? "true" : undefined}
                       aria-expanded={hasDropdown ? isExpanded : undefined}
                       className={`group relative flex items-center justify-center gap-1 px-2 py-2 font-sans text-sm font-medium transition-colors xl:gap-1.5 xl:px-3 xl:text-[14px] 2xl:px-4 2xl:text-[15px] ${
@@ -430,6 +469,9 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                       }`}
                     >
                       {link.name}
+                      {link.isFile && (
+                        <FileText size={13} className="shrink-0" />
+                      )}
                       {hasDropdown && (
                         <ChevronDown
                           size={14}
@@ -446,14 +488,14 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                     <AnimatePresence>
                       {isExpanded && (
                         <div
-                          className={`absolute top-full z-50 pt-4 ${link.name && institution === "engineering" ? "right-0" : link.name === "More" ? "right-0" : "left-0"}`}
+                          className={`absolute top-full z-50 pt-4 ${alignRight ? "right-0" : "left-0"}`}
                         >
                           <motion.div
                             initial={{ opacity: 0, y: 8, scale: 0.985 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 8, scale: 0.985 }}
                             transition={{ duration: 0.22, ease: "easeOut" }}
-                            className={`w-72 rounded-2xl border p-2 shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
+                            className={`scrollbar-hide max-h-[min(70vh,32rem)] w-[min(18rem,calc(100vw-3rem))] overflow-y-auto rounded-2xl border p-2 whitespace-normal shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
                               isDropdownSolid
                                 ? "border-white/10 bg-[#0a1628]/96"
                                 : "border-white/20 bg-[#0a1628]/70"
@@ -463,6 +505,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                               const isChildHashLink = child.href.includes("#");
                               const childPath = child.href.split("#")[0];
                               const isChildActive =
+                                !child.isFile &&
                                 !isChildHashLink &&
                                 (childPath !== "/"
                                   ? pathname === childPath ||
@@ -477,6 +520,12 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                     setDesktopExpanded(null);
                                     handleNavClick(e, child.href);
                                   }}
+                                  target={child.isFile ? "_blank" : undefined}
+                                  rel={
+                                    child.isFile
+                                      ? "noopener noreferrer"
+                                      : undefined
+                                  }
                                   className={`group block rounded-lg px-4 py-3 font-sans transition-colors ${
                                     isDropdownSolid
                                       ? "hover:bg-white/10"
@@ -484,9 +533,9 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                   } ${isChildActive ? "bg-white/10" : ""} ${child.className || ""}`}
                                 >
                                   <div className="flex items-center justify-between gap-3">
-                                    <div>
+                                    <div className="min-w-0">
                                       <div
-                                        className={`text-[15px] font-medium whitespace-nowrap transition-colors ${highlightColor.replace("text-", "group-hover:text-")} ${
+                                        className={`flex items-center gap-1.5 text-[15px] font-medium break-words transition-colors ${highlightColor.replace("text-", "group-hover:text-")} ${
                                           isChildActive
                                             ? highlightColor
                                             : isDropdownSolid
@@ -494,11 +543,19 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                               : "text-white"
                                         }`}
                                       >
-                                        {child.name}
+                                        {child.isFile && (
+                                          <FileText
+                                            size={13}
+                                            className="shrink-0"
+                                          />
+                                        )}
+                                        <span className="min-w-0">
+                                          {child.name}
+                                        </span>
                                       </div>
                                       {child.desc && (
                                         <div
-                                          className={`mt-0.5 text-[13px] whitespace-nowrap transition-colors group-hover:text-white/80 ${
+                                          className={`mt-0.5 text-[13px] break-words transition-colors group-hover:text-white/80 ${
                                             isChildActive
                                               ? "text-white/70"
                                               : isDropdownSolid
@@ -595,7 +652,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               animate={{ x: 0 }}
               exit={{ x: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
-              className="fixed inset-y-4 right-4 z-61 flex w-76 flex-col rounded-3xl border border-white/10 bg-[#0a1628]/95 shadow-2xl backdrop-blur-xl xl:hidden"
+              className="fixed inset-y-4 right-4 z-61 flex w-[min(19rem,calc(100vw-2rem))] flex-col rounded-3xl border border-white/10 bg-[#0a1628]/95 shadow-2xl backdrop-blur-xl xl:hidden"
             >
               <div className="flex items-center justify-between border-b border-white/5 p-5">
                 <div className="flex items-center gap-3">
@@ -637,12 +694,14 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                           <button
                             type="button"
                             onClick={() => toggleMobileSection(link.name)}
-                            className={`flex w-full items-center justify-between rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${mobileExpanded === link.name ? "bg-white/10 text-white shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                            className={`flex w-full items-center justify-between gap-2 rounded-xl px-4 py-3 text-left font-sans text-[15px] font-medium transition-all ${mobileExpanded === link.name ? "bg-white/10 text-white shadow-sm" : "text-white/70 hover:bg-white/5 hover:text-white"}`}
                           >
-                            {link.name}
+                            <span className="min-w-0 break-words">
+                              {link.name}
+                            </span>
                             <ChevronDown
                               size={16}
-                              className={`transition-transform duration-300 ${mobileExpanded === link.name ? "rotate-180" : ""}`}
+                              className={`shrink-0 transition-transform duration-300 ${mobileExpanded === link.name ? "rotate-180" : ""}`}
                             />
                           </button>
                           <AnimatePresence>
@@ -663,6 +722,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                       child.href.includes("#");
                                     const childPath = child.href.split("#")[0];
                                     const isChildActive =
+                                      !child.isFile &&
                                       !isChildHashLink &&
                                       (childPath !== "/"
                                         ? pathname === childPath ||
@@ -676,16 +736,32 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                                         onClick={(e) =>
                                           handleNavClick(e, child.href, true)
                                         }
+                                        target={
+                                          child.isFile ? "_blank" : undefined
+                                        }
+                                        rel={
+                                          child.isFile
+                                            ? "noopener noreferrer"
+                                            : undefined
+                                        }
                                         className={`block rounded-lg px-4 py-3 font-sans transition-colors hover:bg-white/5 ${isChildActive ? `bg-white/5 ${highlightColor}` : highlightColor.replace("text-", "hover:text-")}`}
                                       >
                                         <div
-                                          className={`text-sm ${isChildActive ? "font-medium" : "text-white/70"}`}
+                                          className={`flex items-center gap-1.5 text-sm break-words ${isChildActive ? "font-medium" : "text-white/70"}`}
                                         >
-                                          {child.name}
+                                          {child.isFile && (
+                                            <FileText
+                                              size={13}
+                                              className="shrink-0"
+                                            />
+                                          )}
+                                          <span className="min-w-0">
+                                            {child.name}
+                                          </span>
                                         </div>
                                         {child.desc && (
                                           <div
-                                            className={`mt-0.5 text-xs ${isChildActive ? "text-white/60" : "text-white/40"}`}
+                                            className={`mt-0.5 text-xs break-words ${isChildActive ? "text-white/60" : "text-white/40"}`}
                                           >
                                             {child.desc}
                                           </div>
@@ -702,9 +778,14 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                         <Link
                           href={link.href}
                           onClick={(e) => handleNavClick(e, link.href, true)}
-                          className={`block rounded-xl px-4 py-3 font-sans text-[15px] font-medium transition-all ${pathname === link.href ? `bg-white/10 ${highlightColor} shadow-sm` : "text-white/70 hover:bg-white/5 hover:text-white"}`}
+                          target={link.isFile ? "_blank" : undefined}
+                          rel={link.isFile ? "noopener noreferrer" : undefined}
+                          className={`flex items-center gap-1.5 rounded-xl px-4 py-3 font-sans text-[15px] font-medium break-words transition-all ${!link.isFile && pathname === link.href ? `bg-white/10 ${highlightColor} shadow-sm` : "text-white/70 hover:bg-white/5 hover:text-white"}`}
                         >
-                          {link.name}
+                          {link.isFile && (
+                            <FileText size={14} className="shrink-0" />
+                          )}
+                          <span className="min-w-0">{link.name}</span>
                         </Link>
                       )}
                     </div>

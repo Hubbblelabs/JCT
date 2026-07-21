@@ -132,7 +132,6 @@ function EventsPageInner() {
       setEditHandled(true);
     }
     // openEdit is a stable local closure; deps intentionally omit it.
-     
   }, [editParam, events, loading, editHandled, isMain]);
 
   const openNew = () => {
@@ -218,7 +217,9 @@ function EventsPageInner() {
           <div>
             <h1 className="admin-page-title">
               News &amp; Events
-              {filterInst ? ` — ${INSTITUTION_LABELS[filterInst]}` : " — Latest"}
+              {filterInst
+                ? ` — ${INSTITUTION_LABELS[filterInst]}`
+                : " — Latest"}
             </h1>
             <p className="admin-page-subtitle">
               {isMain ? (
@@ -229,8 +230,8 @@ function EventsPageInner() {
               ) : (
                 <>
                   {events.filter((e) => e.is_active).length} active events —
-                  shown on the {INSTITUTION_LABELS[filterInst]} News &amp; Events
-                  page
+                  shown on the {INSTITUTION_LABELS[filterInst]} News &amp;
+                  Events page
                 </>
               )}
             </p>

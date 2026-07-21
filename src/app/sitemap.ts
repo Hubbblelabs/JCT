@@ -9,10 +9,10 @@ const INSTITUTIONS = ["engineering", "arts-science", "polytechnic"] as const;
 
 function toEntry(
   route: string,
-  { changeFrequency, priority }: Pick<
-    MetadataRoute.Sitemap[number],
-    "changeFrequency" | "priority"
-  >,
+  {
+    changeFrequency,
+    priority,
+  }: Pick<MetadataRoute.Sitemap[number], "changeFrequency" | "priority">,
 ): MetadataRoute.Sitemap[number] {
   return {
     url: `${BASE_URL}${route}`,

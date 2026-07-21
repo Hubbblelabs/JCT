@@ -66,25 +66,61 @@
         {
           "company": "Zoho",
           "students": [
-            { "name": "Karthik Raja S", "program": "B.E. CSE", "package": "12 LPA" },
-            { "name": "Aravind Balaji R", "program": "B.E. CSE", "package": "6.5 LPA" },
-            { "name": "Nithya Sri M", "program": "B.E. ECE", "package": "6.5 LPA" }
+            {
+              "name": "Karthik Raja S",
+              "program": "B.E. CSE",
+              "package": "12 LPA"
+            },
+            {
+              "name": "Aravind Balaji R",
+              "program": "B.E. CSE",
+              "package": "6.5 LPA"
+            },
+            {
+              "name": "Nithya Sri M",
+              "program": "B.E. ECE",
+              "package": "6.5 LPA"
+            }
           ]
         },
         {
           "company": "Tata Consultancy Services",
           "students": [
-            { "name": "Priya Dharshini R", "program": "B.E. ECE", "package": "7 LPA" },
-            { "name": "Manoj Kumar S", "program": "B.E. Mechanical", "package": "3.6 LPA" },
-            { "name": "Kavya Lakshmi P", "program": "B.E. CSE", "package": "3.6 LPA" },
-            { "name": "Surya Prakash V", "program": "B.E. EEE", "package": "3.6 LPA" }
+            {
+              "name": "Priya Dharshini R",
+              "program": "B.E. ECE",
+              "package": "7 LPA"
+            },
+            {
+              "name": "Manoj Kumar S",
+              "program": "B.E. Mechanical",
+              "package": "3.6 LPA"
+            },
+            {
+              "name": "Kavya Lakshmi P",
+              "program": "B.E. CSE",
+              "package": "3.6 LPA"
+            },
+            {
+              "name": "Surya Prakash V",
+              "program": "B.E. EEE",
+              "package": "3.6 LPA"
+            }
           ]
         },
         {
           "company": "Cognizant Technology Solution",
           "students": [
-            { "name": "Sneha Lakshmi K", "program": "B.E. CSE", "package": "4.5 LPA" },
-            { "name": "Gokul Raj M", "program": "B.E. IT", "package": "4.5 LPA" }
+            {
+              "name": "Sneha Lakshmi K",
+              "program": "B.E. CSE",
+              "package": "4.5 LPA"
+            },
+            {
+              "name": "Gokul Raj M",
+              "program": "B.E. IT",
+              "package": "4.5 LPA"
+            }
           ]
         }
       ],
@@ -412,21 +448,41 @@
         {
           "company": "CRI Pumps",
           "students": [
-            { "name": "Sabari Vel M", "program": "Diploma Mechanical", "package": "2.4 LPA" },
-            { "name": "Praveen Kumar S", "program": "Diploma Mechanical", "package": "2.3 LPA" }
+            {
+              "name": "Sabari Vel M",
+              "program": "Diploma Mechanical",
+              "package": "2.4 LPA"
+            },
+            {
+              "name": "Praveen Kumar S",
+              "program": "Diploma Mechanical",
+              "package": "2.3 LPA"
+            }
           ]
         },
         {
           "company": "Windcare India Pvt Ltd",
           "students": [
-            { "name": "Keerthana S", "program": "Diploma EEE", "package": "2.2 LPA" },
-            { "name": "Vignesh R", "program": "Diploma EEE", "package": "2.2 LPA" }
+            {
+              "name": "Keerthana S",
+              "program": "Diploma EEE",
+              "package": "2.2 LPA"
+            },
+            {
+              "name": "Vignesh R",
+              "program": "Diploma EEE",
+              "package": "2.2 LPA"
+            }
           ]
         },
         {
           "company": "RV Constructions",
           "students": [
-            { "name": "Naveen Raj K", "program": "Diploma Civil", "package": "2 LPA" }
+            {
+              "name": "Naveen Raj K",
+              "program": "Diploma Civil",
+              "package": "2 LPA"
+            }
           ]
         }
       ],
@@ -515,7 +571,11 @@
         {
           "company": "Cognizant Technology Solution",
           "students": [
-            { "name": "Deepika Rani R", "program": "B.Sc Computer Science", "package": "4 LPA" },
+            {
+              "name": "Deepika Rani R",
+              "program": "B.Sc Computer Science",
+              "package": "4 LPA"
+            },
             { "name": "Vishnu Priya S", "program": "BCA", "package": "4 LPA" }
           ]
         },
@@ -528,8 +588,16 @@
         {
           "company": "KGISL",
           "students": [
-            { "name": "Bharath Raj R", "program": "B.Sc Computer Science", "package": "4.2 LPA" },
-            { "name": "Ramya Devi K", "program": "B.Sc AI & ML", "package": "4 LPA" }
+            {
+              "name": "Bharath Raj R",
+              "program": "B.Sc Computer Science",
+              "package": "4.2 LPA"
+            },
+            {
+              "name": "Ramya Devi K",
+              "program": "B.Sc AI & ML",
+              "package": "4 LPA"
+            }
           ]
         }
       ],

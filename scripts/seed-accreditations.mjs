@@ -28,7 +28,11 @@ import path from "path";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
 import mongoose from "mongoose";
-import { S3Client, PutObjectCommand, HeadObjectCommand } from "@aws-sdk/client-s3";
+import {
+  S3Client,
+  PutObjectCommand,
+  HeadObjectCommand,
+} from "@aws-sdk/client-s3";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DRY = process.argv.includes("--dry-run") || process.argv.includes("-n");
@@ -233,12 +237,19 @@ async function main() {
     console.error("[seed-accred] MONGODB_URI is required (env or .env).");
     process.exit(1);
   }
-  const { R2_ACCOUNT_ID, R2_ACCESS_KEY_ID, R2_SECRET_ACCESS_KEY, R2_BUCKET_NAME } =
-    env;
+  const {
+    R2_ACCOUNT_ID,
+    R2_ACCESS_KEY_ID,
+    R2_SECRET_ACCESS_KEY,
+    R2_BUCKET_NAME,
+  } = env;
   const R2_PUBLIC = env.NEXT_PUBLIC_R2_PUBLIC_URL || "";
   if (
     !DRY &&
-    (!R2_ACCOUNT_ID || !R2_ACCESS_KEY_ID || !R2_SECRET_ACCESS_KEY || !R2_BUCKET_NAME)
+    (!R2_ACCOUNT_ID ||
+      !R2_ACCESS_KEY_ID ||
+      !R2_SECRET_ACCESS_KEY ||
+      !R2_BUCKET_NAME)
   ) {
     console.error("[seed-accred] R2_* env vars are required to upload.");
     process.exit(1);
@@ -262,7 +273,8 @@ async function main() {
   const documentassets = db.collection("documentassets");
   const now = new Date();
 
-  const urlFor = (key) => (R2_PUBLIC ? `${R2_PUBLIC}/${key}` : `/api/public/images/${key}`);
+  const urlFor = (key) =>
+    R2_PUBLIC ? `${R2_PUBLIC}/${key}` : `/api/public/images/${key}`;
   const uploadCache = new Map(); // src rel path -> storage key
 
   // Upload one backup file (once) and record its asset row. `kind` is
@@ -277,7 +289,11 @@ async function main() {
     }
     const buf = fs.readFileSync(abs);
     const ext = path.extname(relPath).toLowerCase();
-    const hash = crypto.createHash("md5").update(relPath).digest("hex").slice(0, 8);
+    const hash = crypto
+      .createHash("md5")
+      .update(relPath)
+      .digest("hex")
+      .slice(0, 8);
     const key = `${kind}/accred-${slugify(altName)}-${hash}${ext}`;
     const mime = mimeFor(relPath);
 
@@ -355,7 +371,8 @@ async function main() {
   }
   const findLogo = (name) => {
     const n = String(name).toLowerCase().trim();
-    for (const [k, v] of logoByName) if (n.includes(k) || k.includes(n)) return v;
+    for (const [k, v] of logoByName)
+      if (n.includes(k) || k.includes(n)) return v;
     return "";
   };
 
@@ -366,10 +383,16 @@ async function main() {
     for (const e of entries) {
       const { logoSrc, certSrc, ...rest } = e;
       const clean = { ...rest };
-      if (logoSrc) clean.logo = await upload(logoSrc, "images", e.name, institution);
+      if (logoSrc)
+        clean.logo = await upload(logoSrc, "images", e.name, institution);
       if (!clean.logo) clean.logo = findLogo(e.name);
       if (certSrc)
-        clean.certificate = await upload(certSrc, "documents", e.name, institution);
+        clean.certificate = await upload(
+          certSrc,
+          "documents",
+          e.name,
+          institution,
+        );
       out.push(clean);
     }
     return out;

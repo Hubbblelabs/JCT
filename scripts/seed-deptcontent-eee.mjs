@@ -619,7 +619,8 @@ const PROGRAM = {
     // formats) — nothing here is fabricated.
     events: [
       {
-        title: "Springer International Conference on Artificial Intelligence and Smart Energy",
+        title:
+          "Springer International Conference on Artificial Intelligence and Smart Energy",
         date: "30.01.2025 to 31.01.2025",
         type: "International Conference",
         description: "",
@@ -647,14 +648,17 @@ const PROGRAM = {
         resourcePerson: "Mr. C. Karthik PumoTechnovations, Coimbatore",
       },
       {
-        title: "AICTE Sponsored International Conference on Recent Advances in Electrical Science and Technology",
+        title:
+          "AICTE Sponsored International Conference on Recent Advances in Electrical Science and Technology",
         date: "11.08.2025 to 13.08.2025",
         type: "International Conference",
         description: "",
-        resourcePerson: "Dr. P. Santhosh University of Cagliari, Italy Dr. M.A. Asha Rani NIT, Silchar",
+        resourcePerson:
+          "Dr. P. Santhosh University of Cagliari, Italy Dr. M.A. Asha Rani NIT, Silchar",
       },
       {
-        title: "IEEE International Conference on Intelligent Cyber Physical Systems and Internet of Things",
+        title:
+          "IEEE International Conference on Intelligent Cyber Physical Systems and Internet of Things",
         date: "17.09.2025 to 19.09.2025",
         type: "International Conference",
         description: "",
@@ -693,7 +697,8 @@ const PROGRAM = {
         date: "20.01.2024",
         type: "Alumni meet",
         description: "",
-        resourcePerson: "Dr.K.Geetha, Dean/Academics, HOD/EEE, JCT College of Engineering and Technology, Coimbatore.",
+        resourcePerson:
+          "Dr.K.Geetha, Dean/Academics, HOD/EEE, JCT College of Engineering and Technology, Coimbatore.",
       },
       {
         title: "Tenth graduation day",
@@ -707,14 +712,16 @@ const PROGRAM = {
         date: "09.02.2024",
         type: "Motivational Program",
         description: "",
-        resourcePerson: "Mr.Harikrishan N, Head, Social Initiatives, IIT Madras BS Degree",
+        resourcePerson:
+          "Mr.Harikrishan N, Head, Social Initiatives, IIT Madras BS Degree",
       },
       {
         title: "Ariviyalai Kondaduvom",
         date: "29.02.2024",
         type: "National Science Day Celebration",
         description: "",
-        resourcePerson: "Dr.K.Geetha, Dean/Academics, HOD/EEE, JCT College of Engineering and Technology, Coimbatore",
+        resourcePerson:
+          "Dr.K.Geetha, Dean/Academics, HOD/EEE, JCT College of Engineering and Technology, Coimbatore",
       },
       {
         title: "Voting Campaign",
@@ -728,7 +735,8 @@ const PROGRAM = {
         date: "08.03.2024",
         type: "Celebration",
         description: "",
-        resourcePerson: "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
+        resourcePerson:
+          "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
       },
       {
         title: "Campus Cleaning Program",
@@ -749,24 +757,28 @@ const PROGRAM = {
         date: "27.03.2024",
         type: "Awareness program",
         description: "",
-        resourcePerson: "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
+        resourcePerson:
+          "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
       },
       {
         title: "Jfinagles",
         date: "03.04.2024",
         type: "Symposium",
         description: "",
-        resourcePerson: "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
+        resourcePerson:
+          "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
       },
       {
         title: "Idea Generation to Business Launch",
         date: "23.04.2024",
         type: "Seminar",
         description: "",
-        resourcePerson: "Dr.M.Reshma, Assistant Professor, Department of Management, GRG School of Management Studies, PSGR Krishnammal college for Women, Coimbatore",
+        resourcePerson:
+          "Dr.M.Reshma, Assistant Professor, Department of Management, GRG School of Management Studies, PSGR Krishnammal college for Women, Coimbatore",
       },
       {
-        title: "Technological Advancements in Science, Engineering and Management (ICTASEM -24)",
+        title:
+          "Technological Advancements in Science, Engineering and Management (ICTASEM -24)",
         date: "26.04.2024 & 27.04.2024",
         type: "International Conference",
         description: "",
@@ -777,63 +789,73 @@ const PROGRAM = {
         date: "08.05.2024 &09.05.2024",
         type: "PROJECT EXPO 2K24",
         description: "",
-        resourcePerson: "Principal, Dean/ Academics, IQAC Director and all Head of the Department reviewed the Demo presentation",
+        resourcePerson:
+          "Principal, Dean/ Academics, IQAC Director and all Head of the Department reviewed the Demo presentation",
       },
       {
         title: "Mega Passport Service Camp",
         date: "17.05.2024 & 18.05.2024",
         type: "Passport Camp",
         description: "",
-        resourcePerson: "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
+        resourcePerson:
+          "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
       },
       {
         title: "Tools and Techniques to Enhance Effective Research in AI Era",
         date: "28.05.2024",
         type: "International Seminar",
         description: "",
-        resourcePerson: "Dr.SanthoshParamasivam, University of Cagliari, Cagliari, Italy",
+        resourcePerson:
+          "Dr.SanthoshParamasivam, University of Cagliari, Cagliari, Italy",
       },
       {
         title: "Innovative Curriculum Design and Implementation",
         date: "01.06.2024",
         type: "Workshop",
         description: "",
-        resourcePerson: "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
+        resourcePerson:
+          "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
       },
       {
         title: "Drugs awareness",
         date: "24.06.2024",
         type: "Awareness programme",
         description: "",
-        resourcePerson: "Mr.Kumerasen , Sub inspector of police, K G Chavady , Coimbatore",
+        resourcePerson:
+          "Mr.Kumerasen , Sub inspector of police, K G Chavady , Coimbatore",
       },
       {
         title: "கார்கில் வெற்றிதினவிழா",
         date: "26.7.2024",
         type: "Celebration",
         description: "",
-        resourcePerson: "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
+        resourcePerson:
+          "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
       },
       {
         title: "National Education Policy",
         date: "29.7.2024",
         type: "Anniversary",
         description: "",
-        resourcePerson: "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
+        resourcePerson:
+          "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
       },
       {
         title: "Electric Vehicle Charging System",
         date: "01.08.24",
         type: "Alumni talk",
         description: "",
-        resourcePerson: "Er.A.Arun, Batch (2021-2023), Maintenance Engineer (Electrical), M/S.Emirates National Oil Company LLC (ENOC), Dubai",
+        resourcePerson:
+          "Er.A.Arun, Batch (2021-2023), Maintenance Engineer (Electrical), M/S.Emirates National Oil Company LLC (ENOC), Dubai",
       },
       {
-        title: "Intelligent Cyber Physical Systems and Internet Of Things (ICOICI 2024)",
+        title:
+          "Intelligent Cyber Physical Systems and Internet Of Things (ICOICI 2024)",
         date: "30.08..2024",
         type: "International Conference",
         description: "",
-        resourcePerson: "DrArnasMajumder, Professor, Environmental and Architectural Engineering, University of Cagliari, Sardinia, Italy",
+        resourcePerson:
+          "DrArnasMajumder, Professor, Environmental and Architectural Engineering, University of Cagliari, Sardinia, Italy",
       },
       {
         title: "Association Inauguration",
@@ -854,7 +876,8 @@ const PROGRAM = {
         date: "18.9.2024",
         type: "Inauguration",
         description: "",
-        resourcePerson: "Mr.V.NANDHAKUMAR,IRSanCommisioner of Income Tax, Department of Revenue, Ministry of Finance, Government of India",
+        resourcePerson:
+          "Mr.V.NANDHAKUMAR,IRSanCommisioner of Income Tax, Department of Revenue, Ministry of Finance, Government of India",
       },
       {
         title: "JCT IAS Academy",
@@ -868,91 +891,107 @@ const PROGRAM = {
         date: "20.09.2024",
         type: "Guest lecture",
         description: "",
-        resourcePerson: "Dr. N. AmeenaBibi, Associate Professor and Head of Department (In Charge) at Government College of Engineering, Dharmapuri",
+        resourcePerson:
+          "Dr. N. AmeenaBibi, Associate Professor and Head of Department (In Charge) at Government College of Engineering, Dharmapuri",
       },
       {
         title: "International Day of Peace",
         date: "21.09.2024",
         type: "Celebration",
         description: "",
-        resourcePerson: "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
+        resourcePerson:
+          "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
       },
       {
         title: "Mega Job Fair 2024",
         date: "05.10.2024",
         type: "Mega Job Fair 2024",
         description: "",
-        resourcePerson: "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
+        resourcePerson:
+          "Dr.S.Manoharan, Principal, JCT College of Engineering and Technology, Coimbatore.",
       },
       {
-        title: "Challenges and Opportunities in Scaling Renewable Energy for Electric vehicles",
+        title:
+          "Challenges and Opportunities in Scaling Renewable Energy for Electric vehicles",
         date: "16.10.2024",
         type: "Seminar",
         description: "",
-        resourcePerson: "Dr.D.Magdalin Mary, Assistant Professor at Sri Krishna College of Technology, Coimbatore",
+        resourcePerson:
+          "Dr.D.Magdalin Mary, Assistant Professor at Sri Krishna College of Technology, Coimbatore",
       },
       {
         title: "Mastering Arduino simulation with tinker CAD",
         date: "17.10.2024",
         type: "Hands on training",
         description: "",
-        resourcePerson: "Dr.M.Kavitha, Associate Professor, Department of Electrical and Electronics Engineering, Sathyabama Institute of Science and Technology, Chennai",
+        resourcePerson:
+          "Dr.M.Kavitha, Associate Professor, Department of Electrical and Electronics Engineering, Sathyabama Institute of Science and Technology, Chennai",
       },
       {
         title: "Opportunities in automotive’s embedded systems",
         date: "26.10.2024",
         type: "Career Guidance Program",
         description: "",
-        resourcePerson: "Er.P.M.Prabakaran, Associate Technical Architect, Jaguar Land Rover, Gayon, U K",
+        resourcePerson:
+          "Er.P.M.Prabakaran, Associate Technical Architect, Jaguar Land Rover, Gayon, U K",
       },
       {
         title: "Graduation day",
         date: "23.11.24",
         type: "Graduation day",
         description: "",
-        resourcePerson: "Prof AmiyakumarRath Honourable vice chancellor, BijuPatnaik University",
+        resourcePerson:
+          "Prof AmiyakumarRath Honourable vice chancellor, BijuPatnaik University",
       },
       {
         title: "Research Recognition Day",
         date: "23.11.24",
         type: "Research Recognition Day",
         description: "",
-        resourcePerson: "Prof. Amiya Kumar Rath Honourable Vice Chancellor, BijuPatnaik University of Technology, Odisha",
+        resourcePerson:
+          "Prof. Amiya Kumar Rath Honourable Vice Chancellor, BijuPatnaik University of Technology, Odisha",
       },
       {
         title: "Energy Efficient Electrical Machines",
         date: "14.12.2024",
         type: "Seminar",
         description: "",
-        resourcePerson: "Dr.S.Manoharan, Professor and Principal, JCT College of Engineering and Technology, Coimbatore",
+        resourcePerson:
+          "Dr.S.Manoharan, Professor and Principal, JCT College of Engineering and Technology, Coimbatore",
       },
       {
         title: "Christmas day celebration",
         date: "23.12.2024",
         type: "Celebration",
         description: "",
-        resourcePerson: "Dr.S.Manoharan, Proncipal, JCT College of Engineering & Technology, COimbatore",
+        resourcePerson:
+          "Dr.S.Manoharan, Proncipal, JCT College of Engineering & Technology, COimbatore",
       },
       {
-        title: "Innovation & Entrepreneurship Outreach Program in Schools / Community",
+        title:
+          "Innovation & Entrepreneurship Outreach Program in Schools / Community",
         date: "17.07.2023",
         type: "Entrepreneurship",
         description: "",
-        resourcePerson: "Dr.K.Geetha, Head of Department, Electrical and Electronics Engineering",
+        resourcePerson:
+          "Dr.K.Geetha, Head of Department, Electrical and Electronics Engineering",
       },
       {
-        title: "Recent trends and challenges in power generation and power quality improvement techniques",
+        title:
+          "Recent trends and challenges in power generation and power quality improvement techniques",
         date: "17.07.2023-21.07.2023",
         type: "Five days online Faculty Development programme",
         description: "",
-        resourcePerson: "1. Er.V.S.Sriraja Balaguru, Assistant Engineer, Electrical Control and instrumentation Division, MTPS -II 2. Mr.M.Vijaya Kumar, Assistant Engineer, Operation and Efficiency, MTPS-I",
+        resourcePerson:
+          "1. Er.V.S.Sriraja Balaguru, Assistant Engineer, Electrical Control and instrumentation Division, MTPS -II 2. Mr.M.Vijaya Kumar, Assistant Engineer, Operation and Efficiency, MTPS-I",
       },
       {
         title: "Technical quiz for third Year Students",
         date: "12.08.2023",
         type: "Technical quiz program",
         description: "",
-        resourcePerson: "Dr.K.Geetha, Head of Department, Electrical and E;lectronics Engineering",
+        resourcePerson:
+          "Dr.K.Geetha, Head of Department, Electrical and E;lectronics Engineering",
       },
       {
         title: "Independence Day",
@@ -966,7 +1005,8 @@ const PROGRAM = {
         date: "21.08.2023",
         type: "Webinar",
         description: "",
-        resourcePerson: "Mr.Srinivas Sambandam, Managing Director, Galaxy Educational Consultants, Coimbatore.",
+        resourcePerson:
+          "Mr.Srinivas Sambandam, Managing Director, Galaxy Educational Consultants, Coimbatore.",
       },
       {
         title: "I year Inaugural",
@@ -976,18 +1016,21 @@ const PROGRAM = {
         resourcePerson: "Solvendhar Sukisivam",
       },
       {
-        title: "Introduction to Cyber Security- The Smart Power Metering Systems",
+        title:
+          "Introduction to Cyber Security- The Smart Power Metering Systems",
         date: "24.08.2023",
         type: "Webinar",
         description: "",
-        resourcePerson: "Mr.K.Manoj Prabhakar, hardware Security Researcher, Thrissur, Kerala",
+        resourcePerson:
+          "Mr.K.Manoj Prabhakar, hardware Security Researcher, Thrissur, Kerala",
       },
       {
         title: "Design Thinking & Innovation",
         date: "15.09.2023",
         type: "Webinar",
         description: "",
-        resourcePerson: "Dr.Marsaline Beno, Dean Research & Professor/EEE, St Xavier’s Catholic College of Engineering, Kanyakumari",
+        resourcePerson:
+          "Dr.Marsaline Beno, Dean Research & Professor/EEE, St Xavier’s Catholic College of Engineering, Kanyakumari",
       },
       {
         title: "Talent Hunt",
@@ -1008,7 +1051,8 @@ const PROGRAM = {
         date: "03.11.2023",
         type: "Webinar",
         description: "",
-        resourcePerson: "Mr.A.Arun,MaintenanceEngineer (Electrical), Emirates National Oil Company LLC (ENOC), Dubai",
+        resourcePerson:
+          "Mr.A.Arun,MaintenanceEngineer (Electrical), Emirates National Oil Company LLC (ENOC), Dubai",
       },
       {
         title: "Promoting Safety for Women",
@@ -1029,7 +1073,8 @@ const PROGRAM = {
         date: "09.11.2023",
         type: "National educational day celebration",
         description: "",
-        resourcePerson: "Dr.T.Lawrence, Deputy Tahsildar ,MadukkaraiTaluk, Coimbatore",
+        resourcePerson:
+          "Dr.T.Lawrence, Deputy Tahsildar ,MadukkaraiTaluk, Coimbatore",
       },
       {
         title: "Internal Hackathon",
@@ -1050,7 +1095,8 @@ const PROGRAM = {
         date: "22.11.2023",
         type: "Seminar",
         description: "",
-        resourcePerson: "Dr.M.Siva Ramkumar, IIC Innovation Ambassador,Assistant Professor- EEE,Karpagam college of Higher Education, Coimbatore",
+        resourcePerson:
+          "Dr.M.Siva Ramkumar, IIC Innovation Ambassador,Assistant Professor- EEE,Karpagam college of Higher Education, Coimbatore",
       },
       {
         title: "Exposure and field visit for Problem Identification",
@@ -1095,14 +1141,17 @@ const PROGRAM = {
         resourcePerson: "Dept. of EEE",
       },
       {
-        title: "Opportunities of higher Education for Electrical engineers in Overseas",
+        title:
+          "Opportunities of higher Education for Electrical engineers in Overseas",
         date: "23/05/2022",
         type: "Webinar",
         description: "",
-        resourcePerson: "Mr.Shibily Rahiman Ulladasseri, Warsaw University of Technology,Poland",
+        resourcePerson:
+          "Mr.Shibily Rahiman Ulladasseri, Warsaw University of Technology,Poland",
       },
       {
-        title: "Embedded System Application Development Program for Absolute Beginners",
+        title:
+          "Embedded System Application Development Program for Absolute Beginners",
         date: "3/7/2022",
         type: "Inaugural function of Association of ECE and EEE",
         description: "",
@@ -1113,7 +1162,8 @@ const PROGRAM = {
         date: "03.09.2022",
         type: "Webinar",
         description: "",
-        resourcePerson: "Mrs.S.Barathi, M.E (CAD/CAM), Manager (Technical), Central Institute of Petrochemical Engineering and Technology (CIPET), Mysuru.",
+        resourcePerson:
+          "Mrs.S.Barathi, M.E (CAD/CAM), Manager (Technical), Central Institute of Petrochemical Engineering and Technology (CIPET), Mysuru.",
       },
       {
         title: "Onam Aaramb",
@@ -1130,7 +1180,8 @@ const PROGRAM = {
         resourcePerson: "Dr.P.Surya Narayanan (PHD English), Coimbatore.",
       },
       {
-        title: "Department of Electrical and Electronics Engineering signed MOU with IPCS Global Solutions Pvt Ltd",
+        title:
+          "Department of Electrical and Electronics Engineering signed MOU with IPCS Global Solutions Pvt Ltd",
         date: "08/03/2022",
         type: "MoU",
         description: "",
@@ -1144,11 +1195,13 @@ const PROGRAM = {
         resourcePerson: "Ms.Sangeetha Veerachi, AP(Sr.G),SREC",
       },
       {
-        title: "Embedded System Application Development Program for Absolute Beginners",
+        title:
+          "Embedded System Application Development Program for Absolute Beginners",
         date: "15.06.2020",
         type: "Webinar",
         description: "",
-        resourcePerson: "Mr.Boobalan T, Master Trainer FSIPD, IoT and Embedded Specialist (Certified from Texas Instruments)",
+        resourcePerson:
+          "Mr.Boobalan T, Master Trainer FSIPD, IoT and Embedded Specialist (Certified from Texas Instruments)",
       },
       {
         title: "World Environment Day Celebration",
@@ -1162,7 +1215,8 @@ const PROGRAM = {
         date: "19/02/2020",
         type: "Association Inaugral",
         description: "",
-        resourcePerson: "Mr.R.Arun Prakash, COE Lead – EAS IPM EDM Practice, Cognizant.",
+        resourcePerson:
+          "Mr.R.Arun Prakash, COE Lead – EAS IPM EDM Practice, Cognizant.",
       },
       {
         title: "Electrical Machines",
@@ -1200,32 +1254,38 @@ const PROGRAM = {
         resourcePerson: "Department of EEE",
       },
       {
-        title: "Development of Renewable Energy Sources for Rural Electrification",
+        title:
+          "Development of Renewable Energy Sources for Rural Electrification",
         date: "19.11.2018",
         type: "National Level Workshop",
         description: "",
-        resourcePerson: "Dr.A.K.Natesan, Chairman-  ISTE Tamil Nadu &Pondichery Section, Excel Group Institutions, Namakkal",
+        resourcePerson:
+          "Dr.A.K.Natesan, Chairman-  ISTE Tamil Nadu &Pondichery Section, Excel Group Institutions, Namakkal",
       },
       {
-        title: "“RTICET – 16” Emerging Trends in Electrical, Electronics and Computer Engineering",
+        title:
+          "“RTICET – 16” Emerging Trends in Electrical, Electronics and Computer Engineering",
         date: "04.04.2018",
         type: "National Conference",
         description: "",
-        resourcePerson: "Mrs. K. Suganthi, Managing Director MASS Solar Systems Pvt Ltd",
+        resourcePerson:
+          "Mrs. K. Suganthi, Managing Director MASS Solar Systems Pvt Ltd",
       },
       {
         title: "Discrete Time Systems And Signal Processing",
         date: "26.03.2018",
         type: "Guest Lecture",
         description: "",
-        resourcePerson: "Dr. M. Saravanan, Associate Professor, SNS College of Technology",
+        resourcePerson:
+          "Dr. M. Saravanan, Associate Professor, SNS College of Technology",
       },
       {
         title: "Advanced Technology in Solar System",
         date: "09.03.2018",
         type: "Seminar",
         description: "",
-        resourcePerson: "Mr. C. Sivakumar & Mr. M. Nambidass Technical Executive",
+        resourcePerson:
+          "Mr. C. Sivakumar & Mr. M. Nambidass Technical Executive",
       },
       {
         title: "Industrial Automation Tools and Techniques",
@@ -1239,28 +1299,32 @@ const PROGRAM = {
         date: "02.03.2018",
         type: "Workshop",
         description: "",
-        resourcePerson: "Mr. M. Surendar & Mr. T.R. Kiran, Autodesk Certified Instructor",
+        resourcePerson:
+          "Mr. M. Surendar & Mr. T.R. Kiran, Autodesk Certified Instructor",
       },
       {
         title: "Solar Energy",
         date: "15.02.2018 to 16.02.2018",
         type: "Industrial Workshop",
         description: "",
-        resourcePerson: "Mrs. K. Suganthi, Managing Director MASS Solar Systems Pvt Ltd",
+        resourcePerson:
+          "Mrs. K. Suganthi, Managing Director MASS Solar Systems Pvt Ltd",
       },
       {
         title: "Internet of Things",
         date: "21.09.2017 to 22.09.2017",
         type: "Workshop",
         description: "",
-        resourcePerson: "Mr. K. Sasi Kumar, Sr. CRG Engineer & Mr. Dhanush, CRG Engineer",
+        resourcePerson:
+          "Mr. K. Sasi Kumar, Sr. CRG Engineer & Mr. Dhanush, CRG Engineer",
       },
       {
         title: "LITEBRITZ – ‘Glow with Flow’",
         date: "12.09.2017",
         type: "Workshop",
         description: "",
-        resourcePerson: "Mr. Samuel Dilton, Project Engineer & Mr. Kabilan, Manager Business Development IPCS Automation, Coimbatore",
+        resourcePerson:
+          "Mr. Samuel Dilton, Project Engineer & Mr. Kabilan, Manager Business Development IPCS Automation, Coimbatore",
       },
       {
         title: "Power System Analysis",
@@ -1281,70 +1345,82 @@ const PROGRAM = {
         date: "27.08.2016",
         type: "LITEBRITZ",
         description: "",
-        resourcePerson: "Mr.S.A.Kannan Scientist/Engineer ‘SG’ Indian Space Reasearch Organization, Bengaluru",
+        resourcePerson:
+          "Mr.S.A.Kannan Scientist/Engineer ‘SG’ Indian Space Reasearch Organization, Bengaluru",
       },
       {
         title: "Hands on Training in Embedded Systems",
         date: "24.08.2016",
         type: "Workshop",
         description: "",
-        resourcePerson: "Ms.Subha Sree, Technical Manager, BETA Technologies, Coimbatore",
+        resourcePerson:
+          "Ms.Subha Sree, Technical Manager, BETA Technologies, Coimbatore",
       },
       {
         title: "Electrical Machines",
         date: "23.08.2016",
         type: "Guest Lecture",
         description: "",
-        resourcePerson: "Dr.Kaliya Moorthy, Professor/Dr. Mahalingam College of Engg and Tech, Pollachi",
+        resourcePerson:
+          "Dr.Kaliya Moorthy, Professor/Dr. Mahalingam College of Engg and Tech, Pollachi",
       },
       {
-        title: "Basics of Remote Sensing, Geographical Information System & Global Navigation Satellite System",
+        title:
+          "Basics of Remote Sensing, Geographical Information System & Global Navigation Satellite System",
         date: "22.08.2016 to 18.11.2016",
         type: "Guest Lecture",
         description: "",
-        resourcePerson: "Online Course Coordinator : Mr. N.Abner Leo, Assistant Professor,   JCT College of Engineering and Technology, Coimbatore",
+        resourcePerson:
+          "Online Course Coordinator : Mr. N.Abner Leo, Assistant Professor,   JCT College of Engineering and Technology, Coimbatore",
       },
       {
         title: "PLC Training",
         date: "19.08.2016",
         type: "Seminar",
         description: "",
-        resourcePerson: "Mr. Ezhanchelian, Senior Technical Engineer, Prolific Systems, Coimbatore",
+        resourcePerson:
+          "Mr. Ezhanchelian, Senior Technical Engineer, Prolific Systems, Coimbatore",
       },
       {
         title: "Linear Integrated Circuits",
         date: "01.10.2016",
         type: "Guest Lecture",
         description: "",
-        resourcePerson: "Mr. Kishore, ASP/Dr. Mahalingam College of Technology, Pollachi",
+        resourcePerson:
+          "Mr. Kishore, ASP/Dr. Mahalingam College of Technology, Pollachi",
       },
       {
-        title: "“RTICET – 16” Recent Trends in Information, Communication and Electrical Technologies",
+        title:
+          "“RTICET – 16” Recent Trends in Information, Communication and Electrical Technologies",
         date: "02.04.2016",
         type: "National Conference",
         description: "",
-        resourcePerson: "Mr. Mohan Kumar, Managing Director, Skypro Technologies, Bangalore",
+        resourcePerson:
+          "Mr. Mohan Kumar, Managing Director, Skypro Technologies, Bangalore",
       },
       {
         title: "“JFINAGLES “ Symposium of JCT Institutions",
         date: "24.02.2016",
         type: "Guest Lecture",
         description: "",
-        resourcePerson: "G.S.Venkata Subramani, Managing Director, SG Structural Engineering, Coimbatore.",
+        resourcePerson:
+          "G.S.Venkata Subramani, Managing Director, SG Structural Engineering, Coimbatore.",
       },
       {
         title: "Embedded Systems",
         date: "15.02.2016 to 18.02.2016",
         type: "Hands-on Training",
         description: "",
-        resourcePerson: "Ms. Subha Sree, Technical Engineer, BETA Technologies, Coimbatore",
+        resourcePerson:
+          "Ms. Subha Sree, Technical Engineer, BETA Technologies, Coimbatore",
       },
       {
         title: "LITEBRITZ – ‘Glow with Flow’",
         date: "07.09.2015",
         type: "Association Inagrual",
         description: "",
-        resourcePerson: "Prof.R.JAyachandran,Former Project Officer, NISTADS,Govt. of India",
+        resourcePerson:
+          "Prof.R.JAyachandran,Former Project Officer, NISTADS,Govt. of India",
       },
       {
         title: "Power System Analysis",
@@ -1358,35 +1434,40 @@ const PROGRAM = {
         date: "09.09.2015",
         type: "Guest Lecture",
         description: "",
-        resourcePerson: "Mr.Rajasekaran R, Senior Design Engineer, Beta Tecnologies, Coimbatore",
+        resourcePerson:
+          "Mr.Rajasekaran R, Senior Design Engineer, Beta Tecnologies, Coimbatore",
       },
       {
         title: "Digital Logic Circuits and Electro Magnetic Theory",
         date: "15.09.2015",
         type: "Guest Lecture",
         description: "",
-        resourcePerson: "Mr. V. Karthikeyan, Team Leader (DLC & FPGA), SIGRO Technologies, Coimbatore",
+        resourcePerson:
+          "Mr. V. Karthikeyan, Team Leader (DLC & FPGA), SIGRO Technologies, Coimbatore",
       },
       {
         title: "Power System Operation and Control",
         date: "15.09.2015",
         type: "Guest Lecture",
         description: "",
-        resourcePerson: "Mr. H. F. B. Anthony Manoj, R&D Engineer, Alpha Research and Development, Coimbatore",
+        resourcePerson:
+          "Mr. H. F. B. Anthony Manoj, R&D Engineer, Alpha Research and Development, Coimbatore",
       },
       {
         title: "Measurements & Instrumentation",
         date: "16.02.2016",
         type: "Guest Lecture",
         description: "",
-        resourcePerson: "Mrs. Rajeswari, ASP/Adithya Institute of Technology, Coimbatore",
+        resourcePerson:
+          "Mrs. Rajeswari, ASP/Adithya Institute of Technology, Coimbatore",
       },
       {
         title: "FACTS",
         date: "20.04.2016",
         type: "Guest Lecture",
         description: "",
-        resourcePerson: "Mr.Rajasekaran R, AP/SNS College of Technology, Coimbatore",
+        resourcePerson:
+          "Mr.Rajasekaran R, AP/SNS College of Technology, Coimbatore",
       },
     ],
 

@@ -156,9 +156,8 @@ function RecruitersPageInner() {
           <h1 className="admin-page-title">Placement Highlights — {label}</h1>
           <p className="admin-page-subtitle">
             Section copy for the placement carousel on the {label} page. Company
-            logos come from{" "}
-            {college ? "this college" : "every college"}&apos;s placement
-            records.
+            logos come from {college ? "this college" : "every college"}&apos;s
+            placement records.
           </p>
         </div>
       </div>

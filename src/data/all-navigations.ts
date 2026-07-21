@@ -3,12 +3,16 @@ export type NavChild = {
   href: string;
   desc?: string;
   className?: string;
+  /** Set when `href` resolves to an uploaded PDF — the link opens in a new tab. */
+  isFile?: boolean;
 };
 
 export type NavItem = {
   name: string;
   href: string;
   className?: string;
+  /** Set when `href` resolves to an uploaded PDF — the link opens in a new tab. */
+  isFile?: boolean;
   children?: NavChild[];
 };
 

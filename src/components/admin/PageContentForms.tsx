@@ -18,6 +18,7 @@ import {
   TextArea,
   TextInput,
 } from "@/components/admin/inputs";
+import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
 import {
   LIMITS_pamphlet,
   ENG_HERO_LIMITS,
@@ -1092,14 +1093,18 @@ export function PamphletForm({
               label="Button Label"
               value={value.applyLabel ?? ""}
               maxLength={LIMITS_pamphlet.applyLabelMax}
-              onChange={(e) => onChange({ ...value, applyLabel: e.target.value })}
+              onChange={(e) =>
+                onChange({ ...value, applyLabel: e.target.value })
+              }
               placeholder="Apply Now"
             />
             <TextInput
               label="Button Link"
               value={value.applyHref ?? ""}
               maxLength={LIMITS_pamphlet.applyHrefMax}
-              onChange={(e) => onChange({ ...value, applyHref: e.target.value })}
+              onChange={(e) =>
+                onChange({ ...value, applyHref: e.target.value })
+              }
               placeholder="https://admissions.jct.ac.in"
             />
           </div>
@@ -2427,6 +2432,8 @@ export type NavbarChildVal = {
   id?: string;
   label?: string;
   href?: string;
+  /** Storage key of an uploaded PDF. When set it overrides `href`. */
+  file?: string;
   desc?: string;
   visible?: boolean;
 };
@@ -2435,6 +2442,8 @@ export type NavbarItemVal = {
   id?: string;
   label?: string;
   href?: string;
+  /** Storage key of an uploaded PDF. When set it overrides `href`. */
+  file?: string;
   desc?: string;
   visible?: boolean;
   children?: NavbarChildVal[];
@@ -2511,10 +2520,19 @@ function ChildEditor({
         <TextInput
           label="URL / Href"
           value={child.href ?? ""}
+          disabled={!!child.file}
           onChange={(e) => onChange({ ...child, href: e.target.value })}
-          placeholder="/path or https://..."
+          placeholder={
+            child.file ? "Using uploaded PDF" : "/path or https://..."
+          }
         />
       </div>
+      <DocumentUploadInput
+        label="PDF (optional)"
+        hint="Upload a PDF to make this submenu item open the file in a new tab instead of following the URL."
+        value={child.file ?? ""}
+        onChange={(file) => onChange({ ...child, file })}
+      />
       <TextInput
         label="Description (optional)"
         value={child.desc ?? ""}
@@ -2609,10 +2627,21 @@ function NavbarItemEditor({
             <TextInput
               label="URL / Href"
               value={item.href ?? ""}
+              disabled={!!item.file}
               onChange={(e) => onChange({ ...item, href: e.target.value })}
-              placeholder="/path or # for dropdown only"
+              placeholder={
+                item.file
+                  ? "Using uploaded PDF"
+                  : "/path or # for dropdown only"
+              }
             />
           </div>
+          <DocumentUploadInput
+            label="PDF (optional)"
+            hint="Upload a PDF to make this menu item open the file in a new tab instead of following the URL."
+            value={item.file ?? ""}
+            onChange={(file) => onChange({ ...item, file })}
+          />
           <TextInput
             label="Description (optional)"
             value={item.desc ?? ""}
@@ -2786,6 +2815,10 @@ export function NavbarAdminSection({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  // This section renders inside PageContentShell's DeferredUploadsProvider, so
+  // PDF picks are held as `pending:` placeholders until flushed. Its own save
+  // button bypasses the shell's save, so it has to flush them itself.
+  const deferred = useDeferredUploadsOptional();
 
   useEffect(() => {
     let cancelled = false;
@@ -2812,6 +2845,8 @@ export function NavbarAdminSection({
     setSaving(true);
     setMsg(null);
     try {
+      const flushedNav = deferred ? await deferred.flush(navbarVal) : navbarVal;
+      if (deferred) setNavbarVal(flushedNav);
       const put = (config_key: string, value: unknown) =>
         fetch("/api/admin/site-config", {
           method: "PUT",
@@ -2820,12 +2855,15 @@ export function NavbarAdminSection({
         });
       const [hr, nr] = await Promise.all([
         put(headerConfigKey, headerVal),
-        put(navbarConfigKey, navbarVal),
+        put(navbarConfigKey, flushedNav),
       ]);
       const ok = hr.ok && nr.ok;
       setMsg({ ok, text: ok ? "Saved!" : "Save failed." });
-    } catch {
-      setMsg({ ok: false, text: "Save failed." });
+    } catch (err) {
+      setMsg({
+        ok: false,
+        text: err instanceof Error ? err.message : "Save failed.",
+      });
     } finally {
       setSaving(false);
     }

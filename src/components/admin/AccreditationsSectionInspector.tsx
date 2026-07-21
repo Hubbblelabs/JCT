@@ -148,8 +148,6 @@ export function AccreditationsSectionInspector({
       );
 
     default:
-      return (
-        <p className="text-sm text-gray-500">Select a section to edit.</p>
-      );
+      return <p className="text-sm text-gray-500">Select a section to edit.</p>;
   }
 }

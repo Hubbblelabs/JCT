@@ -687,9 +687,9 @@ function LifeAtJctMainEditor() {
           ))}
         </div>
         <p className="mt-2 text-xs text-gray-500">
-          Overwrites the checked institution&apos;s own Life at JCT content
-          with what&apos;s shown above on save. Each institution stays
-          independently editable afterward.
+          Overwrites the checked institution&apos;s own Life at JCT content with
+          what&apos;s shown above on save. Each institution stays independently
+          editable afterward.
         </p>
       </div>
       <button
