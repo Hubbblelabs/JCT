@@ -12,7 +12,9 @@ export const PLACEMENT_INFO_LIMITS = {
   mouItemsMax: 80,
   whyPointsMax: 12,
   processStepsMax: 15,
-  contactsMax: 12,
+  // A college's placement cell is one director plus a per-department
+  // coordinator, so the list runs well past a handful of officers.
+  contactsMax: 40,
   headingMax: 160,
   descriptionMax: 1500,
 } as const;

@@ -88,11 +88,16 @@ function gradientFor(name: string): string {
   return MONOGRAM_GRADIENTS[hashString(name) % MONOGRAM_GRADIENTS.length];
 }
 
+// Honorifics carry no identity — without stripping them every TPO officer's
+// monogram would read "MR" or "DR".
+const HONORIFICS = new Set(["mr", "mrs", "ms", "dr", "prof", "shri", "smt"]);
+
 function initials(name: string): string {
   const words = name
     .replace(/[^a-zA-Z0-9\s]/g, " ")
     .trim()
-    .split(/\s+/);
+    .split(/\s+/)
+    .filter((w) => !HONORIFICS.has(w.toLowerCase()));
   if (words.length === 0 || !words[0]) return "•";
   if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
   return (words[0][0] + words[1][0]).toUpperCase();

@@ -23,6 +23,8 @@
     "seed:faculty:dry": "node scripts/seed-faculty.mjs --dry-run",
     "seed:placements": "node scripts/seed-placements.mjs",
     "seed:placements:dry": "node scripts/seed-placements.mjs --dry-run",
+    "seed:placementinfo": "node scripts/seed-placement-info.mjs",
+    "seed:placementinfo:dry": "node scripts/seed-placement-info.mjs --dry-run",
     "seed:accreditations": "node scripts/seed-accreditations.mjs",
     "seed:accreditations:dry": "node scripts/seed-accreditations.mjs --dry-run",
     "seed:lifeatjct": "node scripts/seed-life-at-jct.mjs",
