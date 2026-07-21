@@ -649,55 +649,63 @@ function MouSection({
       {data.items.length === 0 && editable && (
         <EmptyHint>Click to add MoUs</EmptyHint>
       )}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      {/* Two columns from md up; partner logos vary wildly in aspect ratio, so
+          each gets a fixed padded tile it can `object-contain` into rather than
+          a cramped icon slot. */}
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         {data.items.map((m, i) => {
           const logo = getImageUrl(m.logo);
           const card = (
-            <div className="border-border flex h-full flex-col rounded-2xl border bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
-              <div className="mb-3 flex items-center gap-3">
-                {logo ? (
-                  <div className="relative h-10 w-10 shrink-0">
-                    <Image
-                      src={logo}
-                      alt={m.organization}
-                      fill
-                      sizes="40px"
-                      className="rounded-lg object-contain"
-                      loading="lazy"
-                    />
-                  </div>
-                ) : (
-                  <Monogram
-                    name={m.organization || "MoU"}
-                    className="h-10 w-10 shrink-0 rounded-lg text-xs"
+            <div className="border-border flex h-full flex-col gap-4 rounded-2xl border bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md sm:flex-row sm:p-6">
+              {logo ? (
+                <div className="relative h-24 w-full shrink-0 overflow-hidden rounded-xl border border-stone-100 bg-stone-50 sm:w-28 lg:w-32">
+                  <Image
+                    src={logo}
+                    alt={m.organization}
+                    fill
+                    sizes="(max-width: 640px) 100vw, 128px"
+                    className="object-contain p-3"
+                    loading="lazy"
                   />
-                )}
-                <h3 className="text-navy min-w-0 font-serif text-base font-bold">
-                  {m.organization}
-                </h3>
-                {m.href && (
-                  <ExternalLink size={14} className="ml-auto text-stone-300" />
-                )}
-              </div>
-              {m.purpose && (
-                <p className="text-sm leading-relaxed text-stone-600">
-                  {m.purpose}
-                </p>
+                </div>
+              ) : (
+                <Monogram
+                  name={m.organization || "MoU"}
+                  className="h-24 w-full shrink-0 rounded-xl text-2xl sm:w-28 lg:w-32"
+                />
               )}
-              {(m.signedOn || m.validity) && (
-                <div className="mt-4 flex flex-wrap gap-2 border-t border-stone-100 pt-3">
-                  {m.signedOn && (
-                    <span className="flex items-center gap-1.5 rounded-full bg-stone-50 px-2.5 py-1 text-[11px] font-bold text-stone-500">
-                      <CalendarDays size={11} /> Signed {m.signedOn}
-                    </span>
-                  )}
-                  {m.validity && (
-                    <span className="bg-accent/10 text-accent rounded-full px-2.5 py-1 text-[11px] font-bold">
-                      Valid {m.validity}
-                    </span>
+              <div className="flex min-w-0 flex-1 flex-col">
+                <div className="flex items-start gap-2">
+                  <h3 className="text-navy min-w-0 flex-1 font-serif text-base leading-snug font-bold lg:text-lg">
+                    {m.organization}
+                  </h3>
+                  {m.href && (
+                    <ExternalLink
+                      size={15}
+                      className="mt-1 shrink-0 text-stone-300"
+                    />
                   )}
                 </div>
-              )}
+                {m.purpose && (
+                  <p className="mt-2 text-sm leading-relaxed text-stone-600">
+                    {m.purpose}
+                  </p>
+                )}
+                {(m.signedOn || m.validity) && (
+                  <div className="mt-4 flex flex-wrap gap-2 border-t border-stone-100 pt-3">
+                    {m.signedOn && (
+                      <span className="flex items-center gap-1.5 rounded-full bg-stone-50 px-2.5 py-1 text-[11px] font-bold text-stone-500">
+                        <CalendarDays size={11} /> Signed {m.signedOn}
+                      </span>
+                    )}
+                    {m.validity && (
+                      <span className="bg-accent/10 text-accent rounded-full px-2.5 py-1 text-[11px] font-bold">
+                        Valid {m.validity}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           );
           return m.href ? (
@@ -708,12 +716,14 @@ function MouSection({
               rel={
                 /^https?:\/\//i.test(m.href) ? "noopener noreferrer" : undefined
               }
-              className="block"
+              className="block h-full"
             >
               {card}
             </Link>
           ) : (
-            <div key={`${m.organization}-${i}`}>{card}</div>
+            <div key={`${m.organization}-${i}`} className="h-full">
+              {card}
+            </div>
           );
         })}
       </div>
