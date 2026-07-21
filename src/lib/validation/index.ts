@@ -93,6 +93,15 @@ export type {
   NotablePlacementValue,
 } from "./placements";
 
+export { PlacementInfoSchema, PLACEMENT_INFO_LIMITS } from "./placementInfo";
+export type {
+  PlacementInfoValue,
+  MouItemValue,
+  WhyRecruitPointValue,
+  ProcessStepValue,
+  TpoContactValue,
+} from "./placementInfo";
+
 export {
   RecruitersSectionSchema,
   RECRUITERS_SECTION_LIMITS,

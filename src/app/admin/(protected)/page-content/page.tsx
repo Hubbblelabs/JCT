@@ -34,6 +34,11 @@ import {
   type NavbarVal,
 } from "@/components/admin/PageContentForms";
 import {
+  PlacementInfoForm,
+  PLACEMENT_INFO_DEFAULT,
+  type PlacementInfoVal,
+} from "@/components/admin/PlacementInfoForm";
+import {
   ImageUploadInput,
   Select,
   TextArea,
@@ -501,6 +506,31 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
   );
 }
 
+const PLACEMENT_INFO_KEY: Record<College, string> = {
+  engineering: "engineeringPlacementInfo",
+  "arts-science": "artsSciencePlacementInfo",
+  polytechnic: "polytechnicPlacementInfo",
+};
+
+// Static copy for /institutions/<college>/placements — MoUs, the recruiter
+// pitch, the process, TPO contacts, and the page's sidebar nav. Year-wise
+// numbers stay in the dedicated Placements admin page.
+function placementInfoSection(college: College): SectionDef {
+  return {
+    id: "placementInfo",
+    label: "Placements Page",
+    kind: "form",
+    configKey: PLACEMENT_INFO_KEY[college],
+    defaultValue: PLACEMENT_INFO_DEFAULT,
+    render: (v, onChange) => (
+      <PlacementInfoForm
+        value={v as Partial<PlacementInfoVal> | undefined}
+        onChange={onChange}
+      />
+    ),
+  };
+}
+
 function sectionsFor(college: College): SectionDef[] {
   if (college === "engineering") {
     return [
@@ -575,6 +605,7 @@ function sectionsFor(college: College): SectionDef[] {
           />
         ),
       },
+      placementInfoSection("engineering"),
       {
         id: "testimonials",
         label: "Voices / Testimonials",
@@ -636,6 +667,7 @@ function sectionsFor(college: College): SectionDef[] {
           />
         ),
       },
+      placementInfoSection("arts-science"),
       {
         id: "testimonials",
         label: "Testimonials",
@@ -693,6 +725,7 @@ function sectionsFor(college: College): SectionDef[] {
         <LifeAtJctForm value={(v as LifeAtJctVal) ?? {}} onChange={onChange} />
       ),
     },
+    placementInfoSection("polytechnic"),
     {
       id: "testimonials",
       label: "Testimonials",

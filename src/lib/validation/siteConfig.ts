@@ -38,6 +38,7 @@ import {
   HomeStatisticsSchema,
 } from "./homeSections";
 import { RecruitersSectionSchema } from "./recruiters";
+import { PlacementInfoSchema } from "./placementInfo";
 import { HeaderSchema, FooterSchema } from "./globalCms";
 import { FloatingElementsSchema } from "./floatingElements";
 import { CampusLifePageSchema } from "./campusLifePage";
@@ -78,6 +79,9 @@ export const SITE_CONFIG_SCHEMAS = {
   engineeringPlacementHighlights: RecruitersSectionSchema,
   artsSciencePlacementHighlights: RecruitersSectionSchema,
   polytechnicPlacementHighlights: RecruitersSectionSchema,
+  engineeringPlacementInfo: PlacementInfoSchema,
+  artsSciencePlacementInfo: PlacementInfoSchema,
+  polytechnicPlacementInfo: PlacementInfoSchema,
   header: HeaderSchema,
   mainHeader: HeaderSchema,
   engineeringHeader: HeaderSchema,
@@ -151,6 +155,9 @@ export const SITE_CONFIG_KEY_INSTITUTION: Partial<
   engineeringPlacementHighlights: "engineering",
   artsSciencePlacementHighlights: "arts-science",
   polytechnicPlacementHighlights: "polytechnic",
+  engineeringPlacementInfo: "engineering",
+  artsSciencePlacementInfo: "arts-science",
+  polytechnicPlacementInfo: "polytechnic",
   artsScienceHero: "arts-science",
   artsScienceHeroStats: "arts-science",
   artsScienceLifeAtJct: "arts-science",

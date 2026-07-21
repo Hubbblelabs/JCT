@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PlacementsPageLayout } from "@/components/layout/PlacementsPageLayout";
 import { listPublicPlacements } from "@/lib/public-placements";
+import { getPlacementInfo } from "@/lib/public-placement-info";
 
 export const revalidate = 3600;
 
@@ -11,6 +12,15 @@ export const metadata: Metadata = {
 };
 
 export default async function ArtsSciencePlacementsPage() {
-  const records = await listPublicPlacements("arts-science");
-  return <PlacementsPageLayout institution="arts-science" records={records} />;
+  const [records, info] = await Promise.all([
+    listPublicPlacements("arts-science"),
+    getPlacementInfo("arts-science"),
+  ]);
+  return (
+    <PlacementsPageLayout
+      institution="arts-science"
+      records={records}
+      info={info}
+    />
+  );
 }
