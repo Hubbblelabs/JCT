@@ -51,10 +51,10 @@ const INSTITUTION_LABELS: Record<string, string> = {
 // reorder, hide, or extend this list via the `sidebar.navItems` override on the
 // <college>PlacementInfo site-config key.
 export const PLACEMENT_NAV_DEFAULTS: SidebarNavDefault[] = [
+  { anchor: "process", navLabel: "Placement Process", icon: ClipboardList },
+  { anchor: "tpo", navLabel: "TPO Contacts", icon: Phone },
   { anchor: "mou", navLabel: "MoUs & Collaborations", icon: FileText },
   { anchor: "why-recruit", navLabel: "Why Recruit at JCT", icon: Star },
-  { anchor: "tpo", navLabel: "TPO Contacts", icon: Phone },
-  { anchor: "process", navLabel: "Placement Process", icon: ClipboardList },
   { anchor: "overview", navLabel: "Placement Highlights", icon: TrendingUp },
   { anchor: "recruiters", navLabel: "Our Recruiters", icon: Building2 },
   { anchor: "achievers", navLabel: "Placed Students", icon: GraduationCap },
@@ -177,11 +177,24 @@ function PlacementSideNav({
   items,
   activeId,
   onNavigate,
+  records,
+  selectedId,
+  onSelectYear,
 }: {
   items: ResolvedSidebarItem[];
   activeId: string;
   onNavigate: (anchor: string) => void;
+  records: PublicPlacement[];
+  selectedId: string;
+  onSelectYear: (id: string) => void;
 }) {
+  // The year list is the entry point to the year-wise data: the current year is
+  // selected by default (records arrive is_current-first) and past years sit
+  // under it, so visitors switch years from the sidebar instead of a separate
+  // row above the stats.
+  const pastYears = records.filter((r) => !r.is_current);
+  const currentYears = records.filter((r) => r.is_current);
+
   return (
     <>
       {/* Mobile: horizontally scrollable pill bar */}
@@ -223,6 +236,36 @@ function PlacementSideNav({
           })}
         </div>
       </div>
+
+      {/* Mobile: year pills, directly under the section pills */}
+      {records.length > 1 && (
+        <div className="-mx-4 mt-2 w-full overflow-x-auto px-4 pb-2 lg:hidden">
+          <div className="flex w-max items-center gap-2">
+            <span className="text-xs font-bold tracking-wider text-stone-400 uppercase">
+              Year
+            </span>
+            {records.map((r) => {
+              const active = r._id === selectedId;
+              return (
+                <button
+                  key={r._id}
+                  type="button"
+                  onClick={() => onSelectYear(r._id)}
+                  aria-pressed={active}
+                  className={`rounded-full border px-3.5 py-2 text-xs font-bold whitespace-nowrap transition-colors ${
+                    active
+                      ? "border-accent bg-accent/10 text-accent"
+                      : "border-border text-navy bg-white hover:bg-stone-50"
+                  }`}
+                >
+                  {r.year}
+                  {r.is_current && " · Latest"}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Desktop: sticky "On This Page" card */}
       <nav className="border-border hidden rounded-2xl border bg-white p-5 shadow-sm lg:block">
@@ -275,8 +318,81 @@ function PlacementSideNav({
             );
           })}
         </div>
+
+        {records.length > 0 && (
+          <div className="border-border mt-5 border-t pt-5">
+            <h3 className="text-navy mb-3 text-xs font-bold tracking-[0.15em] uppercase">
+              Placement Data
+            </h3>
+            <div className="space-y-1">
+              {currentYears.map((r) => (
+                <YearButton
+                  key={r._id}
+                  record={r}
+                  active={r._id === selectedId}
+                  onSelect={onSelectYear}
+                />
+              ))}
+            </div>
+            {pastYears.length > 0 && (
+              <>
+                <p className="mt-4 mb-2 text-[11px] font-bold tracking-wider text-stone-400 uppercase">
+                  View Past Years
+                </p>
+                <div className="space-y-1">
+                  {pastYears.map((r) => (
+                    <YearButton
+                      key={r._id}
+                      record={r}
+                      active={r._id === selectedId}
+                      onSelect={onSelectYear}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </nav>
     </>
+  );
+}
+
+function YearButton({
+  record,
+  active,
+  onSelect,
+}: {
+  record: PublicPlacement;
+  active: boolean;
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(record._id)}
+      aria-pressed={active}
+      className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors ${
+        active
+          ? "bg-accent/10 text-accent ring-accent/30 ring-1"
+          : "text-navy hover:bg-stone-50"
+      }`}
+    >
+      <CalendarDays
+        size={16}
+        className={`shrink-0 ${active ? "text-accent" : "text-stone-400"}`}
+      />
+      <span className="min-w-0 flex-1">{record.year}</span>
+      {record.is_current && (
+        <span
+          className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold tracking-wide uppercase ${
+            active ? "bg-accent text-white" : "bg-accent/10 text-accent"
+          }`}
+        >
+          Latest
+        </span>
+      )}
+    </button>
   );
 }
 
@@ -892,52 +1008,6 @@ function CompanyPlacements({ record }: { record: PublicPlacement }) {
   );
 }
 
-// Year switcher pinned at the top of the placement-data section — lets visitors
-// jump straight to any year's record (current or previous) instead of hunting
-// through an accordion at the bottom.
-function YearSwitcher({
-  records,
-  selectedId,
-  onSelect,
-}: {
-  records: PublicPlacement[];
-  selectedId: string;
-  onSelect: (id: string) => void;
-}) {
-  if (records.length <= 1) return null;
-  return (
-    <div className="mb-10 flex flex-wrap gap-2">
-      {records.map((r) => {
-        const active = r._id === selectedId;
-        return (
-          <button
-            key={r._id}
-            type="button"
-            onClick={() => onSelect(r._id)}
-            aria-pressed={active}
-            className={`rounded-full border px-4 py-2 text-sm font-bold transition-colors ${
-              active
-                ? "border-navy bg-navy text-white shadow-sm"
-                : "border-border text-navy bg-white hover:bg-stone-50"
-            }`}
-          >
-            {r.year}
-            {r.is_current && (
-              <span
-                className={`ml-2 rounded-full px-1.5 py-0.5 text-[10px] font-bold tracking-wide uppercase ${
-                  active ? "bg-accent text-white" : "bg-accent/10 text-accent"
-                }`}
-              >
-                Latest
-              </span>
-            )}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export function PlacementsPageLayout({
@@ -1029,6 +1099,13 @@ export function PlacementsPageLayout({
     window.scrollTo({ top, behavior: "smooth" });
   };
 
+  // Switching years from the sidebar swaps the record in place; on mobile the
+  // year pills sit above the content, so jump to the stats the choice affects.
+  const handleSelectYear = (id: string) => {
+    setSelectedId(id);
+    if (window.innerWidth < 1024) handleNavigate("overview");
+  };
+
   const isEmpty = records.length === 0 && present.size === 0;
 
   return (
@@ -1058,47 +1135,44 @@ export function PlacementsPageLayout({
             </div>
           ) : (
             <>
-              {navItems.length > 0 && (
-                <div className="mb-6 lg:hidden">
-                  <PlacementSideNav
-                    items={navItems}
-                    activeId={activeId}
-                    onNavigate={handleNavigate}
-                  />
-                </div>
-              )}
+              <div className="mb-6 lg:hidden">
+                <PlacementSideNav
+                  items={navItems}
+                  activeId={activeId}
+                  onNavigate={handleNavigate}
+                  records={records}
+                  selectedId={active?._id ?? ""}
+                  onSelectYear={handleSelectYear}
+                />
+              </div>
 
               <div className="lg:grid lg:grid-cols-[280px_1fr] lg:gap-10 xl:grid-cols-[300px_1fr] xl:gap-12">
-                {navItems.length > 0 && (
-                  <div className="hidden lg:block">
-                    <div className="sticky top-28">
-                      <PlacementSideNav
-                        items={navItems}
-                        activeId={activeId}
-                        onNavigate={handleNavigate}
-                      />
-                    </div>
+                <div className="hidden lg:block">
+                  <div className="sticky top-28">
+                    <PlacementSideNav
+                      items={navItems}
+                      activeId={activeId}
+                      onNavigate={handleNavigate}
+                      records={records}
+                      selectedId={active?._id ?? ""}
+                      onSelectYear={handleSelectYear}
+                    />
                   </div>
-                )}
+                </div>
 
                 <div className="min-w-0 space-y-16">
+                  {present.has("process") && (
+                    <ProcessSection data={info.process} />
+                  )}
+                  {present.has("tpo") && <TpoSection data={info.tpo} />}
                   {present.has("mou") && <MouSection data={info.mou} />}
                   {present.has("why-recruit") && (
                     <WhyRecruitSection data={info.whyRecruit} label={label} />
-                  )}
-                  {present.has("tpo") && <TpoSection data={info.tpo} />}
-                  {present.has("process") && (
-                    <ProcessSection data={info.process} />
                   )}
 
                   {active && (
                     <>
                       <section id="overview" className="scroll-mt-28">
-                        <YearSwitcher
-                          records={records}
-                          selectedId={active._id}
-                          onSelect={setSelectedId}
-                        />
                         <CurrentYear record={active} />
                       </section>
                       {present.has("recruiters") && (

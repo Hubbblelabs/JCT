@@ -78,6 +78,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: Briefcase,
     },
     {
+      label: "Placements Page",
+      href: "/admin/page-content?college=engineering&section=placementInfo",
+      icon: ScrollText,
+    },
+    {
       label: "Placement Highlights",
       href: "/admin/recruiters?college=engineering",
       icon: Award,
@@ -140,6 +145,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       icon: Briefcase,
     },
     {
+      label: "Placements Page",
+      href: "/admin/page-content?college=arts-science&section=placementInfo",
+      icon: ScrollText,
+    },
+    {
       label: "Placement Highlights",
       href: "/admin/recruiters?college=arts-science",
       icon: Award,
@@ -195,6 +205,11 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       label: "Placements",
       href: "/admin/placements?college=polytechnic",
       icon: Briefcase,
+    },
+    {
+      label: "Placements Page",
+      href: "/admin/page-content?college=polytechnic&section=placementInfo",
+      icon: ScrollText,
     },
     {
       label: "Placement Highlights",
@@ -406,8 +421,7 @@ function TabNavInner() {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const menuProps = (key: string) => ({
     onMouseEnter: () => setOpenMenu(key),
-    onMouseLeave: () =>
-      setOpenMenu((cur) => (cur === key ? null : cur)),
+    onMouseLeave: () => setOpenMenu((cur) => (cur === key ? null : cur)),
     onFocus: () => setOpenMenu(key),
     onBlur: (e: React.FocusEvent<HTMLDivElement>) => {
       if (!e.currentTarget.contains(e.relatedTarget as Node)) {
@@ -525,9 +539,7 @@ function TabNavInner() {
                     key={item.href}
                     href={item.href}
                     className={`admin-nav-dropdown-item ${
-                      isItemActive(item.href, pathname, url)
-                        ? "active"
-                        : ""
+                      isItemActive(item.href, pathname, url) ? "active" : ""
                     }`}
                   >
                     <item.icon size={14} />
@@ -555,9 +567,7 @@ function TabNavInner() {
                     key={item.href}
                     href={item.href}
                     className={`admin-nav-dropdown-item ${
-                      isItemActive(item.href, pathname, url)
-                        ? "active"
-                        : ""
+                      isItemActive(item.href, pathname, url) ? "active" : ""
                     }`}
                   >
                     <item.icon size={14} />
@@ -591,9 +601,7 @@ function TabNavInner() {
                       key={item.href}
                       href={item.href}
                       className={`admin-nav-dropdown-item ${
-                        isItemActive(item.href, pathname, url)
-                          ? "active"
-                          : ""
+                        isItemActive(item.href, pathname, url) ? "active" : ""
                       }`}
                     >
                       <item.icon size={14} />

@@ -108,135 +108,37 @@ export function PlacementInfoForm({
         is hidden on the public page until it has at least one entry.
       </p>
 
-      <Accordion title="MoUs & Collaborations" defaultOpen>
+      <Accordion title="Placement Process" defaultOpen>
         <TextInput
           label="Heading"
-          value={data.mou.heading}
+          value={data.process.heading}
           onChange={(e) =>
-            patch({ mou: { ...data.mou, heading: e.target.value } })
+            patch({ process: { ...data.process, heading: e.target.value } })
           }
-          placeholder="MoUs & Collaborations"
+          placeholder="Placement Process"
         />
         <TextArea
           label="Intro"
           rows={3}
-          value={data.mou.description}
+          value={data.process.description}
           onChange={(e) =>
-            patch({ mou: { ...data.mou, description: e.target.value } })
-          }
-          hint="Shown above the MoU cards."
-        />
-        <Repeater<MouItem>
-          label="MoUs"
-          items={data.mou.items}
-          onChange={(items) => patch({ mou: { ...data.mou, items } })}
-          onItemRemove={(item) => {
-            if (item.logo.startsWith("pending:")) discardAll();
-          }}
-          newItem={() => ({
-            organization: "",
-            logo: "",
-            purpose: "",
-            signedOn: "",
-            validity: "",
-            href: "",
-          })}
-          renderItem={(item, _i, onItemChange) => (
-            <div className="grid grid-cols-1 gap-3 pr-8 sm:grid-cols-2">
-              <TextInput
-                label="Organization"
-                value={item.organization}
-                onChange={(e) =>
-                  onItemChange({ ...item, organization: e.target.value })
-                }
-                placeholder="Infosys Ltd."
-              />
-              <ImageUploadInput
-                label="Logo"
-                value={item.logo}
-                onChange={(url) => onItemChange({ ...item, logo: url })}
-                hideUrlField
-              />
-              <div className="sm:col-span-2">
-                <TextArea
-                  label="Purpose"
-                  rows={2}
-                  value={item.purpose}
-                  onChange={(e) =>
-                    onItemChange({ ...item, purpose: e.target.value })
-                  }
-                  placeholder="Internships, joint certification programmes…"
-                />
-              </div>
-              <TextInput
-                label="Signed On"
-                value={item.signedOn}
-                onChange={(e) =>
-                  onItemChange({ ...item, signedOn: e.target.value })
-                }
-                placeholder="March 2024"
-              />
-              <TextInput
-                label="Validity"
-                value={item.validity}
-                onChange={(e) =>
-                  onItemChange({ ...item, validity: e.target.value })
-                }
-                placeholder="3 years"
-              />
-              <div className="sm:col-span-2">
-                <TextInput
-                  label="Link (optional)"
-                  value={item.href}
-                  onChange={(e) =>
-                    onItemChange({ ...item, href: e.target.value })
-                  }
-                  placeholder="https://…"
-                  hint="Makes the card clickable."
-                />
-              </div>
-            </div>
-          )}
-        />
-      </Accordion>
-
-      <Accordion title="Why Recruit at JCT">
-        <TextInput
-          label="Heading"
-          value={data.whyRecruit.heading}
-          onChange={(e) =>
-            patch({
-              whyRecruit: { ...data.whyRecruit, heading: e.target.value },
-            })
-          }
-          placeholder="Why Recruit at JCT"
-        />
-        <TextArea
-          label="Intro"
-          rows={3}
-          value={data.whyRecruit.description}
-          onChange={(e) =>
-            patch({
-              whyRecruit: { ...data.whyRecruit, description: e.target.value },
-            })
+            patch({ process: { ...data.process, description: e.target.value } })
           }
         />
-        <Repeater<WhyRecruitPoint>
-          label="Reasons"
-          items={data.whyRecruit.points}
-          onChange={(points) =>
-            patch({ whyRecruit: { ...data.whyRecruit, points } })
-          }
+        <Repeater<ProcessStep>
+          label="Steps"
+          items={data.process.steps}
+          onChange={(steps) => patch({ process: { ...data.process, steps } })}
           newItem={() => ({ title: "", desc: "" })}
-          renderItem={(item, _i, onItemChange) => (
+          renderItem={(item, i, onItemChange) => (
             <div className="space-y-3 pr-8">
               <TextInput
-                label="Title"
+                label={`Step ${i + 1} title`}
                 value={item.title}
                 onChange={(e) =>
                   onItemChange({ ...item, title: e.target.value })
                 }
-                placeholder="Industry-ready graduates"
+                placeholder="Company registration"
               />
               <TextArea
                 label="Description"
@@ -370,37 +272,135 @@ export function PlacementInfoForm({
         />
       </Accordion>
 
-      <Accordion title="Placement Process">
+      <Accordion title="MoUs & Collaborations">
         <TextInput
           label="Heading"
-          value={data.process.heading}
+          value={data.mou.heading}
           onChange={(e) =>
-            patch({ process: { ...data.process, heading: e.target.value } })
+            patch({ mou: { ...data.mou, heading: e.target.value } })
           }
-          placeholder="Placement Process"
+          placeholder="MoUs & Collaborations"
         />
         <TextArea
           label="Intro"
           rows={3}
-          value={data.process.description}
+          value={data.mou.description}
           onChange={(e) =>
-            patch({ process: { ...data.process, description: e.target.value } })
+            patch({ mou: { ...data.mou, description: e.target.value } })
+          }
+          hint="Shown above the MoU cards."
+        />
+        <Repeater<MouItem>
+          label="MoUs"
+          items={data.mou.items}
+          onChange={(items) => patch({ mou: { ...data.mou, items } })}
+          onItemRemove={(item) => {
+            if (item.logo.startsWith("pending:")) discardAll();
+          }}
+          newItem={() => ({
+            organization: "",
+            logo: "",
+            purpose: "",
+            signedOn: "",
+            validity: "",
+            href: "",
+          })}
+          renderItem={(item, _i, onItemChange) => (
+            <div className="grid grid-cols-1 gap-3 pr-8 sm:grid-cols-2">
+              <TextInput
+                label="Organization"
+                value={item.organization}
+                onChange={(e) =>
+                  onItemChange({ ...item, organization: e.target.value })
+                }
+                placeholder="Infosys Ltd."
+              />
+              <ImageUploadInput
+                label="Logo"
+                value={item.logo}
+                onChange={(url) => onItemChange({ ...item, logo: url })}
+                hideUrlField
+              />
+              <div className="sm:col-span-2">
+                <TextArea
+                  label="Purpose"
+                  rows={2}
+                  value={item.purpose}
+                  onChange={(e) =>
+                    onItemChange({ ...item, purpose: e.target.value })
+                  }
+                  placeholder="Internships, joint certification programmes…"
+                />
+              </div>
+              <TextInput
+                label="Signed On"
+                value={item.signedOn}
+                onChange={(e) =>
+                  onItemChange({ ...item, signedOn: e.target.value })
+                }
+                placeholder="March 2024"
+              />
+              <TextInput
+                label="Validity"
+                value={item.validity}
+                onChange={(e) =>
+                  onItemChange({ ...item, validity: e.target.value })
+                }
+                placeholder="3 years"
+              />
+              <div className="sm:col-span-2">
+                <TextInput
+                  label="Link (optional)"
+                  value={item.href}
+                  onChange={(e) =>
+                    onItemChange({ ...item, href: e.target.value })
+                  }
+                  placeholder="https://…"
+                  hint="Makes the card clickable."
+                />
+              </div>
+            </div>
+          )}
+        />
+      </Accordion>
+
+      <Accordion title="Why Recruit at JCT">
+        <TextInput
+          label="Heading"
+          value={data.whyRecruit.heading}
+          onChange={(e) =>
+            patch({
+              whyRecruit: { ...data.whyRecruit, heading: e.target.value },
+            })
+          }
+          placeholder="Why Recruit at JCT"
+        />
+        <TextArea
+          label="Intro"
+          rows={3}
+          value={data.whyRecruit.description}
+          onChange={(e) =>
+            patch({
+              whyRecruit: { ...data.whyRecruit, description: e.target.value },
+            })
           }
         />
-        <Repeater<ProcessStep>
-          label="Steps"
-          items={data.process.steps}
-          onChange={(steps) => patch({ process: { ...data.process, steps } })}
+        <Repeater<WhyRecruitPoint>
+          label="Reasons"
+          items={data.whyRecruit.points}
+          onChange={(points) =>
+            patch({ whyRecruit: { ...data.whyRecruit, points } })
+          }
           newItem={() => ({ title: "", desc: "" })}
-          renderItem={(item, i, onItemChange) => (
+          renderItem={(item, _i, onItemChange) => (
             <div className="space-y-3 pr-8">
               <TextInput
-                label={`Step ${i + 1} title`}
+                label="Title"
                 value={item.title}
                 onChange={(e) =>
                   onItemChange({ ...item, title: e.target.value })
                 }
-                placeholder="Company registration"
+                placeholder="Industry-ready graduates"
               />
               <TextArea
                 label="Description"
