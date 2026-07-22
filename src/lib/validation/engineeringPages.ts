@@ -30,6 +30,13 @@ export const RESEARCH_PAGE_LIMITS = {
   centresMax: 24,
   publicationsMax: 60,
   focusMax: 12,
+  // Sidebar tabs. `tabListMax` is generous because a single tab can hold a long
+  // reference list (e.g. the funding-agency roll).
+  tabsMax: 12,
+  tabSectionsMax: 20,
+  tabListMax: 80,
+  tabCardsMax: 24,
+  tabPeopleMax: 60,
 } as const;
 
 const ResearchStatSchema = z.object({
@@ -58,8 +65,82 @@ const PublicationSchema = z.object({
   link: s(500),
 });
 
+// ─── Research sidebar tabs ───────────────────────────────────────────────────
+// Mirrors the Tab/Section shape in src/lib/program-tabs.ts so the Research page
+// renders through the same sidebar-tabs pattern as a program page, and the admin
+// can drive it with the existing <ProgramTabsEditor />. Program content is a
+// `Mixed` Mongo field validated only at read time; a SiteConfig key is validated
+// on every write, so the same shape is restated here as Zod.
+//
+// `richText` is the only untrusted-HTML carrier — always render it through
+// sanitizeHtml(), which allows tables and links but strips scripts and styles.
+
+const ResearchTabSectionSchema = z.discriminatedUnion("kind", [
+  z.object({ kind: z.literal("richText"), html: s(20000) }),
+  z.object({
+    kind: z.literal("stats"),
+    items: z
+      .array(z.object({ label: s(60), value: s(30), sub: s(60).optional() }))
+      .max(RESEARCH_PAGE_LIMITS.statsMax)
+      .default([]),
+  }),
+  z.object({
+    kind: z.literal("list"),
+    title: s(160).optional(),
+    items: z.array(s(600)).max(RESEARCH_PAGE_LIMITS.tabListMax).default([]),
+  }),
+  z.object({
+    kind: z.literal("cards"),
+    title: s(160).optional(),
+    items: z
+      .array(
+        z.object({
+          title: s(200),
+          description: s(1200),
+          image: s(500).optional(),
+        }),
+      )
+      .max(RESEARCH_PAGE_LIMITS.tabCardsMax)
+      .default([]),
+  }),
+  z.object({
+    kind: z.literal("image"),
+    src: s(500),
+    caption: s(300).optional(),
+  }),
+  z.object({
+    kind: z.literal("people"),
+    items: z
+      .array(
+        z.object({
+          name: s(160),
+          title: s(200),
+          image: s(500).optional(),
+          email: s(200).optional(),
+          qualifications: s(300).optional(),
+        }),
+      )
+      .max(RESEARCH_PAGE_LIMITS.tabPeopleMax)
+      .default([]),
+  }),
+]);
+
+const ResearchTabSchema = z.object({
+  id: s(60),
+  label: s(120),
+  icon: s(40).optional(),
+  sections: z
+    .array(ResearchTabSectionSchema)
+    .max(RESEARCH_PAGE_LIMITS.tabSectionsMax)
+    .default([]),
+});
+
 export const ResearchPageSchema = z.object({
   hero: HeroSchema,
+  // When non-empty the page renders as sidebar tabs (programs-style) and the
+  // flat sections below are ignored. Empty keeps the original single-column
+  // layout, so this is additive for any page that predates tabs.
+  tabs: z.array(ResearchTabSchema).max(RESEARCH_PAGE_LIMITS.tabsMax).default([]),
   intro: z.array(s(2000)).max(RESEARCH_PAGE_LIMITS.introMax).default([]),
   stats: z
     .array(ResearchStatSchema)
@@ -80,6 +161,8 @@ export const ResearchPageSchema = z.object({
 });
 
 export type ResearchPageValue = z.infer<typeof ResearchPageSchema>;
+export type ResearchTabValue = z.infer<typeof ResearchTabSchema>;
+export type ResearchTabSectionValue = z.infer<typeof ResearchTabSectionSchema>;
 export type ResearchCentreValue = z.infer<typeof ResearchCentreSchema>;
 export type PublicationValue = z.infer<typeof PublicationSchema>;
 

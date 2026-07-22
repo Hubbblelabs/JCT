@@ -290,6 +290,8 @@ export {
 } from "./engineeringPages";
 export type {
   ResearchPageValue,
+  ResearchTabValue,
+  ResearchTabSectionValue,
   ResearchCentreValue,
   PublicationValue,
   GroupsPageValue,

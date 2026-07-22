@@ -9,6 +9,8 @@ import {
   ItemsEditor,
   Repeater,
 } from "@/components/admin/inputs";
+import { ProgramTabsEditor } from "@/components/admin/ProgramTabsEditor";
+import type { Tab } from "@/lib/program-tabs";
 import type {
   ResearchPageValue,
   ResearchCentreValue,
@@ -17,6 +19,7 @@ import type {
 
 type Stat = ResearchPageValue["stats"][number];
 type Area = ResearchPageValue["areas"][number];
+type ResearchTab = ResearchPageValue["tabs"][number];
 
 export function ResearchSectionInspector({
   section,
@@ -48,6 +51,23 @@ export function ResearchSectionInspector({
             onChange={(e) =>
               patch({ hero: { ...data.hero, subtitle: e.target.value } })
             }
+          />
+        </>
+      );
+
+    // Reuses the program builder's tab editor — the Research tab shape mirrors
+    // TabsProgram exactly, so the two stay editable through one component.
+    case "tabs":
+      return (
+        <>
+          <div className="admin-label mb-2">Sidebar tabs</div>
+          <p className="mb-3 text-xs text-gray-400">
+            Adding a tab switches the public page to the sidebar layout; the
+            single-column sections below are then hidden.
+          </p>
+          <ProgramTabsEditor
+            tabs={data.tabs as Tab[]}
+            onChange={(tabs) => patch({ tabs: tabs as ResearchTab[] })}
           />
         </>
       );
