@@ -1,0 +1,52 @@
+name: Build and Deploy
+
+on:
+  push:
+    branches:
+      - v2-admin
+
+jobs:
+
+  build-and-push:
+    name: Build Docker Images and Push
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+
+      - name: Build and Push Images
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+
+        run: |
+          docker compose -f docker-compose.build.yaml build --push
+
+
+  deploy:
+    name: Deploy to Server
+    needs: build-and-push
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Deploy using SSH password
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: 182.74.148.66
+          username: root
+          password: ${{ secrets.SSH_PASSWORD }}
+
+          script: |
+            cd jct
+            docker compose pull
+            docker compose up -d --remove-orphans
