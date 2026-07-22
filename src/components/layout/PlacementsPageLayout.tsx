@@ -31,6 +31,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
 import { EditableRegion } from "@/components/admin/EditableRegion";
+import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
 import { getImageUrl } from "@/lib/utils";
 import {
   resolveSidebarItems,
@@ -54,12 +55,13 @@ const INSTITUTION_LABELS: Record<string, string> = {
 // students, company-wise) is not here — it lives on the Placement records and
 // is edited under /admin/placements.
 export type PlacementEditableSection =
-  "process" | "tpo" | "mou" | "why-recruit" | "sidebar";
+  "banner" | "process" | "tpo" | "mou" | "why-recruit" | "sidebar";
 
 export const PLACEMENT_SECTION_LABELS: Record<
   PlacementEditableSection,
   string
 > = {
+  banner: "Top Banner",
   process: "Placement Process",
   tpo: "TPO Contacts",
   mou: "MoUs & Collaborations",
@@ -611,6 +613,132 @@ function PastYearSelect({
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+// ─── Top banner ──────────────────────────────────────────────────────────────
+
+// Poster artwork (the annual "Distinguished Alumni" sheet and friends) carries
+// its own layout, type, and aspect ratio, so it renders at its natural shape
+// instead of being cropped into one of the fixed frames the rest of the page
+// uses.
+function BannerImage({
+  src,
+  alt,
+  priority,
+}: {
+  src: string;
+  alt: string;
+  priority: boolean;
+}) {
+  // Inside the admin editor a freshly-picked file is still a `pending:`
+  // placeholder backed by a blob: URL — next/image accepts neither, so the
+  // live preview falls back to a plain <img> until the upload is flushed.
+  const deferred = useDeferredUploadsOptional();
+  const [failed, setFailed] = useState(false);
+  const isPending = src.startsWith("pending:");
+  const pendingPreview = isPending ? (deferred?.getPreview(src) ?? null) : null;
+  const url = isPending ? null : getImageUrl(src);
+
+  if (pendingPreview) {
+    return <img src={pendingPreview} alt={alt} className="h-auto w-full" />;
+  }
+
+  if (!url || failed) {
+    return (
+      <div className="flex aspect-video w-full items-center justify-center bg-stone-50 text-sm text-stone-400">
+        {isPending ? "Uploading on save…" : "Image unavailable"}
+      </div>
+    );
+  }
+
+  return (
+    <Image
+      src={url}
+      alt={alt}
+      // Only a pre-load placeholder — `h-auto` hands the final height back to
+      // the image's own ratio, which is whatever the poster was designed at.
+      width={1600}
+      height={900}
+      sizes="(max-width: 1280px) 100vw, 1200px"
+      className="h-auto w-full"
+      priority={priority}
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+function BannerSection({
+  data,
+  editable,
+  onEditSection,
+}: { data: PlacementInfoValue["banner"] } & EditProps) {
+  const images = data.images.filter((img) => img.image);
+  return (
+    <EditableRegion
+      as="section"
+      id="banner"
+      section="banner"
+      label={PLACEMENT_SECTION_LABELS.banner}
+      editable={editable}
+      onEditSection={onEditSection}
+      className="mb-10 scroll-mt-28"
+    >
+      {(data.heading || data.description) && (
+        <div className="mb-6">
+          {data.heading && (
+            <h2 className="text-navy font-serif text-2xl font-bold md:text-3xl">
+              {data.heading}
+            </h2>
+          )}
+          {data.description && (
+            <p className="mt-2 max-w-3xl text-base leading-relaxed text-stone-600">
+              {data.description}
+            </p>
+          )}
+        </div>
+      )}
+      {images.length === 0 && editable && (
+        <EmptyHint>Click to upload a banner image</EmptyHint>
+      )}
+      <div className="space-y-6">
+        {images.map((img, i) => {
+          const figure = (
+            <figure className="border-border overflow-hidden rounded-2xl border bg-white shadow-sm">
+              <BannerImage
+                src={img.image}
+                alt={img.alt || img.caption || data.heading || "Placements"}
+                priority={i === 0}
+              />
+              {img.caption && (
+                <figcaption className="border-t border-stone-100 px-5 py-3 text-sm text-stone-600">
+                  {img.caption}
+                </figcaption>
+              )}
+            </figure>
+          );
+          // In the editor the banner has to stay clickable-to-edit — wrapping
+          // it in its link would navigate the admin away instead.
+          return img.href && !editable ? (
+            <Link
+              key={`${img.image}-${i}`}
+              href={img.href}
+              target={/^https?:\/\//i.test(img.href) ? "_blank" : undefined}
+              rel={
+                /^https?:\/\//i.test(img.href)
+                  ? "noopener noreferrer"
+                  : undefined
+              }
+              className="block"
+            >
+              {figure}
+            </Link>
+          ) : (
+            <div key={`${img.image}-${i}`}>{figure}</div>
+          );
+        })}
+      </div>
+    </EditableRegion>
   );
 }
 
@@ -1398,7 +1526,13 @@ export function PlacementsPageLayout({
     if (window.innerWidth < 1024) handleNavigate("overview");
   };
 
-  const isEmpty = records.length === 0 && present.size === 0;
+  // The banner sits above the sidebar grid rather than inside the content
+  // column, so it isn't part of `present` / the "On This Page" nav — but it
+  // still counts as content, so a college with only a poster doesn't get the
+  // "nothing published yet" placeholder.
+  const hasBanner = info.banner.images.some((img) => img.image);
+  const hasSections = records.length > 0 || present.size > 0;
+  const isEmpty = !hasSections && !hasBanner;
 
   // No `overflow-x-hidden` here: `overflow-x: hidden` computes overflow-y to
   // `auto`, which makes <main> the sticky sidebar's scroll container — the
@@ -1421,6 +1555,14 @@ export function PlacementsPageLayout({
             />
           </div>
 
+          {(editable || hasBanner) && (
+            <BannerSection
+              data={info.banner}
+              editable={editable}
+              onEditSection={onEditSection}
+            />
+          )}
+
           {isEmpty ? (
             <div className="border-border rounded-2xl border border-dashed bg-white py-20 text-center">
               <Briefcase size={32} className="mx-auto mb-3 text-stone-300" />
@@ -1428,7 +1570,7 @@ export function PlacementsPageLayout({
                 Placement details will be published here soon.
               </p>
             </div>
-          ) : (
+          ) : !hasSections ? null : (
             <>
               <div className="mb-6 lg:hidden">
                 <PlacementSideNav

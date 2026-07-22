@@ -96,6 +96,7 @@ export type {
 export { PlacementInfoSchema, PLACEMENT_INFO_LIMITS } from "./placementInfo";
 export type {
   PlacementInfoValue,
+  BannerImageValue,
   MouItemValue,
   WhyRecruitPointValue,
   ProcessStepValue,

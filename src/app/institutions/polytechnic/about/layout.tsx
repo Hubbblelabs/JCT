@@ -18,6 +18,9 @@ export default function AboutLayout({
 // Admin-managed meta tags win; the fallback above stands when no
 // override is set in the CMS.
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await seoMetadata({ scope: "polytechnic", path: "/institutions/polytechnic/about" });
+  const seo = await seoMetadata({
+    scope: "polytechnic",
+    path: "/institutions/polytechnic/about",
+  });
   return { ...SEO_FALLBACK, ...seo };
 }

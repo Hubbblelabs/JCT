@@ -29,6 +29,9 @@ export default async function EngineeringPlacementsPage() {
 // Admin-managed meta tags win; the fallback above stands when no
 // override is set in the CMS.
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await seoMetadata({ scope: "engineering", path: "/institutions/engineering/placements" });
+  const seo = await seoMetadata({
+    scope: "engineering",
+    path: "/institutions/engineering/placements",
+  });
   return { ...SEO_FALLBACK, ...seo };
 }

@@ -9,6 +9,9 @@ import { SidebarNavItemSchema } from "./sidebarNav";
 const s = (max: number) => z.string().max(max).default("");
 
 export const PLACEMENT_INFO_LIMITS = {
+  // Posters are published per batch/department, so a college accumulates a
+  // handful of them rather than a single banner.
+  bannerImagesMax: 12,
   mouItemsMax: 80,
   whyPointsMax: 12,
   processStepsMax: 15,
@@ -18,6 +21,16 @@ export const PLACEMENT_INFO_LIMITS = {
   headingMax: 160,
   descriptionMax: 1500,
 } as const;
+
+// A poster-style image published at the top of the page (e.g. the annual
+// "Distinguished Alumni" sheet). Shape is deliberately free — these are
+// designed artwork, so the ratio is whatever the college's design team used.
+const BannerImageSchema = z.object({
+  image: s(500),
+  alt: s(200),
+  caption: s(300),
+  href: s(500),
+});
 
 const MouItemSchema = z.object({
   organization: s(160),
@@ -47,6 +60,16 @@ const TpoContactSchema = z.object({
 });
 
 export const PlacementInfoSchema = z.object({
+  banner: z
+    .object({
+      heading: s(PLACEMENT_INFO_LIMITS.headingMax),
+      description: s(PLACEMENT_INFO_LIMITS.descriptionMax),
+      images: z
+        .array(BannerImageSchema)
+        .max(PLACEMENT_INFO_LIMITS.bannerImagesMax)
+        .default([]),
+    })
+    .default({ heading: "", description: "", images: [] }),
   mou: z
     .object({
       heading: s(PLACEMENT_INFO_LIMITS.headingMax),
@@ -112,6 +135,7 @@ export const PlacementInfoSchema = z.object({
 });
 
 export type PlacementInfoValue = z.infer<typeof PlacementInfoSchema>;
+export type BannerImageValue = z.infer<typeof BannerImageSchema>;
 export type MouItemValue = z.infer<typeof MouItemSchema>;
 export type WhyRecruitPointValue = z.infer<typeof WhyRecruitPointSchema>;
 export type ProcessStepValue = z.infer<typeof ProcessStepSchema>;

@@ -10,7 +10,10 @@ const SEO_FALLBACK: Metadata = {
 // The courses page itself is a client component, so its meta tags live here.
 // Admin-managed values win; the fallback above stands when none is set.
 export async function generateMetadata(): Promise<Metadata> {
-  const seo = await seoMetadata({ scope: "arts-science", path: "/institutions/arts-science/courses" });
+  const seo = await seoMetadata({
+    scope: "arts-science",
+    path: "/institutions/arts-science/courses",
+  });
   return { ...SEO_FALLBACK, ...seo };
 }
 

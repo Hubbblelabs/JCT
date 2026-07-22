@@ -251,7 +251,9 @@ async function seedConfigs(db, now) {
         path: pagePath,
         label,
         title: keepExisting ? prev.title : (copy?.title ?? ""),
-        description: keepExisting ? prev.description : (copy?.description ?? ""),
+        description: keepExisting
+          ? prev.description
+          : (copy?.description ?? ""),
       });
       if (copy && !keepExisting) seeded++;
     }

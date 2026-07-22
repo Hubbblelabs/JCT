@@ -12,6 +12,7 @@ import { PLACEMENT_NAV_DEFAULTS } from "@/components/layout/PlacementsPageLayout
 import type { SidebarNavItemRaw } from "@/lib/sidebar-nav";
 import type { PlacementInfoValue } from "@/lib/validation";
 
+type BannerImage = PlacementInfoValue["banner"]["images"][number];
 type MouItem = PlacementInfoValue["mou"]["items"][number];
 type WhyPoint = PlacementInfoValue["whyRecruit"]["points"][number];
 type ProcessStep = PlacementInfoValue["process"]["steps"][number];
@@ -35,6 +36,82 @@ export function PlacementSectionInspector({
   const patch = (p: Partial<PlacementInfoValue>) => onChange({ ...data, ...p });
 
   switch (section) {
+    case "banner":
+      return (
+        <>
+          <p className="mb-3 text-xs text-gray-500">
+            Poster-style images shown at the very top of the placements page —
+            e.g. the annual &ldquo;Distinguished Alumni Students&rdquo; sheet.
+            Each one renders full width at its own shape, so upload it with the{" "}
+            <span className="font-medium">Auto / Original</span> ratio to keep
+            the artwork uncropped.
+          </p>
+          <TextInput
+            label="Heading (optional)"
+            value={data.banner.heading}
+            onChange={(e) =>
+              patch({ banner: { ...data.banner, heading: e.target.value } })
+            }
+            placeholder="Distinguished Alumni Students"
+            hint="Leave blank when the poster already carries its own title."
+          />
+          <TextArea
+            label="Intro (optional)"
+            rows={3}
+            value={data.banner.description}
+            onChange={(e) =>
+              patch({ banner: { ...data.banner, description: e.target.value } })
+            }
+          />
+          <Repeater<BannerImage>
+            label="Banner Images"
+            items={data.banner.images}
+            onChange={(images) => patch({ banner: { ...data.banner, images } })}
+            onItemRemove={(item) => {
+              if (item.image.startsWith("pending:")) discardAll();
+            }}
+            newItem={() => ({ image: "", alt: "", caption: "", href: "" })}
+            renderItem={(item, i, onItemChange) => (
+              <div className="space-y-3 pr-8">
+                <ImageUploadInput
+                  label={`Image ${i + 1}`}
+                  ratio="auto"
+                  value={item.image}
+                  onChange={(url) => onItemChange({ ...item, image: url })}
+                  hideUrlField
+                />
+                <TextInput
+                  label="Alt text"
+                  value={item.alt}
+                  onChange={(e) =>
+                    onItemChange({ ...item, alt: e.target.value })
+                  }
+                  placeholder="Distinguished alumni of JCT Engineering"
+                  hint="Describes the poster for screen readers and search engines."
+                />
+                <TextInput
+                  label="Caption (optional)"
+                  value={item.caption}
+                  onChange={(e) =>
+                    onItemChange({ ...item, caption: e.target.value })
+                  }
+                  placeholder="Class of 2024 — highest package ₹1 Crore"
+                />
+                <TextInput
+                  label="Link (optional)"
+                  value={item.href}
+                  onChange={(e) =>
+                    onItemChange({ ...item, href: e.target.value })
+                  }
+                  placeholder="https://…"
+                  hint="Makes the whole banner clickable."
+                />
+              </div>
+            )}
+          />
+        </>
+      );
+
     case "process":
       return (
         <>
