@@ -259,6 +259,7 @@ function TestimonialFormInner({
       />
       <ImageUploadInput
         label="Avatar"
+        ratio="square"
         value={draft.avatar}
         onChange={(url) => onChange({ ...draft, avatar: url })}
         hideUrlField

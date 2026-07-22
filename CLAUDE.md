@@ -170,6 +170,19 @@ R2_BUCKET_NAME
 NEXT_PUBLIC_R2_PUBLIC_URL
 ```
 
+## Deployment
+
+CI is `.github/workflows/build-deploy.yml`, two jobs on a single `push` trigger (branch `v2-admin` + tags matching `v*`):
+
+- **`build-and-push`** — runs on **both** branch pushes and tag pushes. Builds `docker-compose.build.yaml` (image `kavinnandha/jct:latest`) and pushes to Docker Hub. `MONGODB_URI` is injected as a BuildKit secret, build-time only.
+- **`deploy`** — gated by `if: startsWith(github.ref, 'refs/tags/v')`, so **the server is only touched when a version tag is pushed**. SSHes to the prod host as root and runs `docker compose pull && docker compose up -d --remove-orphans` against the server's copy of `docker-compose.prod.yaml`.
+
+Consequences to keep in mind:
+
+- Pushing to `v2-admin` publishes a new `:latest` image but does **not** deploy. Releasing is a separate, deliberate act: tag `vX.Y.Z` and push the tag.
+- Both compose files hardcode `kavinnandha/jct:latest`, so there is no immutable per-version image — a tag deploys whatever that tag's build produced, and rollback means rebuilding. Parameterizing the image tag would need matching changes in `docker-compose.build.yaml`, `docker-compose.prod.yaml`, and the SSH script.
+- **Pushing a `v*` tag deploys to production.** Never create or push tags on your own — see Git below.
+
 ## Validation
 
 Zod schemas define every entity shape. They live in `src/lib/validation/` and are re-exported from `src/lib/validation/index.ts` (the barrel), each alongside a `LIMITS` constant for max string lengths / array sizes.
@@ -253,10 +266,12 @@ The codebase is indexed using ccc. Use ccc for codebase knowledge.
 
 ## Git
 
-- Never end session without:
-  git push
+- **Do not commit.** Never run `git commit`, `git push`, `git tag`, `git merge`, `git rebase`, or `git reset` unless the user explicitly asks for it in that message. Make the file edits, then stop and report what changed — the user reviews and commits.
+- This is not a formality: pushing a `v*` tag triggers an SSH deploy to the production server (see Deployment). An unrequested tag push ships to prod.
+- Read-only git commands (`status`, `diff`, `log`, `show`) are fine at any time.
+- A request to commit applies once, to that request only. Do not carry it forward to later edits in the same session.
 
-  Before editing:
+## Before Editing
 
 1. Identify the actual root cause.
 2. Grep all affected code paths

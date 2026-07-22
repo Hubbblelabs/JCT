@@ -213,6 +213,7 @@ export function PlacementSectionInspector({
                 />
                 <ImageUploadInput
                   label="Photo"
+                  ratio="portrait"
                   value={item.image}
                   onChange={(url) => onItemChange({ ...item, image: url })}
                   hideUrlField

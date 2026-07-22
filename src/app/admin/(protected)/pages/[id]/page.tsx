@@ -359,6 +359,7 @@ function PageEditorInner({ id }: { id: string }) {
             />
             <ImageUploadInput
               label="Open Graph Image (optional)"
+              ratio="hero"
               value={seo.ogImage ?? ""}
               onChange={(ogImage) => patchContent({ seo: { ...seo, ogImage } })}
               hideUrlField
@@ -412,6 +413,7 @@ function PageEditorInner({ id }: { id: string }) {
             />
             <ImageUploadInput
               label="Hero Image"
+              ratio="hero"
               value={hero.image ?? ""}
               onChange={(image) => patchContent({ hero: { ...hero, image } })}
               hideUrlField
@@ -628,6 +630,7 @@ function PageEditorInner({ id }: { id: string }) {
                   </div>
                   <ImageUploadInput
                     label="Image"
+                    ratio="card"
                     value={img.src}
                     onChange={(src) =>
                       patchContent({

@@ -582,6 +582,7 @@ function PlacementsPageInner() {
                         <div className="sm:col-span-2">
                           <ImageUploadInput
                             label="Photo"
+                            ratio="portrait"
                             value={item.image}
                             onChange={(url) =>
                               onItemChange({ ...item, image: url })

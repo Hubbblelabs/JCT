@@ -138,6 +138,7 @@ function SectionEditor({
         <>
           <ImageUploadInput
             label="Image"
+            ratio="card"
             value={section.src ?? ""}
             onChange={(src) => onChange({ ...section, src })}
             hideUrlField
@@ -251,6 +252,7 @@ function SectionEditor({
                 </div>
                 <ImageUploadInput
                   label="Image (optional)"
+                  ratio="card"
                   value={card.image ?? ""}
                   onChange={(image) =>
                     onChange({

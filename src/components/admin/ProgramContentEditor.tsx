@@ -480,6 +480,7 @@ export function ProgramSectionInspector({
               />
               <ImageUploadInput
                 label="Hero Image"
+                ratio="hero"
                 value={String(content.heroImage ?? "")}
                 onChange={(url) => set("heroImage", url)}
                 hideUrlField
@@ -612,6 +613,7 @@ export function ProgramSectionInspector({
               />
               <ImageUploadInput
                 label="Photo"
+                ratio="portrait"
                 value={flatStr(content, "hodPhoto", "hod.photo")}
                 onChange={(url) => set("hodPhoto", url)}
                 hideUrlField
@@ -1315,6 +1317,7 @@ export function ProgramContentEditor({
           />
           <ImageUploadInput
             label="Photo"
+            ratio="portrait"
             value={flatStr(content, "hodPhoto", "hod.photo")}
             onChange={(url) => set("hodPhoto", url)}
             hideUrlField
@@ -1819,6 +1822,7 @@ export function ProgramContentEditor({
           />
           <ImageUploadInput
             label="Hero Image"
+            ratio="hero"
             value={String(content.heroImage ?? "")}
             onChange={(url) => set("heroImage", url)}
             hideUrlField

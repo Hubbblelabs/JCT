@@ -194,6 +194,7 @@ function HomeHeroForm({
               <div className="flex-1">
                 <ImageUploadInput
                   label={`Slide ${i + 1}`}
+                  ratio="hero"
                   value={src}
                   onChange={(url) =>
                     onChange({
@@ -536,6 +537,7 @@ function TestimonialFormInner({
       />
       <ImageUploadInput
         label="Avatar"
+        ratio="square"
         value={draft.avatar}
         onChange={(url) => onChange({ ...draft, avatar: url })}
         hideUrlField

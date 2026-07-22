@@ -150,6 +150,7 @@ export function CoeSectionInspector({
           />
           <ImageUploadInput
             label="Photo"
+            ratio="portrait"
             value={ctrl.image}
             onChange={(image) =>
               patch({ overview: { ...ov, controller: { ...ctrl, image } } })

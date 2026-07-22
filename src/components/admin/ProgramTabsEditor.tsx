@@ -238,6 +238,7 @@ function CardsSectionEditor({
               />
               <ImageUploadInput
                 label="Image (optional)"
+                ratio="card"
                 value={item.image ?? ""}
                 onChange={(url) =>
                   onChange({
@@ -348,6 +349,7 @@ function PeopleSectionEditor({
             </div>
             <ImageUploadInput
               label="Photo"
+              ratio="portrait"
               value={p.image ?? ""}
               onChange={(url) =>
                 onChange({
@@ -466,6 +468,7 @@ function SectionEditor({
         <>
           <ImageUploadInput
             label="Image"
+            ratio="card"
             value={section.src}
             onChange={(url) => onChange({ ...section, src: url })}
             hideUrlField

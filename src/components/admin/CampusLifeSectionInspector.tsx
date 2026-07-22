@@ -35,6 +35,7 @@ export function CampusLifeSectionInspector({
         <>
           <ImageUploadInput
             label="Background Image"
+            ratio="hero"
             value={data.hero.backgroundImage}
             onChange={(backgroundImage) =>
               patch({ hero: { ...data.hero, backgroundImage } })
@@ -94,6 +95,7 @@ export function CampusLifeSectionInspector({
           />
           <ImageUploadInput
             label="Section Image"
+            ratio="card"
             value={exp.image}
             onChange={(image) => patch({ experience: { ...exp, image } })}
           />
@@ -149,6 +151,7 @@ export function CampusLifeSectionInspector({
               />
               <ImageUploadInput
                 label="Photo"
+                ratio="card"
                 value={item.image}
                 onChange={(image) => update({ ...item, image })}
                 hideUrlField
@@ -217,6 +220,7 @@ export function CampusLifeSectionInspector({
                 />
                 <ImageUploadInput
                   label="Image"
+                  ratio="card"
                   value={item.image}
                   onChange={(image) => update({ ...item, image })}
                   hideUrlField
@@ -303,6 +307,7 @@ export function CampusLifeSectionInspector({
             <ImageUploadInput
               key={idx}
               label={`Sports Image ${idx + 1}`}
+              ratio="card"
               value={sp.images[idx] ?? ""}
               onChange={(url) => {
                 const next = [...sp.images];
@@ -358,6 +363,7 @@ export function CampusLifeSectionInspector({
           </div>
           <ImageUploadInput
             label="Featured Image"
+            ratio="hero"
             value={cl.featuredImage}
             onChange={(featuredImage) =>
               patch({ clubs: { ...cl, featuredImage } })

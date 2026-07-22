@@ -503,6 +503,7 @@ function ProgramDetailInner() {
                 />
                 <ImageUploadInput
                   label="Program Photo"
+                  ratio="hero"
                   value={prog.image}
                   onChange={(v) => setP("image", v)}
                   hideUrlField

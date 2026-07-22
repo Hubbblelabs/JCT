@@ -411,6 +411,7 @@ function EventsPageInner() {
                 <div className="col-span-2">
                   <ImageUploadInput
                     label="Cover image"
+                    ratio="hero"
                     value={form.image}
                     onChange={(url) => set("image", url)}
                     hideUrlField

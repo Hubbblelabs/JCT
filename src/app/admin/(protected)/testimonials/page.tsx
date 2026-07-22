@@ -294,6 +294,7 @@ function TestimonialsPageInner() {
                 />
                 <ImageUploadInput
                   label="Avatar"
+                  ratio="square"
                   value={form.avatar}
                   onChange={(url) => set("avatar", url)}
                   hideUrlField

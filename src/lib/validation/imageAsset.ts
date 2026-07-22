@@ -86,8 +86,12 @@ export const IMAGE_RATIOS: Record<RatioType, RatioRule> = {
   hero: {
     label: "Hero Banner",
     ratio: "16:9",
-    width: 1200,
-    height: 675,
+    // 1920 rather than 1200: a hero spans the full viewport, so a 1200px-wide
+    // source gets upscaled by the browser on a 1080p display and visibly
+    // softens. This also matches the width the pipeline emitted before ratios
+    // existed, so switching a field to "hero" is never a quality regression.
+    width: 1920,
+    height: 1080,
     fit: "cover",
     aspectClass: "aspect-video",
     hint: "Full-width banners and page heroes.",

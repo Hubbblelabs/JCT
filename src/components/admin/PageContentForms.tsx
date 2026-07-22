@@ -1204,6 +1204,7 @@ export function LifeAtJctForm({
             <div key={i} className="rounded-lg border border-gray-200 p-3">
               <ImageUploadInput
                 label="Image"
+                ratio="card"
                 value={photo.src}
                 onChange={(url) =>
                   onChange({

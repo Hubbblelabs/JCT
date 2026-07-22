@@ -201,6 +201,7 @@ export function AboutSectionInspector({
           />
           <ImageUploadInput
             label="Photo"
+            ratio="portrait"
             value={data.principal.image}
             onChange={(image) =>
               patch({ principal: { ...data.principal, image } })
@@ -296,6 +297,7 @@ export function AboutSectionInspector({
                 />
                 <ImageUploadInput
                   label="Photo"
+                  ratio="portrait"
                   value={item.image}
                   onChange={(image) => oc({ ...item, image })}
                   hideUrlField
@@ -359,6 +361,7 @@ export function AboutSectionInspector({
                 />
                 <ImageUploadInput
                   label="Avatar"
+                  ratio="square"
                   value={item.avatar}
                   onChange={(avatar) => oc({ ...item, avatar })}
                   hideUrlField
