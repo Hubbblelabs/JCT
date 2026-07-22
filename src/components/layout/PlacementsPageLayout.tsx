@@ -1,6 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -21,6 +27,8 @@ import {
   GraduationCap,
   CheckCircle2,
   CalendarDays,
+  ArrowLeft,
+  ArrowRight,
   ChevronDown,
   ExternalLink,
   Images,
@@ -620,6 +628,8 @@ function PastYearSelect({
 
 // ─── Highlights (banner images) ─────────────────────────────────────────────
 
+const BANNER_CAROUSEL_INTERVAL_MS = 4000;
+
 // Poster artwork (the annual "Distinguished Alumni" sheet and friends) carries
 // its own layout, type, and aspect ratio, so it renders at its natural shape
 // instead of being cropped into one of the fixed frames the rest of the page
@@ -670,12 +680,81 @@ function BannerImage({
   );
 }
 
+type PlacementBannerImage = PlacementInfoValue["banner"]["images"][number];
+
+function BannerFigure({
+  img,
+  fallbackAlt,
+  priority,
+}: {
+  img: PlacementBannerImage;
+  fallbackAlt: string;
+  priority: boolean;
+}) {
+  return (
+    <figure className="border-border overflow-hidden rounded-2xl border bg-white shadow-sm">
+      <BannerImage
+        src={img.image}
+        alt={img.alt || img.caption || fallbackAlt}
+        priority={priority}
+      />
+      {img.caption && (
+        <figcaption className="border-t border-stone-100 px-5 py-3 text-sm text-stone-600">
+          {img.caption}
+        </figcaption>
+      )}
+    </figure>
+  );
+}
+
 function BannerSection({
   data,
   editable,
   onEditSection,
 }: { data: PlacementInfoValue["banner"] } & EditProps) {
   const images = data.images.filter((img) => img.image);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const activeImage = images[activeIndex] ?? images[0];
+  const hasMultipleImages = images.length > 1;
+
+  useEffect(() => {
+    setActiveIndex((index) =>
+      images.length === 0 ? 0 : Math.min(index, images.length - 1),
+    );
+  }, [images.length]);
+
+  useEffect(() => {
+    if (!hasMultipleImages) return;
+
+    const timer = window.setInterval(() => {
+      setActiveIndex((index) => (index + 1) % images.length);
+    }, BANNER_CAROUSEL_INTERVAL_MS);
+
+    return () => window.clearInterval(timer);
+  }, [hasMultipleImages, images.length]);
+
+  const stepSlide = (
+    direction: "previous" | "next",
+    event: ReactMouseEvent<HTMLButtonElement>,
+  ) => {
+    event.stopPropagation();
+    if (!hasMultipleImages) return;
+
+    setActiveIndex((index) =>
+      direction === "previous"
+        ? (index - 1 + images.length) % images.length
+        : (index + 1) % images.length,
+    );
+  };
+
+  const selectSlide = (
+    index: number,
+    event: ReactMouseEvent<HTMLButtonElement>,
+  ) => {
+    event.stopPropagation();
+    setActiveIndex(index);
+  };
+
   return (
     <EditableRegion
       as="section"
@@ -690,7 +769,6 @@ function BannerSection({
         icon={Images}
         eyebrow="Highlights"
         title={data.heading || "Placement Highlights"}
-        meta={images.length > 0 ? `${images.length} images` : undefined}
       />
       {data.description && (
         <p className="mb-8 max-w-3xl text-base leading-relaxed text-stone-600">
@@ -700,43 +778,93 @@ function BannerSection({
       {images.length === 0 && editable && (
         <EmptyHint>Click to upload a banner image</EmptyHint>
       )}
-      <div className="space-y-6">
-        {images.map((img, i) => {
-          const figure = (
-            <figure className="border-border overflow-hidden rounded-2xl border bg-white shadow-sm">
-              <BannerImage
-                src={img.image}
-                alt={img.alt || img.caption || data.heading || "Placements"}
-                priority={i === 0}
-              />
-              {img.caption && (
-                <figcaption className="border-t border-stone-100 px-5 py-3 text-sm text-stone-600">
-                  {img.caption}
-                </figcaption>
-              )}
-            </figure>
-          );
-          // In the editor the banner has to stay clickable-to-edit — wrapping
-          // it in its link would navigate the admin away instead.
-          return img.href && !editable ? (
-            <Link
-              key={`${img.image}-${i}`}
-              href={img.href}
-              target={/^https?:\/\//i.test(img.href) ? "_blank" : undefined}
-              rel={
-                /^https?:\/\//i.test(img.href)
-                  ? "noopener noreferrer"
-                  : undefined
-              }
-              className="block"
+      {activeImage && (
+        <div className="relative">
+          {hasMultipleImages && (
+            <div className="mb-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={(event) => stepSlide("previous", event)}
+                aria-label="Show previous placement highlight"
+                className="border-border text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white shadow-sm transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                onClick={(event) => stepSlide("next", event)}
+                aria-label="Show next placement highlight"
+                className="border-border text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 w-10 items-center justify-center rounded-full border bg-white shadow-sm transition-colors"
+              >
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          )}
+
+          <div className="overflow-hidden rounded-2xl">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={`${activeImage.image}-${activeIndex}`}
+                initial={{ opacity: 0, x: 24 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -24 }}
+                transition={{ duration: 0.25, ease: "easeOut" }}
+              >
+                {activeImage.href && !editable ? (
+                  <Link
+                    href={activeImage.href}
+                    target={
+                      /^https?:\/\//i.test(activeImage.href)
+                        ? "_blank"
+                        : undefined
+                    }
+                    rel={
+                      /^https?:\/\//i.test(activeImage.href)
+                        ? "noopener noreferrer"
+                        : undefined
+                    }
+                    className="block"
+                  >
+                    <BannerFigure
+                      img={activeImage}
+                      fallbackAlt={data.heading || "Placements"}
+                      priority={activeIndex === 0}
+                    />
+                  </Link>
+                ) : (
+                  <BannerFigure
+                    img={activeImage}
+                    fallbackAlt={data.heading || "Placements"}
+                    priority={activeIndex === 0}
+                  />
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {hasMultipleImages && (
+            <div
+              className="mt-4 flex justify-center gap-2"
+              aria-label="Placement highlight slides"
             >
-              {figure}
-            </Link>
-          ) : (
-            <div key={`${img.image}-${i}`}>{figure}</div>
-          );
-        })}
-      </div>
+              {images.map((img, i) => (
+                <button
+                  key={`${img.image}-${i}-dot`}
+                  type="button"
+                  onClick={(event) => selectSlide(i, event)}
+                  aria-label={`Show placement highlight ${i + 1}`}
+                  aria-current={i === activeIndex ? "true" : undefined}
+                  className={`h-2.5 rounded-full transition-all ${
+                    i === activeIndex
+                      ? "bg-accent w-8"
+                      : "w-2.5 bg-stone-300 hover:bg-stone-400"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </EditableRegion>
   );
 }

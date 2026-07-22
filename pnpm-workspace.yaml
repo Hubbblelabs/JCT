@@ -14,3 +14,5 @@ overrides:
   # libvips .so that Vercel's Next file-tracing never bundled:
   # "ERR_DLOPEN_FAILED: libvips-cpp.so.8.18.3: cannot open shared object file".
   sharp: 0.34.5
+minimumReleaseAgeExclude:
+  - postcss@8.5.21
