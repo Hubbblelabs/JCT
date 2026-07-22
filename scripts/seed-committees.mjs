@@ -28,6 +28,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import mongoose from "mongoose";
+import { ensureSrvResolvable } from "./_mongo-dns.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -329,6 +330,7 @@ async function main() {
     return;
   }
 
+  await ensureSrvResolvable(env.MONGODB_URI);
   await mongoose.connect(env.MONGODB_URI, { serverSelectionTimeoutMS: 15000 });
   const siteconfigs = mongoose.connection.collection("siteconfigs");
   const now = new Date();

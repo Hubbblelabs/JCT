@@ -36,7 +36,13 @@ export const LIMITS = {
   descriptionMax: 20000,
   categoryMax: 40,
   locationMax: 120,
+  galleryMax: 4,
 } as const;
+
+// Extra photos beyond the cover image, rendered as a grid on the detail page.
+const zEventGallery = z
+  .array(zUrl)
+  .max(LIMITS.galleryMax, `At most ${LIMITS.galleryMax} gallery images`);
 
 const zEventDate = z
   .string()
@@ -54,6 +60,7 @@ const EventBaseSchema = z.object({
   event_date: zEventDate,
   location: zOptionalString(LIMITS.locationMax),
   image: zUrl.optional().or(z.literal("")),
+  gallery: zEventGallery,
   institution: zEnum(INSTITUTIONS),
   is_active: z.boolean(),
   sort_order: zNonNegativeInt,
@@ -66,6 +73,7 @@ export const EventCreateSchema = EventBaseSchema.extend({
     "Campus Life",
   ),
   location: zOptionalString(LIMITS.locationMax).default(""),
+  gallery: zEventGallery.default([]),
   is_active: z.boolean().optional().default(true),
   sort_order: zNonNegativeInt.optional().default(0),
 });

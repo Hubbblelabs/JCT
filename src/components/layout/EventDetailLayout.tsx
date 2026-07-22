@@ -7,7 +7,21 @@ import { Calendar, MapPin, ArrowLeft } from "lucide-react";
 import type { PublicEventDetail } from "@/lib/public-events";
 import { formatEventDate } from "@/lib/utils";
 
+// Column counts per gallery size. Every tile keeps a fixed aspect ratio and
+// crops with object-cover, so mixed-shape uploads still line up on a grid.
+const GALLERY_COLS: Record<number, string> = {
+  1: "grid-cols-1",
+  2: "grid-cols-1 sm:grid-cols-2",
+  3: "grid-cols-2 sm:grid-cols-3",
+  4: "grid-cols-2 md:grid-cols-4",
+};
+
 export function EventDetailLayout({ event }: { event: PublicEventDetail }) {
+  const gallery = event.gallery ?? [];
+  const cols = GALLERY_COLS[gallery.length] ?? "grid-cols-2 md:grid-cols-4";
+  // A lone photo reads as a banner; two or more read better as uniform cards.
+  const tileAspect = gallery.length === 1 ? "aspect-video" : "aspect-[4/3]";
+
   return (
     <article className="bg-surface py-10 md:py-14">
       <div className="container mx-auto max-w-4xl px-4 md:px-8">
@@ -78,6 +92,31 @@ export function EventDetailLayout({ event }: { event: PublicEventDetail }) {
               // Pre-sanitized server-side in getPublicEventBySlug (sanitizeHtml).
               dangerouslySetInnerHTML={{ __html: event.descriptionHtml }}
             />
+          )}
+
+          {gallery.length > 0 && (
+            <section className="border-border mt-10 border-t pt-8">
+              <h2 className="text-foreground mb-5 font-serif text-2xl italic">
+                Gallery
+              </h2>
+              <div className={`grid gap-4 ${cols}`}>
+                {gallery.map((src, i) => (
+                  <div
+                    key={`${src}-${i}`}
+                    className={`bg-muted relative ${tileAspect} w-full overflow-hidden rounded-2xl`}
+                  >
+                    <Image
+                      src={src}
+                      alt={`${event.title} — photo ${i + 1}`}
+                      fill
+                      sizes="(min-width: 768px) 25vw, 50vw"
+                      className="object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                ))}
+              </div>
+            </section>
           )}
         </motion.div>
       </div>

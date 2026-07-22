@@ -82,8 +82,13 @@ export async function PATCH(
     // Load existing doc up-front to enforce institution scope and reuse the
     // image key / old slug for cleanup and revalidation in a single query.
     const existing = await Event.findById(id)
-      .select("institution image slug")
-      .lean<{ institution?: string; image?: string; slug?: string } | null>();
+      .select("institution image gallery slug")
+      .lean<{
+        institution?: string;
+        image?: string;
+        gallery?: string[];
+        slug?: string;
+      } | null>();
     if (!existing) return notFound();
 
     const scope = enforceInstitutionScope(session, existing.institution);
@@ -108,8 +113,18 @@ export async function PATCH(
     );
     if (!doc) return notFound();
 
-    if (oldImage && oldImage !== body.image) {
-      cleanupStorageKeys([oldImage], "events/patch");
+    // Drop the blobs for anything this edit replaced: the old cover, plus any
+    // gallery photo the editor removed from the list.
+    const orphaned: string[] = [];
+    if (oldImage && oldImage !== body.image) orphaned.push(oldImage);
+    if (body.gallery !== undefined) {
+      const kept = new Set(body.gallery);
+      for (const key of existing.gallery ?? []) {
+        if (key && !kept.has(key)) orphaned.push(key);
+      }
+    }
+    if (orphaned.length > 0) {
+      cleanupStorageKeys(orphaned, "events/patch");
     }
 
     revalidateEventPages(existing.slug, doc.slug);
@@ -150,8 +165,11 @@ export async function DELETE(
     const doc = await Event.findByIdAndDelete(id);
     if (!doc) return notFound();
 
-    if (doc.image) {
-      cleanupStorageKeys([doc.image], "events/delete");
+    const keys = [doc.image, ...(doc.gallery ?? [])].filter(
+      (key: string): key is string => !!key,
+    );
+    if (keys.length > 0) {
+      cleanupStorageKeys(keys, "events/delete");
     }
 
     revalidateEventPages(doc.slug);

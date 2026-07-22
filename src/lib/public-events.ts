@@ -13,6 +13,7 @@ type EventLean = {
   event_date?: Date | string;
   location?: string;
   image?: string;
+  gallery?: string[];
   institution?: string;
 };
 
@@ -31,6 +32,9 @@ export type PublicEventCard = {
 export type PublicEventDetail = PublicEventCard & {
   // Sanitized HTML — safe to render with dangerouslySetInnerHTML.
   descriptionHtml: string;
+  // Resolved URLs for the extra photos. Detail-only — the list query does not
+  // fetch them, so cards never pay for images they don't render.
+  gallery: string[];
 };
 
 function asCard(doc: EventLean): PublicEventCard {
@@ -98,7 +102,7 @@ export async function getPublicEventBySlug(
 
   const doc = await Event.findOne({ slug, is_active: true })
     .select(
-      "title slug excerpt description category event_date location image institution",
+      "title slug excerpt description category event_date location image gallery institution",
     )
     .lean<EventLean | null>();
   if (!doc) return null;
@@ -106,5 +110,8 @@ export async function getPublicEventBySlug(
   return {
     ...asCard(doc),
     descriptionHtml: sanitizeHtml(doc.description),
+    gallery: (doc.gallery ?? [])
+      .map((key) => getImageUrl(key))
+      .filter((url): url is string => !!url),
   };
 }

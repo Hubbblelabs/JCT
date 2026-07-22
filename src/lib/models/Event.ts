@@ -11,6 +11,9 @@ export interface IEvent extends Document {
   event_date: Date;
   location: string;
   image: string;
+  // Extra photos shown as a grid on the detail page, below the body. The cover
+  // `image` is separate — it drives the card thumbnail and the detail hero.
+  gallery: string[];
   institution: "engineering" | "arts-science" | "polytechnic";
   is_active: boolean;
   sort_order: number;
@@ -29,6 +32,7 @@ const EventSchema = new Schema<IEvent>(
     event_date: { type: Date, required: true },
     location: { type: String, default: "" },
     image: { type: String, default: "" },
+    gallery: { type: [String], default: [] },
     institution: {
       type: String,
       enum: ["engineering", "arts-science", "polytechnic"],

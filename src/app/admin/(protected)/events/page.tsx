@@ -27,7 +27,9 @@ import {
 } from "@/lib/deferred-uploads";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
-import { EVENT_CATEGORY_SUGGESTIONS } from "@/lib/validation";
+import { EVENT_CATEGORY_SUGGESTIONS, LIMITS_event } from "@/lib/validation";
+
+const GALLERY_MAX = LIMITS_event.galleryMax;
 
 interface EventItem {
   _id: string;
@@ -39,6 +41,7 @@ interface EventItem {
   event_date: string;
   location: string;
   image: string;
+  gallery: string[];
   institution: string;
   is_active: boolean;
   sort_order: number;
@@ -53,6 +56,7 @@ const EMPTY: Omit<EventItem, "_id"> = {
   event_date: "",
   location: "",
   image: "",
+  gallery: [],
   institution: "engineering",
   is_active: true,
   sort_order: 0,
@@ -146,7 +150,12 @@ function EventsPageInner() {
   };
   const openEdit = (e: EventItem) => {
     setEditing(e);
-    setForm({ ...e, event_date: e.event_date?.slice(0, 10) ?? "" });
+    setForm({
+      ...e,
+      event_date: e.event_date?.slice(0, 10) ?? "",
+      // Records created before the gallery field existed have no array.
+      gallery: Array.isArray(e.gallery) ? e.gallery : [],
+    });
     setSlugTouched(true);
     setApiError(null);
   };
@@ -166,12 +175,37 @@ function EventsPageInner() {
       slug: slugTouched ? f.slug : slugify(title),
     }));
 
+  const addGallerySlot = () =>
+    setForm((f) =>
+      f.gallery.length >= GALLERY_MAX
+        ? f
+        : { ...f, gallery: [...f.gallery, ""] },
+    );
+
+  // Clearing a slot from inside the uploader drops the slot entirely, so the
+  // grid never leaves a gap the editor has to tidy up by hand.
+  const setGalleryAt = (i: number, url: string) =>
+    setForm((f) => {
+      const next = [...f.gallery];
+      if (url) next[i] = url;
+      else next.splice(i, 1);
+      return { ...f, gallery: next };
+    });
+
+  const removeGalleryAt = (i: number) =>
+    setForm((f) => ({ ...f, gallery: f.gallery.filter((_, j) => j !== i) }));
+
   const save = async () => {
     setSaving(true);
     setApiError(null);
     try {
-      const flushedForm = await flush(form);
-      setForm(flushedForm as Omit<EventItem, "_id">);
+      const flushed = (await flush(form)) as Omit<EventItem, "_id">;
+      // A slot the editor added but never filled would fail zUrl — drop it.
+      const flushedForm = {
+        ...flushed,
+        gallery: flushed.gallery.filter(Boolean),
+      };
+      setForm(flushedForm);
       const isNew = !editing?._id;
       const url = isNew
         ? "/api/admin/events"
@@ -416,6 +450,62 @@ function EventsPageInner() {
                     onChange={(url) => set("image", url)}
                     hideUrlField
                   />
+                </div>
+
+                <div className="col-span-2">
+                  <div className="mb-2 flex items-center justify-between gap-3">
+                    <div>
+                      <span className="admin-label mb-0">Gallery images</span>
+                      <p className="mt-0.5 text-xs text-gray-400">
+                        Shown as a grid on the event detail page, below the
+                        content.
+                      </p>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-2">
+                      <span className="text-xs font-medium text-gray-400">
+                        {form.gallery.length} / {GALLERY_MAX}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={addGallerySlot}
+                        disabled={form.gallery.length >= GALLERY_MAX}
+                        className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+                      >
+                        <Plus size={14} /> Add image
+                      </button>
+                    </div>
+                  </div>
+
+                  {form.gallery.length === 0 ? (
+                    <p className="rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-400">
+                      No gallery images. Add up to {GALLERY_MAX}.
+                    </p>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-4">
+                      {form.gallery.map((url, i) => (
+                        <div
+                          key={i}
+                          className="relative rounded-lg border border-gray-200 p-3"
+                        >
+                          <button
+                            type="button"
+                            onClick={() => removeGalleryAt(i)}
+                            aria-label={`Remove image ${i + 1}`}
+                            className="admin-btn admin-btn-danger admin-btn-sm absolute top-2 right-2 z-10"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                          <ImageUploadInput
+                            label={`Image ${i + 1}`}
+                            ratio="card"
+                            value={url}
+                            onChange={(next) => setGalleryAt(i, next)}
+                            hideUrlField
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
               <TextArea
