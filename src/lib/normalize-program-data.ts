@@ -81,6 +81,18 @@ function normalizeSectionBlocksPosition(
   return Object.keys(out).length > 0 ? out : undefined;
 }
 
+function normalizeSeo(
+  v: unknown,
+): { title: string; description: string } | undefined {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return undefined;
+  const r = v as Record<string, unknown>;
+  const title = typeof r.title === "string" ? r.title.trim() : "";
+  const description =
+    typeof r.description === "string" ? r.description.trim() : "";
+  if (!title && !description) return undefined;
+  return { title, description };
+}
+
 function normalizeLabels(v: unknown): LabelsTree | undefined {
   if (!v || typeof v !== "object" || Array.isArray(v)) return undefined;
   const r = v as Record<string, unknown>;
@@ -256,5 +268,6 @@ export function normalizeProgramData(
     sectionBlocksPosition: normalizeSectionBlocksPosition(
       c.sectionBlocksPosition,
     ),
+    seo: normalizeSeo(c.seo),
   };
 }

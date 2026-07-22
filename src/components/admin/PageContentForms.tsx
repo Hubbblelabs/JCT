@@ -11,6 +11,7 @@ import {
   Trash2,
 } from "lucide-react";
 import {
+  Accordion,
   Field,
   ImageUploadInput,
   DocumentUploadInput,
@@ -18,6 +19,7 @@ import {
   TextArea,
   TextInput,
 } from "@/components/admin/inputs";
+import { SeoFields } from "@/components/admin/SeoFields";
 import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
 import {
   LIMITS_pamphlet,
@@ -40,6 +42,7 @@ import {
   FOOTER_LIMITS,
   FLOATING_ELEMENTS_LIMITS,
   NAVBAR_LIMITS,
+  SEO_LIMITS,
 } from "@/lib/validation";
 
 /* ─── Shared types ─── */
@@ -3444,6 +3447,122 @@ export function RecruitersSectionForm({
           </div>
         </div>
       </Field>
+    </div>
+  );
+}
+
+/* ─── SEO / Meta Tags ─── */
+
+export type SeoPageEntry = {
+  path: string;
+  label?: string;
+  title?: string;
+  description?: string;
+};
+export type SeoPagesVal = { pages?: SeoPageEntry[] };
+
+/**
+ * Per-page meta title/description for one institution scope. Rows are keyed
+ * by public route path — `getPageSeo` matches on that path, so a row whose
+ * path doesn't match a real route is simply never used.
+ */
+export function SeoPagesForm({
+  value,
+  onChange,
+}: {
+  value: SeoPagesVal;
+  onChange: (next: SeoPagesVal) => void;
+}) {
+  const pages = value.pages ?? [];
+  const atMax = pages.length >= SEO_LIMITS.pagesMax;
+
+  const setPage = (i: number, patch: Partial<SeoPageEntry>) =>
+    onChange({
+      ...value,
+      pages: pages.map((p, j) => (j === i ? { ...p, ...patch } : p)),
+    });
+
+  return (
+    <div className="space-y-3">
+      <p className="text-xs text-gray-500">
+        The title and description search engines show for each page. Leave a
+        field blank to keep the page&apos;s built-in default. Program pages are
+        edited on the program itself, under Programs → SEO.
+      </p>
+
+      {pages.length === 0 && (
+        <p className="text-sm text-gray-400">No pages configured yet.</p>
+      )}
+
+      {pages.map((page, i) => (
+        <Accordion
+          key={i}
+          title={
+            <span className="flex min-w-0 items-center gap-2">
+              <span className="truncate">
+                {page.label?.trim() || page.path || "Untitled page"}
+              </span>
+              {!page.title?.trim() && !page.description?.trim() && (
+                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium tracking-wide text-gray-500">
+                  not set
+                </span>
+              )}
+            </span>
+          }
+        >
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <TextInput
+              label="Page Name"
+              value={page.label ?? ""}
+              maxLength={SEO_LIMITS.labelMax}
+              placeholder="e.g. Landing page"
+              onChange={(e) => setPage(i, { label: e.target.value })}
+            />
+            <TextInput
+              label="Path"
+              value={page.path ?? ""}
+              maxLength={SEO_LIMITS.pathMax}
+              placeholder="/institutions/engineering"
+              onChange={(e) => setPage(i, { path: e.target.value })}
+            />
+          </div>
+          <SeoFields
+            title={page.title ?? ""}
+            description={page.description ?? ""}
+            path={page.path}
+            onChange={(patch) => setPage(i, patch)}
+          />
+          <button
+            type="button"
+            onClick={() =>
+              onChange({ ...value, pages: pages.filter((_, j) => j !== i) })
+            }
+            className="admin-btn admin-btn-danger admin-btn-sm"
+          >
+            <Trash2 size={13} /> Remove Page
+          </button>
+        </Accordion>
+      ))}
+
+      <div className="flex items-center justify-between">
+        <button
+          type="button"
+          onClick={() =>
+            onChange({
+              ...value,
+              pages: [
+                ...pages,
+                { path: "", label: "", title: "", description: "" },
+              ],
+            })
+          }
+          disabled={atMax}
+          className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Plus size={14} /> Add Page
+        </button>
+        <LimitHint count={pages.length} max={SEO_LIMITS.pagesMax} />
+      </div>
     </div>
   );
 }

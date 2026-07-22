@@ -18,6 +18,7 @@ import {
   Loader2,
   Check,
   ExternalLink,
+  Search,
   X,
 } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
@@ -363,6 +364,16 @@ function ProgramDetailInner() {
             </span>
           )}
 
+          {/* SEO edits the page's <head>, so there is nothing in the preview
+              to click — it needs its own way into the inspector. */}
+          {!isNew && (
+            <button
+              onClick={() => selectSection("seo")}
+              className="admin-btn admin-btn-outline admin-btn-sm"
+            >
+              <Search size={14} /> SEO
+            </button>
+          )}
           {!isNew && prog.slug && (
             <a
               href={`/institutions/${prog.institution}/programs/${prog.slug}`}
@@ -532,6 +543,7 @@ function ProgramDetailInner() {
                   onProgramAbbrChange={(abbr) => setP("abbr", abbr)}
                   programSlug={prog.slug}
                   onProgramSlugChange={(slug) => setP("slug", slug)}
+                  programCollege={prog.institution}
                   programCard={{
                     degree: prog.degree,
                     duration: prog.duration,

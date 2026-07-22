@@ -276,3 +276,12 @@ export type {
   AccreditationsPageValue,
   AccreditationItemValue,
 } from "./accreditationsPage";
+
+export {
+  SeoEntrySchema,
+  SeoPagesSchema,
+  ProgramSeoSchema,
+  SEO_RECOMMENDED,
+  LIMITS as SEO_LIMITS,
+} from "./seo";
+export type { SeoEntry, SeoPagesValue, ProgramSeoValue } from "./seo";

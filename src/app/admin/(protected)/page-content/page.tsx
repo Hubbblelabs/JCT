@@ -23,6 +23,8 @@ import {
   LifeAtJctForm,
   MetricsForm,
   NavbarAdminSection,
+  SeoPagesForm,
+  type SeoPagesVal,
   type EngHeroVal,
   type ArtsHeroVal,
   type PolyHeroVal,
@@ -45,8 +47,29 @@ import {
   polytechnicNavigation,
   type NavItem as StaticNavItem,
 } from "@/data/all-navigations";
+import { seoPagesDefaultValue } from "@/data/seo-pages";
 
 type College = "engineering" | "arts-science" | "polytechnic";
+
+const SEO_CONFIG_KEY: Record<College, string> = {
+  engineering: "engineeringSeo",
+  "arts-science": "artsScienceSeo",
+  polytechnic: "polytechnicSeo",
+};
+
+/** Meta title/description for every public page of one college. */
+function seoSection(college: College): SectionDef {
+  return {
+    id: "seo",
+    label: "SEO / Meta Tags",
+    kind: "form",
+    configKey: SEO_CONFIG_KEY[college],
+    defaultValue: seoPagesDefaultValue(college) as SeoPagesVal,
+    render: (v, onChange) => (
+      <SeoPagesForm value={(v as SeoPagesVal) ?? {}} onChange={onChange} />
+    ),
+  };
+}
 
 function navDefaultFor(college: College): NavbarVal {
   const src: StaticNavItem[] =
@@ -583,6 +606,7 @@ function sectionsFor(college: College): SectionDef[] {
           <CollegeTestimonialsManager institution="engineering" />
         ),
       },
+      seoSection("engineering"),
     ];
   }
 
@@ -644,6 +668,7 @@ function sectionsFor(college: College): SectionDef[] {
           <CollegeTestimonialsManager institution="arts-science" />
         ),
       },
+      seoSection("arts-science"),
     ];
   }
 
@@ -701,6 +726,7 @@ function sectionsFor(college: College): SectionDef[] {
         <CollegeTestimonialsManager institution="polytechnic" />
       ),
     },
+    seoSection("polytechnic"),
   ];
 }
 

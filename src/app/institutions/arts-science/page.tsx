@@ -6,20 +6,21 @@ import {
   getPublishedConfigs,
   ARTS_SCIENCE_CONFIG_KEYS,
 } from "@/lib/site-config-server";
+import { seoMetadata } from "@/lib/seo";
 
 export const revalidate = 86400;
 
-export const metadata: Metadata = {
-  title: "Arts & Science | JCT College of Arts & Science, Coimbatore",
-  description:
-    "Explore undergraduate programs in Computer Science, AI & ML, BCA, Commerce, and Business at JCT College of Arts & Science, Coimbatore. NAAC accredited. Strong placement record.",
-  openGraph: {
-    title: "Arts & Science | JCT College of Arts & Science, Coimbatore",
-    description:
+export async function generateMetadata(): Promise<Metadata> {
+  return seoMetadata({
+    scope: "arts-science",
+    path: "/institutions/arts-science",
+    fallbackTitle: "Arts & Science | JCT College of Arts & Science, Coimbatore",
+    fallbackDescription:
+      "Explore undergraduate programs in Computer Science, AI & ML, BCA, Commerce, and Business at JCT College of Arts & Science, Coimbatore. NAAC accredited. Strong placement record.",
+    fallbackOgDescription:
       "Explore undergraduate programs in Computer Science, AI & ML, BCA, Commerce, and Business at JCT College of Arts & Science, Coimbatore.",
-    type: "website",
-  },
-};
+  });
+}
 
 import { Hero } from "@/modules/arts-science/Hero";
 import { UgPrograms } from "@/modules/arts-science/UgPrograms";

@@ -34,6 +34,7 @@ import {
 } from "@/components/admin/ProgramTabsEditor";
 import { ProgramLabelsEditor } from "@/components/admin/ProgramLabelsEditor";
 import { PageBodySectionsEditor } from "@/components/admin/PageBodySectionsEditor";
+import { SeoFields } from "@/components/admin/SeoFields";
 import type { PageBodySection } from "@/lib/validation";
 import type { HeroMetaItem, LabelsTree, TabConfigItem } from "@/types/program";
 
@@ -309,7 +310,8 @@ export type ProgramContentSection =
   | "participation"
   | "careerProgression"
   | "feedback"
-  | "tabs";
+  | "tabs"
+  | "seo";
 
 export const PROGRAM_CONTENT_SECTION_LABELS: Record<
   ProgramContentSection,
@@ -338,6 +340,7 @@ export const PROGRAM_CONTENT_SECTION_LABELS: Record<
   careerProgression: "Career progression",
   feedback: "Feedback & improvements",
   tabs: "Sidebar tabs",
+  seo: "SEO / Meta tags",
 };
 
 /** Card-level display fields rendered on the public program cards. */
@@ -359,6 +362,7 @@ export function ProgramSectionInspector({
   onProgramAbbrChange,
   programSlug,
   onProgramSlugChange,
+  programCollege,
   programCard,
   onProgramCardChange,
 }: {
@@ -371,6 +375,8 @@ export function ProgramSectionInspector({
   onProgramAbbrChange?: (abbr: string) => void;
   programSlug?: string;
   onProgramSlugChange?: (slug: string) => void;
+  /** Institution slug — only used to build the SEO preview URL. */
+  programCollege?: string;
   programCard?: ProgramCardExtras;
   onProgramCardChange?: (patch: Partial<ProgramCardExtras>) => void;
 }) {
@@ -994,10 +1000,36 @@ export function ProgramSectionInspector({
             </button>
           </>
         );
+      case "seo": {
+        const seo = flatObj(content, "seo");
+        return (
+          <>
+            <p className="mb-3 text-xs text-gray-500">
+              The title and description search engines show for this
+              program&apos;s public page. Leave blank to fall back to the
+              program name and its first About paragraph. Publish the program
+              for changes to go live.
+            </p>
+            <SeoFields
+              title={String(seo.title ?? "")}
+              description={String(seo.description ?? "")}
+              path={
+                programSlug
+                  ? `/institutions/${programCollege ?? "engineering"}/programs/${programSlug}`
+                  : undefined
+              }
+              onChange={(patch) => set("seo", { ...seo, ...patch })}
+            />
+          </>
+        );
+      }
     }
   })();
 
-  const showBlocksEditor = section !== "hero" && section !== "tabs";
+  // "hero" and "tabs" edit page chrome, and "seo" edits head tags — none of
+  // them render a body section that extra blocks could attach to.
+  const showBlocksEditor =
+    section !== "hero" && section !== "tabs" && section !== "seo";
 
   return (
     <div className="space-y-6">

@@ -302,4 +302,7 @@ export type ProgramData = {
   sectionBlocks?: Record<string, import("@/lib/validation").PageBodySection[]>;
   /** Where each section's extra blocks render relative to its fixed content. Default: "after". */
   sectionBlocksPosition?: Record<string, "before" | "after">;
+
+  /** Admin-managed meta tags for the program's public detail page. */
+  seo?: { title: string; description: string };
 };

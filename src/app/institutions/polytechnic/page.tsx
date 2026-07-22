@@ -7,6 +7,7 @@ import {
   getPublishedConfigs,
   POLYTECHNIC_CONFIG_KEYS,
 } from "@/lib/site-config-server";
+import { seoMetadata } from "@/lib/seo";
 
 export const revalidate = 86400;
 
@@ -16,17 +17,18 @@ import { Placements } from "@/components/layout/Placements";
 import { CampusLife } from "@/components/layout/CampusLife";
 import { Testimonials } from "@/modules/polytechnic/Testimonials";
 
-export const metadata: Metadata = {
-  title: "Polytechnic | JCT Polytechnic College, Coimbatore",
-  description:
-    "JCT Polytechnic College offers AICTE-approved three-year diploma programs in Computer Technology, Mechanical, Civil, Electrical & Electronics, Agricultural, and Petrochemical Engineering. Workshop-driven training with 98% placement rate.",
-  openGraph: {
-    title: "JCT Polytechnic College | Diploma Programs, Coimbatore",
-    description:
+export async function generateMetadata(): Promise<Metadata> {
+  return seoMetadata({
+    scope: "polytechnic",
+    path: "/institutions/polytechnic",
+    fallbackTitle: "Polytechnic | JCT Polytechnic College, Coimbatore",
+    fallbackDescription:
+      "JCT Polytechnic College offers AICTE-approved three-year diploma programs in Computer Technology, Mechanical, Civil, Electrical & Electronics, Agricultural, and Petrochemical Engineering. Workshop-driven training with 98% placement rate.",
+    fallbackOgTitle: "JCT Polytechnic College | Diploma Programs, Coimbatore",
+    fallbackOgDescription:
       "AICTE-approved diploma programs with industry-linked training. 98% placement rate. Lateral entry to B.E. available.",
-    type: "website",
-  },
-};
+  });
+}
 
 export default async function PolytechnicPage() {
   const configs = await getPublishedConfigs([...POLYTECHNIC_CONFIG_KEYS]);

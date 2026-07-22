@@ -8,6 +8,7 @@ import {
   zNonNegativeInt,
 } from "./_primitives";
 import { PageBodySectionSchema } from "./pages";
+import { ProgramSeoSchema } from "./seo";
 
 export const INSTITUTIONS = [
   "engineering",
@@ -426,6 +427,9 @@ export const ProgramContentSchema = z
       .max(LIMITS.sidebarTabsMax)
       .optional(),
     labels: LabelsTreeSchema.optional(),
+    // Meta title/description for the program's public detail page. Lives in
+    // `content` so it follows the program's draft → publish cycle.
+    seo: ProgramSeoSchema.optional(),
   })
   .passthrough();
 

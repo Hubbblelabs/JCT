@@ -5,6 +5,7 @@ import {
   getPublishedProgramBySlug,
   listPublishedProgramSlugs,
 } from "@/lib/public-programs";
+import { programMetadata } from "@/lib/seo";
 
 export const dynamicParams = true;
 export const revalidate = 86400;
@@ -28,19 +29,11 @@ export async function generateMetadata({
     slug,
   });
   if (program) {
-    const programData = program.content;
-    return {
-      title: `${programData.name} | JCT Polytechnic College`,
-      description: programData.about.paragraphs[0] ?? "",
-      alternates: {
-        canonical: `${process.env.NEXTAUTH_URL}/institutions/polytechnic/programs/${slug}`,
-      },
-      openGraph: {
-        title: `${programData.name} | JCT Polytechnic College`,
-        description: programData.about.paragraphs[0] ?? "",
-        type: "website",
-      },
-    };
+    return programMetadata({
+      program: program.content,
+      path: `/institutions/polytechnic/programs/${slug}`,
+      titleSuffix: "JCT Polytechnic College",
+    });
   }
   return {};
 }

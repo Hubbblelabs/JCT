@@ -16,6 +16,8 @@ import {
   AccreditationsForm,
   StatisticsForm,
   NavbarAdminSection,
+  SeoPagesForm,
+  type SeoPagesVal,
   type PamphletVal,
   type LifeAtJctVal,
   type WhyChooseJctVal,
@@ -25,6 +27,7 @@ import {
   type NavbarVal,
 } from "@/components/admin/PageContentForms";
 import { mainNavigation } from "@/data/all-navigations";
+import { seoPagesDefaultValue } from "@/data/seo-pages";
 import {
   TextArea,
   TextInput,
@@ -1066,6 +1069,16 @@ function Inner() {
           value={(v as HomeAdmissionsVal) ?? {}}
           onChange={(next) => onChange(next)}
         />
+      ),
+    },
+    {
+      id: "seo",
+      label: "SEO / Meta Tags",
+      kind: "form",
+      configKey: "mainSeo",
+      defaultValue: seoPagesDefaultValue("main") as SeoPagesVal,
+      render: (v, onChange) => (
+        <SeoPagesForm value={(v as SeoPagesVal) ?? {}} onChange={onChange} />
       ),
     },
   ];

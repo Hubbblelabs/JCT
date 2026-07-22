@@ -44,6 +44,7 @@ import { FloatingElementsSchema } from "./floatingElements";
 import { CampusLifePageSchema } from "./campusLifePage";
 import { AccreditationsPageSchema } from "./accreditationsPage";
 import { NavbarSchema } from "./navbar";
+import { SeoPagesSchema } from "./seo";
 
 // Every site-config key the admin UI writes must have an entry below.
 // Keys in this map are validated strictly; unknown keys are rejected.
@@ -103,6 +104,11 @@ export const SITE_CONFIG_SCHEMAS = {
   engineeringAccreditations: AccreditationsPageSchema,
   artsScienceAccreditations: AccreditationsPageSchema,
   polytechnicAccreditations: AccreditationsPageSchema,
+  // Per-page meta title/description, keyed by public route path.
+  mainSeo: SeoPagesSchema,
+  engineeringSeo: SeoPagesSchema,
+  artsScienceSeo: SeoPagesSchema,
+  polytechnicSeo: SeoPagesSchema,
 } as const;
 
 export type SiteConfigKey = keyof typeof SITE_CONFIG_SCHEMAS;
@@ -174,6 +180,9 @@ export const SITE_CONFIG_KEY_INSTITUTION: Partial<
   engineeringAccreditations: "engineering",
   artsScienceAccreditations: "arts-science",
   polytechnicAccreditations: "polytechnic",
+  engineeringSeo: "engineering",
+  artsScienceSeo: "arts-science",
+  polytechnicSeo: "polytechnic",
 };
 
 export function validateSiteConfigValue(key: SiteConfigKey, value: unknown) {

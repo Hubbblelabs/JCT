@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { seoMetadata } from "@/lib/seo";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
@@ -18,7 +19,7 @@ async function getEvents(): Promise<PublicEventCard[]> {
   }
 }
 
-export const metadata: Metadata = {
+const SEO_FALLBACK: Metadata = {
   title: "News & Events | JCT College of Arts & Science, Coimbatore",
   description:
     "Latest news, events, achievements, and academic breakthroughs at JCT College of Arts & Science, Coimbatore.",
@@ -38,4 +39,11 @@ export default async function ArtsScienceEventsPage() {
       <Footer />
     </main>
   );
+}
+
+// Admin-managed meta tags win; the fallback above stands when no
+// override is set in the CMS.
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await seoMetadata({ scope: "arts-science", path: "/institutions/arts-science/events" });
+  return { ...SEO_FALLBACK, ...seo };
 }

@@ -13,8 +13,16 @@ import {
   getPublishedConfigs,
   HOME_CONFIG_KEYS,
 } from "@/lib/site-config-server";
+import { seoMetadata } from "@/lib/seo";
+import type { Metadata } from "next";
 
 export const revalidate = 86400;
+
+// No fallbacks: with no CMS entry the root layout's metadata stands, which
+// keeps the home page's siteName/locale/twitter tags intact.
+export async function generateMetadata(): Promise<Metadata> {
+  return seoMetadata({ scope: "main", path: "/" });
+}
 
 export default async function HomePage() {
   const configs = await getPublishedConfigs([...HOME_CONFIG_KEYS]);

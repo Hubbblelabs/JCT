@@ -104,6 +104,12 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   engineeringAccreditations: ["engineering"],
   artsScienceAccreditations: ["arts-science"],
   polytechnicAccreditations: ["polytechnic"],
+  // Meta tags are read inside generateMetadata, so every page in the scope
+  // has to be re-rendered for a title/description change to take effect.
+  mainSeo: ["home"],
+  engineeringSeo: ["engineering"],
+  artsScienceSeo: ["arts-science"],
+  polytechnicSeo: ["polytechnic"],
   // Rendered in the root layout, so it affects every public page. "home"
   // is included because "all-institutions" doesn't cover /campus-life.
   floatingElements: ["home", "all-institutions"],
