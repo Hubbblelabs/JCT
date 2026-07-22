@@ -5,7 +5,7 @@
  *
  * Two destinations:
  *   1. `<scope>Seo` SiteConfig keys — per-page meta tags for the landing and
- *      standalone pages. Every route in src/data/seo-pages.ts gets a row, so
+ *      standalone pages. Every route in src/lib/seo-pages.ts gets a row, so
  *      the admin form lists all pages even where the sheet had no copy.
  *   2. `Program.content.seo` — program detail pages. `published_content.seo`
  *      is updated too (only for programs that are already published), so the
@@ -38,7 +38,7 @@ function loadUri() {
   return null;
 }
 
-// Mirrors src/data/seo-pages.ts — kept as plain data here because seed scripts
+// Mirrors src/lib/seo-pages.ts — kept as plain data here because seed scripts
 // run outside the Next/TS build.
 const SCOPE_PAGES = {
   main: [

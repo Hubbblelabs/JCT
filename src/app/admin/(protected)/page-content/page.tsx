@@ -47,7 +47,7 @@ import {
   polytechnicNavigation,
   type NavItem as StaticNavItem,
 } from "@/data/all-navigations";
-import { seoPagesDefaultValue } from "@/data/seo-pages";
+import { seoPagesDefaultValue } from "@/lib/seo-pages";
 
 type College = "engineering" | "arts-science" | "polytechnic";
 

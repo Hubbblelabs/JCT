@@ -27,7 +27,7 @@ import {
   type NavbarVal,
 } from "@/components/admin/PageContentForms";
 import { mainNavigation } from "@/data/all-navigations";
-import { seoPagesDefaultValue } from "@/data/seo-pages";
+import { seoPagesDefaultValue } from "@/lib/seo-pages";
 import {
   TextArea,
   TextInput,
