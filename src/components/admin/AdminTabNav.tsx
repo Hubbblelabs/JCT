@@ -33,6 +33,8 @@ import {
   ScrollText,
   TreePalm,
   CalendarDays,
+  FlaskConical,
+  FolderOpen,
 } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
 import { Suspense, useState } from "react";
@@ -121,6 +123,26 @@ const COLLEGE_ITEMS: Record<string, NavItem[]> = {
       label: "COE",
       href: "/admin/coe",
       icon: ScrollText,
+    },
+    {
+      label: "Research",
+      href: "/admin/research",
+      icon: FlaskConical,
+    },
+    {
+      label: "Clubs & Cells",
+      href: "/admin/clubs",
+      icon: Sparkles,
+    },
+    {
+      label: "Committees",
+      href: "/admin/committees",
+      icon: Users,
+    },
+    {
+      label: "Documents",
+      href: "/admin/documents",
+      icon: FolderOpen,
     },
   ],
   "arts-science": [
@@ -460,10 +482,16 @@ function TabNavInner() {
     return null;
   }
 
+  // Full-bleed live-preview editors render the public page edge-to-edge; the
+  // top nav would compete with the previewed site chrome.
   if (
     pathname === "/admin/about" ||
     pathname === "/admin/coe" ||
-    pathname === "/admin/campus-life"
+    pathname === "/admin/campus-life" ||
+    pathname === "/admin/research" ||
+    pathname === "/admin/clubs" ||
+    pathname === "/admin/committees" ||
+    pathname === "/admin/documents"
   ) {
     return null;
   }

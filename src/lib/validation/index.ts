@@ -281,6 +281,26 @@ export type {
 } from "./accreditationsPage";
 
 export {
+  ResearchPageSchema,
+  GroupsPageSchema,
+  DocumentsPageSchema,
+  RESEARCH_PAGE_LIMITS,
+  GROUPS_PAGE_LIMITS,
+  DOCUMENTS_PAGE_LIMITS,
+} from "./engineeringPages";
+export type {
+  ResearchPageValue,
+  ResearchCentreValue,
+  PublicationValue,
+  GroupsPageValue,
+  GroupValue,
+  GroupMemberValue,
+  DocumentsPageValue,
+  DocumentCategoryValue,
+  DocumentItemValue,
+} from "./engineeringPages";
+
+export {
   SeoEntrySchema,
   SeoPagesSchema,
   ProgramSeoSchema,

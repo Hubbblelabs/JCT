@@ -76,13 +76,16 @@ There is **no test framework** configured — no test runner, no test files, no 
 
 ### Visual page editors
 
-Three admin areas share a **click-to-edit + inspector** pattern:
+Several admin areas share a **click-to-edit + inspector** pattern:
 
 - **Program builder** (`/admin/programs/[id]`) — edit tabs/sections on the left, live-preview on the right (see below).
 - **About editor** (`/admin/about`) — renders the public `AboutPageLayout` with editable overlays; clicking a section opens `AboutSectionInspector` in a slide-over panel. Backed by SiteConfig keys like `engineeringAbout`.
 - **CoE editor** (`/admin/coe`) — same pattern with `CoePageLayout` / `CoeSectionInspector`, backed by the `engineeringCoe` SiteConfig key.
+- **Engineering sub-page editors** — `/admin/research`, `/admin/clubs`, `/admin/committees`, `/admin/documents`, backed by `engineeringResearch`, `engineeringClubs`, `engineeringCommittees`, `engineeringDocuments`. These four are built on the shared `LivePageEditor` shell (`src/components/admin/LivePageEditor.tsx`), which owns all the load/save/inspector boilerplate — a new page of this kind needs only a schema, a layout, and an inspector, not another copy of the editor. Clubs & Cells and Committees are the same data shape and share `GroupsPageLayout` / `GroupsSectionInspector`, distinguished by a `variant` prop.
 
-All three save via `PUT /api/admin/site-config` and revalidate the relevant institution pages immediately.
+All of them save via `PUT /api/admin/site-config` and revalidate the relevant institution pages immediately.
+
+Public page layouts wrap each section in `EditableRegion`, which is inert unless `editable` is passed — so the admin preview and the live page render from exactly one component.
 
 ### Program CMS — the content builder (most important subsystem)
 

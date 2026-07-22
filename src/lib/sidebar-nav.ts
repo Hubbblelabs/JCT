@@ -143,9 +143,14 @@ export function resolveSidebarItems(
   }
   const builtinMap = new Map(defaults.map((d) => [d.anchor, d]));
   const out: ResolvedSidebarItem[] = [];
+  const seenBuiltins = new Set<string>();
   for (let i = 0; i < overrides.length; i++) {
     const o = overrides[i];
-    if (!o || o.visible === false) continue;
+    if (!o) continue;
+    // Track hidden built-ins too, so the back-fill below doesn't resurrect one
+    // the admin deliberately switched off.
+    if (o.key && builtinMap.has(o.key)) seenBuiltins.add(o.key);
+    if (o.visible === false) continue;
     const idBase = o.id || o.key || `i:${i}`;
     const href = (o.href ?? "").trim();
     if (href) {
@@ -181,6 +186,19 @@ export function resolveSidebarItems(
         blocks: o.blocks,
       });
     }
+  }
+  // Back-fill built-ins the stored override list predates. Without this, a
+  // built-in section added after an admin saved a custom sidebar order would
+  // never render — the editor cannot delete built-ins (only hide them), so an
+  // absent key always means "saved before this section existed".
+  for (const d of defaults) {
+    if (seenBuiltins.has(d.anchor)) continue;
+    out.push({
+      id: `b:${d.anchor}`,
+      anchor: d.anchor,
+      navLabel: d.navLabel,
+      icon: d.icon,
+    });
   }
   return out;
 }

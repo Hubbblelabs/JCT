@@ -27,6 +27,8 @@
     "seed:placementinfo:dry": "node scripts/seed-placement-info.mjs --dry-run",
     "seed:accreditations": "node scripts/seed-accreditations.mjs",
     "seed:accreditations:dry": "node scripts/seed-accreditations.mjs --dry-run",
+    "seed:committees": "node scripts/seed-committees.mjs",
+    "seed:committees:dry": "node scripts/seed-committees.mjs --dry-run",
     "seed:lifeatjct": "node scripts/seed-life-at-jct.mjs",
     "seed:lifeatjct:dry": "node scripts/seed-life-at-jct.mjs --dry-run",
     "seed:seo": "node scripts/seed-seo.mjs",

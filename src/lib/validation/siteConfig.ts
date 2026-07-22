@@ -45,6 +45,11 @@ import { CampusLifePageSchema } from "./campusLifePage";
 import { AccreditationsPageSchema } from "./accreditationsPage";
 import { NavbarSchema } from "./navbar";
 import { SeoPagesSchema } from "./seo";
+import {
+  ResearchPageSchema,
+  GroupsPageSchema,
+  DocumentsPageSchema,
+} from "./engineeringPages";
 
 // Every site-config key the admin UI writes must have an entry below.
 // Keys in this map are validated strictly; unknown keys are rejected.
@@ -99,6 +104,10 @@ export const SITE_CONFIG_SCHEMAS = {
   artsScienceAbout: ArtsScienceAboutSchema,
   polytechnicAbout: PolytechnicAboutSchema,
   engineeringCoe: CoePageSchema,
+  engineeringResearch: ResearchPageSchema,
+  engineeringClubs: GroupsPageSchema,
+  engineeringCommittees: GroupsPageSchema,
+  engineeringDocuments: DocumentsPageSchema,
   campusLifePage: CampusLifePageSchema,
   mainAccreditations: AccreditationsPageSchema,
   engineeringAccreditations: AccreditationsPageSchema,
@@ -155,6 +164,10 @@ export const SITE_CONFIG_KEY_INSTITUTION: Partial<
   engineeringAdmissions: "engineering",
   engineeringAbout: "engineering",
   engineeringCoe: "engineering",
+  engineeringResearch: "engineering",
+  engineeringClubs: "engineering",
+  engineeringCommittees: "engineering",
+  engineeringDocuments: "engineering",
   engineeringHeader: "engineering",
   engineeringNavbar: "engineering",
   engineeringLifeAtJct: "engineering",

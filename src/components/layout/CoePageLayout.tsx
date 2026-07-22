@@ -17,6 +17,8 @@ import {
   Settings,
   Activity,
   ChevronRight,
+  CalendarDays,
+  CalendarCheck,
   type LucideIcon,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
@@ -36,13 +38,20 @@ import {
 // ─── Editable sections ───────────────────────────────────────────────────────
 
 export type CoeEditableSection =
-  "hero" | "overview" | "responsibilities" | "obe" | "downloads" | "sidebar";
+  | "hero"
+  | "overview"
+  | "responsibilities"
+  | "obe"
+  | "academicCalendar"
+  | "downloads"
+  | "sidebar";
 
 export const COE_SECTION_LABELS: Record<CoeEditableSection, string> = {
   hero: "Hero",
   overview: "Office of the COE (Overview)",
   responsibilities: "Roles & Responsibilities",
   obe: "Outcome Based Education",
+  academicCalendar: "Academic Calendar",
   downloads: "Circulars & Downloads",
   sidebar: "Sidebar (Quick Facts & CTA)",
 };
@@ -52,6 +61,7 @@ export const COE_SECTION_ORDER: CoeEditableSection[] = [
   "overview",
   "responsibilities",
   "obe",
+  "academicCalendar",
   "downloads",
   "sidebar",
 ];
@@ -68,12 +78,21 @@ export const COE_NAV_DEFAULTS: SidebarNavDefault[] = [
     icon: ClipboardList,
   },
   { anchor: "obe", navLabel: "Outcome Based Education", icon: BookOpen },
+  {
+    anchor: "academic-calendar",
+    navLabel: "Academic Calendar",
+    icon: CalendarDays,
+  },
   { anchor: "downloads", navLabel: "Circulars & Downloads", icon: Download },
 ];
 
 // Images come only from R2/CMS. Empty value -> "" so the call site skips the
 // <Image> and the neutral wrapper (bg-white/5) shows as the placeholder.
 const imgUrl = (v: string) => getImageUrl(v) || "";
+
+// Uploaded documents are stored as R2 keys ("documents/…"), which are not
+// valid hrefs on their own — resolve them the same way images are.
+const docUrl = (v: string) => getImageUrl(v) || "";
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
 
@@ -315,6 +334,15 @@ export function CoePageLayout({
   };
 
   const ctrl = data.overview.controller;
+  // Published values are read straight out of Mongo without re-parsing the Zod
+  // schema, so documents saved before this field existed have no calendar.
+  const cal: CoePageValue["academicCalendar"] = data.academicCalendar ?? {
+    heading: "",
+    academicYear: "",
+    description: "",
+    events: [],
+    downloads: [],
+  };
 
   return (
     <main className="bg-surface text-foreground min-h-screen">
@@ -546,7 +574,101 @@ export function CoePageLayout({
               </div>
             </EditableRegion>
 
-            {/* 4. Circulars & Downloads */}
+            {/* 4. Academic Calendar */}
+            <EditableRegion
+              as="section"
+              id="academic-calendar"
+              section="academicCalendar"
+              label={COE_SECTION_LABELS.academicCalendar}
+              editable={editable}
+              onEditSection={onEditSection}
+              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("academic-calendar")}`}
+            >
+              <SectionHeading
+                icon={CalendarDays}
+                title={cal.heading || "Academic Calendar"}
+              />
+
+              {cal.academicYear && (
+                <span className="border-gold/30 text-gold mb-5 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-bold tracking-wider uppercase">
+                  <CalendarCheck size={13} />
+                  {cal.academicYear}
+                </span>
+              )}
+
+              {cal.description && (
+                <p className="text-muted-foreground mb-8 text-sm leading-relaxed md:text-base">
+                  {cal.description}
+                </p>
+              )}
+
+              {cal.events.length > 0 && (
+                <ol className="relative space-y-4 border-l border-white/10 pl-6 md:pl-8">
+                  {cal.events.map((ev, i) => (
+                    <li key={i} className="relative">
+                      <span className="bg-gold absolute top-2 -left-[27px] h-2.5 w-2.5 rounded-full ring-4 ring-[color:var(--color-surface,transparent)] md:-left-[35px]" />
+                      <div className="hover:border-gold/30 rounded-2xl border border-white/10 bg-white/5 p-5 transition-all duration-300 hover:bg-white/10">
+                        <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:justify-between sm:gap-4">
+                          <h4 className="text-foreground text-sm font-bold md:text-base">
+                            {ev.title}
+                          </h4>
+                          {ev.date && (
+                            <span className="text-gold shrink-0 text-xs font-bold tracking-wider whitespace-nowrap uppercase">
+                              {ev.date}
+                            </span>
+                          )}
+                        </div>
+                        {ev.note && (
+                          <p className="text-muted-foreground mt-2 text-xs leading-relaxed md:text-sm">
+                            {ev.note}
+                          </p>
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ol>
+              )}
+
+              {cal.downloads.length > 0 && (
+                <div className="mt-8 grid gap-4 sm:grid-cols-2">
+                  {cal.downloads.map((dl, i) => {
+                    const href = docUrl(dl.href);
+                    return (
+                      <a
+                        key={i}
+                        href={href || "#"}
+                        target={href ? "_blank" : undefined}
+                        rel="noopener noreferrer"
+                        onClick={
+                          editable || !href
+                            ? (e) => e.preventDefault()
+                            : undefined
+                        }
+                        className="hover:border-gold/30 group flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/5 p-5 transition-all duration-300 hover:bg-white/10"
+                      >
+                        <span className="text-foreground group-hover:text-gold text-sm font-bold transition-colors duration-300">
+                          {dl.label}
+                        </span>
+                        <span className="text-gold flex shrink-0 items-center gap-1.5 text-xs font-bold">
+                          <Download size={14} />
+                          Download
+                        </span>
+                      </a>
+                    );
+                  })}
+                </div>
+              )}
+
+              {editable &&
+                cal.events.length === 0 &&
+                cal.downloads.length === 0 && (
+                  <div className="text-muted-foreground rounded-xl border-2 border-dashed border-white/10 py-8 text-center text-sm">
+                    Click to add calendar dates and downloadable calendars
+                  </div>
+                )}
+            </EditableRegion>
+
+            {/* 5. Circulars & Downloads */}
             <EditableRegion
               as="section"
               id="downloads"
@@ -561,40 +683,43 @@ export function CoePageLayout({
                 {data.downloads.description}
               </p>
               <div className="grid gap-6 sm:grid-cols-2">
-                {data.downloads.forms.map((form, index) => (
-                  <div
-                    key={index}
-                    className="hover:border-gold/30 group flex flex-col justify-between rounded-3xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:bg-white/10"
-                  >
-                    <div>
-                      <span className="text-gold text-[10px] font-bold tracking-wider uppercase">
-                        Academic Form
-                      </span>
-                      <h4 className="text-foreground group-hover:text-gold mt-1 text-base font-bold transition-colors duration-300">
-                        {form.title}
-                      </h4>
-                      <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
-                        {form.desc}
-                      </p>
+                {data.downloads.forms.map((form, index) => {
+                  const href = docUrl(form.href);
+                  return (
+                    <div
+                      key={index}
+                      className="hover:border-gold/30 group flex flex-col justify-between rounded-3xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:bg-white/10"
+                    >
+                      <div>
+                        <span className="text-gold text-[10px] font-bold tracking-wider uppercase">
+                          Academic Form
+                        </span>
+                        <h4 className="text-foreground group-hover:text-gold mt-1 text-base font-bold transition-colors duration-300">
+                          {form.title}
+                        </h4>
+                        <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
+                          {form.desc}
+                        </p>
+                      </div>
+                      <div className="mt-6 flex items-center justify-end border-t border-white/5 pt-4">
+                        <a
+                          href={href || "#"}
+                          target={href ? "_blank" : undefined}
+                          rel="noopener noreferrer"
+                          onClick={
+                            editable || !href
+                              ? (e) => e.preventDefault()
+                              : undefined
+                          }
+                          className="text-gold flex items-center gap-1.5 text-xs font-bold hover:underline"
+                        >
+                          <Download size={14} />
+                          Download
+                        </a>
+                      </div>
                     </div>
-                    <div className="mt-6 flex items-center justify-end border-t border-white/5 pt-4">
-                      <a
-                        href={form.href || "#"}
-                        target={form.href ? "_blank" : undefined}
-                        rel="noopener noreferrer"
-                        onClick={
-                          editable || !form.href
-                            ? (e) => e.preventDefault()
-                            : undefined
-                        }
-                        className="text-gold flex items-center gap-1.5 text-xs font-bold hover:underline"
-                      >
-                        <Download size={14} />
-                        Download
-                      </a>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </EditableRegion>
 

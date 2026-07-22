@@ -4,48 +4,47 @@ import { publicCacheClear } from "@/lib/public-cache";
 export type RevalidateTarget =
   "home" | "engineering" | "arts-science" | "polytechnic" | "all-institutions";
 
+// Per-institution page lists, composed into "all-institutions" below so a page
+// added to one institution can't drift out of the site-wide target.
+const ENGINEERING_PATHS = [
+  "/institutions/engineering",
+  "/institutions/engineering/programs",
+  "/institutions/engineering/about",
+  "/institutions/engineering/coe",
+  "/institutions/engineering/placements",
+  "/institutions/engineering/accreditations",
+  "/institutions/engineering/research",
+  "/institutions/engineering/clubs-and-cells",
+  "/institutions/engineering/committees",
+  "/institutions/engineering/documents",
+];
+
+const ARTS_SCIENCE_PATHS = [
+  "/institutions/arts-science",
+  "/institutions/arts-science/programs",
+  "/institutions/arts-science/about",
+  "/institutions/arts-science/placements",
+  "/institutions/arts-science/accreditations",
+];
+
+const POLYTECHNIC_PATHS = [
+  "/institutions/polytechnic",
+  "/institutions/polytechnic/programs",
+  "/institutions/polytechnic/about",
+  "/institutions/polytechnic/placements",
+  "/institutions/polytechnic/accreditations",
+];
+
 const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
   home: ["/", "/campus-life", "/about-us", "/accreditations"],
-  engineering: [
-    "/institutions/engineering",
-    "/institutions/engineering/programs",
-    "/institutions/engineering/about",
-    "/institutions/engineering/coe",
-    "/institutions/engineering/placements",
-    "/institutions/engineering/accreditations",
-  ],
-  "arts-science": [
-    "/institutions/arts-science",
-    "/institutions/arts-science/programs",
-    "/institutions/arts-science/about",
-    "/institutions/arts-science/placements",
-    "/institutions/arts-science/accreditations",
-  ],
-  polytechnic: [
-    "/institutions/polytechnic",
-    "/institutions/polytechnic/programs",
-    "/institutions/polytechnic/about",
-    "/institutions/polytechnic/placements",
-    "/institutions/polytechnic/accreditations",
-  ],
+  engineering: ENGINEERING_PATHS,
+  "arts-science": ARTS_SCIENCE_PATHS,
+  polytechnic: POLYTECHNIC_PATHS,
   "all-institutions": [
     "/",
-    "/institutions/engineering",
-    "/institutions/engineering/programs",
-    "/institutions/engineering/about",
-    "/institutions/engineering/coe",
-    "/institutions/engineering/placements",
-    "/institutions/engineering/accreditations",
-    "/institutions/arts-science",
-    "/institutions/arts-science/programs",
-    "/institutions/arts-science/about",
-    "/institutions/arts-science/placements",
-    "/institutions/arts-science/accreditations",
-    "/institutions/polytechnic",
-    "/institutions/polytechnic/programs",
-    "/institutions/polytechnic/about",
-    "/institutions/polytechnic/placements",
-    "/institutions/polytechnic/accreditations",
+    ...ENGINEERING_PATHS,
+    ...ARTS_SCIENCE_PATHS,
+    ...POLYTECHNIC_PATHS,
   ],
 };
 
@@ -99,6 +98,10 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   artsScienceAbout: ["arts-science"],
   polytechnicAbout: ["polytechnic"],
   engineeringCoe: ["engineering"],
+  engineeringResearch: ["engineering"],
+  engineeringClubs: ["engineering"],
+  engineeringCommittees: ["engineering"],
+  engineeringDocuments: ["engineering"],
   campusLifePage: ["home"],
   mainAccreditations: ["home"],
   engineeringAccreditations: ["engineering"],

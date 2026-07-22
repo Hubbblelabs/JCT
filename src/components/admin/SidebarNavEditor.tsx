@@ -31,8 +31,17 @@ const ICON_SELECT_OPTIONS = [
 
 export function SidebarNavEditor({ defaults, value, onChange }: Props) {
   const seeded = useMemo<SidebarNavItemRaw[]>(() => {
-    if (Array.isArray(value) && value.length > 0) return value;
-    return defaultsAsOverrides(defaults);
+    if (!Array.isArray(value) || value.length === 0) {
+      return defaultsAsOverrides(defaults);
+    }
+    // Append built-ins the stored list predates, mirroring the back-fill in
+    // resolveSidebarItems — otherwise a newly added built-in section would be
+    // live on the public page but missing from this editor.
+    const present = new Set(value.map((it) => it.key).filter(Boolean));
+    const missing = defaultsAsOverrides(
+      defaults.filter((d) => !present.has(d.anchor)),
+    );
+    return missing.length > 0 ? [...value, ...missing] : value;
   }, [value, defaults]);
 
   const builtinSet = useMemo(

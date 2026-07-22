@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - v2-admin
-
+    tags:
+      - "v*"
 jobs:
   build-and-push:
     name: Build Docker Images and Push
@@ -31,6 +32,8 @@ jobs:
     name: Deploy to Server
     needs: build-and-push
     runs-on: ubuntu-latest
+    
+    if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
       - name: Deploy using SSH password

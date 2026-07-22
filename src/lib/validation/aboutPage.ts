@@ -304,6 +304,19 @@ const CoeGovernanceSchema = z.object({
   desc: s(500),
 });
 
+/** One dated row of the academic calendar timeline. */
+const CoeCalendarEventSchema = z.object({
+  title: s(200),
+  date: s(100),
+  note: s(500),
+});
+
+/** A downloadable calendar PDF (per semester / academic year). */
+const CoeCalendarDownloadSchema = z.object({
+  label: s(200),
+  href: s(500),
+});
+
 export const CoePageSchema = z.object({
   hero: z
     .object({
@@ -357,6 +370,21 @@ export const CoePageSchema = z.object({
       paragraphs: z.array(s(2000)).default([]),
     })
     .default({ heading: "", quote: "", paragraphs: [] }),
+  academicCalendar: z
+    .object({
+      heading: s(200),
+      academicYear: s(60),
+      description: s(1000),
+      events: z.array(CoeCalendarEventSchema).default([]),
+      downloads: z.array(CoeCalendarDownloadSchema).default([]),
+    })
+    .default({
+      heading: "",
+      academicYear: "",
+      description: "",
+      events: [],
+      downloads: [],
+    }),
   downloads: z
     .object({
       description: s(1000),

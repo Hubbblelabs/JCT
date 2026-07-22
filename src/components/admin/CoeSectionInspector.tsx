@@ -21,6 +21,18 @@ type Governance = CoePageValue["overview"]["governance"][number];
 type Phase = CoePageValue["responsibilities"]["phases"][number];
 type CoeForm = CoePageValue["downloads"]["forms"][number];
 type QuickFact = CoePageValue["sidebar"]["quickFacts"][number];
+type Calendar = CoePageValue["academicCalendar"];
+type CalendarEvent = Calendar["events"][number];
+type CalendarDownload = Calendar["downloads"][number];
+
+/** Values stored before the calendar field existed load without it. */
+const EMPTY_CALENDAR: Calendar = {
+  heading: "",
+  academicYear: "",
+  description: "",
+  events: [],
+  downloads: [],
+};
 
 export function CoeSectionInspector({
   section,
@@ -269,6 +281,87 @@ export function CoeSectionInspector({
           />
         </>
       );
+
+    case "academicCalendar": {
+      const cal = data.academicCalendar ?? EMPTY_CALENDAR;
+      const patchCal = (p: Partial<Calendar>) =>
+        patch({ academicCalendar: { ...cal, ...p } });
+      return (
+        <>
+          <TextInput
+            label="Section Heading"
+            value={cal.heading}
+            placeholder="Academic Calendar"
+            onChange={(e) => patchCal({ heading: e.target.value })}
+          />
+          <TextInput
+            label="Academic Year"
+            value={cal.academicYear}
+            placeholder="2025 – 2026"
+            onChange={(e) => patchCal({ academicYear: e.target.value })}
+          />
+          <TextArea
+            label="Section Description"
+            rows={3}
+            value={cal.description}
+            placeholder="Key dates for the current academic year…"
+            onChange={(e) => patchCal({ description: e.target.value })}
+          />
+
+          <Repeater<CalendarEvent>
+            label="Calendar Dates"
+            items={cal.events}
+            onChange={(events) => patchCal({ events })}
+            newItem={() => ({ title: "", date: "", note: "" })}
+            renderItem={(item, _i, oc) => (
+              <div className="space-y-1">
+                <TextInput
+                  label="Event"
+                  value={item.title}
+                  placeholder="Commencement of Classes"
+                  onChange={(e) => oc({ ...item, title: e.target.value })}
+                />
+                <TextInput
+                  label="Date / Period"
+                  value={item.date}
+                  placeholder="01 Jul 2026"
+                  onChange={(e) => oc({ ...item, date: e.target.value })}
+                />
+                <TextArea
+                  label="Note (optional)"
+                  rows={2}
+                  value={item.note}
+                  onChange={(e) => oc({ ...item, note: e.target.value })}
+                />
+              </div>
+            )}
+          />
+
+          <Repeater<CalendarDownload>
+            label="Downloadable Calendars"
+            items={cal.downloads}
+            onChange={(downloads) => patchCal({ downloads })}
+            newItem={() => ({ label: "", href: "" })}
+            renderItem={(item, _i, oc) => (
+              <div className="space-y-1">
+                <TextInput
+                  label="Label"
+                  value={item.label}
+                  placeholder="Odd Semester 2025–26"
+                  onChange={(e) => oc({ ...item, label: e.target.value })}
+                />
+                <DocumentUploadInput
+                  label="Calendar (PDF)"
+                  value={item.href}
+                  onChange={(href) => oc({ ...item, href })}
+                  hint="Upload the calendar PDF — its link powers the Download button."
+                />
+              </div>
+            )}
+          />
+        </>
+      );
+    }
 
     case "downloads":
       return (

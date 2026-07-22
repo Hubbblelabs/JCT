@@ -103,6 +103,32 @@ export const engineeringNavigation: NavItem[] = [
     name: "COE",
     href: "/institutions/engineering/coe",
   },
+  {
+    name: "Campus",
+    href: "#",
+    children: [
+      {
+        name: "Research",
+        href: "/institutions/engineering/research",
+        desc: "Research centres, focus areas and publications",
+      },
+      {
+        name: "Clubs & Cells",
+        href: "/institutions/engineering/clubs-and-cells",
+        desc: "Technical, cultural and social student bodies",
+      },
+      {
+        name: "Committees",
+        href: "/institutions/engineering/committees",
+        desc: "Statutory and institutional committees",
+      },
+      {
+        name: "Documents",
+        href: "/institutions/engineering/documents",
+        desc: "Disclosures, forms and downloads",
+      },
+    ],
+  },
 ];
 
 export const artsNavigation: NavItem[] = [
