@@ -7,6 +7,13 @@
       "runtimeArgs": ["run", "dev"],
       "port": 3000,
       "autoPort": false
+    },
+    {
+      "name": "dev-preview",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["dev", "-p", "3210"],
+      "port": 3210,
+      "autoPort": false
     }
   ]
 }

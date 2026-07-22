@@ -103,6 +103,12 @@ const GroupMemberSchema = z.object({
 
 const GroupSchema = z.object({
   name: s(200),
+  /**
+   * Optional URL override for the detail page. Blank means "derive from name"
+   * (see src/lib/group-slugs.ts) — set it only to keep a published URL stable
+   * across a rename.
+   */
+  slug: s(80),
   category: s(120),
   description: s(1500),
   image: s(500),

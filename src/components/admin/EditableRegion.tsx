@@ -35,8 +35,13 @@ export function EditableRegion<S extends string>({
   children: ReactNode;
 }) {
   const Component = as ?? "section";
-  const handleSelect = () => {
-    if (editable) onEditSection?.(section);
+  // Regions nest (a section containing per-item cards). Without stopping
+  // propagation the outer region would also fire and win, so clicking an item
+  // would open the wrong inspector.
+  const handleSelect = (event: { stopPropagation: () => void }) => {
+    if (!editable) return;
+    event.stopPropagation();
+    onEditSection?.(section);
   };
 
   return (
@@ -54,7 +59,7 @@ export function EditableRegion<S extends string>({
           ? (event: KeyboardEvent) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
-                handleSelect();
+                handleSelect(event);
               }
             }
           : undefined

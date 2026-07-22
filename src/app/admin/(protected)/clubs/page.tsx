@@ -1,14 +1,16 @@
 "use client";
 
 import { LivePageEditor } from "@/components/admin/LivePageEditor";
+import { GroupsPageLayout } from "@/components/layout/GroupsPageLayout";
 import {
-  GroupsPageLayout,
   GROUPS_SECTION_LABELS,
   GROUPS_SECTION_ORDER,
   GROUPS_VARIANT_META,
-  type GroupsEditableSection,
-} from "@/components/layout/GroupsPageLayout";
-import { GroupsSectionInspector } from "@/components/admin/GroupsSectionInspector";
+} from "@/lib/groups-meta";
+import {
+  GroupsSectionInspector,
+  groupsSectionTitle,
+} from "@/components/admin/GroupsSectionInspector";
 import { GroupsPageSchema } from "@/lib/validation";
 import type { GroupsPageValue } from "@/lib/validation";
 
@@ -27,13 +29,16 @@ export default function ClubsEditorPage() {
       emptyValue={() => GroupsPageSchema.parse({})}
       sectionOrder={GROUPS_SECTION_ORDER}
       sectionLabels={LABELS}
+      sectionTitle={(section, data) =>
+        groupsSectionTitle(section, data, "clubs")
+      }
       initialSection="hero"
       renderPreview={({ data, onEditSection }) => (
         <GroupsPageLayout
           data={data}
           variant="clubs"
           editable
-          onEditSection={onEditSection as (s: GroupsEditableSection) => void}
+          onEditSection={onEditSection}
         />
       )}
       renderInspector={({ section, data, onChange }) => (

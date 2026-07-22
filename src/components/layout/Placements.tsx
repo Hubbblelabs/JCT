@@ -177,29 +177,12 @@ export function Placements({ institution }: PlacementsProps = {}) {
               {section.description}
             </motion.p>
           )}
-          {institution && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="mt-6"
-            >
-              <Link
-                href={`/institutions/${institution}/placements`}
-                className="text-accent hover:text-navy inline-flex items-center gap-2 text-sm font-bold tracking-wide uppercase transition-colors"
-              >
-                View Placement Details
-                <ArrowRight size={16} />
-              </Link>
-            </motion.div>
-          )}
         </div>
       </div>
 
       {/* Stats */}
       {section.stats.length > 0 && (
-        <div className="container mx-auto mb-14 px-4 md:mb-20 md:px-6">
+        <div className="container mx-auto mb-10 px-4 md:mb-14 md:px-6">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -231,6 +214,30 @@ export function Placements({ institution }: PlacementsProps = {}) {
                 </motion.div>
               );
             })}
+          </motion.div>
+        </div>
+      )}
+
+      {/* Placements page CTA — sits between the stats and the logo carousel */}
+      {institution && (
+        <div className="container mx-auto mb-14 px-4 md:mb-20 md:px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="flex items-center justify-center gap-6 md:gap-10"
+          >
+            <span className="via-border hidden h-px max-w-32 flex-1 bg-linear-to-r from-transparent to-transparent sm:block" />
+            <Link
+              href={`/institutions/${institution}/placements`}
+              className="group bg-navy hover:bg-navy-light shadow-navy/25 inline-flex items-center gap-3 rounded-full px-8 py-4 text-center font-sans text-base font-bold tracking-wide text-white shadow-xl transition-all duration-300 hover:scale-[1.03] hover:shadow-2xl active:scale-95 md:gap-4 md:px-12 md:py-5 md:text-lg"
+            >
+              View Placement Details
+              <span className="bg-accent text-accent-foreground flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-transform duration-300 group-hover:translate-x-1 md:h-9 md:w-9">
+                <ArrowRight size={18} strokeWidth={2.5} />
+              </span>
+            </Link>
+            <span className="via-border hidden h-px max-w-32 flex-1 bg-linear-to-r from-transparent to-transparent sm:block" />
           </motion.div>
         </div>
       )}

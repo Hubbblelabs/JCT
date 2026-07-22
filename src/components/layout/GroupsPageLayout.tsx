@@ -1,116 +1,63 @@
 "use client";
 
 import Image from "next/image";
-import { Mail, Sparkles, UserRound, Users, type LucideIcon } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, ListChecks, UserRound, Users } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EditableRegion } from "@/components/admin/EditableRegion";
 import { getImageUrl } from "@/lib/utils";
+import { resolveGroupSlugs } from "@/lib/group-slugs";
+import {
+  GROUPS_SECTION_LABELS,
+  GROUPS_VARIANT_META,
+  type GroupsVariant,
+  type GroupsVariantMeta,
+} from "@/lib/groups-meta";
 import type { GroupsPageValue, GroupValue } from "@/lib/validation";
 
 /**
- * Shared layout for the two "list of groups with members" pages — Clubs & Cells
- * and Committees. `variant` only changes the copy (breadcrumb, headings, empty
- * states); the data shape and styling are identical.
+ * Index layout for the two "list of groups" pages — Clubs & Cells and
+ * Committees. Each card links to its own detail page (rendered by
+ * GroupDetailLayout); `variant` only changes copy and the detail base path.
+ *
+ * The variant metadata lives in @/lib/groups-meta so the server-rendered detail
+ * pages can share it — see the note there.
  */
-export type GroupsVariant = "clubs" | "committees";
 
-export type GroupsEditableSection = "hero" | "intro" | "groups";
-
-export const GROUPS_SECTION_LABELS: Record<GroupsEditableSection, string> = {
-  hero: "Hero",
-  intro: "Introduction",
-  groups: "Groups",
-};
-
-export const GROUPS_SECTION_ORDER: GroupsEditableSection[] = [
-  "hero",
-  "intro",
-  "groups",
-];
-
-export const GROUPS_VARIANT_META: Record<
-  GroupsVariant,
-  {
-    breadcrumb: string;
-    defaultHeroTitle: string;
-    listHeading: string;
-    icon: LucideIcon;
-    convenorFallback: string;
-    membersLabel: string;
-    activitiesLabel: string;
-    emptyHint: string;
-    publicEmpty: string;
-    /** Label used for the "Groups" section in the admin inspector. */
-    sectionLabel: string;
-  }
-> = {
-  clubs: {
-    breadcrumb: "Clubs & Cells",
-    defaultHeroTitle: "Clubs & Cells",
-    listHeading: "Student Clubs & Cells",
-    icon: Sparkles,
-    convenorFallback: "Faculty Coordinator",
-    membersLabel: "Office Bearers",
-    activitiesLabel: "Activities",
-    emptyHint: "Click to add clubs and cells",
-    publicEmpty: "Club details will be published soon.",
-    sectionLabel: "Clubs & Cells",
-  },
-  committees: {
-    breadcrumb: "Committees",
-    defaultHeroTitle: "Committees",
-    listHeading: "Institutional Committees",
-    icon: Users,
-    convenorFallback: "Convenor",
-    membersLabel: "Members",
-    activitiesLabel: "Responsibilities",
-    emptyHint: "Click to add committees",
-    publicEmpty: "Committee details will be published soon.",
-    sectionLabel: "Committees",
-  },
-};
-
-/** Published contacts are phone numbers or emails — link them accordingly. */
-function contactHref(contact: string): string {
-  const v = contact.trim();
-  if (v.includes("@")) return `mailto:${v}`;
-  return `tel:${v.replace(/[^\d+]/g, "")}`;
-}
+type Entry = { group: GroupValue; index: number; slug: string };
 
 /**
- * Buckets groups under their `category`, preserving first-appearance order so
+ * Buckets entries under their `category`, preserving first-appearance order so
  * the admin's ordering drives the page. Groups with no category fall into a
  * single unlabelled bucket, which renders as a plain grid with no subheading.
  */
-function groupByCategory(groups: GroupValue[]): [string, GroupValue[]][] {
-  const buckets = new Map<string, GroupValue[]>();
-  for (const g of groups) {
-    const key = g.category.trim();
+function groupByCategory(entries: Entry[]): [string, Entry[]][] {
+  const buckets = new Map<string, Entry[]>();
+  for (const e of entries) {
+    const key = e.group.category.trim();
     const existing = buckets.get(key);
-    if (existing) existing.push(g);
-    else buckets.set(key, [g]);
+    if (existing) existing.push(e);
+    else buckets.set(key, [e]);
   }
   return [...buckets.entries()];
 }
 
-function GroupCard({
+function CardBody({
   group,
   meta,
-  editable,
 }: {
   group: GroupValue;
-  meta: (typeof GROUPS_VARIANT_META)[GroupsVariant];
-  editable?: boolean;
+  meta: GroupsVariantMeta;
 }) {
   const img = getImageUrl(group.image) || "";
-  const members = group.members.filter((m) => m.name.trim() !== "");
-  const activities = group.activities.filter((a) => a.trim() !== "");
+  const memberCount = group.members.filter((m) => m.name.trim() !== "").length;
+  const activityCount = group.activities.filter((a) => a.trim() !== "").length;
 
   return (
-    <div className="hover:border-gold/30 flex h-full flex-col rounded-3xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:bg-white/10">
+    <>
       <div className="flex items-start gap-4">
         <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-white/5">
           {img ? (
@@ -129,96 +76,51 @@ function GroupCard({
         </div>
         <div className="min-w-0 flex-1">
           {/* The category is the section heading above, so it isn't repeated here. */}
-          <h3 className="text-foreground font-serif text-lg font-bold">
+          <h3 className="text-foreground group-hover/card:text-gold font-serif text-lg font-bold transition-colors duration-300">
             {group.name || "Untitled"}
           </h3>
+          {group.convenor && (
+            <p className="text-muted-foreground mt-1 flex items-center gap-1.5 text-xs">
+              <UserRound size={12} className="shrink-0" />
+              {group.convenor}
+            </p>
+          )}
         </div>
       </div>
 
       {group.description && (
-        <p className="text-muted-foreground mt-4 text-sm leading-relaxed">
+        <p className="text-muted-foreground mt-4 line-clamp-3 text-sm leading-relaxed">
           {group.description}
         </p>
       )}
 
-      {group.convenor && (
-        <div className="mt-4 flex items-center gap-2 border-t border-white/5 pt-4">
-          <span className="bg-gold/15 text-gold flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
-            <UserRound size={15} />
+      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-5">
+        {memberCount > 0 && (
+          <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
+            <Users size={13} className="shrink-0" />
+            {memberCount} {meta.membersLabel.toLowerCase()}
           </span>
-          <div className="min-w-0">
-            <p className="text-foreground text-sm font-bold">
-              {group.convenor}
-            </p>
-            <p className="text-muted-foreground text-[11px]">
-              {group.convenorRole || meta.convenorFallback}
-            </p>
-          </div>
-        </div>
-      )}
-
-      {members.length > 0 && (
-        <div className="mt-4">
-          <p className="text-muted-foreground mb-2 text-[10px] font-bold tracking-wider uppercase">
-            {meta.membersLabel}
-          </p>
-          <ul className="divide-y divide-white/5">
-            {members.map((m, i) => (
-              <li
-                key={i}
-                className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5 py-1.5 text-sm"
-              >
-                <span className="text-foreground font-medium">{m.name}</span>
-                <span className="flex flex-wrap items-baseline gap-x-2 text-xs">
-                  <span className="text-muted-foreground">
-                    {[m.role, m.dept].filter(Boolean).join(" · ")}
-                  </span>
-                  {m.contact && (
-                    <a
-                      href={contactHref(m.contact)}
-                      onClick={editable ? (e) => e.preventDefault() : undefined}
-                      className="text-gold font-medium hover:underline"
-                    >
-                      {m.contact}
-                    </a>
-                  )}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {activities.length > 0 && (
-        <div className="mt-4">
-          <p className="text-muted-foreground mb-2 text-[10px] font-bold tracking-wider uppercase">
-            {meta.activitiesLabel}
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {activities.map((a, i) => (
-              <span
-                key={i}
-                className="rounded-full border border-white/10 bg-white/5 px-2.5 py-0.5 text-[11px] font-medium"
-              >
-                {a}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {group.email && (
-        <a
-          href={`mailto:${group.email}`}
-          className="text-gold mt-auto flex items-center gap-1.5 pt-4 text-xs font-bold hover:underline"
-        >
-          <Mail size={14} />
-          {group.email}
-        </a>
-      )}
-    </div>
+        )}
+        {activityCount > 0 && (
+          <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
+            <ListChecks size={13} className="shrink-0" />
+            {activityCount} {meta.activitiesLabel.toLowerCase()}
+          </span>
+        )}
+        <span className="text-gold ml-auto flex items-center gap-1.5 text-xs font-bold">
+          View details
+          <ArrowRight
+            size={13}
+            className="transition-transform duration-300 group-hover/card:translate-x-0.5"
+          />
+        </span>
+      </div>
+    </>
   );
 }
+
+const CARD_CLASS =
+  "hover:border-gold/30 group/card flex h-full flex-col rounded-3xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:bg-white/10";
 
 export function GroupsPageLayout({
   data,
@@ -229,13 +131,16 @@ export function GroupsPageLayout({
   data: GroupsPageValue;
   variant: GroupsVariant;
   editable?: boolean;
-  onEditSection?: (section: GroupsEditableSection) => void;
+  /** Receives "hero" | "intro" | "groups" | `group:<index>`. */
+  onEditSection?: (section: string) => void;
 }) {
   const meta = GROUPS_VARIANT_META[variant];
   const intro = data.intro.filter((p) => p.trim() !== "");
-  const groups = editable
-    ? data.groups
-    : data.groups.filter((g) => g.name.trim() !== "");
+  const slugs = resolveGroupSlugs(data.groups);
+  const entries: Entry[] = data.groups
+    .map((group, index) => ({ group, index, slug: slugs[index] }))
+    // Unnamed rows are placeholders the admin hasn't filled in yet.
+    .filter((e) => editable || e.group.name.trim() !== "");
 
   return (
     <main className="bg-surface text-foreground min-h-screen">
@@ -293,7 +198,7 @@ export function GroupsPageLayout({
         <EditableRegion
           as="section"
           section="groups"
-          label={meta.sectionLabel}
+          label={`${meta.sectionLabel} — add, remove & reorder`}
           editable={editable}
           onEditSection={onEditSection}
           className="mt-12"
@@ -305,24 +210,41 @@ export function GroupsPageLayout({
             {meta.listHeading}
           </h2>
 
-          {groups.length > 0 ? (
+          {entries.length > 0 ? (
             <div className="space-y-12">
-              {groupByCategory(groups).map(([category, items]) => (
+              {groupByCategory(entries).map(([category, items]) => (
                 <div key={category || "__uncategorised"}>
                   {category && (
                     <h3 className="text-gold mb-4 border-b border-white/10 pb-2 text-sm font-bold tracking-wider uppercase">
                       {category}
                     </h3>
                   )}
-                  <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-                    {items.map((group, i) => (
-                      <GroupCard
-                        key={i}
-                        group={group}
-                        meta={meta}
-                        editable={editable}
-                      />
-                    ))}
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                    {items.map(({ group, index, slug }) =>
+                      editable ? (
+                        // In the admin, a card opens that one entry's inspector
+                        // instead of navigating away from the editor.
+                        <EditableRegion
+                          key={index}
+                          as="div"
+                          section={`group:${index}`}
+                          label={group.name || "Untitled"}
+                          editable
+                          onEditSection={onEditSection}
+                          className={CARD_CLASS}
+                        >
+                          <CardBody group={group} meta={meta} />
+                        </EditableRegion>
+                      ) : (
+                        <Link
+                          key={index}
+                          href={`${meta.basePath}/${slug}`}
+                          className={CARD_CLASS}
+                        >
+                          <CardBody group={group} meta={meta} />
+                        </Link>
+                      ),
+                    )}
                   </div>
                 </div>
               ))}

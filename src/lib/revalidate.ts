@@ -118,15 +118,38 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   floatingElements: ["home", "all-institutions"],
 };
 
+/**
+ * Dynamic detail routes. `revalidatePath` needs the route *pattern* plus the
+ * "page" type for these — passing a concrete URL only clears that one entry,
+ * which would leave every other slug stale after an edit.
+ */
+const DYNAMIC_PAGE_PATTERNS: Partial<Record<RevalidateTarget, string[]>> = {
+  engineering: [
+    "/institutions/engineering/committees/[slug]",
+    "/institutions/engineering/clubs-and-cells/[slug]",
+  ],
+};
+DYNAMIC_PAGE_PATTERNS["all-institutions"] =
+  DYNAMIC_PAGE_PATTERNS.engineering ?? [];
+
 export function revalidateTargets(...targets: RevalidateTarget[]): void {
   publicCacheClear();
   const paths = new Set<string>();
+  const patterns = new Set<string>();
   for (const t of targets) {
     for (const p of TARGET_PATHS[t] ?? []) paths.add(p);
+    for (const p of DYNAMIC_PAGE_PATTERNS[t] ?? []) patterns.add(p);
   }
   for (const path of paths) {
     try {
       revalidatePath(path);
+    } catch {
+      /* non-fatal */
+    }
+  }
+  for (const pattern of patterns) {
+    try {
+      revalidatePath(pattern, "page");
     } catch {
       /* non-fatal */
     }

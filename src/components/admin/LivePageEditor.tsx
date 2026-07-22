@@ -28,6 +28,12 @@ type Props<T> = {
   /** Section keys in the order the quick-jump buttons should appear. */
   sectionOrder: readonly string[];
   sectionLabels: Record<string, string>;
+  /**
+   * Inspector heading for the selected section. Needed when a page has
+   * per-item sections (e.g. `group:3`) whose titles come from the data rather
+   * than a fixed label map. Falls back to `sectionLabels`.
+   */
+  sectionTitle?: (section: string, data: T) => string;
   initialSection: string;
   renderPreview: (args: {
     data: T;
@@ -56,6 +62,7 @@ function LivePageEditorInner<T>({
   emptyValue,
   sectionOrder,
   sectionLabels,
+  sectionTitle,
   initialSection,
   renderPreview,
   renderInspector,
@@ -217,7 +224,9 @@ function LivePageEditorInner<T>({
                   Inspector
                 </p>
                 <h2 className="mt-0.5 font-semibold text-gray-900">
-                  {sectionLabels[selected] ?? "Section"}
+                  {sectionTitle?.(selected, draft) ??
+                    sectionLabels[selected] ??
+                    "Section"}
                 </h2>
               </div>
               <button

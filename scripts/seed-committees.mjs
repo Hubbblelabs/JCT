@@ -9,9 +9,12 @@
  * into the two categories it uses (Statutory / Other). The `category` field is
  * what groups the cards under a heading on the public page.
  *
- * Only the SC/ST committee has a published roster, so only it is seeded with a
- * description and members; every other committee is written as an empty shell
- * for the admin to complete via /admin/committees. Nothing is invented.
+ * Rosters are seeded only where the college has published one — currently the
+ * SC/ST Committee, the Internal Complaints Committee, and the IQAC. Every other
+ * committee is written as an empty shell for the admin to complete via
+ * /admin/committees. No names, contacts, or prose are invented; the only edits
+ * to source text are whitespace/spelling normalisation of names and addresses
+ * that arrived run together from the source tables.
  *
  * Re-running is idempotent — the SiteConfig doc is upserted, not duplicated —
  * but note it DOES overwrite: any committee rosters entered through the admin
@@ -48,6 +51,7 @@ const OTHER = "Other Committees";
 /** A committee with no published roster yet — shape must match GroupSchema. */
 const shell = (name, category) => ({
   name,
+  slug: "",
   category,
   description: "",
   image: "",
@@ -60,6 +64,7 @@ const shell = (name, category) => ({
 
 const SC_ST = {
   name: "SC / ST Committee",
+  slug: "",
   category: STATUTORY,
   description:
     "The SC/ST cell of JCT College of Engineering and Technology was started in the year (2012-2013) with the purpose to empower the SC/ST students in the college. At present for the academic year (2023-2024) the college takes special interest in facilitating financial support to the students from these communities.",
@@ -68,8 +73,10 @@ const SC_ST = {
   convenorRole: "",
   email: "",
   members: [
+    // Source lists this as "Dr. MANOHARAN S"; spelled here as in the IQAC
+    // table so the same person reads consistently across the page.
     {
-      name: "Dr. MANOHARAN S",
+      name: "Dr. S. Manoharan",
       role: "Principal / Member",
       dept: "",
       contact: "9443359438",
@@ -98,9 +105,163 @@ const SC_ST = {
   activities: [],
 };
 
+const INTERNAL_COMPLAINTS = {
+  name: "Internal Complaints Committee",
+  slug: "",
+  category: STATUTORY,
+  description:
+    "The Internal Complaints Committee has been constituted and the main aim of the committee is to provide a healthy and congenial atmosphere to all the staff members and students. This committee shall address sexual harassment issues faced by girl students/women staff inside the college premises.",
+  image: "",
+  convenor: "",
+  convenorRole: "",
+  email: "",
+  // role = "Committee Designation" column, dept = "Official Designation & Department".
+  members: [
+    {
+      name: "Mrs. Vedha Vinodha D",
+      role: "Chairperson / Presiding Officer",
+      dept: "Assistant Professor - ECE",
+      contact: "8760993236",
+    },
+    {
+      name: "Mrs. Roopasree A",
+      role: "External Member",
+      dept: "Advocate, Bar Council of Tamil Nadu & Puducherry",
+      contact: "9500809874",
+    },
+    {
+      name: "Dr. S. Kanchana Devi",
+      role: "Member",
+      dept: "Associate Professor - S&H",
+      contact: "9942722220",
+    },
+    {
+      name: "Dr. V. Murugesh",
+      role: "Member",
+      dept: "Professor & HoD - Civil",
+      contact: "8300652289",
+    },
+    {
+      name: "Mrs. Johncy Deepa A",
+      role: "Member",
+      dept: "Admin Staff - Office",
+      contact: "9843008705",
+    },
+    {
+      name: "Mr. Vineeth Chandran",
+      role: "Member",
+      dept: "System Administrator",
+      contact: "8848873448",
+    },
+    {
+      name: "Ms. Gunashri M",
+      role: "Member",
+      dept: "Student",
+      contact: "9566927313",
+    },
+    {
+      name: "Mr. M. Shyam",
+      role: "Member",
+      dept: "Student",
+      contact: "9895343032",
+    },
+    {
+      name: "Ms. Varsha K. C",
+      role: "Member",
+      dept: "Student",
+      contact: "9842815277",
+    },
+  ],
+  activities: [],
+};
+
+const IQAC = {
+  name: "Constitution of Internal Quality Assurance Cell",
+  slug: "",
+  category: STATUTORY,
+  // The source table's "Composition Criteria Specified by NAAC" column is
+  // summarised here; each member row carries its designation and affiliation.
+  description:
+    "Constituted in accordance with the composition criteria specified by NAAC, with representation from the management, senior administration, teaching staff at all levels, students, alumni, local society, employers, industrialists, and parents.",
+  image: "",
+  convenor: "Dr. V. J. Arulkarthick",
+  convenorRole: "Director - IQAC",
+  email: "",
+  // role = "Designation" column; dept = the affiliation detail given with it.
+  members: [
+    { name: "Shri. R. Durgashankar", role: "Secretary", dept: "Management", contact: "" },
+    {
+      name: "Dr. S. Manoharan",
+      role: "Principal",
+      dept: "Chairperson - Head of the Institution",
+      contact: "",
+    },
+    {
+      name: "Mr. A. Chandrahasan",
+      role: "Administrative Officer",
+      dept: "",
+      contact: "",
+    },
+    {
+      name: "Dr. V. J. Arulkarthick",
+      role: "Director - IQAC",
+      dept: "Coordinator",
+      contact: "",
+    },
+    { name: "Dr. G. Mahesh", role: "Professor", dept: "Mechanical", contact: "" },
+    {
+      name: "Dr. I. J. Isaac Premkumar",
+      role: "Associate Professor",
+      dept: "Mechanical",
+      contact: "",
+    },
+    {
+      name: "Mr. S. Renswick",
+      role: "Assistant Professor",
+      dept: "ECE",
+      contact: "",
+    },
+    {
+      name: "Mr. S. Navaneeth",
+      role: "Alumni",
+      dept: "Vinayaka Nagar, Nembara (PO), Palakkad, Kerala 678508",
+      contact: "",
+    },
+    {
+      name: "Mr. R. Thangam",
+      role: "Local Society",
+      dept: "Ex-President, Pichanur Village",
+      contact: "",
+    },
+    {
+      name: "Mr. Chandan Kumar",
+      role: "Student",
+      dept: "IV Year, Mechanical",
+      contact: "",
+    },
+    {
+      name: "Mr. K. Kathirvel",
+      role: "Employer",
+      dept: "Founder, Sai Sri Automation, Podanur, Coimbatore",
+      contact: "",
+    },
+    {
+      name: "Mr. P. Sakthivel",
+      role: "Industrialist",
+      dept: "Automation Engineer, LMW Ltd, Kaniyur, Coimbatore",
+      contact: "",
+    },
+    {
+      name: "Mr. M. Gowtham",
+      role: "Parent",
+      dept: "S/O Kalpana M, Erukkalampara, Parissikal (PO), Palakkad 678556",
+      contact: "",
+    },
+  ],
+  activities: [],
+};
+
 const STATUTORY_NAMES = [
-  "Internal Complaint Committee",
-  "Constitution of Internal Quality Assurance Cell",
   "Anti-Ragging Committee",
   "Student's Grievance Redressal Cell",
   "Discipline and Welfare Committee",
@@ -135,6 +296,8 @@ export const VALUE = {
   intro: [],
   groups: [
     SC_ST,
+    INTERNAL_COMPLAINTS,
+    IQAC,
     ...STATUTORY_NAMES.map((n) => shell(n, STATUTORY)),
     ...OTHER_NAMES.map((n) => shell(n, OTHER)),
   ],
