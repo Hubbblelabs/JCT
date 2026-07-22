@@ -40,9 +40,10 @@ export function PlacementSectionInspector({
       return (
         <>
           <p className="mb-3 text-xs text-gray-500">
-            Poster-style images shown at the very top of the placements page —
-            e.g. the annual &ldquo;Distinguished Alumni Students&rdquo; sheet.
-            Each one renders full width at its own shape, so upload it with the{" "}
+            Poster-style images for the &ldquo;Highlights&rdquo; section — the
+            first item in the page&apos;s sidebar — e.g. the annual
+            &ldquo;Distinguished Alumni Students&rdquo; sheet. Each one renders
+            full width at its own shape, so upload it with the{" "}
             <span className="font-medium">Auto / Original</span> ratio to keep
             the artwork uncropped.
           </p>

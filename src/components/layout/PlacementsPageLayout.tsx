@@ -23,6 +23,7 @@ import {
   CalendarDays,
   ChevronDown,
   ExternalLink,
+  Images,
   type LucideIcon,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
@@ -61,7 +62,7 @@ export const PLACEMENT_SECTION_LABELS: Record<
   PlacementEditableSection,
   string
 > = {
-  banner: "Top Banner",
+  banner: "Highlights",
   process: "Placement Process",
   tpo: "TPO Contacts",
   mou: "MoUs & Collaborations",
@@ -88,6 +89,7 @@ function EmptyHint({ children }: { children: string }) {
 // reorder, hide, or extend this list via the `sidebar.navItems` override on the
 // <college>PlacementInfo site-config key.
 export const PLACEMENT_NAV_DEFAULTS: SidebarNavDefault[] = [
+  { anchor: "banner", navLabel: "Highlights", icon: Images },
   { anchor: "process", navLabel: "Placement Process", icon: ClipboardList },
   { anchor: "tpo", navLabel: "TPO Contacts", icon: Phone },
   { anchor: "mou", navLabel: "MoUs & Collaborations", icon: FileText },
@@ -616,7 +618,7 @@ function PastYearSelect({
   );
 }
 
-// ─── Top banner ──────────────────────────────────────────────────────────────
+// ─── Highlights (banner images) ─────────────────────────────────────────────
 
 // Poster artwork (the annual "Distinguished Alumni" sheet and friends) carries
 // its own layout, type, and aspect ratio, so it renders at its natural shape
@@ -682,21 +684,18 @@ function BannerSection({
       label={PLACEMENT_SECTION_LABELS.banner}
       editable={editable}
       onEditSection={onEditSection}
-      className="mb-10 scroll-mt-28"
+      className="scroll-mt-28"
     >
-      {(data.heading || data.description) && (
-        <div className="mb-6">
-          {data.heading && (
-            <h2 className="text-navy font-serif text-2xl font-bold md:text-3xl">
-              {data.heading}
-            </h2>
-          )}
-          {data.description && (
-            <p className="mt-2 max-w-3xl text-base leading-relaxed text-stone-600">
-              {data.description}
-            </p>
-          )}
-        </div>
+      <SectionHeading
+        icon={Images}
+        eyebrow="Highlights"
+        title={data.heading || "Placement Highlights"}
+        meta={images.length > 0 ? `${images.length} images` : undefined}
+      />
+      {data.description && (
+        <p className="mb-8 max-w-3xl text-base leading-relaxed text-stone-600">
+          {data.description}
+        </p>
       )}
       {images.length === 0 && editable && (
         <EmptyHint>Click to upload a banner image</EmptyHint>
@@ -1450,6 +1449,8 @@ export function PlacementsPageLayout({
   // otherwise there'd be nothing to click to fill it in.
   const present = useMemo(() => {
     const set = new Set<string>();
+    if (editable || info.banner.images.some((img) => img.image))
+      set.add("banner");
     if (editable || info.mou.items.length > 0) set.add("mou");
     if (editable || info.whyRecruit.points.length > 0) set.add("why-recruit");
     if (
@@ -1526,13 +1527,8 @@ export function PlacementsPageLayout({
     if (window.innerWidth < 1024) handleNavigate("overview");
   };
 
-  // The banner sits above the sidebar grid rather than inside the content
-  // column, so it isn't part of `present` / the "On This Page" nav — but it
-  // still counts as content, so a college with only a poster doesn't get the
-  // "nothing published yet" placeholder.
-  const hasBanner = info.banner.images.some((img) => img.image);
   const hasSections = records.length > 0 || present.size > 0;
-  const isEmpty = !hasSections && !hasBanner;
+  const isEmpty = !hasSections;
 
   // No `overflow-x-hidden` here: `overflow-x: hidden` computes overflow-y to
   // `auto`, which makes <main> the sticky sidebar's scroll container — the
@@ -1554,14 +1550,6 @@ export function PlacementsPageLayout({
               ]}
             />
           </div>
-
-          {(editable || hasBanner) && (
-            <BannerSection
-              data={info.banner}
-              editable={editable}
-              onEditSection={onEditSection}
-            />
-          )}
 
           {isEmpty ? (
             <div className="border-border rounded-2xl border border-dashed bg-white py-20 text-center">
@@ -1602,6 +1590,13 @@ export function PlacementsPageLayout({
                 </div>
 
                 <div className="min-w-0 space-y-16">
+                  {present.has("banner") && (
+                    <BannerSection
+                      data={info.banner}
+                      editable={editable}
+                      onEditSection={onEditSection}
+                    />
+                  )}
                   {present.has("process") && (
                     <ProcessSection
                       data={info.process}
