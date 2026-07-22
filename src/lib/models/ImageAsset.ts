@@ -19,6 +19,10 @@ export interface IImageAsset extends Document {
   mime_type: string;
   width?: number;
   height?: number;
+  /** Which IMAGE_RATIOS preset the upload was processed with */
+  ratio_type?: string;
+  /** Human-readable ratio of the stored image, e.g. "16:9" */
+  aspect_ratio?: string;
   uploaded_by: string;
   created_at: Date;
 }
@@ -48,6 +52,10 @@ const ImageAssetSchema = new Schema<IImageAsset>(
     mime_type: { type: String, default: "image/webp" },
     width: Number,
     height: Number,
+    // Optional and additive: assets uploaded before ratio selection existed
+    // read back as undefined, which the UI renders as "Original".
+    ratio_type: String,
+    aspect_ratio: String,
     uploaded_by: { type: String, required: true },
   },
   { timestamps: { createdAt: "created_at", updatedAt: false } },

@@ -18,34 +18,26 @@ import {
   ImageUploadFieldsSchema,
   ALLOWED_MIME_TYPES,
   MAX_FILE_SIZE,
-  CATEGORY_RULES,
+  IMAGE_RATIOS,
+  ratioSourceTooSmall,
 } from "@/lib/validation";
 
-function checkDimensions(
-  category: keyof typeof CATEGORY_RULES,
-  width: number,
-  height: number,
-): string | null {
-  const rule = CATEGORY_RULES[category];
-  if (rule.minWidth && width < rule.minWidth) {
-    return `Image is too small (${width}px wide). Category "${category}" requires at least ${rule.minWidth}px wide.`;
-  }
-  if (rule.minHeight && height < rule.minHeight) {
-    return `Image is too short (${height}px tall). Category "${category}" requires at least ${rule.minHeight}px tall.`;
-  }
-  if (rule.maxWidth && width > rule.maxWidth) {
-    return `Image is too wide (${width}px). Category "${category}" allows at most ${rule.maxWidth}px wide.`;
-  }
-  if (rule.maxHeight && height > rule.maxHeight) {
-    return `Image is too tall (${height}px). Category "${category}" allows at most ${rule.maxHeight}px tall.`;
-  }
-  if (rule.aspect) {
-    const ratio = width / height;
-    if (Math.abs(ratio - rule.aspect.value) > rule.aspect.tolerance) {
-      return `Image aspect ratio ${ratio.toFixed(2)} doesn't match the ${rule.aspect.label} required for category "${category}".`;
-    }
-  }
-  return null;
+// sharp decode + resize is CPU-bound and can outrun the default limit on a
+// large source image.
+export const maxDuration = 60;
+
+/**
+ * Simplify actual pixel dimensions to a display ratio ("1920x1080" -> "16:9").
+ * Only used for "auto" uploads, where there is no preset ratio to record.
+ * Falls back to "W:H" when the reduced terms are still unwieldy.
+ */
+function aspectRatioOf(width?: number, height?: number): string {
+  if (!width || !height) return "original";
+  const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
+  const divisor = gcd(width, height);
+  const w = width / divisor;
+  const h = height / divisor;
+  return w <= 40 && h <= 40 ? `${w}:${h}` : `${width}:${height}`;
 }
 
 export async function POST(req: NextRequest) {
@@ -98,11 +90,13 @@ export async function POST(req: NextRequest) {
         category: (formData.get("category") as string) ?? "other",
         institution:
           (formData.get("institution") as string) ?? defaultInstitution,
+        ratioType: (formData.get("ratioType") as string) ?? "auto",
       },
       ImageUploadFieldsSchema,
     );
     if (!parsed.ok) return parsed.response;
-    const { altText, category, institution } = parsed.data;
+    const { altText, category, institution, ratioType } = parsed.data;
+    const rule = IMAGE_RATIOS[ratioType];
 
     // Editors may only tag uploads with their own college or the shared
     // ("all") pool — not another college's institution.
@@ -111,8 +105,8 @@ export async function POST(req: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    // Inspect dimensions before resize so per-category rules apply to the
-    // user-supplied image, not the post-resize artifact.
+    // Inspect the source dimensions before resizing so the too-small guard
+    // judges what the editor actually supplied, not the resized artifact.
     //
     // failOn:"error" makes sharp abort on broken/malicious inputs instead
     // of silently producing partial output. limitInputPixels caps the
@@ -140,7 +134,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const dimError = checkDimensions(category, origWidth, origHeight);
+    const dimError = ratioSourceTooSmall(rule, origWidth, origHeight);
     if (dimError) {
       return validationError([
         {
@@ -151,11 +145,53 @@ export async function POST(req: NextRequest) {
       ]);
     }
 
-    const rule = CATEGORY_RULES[category];
-    const webpBuffer = await sharpInstance
-      .resize({ width: rule.targetWidth, withoutEnlargement: true })
-      .webp({ quality: 85 })
-      .toBuffer();
+    // Resize to the selected ratio. "auto" keeps the source shape and only
+    // caps the width; the fixed ratios produce exactly rule.width x rule.height
+    // so the admin preview and the public frame can never disagree.
+    const resized =
+      rule.height === null
+        ? sharpInstance.resize({
+            width: rule.width,
+            withoutEnlargement: true,
+          })
+        : rule.fit === "contain"
+          ? sharpInstance.resize({
+              width: rule.width,
+              height: rule.height,
+              fit: "contain",
+              // Pad with transparency rather than a colour so a logo drops onto
+              // any background. withoutEnlargement keeps a small logo crisp at
+              // native size, centered on the canvas, instead of upscaling it.
+              background: { r: 255, g: 255, b: 255, alpha: 0 },
+              withoutEnlargement: true,
+            })
+          : sharpInstance.resize({
+              width: rule.width,
+              height: rule.height,
+              fit: "cover",
+              position: "center",
+            });
+
+    let webpBuffer: Buffer;
+    let processedMetadata: Awaited<
+      ReturnType<ReturnType<typeof sharp>["metadata"]>
+    >;
+    try {
+      webpBuffer = await resized.webp({ quality: 85 }).toBuffer();
+      // Read dimensions back off the *processed* buffer. Using the source
+      // metadata here would record a size the stored object doesn't have.
+      processedMetadata = await sharp(webpBuffer).metadata();
+    } catch (procErr) {
+      console.error("[images/upload] processing failed", procErr);
+      return validationError([
+        {
+          path: ["file"],
+          message:
+            "Could not process this image at the selected ratio. Try a different file.",
+          code: "custom",
+        } as never,
+      ]);
+    }
 
     const baseName = file.name
       .replace(/\.[^.]+$/, "")
@@ -181,8 +217,13 @@ export async function POST(req: NextRequest) {
         institution,
         file_size: webpBuffer.length,
         mime_type: "image/webp",
-        width: metadata.width,
-        height: metadata.height,
+        width: processedMetadata.width,
+        height: processedMetadata.height,
+        ratio_type: ratioType,
+        aspect_ratio:
+          ratioType === "auto"
+            ? aspectRatioOf(processedMetadata.width, processedMetadata.height)
+            : rule.ratio,
         uploaded_by: session!.user?.email ?? "",
       });
 

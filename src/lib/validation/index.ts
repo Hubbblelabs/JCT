@@ -140,9 +140,11 @@ export {
   IMAGE_INSTITUTIONS,
   ALLOWED_MIME_TYPES,
   MAX_FILE_SIZE,
-  CATEGORY_RULES,
+  IMAGE_RATIOS,
+  RATIO_TYPES,
+  ratioSourceTooSmall,
 } from "./imageAsset";
-export type { CategoryRule, ImageUploadFields } from "./imageAsset";
+export type { RatioType, RatioRule, ImageUploadFields } from "./imageAsset";
 
 export {
   ContactSchema,

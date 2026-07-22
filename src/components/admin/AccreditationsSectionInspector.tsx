@@ -93,6 +93,7 @@ export function AccreditationsSectionInspector({
               />
               <ImageUploadInput
                 label="Logo"
+                ratio="square"
                 value={item.logo}
                 onChange={(logo) => oc({ ...item, logo })}
                 hideUrlField

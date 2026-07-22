@@ -519,6 +519,7 @@ function PlacementsPageInner() {
                           />
                           <ImageUploadInput
                             label="Logo"
+                            ratio="square"
                             value={item.logo}
                             onChange={(url) =>
                               onItemChange({ ...item, logo: url })
@@ -625,6 +626,7 @@ function PlacementsPageInner() {
                             />
                             <ImageUploadInput
                               label="Company Logo"
+                              ratio="square"
                               value={item.logo}
                               onChange={(url) =>
                                 onItemChange({ ...item, logo: url })

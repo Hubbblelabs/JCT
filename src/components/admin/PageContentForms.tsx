@@ -276,6 +276,7 @@ function AccreditationList({
         <div key={i} className="rounded-lg border border-gray-200 p-3">
           <ImageUploadInput
             label="Logo"
+            ratio="square"
             value={item.logo}
             onChange={(url) =>
               onChange(safe.map((a, j) => (j === i ? { ...a, logo: url } : a)))

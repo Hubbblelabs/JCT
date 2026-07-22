@@ -14,6 +14,9 @@ import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
 import {
   ALLOWED_MIME_TYPES,
   MAX_DIRECT_UPLOAD_SIZE,
+  IMAGE_RATIOS,
+  RATIO_TYPES,
+  type RatioType,
 } from "@/lib/validation/imageAsset";
 
 // Mirrors /api/admin/documents/upload + /presign (kept in sync by hand —
@@ -252,6 +255,40 @@ interface ImageUploadInputProps {
   hint?: string;
   /** Hide the URL text field — show only the upload button + preview */
   hideUrlField?: boolean;
+  /**
+   * Default ratio preset for this field, e.g. "hero" on a banner field. The
+   * editor can still change it per upload. Omitted = "auto", which preserves
+   * the pre-ratio behaviour (cap width, keep the source shape).
+   */
+  ratio?: RatioType;
+}
+
+/** Dimensions + ratio shown under the preview once they are known. */
+type PreviewMeta = {
+  width?: number;
+  height?: number;
+  aspectRatio: string;
+  ratioType: RatioType;
+  /** Absent while an upload is still pending — the processed size isn't known yet. */
+  fileSize?: number;
+};
+
+function formatBytes(bytes: number): string {
+  if (bytes >= 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+}
+
+/** Natural dimensions of a picked file, for "auto" pending previews. */
+function readNaturalSize(
+  objectUrl: string,
+): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
+    const img = new window.Image();
+    img.onload = () =>
+      resolve({ width: img.naturalWidth, height: img.naturalHeight });
+    img.onerror = () => resolve(null);
+    img.src = objectUrl;
+  });
 }
 
 export function ImageUploadInput({
@@ -260,15 +297,27 @@ export function ImageUploadInput({
   onChange,
   hint,
   hideUrlField,
+  ratio = "auto",
 }: ImageUploadInputProps) {
   const deferred = useDeferredUploadsOptional();
   const [uploading, setUploading] = useState(false);
   const [imgError, setImgError] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [ratioType, setRatioType] = useState<RatioType>(ratio);
+  const [meta, setMeta] = useState<PreviewMeta | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const selectId = useId();
+
+  const rule = IMAGE_RATIOS[ratioType];
 
   useEffect(() => {
     setImgError(false);
+  }, [value]);
+
+  // A value arriving from outside (loaded record, or cleared) has no metadata
+  // we can trust, so drop any badge from a previous upload in this session.
+  useEffect(() => {
+    if (!value) setMeta(null);
   }, [value]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -288,20 +337,52 @@ export function ImageUploadInput({
       const placeholder = `pending:img:${id}`;
       const previewUrl = URL.createObjectURL(file);
       if (value.startsWith("pending:")) deferred.cancel(value);
-      deferred.register(placeholder, { file, previewUrl, endpoint: "images" });
+      deferred.register(placeholder, {
+        file,
+        previewUrl,
+        endpoint: "images",
+        ratioType,
+      });
       onChange(placeholder);
+
+      // A fixed ratio resizes to known dimensions, so they can be shown before
+      // the upload happens. "auto" keeps the source shape — read it off the file.
+      if (rule.height !== null) {
+        setMeta({
+          width: rule.width,
+          height: rule.height,
+          aspectRatio: rule.ratio,
+          ratioType,
+        });
+      } else {
+        const natural = await readNaturalSize(previewUrl);
+        setMeta({
+          width: natural?.width,
+          height: natural?.height,
+          aspectRatio: rule.ratio,
+          ratioType,
+        });
+      }
     } else {
       setUploading(true);
       setUploadError(null);
       const fd = new FormData();
       fd.append("file", file);
+      fd.append("ratioType", ratioType);
       const r = await fetch("/api/admin/images/upload", {
         method: "POST",
         body: fd,
       });
       if (r.ok) {
-        const data = (await r.json()) as Record<string, string>;
-        onChange(data.url || data.storage_key);
+        const data = (await r.json()) as Record<string, unknown>;
+        onChange((data.url as string) || (data.storage_key as string));
+        setMeta({
+          width: data.width as number | undefined,
+          height: data.height as number | undefined,
+          aspectRatio: (data.aspect_ratio as string) ?? rule.ratio,
+          ratioType: ((data.ratio_type as RatioType) ?? ratioType) as RatioType,
+          fileSize: data.file_size as number | undefined,
+        });
       } else if (r.status === 413) {
         setUploadError(PAYLOAD_TOO_LARGE_MSG);
       } else {
@@ -309,8 +390,14 @@ export function ImageUploadInput({
           string,
           unknown
         >;
+        const detail = Array.isArray(body.details)
+          ? (body.details as Array<{ message: string }>)[0]?.message
+          : undefined;
         setUploadError(
-          (body.message as string) ?? (body.error as string) ?? "Upload failed",
+          detail ??
+            (body.message as string) ??
+            (body.error as string) ??
+            "Upload failed",
         );
       }
       setUploading(false);
@@ -320,6 +407,7 @@ export function ImageUploadInput({
 
   const handleRemove = () => {
     if (value.startsWith("pending:") && deferred) deferred.cancel(value);
+    setMeta(null);
     onChange("");
   };
 
@@ -334,40 +422,116 @@ export function ImageUploadInput({
   };
 
   const isPending = deferred && value.startsWith("pending:");
+  // The preview frame mirrors how the public site renders this ratio, so what
+  // the editor sees here is what ships.
+  const previewFrame = rule.aspectClass
+    ? `w-48 ${rule.aspectClass}`
+    : "h-28 w-48";
+  const previewFit =
+    rule.fit === "contain" || rule.height === null
+      ? "object-contain"
+      : "object-cover";
+  const staleRatio = meta !== null && meta.ratioType !== ratioType;
 
   return (
     <Field label={label} hint={hint}>
       <div className="space-y-2">
         {value && (
-          <div className="relative h-28 w-48 overflow-hidden rounded-lg border border-gray-200 bg-gray-50">
-            {imgError ? (
-              <span className="flex h-full w-full items-center justify-center text-xs text-gray-400">
-                No preview
-              </span>
-            ) : (
-              <img
-                src={getPreviewUrl(value)}
-                alt=""
-                className="h-full w-full object-contain"
-                onError={() => setImgError(true)}
-              />
-            )}
-            {isPending && (
-              <span className="absolute bottom-1 left-1 rounded bg-amber-500 px-1 py-0.5 text-[10px] font-semibold text-white">
-                Pending
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={handleRemove}
-              className="admin-btn admin-btn-danger admin-btn-sm absolute top-1 right-1"
-              style={{ padding: "0.2rem 0.4rem" }}
-              title="Remove image"
+          <div className="space-y-1">
+            <div
+              className={`relative overflow-hidden rounded-lg border border-gray-200 bg-gray-50 ${previewFrame}`}
             >
-              <Trash2 size={12} />
-            </button>
+              {imgError ? (
+                <span className="flex h-full w-full items-center justify-center text-xs text-gray-400">
+                  No preview
+                </span>
+              ) : (
+                <img
+                  src={getPreviewUrl(value)}
+                  alt=""
+                  className={`h-full w-full ${previewFit}`}
+                  onError={() => setImgError(true)}
+                />
+              )}
+              {isPending && (
+                <span className="absolute bottom-1 left-1 rounded bg-amber-500 px-1 py-0.5 text-[10px] font-semibold text-white">
+                  Pending
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={handleRemove}
+                className="admin-btn admin-btn-danger admin-btn-sm absolute top-1 right-1"
+                style={{ padding: "0.2rem 0.4rem" }}
+                title="Remove image"
+              >
+                <Trash2 size={12} />
+              </button>
+            </div>
+            {meta && (
+              <p className="w-48 text-[11px] leading-tight text-gray-500">
+                {meta.width && meta.height ? (
+                  <span className="font-medium text-gray-700">
+                    {meta.width} × {meta.height}
+                  </span>
+                ) : null}
+                <span className="block">
+                  {meta.aspectRatio} · {IMAGE_RATIOS[meta.ratioType].label}
+                </span>
+                {meta.fileSize !== undefined && (
+                  <span className="block">{formatBytes(meta.fileSize)}</span>
+                )}
+              </p>
+            )}
           </div>
         )}
+
+        <div>
+          <label
+            htmlFor={selectId}
+            className="mb-1 block text-[11px] font-medium text-gray-600"
+          >
+            Image ratio
+          </label>
+          <select
+            id={selectId}
+            className="admin-select"
+            value={ratioType}
+            onChange={(e) => setRatioType(e.target.value as RatioType)}
+          >
+            {RATIO_TYPES.map((key) => {
+              const r = IMAGE_RATIOS[key];
+              return (
+                <option key={key} value={key}>
+                  {r.label}
+                  {r.height === null
+                    ? " — original shape"
+                    : ` — ${r.ratio} (${r.width}×${r.height})`}
+                </option>
+              );
+            })}
+          </select>
+          <p className="mt-1 text-[11px] leading-tight text-gray-500">
+            <span className="font-medium text-gray-700">Selected:</span>{" "}
+            {rule.label}
+            {rule.height !== null && (
+              <>
+                {" · "}
+                <span className="font-medium text-gray-700">
+                  Required:
+                </span>{" "}
+                {rule.ratio} — at least {rule.width}×{rule.height}px
+              </>
+            )}
+            <span className="block">{rule.hint}</span>
+            {staleRatio && (
+              <span className="block text-amber-700">
+                Ratio changed — re-upload to apply it to this image.
+              </span>
+            )}
+          </p>
+        </div>
+
         <input
           type="file"
           ref={fileRef}

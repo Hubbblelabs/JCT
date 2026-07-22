@@ -7,11 +7,18 @@ import {
   useEffect,
   type ReactNode,
 } from "react";
+import type { RatioType } from "@/lib/validation/imageAsset";
 
 export interface PendingUpload {
   file: File;
   previewUrl: string;
   endpoint: "images" | "documents";
+  /**
+   * Ratio preset chosen at pick time. Carried through the deferred queue so a
+   * deferred upload resizes identically to an immediate one — without this the
+   * editor's choice would be dropped at flush and land as "auto".
+   */
+  ratioType?: RatioType;
 }
 
 export interface DeferredUploadsContextValue {
@@ -63,7 +70,11 @@ export function DeferredUploadsProvider({ children }: { children: ReactNode }) {
             return;
           }
           try {
-            const realKey = await doUpload(info.file, info.endpoint);
+            const realKey = await doUpload(
+              info.file,
+              info.endpoint,
+              info.ratioType,
+            );
             replacements.set(placeholderKey, realKey);
             URL.revokeObjectURL(info.previewUrl);
             map.delete(placeholderKey);
@@ -101,11 +112,13 @@ export function useDeferredUploadsOptional(): DeferredUploadsContextValue | null
 async function doUpload(
   file: File,
   endpoint: "images" | "documents",
+  ratioType?: RatioType,
 ): Promise<string> {
   if (endpoint === "documents") return doPresignedDocumentUpload(file);
 
   const fd = new FormData();
   fd.append("file", file);
+  if (ratioType) fd.append("ratioType", ratioType);
   const r = await fetch("/api/admin/images/upload", {
     method: "POST",
     body: fd,
