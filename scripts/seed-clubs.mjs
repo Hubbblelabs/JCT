@@ -48,6 +48,7 @@ const club = (name, description, opts = {}) => ({
   category: CLUBS,
   description,
   image: "",
+  gallery: [],
   convenor: opts.convenor ?? "",
   convenorRole: opts.convenorRole ?? "",
   email: "",

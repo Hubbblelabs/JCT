@@ -173,6 +173,7 @@ export const GROUPS_PAGE_LIMITS = {
   groupsMax: 60,
   membersMax: 40,
   activitiesMax: 20,
+  galleryMax: 12,
 } as const;
 
 const GroupMemberSchema = z.object({
@@ -195,6 +196,8 @@ const GroupSchema = z.object({
   category: s(120),
   description: s(1500),
   image: s(500),
+  /** Event/activity photos shown in the sidebar on the detail page. */
+  gallery: z.array(s(500)).max(GROUPS_PAGE_LIMITS.galleryMax).default([]),
   convenor: s(160),
   convenorRole: s(160),
   email: s(200),

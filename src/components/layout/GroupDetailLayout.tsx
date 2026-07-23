@@ -16,11 +16,19 @@ function contactHref(contact: string): string {
   return `tel:${v.replace(/[^\d+]/g, "")}`;
 }
 
+// Column counts for the sidebar gallery grid — a lone photo reads as a
+// banner, two+ read better as uniform tiles.
+const GALLERY_COLS: Record<number, string> = {
+  1: "grid-cols-1",
+  2: "grid-cols-2",
+  3: "grid-cols-2",
+};
+
 /**
  * Detail page for one club/cell/committee. Rendered by
- * `<basePath>/[slug]/page.tsx` for both variants — the roster is the reason
- * this page exists, so it gets a real table on desktop rather than the
- * compressed list the index cards used to show.
+ * `<basePath>/[slug]/page.tsx` for both variants. Photo, convenor contact,
+ * and the event gallery live in a sticky sidebar; the description, roster,
+ * and activities are the main column.
  */
 export function GroupDetailLayout({
   group,
@@ -31,12 +39,17 @@ export function GroupDetailLayout({
 }) {
   const meta = GROUPS_VARIANT_META[variant];
   const img = getImageUrl(group.image) || "";
+  const gallery = (group.gallery ?? [])
+    .map((g) => getImageUrl(g) || "")
+    .filter(Boolean);
+  const galleryCols = GALLERY_COLS[gallery.length] ?? "grid-cols-2";
   const members = group.members.filter((m) => m.name.trim() !== "");
   const activities = group.activities.filter((a) => a.trim() !== "");
   // Columns are dropped entirely when no member fills them, so a roster with
   // only names and phone numbers doesn't render two dead columns.
   const showDept = members.some((m) => m.dept.trim() !== "");
   const showContact = members.some((m) => m.contact.trim() !== "");
+  const hasSidebarInfo = img || group.convenor || group.email;
 
   return (
     <main className="bg-surface text-foreground min-h-screen">
@@ -53,196 +66,227 @@ export function GroupDetailLayout({
           ]}
         />
 
-        <div className="mt-8 max-w-4xl">
-          <Link
-            href={meta.basePath}
-            className="text-muted-foreground hover:text-gold inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
-          >
-            <ArrowLeft size={15} />
-            All {meta.breadcrumb}
-          </Link>
+        <Link
+          href={meta.basePath}
+          className="text-muted-foreground hover:text-gold mt-8 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+        >
+          <ArrowLeft size={15} />
+          All {meta.breadcrumb}
+        </Link>
 
-          {(img || group.description) && (
-            <div className="mt-6 flex flex-col gap-6 sm:flex-row sm:items-start">
-              {img && (
-                <div className="relative h-40 w-40 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/5">
-                  <Image
-                    src={img}
-                    alt={group.name}
-                    fill
-                    sizes="160px"
-                    className="object-cover"
-                  />
-                </div>
-              )}
-              {group.description && (
-                <p className="text-muted-foreground text-base leading-relaxed md:text-lg">
-                  {group.description}
-                </p>
-              )}
-            </div>
-          )}
+        <div className="mt-6 grid grid-cols-1 gap-10 lg:grid-cols-[1fr_320px]">
+          {/* Main column */}
+          <div className="min-w-0">
+            {group.description && (
+              <p className="text-muted-foreground text-base leading-relaxed md:text-lg">
+                {group.description}
+              </p>
+            )}
 
-          {(group.convenor || group.email) && (
-            <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4 rounded-2xl border border-white/10 bg-white/5 p-5">
-              {group.convenor && (
-                <div className="flex items-center gap-3">
-                  <span className="bg-gold/15 text-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
-                    <UserRound size={18} />
-                  </span>
-                  <div className="min-w-0">
-                    <p className="text-foreground text-sm font-bold">
-                      {group.convenor}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      {group.convenorRole || meta.convenorFallback}
-                    </p>
-                  </div>
-                </div>
-              )}
-              {group.email && (
-                <a
-                  href={`mailto:${group.email}`}
-                  className="text-gold flex items-center gap-1.5 text-sm font-bold hover:underline"
-                >
-                  <Mail size={15} />
-                  {group.email}
-                </a>
-              )}
-            </div>
-          )}
+            {members.length > 0 && (
+              <section className="mt-12">
+                <h2 className="text-foreground mb-5 font-serif text-xl font-bold md:text-2xl">
+                  {meta.membersLabel}
+                </h2>
 
-          {members.length > 0 && (
-            <section className="mt-12">
-              <h2 className="text-foreground mb-5 font-serif text-xl font-bold md:text-2xl">
-                {meta.membersLabel}
-              </h2>
-
-              {/* Desktop: a real table. A 4-column roster is tabular data and
-                  reads far better than stacked key/value pairs. */}
-              <div className="hidden overflow-x-auto rounded-2xl border border-white/10 sm:block">
-                <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
-                  <thead>
-                    <tr className="bg-white/5">
-                      <th className="text-muted-foreground w-12 px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
-                        #
-                      </th>
-                      <th className="text-muted-foreground px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
-                        Name
-                      </th>
-                      <th className="text-muted-foreground px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
-                        Designation
-                      </th>
-                      {showDept && (
-                        <th className="text-muted-foreground px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
-                          Department / Affiliation
+                {/* Desktop: a real table. A 4-column roster is tabular data and
+                    reads far better than stacked key/value pairs. */}
+                <div className="hidden overflow-x-auto rounded-2xl border border-white/10 sm:block">
+                  <table className="w-full min-w-[36rem] border-collapse text-left text-sm">
+                    <thead>
+                      <tr className="bg-white/5">
+                        <th className="text-muted-foreground w-12 px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
+                          #
                         </th>
-                      )}
-                      {showContact && (
                         <th className="text-muted-foreground px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
-                          Contact
+                          Name
                         </th>
-                      )}
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-white/5">
-                    {members.map((m, i) => (
-                      <tr
-                        key={i}
-                        className="transition-colors hover:bg-white/5"
-                      >
-                        <td className="text-muted-foreground px-4 py-3 text-xs">
-                          {i + 1}
-                        </td>
-                        <td className="text-foreground px-4 py-3 font-medium">
-                          {m.name}
-                        </td>
-                        <td className="text-muted-foreground px-4 py-3">
-                          {m.role}
-                        </td>
+                        <th className="text-muted-foreground px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
+                          Designation
+                        </th>
                         {showDept && (
-                          <td className="text-muted-foreground px-4 py-3">
-                            {m.dept}
-                          </td>
+                          <th className="text-muted-foreground px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
+                            Department / Affiliation
+                          </th>
                         )}
                         {showContact && (
-                          <td className="px-4 py-3">
-                            {m.contact && (
-                              <a
-                                href={contactHref(m.contact)}
-                                className="text-gold font-medium hover:underline"
-                              >
-                                {m.contact}
-                              </a>
-                            )}
-                          </td>
+                          <th className="text-muted-foreground px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
+                            Contact
+                          </th>
                         )}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {members.map((m, i) => (
+                        <tr
+                          key={i}
+                          className="transition-colors hover:bg-white/5"
+                        >
+                          <td className="text-muted-foreground px-4 py-3 text-xs">
+                            {i + 1}
+                          </td>
+                          <td className="text-foreground px-4 py-3 font-medium">
+                            {m.name}
+                          </td>
+                          <td className="text-muted-foreground px-4 py-3">
+                            {m.role}
+                          </td>
+                          {showDept && (
+                            <td className="text-muted-foreground px-4 py-3">
+                              {m.dept}
+                            </td>
+                          )}
+                          {showContact && (
+                            <td className="px-4 py-3">
+                              {m.contact && (
+                                <a
+                                  href={contactHref(m.contact)}
+                                  className="text-gold font-medium hover:underline"
+                                >
+                                  {m.contact}
+                                </a>
+                              )}
+                            </td>
+                          )}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
 
-              {/* Mobile: one card per member — a 5-column table can't shrink. */}
-              <ul className="space-y-3 sm:hidden">
-                {members.map((m, i) => (
-                  <li
-                    key={i}
-                    className="rounded-2xl border border-white/10 bg-white/5 p-4"
-                  >
-                    <p className="text-foreground font-bold">{m.name}</p>
-                    {m.role && (
-                      <p className="text-gold mt-0.5 text-xs font-semibold">
-                        {m.role}
-                      </p>
+                {/* Mobile: one card per member — a 5-column table can't shrink. */}
+                <ul className="space-y-3 sm:hidden">
+                  {members.map((m, i) => (
+                    <li
+                      key={i}
+                      className="rounded-2xl border border-white/10 bg-white/5 p-4"
+                    >
+                      <p className="text-foreground font-bold">{m.name}</p>
+                      {m.role && (
+                        <p className="text-gold mt-0.5 text-xs font-semibold">
+                          {m.role}
+                        </p>
+                      )}
+                      {m.dept && (
+                        <p className="text-muted-foreground mt-1 text-xs">
+                          {m.dept}
+                        </p>
+                      )}
+                      {m.contact && (
+                        <a
+                          href={contactHref(m.contact)}
+                          className="text-gold mt-2 inline-block text-xs font-bold hover:underline"
+                        >
+                          {m.contact}
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {activities.length > 0 && (
+              <section className="mt-12">
+                <h2 className="text-foreground mb-5 font-serif text-xl font-bold md:text-2xl">
+                  {meta.activitiesLabel}
+                </h2>
+                <ul className="space-y-3">
+                  {activities.map((a, i) => (
+                    <li
+                      key={i}
+                      className="text-muted-foreground flex items-start gap-3 text-sm leading-relaxed md:text-base"
+                    >
+                      <CheckCircle
+                        size={15}
+                        className="text-gold mt-1 shrink-0"
+                      />
+                      <span>{a}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {members.length === 0 && activities.length === 0 && (
+              <p className="text-muted-foreground/60 mt-10 rounded-2xl border border-dashed border-white/15 py-12 text-center text-sm">
+                Details for this {meta.singular.toLowerCase()} will be
+                published soon.
+              </p>
+            )}
+          </div>
+
+          {/* Sidebar */}
+          <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+            {hasSidebarInfo && (
+              <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
+                {img && (
+                  <div className="relative aspect-[4/3] w-full">
+                    <Image
+                      src={img}
+                      alt={group.name}
+                      fill
+                      sizes="320px"
+                      className="object-cover"
+                    />
+                  </div>
+                )}
+                {(group.convenor || group.email) && (
+                  <div className="space-y-4 p-5">
+                    {group.convenor && (
+                      <div className="flex items-center gap-3">
+                        <span className="bg-gold/15 text-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+                          <UserRound size={18} />
+                        </span>
+                        <div className="min-w-0">
+                          <p className="text-foreground text-sm font-bold">
+                            {group.convenor}
+                          </p>
+                          <p className="text-muted-foreground text-xs">
+                            {group.convenorRole || meta.convenorFallback}
+                          </p>
+                        </div>
+                      </div>
                     )}
-                    {m.dept && (
-                      <p className="text-muted-foreground mt-1 text-xs">
-                        {m.dept}
-                      </p>
-                    )}
-                    {m.contact && (
+                    {group.email && (
                       <a
-                        href={contactHref(m.contact)}
-                        className="text-gold mt-2 inline-block text-xs font-bold hover:underline"
+                        href={`mailto:${group.email}`}
+                        className="text-gold flex items-center gap-1.5 text-sm font-bold hover:underline"
                       >
-                        {m.contact}
+                        <Mail size={15} className="shrink-0" />
+                        <span className="truncate">{group.email}</span>
                       </a>
                     )}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
+                  </div>
+                )}
+              </div>
+            )}
 
-          {activities.length > 0 && (
-            <section className="mt-12">
-              <h2 className="text-foreground mb-5 font-serif text-xl font-bold md:text-2xl">
-                {meta.activitiesLabel}
-              </h2>
-              <ul className="space-y-3">
-                {activities.map((a, i) => (
-                  <li
-                    key={i}
-                    className="text-muted-foreground flex items-start gap-3 text-sm leading-relaxed md:text-base"
-                  >
-                    <CheckCircle
-                      size={15}
-                      className="text-gold mt-1 shrink-0"
-                    />
-                    <span>{a}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {members.length === 0 && activities.length === 0 && (
-            <p className="text-muted-foreground/60 mt-10 rounded-2xl border border-dashed border-white/15 py-12 text-center text-sm">
-              Details for this {meta.singular.toLowerCase()} will be published
-              soon.
-            </p>
-          )}
+            {gallery.length > 0 && (
+              <div className="rounded-3xl border border-white/10 bg-white/5 p-5">
+                <h2 className="text-foreground mb-4 font-serif text-base font-bold">
+                  Gallery
+                </h2>
+                <div className={`grid gap-2 ${galleryCols}`}>
+                  {gallery.map((src, i) => (
+                    <div
+                      key={`${src}-${i}`}
+                      className="relative aspect-square w-full overflow-hidden rounded-xl border border-white/10 bg-white/5"
+                    >
+                      <Image
+                        src={src}
+                        alt={`${group.name} — photo ${i + 1}`}
+                        fill
+                        sizes="150px"
+                        className="object-cover transition-transform duration-300 hover:scale-105"
+                        loading="lazy"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </aside>
         </div>
       </div>
 

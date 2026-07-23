@@ -28,6 +28,12 @@ export type GroupsVariantMeta = {
   sectionLabel: string;
   /** Singular noun, for detail-page copy. */
   singular: string;
+  /**
+   * "image" — a full-width photo leads the card (Clubs & Cells, where every
+   * entry has its own picture). "avatar" — a small icon/logo badge next to
+   * the name (Committees, which mostly don't have a photo).
+   */
+  cardStyle: "image" | "avatar";
 };
 
 export const GROUPS_VARIANT_META: Record<GroupsVariant, GroupsVariantMeta> = {
@@ -44,6 +50,7 @@ export const GROUPS_VARIANT_META: Record<GroupsVariant, GroupsVariantMeta> = {
     publicEmpty: "Club details will be published soon.",
     sectionLabel: "Clubs & Cells",
     singular: "Club",
+    cardStyle: "image",
   },
   committees: {
     basePath: "/institutions/engineering/committees",
@@ -58,6 +65,7 @@ export const GROUPS_VARIANT_META: Record<GroupsVariant, GroupsVariantMeta> = {
     publicEmpty: "Committee details will be published soon.",
     sectionLabel: "Committees",
     singular: "Committee",
+    cardStyle: "avatar",
   },
 };
 

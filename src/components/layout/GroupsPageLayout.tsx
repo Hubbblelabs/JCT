@@ -2,7 +2,13 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ListChecks, UserRound, Users } from "lucide-react";
+import {
+  ArrowRight,
+  ImageIcon,
+  ListChecks,
+  UserRound,
+  Users,
+} from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
@@ -45,7 +51,51 @@ function groupByCategory(entries: Entry[]): [string, Entry[]][] {
   return [...buckets.entries()];
 }
 
-function CardBody({
+function CardFooter({
+  group,
+  meta,
+}: {
+  group: GroupValue;
+  meta: GroupsVariantMeta;
+}) {
+  const memberCount = group.members.filter((m) => m.name.trim() !== "").length;
+  const activityCount = group.activities.filter((a) => a.trim() !== "").length;
+  const galleryCount = (group.gallery ?? []).filter((g) => g.trim() !== "")
+    .length;
+
+  return (
+    <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-5">
+      {memberCount > 0 && (
+        <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
+          <Users size={13} className="shrink-0" />
+          {memberCount} {meta.membersLabel.toLowerCase()}
+        </span>
+      )}
+      {activityCount > 0 && (
+        <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
+          <ListChecks size={13} className="shrink-0" />
+          {activityCount} {meta.activitiesLabel.toLowerCase()}
+        </span>
+      )}
+      {galleryCount > 0 && (
+        <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
+          <ImageIcon size={13} className="shrink-0" />
+          {galleryCount} photos
+        </span>
+      )}
+      <span className="text-gold ml-auto flex items-center gap-1.5 text-xs font-bold">
+        View details
+        <ArrowRight
+          size={13}
+          className="transition-transform duration-300 group-hover/card:translate-x-0.5"
+        />
+      </span>
+    </div>
+  );
+}
+
+/** Avatar-style card — a small logo badge beside the name (Committees). */
+function CardBodyAvatar({
   group,
   meta,
 }: {
@@ -53,8 +103,6 @@ function CardBody({
   meta: GroupsVariantMeta;
 }) {
   const img = getImageUrl(group.image) || "";
-  const memberCount = group.members.filter((m) => m.name.trim() !== "").length;
-  const activityCount = group.activities.filter((a) => a.trim() !== "").length;
 
   return (
     <>
@@ -94,33 +142,81 @@ function CardBody({
         </p>
       )}
 
-      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-5">
-        {memberCount > 0 && (
-          <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
-            <Users size={13} className="shrink-0" />
-            {memberCount} {meta.membersLabel.toLowerCase()}
-          </span>
-        )}
-        {activityCount > 0 && (
-          <span className="text-muted-foreground flex items-center gap-1.5 text-xs">
-            <ListChecks size={13} className="shrink-0" />
-            {activityCount} {meta.activitiesLabel.toLowerCase()}
-          </span>
-        )}
-        <span className="text-gold ml-auto flex items-center gap-1.5 text-xs font-bold">
-          View details
-          <ArrowRight
-            size={13}
-            className="transition-transform duration-300 group-hover/card:translate-x-0.5"
+      <CardFooter group={group} meta={meta} />
+    </>
+  );
+}
+
+/** Image-led card — a full-bleed photo above the name/desc (Clubs & Cells). */
+function CardBodyImage({
+  group,
+  meta,
+}: {
+  group: GroupValue;
+  meta: GroupsVariantMeta;
+}) {
+  const img = getImageUrl(group.image) || "";
+
+  return (
+    <>
+      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-white/5">
+        {img ? (
+          <Image
+            src={img}
+            alt={group.name || meta.breadcrumb}
+            fill
+            sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw"
+            className="object-cover transition-transform duration-500 group-hover/card:scale-105"
           />
-        </span>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <meta.icon size={32} className="text-gold/40" />
+          </div>
+        )}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent" />
+      </div>
+
+      <div className="flex flex-1 flex-col p-5">
+        <h3 className="text-foreground group-hover/card:text-gold font-serif text-lg font-bold transition-colors duration-300">
+          {group.name || "Untitled"}
+        </h3>
+        {group.convenor && (
+          <p className="text-muted-foreground mt-1 flex items-center gap-1.5 text-xs">
+            <UserRound size={12} className="shrink-0" />
+            {group.convenor}
+          </p>
+        )}
+        {group.description && (
+          <p className="text-muted-foreground mt-3 line-clamp-3 text-sm leading-relaxed">
+            {group.description}
+          </p>
+        )}
+
+        <CardFooter group={group} meta={meta} />
       </div>
     </>
   );
 }
 
-const CARD_CLASS =
+function CardBody({
+  group,
+  meta,
+}: {
+  group: GroupValue;
+  meta: GroupsVariantMeta;
+}) {
+  return meta.cardStyle === "image" ? (
+    <CardBodyImage group={group} meta={meta} />
+  ) : (
+    <CardBodyAvatar group={group} meta={meta} />
+  );
+}
+
+const CARD_CLASS_AVATAR =
   "hover:border-gold/30 group/card flex h-full flex-col rounded-3xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:bg-white/10";
+
+const CARD_CLASS_IMAGE =
+  "hover:border-gold/30 group/card flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 transition-all duration-300 hover:bg-white/10 hover:shadow-xl hover:shadow-black/20";
 
 export function GroupsPageLayout({
   data,
@@ -135,6 +231,8 @@ export function GroupsPageLayout({
   onEditSection?: (section: string) => void;
 }) {
   const meta = GROUPS_VARIANT_META[variant];
+  const cardClass =
+    meta.cardStyle === "image" ? CARD_CLASS_IMAGE : CARD_CLASS_AVATAR;
   const intro = data.intro.filter((p) => p.trim() !== "");
   const slugs = resolveGroupSlugs(data.groups);
   const entries: Entry[] = data.groups
@@ -231,7 +329,7 @@ export function GroupsPageLayout({
                           label={group.name || "Untitled"}
                           editable
                           onEditSection={onEditSection}
-                          className={CARD_CLASS}
+                          className={cardClass}
                         >
                           <CardBody group={group} meta={meta} />
                         </EditableRegion>
@@ -239,7 +337,7 @@ export function GroupsPageLayout({
                         <Link
                           key={index}
                           href={`${meta.basePath}/${slug}`}
-                          className={CARD_CLASS}
+                          className={cardClass}
                         >
                           <CardBody group={group} meta={meta} />
                         </Link>
