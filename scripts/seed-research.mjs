@@ -207,12 +207,14 @@ const FUNDING_AGENCIES = [
   ["Tata Institute of Fundamental Research", "http://www.tifr.res.in/"],
 ];
 
+// No target="_blank": sanitizeHtml() strips `target` and `rel` from CMS HTML
+// (DOMPurify drops them by default as tabnabbing protection), so writing them
+// here would store markup that never survives to the page. These open in the
+// same tab, like every other CMS-authored link on the site.
 const FUNDING_HTML =
   "<ul>" +
   FUNDING_AGENCIES.map(
-    ([label, href]) =>
-      `<li><a href="${esc(href)}" target="_blank" rel="noopener noreferrer">` +
-      `${esc(label)}</a></li>`,
+    ([label, href]) => `<li><a href="${esc(href)}">${esc(label)}</a></li>`,
   ).join("") +
   "</ul>";
 
