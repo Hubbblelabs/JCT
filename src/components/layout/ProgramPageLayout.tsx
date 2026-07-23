@@ -1663,36 +1663,42 @@ function LifeTab({
               title={labels?.events?.title || "Events Organized"}
               ac={ac}
             />
-            <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
+            <div className="relative ml-3 border-l-2 border-gray-100 pl-6">
               {dept.events.map((ev, i) => (
                 <FadeUp key={i} delay={i * 0.05}>
-                  <Card className="h-full p-5">
-                    <div className="mb-2.5 flex flex-wrap items-start justify-between gap-2">
-                      <h4 className="leading-snug font-bold text-gray-900">
-                        {ev.title}
-                      </h4>
-                      <Badge ac={ac}>{ev.type}</Badge>
-                    </div>
-                    <p className="mb-2 text-xs font-semibold text-gray-400">
-                      {ev.date}
-                    </p>
-                    <p className="text-sm leading-relaxed text-gray-600">
-                      {ev.description}
-                    </p>
-                    {ev.resourcePerson && (
-                      <div
-                        className="mt-3 inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs"
-                        style={{ backgroundColor: `${ac}08` }}
-                      >
-                        <span className="font-bold text-gray-500">
-                          Resource Person:
-                        </span>
-                        <span className="font-semibold" style={{ color: ac }}>
-                          {ev.resourcePerson}
-                        </span>
+                  <div className="relative mb-8 last:mb-0">
+                    <div
+                      className="absolute -left-[1.85rem] mt-1 h-5 w-5 rounded-full border-4 border-white shadow-sm"
+                      style={{ backgroundColor: ac }}
+                    />
+                    <Card className="p-5">
+                      <div className="mb-2.5 flex flex-wrap items-start justify-between gap-2">
+                        <h4 className="leading-snug font-bold text-gray-900">
+                          {ev.title}
+                        </h4>
+                        <Badge ac={ac}>{ev.type}</Badge>
                       </div>
-                    )}
-                  </Card>
+                      <p className="mb-2 text-xs font-semibold text-gray-400">
+                        {ev.date}
+                      </p>
+                      <p className="text-sm leading-relaxed text-gray-600">
+                        {ev.description}
+                      </p>
+                      {ev.resourcePerson && (
+                        <div
+                          className="mt-3 inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs"
+                          style={{ backgroundColor: `${ac}08` }}
+                        >
+                          <span className="font-bold text-gray-500">
+                            Resource Person:
+                          </span>
+                          <span className="font-semibold" style={{ color: ac }}>
+                            {ev.resourcePerson}
+                          </span>
+                        </div>
+                      )}
+                    </Card>
+                  </div>
                 </FadeUp>
               ))}
             </div>
