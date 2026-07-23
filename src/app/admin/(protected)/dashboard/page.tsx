@@ -3,6 +3,8 @@ import { redirect } from "next/navigation";
 import { connectDB } from "@/lib/mongodb";
 import { Program, Placement, Testimonial, AuditLog } from "@/lib/models";
 import { GraduationCap, Send, Briefcase, MessageSquare } from "lucide-react";
+import Link from "next/link";
+import { hubHref, sectionItems, visibleSections } from "@/lib/admin-nav";
 
 async function getStats() {
   try {
@@ -34,7 +36,7 @@ export default async function DashboardPage() {
   if (role === "editor") {
     const institution = (session?.user as Record<string, unknown>)
       ?.institution as string;
-    redirect(`/admin/page-content?college=${institution || "engineering"}`);
+    redirect(`/admin/hub/${institution || "engineering"}`);
   }
 
   const { programs, published, placements, testimonials, logs } =
@@ -98,6 +100,37 @@ export default async function DashboardPage() {
               </div>
             </a>
           ))}
+        </div>
+
+        {/* Content sections — each opens a hub listing its pages */}
+        <div className="mb-6">
+          <h2 className="mb-3 text-xs font-bold tracking-wider text-gray-400 uppercase">
+            Manage Content
+          </h2>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {visibleSections(role ?? "admin", "all").map((s) => (
+              <Link
+                key={s.id}
+                href={hubHref(s.id)}
+                className="group admin-card flex items-start gap-3 no-underline transition-all hover:border-[#c9a84c] hover:shadow-md"
+              >
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#0a1628]/8 text-[#0a1628] transition-colors group-hover:bg-[#c9a84c]/20">
+                  <s.icon size={17} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-gray-900">
+                    {s.label}
+                  </span>
+                  <span className="mt-0.5 block text-xs leading-relaxed text-gray-500">
+                    {s.description}
+                  </span>
+                  <span className="mt-1 block text-[11px] font-medium text-gray-400">
+                    {sectionItems(s, role ?? "admin").length} pages
+                  </span>
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Recent activity */}

@@ -2,458 +2,27 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import {
-  BookOpen,
-  LayoutDashboard,
-  GraduationCap,
-  Briefcase,
-  MessageSquare,
-  Image,
-  ClipboardList,
-  Users,
-  LogOut,
-  User,
-  ChevronDown,
-  Wrench,
-  FileEdit,
-  Home,
-  Bell,
-  BarChart3,
-  Camera,
-  Layers,
-  Globe,
-  PanelTop,
-  PanelBottom,
-  Award,
-  Sparkles,
-  LayoutGrid,
-  MousePointerClick,
-  Settings,
-  Info,
-  ScrollText,
-  TreePalm,
-  CalendarDays,
-  FlaskConical,
-  FolderOpen,
-} from "lucide-react";
+import { BookOpen, LayoutDashboard, LogOut, User } from "lucide-react";
 import { useSession, signOut } from "next-auth/react";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import { hasMinRole } from "@/lib/permissions";
-
-type NavItem = {
-  label: string;
-  href: string;
-  icon: React.ComponentType<{ size?: number }>;
-  minRole?: "editor" | "admin";
-};
-
-const COLLEGE_ITEMS: Record<string, NavItem[]> = {
-  engineering: [
-    {
-      label: "Navbar",
-      href: "/admin/page-content?college=engineering&section=navbar",
-      icon: PanelTop,
-    },
-    {
-      label: "Announcement Bar",
-      href: "/admin/page-content?college=engineering&section=announcement",
-      icon: Bell,
-    },
-    {
-      label: "Hero",
-      href: "/admin/page-content?college=engineering&section=hero",
-      icon: Image,
-    },
-    {
-      label: "Programs",
-      href: "/admin/programs?college=engineering",
-      icon: GraduationCap,
-    },
-    {
-      label: "Performance Metrics",
-      href: "/admin/page-content?college=engineering&section=metrics",
-      icon: BarChart3,
-    },
-    {
-      label: "Placements",
-      href: "/admin/placements?college=engineering",
-      icon: Briefcase,
-    },
-    {
-      label: "Placements Page",
-      href: "/admin/placements-page?college=engineering",
-      icon: ScrollText,
-    },
-    {
-      label: "Placement Highlights",
-      href: "/admin/recruiters?college=engineering",
-      icon: Award,
-    },
-    {
-      label: "Admissions",
-      href: "/admin/page-content?college=engineering&section=admissions",
-      icon: ClipboardList,
-    },
-    {
-      label: "Life at JCT",
-      href: "/admin/page-content?college=engineering&section=lifeAtJct",
-      icon: Camera,
-    },
-    {
-      label: "News & Events",
-      href: "/admin/events?college=engineering",
-      icon: CalendarDays,
-    },
-    {
-      label: "Testimonials",
-      href: "/admin/page-content?college=engineering&section=testimonials",
-      icon: MessageSquare,
-    },
-    {
-      label: "About Us",
-      href: "/admin/about?college=engineering",
-      icon: Info,
-    },
-    {
-      label: "Accreditations",
-      href: "/admin/accreditations?college=engineering",
-      icon: Award,
-    },
-    {
-      label: "COE",
-      href: "/admin/coe",
-      icon: ScrollText,
-    },
-    {
-      label: "Research",
-      href: "/admin/research",
-      icon: FlaskConical,
-    },
-    {
-      label: "Clubs & Cells",
-      href: "/admin/clubs",
-      icon: Sparkles,
-    },
-    {
-      label: "Committees",
-      href: "/admin/committees",
-      icon: Users,
-    },
-    {
-      label: "Documents",
-      href: "/admin/documents",
-      icon: FolderOpen,
-    },
-  ],
-  "arts-science": [
-    {
-      label: "Navbar",
-      href: "/admin/page-content?college=arts-science&section=navbar",
-      icon: PanelTop,
-    },
-    {
-      label: "Hero",
-      href: "/admin/page-content?college=arts-science&section=hero",
-      icon: FileEdit,
-    },
-    {
-      label: "Programs",
-      href: "/admin/programs?college=arts-science",
-      icon: GraduationCap,
-    },
-    {
-      label: "Placements",
-      href: "/admin/placements?college=arts-science",
-      icon: Briefcase,
-    },
-    {
-      label: "Placements Page",
-      href: "/admin/placements-page?college=arts-science",
-      icon: ScrollText,
-    },
-    {
-      label: "Placement Highlights",
-      href: "/admin/recruiters?college=arts-science",
-      icon: Award,
-    },
-    {
-      label: "Admissions",
-      href: "/admin/page-content?college=arts-science&section=admissions",
-      icon: ClipboardList,
-    },
-    {
-      label: "Life at JCT",
-      href: "/admin/page-content?college=arts-science&section=lifeAtJct",
-      icon: Camera,
-    },
-    {
-      label: "News & Events",
-      href: "/admin/events?college=arts-science",
-      icon: CalendarDays,
-    },
-    {
-      label: "Testimonials",
-      href: "/admin/page-content?college=arts-science&section=testimonials",
-      icon: MessageSquare,
-    },
-    {
-      label: "About Us",
-      href: "/admin/about?college=arts-science",
-      icon: Info,
-    },
-    {
-      label: "Accreditations",
-      href: "/admin/accreditations?college=arts-science",
-      icon: Award,
-    },
-  ],
-  polytechnic: [
-    {
-      label: "Navbar",
-      href: "/admin/page-content?college=polytechnic&section=navbar",
-      icon: PanelTop,
-    },
-    {
-      label: "Hero",
-      href: "/admin/page-content?college=polytechnic&section=hero",
-      icon: FileEdit,
-    },
-    {
-      label: "Programs",
-      href: "/admin/programs?college=polytechnic",
-      icon: GraduationCap,
-    },
-    {
-      label: "Placements",
-      href: "/admin/placements?college=polytechnic",
-      icon: Briefcase,
-    },
-    {
-      label: "Placements Page",
-      href: "/admin/placements-page?college=polytechnic",
-      icon: ScrollText,
-    },
-    {
-      label: "Placement Highlights",
-      href: "/admin/recruiters?college=polytechnic",
-      icon: Award,
-    },
-    {
-      label: "Admissions",
-      href: "/admin/page-content?college=polytechnic&section=admissions",
-      icon: ClipboardList,
-    },
-    {
-      label: "Life at JCT",
-      href: "/admin/page-content?college=polytechnic&section=lifeAtJct",
-      icon: Camera,
-    },
-    {
-      label: "News & Events",
-      href: "/admin/events?college=polytechnic",
-      icon: CalendarDays,
-    },
-    {
-      label: "Testimonials",
-      href: "/admin/page-content?college=polytechnic&section=testimonials",
-      icon: MessageSquare,
-    },
-    {
-      label: "About Us",
-      href: "/admin/about?college=polytechnic",
-      icon: Info,
-    },
-    {
-      label: "Accreditations",
-      href: "/admin/accreditations?college=polytechnic",
-      icon: Award,
-    },
-  ],
-};
-
-const MAIN_ITEMS: NavItem[] = [
-  {
-    label: "Navbar",
-    href: "/admin/main/page-content?section=navbar",
-    icon: PanelTop,
-  },
-  {
-    label: "Pamphlet Popup",
-    href: "/admin/main/page-content?section=pamphlet",
-    icon: Layers,
-  },
-  {
-    label: "Hero",
-    href: "/admin/main/page-content?section=hero",
-    icon: FileEdit,
-  },
-  {
-    label: "Accreditation Logos",
-    href: "/admin/main/page-content?section=accreditations",
-    icon: Award,
-  },
-  {
-    label: "Statistics",
-    href: "/admin/main/page-content?section=statistics",
-    icon: BarChart3,
-  },
-  {
-    label: "Why Choose JCT",
-    href: "/admin/main/page-content?section=whyChooseJct",
-    icon: Sparkles,
-  },
-  {
-    label: "Card",
-    href: "/admin/main/page-content?section=card",
-    icon: LayoutGrid,
-  },
-  {
-    label: "Placement Highlights",
-    href: "/admin/recruiters?scope=main",
-    icon: Award,
-  },
-  {
-    label: "Life at JCT",
-    href: "/admin/main/page-content?section=lifeAtJct",
-    icon: Camera,
-  },
-  {
-    label: "News & Events",
-    href: "/admin/events?scope=main",
-    icon: CalendarDays,
-  },
-  {
-    label: "Testimonials",
-    href: "/admin/main/page-content?section=testimonials",
-    icon: MessageSquare,
-  },
-  {
-    label: "Admissions",
-    href: "/admin/main/page-content?section=homeAdmissions",
-    icon: ClipboardList,
-  },
-  {
-    label: "About Us",
-    href: "/admin/about?college=main",
-    icon: Info,
-  },
-  {
-    label: "Accreditations",
-    href: "/admin/accreditations?college=main",
-    icon: Award,
-  },
-  {
-    label: "Campus Life",
-    href: "/admin/campus-life",
-    icon: TreePalm,
-  },
-];
-
-const GLOBAL_CMS_ITEMS: NavItem[] = [
-  {
-    label: "Footer",
-    href: "/admin/global/page-content?section=footer",
-    icon: PanelBottom,
-  },
-  {
-    label: "Floating Elements",
-    href: "/admin/global/page-content?section=floatingElements",
-    icon: MousePointerClick,
-  },
-];
-
-const ADMIN_ITEMS: NavItem[] = [
-  {
-    label: "Dynamic Pages",
-    href: "/admin/pages",
-    icon: FileEdit,
-    minRole: "editor",
-  },
-  { label: "Users", href: "/admin/users", icon: Users, minRole: "admin" },
-  {
-    label: "Audit Log",
-    href: "/admin/audit",
-    icon: ClipboardList,
-    minRole: "admin",
-  },
-  {
-    label: "Settings",
-    href: "/admin/settings",
-    icon: Settings,
-    minRole: "admin",
-  },
-];
-
-const ALL_COLLEGES = [
-  { id: "engineering", label: "Engineering" },
-  { id: "arts-science", label: "Arts" },
-  { id: "polytechnic", label: "Polytechnic" },
-] as const;
-
-type NavScope = {
-  college: string | null;
-  section: string | null;
-  scope: string | null;
-};
-
-// Scoping params compared with strict null-aware equality: an item that omits a
-// param must NOT match a URL that carries it (and vice-versa). This is what
-// keeps the bare `/admin/events` (Main) item from lighting up on every
-// college's `/admin/events?college=X` page — the collision the old asymmetric
-// check produced.
-const SCOPE_PARAMS = ["college", "section", "scope"] as const;
-
-function isItemActive(href: string, pathname: string, url: NavScope): boolean {
-  const qIdx = href.indexOf("?");
-  const itemPath = qIdx >= 0 ? href.slice(0, qIdx) : href;
-  const itemQuery = qIdx >= 0 ? href.slice(qIdx + 1) : "";
-
-  const pathMatch =
-    pathname === itemPath || pathname.startsWith(itemPath + "/");
-  if (!pathMatch) return false;
-
-  const params = new URLSearchParams(itemQuery);
-  for (const key of SCOPE_PARAMS) {
-    if ((params.get(key) ?? null) !== (url[key] ?? null)) return false;
-  }
-  return true;
-}
-
-function isDropdownActive(
-  items: NavItem[],
-  pathname: string,
-  url: NavScope,
-): boolean {
-  return items.some((item) => isItemActive(item.href, pathname, url));
-}
+import { AdminQuickSearch } from "@/components/admin/AdminQuickSearch";
+import {
+  hubHref,
+  isSectionActive,
+  visibleSections,
+  type NavScope,
+} from "@/lib/admin-nav";
 
 function TabNavInner() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { data: session } = useSession();
-  const college = searchParams.get("college");
-  const section = searchParams.get("section");
-  const scope = searchParams.get("scope");
-  const url: NavScope = { college, section, scope };
-
-  // Only one dropdown may be open at a time. Hover, keyboard focus, and click
-  // all drive a single `openMenu` key so a click-opened menu can't linger open
-  // while another is hovered (which produced overlapping menus). Pure CSS
-  // :hover + :focus-within could show two menus simultaneously.
-  const [openMenu, setOpenMenu] = useState<string | null>(null);
-  const menuProps = (key: string) => ({
-    onMouseEnter: () => setOpenMenu(key),
-    onMouseLeave: () => setOpenMenu((cur) => (cur === key ? null : cur)),
-    onFocus: () => setOpenMenu(key),
-    onBlur: (e: React.FocusEvent<HTMLDivElement>) => {
-      if (!e.currentTarget.contains(e.relatedTarget as Node)) {
-        setOpenMenu((cur) => (cur === key ? null : cur));
-      }
-    },
-    onClick: () => setOpenMenu(null),
-  });
-  const menuClass = (key: string) =>
-    `admin-nav-dropdown-menu ${openMenu === key ? "open" : ""}`;
+  const url: NavScope = {
+    college: searchParams.get("college"),
+    section: searchParams.get("section"),
+    scope: searchParams.get("scope"),
+  };
 
   const userRole =
     ((session?.user as Record<string, unknown>)?.role as string) ?? "editor";
@@ -461,19 +30,12 @@ function TabNavInner() {
     ((session?.user as Record<string, unknown>)?.institution as string) ?? "";
   const isAdmin = hasMinRole(userRole, "admin");
 
-  const visibleAdminItems = ADMIN_ITEMS.filter((item) =>
-    hasMinRole(userRole, item.minRole ?? "editor"),
-  );
-
-  // Editors see only their assigned college; admins see all three
-  const visibleColleges = isAdmin
-    ? ALL_COLLEGES
-    : ALL_COLLEGES.filter((c) => c.id === userInstitution);
+  // One trigger per section — each opens that section's hub page, where the
+  // content pages are listed as searchable cards. The nav used to carry every
+  // link inside dropdowns, which grew unusably long.
+  const sections = visibleSections(userRole, userInstitution);
 
   const dashActive = pathname === "/admin/dashboard" || pathname === "/admin";
-  const adminMenuActive = isDropdownActive(visibleAdminItems, pathname, url);
-  const mainActive = isDropdownActive(MAIN_ITEMS, pathname, url);
-  const globalCmsActive = isDropdownActive(GLOBAL_CMS_ITEMS, pathname, url);
 
   if (
     pathname.startsWith("/admin/programs/") &&
@@ -500,7 +62,10 @@ function TabNavInner() {
     <div className="admin-top-nav">
       <div className="admin-brand-bar">
         {/* Brand */}
-        <div className="flex shrink-0 items-center gap-2">
+        <Link
+          href={isAdmin ? "/admin/dashboard" : hubHref(sections[0]?.id ?? "")}
+          className="flex shrink-0 items-center gap-2 no-underline"
+        >
           <BookOpen size={18} color="#c9a84c" />
           <div>
             <p className="text-sm leading-tight font-bold text-white">
@@ -510,11 +75,10 @@ function TabNavInner() {
               Content Management
             </p>
           </div>
-        </div>
+        </Link>
 
-        {/* Nav items — scroll horizontally on narrow viewports instead of clipping */}
-        <nav className="scrollbar-hide flex min-w-0 items-center gap-0.5 overflow-x-clip">
-          {/* Dashboard — admin only */}
+        {/* Section triggers — scroll horizontally on narrow viewports */}
+        <nav className="scrollbar-hide flex min-w-0 items-center gap-0.5 overflow-x-auto">
           {isAdmin && (
             <Link
               href="/admin/dashboard"
@@ -525,125 +89,23 @@ function TabNavInner() {
             </Link>
           )}
 
-          {/* Admin tools dropdown — admin only */}
-          {isAdmin && visibleAdminItems.length > 0 && (
-            <div className="admin-nav-item" {...menuProps("admin")}>
-              <button
-                className={`admin-nav-trigger ${adminMenuActive ? "active" : ""}`}
-              >
-                <Wrench size={13} />
-                Admin
-                <ChevronDown size={11} />
-              </button>
-              <div className={menuClass("admin")}>
-                {visibleAdminItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`admin-nav-dropdown-item ${pathname === item.href ? "active" : ""}`}
-                  >
-                    <item.icon size={14} />
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Global CMS — admin only */}
-          {isAdmin && (
-            <div className="admin-nav-item" {...menuProps("global")}>
-              <Link
-                href="/admin/global/page-content"
-                className={`admin-nav-trigger ${globalCmsActive ? "active" : ""}`}
-              >
-                <Globe size={13} />
-                Global CMS
-                <ChevronDown size={11} />
-              </Link>
-              <div className={menuClass("global")}>
-                {GLOBAL_CMS_ITEMS.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`admin-nav-dropdown-item ${
-                      isItemActive(item.href, pathname, url) ? "active" : ""
-                    }`}
-                  >
-                    <item.icon size={14} />
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Main (landing page) — admin only */}
-          {isAdmin && (
-            <div className="admin-nav-item" {...menuProps("main")}>
-              <Link
-                href="/admin/main/page-content"
-                className={`admin-nav-trigger ${mainActive ? "active" : ""}`}
-              >
-                <Home size={13} />
-                Main
-                <ChevronDown size={11} />
-              </Link>
-              <div className={menuClass("main")}>
-                {MAIN_ITEMS.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={`admin-nav-dropdown-item ${
-                      isItemActive(item.href, pathname, url) ? "active" : ""
-                    }`}
-                  >
-                    <item.icon size={14} />
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* College dropdowns — editors see only their assigned college */}
-          {visibleColleges.map(({ id, label }) => {
-            const items = COLLEGE_ITEMS[id];
-            const active = isDropdownActive(items, pathname, url);
-            return (
-              <div
-                key={id}
-                className="admin-nav-item admin-nav-item--right"
-                {...menuProps(`college:${id}`)}
-              >
-                <Link
-                  href={`/admin/page-content?college=${id}`}
-                  className={`admin-nav-trigger ${active ? "active" : ""}`}
-                >
-                  {label}
-                  <ChevronDown size={11} />
-                </Link>
-                <div className={menuClass(`college:${id}`)}>
-                  {items.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`admin-nav-dropdown-item ${
-                        isItemActive(item.href, pathname, url) ? "active" : ""
-                      }`}
-                    >
-                      <item.icon size={14} />
-                      {item.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+          {sections.map((s) => (
+            <Link
+              key={s.id}
+              href={hubHref(s.id)}
+              className={`admin-nav-trigger ${
+                isSectionActive(s, userRole, pathname, url) ? "active" : ""
+              }`}
+            >
+              <s.icon size={13} />
+              {s.navLabel}
+            </Link>
+          ))}
         </nav>
 
-        {/* User info + sign out */}
+        {/* Quick search + user info + sign out */}
         <div className="flex shrink-0 items-center gap-3">
+          <AdminQuickSearch role={userRole} institution={userInstitution} />
           <div className="flex items-center gap-2 text-sm text-white/75">
             <User size={14} />
             <span className="hidden md:inline">

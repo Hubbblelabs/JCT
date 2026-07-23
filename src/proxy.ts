@@ -30,11 +30,10 @@ export default auth((req) => {
     const institution = (req.auth.user as Record<string, unknown>)
       ?.institution as string;
     if (userRole === "editor") {
+      // Their college hub — the hub itself re-routes if the institution value
+      // doesn't name a section they can open.
       return NextResponse.redirect(
-        new URL(
-          `/admin/page-content?college=${institution || "engineering"}`,
-          req.url,
-        ),
+        new URL(`/admin/hub/${institution || "engineering"}`, req.url),
       );
     }
     return NextResponse.redirect(new URL("/admin/dashboard", req.url));
