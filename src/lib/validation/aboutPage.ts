@@ -54,8 +54,30 @@ const InstitutionInfoSchema = z.object({
 const VisionMissionSchema = z.object({
   visionText: s(2000),
   missionPoints: z.array(s(500)).default([]),
+  /** @deprecated superseded by the top-level `qualityPolicy` section — kept
+   * only so previously stored values still validate. Not rendered. */
   qualityPolicy: s(2000),
 });
+
+const QualityPolicySchema = z.object({
+  intro: s(1000),
+  points: z.array(s(1000)).default([]),
+});
+
+const PlanningBoardMemberSchema = z.object({
+  name: s(200),
+  position: s(100),
+  category: s(300),
+  qualification: s(200),
+});
+
+const PlanningBoardSchema = z.object({
+  paragraphs: z.array(s(1500)).default([]),
+  members: z.array(PlanningBoardMemberSchema).default([]),
+});
+
+const QUALITY_POLICY_DEFAULT = { intro: "", points: [] };
+const PLANNING_BOARD_DEFAULT = { paragraphs: [], members: [] };
 
 const PrincipalSchema = z.object({
   name: s(120),
@@ -143,6 +165,8 @@ export const EngineeringAboutSchema = z.object({
   accreditations: z.array(AccreditationSchema).default([]),
   campusHighlights: z.array(HighlightSchema).default([]),
   whyJct: z.array(s(300)).default([]),
+  qualityPolicy: QualityPolicySchema.default(QUALITY_POLICY_DEFAULT),
+  planningBoard: PlanningBoardSchema.default(PLANNING_BOARD_DEFAULT),
   sidebar: AboutSidebarSchema.default(ABOUT_SIDEBAR_DEFAULT),
 });
 
@@ -190,6 +214,8 @@ export const ArtsScienceAboutSchema = z.object({
   accreditations: z.array(AccreditationSchema).default([]),
   campusHighlights: z.array(HighlightSchema).default([]),
   whyJct: z.array(s(300)).default([]),
+  qualityPolicy: QualityPolicySchema.default(QUALITY_POLICY_DEFAULT),
+  planningBoard: PlanningBoardSchema.default(PLANNING_BOARD_DEFAULT),
   sidebar: AboutSidebarSchema.default(ABOUT_SIDEBAR_DEFAULT),
 });
 
@@ -234,6 +260,8 @@ export const PolytechnicAboutSchema = z.object({
   accreditations: z.array(AccreditationSchema).default([]),
   campusHighlights: z.array(HighlightSchema).default([]),
   whyJct: z.array(s(300)).default([]),
+  qualityPolicy: QualityPolicySchema.default(QUALITY_POLICY_DEFAULT),
+  planningBoard: PlanningBoardSchema.default(PLANNING_BOARD_DEFAULT),
   sidebar: AboutSidebarSchema.default(ABOUT_SIDEBAR_DEFAULT),
 });
 
@@ -280,6 +308,8 @@ export const MainAboutSchema = z.object({
   accreditations: z.array(AccreditationSchema).default([]),
   campusHighlights: z.array(HighlightSchema).default([]),
   whyJct: z.array(s(300)).default([]),
+  qualityPolicy: QualityPolicySchema.default(QUALITY_POLICY_DEFAULT),
+  planningBoard: PlanningBoardSchema.default(PLANNING_BOARD_DEFAULT),
   sidebar: AboutSidebarSchema.default(ABOUT_SIDEBAR_DEFAULT),
 });
 

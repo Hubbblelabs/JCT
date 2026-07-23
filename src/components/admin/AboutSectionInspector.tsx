@@ -20,6 +20,7 @@ type Stat = AboutPageValue["about"]["stats"][number];
 type MgmtMember = AboutPageValue["management"]["members"][number];
 type HodMember = AboutPageValue["hod"]["members"][number];
 type CouncilMember = AboutPageValue["governingCouncil"]["members"][number];
+type BoardMember = AboutPageValue["planningBoard"]["members"][number];
 type ValueItem = AboutPageValue["coreValues"][number];
 type Accreditation = AboutPageValue["accreditations"][number];
 type Highlight = AboutPageValue["campusHighlights"][number];
@@ -153,21 +154,87 @@ export function AboutSectionInspector({
             }
             placeholder="A mission point…"
           />
+        </>
+      );
+
+    case "qualityPolicy": {
+      // Absent on documents stored before this section existed.
+      const qp = {
+        intro: data.qualityPolicy?.intro ?? "",
+        points: data.qualityPolicy?.points ?? [],
+      };
+      return (
+        <>
           <TextArea
-            label="Quality Policy (optional — leave blank to hide)"
-            rows={5}
-            value={data.visionMission.qualityPolicy}
+            label="Intro (optional — shown above the policy points)"
+            rows={3}
+            value={qp.intro}
             onChange={(e) =>
-              patch({
-                visionMission: {
-                  ...data.visionMission,
-                  qualityPolicy: e.target.value,
-                },
-              })
+              patch({ qualityPolicy: { ...qp, intro: e.target.value } })
             }
+          />
+          <TextAreaList
+            label="Policy Points"
+            values={qp.points}
+            onChange={(points) => patch({ qualityPolicy: { ...qp, points } })}
+            placeholder="A quality policy statement…"
           />
         </>
       );
+    }
+
+    case "planningBoard": {
+      const pb = {
+        paragraphs: data.planningBoard?.paragraphs ?? [],
+        members: data.planningBoard?.members ?? [],
+      };
+      return (
+        <>
+          <TextAreaList
+            label="Description Paragraphs"
+            values={pb.paragraphs}
+            onChange={(paragraphs) =>
+              patch({ planningBoard: { ...pb, paragraphs } })
+            }
+            placeholder="What this committee does…"
+          />
+          <div className="admin-label mt-4 mb-2">Members</div>
+          <ItemsEditor
+            items={pb.members as unknown as Record<string, unknown>[]}
+            onChange={(v) =>
+              patch({
+                planningBoard: {
+                  ...pb,
+                  members: v as unknown as BoardMember[],
+                },
+              })
+            }
+            fields={[
+              { key: "name", label: "Name", placeholder: "Dr. MANOHARAN S" },
+              { key: "position", label: "Position", placeholder: "Chairman" },
+              {
+                key: "category",
+                label: "Category",
+                placeholder: "Senior faculty member of the College",
+                span2: true,
+              },
+              {
+                key: "qualification",
+                label: "Qualification",
+                placeholder: "Ph.D. — Electrical Machines",
+              },
+            ]}
+            emptyItem={{
+              name: "",
+              position: "",
+              category: "",
+              qualification: "",
+            }}
+            addLabel="Add member"
+          />
+        </>
+      );
+    }
 
     case "principal":
       return (

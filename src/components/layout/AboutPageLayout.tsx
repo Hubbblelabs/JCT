@@ -14,6 +14,7 @@ import {
   Lightbulb,
   Award,
   CheckCircle,
+  ClipboardList,
   MessageSquareQuote,
   School,
   Star,
@@ -66,6 +67,8 @@ export type AboutEditableSection =
   | "hero"
   | "about"
   | "visionMission"
+  | "qualityPolicy"
+  | "planningBoard"
   | "principal"
   | "management"
   | "hod"
@@ -80,6 +83,8 @@ export const ABOUT_SECTION_LABELS: Record<AboutEditableSection, string> = {
   hero: "Hero",
   about: "About the Institution",
   visionMission: "Vision & Mission",
+  qualityPolicy: "Quality Policy",
+  planningBoard: "Planning & Monitoring Board",
   principal: "Principal's Message",
   management: "Management",
   hod: "Administration — HOD",
@@ -96,10 +101,12 @@ export const ABOUT_SECTION_ORDER: AboutEditableSection[] = [
   "hero",
   "about",
   "visionMission",
+  "qualityPolicy",
   "principal",
   "management",
   "hod",
   "governingCouncil",
+  "planningBoard",
   "coreValues",
   "accreditations",
   "campusHighlights",
@@ -238,6 +245,7 @@ const VALUE_ICONS: LucideIcon[] = [
 export const ABOUT_NAV_DEFAULTS: SidebarNavDefault[] = [
   { anchor: "about", navLabel: "About", icon: Landmark },
   { anchor: "vision", navLabel: "Vision & Mission", icon: Target },
+  { anchor: "quality-policy", navLabel: "Quality Policy", icon: ShieldCheck },
   {
     anchor: "principal",
     navLabel: "Principal's Message",
@@ -246,6 +254,11 @@ export const ABOUT_NAV_DEFAULTS: SidebarNavDefault[] = [
   { anchor: "management", navLabel: "Management", icon: Briefcase },
   { anchor: "hod", navLabel: "Administration — HOD", icon: BookOpen },
   { anchor: "governing-council", navLabel: "Governing Council", icon: Users },
+  {
+    anchor: "planning-board",
+    navLabel: "Planning & Monitoring Board",
+    icon: ClipboardList,
+  },
   { anchor: "core-values", navLabel: "Core Values", icon: Heart },
   { anchor: "accreditations", navLabel: "Accreditations", icon: Award },
   { anchor: "campus", navLabel: "Campus", icon: School },
@@ -284,6 +297,7 @@ function AboutSideNav({
   theme,
   activeId,
   setActiveId,
+  visibleAnchors,
   editable,
   onEditSection,
 }: {
@@ -291,12 +305,17 @@ function AboutSideNav({
   theme: ThemeTokens;
   activeId: string;
   setActiveId: (id: string) => void;
+  /** Built-in anchors that actually render — others are dropped from the nav
+   * so a link never scrolls to a section hidden for lack of content. */
+  visibleAnchors: Set<string>;
   editable?: boolean;
   onEditSection?: (section: string) => void;
 }) {
   const navItems: ResolvedSidebarItem[] = resolveSidebarItems(
     ABOUT_NAV_DEFAULTS,
     data.sidebar.navItems,
+  ).filter(
+    (n) => n.customHref || n.customSection || visibleAnchors.has(n.anchor),
   );
   const builtins = navItems.filter((n) => !n.customHref);
 
@@ -524,6 +543,18 @@ export function AboutPageLayout({
   );
   const customSections = resolved.filter((r) => r.customSection);
 
+  // Added after the About configs were first stored, so a document written
+  // before this section existed simply has no key — read it as empty (the
+  // section then stays hidden) rather than substituting canned copy.
+  const qualityPolicy = {
+    intro: data.qualityPolicy?.intro ?? "",
+    points: data.qualityPolicy?.points ?? [],
+  };
+  const planningBoard = {
+    paragraphs: data.planningBoard?.paragraphs ?? [],
+    members: data.planningBoard?.members ?? [],
+  };
+
   // In editable mode every section stays visible so it can be selected.
   const mobileVis = (anchor: string) =>
     editable
@@ -540,6 +571,15 @@ export function AboutPageLayout({
         return (
           data.visionMission.visionText.trim() !== "" ||
           data.visionMission.missionPoints.length > 0
+        );
+      case "quality-policy":
+        return (
+          qualityPolicy.intro.trim() !== "" || qualityPolicy.points.length > 0
+        );
+      case "planning-board":
+        return (
+          planningBoard.paragraphs.length > 0 ||
+          planningBoard.members.length > 0
         );
       case "principal":
         return data.principal.name.trim() !== "";
@@ -621,6 +661,7 @@ export function AboutPageLayout({
             theme={theme}
             activeId={activeId}
             setActiveId={setActiveId}
+            visibleAnchors={visibleBuiltins}
             editable={editable}
             onEditSection={onEditSection}
           />
@@ -634,6 +675,7 @@ export function AboutPageLayout({
                 theme={theme}
                 activeId={activeId}
                 setActiveId={setActiveId}
+                visibleAnchors={visibleBuiltins}
                 editable={editable}
                 onEditSection={onEditSection}
               />
@@ -736,19 +778,46 @@ export function AboutPageLayout({
                   </ul>
                 </div>
               </div>
-              {data.visionMission.qualityPolicy && (
-                <div
-                  className={`${theme.border20} ${theme.softBg5} mt-4 rounded-2xl border p-5 md:p-6`}
-                >
-                  <h3 className="text-foreground mb-2 flex items-center gap-2 text-lg font-bold">
-                    <ShieldCheck size={18} className={theme.accentText} />
-                    Quality Policy
-                  </h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed md:text-base">
-                    {data.visionMission.qualityPolicy}
+            </EditableRegion>
+
+            {/* 3. Quality Policy */}
+            <EditableRegion
+              as="section"
+              id="quality-policy"
+              section="qualityPolicy"
+              label={ABOUT_SECTION_LABELS.qualityPolicy}
+              editable={editable}
+              onEditSection={onEditSection}
+              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("quality-policy")}`}
+            >
+              <SectionHeading
+                icon={ShieldCheck}
+                title="Quality Policy"
+                theme={theme}
+              />
+              <div
+                className={`${theme.border20} ${theme.softBg5} rounded-2xl border p-5 md:p-6`}
+              >
+                {qualityPolicy.intro && (
+                  <p className="text-muted-foreground mb-4 text-sm leading-relaxed md:text-base">
+                    {qualityPolicy.intro}
                   </p>
-                </div>
-              )}
+                )}
+                <ul className="space-y-3">
+                  {qualityPolicy.points.map((point, i) => (
+                    <li
+                      key={i}
+                      className="text-muted-foreground flex items-start gap-2.5 text-sm leading-relaxed md:text-base"
+                    >
+                      <CheckCircle
+                        size={15}
+                        className={`${theme.accentText} mt-1 shrink-0`}
+                      />
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </EditableRegion>
 
             {/* 3. Leadership heading (shared by Principal + Management) */}
@@ -1048,6 +1117,77 @@ export function AboutPageLayout({
                         </td>
                         <td className="text-muted-foreground px-4 py-3 text-xs">
                           {m.category}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </EditableRegion>
+
+            {/* 6b. Planning & Monitoring Board */}
+            <EditableRegion
+              as="section"
+              id="planning-board"
+              section="planningBoard"
+              label={ABOUT_SECTION_LABELS.planningBoard}
+              editable={editable}
+              onEditSection={onEditSection}
+              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("planning-board")}`}
+            >
+              <SectionHeading
+                icon={ClipboardList}
+                title="Planning & Monitoring Board"
+                theme={theme}
+              />
+              <div className="text-muted-foreground mb-8 space-y-3 text-sm leading-relaxed md:text-base">
+                {planningBoard.paragraphs.map((p, i) => (
+                  <p key={i}>{p}</p>
+                ))}
+              </div>
+              <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
+                <table className="w-full min-w-[640px] text-sm">
+                  <thead>
+                    <tr className="border-b border-white/10 bg-white/5">
+                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
+                        S.No
+                      </th>
+                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
+                        Name
+                      </th>
+                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
+                        Position
+                      </th>
+                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
+                        Category
+                      </th>
+                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
+                        Qualification
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {planningBoard.members.map((m, i) => (
+                      <tr
+                        key={i}
+                        className="transition-colors hover:bg-white/5"
+                      >
+                        <td className="text-muted-foreground px-4 py-3 text-xs">
+                          {i + 1}
+                        </td>
+                        <td className="text-foreground px-4 py-3 font-medium">
+                          {m.name}
+                        </td>
+                        <td
+                          className={`${theme.accentText} px-4 py-3 text-xs font-semibold`}
+                        >
+                          {m.position}
+                        </td>
+                        <td className="text-muted-foreground px-4 py-3 text-xs">
+                          {m.category}
+                        </td>
+                        <td className="text-muted-foreground px-4 py-3 text-xs">
+                          {m.qualification}
                         </td>
                       </tr>
                     ))}

@@ -215,9 +215,7 @@ function GroupFields({
         label={meta.activitiesLabel}
         values={group.activities}
         onChange={(activities) => onChange({ ...group, activities })}
-        placeholder={
-          variant === "clubs" ? "Hackathons" : "Grievance redressal"
-        }
+        placeholder={variant === "clubs" ? "Hackathons" : "Grievance redressal"}
       />
     </div>
   );

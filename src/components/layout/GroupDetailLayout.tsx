@@ -210,8 +210,8 @@ export function GroupDetailLayout({
 
             {members.length === 0 && activities.length === 0 && (
               <p className="text-muted-foreground/60 mt-10 rounded-2xl border border-dashed border-white/15 py-12 text-center text-sm">
-                Details for this {meta.singular.toLowerCase()} will be
-                published soon.
+                Details for this {meta.singular.toLowerCase()} will be published
+                soon.
               </p>
             )}
           </div>

@@ -100,13 +100,7 @@ export const VALUE = {
       "Student clubs at JCT College of Engineering and Technology that nurture creativity, culture, and extracurricular skills alongside academics.",
   },
   intro: [],
-  groups: [
-    FINE_ARTS,
-    MOVIE_CLUB,
-    CULTURAL_CLUB,
-    ARTS_CLUB,
-    PHOTOGRAPHY,
-  ],
+  groups: [FINE_ARTS, MOVIE_CLUB, CULTURAL_CLUB, ARTS_CLUB, PHOTOGRAPHY],
 };
 
 async function main() {

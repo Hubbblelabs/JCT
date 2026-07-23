@@ -190,7 +190,12 @@ const IQAC = {
   email: "",
   // role = "Designation" column; dept = the affiliation detail given with it.
   members: [
-    { name: "Shri. R. Durgashankar", role: "Secretary", dept: "Management", contact: "" },
+    {
+      name: "Shri. R. Durgashankar",
+      role: "Secretary",
+      dept: "Management",
+      contact: "",
+    },
     {
       name: "Dr. S. Manoharan",
       role: "Principal",
@@ -209,7 +214,12 @@ const IQAC = {
       dept: "Coordinator",
       contact: "",
     },
-    { name: "Dr. G. Mahesh", role: "Professor", dept: "Mechanical", contact: "" },
+    {
+      name: "Dr. G. Mahesh",
+      role: "Professor",
+      dept: "Mechanical",
+      contact: "",
+    },
     {
       name: "Dr. I. J. Isaac Premkumar",
       role: "Associate Professor",

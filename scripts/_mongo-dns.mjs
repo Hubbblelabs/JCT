@@ -76,7 +76,9 @@ export async function ensureSrvResolvable(uri, log = console.warn) {
       dns.setServers(forced);
       log(`[mongo-dns] Using SEED_DNS_SERVERS: ${forced.join(", ")}`);
     } catch (err) {
-      log(`[mongo-dns] SEED_DNS_SERVERS is not a valid resolver list: ${err.message}`);
+      log(
+        `[mongo-dns] SEED_DNS_SERVERS is not a valid resolver list: ${err.message}`,
+      );
     }
     return;
   }

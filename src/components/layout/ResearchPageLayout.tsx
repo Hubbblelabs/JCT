@@ -28,23 +28,18 @@ import type {
 } from "@/lib/validation";
 
 export type ResearchEditableSection =
-  | "hero"
-  | "tabs"
-  | "intro"
-  | "stats"
-  | "areas"
-  | "centres"
-  | "publications";
+  "hero" | "tabs" | "intro" | "stats" | "areas" | "centres" | "publications";
 
-export const RESEARCH_SECTION_LABELS: Record<ResearchEditableSection, string> = {
-  hero: "Hero",
-  tabs: "Sidebar tabs",
-  intro: "Introduction",
-  stats: "Research at a Glance",
-  areas: "Focus Areas",
-  centres: "Research Centres",
-  publications: "Publications",
-};
+export const RESEARCH_SECTION_LABELS: Record<ResearchEditableSection, string> =
+  {
+    hero: "Hero",
+    tabs: "Sidebar tabs",
+    intro: "Introduction",
+    stats: "Research at a Glance",
+    areas: "Focus Areas",
+    centres: "Research Centres",
+    publications: "Publications",
+  };
 
 export const RESEARCH_SECTION_ORDER: ResearchEditableSection[] = [
   "hero",

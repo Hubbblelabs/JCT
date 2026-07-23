@@ -60,8 +60,9 @@ function CardFooter({
 }) {
   const memberCount = group.members.filter((m) => m.name.trim() !== "").length;
   const activityCount = group.activities.filter((a) => a.trim() !== "").length;
-  const galleryCount = (group.gallery ?? []).filter((g) => g.trim() !== "")
-    .length;
+  const galleryCount = (group.gallery ?? []).filter(
+    (g) => g.trim() !== "",
+  ).length;
 
   return (
     <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1 pt-5">

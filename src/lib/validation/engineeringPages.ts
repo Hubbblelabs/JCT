@@ -140,7 +140,10 @@ export const ResearchPageSchema = z.object({
   // When non-empty the page renders as sidebar tabs (programs-style) and the
   // flat sections below are ignored. Empty keeps the original single-column
   // layout, so this is additive for any page that predates tabs.
-  tabs: z.array(ResearchTabSchema).max(RESEARCH_PAGE_LIMITS.tabsMax).default([]),
+  tabs: z
+    .array(ResearchTabSchema)
+    .max(RESEARCH_PAGE_LIMITS.tabsMax)
+    .default([]),
   intro: z.array(s(2000)).max(RESEARCH_PAGE_LIMITS.introMax).default([]),
   stats: z
     .array(ResearchStatSchema)
@@ -205,10 +208,7 @@ const GroupSchema = z.object({
     .array(GroupMemberSchema)
     .max(GROUPS_PAGE_LIMITS.membersMax)
     .default([]),
-  activities: z
-    .array(s(300))
-    .max(GROUPS_PAGE_LIMITS.activitiesMax)
-    .default([]),
+  activities: z.array(s(300)).max(GROUPS_PAGE_LIMITS.activitiesMax).default([]),
 });
 
 export const GroupsPageSchema = z.object({

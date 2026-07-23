@@ -113,7 +113,11 @@ const ADVISORY_MEMBERS = [
   ],
   ["Dr. A. Murugesan", "Member", "HOD, Petrochemical Technology"],
   ["Dr. K. Ramachandran", "Member", "HOD, Petroleum Engineering"],
-  ["Dr. S. Sakthi Vinayagam", "Member", "HOD, Computer Science and Engineering"],
+  [
+    "Dr. S. Sakthi Vinayagam",
+    "Member",
+    "HOD, Computer Science and Engineering",
+  ],
   ["Dr. P. Balamurugan", "Member", "HOD, Food Technology"],
   ["Dr. M. Bhuvaneshwaran", "Member", "HOD, Mechanical Engineering"],
   [
@@ -153,10 +157,7 @@ const FUNDING_AGENCIES = [
     "Council of Scientific & Industrial Research (CSIR)",
     "http://www.csir.res.in/",
   ],
-  [
-    "Defence Research & Development Organisation (DRDO)",
-    "http://drdo.gov.in/",
-  ],
+  ["Defence Research & Development Organisation (DRDO)", "http://drdo.gov.in/"],
   ["Department of Atomic Energy", "http://dae.nic.in/"],
   ["Department of Biotechnology (DBT)", "http://dbtindia.nic.in/"],
   [
@@ -168,10 +169,7 @@ const FUNDING_AGENCIES = [
     "http://deity.gov.in/",
   ],
   ["European Union", "http://www.iitgn.ac.in/european_union.htm"],
-  [
-    "Indian Council of Agricultural Research (ICAR)",
-    "http://www.icar.org.in/",
-  ],
+  ["Indian Council of Agricultural Research (ICAR)", "http://www.icar.org.in/"],
   ["Indian Council of Medical Research (ICMR)", "http://www.icmr.nic.in/"],
   [
     "Indian Council of Social Science Research (ICSSR)",
@@ -200,10 +198,7 @@ const FUNDING_AGENCIES = [
     "Petroleum Conservation Research Association (PCRA)",
     "http://www.pcra.org/",
   ],
-  [
-    "Science and Engineering Research Board (SERB)",
-    "http://www.serb.gov.in/",
-  ],
+  ["Science and Engineering Research Board (SERB)", "http://www.serb.gov.in/"],
   ["Tata Institute of Fundamental Research", "http://www.tifr.res.in/"],
 ];
 
@@ -251,9 +246,7 @@ export const VALUE = {
       id: "purpose",
       label: "Purpose of R&D",
       icon: "Target",
-      sections: [
-        { kind: "richText", html: `<p>${esc(PURPOSE_TEXT)}</p>` },
-      ],
+      sections: [{ kind: "richText", html: `<p>${esc(PURPOSE_TEXT)}</p>` }],
     },
     {
       id: "advisory-committee",

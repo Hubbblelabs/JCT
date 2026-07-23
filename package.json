@@ -36,7 +36,9 @@
     "seed:lifeatjct": "node scripts/seed-life-at-jct.mjs",
     "seed:lifeatjct:dry": "node scripts/seed-life-at-jct.mjs --dry-run",
     "seed:seo": "node scripts/seed-seo.mjs",
-    "seed:seo:dry": "node scripts/seed-seo.mjs --dry-run"
+    "seed:seo:dry": "node scripts/seed-seo.mjs --dry-run",
+    "seed:aboutsections": "node scripts/seed-about-sections.mjs",
+    "seed:aboutsections:dry": "node scripts/seed-about-sections.mjs --dry-run"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1091.0",
