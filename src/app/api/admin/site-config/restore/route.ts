@@ -31,6 +31,9 @@ interface DocMeta {
   uploaded_by: string;
 }
 
+/** Guards the legacy-key passthrough against junk or injection-shaped keys. */
+const SAFE_LEGACY_KEY = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/;
+
 interface RestorePayload {
   configs?: unknown[];
   imageMeta?: unknown[];
@@ -56,11 +59,12 @@ export async function POST(req: NextRequest) {
 
   const errs: string[] = [];
   const validConfigs: Array<{
-    config_key: SiteConfigKey;
+    config_key: string;
     value: unknown;
     published_value: unknown;
     status: string;
   }> = [];
+  let legacyRestored = 0;
 
   for (const item of rawConfigs) {
     if (typeof item !== "object" || item === null) {
@@ -70,7 +74,25 @@ export async function POST(req: NextRequest) {
     const entry = item as Record<string, unknown>;
     const key = entry.config_key as string;
     if (!isKnownSiteConfigKey(key)) {
-      errs.push(`Unknown config_key: "${key}" — skipped`);
+      // Keys outside the registry are still real stored settings — e.g.
+      // `recruitersSection`, which the seed route reads as a migration source.
+      // Dropping them made a restore lossy, so carry them across verbatim and
+      // report them instead. Nothing renders them: public reads resolve keys
+      // through the registry, and the normal write path still rejects unknowns.
+      if (!SAFE_LEGACY_KEY.test(key ?? "")) {
+        errs.push(`Malformed config_key: "${String(key)}" — skipped`);
+        continue;
+      }
+      validConfigs.push({
+        config_key: key,
+        value: entry.value,
+        published_value: entry.published_value ?? entry.value,
+        status: entry.status === "published" ? "published" : "draft",
+      });
+      legacyRestored++;
+      errs.push(
+        `"${key}" is not in the config registry — restored as-is (legacy key)`,
+      );
       continue;
     }
     const schema = SITE_CONFIG_SCHEMAS[key];
@@ -127,7 +149,11 @@ export async function POST(req: NextRequest) {
         },
         { upsert: true },
       );
-      revalidateForConfigKey(cfg.config_key);
+      // Only registry keys have revalidation targets mapped; legacy keys are
+      // covered by the blanket revalidate below.
+      if (isKnownSiteConfigKey(cfg.config_key)) {
+        revalidateForConfigKey(cfg.config_key as SiteConfigKey);
+      }
     }
     revalidateTargets("all-institutions");
 
@@ -225,7 +251,8 @@ export async function POST(req: NextRequest) {
 
     return json({
       restored: validConfigs.length,
-      skipped: errs.length,
+      restored_legacy: legacyRestored,
+      skipped: rawConfigs.length - validConfigs.length,
       images_restored: imagesRestored,
       documents_restored: docsRestored,
       warnings: warnings.length > 0 ? warnings : undefined,

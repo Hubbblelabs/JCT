@@ -35,10 +35,36 @@ function isRejectedType(key: string, mime: string): boolean {
   return mime === "image/svg+xml" || /\.svgz?$/i.test(key);
 }
 
-type MetaMap = Record<string, Record<string, unknown>>;
+type MetaMap = Record<string, Record<string, unknown> | undefined>;
 
-function metaFor(map: MetaMap, key: string): Record<string, unknown> {
-  return map[key] ?? {};
+const MIME_BY_EXT: Record<string, string> = {
+  webp: "image/webp",
+  jpg: "image/jpeg",
+  jpeg: "image/jpeg",
+  png: "image/png",
+  gif: "image/gif",
+  avif: "image/avif",
+  pdf: "application/pdf",
+  doc: "application/msword",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  xls: "application/vnd.ms-excel",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  txt: "text/plain",
+  csv: "text/csv",
+};
+
+/**
+ * Content-Type has to come from the key's extension when the archive carries no
+ * metadata for it. Defaulting by prefix alone would stamp `image/webp` onto
+ * every untracked `.jpeg`/`.png`, and R2 serves that header straight to
+ * browsers. A ZIP entry's blob type is empty, so it can't be relied on either.
+ */
+function mimeForKey(key: string, metaMime: unknown, blobType: string): string {
+  if (typeof metaMime === "string" && metaMime.length > 0) return metaMime;
+  const ext = key.split(".").pop()?.toLowerCase() ?? "";
+  if (MIME_BY_EXT[ext]) return MIME_BY_EXT[ext];
+  if (blobType) return blobType;
+  return key.startsWith("images/") ? "image/webp" : "application/octet-stream";
 }
 
 function str(v: unknown, fallback = ""): string {
@@ -146,11 +172,8 @@ export async function POST(req: NextRequest) {
           return { key, ok: false, reason: "exceeds 50MB" };
         }
         const isImage = key.startsWith("images/");
-        const meta = metaFor(isImage ? imageMeta : docMeta, key);
-        const mime = str(
-          meta.mime_type,
-          file.type || (isImage ? "image/webp" : "application/pdf"),
-        );
+        const meta = (isImage ? imageMeta : docMeta)[key];
+        const mime = mimeForKey(key, meta?.mime_type, file.type);
         if (isRejectedType(key, mime)) {
           return { key, ok: false, reason: "SVG is not permitted" };
         }
@@ -158,6 +181,12 @@ export async function POST(req: NextRequest) {
         try {
           const buffer = Buffer.from(await file.arrayBuffer());
           const url = await uploadToR2(key, buffer, mime);
+
+          // No metadata means the archive held a file that never had a tracking
+          // row (seeded assets under images/programs/…, images/hod/…). Put the
+          // bytes back but don't invent a media-library entry that the original
+          // install didn't have.
+          if (!meta) return { key, ok: true, reason: "" };
 
           if (isImage) {
             await ImageAsset.findOneAndUpdate(
