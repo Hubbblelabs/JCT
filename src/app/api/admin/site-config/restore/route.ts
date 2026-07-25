@@ -81,13 +81,17 @@ export async function POST(req: NextRequest) {
       );
       continue;
     }
-    let publishedValue: unknown = parsedValue.data;
+    // Store the ORIGINAL value, not `parsedValue.data`. Zod strips keys the
+    // schema doesn't declare and injects `.default()`s, so writing the parsed
+    // output makes restore lossy: a backup→restore round-trip silently dropped
+    // fields like `mainNavbar.items[].inMore`. The parse is a safety gate only.
+    let publishedValue: unknown = entry.value;
     // A draft-only config exports `published_value: null`; that is expected,
     // not a schema failure, so don't warn about it.
     if (entry.published_value !== undefined && entry.published_value !== null) {
       const parsedPublished = schema.safeParse(entry.published_value);
       if (parsedPublished.success) {
-        publishedValue = parsedPublished.data;
+        publishedValue = entry.published_value;
       } else {
         errs.push(
           `${key}.published_value: rejected by schema, reverting to draft value`,
@@ -96,7 +100,7 @@ export async function POST(req: NextRequest) {
     }
     validConfigs.push({
       config_key: key,
-      value: parsedValue.data,
+      value: entry.value,
       published_value: publishedValue,
       status: entry.status === "published" ? "published" : "draft",
     });

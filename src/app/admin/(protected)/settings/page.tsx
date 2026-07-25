@@ -23,14 +23,129 @@ interface BackupPreview {
   configCount: number;
   imageCount: number;
   docCount: number;
+  /** Binaries actually present in the archive, incl. files with no DB row. */
+  assetFileCount: number;
 }
 
 type Status = { type: "success" | "error" | "warning"; message: string };
+
+/**
+ * Asset binaries go up in small batches: a full archive is tens of megabytes
+ * and a single request would hit the reverse proxy's body limit. Batches are
+ * capped by BOTH byte size and file count so a few large PDFs can't build an
+ * oversized request on their own.
+ */
+const ASSET_BATCH_BYTES = 6 * 1024 * 1024;
+const ASSET_BATCH_FILES = 25;
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+/** Every binary in the archive, i.e. everything except the JSON manifests. */
+function collectAssetEntries(zip: JSZip): JSZip.JSZipObject[] {
+  const out: JSZip.JSZipObject[] = [];
+  zip.forEach((relPath, entry) => {
+    if (entry.dir) return;
+    if (!relPath.startsWith("images/") && !relPath.startsWith("documents/")) {
+      return;
+    }
+    if (relPath.endsWith("/_metadata.json")) return;
+    out.push(entry);
+  });
+  return out;
+}
+
+function indexMetaByKey(
+  meta: unknown[] | undefined,
+): Record<string, Record<string, unknown>> {
+  const map: Record<string, Record<string, unknown>> = {};
+  for (const raw of meta ?? []) {
+    const m = raw as Record<string, unknown>;
+    if (typeof m?.storage_key === "string") map[m.storage_key] = m;
+  }
+  return map;
+}
+
+/**
+ * Send the archive's binaries to the restore-assets route in size-bounded
+ * batches. Batch failures are collected rather than thrown so one bad file
+ * can't abandon the rest of the restore midway.
+ */
+async function uploadAssetBatches(
+  entries: JSZip.JSZipObject[],
+  meta: {
+    images: Record<string, Record<string, unknown>>;
+    docs: Record<string, Record<string, unknown>>;
+  },
+  onProgress: (done: number) => void,
+): Promise<{ uploaded: number; errors: string[] }> {
+  let uploaded = 0;
+  let done = 0;
+  const errors: string[] = [];
+
+  let batch: Array<{ key: string; blob: Blob }> = [];
+  let batchBytes = 0;
+
+  const flush = async () => {
+    if (batch.length === 0) return;
+    const form = new FormData();
+    const imageMeta: Record<string, unknown> = {};
+    const docMeta: Record<string, unknown> = {};
+    for (const item of batch) {
+      form.append("keys", item.key);
+      form.append("files", item.blob, item.key.split("/").pop() ?? "asset");
+      const m = item.key.startsWith("images/")
+        ? meta.images[item.key]
+        : meta.docs[item.key];
+      if (m) {
+        if (item.key.startsWith("images/")) imageMeta[item.key] = m;
+        else docMeta[item.key] = m;
+      }
+    }
+    form.append("imageMeta", JSON.stringify(imageMeta));
+    form.append("docMeta", JSON.stringify(docMeta));
+
+    try {
+      const res = await fetch("/api/admin/site-config/restore-assets", {
+        method: "POST",
+        body: form,
+      });
+      const data = (await res.json()) as Record<string, unknown>;
+      if (!res.ok) {
+        errors.push(
+          `Asset batch failed: ${(data.error as string) ?? res.status}`,
+        );
+      } else {
+        uploaded += (data.uploaded as number) ?? 0;
+        const batchErrors = data.errors as string[] | undefined;
+        if (batchErrors?.length) errors.push(...batchErrors);
+      }
+    } catch (err) {
+      errors.push(`Asset batch failed: ${String(err)}`);
+    }
+    done += batch.length;
+    onProgress(done);
+    batch = [];
+    batchBytes = 0;
+  };
+
+  for (const entry of entries) {
+    const blob = await entry.async("blob");
+    if (
+      batch.length >= ASSET_BATCH_FILES ||
+      (batchBytes > 0 && batchBytes + blob.size > ASSET_BATCH_BYTES)
+    ) {
+      await flush();
+    }
+    batch.push({ key: entry.name, blob });
+    batchBytes += blob.size;
+  }
+  await flush();
+
+  return { uploaded, errors };
 }
 
 export default function SettingsPage() {
@@ -56,6 +171,10 @@ export default function SettingsPage() {
   const [restoring, setRestoring] = useState(false);
   const [restoreStatus, setRestoreStatus] = useState<Status | null>(null);
   const [restoreWarnings, setRestoreWarnings] = useState<string[]>([]);
+  const [assetProgress, setAssetProgress] = useState<{
+    done: number;
+    total: number;
+  } | null>(null);
 
   // Reset state
   const [resetting, setResetting] = useState(false);
@@ -168,6 +287,7 @@ export default function SettingsPage() {
         configCount,
         imageCount,
         docCount,
+        assetFileCount: collectAssetEntries(zip).length,
       });
       setRestoreFile(file);
     } catch {
@@ -180,6 +300,7 @@ export default function SettingsPage() {
     setRestoring(true);
     setRestoreStatus(null);
     setRestoreWarnings([]);
+    setAssetProgress(null);
     try {
       // Parse the ZIP client-side — send only structured JSON to avoid
       // nginx body size limits that break large multipart/binary uploads.
@@ -240,16 +361,28 @@ export default function SettingsPage() {
         return;
       }
       const parts = [`${data.restored as number} config entries`];
-      if ((data.images_restored as number) > 0)
-        parts.push(`${data.images_restored as number} images`);
-      if ((data.documents_restored as number) > 0)
-        parts.push(`${data.documents_restored as number} documents`);
-      const warnings = data.warnings as string[] | undefined;
+      const warnings = [...((data.warnings as string[] | undefined) ?? [])];
       const skipped = (data.skipped as number) ?? 0;
+
+      // Push the binaries back into R2. Restoring only the metadata rows leaves
+      // the media library pointing at objects that don't exist.
+      const assets = collectAssetEntries(zip);
+      if (assets.length > 0) {
+        const metaByKey = {
+          images: indexMetaByKey(imageMeta),
+          docs: indexMetaByKey(docMeta),
+        };
+        const result = await uploadAssetBatches(assets, metaByKey, (done) =>
+          setAssetProgress({ done, total: assets.length }),
+        );
+        if (result.uploaded > 0) parts.push(`${result.uploaded} asset files`);
+        warnings.push(...result.errors);
+      }
+
       const msg = `Restored: ${parts.join(", ")}.${skipped > 0 ? ` ${skipped} entry(s) skipped.` : ""}`;
-      setRestoreWarnings(warnings ?? []);
+      setRestoreWarnings(warnings);
       setRestoreStatus({
-        type: warnings?.length ? "warning" : "success",
+        type: warnings.length ? "warning" : "success",
         message: msg,
       });
       setPreview(null);
@@ -454,7 +587,18 @@ export default function SettingsPage() {
                       {preview.docCount} documents
                     </span>
                   )}
+                  {preview.assetFileCount > 0 && (
+                    <span className="admin-badge admin-badge-green text-[11px]">
+                      {preview.assetFileCount} asset files
+                    </span>
+                  )}
                 </div>
+                {preview.assetFileCount === 0 && (
+                  <p className="pt-1 text-xs text-amber-600">
+                    This archive has no asset files — images and documents will
+                    not be restored to storage.
+                  </p>
+                )}
               </div>
             )}
 
@@ -468,7 +612,11 @@ export default function SettingsPage() {
               ) : (
                 <Upload size={15} />
               )}
-              {restoring ? "Restoring…" : "Restore Backup"}
+              {restoring
+                ? assetProgress
+                  ? `Uploading assets ${assetProgress.done}/${assetProgress.total}…`
+                  : "Restoring…"
+                : "Restore Backup"}
             </button>
           </div>
         </div>

@@ -4,6 +4,7 @@ import {
   DeleteObjectCommand,
   GetObjectCommand,
   HeadObjectCommand,
+  ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
@@ -187,6 +188,41 @@ export async function getR2AsBuffer(
     buffer: Buffer.from(bytes),
     contentType: res.ContentType ?? "application/octet-stream",
   };
+}
+
+/**
+ * Enumerate every object under a prefix, following pagination to the end.
+ *
+ * The bucket — not the `ImageAsset`/`DocumentAsset` collections — is the source
+ * of truth for what actually exists in storage. Seeded and hand-uploaded files
+ * live in R2 without a tracking row, so anything that walks only the DB (a
+ * backup, an audit) silently misses them.
+ */
+export async function listR2Objects(
+  prefix: string,
+): Promise<Array<{ key: string; size: number }>> {
+  const client = getR2Client();
+  const bucket = process.env.R2_BUCKET_NAME;
+  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+
+  const out: Array<{ key: string; size: number }> = [];
+  let token: string | undefined;
+  do {
+    const res = await client.send(
+      new ListObjectsV2Command({
+        Bucket: bucket,
+        Prefix: prefix,
+        ContinuationToken: token,
+      }),
+    );
+    for (const obj of res.Contents ?? []) {
+      // Directory placeholder objects carry a trailing slash and no bytes.
+      if (!obj.Key || obj.Key.endsWith("/")) continue;
+      out.push({ key: obj.Key, size: obj.Size ?? 0 });
+    }
+    token = res.IsTruncated ? res.NextContinuationToken : undefined;
+  } while (token);
+  return out;
 }
 
 export function isR2Configured(): boolean {

@@ -4,13 +4,15 @@ import { connectDB } from "@/lib/mongodb";
 import { SiteConfig, ImageAsset, DocumentAsset } from "@/lib/models";
 import { requireRole, serverError, badRequest } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
-import { getR2AsBuffer, isR2Configured } from "@/lib/r2";
+import { getR2AsBuffer, isR2Configured, listR2Objects } from "@/lib/r2";
 
 // Each R2 GET costs ~1-2s round-trip. Fetching a few hundred assets serially
 // takes minutes and the request dies at the reverse proxy before the ZIP is
 // ever written, so pull them through a bounded pool instead.
 const R2_FETCH_CONCURRENCY = 12;
-const R2_FETCH_TIMEOUT_MS = 20_000;
+// Generous enough for multi-megabyte PDFs on a slow link; short enough that a
+// genuinely stuck object can't hold a pool slot for the whole request.
+const R2_FETCH_TIMEOUT_MS = 90_000;
 
 async function mapWithConcurrency<T, R>(
   items: T[],
@@ -56,6 +58,35 @@ async function fetchAsset(
   }
 }
 
+/**
+ * Every storage key worth archiving under a prefix: the union of what R2
+ * actually holds and what the DB claims to track. DB-only keys are kept in the
+ * list on purpose so a broken row surfaces as an "unreadable" count rather
+ * than vanishing from the report.
+ */
+async function collectAssetKeys(
+  prefix: string,
+  dbKeys: string[],
+): Promise<string[]> {
+  const keys = new Set<string>();
+  try {
+    for (const obj of await listR2Objects(prefix)) {
+      // Reserved manifest names are written from the DB, never copied from R2.
+      if (obj.key.endsWith("/_metadata.json")) continue;
+      keys.add(obj.key);
+    }
+  } catch (err) {
+    console.error(`[backup] Could not list R2 prefix ${prefix}:`, err);
+  }
+  for (const key of dbKeys) {
+    if (typeof key === "string" && key.startsWith(prefix)) keys.add(key);
+  }
+  return [...keys].sort();
+}
+
+// Pulling several hundred objects out of R2 outlasts the default limit.
+export const maxDuration = 300;
+
 export async function GET(req: NextRequest) {
   const { session, error } = await requireRole(req, "admin");
   if (error) return error;
@@ -96,6 +127,7 @@ export async function GET(req: NextRequest) {
     });
 
     // 2. Images
+    let imagesArchived = 0;
     if (includeImages) {
       const images = await ImageAsset.find().lean();
       const metadata = images.map((img) => ({
@@ -108,14 +140,23 @@ export async function GET(req: NextRequest) {
         mime_type: img.mime_type,
         width: img.width,
         height: img.height,
+        ratio_type: img.ratio_type,
+        aspect_ratio: img.aspect_ratio,
         uploaded_by: img.uploaded_by,
       }));
       zip.file("images/_metadata.json", JSON.stringify(metadata, null, 2), {
         compression: "DEFLATE",
       });
 
-      const fetched = await mapWithConcurrency(
+      // Archive what the bucket actually holds, not just what the media
+      // library tracks: seeded files (images/programs/…, images/hod/…) have no
+      // ImageAsset row and were being left out of every backup.
+      const keys = await collectAssetKeys(
+        "images/",
         images.map((img) => img.storage_key as string),
+      );
+      const fetched = await mapWithConcurrency(
+        keys,
         R2_FETCH_CONCURRENCY,
         fetchAsset,
       );
@@ -124,13 +165,15 @@ export async function GET(req: NextRequest) {
           imagesSkipped++;
           continue;
         }
-        const filename = asset.storageKey.replace(/^images\//, "");
-        // Images are already compressed — re-deflating burns CPU for nothing.
-        zip.file(`images/${filename}`, asset.buffer, { compression: "STORE" });
+        // Store under the full storage key so restore can rebuild it verbatim.
+        // Already-compressed bytes — re-deflating burns CPU for nothing.
+        zip.file(asset.storageKey, asset.buffer, { compression: "STORE" });
+        imagesArchived++;
       }
     }
 
     // 3. Documents
+    let docsArchived = 0;
     if (includeDocs) {
       const docs = await DocumentAsset.find().lean();
       const metadata = docs.map((doc) => ({
@@ -144,8 +187,12 @@ export async function GET(req: NextRequest) {
         compression: "DEFLATE",
       });
 
-      const fetched = await mapWithConcurrency(
+      const keys = await collectAssetKeys(
+        "documents/",
         docs.map((doc) => doc.storage_key as string),
+      );
+      const fetched = await mapWithConcurrency(
+        keys,
         R2_FETCH_CONCURRENCY,
         fetchAsset,
       );
@@ -154,23 +201,40 @@ export async function GET(req: NextRequest) {
           docsSkipped++;
           continue;
         }
-        const filename = asset.storageKey.replace(/^documents\//, "");
-        zip.file(`documents/${filename}`, asset.buffer, {
-          compression: "STORE",
-        });
+        zip.file(asset.storageKey, asset.buffer, { compression: "STORE" });
+        docsArchived++;
       }
     }
+
+    // 4. Manifest — lets restore (and the operator) verify coverage without
+    // re-deriving it from the ZIP's directory listing.
+    zip.file(
+      "manifest.json",
+      JSON.stringify(
+        {
+          version: "2.1",
+          exported_at: configData.exported_at,
+          exported_by: configData.exported_by,
+          config_entries: configs.length,
+          images: { archived: imagesArchived, unreadable: imagesSkipped },
+          documents: { archived: docsArchived, unreadable: docsSkipped },
+        },
+        null,
+        2,
+      ),
+      { compression: "DEFLATE" },
+    );
 
     const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
 
     const parts = [`${configs.length} config entries`];
     if (includeImages)
       parts.push(
-        imagesSkipped > 0 ? `images (${imagesSkipped} unreadable)` : "images",
+        `${imagesArchived} images${imagesSkipped > 0 ? ` (${imagesSkipped} unreadable)` : ""}`,
       );
     if (includeDocs)
       parts.push(
-        docsSkipped > 0 ? `documents (${docsSkipped} unreadable)` : "documents",
+        `${docsArchived} documents${docsSkipped > 0 ? ` (${docsSkipped} unreadable)` : ""}`,
       );
     await logAudit(
       "site-config",
