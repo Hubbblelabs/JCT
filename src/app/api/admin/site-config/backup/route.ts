@@ -4,7 +4,9 @@ import { connectDB } from "@/lib/mongodb";
 import { SiteConfig, ImageAsset, DocumentAsset } from "@/lib/models";
 import { requireRole, serverError, badRequest } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
+import mongoose from "mongoose";
 import { getR2AsBuffer, isR2Configured, listR2Objects } from "@/lib/r2";
+import { BACKUP_COLLECTIONS, serializeDoc } from "@/lib/backup-collections";
 
 // Each R2 GET costs ~1-2s round-trip. Fetching a few hundred assets serially
 // takes minutes and the request dies at the reverse proxy before the ZIP is
@@ -126,6 +128,28 @@ export async function GET(req: NextRequest) {
       compression: "DEFLATE",
     });
 
+    // 1b. Content collections. Read through the native driver rather than the
+    // Mongoose models: `recruiters` still exists as a collection after its
+    // model was removed, and a backup must not silently skip it.
+    const collectionCounts: Record<string, number> = {};
+    const db = mongoose.connection.db;
+    for (const col of BACKUP_COLLECTIONS) {
+      let docs: Record<string, unknown>[] = [];
+      try {
+        docs = db
+          ? await db.collection(col.name).find({}).toArray()
+          : [];
+      } catch (err) {
+        console.warn(`[backup] Could not read collection ${col.name}:`, err);
+      }
+      collectionCounts[col.name] = docs.length;
+      zip.file(
+        `collections/${col.name}.json`,
+        JSON.stringify(docs.map(serializeDoc), null, 2),
+        { compression: "DEFLATE" },
+      );
+    }
+
     // 2. Images
     let imagesArchived = 0;
     if (includeImages) {
@@ -216,6 +240,7 @@ export async function GET(req: NextRequest) {
           exported_at: configData.exported_at,
           exported_by: configData.exported_by,
           config_entries: configs.length,
+          collections: collectionCounts,
           images: { archived: imagesArchived, unreadable: imagesSkipped },
           documents: { archived: docsArchived, unreadable: docsSkipped },
         },
@@ -228,6 +253,11 @@ export async function GET(req: NextRequest) {
     const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
 
     const parts = [`${configs.length} config entries`];
+    const contentTotal = Object.values(collectionCounts).reduce(
+      (a, b) => a + b,
+      0,
+    );
+    if (contentTotal > 0) parts.push(`${contentTotal} content documents`);
     if (includeImages)
       parts.push(
         `${imagesArchived} images${imagesSkipped > 0 ? ` (${imagesSkipped} unreadable)` : ""}`,

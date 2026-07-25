@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import JSZip from "jszip";
+import { BACKUP_COLLECTIONS } from "@/lib/backup-collections";
 import {
   Download,
   Upload,
@@ -25,6 +26,8 @@ interface BackupPreview {
   docCount: number;
   /** Binaries actually present in the archive, incl. files with no DB row. */
   assetFileCount: number;
+  /** Per-collection document counts found under `collections/`. */
+  collectionCounts: Array<{ label: string; count: number }>;
 }
 
 type Status = { type: "success" | "error" | "warning"; message: string };
@@ -37,6 +40,95 @@ type Status = { type: "success" | "error" | "warning"; message: string };
  */
 const ASSET_BATCH_BYTES = 6 * 1024 * 1024;
 const ASSET_BATCH_FILES = 25;
+
+/** Same reasoning for content documents — programs alone run to ~750 KB. */
+const DOC_BATCH_BYTES = 512 * 1024;
+
+/**
+ * Read `collections/<name>.json` out of the archive. Returns null when the
+ * archive predates collection support, so an older backup still restores its
+ * configs and assets instead of erroring.
+ */
+async function readCollection(
+  zip: JSZip,
+  name: string,
+): Promise<Record<string, unknown>[] | null> {
+  const file = zip.file(`collections/${name}.json`);
+  if (!file) return null;
+  try {
+    const parsed = JSON.parse(await file.async("string")) as unknown;
+    return Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>[])
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Split documents so each request stays under the body limit. */
+function chunkBySize(
+  docs: Record<string, unknown>[],
+  maxBytes: number,
+): Record<string, unknown>[][] {
+  const chunks: Record<string, unknown>[][] = [];
+  let current: Record<string, unknown>[] = [];
+  let bytes = 0;
+  for (const doc of docs) {
+    const size = JSON.stringify(doc).length;
+    if (current.length > 0 && bytes + size > maxBytes) {
+      chunks.push(current);
+      current = [];
+      bytes = 0;
+    }
+    current.push(doc);
+    bytes += size;
+  }
+  if (current.length > 0) chunks.push(current);
+  return chunks;
+}
+
+/**
+ * Push every content collection back, chunk by chunk. Failures are collected
+ * rather than thrown so one bad collection can't strand the rest of a restore.
+ */
+async function restoreCollections(
+  zip: JSZip,
+  onProgress: (label: string) => void,
+): Promise<{ restored: number; errors: string[] }> {
+  let restored = 0;
+  const errors: string[] = [];
+
+  for (const col of BACKUP_COLLECTIONS) {
+    const docs = await readCollection(zip, col.name);
+    if (docs === null || docs.length === 0) continue;
+    onProgress(col.label);
+    for (const chunk of chunkBySize(docs, DOC_BATCH_BYTES)) {
+      try {
+        const res = await fetch(
+          "/api/admin/site-config/restore-collections",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ collection: col.name, docs: chunk }),
+          },
+        );
+        const data = (await res.json()) as Record<string, unknown>;
+        if (!res.ok) {
+          errors.push(
+            `${col.label}: ${(data.error as string) ?? `HTTP ${res.status}`}`,
+          );
+          continue;
+        }
+        restored += (data.restored as number) ?? 0;
+        const chunkErrors = data.errors as string[] | undefined;
+        if (chunkErrors?.length) errors.push(...chunkErrors);
+      } catch (err) {
+        errors.push(`${col.label}: ${String(err)}`);
+      }
+    }
+  }
+  return { restored, errors };
+}
 
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
@@ -174,6 +266,7 @@ export default function SettingsPage() {
   const [assetProgress, setAssetProgress] = useState<{
     done: number;
     total: number;
+    label?: string;
   } | null>(null);
 
   // Reset state
@@ -281,6 +374,14 @@ export default function SettingsPage() {
         docCount = Array.isArray(meta) ? meta.length : 0;
       }
 
+      const collectionCounts: Array<{ label: string; count: number }> = [];
+      for (const col of BACKUP_COLLECTIONS) {
+        const docs = await readCollection(zip, col.name);
+        if (docs && docs.length > 0) {
+          collectionCounts.push({ label: col.label, count: docs.length });
+        }
+      }
+
       setPreview({
         exportedAt: configData.exported_at ?? "",
         exportedBy: configData.exported_by ?? "",
@@ -288,6 +389,7 @@ export default function SettingsPage() {
         imageCount,
         docCount,
         assetFileCount: collectAssetEntries(zip).length,
+        collectionCounts,
       });
       setRestoreFile(file);
     } catch {
@@ -363,6 +465,16 @@ export default function SettingsPage() {
       const parts = [`${data.restored as number} config entries`];
       const warnings = [...((data.warnings as string[] | undefined) ?? [])];
       const skipped = (data.skipped as number) ?? 0;
+
+      // Content collections (programs, placements, testimonials, …). Without
+      // this a "full" restore rebuilt the settings but left the site empty.
+      const content = await restoreCollections(zip, (label) =>
+        setAssetProgress({ label, done: 0, total: 0 }),
+      );
+      if (content.restored > 0) {
+        parts.push(`${content.restored} content documents`);
+      }
+      warnings.push(...content.errors);
 
       // Push the binaries back into R2. Restoring only the metadata rows leaves
       // the media library pointing at objects that don't exist.
@@ -587,12 +699,26 @@ export default function SettingsPage() {
                       {preview.docCount} documents
                     </span>
                   )}
+                  {preview.collectionCounts.map((c) => (
+                    <span
+                      key={c.label}
+                      className="admin-badge admin-badge-yellow text-[11px]"
+                    >
+                      {c.count} {c.label.toLowerCase()}
+                    </span>
+                  ))}
                   {preview.assetFileCount > 0 && (
                     <span className="admin-badge admin-badge-green text-[11px]">
                       {preview.assetFileCount} asset files
                     </span>
                   )}
                 </div>
+                {preview.collectionCounts.length === 0 && (
+                  <p className="pt-1 text-xs text-amber-600">
+                    This archive predates content backups — programs,
+                    placements and testimonials will not be restored.
+                  </p>
+                )}
                 {preview.assetFileCount === 0 && (
                   <p className="pt-1 text-xs text-amber-600">
                     This archive has no asset files — images and documents will
@@ -614,7 +740,9 @@ export default function SettingsPage() {
               )}
               {restoring
                 ? assetProgress
-                  ? `Uploading assets ${assetProgress.done}/${assetProgress.total}…`
+                  ? assetProgress.total > 0
+                    ? `Uploading assets ${assetProgress.done}/${assetProgress.total}…`
+                    : `Restoring ${assetProgress.label}…`
                   : "Restoring…"
                 : "Restore Backup"}
             </button>
