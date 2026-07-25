@@ -27,6 +27,12 @@ interface BackupPreview {
 
 type Status = { type: "success" | "error" | "warning"; message: string };
 
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 export default function SettingsPage() {
   const { data: session, status } = useSession();
   const role = (session?.user as Record<string, unknown>)?.role as string;
@@ -49,6 +55,7 @@ export default function SettingsPage() {
   const [fileError, setFileError] = useState("");
   const [restoring, setRestoring] = useState(false);
   const [restoreStatus, setRestoreStatus] = useState<Status | null>(null);
+  const [restoreWarnings, setRestoreWarnings] = useState<string[]>([]);
 
   // Reset state
   const [resetting, setResetting] = useState(false);
@@ -86,13 +93,23 @@ export default function SettingsPage() {
       const disposition = res.headers.get("Content-Disposition") ?? "";
       const match = disposition.match(/filename="([^"]+)"/);
       const filename = match?.[1] ?? "jct-backup.zip";
+      // The anchor must be in the document and the object URL must outlive the
+      // click: revoking synchronously after click() races the browser's own
+      // fetch of the blob and lands a 0-byte file in Downloads.
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = filename;
+      a.rel = "noopener";
+      a.style.display = "none";
+      document.body.appendChild(a);
       a.click();
-      URL.revokeObjectURL(url);
-      setExportStatus({ type: "success", message: "Backup downloaded." });
+      a.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      setExportStatus({
+        type: "success",
+        message: `Backup downloaded (${formatBytes(blob.size)}).`,
+      });
     } catch {
       setExportStatus({ type: "error", message: "Export failed. Try again." });
     } finally {
@@ -162,6 +179,7 @@ export default function SettingsPage() {
     if (!restoreFile) return;
     setRestoring(true);
     setRestoreStatus(null);
+    setRestoreWarnings([]);
     try {
       // Parse the ZIP client-side — send only structured JSON to avoid
       // nginx body size limits that break large multipart/binary uploads.
@@ -213,10 +231,11 @@ export default function SettingsPage() {
       });
       const data = (await res.json()) as Record<string, unknown>;
       if (!res.ok) {
-        const details = (data.details as string[] | undefined)?.join("; ");
+        const details = data.details as string[] | undefined;
+        setRestoreWarnings(details ?? []);
         setRestoreStatus({
           type: "error",
-          message: `Restore failed: ${details ?? (data.error as string)}`,
+          message: `Restore failed: ${(data.error as string) ?? "Unknown error"}`,
         });
         return;
       }
@@ -226,7 +245,9 @@ export default function SettingsPage() {
       if ((data.documents_restored as number) > 0)
         parts.push(`${data.documents_restored as number} documents`);
       const warnings = data.warnings as string[] | undefined;
-      const msg = `Restored: ${parts.join(", ")}.${warnings?.length ? ` ${warnings.length} warning(s).` : ""}`;
+      const skipped = (data.skipped as number) ?? 0;
+      const msg = `Restored: ${parts.join(", ")}.${skipped > 0 ? ` ${skipped} entry(s) skipped.` : ""}`;
+      setRestoreWarnings(warnings ?? []);
       setRestoreStatus({
         type: warnings?.length ? "warning" : "success",
         message: msg,
@@ -374,6 +395,19 @@ export default function SettingsPage() {
           </div>
 
           <StatusBanner status={restoreStatus} />
+
+          {restoreWarnings.length > 0 && (
+            <details className="mb-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">
+              <summary className="cursor-pointer font-medium text-amber-800">
+                {restoreWarnings.length} entry(s) not restored — details
+              </summary>
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-amber-800">
+                {restoreWarnings.map((w, i) => (
+                  <li key={i}>{w}</li>
+                ))}
+              </ul>
+            </details>
+          )}
 
           <div className="space-y-3">
             <label className="flex flex-col gap-1">

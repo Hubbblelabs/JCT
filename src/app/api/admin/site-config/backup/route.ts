@@ -6,6 +6,56 @@ import { requireRole, serverError, badRequest } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { getR2AsBuffer, isR2Configured } from "@/lib/r2";
 
+// Each R2 GET costs ~1-2s round-trip. Fetching a few hundred assets serially
+// takes minutes and the request dies at the reverse proxy before the ZIP is
+// ever written, so pull them through a bounded pool instead.
+const R2_FETCH_CONCURRENCY = 12;
+const R2_FETCH_TIMEOUT_MS = 20_000;
+
+async function mapWithConcurrency<T, R>(
+  items: T[],
+  limit: number,
+  fn: (item: T) => Promise<R>,
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let cursor = 0;
+  const workers = Array.from(
+    { length: Math.min(limit, items.length) },
+    async () => {
+      for (let i = cursor++; i < items.length; i = cursor++) {
+        results[i] = await fn(items[i]!);
+      }
+    },
+  );
+  await Promise.all(workers);
+  return results;
+}
+
+/**
+ * Fetch one asset's bytes, or null when it is missing/unreadable. A single
+ * dead storage key must not abort the whole backup, and must not be able to
+ * stall a pool slot indefinitely.
+ */
+async function fetchAsset(
+  storageKey: string,
+): Promise<{ storageKey: string; buffer: Buffer } | null> {
+  try {
+    const { buffer } = await Promise.race([
+      getR2AsBuffer(storageKey),
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error("R2 fetch timed out")),
+          R2_FETCH_TIMEOUT_MS,
+        ),
+      ),
+    ]);
+    return { storageKey, buffer };
+  } catch (err) {
+    console.warn(`[backup] Skipping asset ${storageKey}:`, err);
+    return null;
+  }
+}
+
 export async function GET(req: NextRequest) {
   const { session, error } = await requireRole(req, "admin");
   if (error) return error;
@@ -23,6 +73,8 @@ export async function GET(req: NextRequest) {
   try {
     await connectDB();
     const zip = new JSZip();
+    let imagesSkipped = 0;
+    let docsSkipped = 0;
 
     // 1. Site config (always included)
     const configs = await SiteConfig.find().sort({ config_key: 1 }).lean();
@@ -39,7 +91,9 @@ export async function GET(req: NextRequest) {
         published_at: doc.published_at ?? null,
       })),
     };
-    zip.file("site-config.json", JSON.stringify(configData, null, 2));
+    zip.file("site-config.json", JSON.stringify(configData, null, 2), {
+      compression: "DEFLATE",
+    });
 
     // 2. Images
     if (includeImages) {
@@ -56,16 +110,23 @@ export async function GET(req: NextRequest) {
         height: img.height,
         uploaded_by: img.uploaded_by,
       }));
-      zip.file("images/_metadata.json", JSON.stringify(metadata, null, 2));
+      zip.file("images/_metadata.json", JSON.stringify(metadata, null, 2), {
+        compression: "DEFLATE",
+      });
 
-      for (const img of images) {
-        try {
-          const { buffer } = await getR2AsBuffer(img.storage_key);
-          const filename = img.storage_key.replace(/^images\//, "");
-          zip.file(`images/${filename}`, buffer);
-        } catch (err) {
-          console.warn(`[backup] Skipping image ${img.storage_key}:`, err);
+      const fetched = await mapWithConcurrency(
+        images.map((img) => img.storage_key as string),
+        R2_FETCH_CONCURRENCY,
+        fetchAsset,
+      );
+      for (const asset of fetched) {
+        if (!asset) {
+          imagesSkipped++;
+          continue;
         }
+        const filename = asset.storageKey.replace(/^images\//, "");
+        // Images are already compressed — re-deflating burns CPU for nothing.
+        zip.file(`images/${filename}`, asset.buffer, { compression: "STORE" });
       }
     }
 
@@ -79,24 +140,38 @@ export async function GET(req: NextRequest) {
         file_size: doc.file_size,
         uploaded_by: doc.uploaded_by,
       }));
-      zip.file("documents/_metadata.json", JSON.stringify(metadata, null, 2));
+      zip.file("documents/_metadata.json", JSON.stringify(metadata, null, 2), {
+        compression: "DEFLATE",
+      });
 
-      for (const doc of docs) {
-        try {
-          const { buffer } = await getR2AsBuffer(doc.storage_key);
-          const filename = doc.storage_key.replace(/^documents\//, "");
-          zip.file(`documents/${filename}`, buffer);
-        } catch (err) {
-          console.warn(`[backup] Skipping document ${doc.storage_key}:`, err);
+      const fetched = await mapWithConcurrency(
+        docs.map((doc) => doc.storage_key as string),
+        R2_FETCH_CONCURRENCY,
+        fetchAsset,
+      );
+      for (const asset of fetched) {
+        if (!asset) {
+          docsSkipped++;
+          continue;
         }
+        const filename = asset.storageKey.replace(/^documents\//, "");
+        zip.file(`documents/${filename}`, asset.buffer, {
+          compression: "STORE",
+        });
       }
     }
 
     const zipBuffer = await zip.generateAsync({ type: "nodebuffer" });
 
     const parts = [`${configs.length} config entries`];
-    if (includeImages) parts.push("images");
-    if (includeDocs) parts.push("documents");
+    if (includeImages)
+      parts.push(
+        imagesSkipped > 0 ? `images (${imagesSkipped} unreadable)` : "images",
+      );
+    if (includeDocs)
+      parts.push(
+        docsSkipped > 0 ? `documents (${docsSkipped} unreadable)` : "documents",
+      );
     await logAudit(
       "site-config",
       "exported",

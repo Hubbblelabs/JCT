@@ -82,7 +82,9 @@ export async function POST(req: NextRequest) {
       continue;
     }
     let publishedValue: unknown = parsedValue.data;
-    if (entry.published_value !== undefined) {
+    // A draft-only config exports `published_value: null`; that is expected,
+    // not a schema failure, so don't warn about it.
+    if (entry.published_value !== undefined && entry.published_value !== null) {
       const parsedPublished = schema.safeParse(entry.published_value);
       if (parsedPublished.success) {
         publishedValue = parsedPublished.data;
