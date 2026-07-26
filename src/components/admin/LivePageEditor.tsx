@@ -43,6 +43,9 @@ type Props<T> = {
     section: string;
     data: T;
     onChange: (next: T) => void;
+    /** Lets an inspector jump the panel to another section (e.g. a block list
+     * whose rows open the individual block editors). */
+    onSelectSection: (section: string) => void;
   }) => ReactNode;
 };
 
@@ -242,6 +245,7 @@ function LivePageEditorInner<T>({
                 section: selected,
                 data: draft,
                 onChange: setDraft,
+                onSelectSection: setSelected,
               })}
             </div>
             <div className="sticky bottom-0 mt-auto border-t border-gray-100 bg-white px-6 py-3">

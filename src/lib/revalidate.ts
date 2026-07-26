@@ -1,5 +1,6 @@
 import { revalidatePath } from "next/cache";
 import { publicCacheClear } from "@/lib/public-cache";
+import { CONTENT_PAGES } from "@/lib/content-pages";
 
 export type RevalidateTarget =
   "home" | "engineering" | "arts-science" | "polytechnic" | "all-institutions";
@@ -17,6 +18,12 @@ const ENGINEERING_PATHS = [
   "/institutions/engineering/clubs-and-cells",
   "/institutions/engineering/committees",
   "/institutions/engineering/documents",
+  "/institutions/engineering/accreditations/naac",
+  // Block-based content pages (Library, NIRF, Timeline, …) — sourced from the
+  // registry so a page added there can't drift out of the institution target.
+  ...CONTENT_PAGES.filter((p) => p.institution === "engineering").map(
+    (p) => p.path,
+  ),
 ];
 
 const ARTS_SCIENCE_PATHS = [
@@ -49,6 +56,12 @@ const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
 };
 
 const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
+  // Every block-based content page revalidates its own institution.
+  ...Object.fromEntries(
+    CONTENT_PAGES.map(
+      (p) => [p.configKey, [p.institution]] as [string, RevalidateTarget[]],
+    ),
+  ),
   contact: ["all-institutions"],
   social: ["all-institutions"],
   address: ["all-institutions"],
@@ -105,6 +118,7 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   campusLifePage: ["home"],
   mainAccreditations: ["home"],
   engineeringAccreditations: ["engineering"],
+  engineeringNaac: ["engineering"],
   artsScienceAccreditations: ["arts-science"],
   polytechnicAccreditations: ["polytechnic"],
   // Meta tags are read inside generateMetadata, so every page in the scope

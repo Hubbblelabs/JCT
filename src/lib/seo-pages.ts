@@ -7,10 +7,19 @@
  * wired to a `generateMetadata` that calls `seoMetadata`/`getPageSeo`. Adding
  * a row here without wiring the route does nothing.
  */
+import { CONTENT_PAGES } from "@/lib/content-pages";
+
 export type SeoPageDefault = {
   path: string;
   label: string;
 };
+
+/** SEO rows for the block-based content pages of one institution. */
+function contentPageSeoRows(institution: string): SeoPageDefault[] {
+  return CONTENT_PAGES.filter((p) => p.institution === institution).map(
+    (p) => ({ path: p.path, label: p.seoLabel }),
+  );
+}
 
 export const MAIN_SEO_PAGES: SeoPageDefault[] = [
   { path: "/", label: "Home" },
@@ -28,6 +37,10 @@ export const ENGINEERING_SEO_PAGES: SeoPageDefault[] = [
   { path: "/institutions/engineering/placements", label: "Placements" },
   { path: "/institutions/engineering/events", label: "News & Events" },
   { path: "/institutions/engineering/accreditations", label: "Accreditations" },
+  {
+    path: "/institutions/engineering/accreditations/naac",
+    label: "Accreditations — NAAC",
+  },
   { path: "/institutions/engineering/research", label: "Research" },
   {
     path: "/institutions/engineering/clubs-and-cells",
@@ -35,6 +48,7 @@ export const ENGINEERING_SEO_PAGES: SeoPageDefault[] = [
   },
   { path: "/institutions/engineering/committees", label: "Committees" },
   { path: "/institutions/engineering/documents", label: "Documents" },
+  ...contentPageSeoRows("engineering"),
 ];
 
 export const ARTS_SCIENCE_SEO_PAGES: SeoPageDefault[] = [

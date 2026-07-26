@@ -8,6 +8,7 @@
  */
 import {
   Award,
+  BadgeCheck,
   BarChart3,
   Bell,
   Briefcase,
@@ -37,6 +38,7 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { hasMinRole } from "@/lib/permissions";
+import { CONTENT_PAGES } from "@/lib/content-pages";
 
 export type AdminRole = "editor" | "admin";
 
@@ -93,6 +95,21 @@ function collegeGroups(college: College): AdminNavGroup[] {
   const eng = college === "engineering";
   const q = `college=${college}`;
   const pc = (section: string) => `/admin/page-content?${q}&section=${section}`;
+
+  // Editors for the block-based content pages (Library, NIRF, Timeline, …).
+  // They all share one route — the registry decides which pages exist and
+  // which hub group each card belongs to.
+  const contentItems = (
+    group: (typeof CONTENT_PAGES)[number]["group"],
+  ): AdminNavItem[] =>
+    CONTENT_PAGES.filter(
+      (p) => p.institution === college && p.group === group,
+    ).map((p) => ({
+      label: p.label,
+      href: `/admin/content/${p.slug}`,
+      icon: p.icon,
+      description: p.description,
+    }));
 
   const homePage: AdminNavItem[] = [
     {
@@ -170,6 +187,7 @@ function collegeGroups(college: College): AdminNavGroup[] {
           },
         ]
       : []),
+    ...contentItems("Academics"),
   ];
 
   const placements: AdminNavItem[] = [
@@ -191,6 +209,7 @@ function collegeGroups(college: College): AdminNavGroup[] {
       icon: Award,
       description: "Recruiter logos and highlight stats.",
     },
+    ...contentItems("Placements"),
   ];
 
   const campus: AdminNavItem[] = [
@@ -222,6 +241,7 @@ function collegeGroups(college: College): AdminNavGroup[] {
           },
         ]
       : []),
+    ...contentItems("Campus & Community"),
   ];
 
   const institution: AdminNavItem[] = [
@@ -237,6 +257,17 @@ function collegeGroups(college: College): AdminNavGroup[] {
       icon: Award,
       description: "Accreditation badges, bodies and certificates.",
     },
+    ...(eng
+      ? [
+          {
+            label: "NAAC",
+            href: "/admin/naac",
+            icon: BadgeCheck,
+            description: "NAAC appeal tables and supporting documents.",
+          },
+        ]
+      : []),
+    ...contentItems("Institution"),
   ];
 
   return [

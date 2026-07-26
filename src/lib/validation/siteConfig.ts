@@ -43,6 +43,8 @@ import { HeaderSchema, FooterSchema } from "./globalCms";
 import { FloatingElementsSchema } from "./floatingElements";
 import { CampusLifePageSchema } from "./campusLifePage";
 import { AccreditationsPageSchema } from "./accreditationsPage";
+import { NaacPageSchema } from "./naacPage";
+import { ContentPageSchema } from "./contentPage";
 import { NavbarSchema } from "./navbar";
 import { SeoPagesSchema } from "./seo";
 import {
@@ -111,8 +113,22 @@ export const SITE_CONFIG_SCHEMAS = {
   campusLifePage: CampusLifePageSchema,
   mainAccreditations: AccreditationsPageSchema,
   engineeringAccreditations: AccreditationsPageSchema,
+  engineeringNaac: NaacPageSchema,
   artsScienceAccreditations: AccreditationsPageSchema,
   polytechnicAccreditations: AccreditationsPageSchema,
+  // Block-based content pages — one key per entry in src/lib/content-pages.ts.
+  engineeringLibrary: ContentPageSchema,
+  engineeringNirf: ContentPageSchema,
+  engineeringTimeline: ContentPageSchema,
+  engineeringProfessionalBodies: ContentPageSchema,
+  engineeringCyberSafety: ContentPageSchema,
+  engineeringNaacBestPractices: ContentPageSchema,
+  engineeringNaacDistinctiveness: ContentPageSchema,
+  engineeringNaacAqar: ContentPageSchema,
+  engineeringFinancialStatements: ContentPageSchema,
+  engineeringIctContent: ContentPageSchema,
+  engineeringNss: ContentPageSchema,
+  engineeringPlacementGallery: ContentPageSchema,
   // Per-page meta title/description, keyed by public route path.
   mainSeo: SeoPagesSchema,
   engineeringSeo: SeoPagesSchema,
@@ -168,6 +184,7 @@ export const SITE_CONFIG_KEY_INSTITUTION: Partial<
   engineeringClubs: "engineering",
   engineeringCommittees: "engineering",
   engineeringDocuments: "engineering",
+  engineeringNaac: "engineering",
   engineeringHeader: "engineering",
   engineeringNavbar: "engineering",
   engineeringLifeAtJct: "engineering",
@@ -193,6 +210,18 @@ export const SITE_CONFIG_KEY_INSTITUTION: Partial<
   engineeringAccreditations: "engineering",
   artsScienceAccreditations: "arts-science",
   polytechnicAccreditations: "polytechnic",
+  engineeringLibrary: "engineering",
+  engineeringNirf: "engineering",
+  engineeringTimeline: "engineering",
+  engineeringProfessionalBodies: "engineering",
+  engineeringCyberSafety: "engineering",
+  engineeringNaacBestPractices: "engineering",
+  engineeringNaacDistinctiveness: "engineering",
+  engineeringNaacAqar: "engineering",
+  engineeringFinancialStatements: "engineering",
+  engineeringIctContent: "engineering",
+  engineeringNss: "engineering",
+  engineeringPlacementGallery: "engineering",
   engineeringSeo: "engineering",
   artsScienceSeo: "arts-science",
   polytechnicSeo: "polytechnic",

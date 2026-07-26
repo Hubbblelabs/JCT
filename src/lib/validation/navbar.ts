@@ -3,7 +3,11 @@ import { zClampedString, zUrl } from "./_primitives";
 
 export const NAVBAR_LIMITS = {
   items: 24,
-  children: 16,
+  // The engineering "More" menu alone carries the long tail of institutional
+  // pages (Library, NIRF, Timeline, the NAAC sub-pages, …), which is already
+  // past 16. The dropdown panel scrolls, so the ceiling is about keeping the
+  // document a sane size, not about what fits on screen.
+  children: 28,
   labelMax: 60,
   descMax: 160,
 } as const;

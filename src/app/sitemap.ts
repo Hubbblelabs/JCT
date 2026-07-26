@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { listPublishedProgramSlugs } from "@/lib/public-programs";
 import { listPublishedPageSlugs } from "@/lib/public-pages";
 import { listPublicEventSlugs } from "@/lib/public-events";
+import { CONTENT_PAGES } from "@/lib/content-pages";
 
 const BASE_URL = "https://jct.ac.in";
 
@@ -34,6 +35,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/institutions/engineering/courses",
     "/institutions/engineering/coe",
     "/institutions/engineering/accreditations",
+    "/institutions/engineering/accreditations/naac",
     "/institutions/engineering/placements",
     "/institutions/arts-science",
     "/institutions/arts-science/about",
@@ -45,6 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/institutions/polytechnic/courses",
     "/institutions/polytechnic/accreditations",
     "/institutions/polytechnic/placements",
+    ...CONTENT_PAGES.map((p) => p.path),
   ];
 
   const staticEntries = staticRoutes.map((route) => {

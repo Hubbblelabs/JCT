@@ -303,6 +303,42 @@ export type {
 } from "./engineeringPages";
 
 export {
+  ContentPageSchema,
+  ContentBlockSchema,
+  ContentDocSchema,
+  ContentCellSchema,
+  ContentImageSchema,
+  CONTENT_PAGE_LIMITS,
+  CONTENT_BLOCK_TYPES,
+  CONTENT_BLOCK_LABELS,
+  emptyContentBlock,
+} from "./contentPage";
+export type {
+  ContentPageValue,
+  ContentBlockValue,
+  ContentBlockType,
+  ContentDocValue,
+  ContentDocGroupValue,
+  ContentCellValue,
+  ContentTableRowValue,
+  ContentImageValue,
+  ContentImageGroupValue,
+  ContentTimelineEntryValue,
+  ContentAccordionItemValue,
+  ContentBreadcrumbValue,
+} from "./contentPage";
+
+export { NaacPageSchema, NAAC_PAGE_LIMITS } from "./naacPage";
+export type {
+  NaacPageValue,
+  NaacDocValue,
+  NaacDocGroupValue,
+  NaacDocSectionValue,
+  NaacQualitativeRowValue,
+  NaacQuantitativeRowValue,
+} from "./naacPage";
+
+export {
   SeoEntrySchema,
   SeoPagesSchema,
   ProgramSeoSchema,

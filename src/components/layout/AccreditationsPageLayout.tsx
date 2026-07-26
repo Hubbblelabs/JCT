@@ -1,7 +1,9 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import {
+  ArrowRight,
   Award,
   BadgeCheck,
   CalendarRange,
@@ -84,6 +86,29 @@ const INSTITUTION_META: Record<
   },
 };
 
+/**
+ * Accreditations that have a dedicated page on this site. Keyed by
+ * `<institution>:<lowercased item name>`; used when the CMS entry has no
+ * explicit `detailHref`, so existing seeded data links through without needing
+ * a re-seed.
+ */
+const ACCREDITATION_DETAIL_PAGES: Record<string, string> = {
+  "engineering:naac": "/institutions/engineering/accreditations/naac",
+};
+
+function detailPageFor(
+  item: AccreditationsPageValue["items"][number],
+  institution: Institution,
+): string {
+  const explicit = item.detailHref?.trim();
+  if (explicit) return explicit;
+  return (
+    ACCREDITATION_DETAIL_PAGES[
+      `${institution}:${item.name.trim().toLowerCase()}`
+    ] ?? ""
+  );
+}
+
 function validityLabel(from: string, to: string): string {
   const f = from.trim();
   const t = to.trim();
@@ -96,13 +121,18 @@ function validityLabel(from: string, to: string): string {
 function AccreditationCard({
   item,
   theme,
+  institution,
+  editable,
 }: {
   item: AccreditationsPageValue["items"][number];
   theme: (typeof THEME)[Institution];
+  institution: Institution;
+  editable: boolean;
 }) {
   const logo = getImageUrl(item.logo) || "";
   const certificate = getImageUrl(item.certificate) || "";
   const validity = validityLabel(item.validFrom, item.validTo);
+  const detailHref = detailPageFor(item, institution);
 
   return (
     <div className="bg-card flex h-full flex-col rounded-2xl border border-white/10 p-6 shadow-sm transition-all hover:border-white/20 hover:shadow-md">
@@ -124,7 +154,17 @@ function AccreditationCard({
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="text-foreground font-serif text-lg font-bold">
-            {item.name || "Untitled"}
+            {detailHref ? (
+              <Link
+                href={detailHref}
+                onClick={editable ? (e) => e.preventDefault() : undefined}
+                className="transition-opacity hover:underline hover:opacity-80"
+              >
+                {item.name || "Untitled"}
+              </Link>
+            ) : (
+              item.name || "Untitled"
+            )}
           </h3>
           {item.fullName && (
             <p className="text-muted-foreground mt-0.5 text-sm">
@@ -171,16 +211,30 @@ function AccreditationCard({
         )}
       </div>
 
-      {certificate && (
-        <a
-          href={certificate}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={`mt-4 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition-colors hover:bg-white/5 ${theme.chip}`}
-        >
-          <Download size={15} />
-          {item.certificateLabel?.trim() || "View Certificate"}
-        </a>
+      {(certificate || detailHref) && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {detailHref && (
+            <Link
+              href={detailHref}
+              onClick={editable ? (e) => e.preventDefault() : undefined}
+              className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition-colors hover:bg-white/5 ${theme.chip}`}
+            >
+              {`View ${item.name.trim() || "Details"}`}
+              <ArrowRight size={15} />
+            </Link>
+          )}
+          {certificate && (
+            <a
+              href={certificate}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm font-semibold transition-colors hover:bg-white/5 ${theme.chip}`}
+            >
+              <Download size={15} />
+              {item.certificateLabel?.trim() || "View Certificate"}
+            </a>
+          )}
+        </div>
       )}
     </div>
   );
@@ -269,7 +323,13 @@ export function AccreditationsPageLayout({
           {items.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((item, i) => (
-                <AccreditationCard key={i} item={item} theme={theme} />
+                <AccreditationCard
+                  key={i}
+                  item={item}
+                  theme={theme}
+                  institution={institution}
+                  editable={editable}
+                />
               ))}
             </div>
           ) : (

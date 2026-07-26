@@ -11,7 +11,18 @@ import {
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 
-const ALLOWED_MIME = ["application/pdf"] as const;
+// PDFs cover most downloads, but pages such as ICT Content publish faculty
+// slide decks and some statutory returns arrive as Word/Excel — those have to
+// be replaceable from the admin UI too, not just seedable.
+const ALLOWED_MIME = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+] as const;
 const MAX_SIZE = 25 * 1024 * 1024; // 25 MB
 
 export const maxDuration = 60;
@@ -29,7 +40,7 @@ export async function POST(req: NextRequest) {
     if (!file) return badRequest("No file provided");
     if (!ALLOWED_MIME.includes(file.type as (typeof ALLOWED_MIME)[number])) {
       return badRequest(
-        `Invalid file type "${file.type}". Only PDF files are accepted.`,
+        `Invalid file type "${file.type}". Accepted: PDF, Word, Excel and PowerPoint files.`,
       );
     }
     if (file.size > MAX_SIZE) {
@@ -44,7 +55,7 @@ export async function POST(req: NextRequest) {
       .replace(/[^a-zA-Z0-9._-]/g, "_");
     const storageKey = `documents/${Date.now()}-${safeName}`;
 
-    const publicUrl = await uploadToR2(storageKey, buffer, "application/pdf");
+    const publicUrl = await uploadToR2(storageKey, buffer, file.type);
 
     // Track the document in MongoDB so it can be deleted later (and R2 cleaned up).
     // If the DB write fails, roll back the R2 upload.

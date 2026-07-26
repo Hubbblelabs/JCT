@@ -26,6 +26,7 @@ export const ACCREDITATIONS_PAGE_LIMITS = {
   validMax: 20,
   certificateMax: 500,
   certificateLabelMax: 120,
+  detailHrefMax: 300,
   itemsMax: 40,
 } as const;
 
@@ -42,6 +43,10 @@ const AccreditationItemSchema = z.object({
   validTo: s(ACCREDITATIONS_PAGE_LIMITS.validMax), // "2027"
   certificate: s(ACCREDITATIONS_PAGE_LIMITS.certificateMax), // R2 doc key / URL
   certificateLabel: s(ACCREDITATIONS_PAGE_LIMITS.certificateLabelMax),
+  // Optional dedicated page for this accreditation, e.g.
+  // "/institutions/engineering/accreditations/naac". Blank falls back to
+  // ACCREDITATION_DETAIL_PAGES in AccreditationsPageLayout.
+  detailHref: s(ACCREDITATIONS_PAGE_LIMITS.detailHrefMax),
 });
 
 export type AccreditationItemValue = z.infer<typeof AccreditationItemSchema>;

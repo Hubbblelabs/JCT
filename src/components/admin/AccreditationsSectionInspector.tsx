@@ -23,6 +23,7 @@ const EMPTY_ITEM: AccreditationItem = {
   validTo: "",
   certificate: "",
   certificateLabel: "",
+  detailHref: "",
 };
 
 export function AccreditationsSectionInspector({
@@ -142,6 +143,12 @@ export function AccreditationsSectionInspector({
                 onChange={(e) =>
                   oc({ ...item, certificateLabel: e.target.value })
                 }
+              />
+              <TextInput
+                label="Dedicated Page (optional)"
+                value={item.detailHref}
+                placeholder="/institutions/engineering/accreditations/naac"
+                onChange={(e) => oc({ ...item, detailHref: e.target.value })}
               />
             </div>
           )}

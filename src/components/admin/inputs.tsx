@@ -47,9 +47,21 @@ function validateImageFile(file: File): string | null {
   return null;
 }
 
+// Mirrors ALLOWED_MIME in /api/admin/documents/upload.
+const DOC_MIME_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+];
+const DOC_ACCEPT = `${DOC_MIME_TYPES.join(",")},.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx`;
+
 function validateDocumentFile(file: File): string | null {
-  if (file.type !== "application/pdf")
-    return `Invalid file type${file.type ? ` "${file.type}"` : ""}. Only PDF files are accepted.`;
+  if (!DOC_MIME_TYPES.includes(file.type))
+    return `Invalid file type${file.type ? ` "${file.type}"` : ""}. Accepted: PDF, Word, Excel and PowerPoint.`;
   if (file.size > DOC_MAX_FILE_SIZE)
     return `File too large (${asMb(file.size)} MB). Max is ${DOC_MAX_FILE_SIZE / 1024 / 1024} MB.`;
   return null;
@@ -760,7 +772,7 @@ export function DocumentUploadInput({
         <input
           type="file"
           ref={fileRef}
-          accept="application/pdf"
+          accept={DOC_ACCEPT}
           className="hidden"
           onChange={handleFileChange}
         />
@@ -775,7 +787,11 @@ export function DocumentUploadInput({
           ) : (
             <Upload size={14} />
           )}
-          {uploading ? "Uploading…" : value ? "Replace PDF" : "Upload PDF"}
+          {uploading
+            ? "Uploading…"
+            : value
+              ? "Replace document"
+              : "Upload document"}
         </button>
         {uploadError && (
           <p className="mt-1 flex items-start gap-1 text-xs text-red-600">

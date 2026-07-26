@@ -82,6 +82,7 @@ function item(partial) {
     validTo: "",
     certificate: "",
     certificateLabel: "",
+    detailHref: "",
     ...partial,
   };
 }
@@ -103,6 +104,7 @@ const ENGINEERING = [
       "JCT College of Engineering & Technology is accredited by NAAC with 'A' Grade, affirming its overall institutional quality.",
     certSrc: `${ENG}/2021/11/NAAC-Certificate.pdf`,
     certificateLabel: "View NAAC Certificate",
+    detailHref: "/institutions/engineering/accreditations/naac",
   }),
   item({
     name: "NBA",
