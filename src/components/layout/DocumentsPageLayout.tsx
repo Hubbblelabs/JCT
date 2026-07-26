@@ -30,6 +30,23 @@ export const DOCUMENTS_SECTION_ORDER: DocumentsEditableSection[] = [
 // hrefs on their own — resolve them the same way images are.
 const docUrl = (v: string) => getImageUrl(v) || "";
 
+/**
+ * A document with a file but no typed-in title is still a real download, so it
+ * must render. Derive a readable label from the storage key / URL:
+ * "documents/1785040633931-Mandatory-Disclosure-2026.pdf" → "Mandatory Disclosure 2026".
+ */
+function docLabel(doc: { title: string; file: string }): string {
+  if (doc.title.trim()) return doc.title;
+  const file = doc.file.trim();
+  if (!file) return "Untitled Document";
+  const base = (file.split("?")[0].split("/").pop() ?? "")
+    .replace(/^\d{10,}-/, "")
+    .replace(/\.[a-z0-9]+$/i, "")
+    .replace(/[-_]+/g, " ")
+    .trim();
+  return base || "Download";
+}
+
 export function DocumentsPageLayout({
   data,
   editable = false,
@@ -40,12 +57,16 @@ export function DocumentsPageLayout({
   onEditSection?: (section: DocumentsEditableSection) => void;
 }) {
   const intro = data.intro.filter((p) => p.trim() !== "");
+  // A row counts as publishable once it has a file OR a title — filtering on
+  // title alone hid uploaded documents the admin never named.
   const categories = editable
     ? data.categories
     : data.categories
         .map((c) => ({
           ...c,
-          documents: c.documents.filter((d) => d.title.trim() !== ""),
+          documents: c.documents.filter(
+            (d) => d.file.trim() !== "" || d.title.trim() !== "",
+          ),
         }))
         .filter((c) => c.documents.length > 0);
 
@@ -148,7 +169,7 @@ export function DocumentsPageLayout({
                             </span>
                             <span className="min-w-0 flex-1">
                               <span className="text-foreground group-hover:text-gold block text-sm font-bold transition-colors duration-300">
-                                {doc.title}
+                                {docLabel(doc)}
                               </span>
                               {doc.description && (
                                 <span className="text-muted-foreground mt-1 block text-xs leading-relaxed">

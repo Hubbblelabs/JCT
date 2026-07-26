@@ -97,6 +97,7 @@ export function DocumentsSectionInspector({
                     <TextInput
                       label="Document Title"
                       value={doc.title}
+                      placeholder="Mandatory Disclosure 2026"
                       onChange={(e) => ocDoc({ ...doc, title: e.target.value })}
                     />
                     <TextArea
