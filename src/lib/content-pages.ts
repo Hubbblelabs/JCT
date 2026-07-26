@@ -22,6 +22,7 @@ import {
   History,
   MessageSquare,
   MonitorPlay,
+  Palette,
   ShieldCheck,
   Sparkles,
   Users,
@@ -50,7 +51,9 @@ export type ContentPageDef = {
 };
 
 const ENG = "/institutions/engineering";
+const POLY = "/institutions/polytechnic";
 const SUFFIX = "JCT College of Engineering & Technology, Coimbatore";
+const POLY_SUFFIX = "JCT Polytechnic College, Coimbatore";
 
 export const CONTENT_PAGES: ContentPageDef[] = [
   {
@@ -235,9 +238,35 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     icon: Camera,
     group: "Placements",
   },
+  {
+    slug: "fine-arts-club",
+    configKey: "polytechnicFineArtsClub",
+    institution: "polytechnic",
+    path: `${POLY}/fine-arts-club`,
+    label: "Fine Arts Club",
+    description: "Movie, cultural, arts and photography clubs and their gallery.",
+    seoLabel: "Fine Arts Club",
+    seoTitle: `Fine Arts Club | ${POLY_SUFFIX}`,
+    seoDescription:
+      "The Fine Arts Club at JCT Polytechnic College — its movie, cultural, arts and photography wings, objectives and event gallery.",
+    icon: Palette,
+    group: "Campus & Community",
+  },
 ];
 
 export const CONTENT_PAGE_CONFIG_KEYS = CONTENT_PAGES.map((p) => p.configKey);
+
+// `slug` keys the admin editor route and `configKey` keys the SiteConfig doc,
+// so a duplicate of either would silently route two pages to one record. Slugs
+// are global, not per-institution — two colleges can't both use "library".
+for (const field of ["slug", "configKey"] as const) {
+  const values = CONTENT_PAGES.map((p) => p[field]);
+  const dupes = values.filter((v, i) => values.indexOf(v) !== i);
+  if (dupes.length)
+    throw new Error(
+      `[content-pages] duplicate ${field}: ${[...new Set(dupes)].join(", ")}`,
+    );
+}
 
 export function getContentPage(slug: string): ContentPageDef | undefined {
   return CONTENT_PAGES.find((p) => p.slug === slug);

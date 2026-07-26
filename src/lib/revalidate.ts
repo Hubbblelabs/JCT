@@ -41,6 +41,9 @@ const POLYTECHNIC_PATHS = [
   "/institutions/polytechnic/placements",
   "/institutions/polytechnic/accreditations",
   "/institutions/polytechnic/committees",
+  ...CONTENT_PAGES.filter((p) => p.institution === "polytechnic").map(
+    (p) => p.path,
+  ),
 ];
 
 const TARGET_PATHS: Record<RevalidateTarget, string[]> = {

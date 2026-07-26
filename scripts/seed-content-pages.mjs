@@ -65,6 +65,7 @@ const CONFIG_KEYS = {
   "ict-content": "engineeringIctContent",
   nss: "engineeringNss",
   "feedback-system": "engineeringFeedbackSystem",
+  "fine-arts-club": "polytechnicFineArtsClub",
   "placement-gallery": "engineeringPlacementGallery",
 };
 

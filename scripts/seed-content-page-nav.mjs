@@ -111,6 +111,11 @@ const POLYTECHNIC_ENTRIES = [
     href: `${POLY}/committees`,
     desc: "Committees and cells across the college",
   },
+  {
+    label: "Fine Arts Club",
+    href: `${POLY}/fine-arts-club`,
+    desc: "Movie, cultural, arts and photography wings",
+  },
 ];
 
 /** One navbar config key per college, with the links it should carry. */

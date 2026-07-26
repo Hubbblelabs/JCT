@@ -130,6 +130,7 @@ export const SITE_CONFIG_SCHEMAS = {
   engineeringIctContent: ContentPageSchema,
   engineeringNss: ContentPageSchema,
   engineeringFeedbackSystem: ContentPageSchema,
+  polytechnicFineArtsClub: ContentPageSchema,
   engineeringPlacementGallery: ContentPageSchema,
   // Per-page meta title/description, keyed by public route path.
   mainSeo: SeoPagesSchema,
@@ -204,6 +205,7 @@ export const SITE_CONFIG_KEY_INSTITUTION: Partial<
   artsScienceHeader: "arts-science",
   artsScienceNavbar: "arts-science",
   polytechnicCommittees: "polytechnic",
+  polytechnicFineArtsClub: "polytechnic",
   polytechnicHero: "polytechnic",
   polytechnicLifeAtJct: "polytechnic",
   polytechnicAdmissions: "polytechnic",
