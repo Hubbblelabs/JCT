@@ -64,6 +64,7 @@ const CONFIG_KEYS = {
   "financial-statements": "engineeringFinancialStatements",
   "ict-content": "engineeringIctContent",
   nss: "engineeringNss",
+  "feedback-system": "engineeringFeedbackSystem",
   "placement-gallery": "engineeringPlacementGallery",
 };
 

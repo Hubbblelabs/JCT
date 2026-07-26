@@ -33,6 +33,8 @@
     "seed:contentpages:dry": "node scripts/seed-content-pages.mjs --dry-run",
     "seed:contentpagenav": "node scripts/seed-content-page-nav.mjs",
     "seed:contentpagenav:dry": "node scripts/seed-content-page-nav.mjs --dry-run",
+    "seed:committeegroups": "node scripts/seed-committee-groups.mjs",
+    "seed:committeegroups:dry": "node scripts/seed-committee-groups.mjs --dry-run",
     "seed:committees": "node scripts/seed-committees.mjs",
     "seed:committees:dry": "node scripts/seed-committees.mjs --dry-run",
     "seed:clubs": "node scripts/seed-clubs.mjs",

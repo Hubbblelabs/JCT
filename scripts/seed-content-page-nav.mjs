@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 /**
- * Link the block-based content pages (see src/lib/content-pages.ts) into the
- * public Engineering navbar, under the "More" dropdown.
+ * Link CMS-backed sub-pages into the public college navbars, under their
+ * "More" dropdown.
  *
- * The navbar is CMS data — the `engineeringNavbar` SiteConfig key, edited at
- * /admin/page-content?college=engineering&section=navbar. This script only
- * appends the entries that are missing, matched by `href`, so it is safe to
- * re-run and never touches links the admin has added, renamed or reordered.
+ * A navbar is CMS data — the `<college>Navbar` SiteConfig key, edited at
+ * /admin/page-content?college=<college>&section=navbar. This script only
+ * appends the entries that are missing, matched by `href` across the whole
+ * navbar, so it is safe to re-run and never touches links the admin has added,
+ * renamed or reordered.
  *
  * Usage:
- *   node scripts/seed-content-page-nav.mjs [--dry-run]
+ *   node scripts/seed-content-page-nav.mjs [--dry-run] [--only=<configKey>]
  * Requires MONGODB_URI (env, falling back to repo .env).
  */
 import fs from "fs";
@@ -20,18 +21,23 @@ import mongoose from "mongoose";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const DRY = process.argv.includes("--dry-run") || process.argv.includes("-n");
 
-const CONFIG_KEY = "engineeringNavbar";
+const ONLY = (() => {
+  const arg = process.argv.find((a) => a.startsWith("--only="));
+  return arg ? arg.slice("--only=".length).trim() : null;
+})();
+
 /** The dropdown the entries are appended to, matched on its label. */
 const PARENT_LABEL = "More";
 /** Mirrors NAVBAR_LIMITS.children in src/lib/validation/navbar.ts. */
 const MAX_CHILDREN = 28;
 
 const ENG = "/institutions/engineering";
+const POLY = "/institutions/polytechnic";
 
 // Mirrors CONTENT_PAGES in src/lib/content-pages.ts. `label`/`desc` are the
 // public-facing wording, which is deliberately allowed to differ from the
 // admin-facing labels in the registry.
-const NAV_ENTRIES = [
+const ENGINEERING_ENTRIES = [
   {
     label: "Library",
     href: `${ENG}/library`,
@@ -92,6 +98,25 @@ const NAV_ENTRIES = [
     href: `${ENG}/placements/gallery`,
     desc: "Photographs from recruitment drives",
   },
+  {
+    label: "Feedback System",
+    href: `${ENG}/feedback-system`,
+    desc: "Student and staff feedback portals",
+  },
+];
+
+const POLYTECHNIC_ENTRIES = [
+  {
+    label: "Committees & Cells",
+    href: `${POLY}/committees`,
+    desc: "Committees and cells across the college",
+  },
+];
+
+/** One navbar config key per college, with the links it should carry. */
+const NAV_PLAN = [
+  { configKey: "engineeringNavbar", entries: ENGINEERING_ENTRIES },
+  { configKey: "polytechnicNavbar", entries: POLYTECHNIC_ENTRIES },
 ];
 
 function loadEnv() {
@@ -112,7 +137,7 @@ const normHref = (h) => String(h ?? "").trim().replace(/\/+$/, "").toLowerCase()
  * Append the missing entries to the "More" item of one navbar value.
  * Returns the number of links added.
  */
-function linkInto(value) {
+function linkInto(value, entries) {
   if (!value || typeof value !== "object" || !Array.isArray(value.items))
     return 0;
 
@@ -131,7 +156,7 @@ function linkInto(value) {
   }
 
   let added = 0;
-  for (const entry of NAV_ENTRIES) {
+  for (const entry of entries) {
     if (existing.has(normHref(entry.href))) continue;
     if (parent.children.length >= MAX_CHILDREN) {
       console.warn(
@@ -155,57 +180,70 @@ async function main() {
     process.exit(1);
   }
 
-  await mongoose.connect(uri, { serverSelectionTimeoutMS: 15000 });
-  const db = mongoose.connection.db;
-  const doc = await db
-    .collection("siteconfigs")
-    .findOne({ config_key: CONFIG_KEY });
-
-  if (!doc) {
-    console.error(
-      `[seed-content-page-nav] no "${CONFIG_KEY}" config — set the navbar up in the admin first.`,
-    );
-    await mongoose.disconnect();
+  const plan = NAV_PLAN.filter((p) => !ONLY || p.configKey === ONLY);
+  if (!plan.length) {
+    console.error("[seed-content-page-nav] --only matched no navbar.");
     process.exit(1);
   }
 
-  console.log(`[seed-content-page-nav] ${DRY ? "DRY-RUN — " : ""}draft:`);
-  const draftAdded = linkInto(doc.value);
-  console.log(`[seed-content-page-nav] ${DRY ? "DRY-RUN — " : ""}published:`);
-  const publishedAdded = linkInto(doc.published_value);
+  await mongoose.connect(uri, { serverSelectionTimeoutMS: 15000 });
+  const db = mongoose.connection.db;
+  let total = 0;
+
+  for (const { configKey, entries } of plan) {
+    const doc = await db
+      .collection("siteconfigs")
+      .findOne({ config_key: configKey });
+
+    if (!doc) {
+      console.warn(
+        `[seed-content-page-nav] no "${configKey}" config — set that navbar up in the admin first. Skipping.`,
+      );
+      continue;
+    }
+
+    console.log(`\n[seed-content-page-nav] ${DRY ? "DRY-RUN — " : ""}${configKey}:`);
+    // The draft and the published copy are updated together, so an admin
+    // opening the editor never sees the link vanish.
+    const draftAdded = linkInto(doc.value, entries);
+    const publishedAdded = linkInto(doc.published_value, entries);
+    const added = Math.max(draftAdded, publishedAdded);
+
+    if (added === 0) {
+      console.log(`  [skip] already linked.`);
+      continue;
+    }
+    total += added;
+    if (DRY) continue;
+
+    await db.collection("siteconfigs").updateOne(
+      { config_key: configKey },
+      {
+        $set: {
+          value: doc.value,
+          published_value: doc.published_value,
+          status: "published",
+          published_at: new Date(),
+          updated_by: "seed-content-page-nav",
+          updated_at: new Date(),
+        },
+        $inc: { version: 1 },
+      },
+    );
+    console.log(`  [published] ${added} link(s) added under "${PARENT_LABEL}".`);
+  }
 
   if (DRY) {
     console.log(
-      `\n[seed-content-page-nav] dry-run — would add ${draftAdded} draft / ${publishedAdded} published link(s).`,
+      `\n[seed-content-page-nav] dry-run — would add ${total} link(s).`,
     );
     await mongoose.disconnect();
     return;
   }
 
-  if (draftAdded === 0 && publishedAdded === 0) {
-    console.log("\n[seed-content-page-nav] Already linked — nothing to do.");
-    await mongoose.disconnect();
-    return;
-  }
-
-  await db.collection("siteconfigs").updateOne(
-    { config_key: CONFIG_KEY },
-    {
-      $set: {
-        value: doc.value,
-        published_value: doc.published_value,
-        status: "published",
-        published_at: new Date(),
-        updated_by: "seed-content-page-nav",
-        updated_at: new Date(),
-      },
-      $inc: { version: 1 },
-    },
-  );
-
   console.log(
-    `\n[seed-content-page-nav] Linked ${draftAdded} page(s) under "${PARENT_LABEL}". ` +
-      "Reorder or reword them at /admin/page-content?college=engineering&section=navbar.",
+    `\n[seed-content-page-nav] Linked ${total} page(s). ` +
+      "Reorder or reword them at /admin/page-content?college=<college>&section=navbar.",
   );
   console.log(
     "[seed-content-page-nav] NOTE: a running app serves /api/public/* from an " +

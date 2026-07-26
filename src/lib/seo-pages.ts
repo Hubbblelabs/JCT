@@ -70,6 +70,11 @@ export const POLYTECHNIC_SEO_PAGES: SeoPageDefault[] = [
   { path: "/institutions/polytechnic/placements", label: "Placements" },
   { path: "/institutions/polytechnic/events", label: "News & Events" },
   { path: "/institutions/polytechnic/accreditations", label: "Accreditations" },
+  {
+    path: "/institutions/polytechnic/committees",
+    label: "Committees & Cells",
+  },
+  ...contentPageSeoRows("polytechnic"),
 ];
 
 export const SEO_PAGE_DEFAULTS: Record<string, SeoPageDefault[]> = {

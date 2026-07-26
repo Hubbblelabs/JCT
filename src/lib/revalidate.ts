@@ -40,6 +40,7 @@ const POLYTECHNIC_PATHS = [
   "/institutions/polytechnic/about",
   "/institutions/polytechnic/placements",
   "/institutions/polytechnic/accreditations",
+  "/institutions/polytechnic/committees",
 ];
 
 const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
@@ -115,6 +116,7 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   engineeringClubs: ["engineering"],
   engineeringCommittees: ["engineering"],
   engineeringDocuments: ["engineering"],
+  polytechnicCommittees: ["polytechnic"],
   campusLifePage: ["home"],
   mainAccreditations: ["home"],
   engineeringAccreditations: ["engineering"],
@@ -142,9 +144,12 @@ const DYNAMIC_PAGE_PATTERNS: Partial<Record<RevalidateTarget, string[]>> = {
     "/institutions/engineering/committees/[slug]",
     "/institutions/engineering/clubs-and-cells/[slug]",
   ],
+  polytechnic: ["/institutions/polytechnic/committees/[slug]"],
 };
-DYNAMIC_PAGE_PATTERNS["all-institutions"] =
-  DYNAMIC_PAGE_PATTERNS.engineering ?? [];
+DYNAMIC_PAGE_PATTERNS["all-institutions"] = [
+  ...(DYNAMIC_PAGE_PATTERNS.engineering ?? []),
+  ...(DYNAMIC_PAGE_PATTERNS.polytechnic ?? []),
+];
 
 export function revalidateTargets(...targets: RevalidateTarget[]): void {
   publicCacheClear();

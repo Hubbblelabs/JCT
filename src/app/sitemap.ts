@@ -47,6 +47,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "/institutions/polytechnic/courses",
     "/institutions/polytechnic/accreditations",
     "/institutions/polytechnic/placements",
+    "/institutions/polytechnic/committees",
     ...CONTENT_PAGES.map((p) => p.path),
   ];
 

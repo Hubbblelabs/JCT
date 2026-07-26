@@ -12,6 +12,8 @@ import {
 } from "@/components/admin/inputs";
 import {
   GROUPS_VARIANT_META,
+  groupsBasePath,
+  type GroupsInstitution,
   type GroupsVariant,
   type GroupsVariantMeta,
 } from "@/lib/groups-meta";
@@ -121,12 +123,14 @@ function GroupFields({
   group,
   meta,
   variant,
+  basePath,
   resolvedSlug,
   onChange,
 }: {
   group: GroupValue;
   meta: GroupsVariantMeta;
   variant: GroupsVariant;
+  basePath: string;
   resolvedSlug: string;
   onChange: (next: GroupValue) => void;
 }) {
@@ -151,7 +155,7 @@ function GroupFields({
         label="URL Slug (optional)"
         value={group.slug}
         placeholder={autoSlug || "auto-generated-from-name"}
-        hint={`Page URL: ${meta.basePath}/${resolvedSlug || "…"} — leave blank to follow the name. Set it only to keep an existing link working after a rename.`}
+        hint={`Page URL: ${basePath}/${resolvedSlug || "…"} — leave blank to follow the name. Set it only to keep an existing link working after a rename.`}
         onChange={(e) => onChange({ ...group, slug: e.target.value })}
       />
       <TextArea
@@ -224,15 +228,19 @@ function GroupFields({
 export function GroupsSectionInspector({
   section,
   variant,
+  institution = "engineering",
   data,
   onChange,
 }: {
   section: string;
   variant: GroupsVariant;
+  /** Drives the "Page URL" hint on the slug field. */
+  institution?: GroupsInstitution;
   data: GroupsPageValue;
   onChange: (next: GroupsPageValue) => void;
 }) {
   const meta = GROUPS_VARIANT_META[variant];
+  const basePath = groupsBasePath(variant, institution);
   const patch = (p: Partial<GroupsPageValue>) => onChange({ ...data, ...p });
   const slugs = resolveGroupSlugs(data.groups);
 
@@ -252,6 +260,7 @@ export function GroupsSectionInspector({
         group={group}
         meta={meta}
         variant={variant}
+        basePath={basePath}
         resolvedSlug={slugs[idx]}
         onChange={(next) =>
           patch({

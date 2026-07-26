@@ -12,9 +12,33 @@ import { Sparkles, Users, type LucideIcon } from "lucide-react";
  */
 export type GroupsVariant = "clubs" | "committees";
 
+/**
+ * Which college's pages a groups list belongs to. The variant decides the copy;
+ * the institution decides the URL and the breadcrumb root, so the same layout
+ * serves `/institutions/engineering/committees` and the polytechnic equivalent.
+ */
+export type GroupsInstitution = "engineering" | "arts-science" | "polytechnic";
+
+export const GROUPS_INSTITUTION_LABELS: Record<GroupsInstitution, string> = {
+  engineering: "Engineering",
+  "arts-science": "Arts & Science",
+  polytechnic: "Polytechnic",
+};
+
+const VARIANT_SEGMENT: Record<GroupsVariant, string> = {
+  clubs: "clubs-and-cells",
+  committees: "committees",
+};
+
+/** Detail pages live at `${groupsBasePath(...)}/${slug}`. */
+export function groupsBasePath(
+  variant: GroupsVariant,
+  institution: GroupsInstitution = "engineering",
+): string {
+  return `/institutions/${institution}/${VARIANT_SEGMENT[variant]}`;
+}
+
 export type GroupsVariantMeta = {
-  /** Detail pages live at `${basePath}/${slug}`. */
-  basePath: string;
   breadcrumb: string;
   defaultHeroTitle: string;
   listHeading: string;
@@ -38,7 +62,6 @@ export type GroupsVariantMeta = {
 
 export const GROUPS_VARIANT_META: Record<GroupsVariant, GroupsVariantMeta> = {
   clubs: {
-    basePath: "/institutions/engineering/clubs-and-cells",
     breadcrumb: "Clubs & Cells",
     defaultHeroTitle: "Clubs & Cells",
     listHeading: "Student Clubs & Cells",
@@ -53,7 +76,6 @@ export const GROUPS_VARIANT_META: Record<GroupsVariant, GroupsVariantMeta> = {
     cardStyle: "image",
   },
   committees: {
-    basePath: "/institutions/engineering/committees",
     breadcrumb: "Committees",
     defaultHeroTitle: "Committees",
     listHeading: "Institutional Committees",

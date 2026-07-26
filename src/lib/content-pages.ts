@@ -20,6 +20,7 @@ import {
   FileSpreadsheet,
   HeartHandshake,
   History,
+  MessageSquare,
   MonitorPlay,
   ShieldCheck,
   Sparkles,
@@ -205,6 +206,20 @@ export const CONTENT_PAGES: ContentPageDef[] = [
       "The National Service Scheme unit at JCT along with the Red Ribbon Club and Youth Red Cross — objectives, activities and faculty in charge.",
     icon: HeartHandshake,
     group: "Campus & Community",
+  },
+  {
+    slug: "feedback-system",
+    configKey: "engineeringFeedbackSystem",
+    institution: "engineering",
+    path: `${ENG}/feedback-system`,
+    label: "Feedback System",
+    description: "Links to the student and staff ERP feedback portals.",
+    seoLabel: "Feedback System",
+    seoTitle: `Feedback System | ${SUFFIX}`,
+    seoDescription:
+      "Student and staff feedback portals of JCT College of Engineering & Technology, accessed through the institution's ERP.",
+    icon: MessageSquare,
+    group: "Institution",
   },
   {
     slug: "placement-gallery",

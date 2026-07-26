@@ -90,6 +90,9 @@ const COLLEGE_NAV_LABELS: Record<College, string> = {
   polytechnic: "Polytechnic",
 };
 
+/** Colleges that publish a committees & cells page — see /admin/committees. */
+const COMMITTEE_COLLEGES: College[] = ["engineering", "polytechnic"];
+
 /** Groups for one college. Engineering carries extra sub-pages. */
 function collegeGroups(college: College): AdminNavGroup[] {
   const eng = college === "engineering";
@@ -227,12 +230,22 @@ function collegeGroups(college: College): AdminNavGroup[] {
             icon: Sparkles,
             description: "Student clubs and cells page.",
           },
+        ]
+      : []),
+    // Engineering and Polytechnic both publish a committees & cells page; the
+    // editor is one route scoped by `?college=`.
+    ...(COMMITTEE_COLLEGES.includes(college)
+      ? [
           {
-            label: "Committees",
-            href: "/admin/committees",
+            label: "Committees & Cells",
+            href: `/admin/committees?${q}`,
             icon: Users,
-            description: "Statutory and internal committees page.",
+            description: "Statutory committees and cells page.",
           },
+        ]
+      : []),
+    ...(eng
+      ? [
           {
             label: "Documents",
             href: "/admin/documents",

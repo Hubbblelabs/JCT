@@ -6,7 +6,13 @@ import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { getImageUrl } from "@/lib/utils";
-import { GROUPS_VARIANT_META, type GroupsVariant } from "@/lib/groups-meta";
+import {
+  GROUPS_INSTITUTION_LABELS,
+  GROUPS_VARIANT_META,
+  groupsBasePath,
+  type GroupsInstitution,
+  type GroupsVariant,
+} from "@/lib/groups-meta";
 import type { GroupValue } from "@/lib/validation";
 
 /** Published contacts are phone numbers or emails — link them accordingly. */
@@ -33,11 +39,15 @@ const GALLERY_COLS: Record<number, string> = {
 export function GroupDetailLayout({
   group,
   variant,
+  institution = "engineering",
 }: {
   group: GroupValue;
   variant: GroupsVariant;
+  /** Which college's list this detail page belongs to. */
+  institution?: GroupsInstitution;
 }) {
   const meta = GROUPS_VARIANT_META[variant];
+  const basePath = groupsBasePath(variant, institution);
   const img = getImageUrl(group.image) || "";
   const gallery = (group.gallery ?? [])
     .map((g) => getImageUrl(g) || "")
@@ -60,14 +70,17 @@ export function GroupDetailLayout({
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
         <Breadcrumb
           items={[
-            { label: "Engineering", href: "/institutions/engineering" },
-            { label: meta.breadcrumb, href: meta.basePath },
+            {
+              label: GROUPS_INSTITUTION_LABELS[institution],
+              href: `/institutions/${institution}`,
+            },
+            { label: meta.breadcrumb, href: basePath },
             { label: group.name },
           ]}
         />
 
         <Link
-          href={meta.basePath}
+          href={basePath}
           className="text-muted-foreground hover:text-gold mt-8 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
         >
           <ArrowLeft size={15} />

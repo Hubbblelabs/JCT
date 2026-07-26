@@ -17,8 +17,11 @@ import { EditableRegion } from "@/components/admin/EditableRegion";
 import { getImageUrl } from "@/lib/utils";
 import { resolveGroupSlugs } from "@/lib/group-slugs";
 import {
+  GROUPS_INSTITUTION_LABELS,
   GROUPS_SECTION_LABELS,
   GROUPS_VARIANT_META,
+  groupsBasePath,
+  type GroupsInstitution,
   type GroupsVariant,
   type GroupsVariantMeta,
 } from "@/lib/groups-meta";
@@ -222,16 +225,20 @@ const CARD_CLASS_IMAGE =
 export function GroupsPageLayout({
   data,
   variant,
+  institution = "engineering",
   editable = false,
   onEditSection,
 }: {
   data: GroupsPageValue;
   variant: GroupsVariant;
+  /** Which college's route the detail links point at. */
+  institution?: GroupsInstitution;
   editable?: boolean;
   /** Receives "hero" | "intro" | "groups" | `group:<index>`. */
   onEditSection?: (section: string) => void;
 }) {
   const meta = GROUPS_VARIANT_META[variant];
+  const basePath = groupsBasePath(variant, institution);
   const cardClass =
     meta.cardStyle === "image" ? CARD_CLASS_IMAGE : CARD_CLASS_AVATAR;
   const intro = data.intro.filter((p) => p.trim() !== "");
@@ -261,7 +268,10 @@ export function GroupsPageLayout({
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
         <Breadcrumb
           items={[
-            { label: "Engineering", href: "/institutions/engineering" },
+            {
+              label: GROUPS_INSTITUTION_LABELS[institution],
+              href: `/institutions/${institution}`,
+            },
             { label: meta.breadcrumb },
           ]}
         />
@@ -337,7 +347,7 @@ export function GroupsPageLayout({
                       ) : (
                         <Link
                           key={index}
-                          href={`${meta.basePath}/${slug}`}
+                          href={`${basePath}/${slug}`}
                           className={cardClass}
                         >
                           <CardBody group={group} meta={meta} />
