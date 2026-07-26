@@ -244,16 +244,6 @@ function collegeGroups(college: College): AdminNavGroup[] {
           },
         ]
       : []),
-    ...(eng
-      ? [
-          {
-            label: "Documents",
-            href: "/admin/documents",
-            icon: FolderOpen,
-            description: "Downloadable documents and mandatory disclosures.",
-          },
-        ]
-      : []),
     ...contentItems("Campus & Community"),
   ];
 
@@ -276,7 +266,18 @@ function collegeGroups(college: College): AdminNavGroup[] {
             label: "NAAC",
             href: "/admin/naac",
             icon: BadgeCheck,
-            description: "NAAC appeal tables and supporting documents.",
+            description:
+              "NAAC appeal tables, supporting documents and its sub-page tabs.",
+          },
+          // Sits here rather than under Campus & Community: the Documents page
+          // now also hosts the NIRF, financial statements and ICT content tabs,
+          // whose cards are in this group.
+          {
+            label: "Documents",
+            href: "/admin/documents",
+            icon: FolderOpen,
+            description:
+              "Downloads, mandatory disclosures and the NIRF / financial / ICT tabs.",
           },
         ]
       : []),

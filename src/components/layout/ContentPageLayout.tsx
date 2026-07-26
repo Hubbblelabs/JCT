@@ -74,7 +74,9 @@ export function contentSectionTitle(
 
 /** Public label for a block in the preview's edit badge / block list. */
 export function blockLabel(block: ContentBlockValue, index: number): string {
-  return block.title?.trim() || `${CONTENT_BLOCK_LABELS[block.type]} ${index + 1}`;
+  return (
+    block.title?.trim() || `${CONTENT_BLOCK_LABELS[block.type]} ${index + 1}`
+  );
 }
 
 // ─── Shared bits ────────────────────────────────────────────────────────────
@@ -263,7 +265,13 @@ function ListBlockView({
   );
 }
 
-function DocCard({ doc, editable }: { doc: ContentDocValue; editable: boolean }) {
+function DocCard({
+  doc,
+  editable,
+}: {
+  doc: ContentDocValue;
+  editable: boolean;
+}) {
   return (
     <Anchor
       href={doc.file}
@@ -378,7 +386,8 @@ function Cell({
   editable: boolean;
 }) {
   const text = cell.text.trim();
-  if (!cell.href.trim()) return <span className="whitespace-pre-line">{text}</span>;
+  if (!cell.href.trim())
+    return <span className="whitespace-pre-line">{text}</span>;
   return (
     <Anchor
       href={cell.href}
@@ -410,7 +419,9 @@ function TableBlockView({
   );
   const rows = editable
     ? block.rows
-    : block.rows.filter((r) => r.cells.some((c) => c.text.trim() || c.href.trim()));
+    : block.rows.filter((r) =>
+        r.cells.some((c) => c.text.trim() || c.href.trim()),
+      );
 
   return (
     <>
@@ -446,7 +457,9 @@ function TableBlockView({
                       const cell = row.cells[ci];
                       return (
                         <td key={ci} className={TD}>
-                          {cell ? <Cell cell={cell} editable={editable} /> : null}
+                          {cell ? (
+                            <Cell cell={cell} editable={editable} />
+                          ) : null}
                         </td>
                       );
                     })}
@@ -724,7 +737,13 @@ function BlockView({
 
 // ─── Page ───────────────────────────────────────────────────────────────────
 
-export function ContentPageLayout({
+/**
+ * Intro + blocks, without the page chrome (navbar, hero, breadcrumb, footer).
+ * Rendered on its own route by `ContentPageLayout` below, and as one sidebar
+ * panel of a host page (NAAC, Documents, Placements) for the entries in
+ * `CONTENT_PAGES` that carry a `host`.
+ */
+export function ContentPageBody({
   data,
   editable = false,
   onEditSection,
@@ -735,6 +754,86 @@ export function ContentPageLayout({
 }) {
   const onEdit = onEditSection as ((s: string) => void) | undefined;
   const intro = data.intro.filter((p) => p.trim() !== "");
+
+  return (
+    <>
+      {(intro.length > 0 || editable) && (
+        <EditableRegion
+          as="section"
+          section="intro"
+          label={CONTENT_SECTION_LABELS.intro}
+          editable={editable}
+          onEditSection={onEdit}
+          className="max-w-4xl"
+        >
+          {intro.length > 0 ? (
+            <div className="space-y-4">
+              {intro.map((p, i) => (
+                <p
+                  key={i}
+                  className="text-muted-foreground text-base leading-relaxed whitespace-pre-line md:text-lg"
+                >
+                  {p}
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground/60 text-sm italic">
+              Click to add an introduction…
+            </p>
+          )}
+        </EditableRegion>
+      )}
+
+      {data.blocks.length > 0
+        ? data.blocks.map((block, i) => (
+            <EditableRegion
+              key={i}
+              as="section"
+              section={`block:${i}`}
+              label={blockLabel(block, i)}
+              editable={editable}
+              onEditSection={onEdit}
+              className="mt-14 first:mt-10"
+            >
+              <BlockView block={block} editable={editable} />
+            </EditableRegion>
+          ))
+        : editable && (
+            <EditableRegion
+              as="section"
+              section="blocks"
+              label={CONTENT_SECTION_LABELS.blocks}
+              editable={editable}
+              onEditSection={onEdit}
+              className="mt-14"
+            >
+              <div className="text-muted-foreground/60 rounded-2xl border border-dashed border-white/15 py-16 text-center text-sm">
+                No blocks yet. Click to add the first one.
+              </div>
+            </EditableRegion>
+          )}
+    </>
+  );
+}
+
+export function ContentPageLayout({
+  data,
+  editable = false,
+  onEditSection,
+  showBreadcrumb = true,
+}: {
+  data: ContentPageValue;
+  editable?: boolean;
+  onEditSection?: (section: ContentEditableSection) => void;
+  /**
+   * False for a hosted page: it renders inside a host route whose own
+   * breadcrumb applies, so its stored trail is never published and the editor
+   * must not invite anyone to fill it in.
+   */
+  showBreadcrumb?: boolean;
+}) {
+  const onEdit = onEditSection as ((s: string) => void) | undefined;
   const crumbs = data.breadcrumb.filter((c) => c.label.trim() !== "");
 
   return (
@@ -752,13 +851,14 @@ export function ContentPageLayout({
       </EditableRegion>
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-        {(crumbs.length > 0 || editable) && (
+        {showBreadcrumb && (crumbs.length > 0 || editable) && (
           <EditableRegion
             as="div"
             section="breadcrumb"
             label={CONTENT_SECTION_LABELS.breadcrumb}
             editable={editable}
             onEditSection={onEdit}
+            className="mb-8"
           >
             {crumbs.length > 0 ? (
               <Breadcrumb
@@ -775,62 +875,11 @@ export function ContentPageLayout({
           </EditableRegion>
         )}
 
-        {(intro.length > 0 || editable) && (
-          <EditableRegion
-            as="section"
-            section="intro"
-            label={CONTENT_SECTION_LABELS.intro}
-            editable={editable}
-            onEditSection={onEdit}
-            className="mt-8 max-w-4xl"
-          >
-            {intro.length > 0 ? (
-              <div className="space-y-4">
-                {intro.map((p, i) => (
-                  <p
-                    key={i}
-                    className="text-muted-foreground text-base leading-relaxed whitespace-pre-line md:text-lg"
-                  >
-                    {p}
-                  </p>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground/60 text-sm italic">
-                Click to add an introduction…
-              </p>
-            )}
-          </EditableRegion>
-        )}
-
-        {data.blocks.length > 0
-          ? data.blocks.map((block, i) => (
-              <EditableRegion
-                key={i}
-                as="section"
-                section={`block:${i}`}
-                label={blockLabel(block, i)}
-                editable={editable}
-                onEditSection={onEdit}
-                className="mt-14 first:mt-10"
-              >
-                <BlockView block={block} editable={editable} />
-              </EditableRegion>
-            ))
-          : editable && (
-              <EditableRegion
-                as="section"
-                section="blocks"
-                label={CONTENT_SECTION_LABELS.blocks}
-                editable={editable}
-                onEditSection={onEdit}
-                className="mt-14"
-              >
-                <div className="text-muted-foreground/60 rounded-2xl border border-dashed border-white/15 py-16 text-center text-sm">
-                  No blocks yet. Click to add the first one.
-                </div>
-              </EditableRegion>
-            )}
+        <ContentPageBody
+          data={data}
+          editable={editable}
+          onEditSection={onEditSection}
+        />
       </div>
 
       {!editable && <Footer />}

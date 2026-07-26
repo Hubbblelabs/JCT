@@ -8,16 +8,26 @@ import {
   type DocumentsEditableSection,
 } from "@/components/layout/DocumentsPageLayout";
 import { DocumentsSectionInspector } from "@/components/admin/DocumentsSectionInspector";
+import { hostedContentEditorLinks } from "@/lib/content-pages";
 import { DocumentsPageSchema } from "@/lib/validation";
 import type { DocumentsPageValue } from "@/lib/validation";
+
+const PUBLIC_PATH = "/institutions/engineering/documents";
+
+// NIRF, financial statements and ICT content are panels of the public
+// Documents page but keep their own editors, so the preview's sidebar links
+// across to them.
+const HOSTED_LINKS = hostedContentEditorLinks(PUBLIC_PATH).map(
+  ({ icon: Icon, ...rest }) => ({ ...rest, icon: <Icon /> }),
+);
 
 export default function DocumentsEditorPage() {
   return (
     <LivePageEditor<DocumentsPageValue>
       configKey="engineeringDocuments"
-      publicPath="/institutions/engineering/documents"
+      publicPath={PUBLIC_PATH}
       title="Documents Page Editor"
-      subtitle="Engineering — upload and organise downloadable documents"
+      subtitle="Engineering — downloads, disclosures and the NIRF / financial / ICT tabs"
       emptyValue={() => DocumentsPageSchema.parse({})}
       sectionOrder={DOCUMENTS_SECTION_ORDER}
       sectionLabels={DOCUMENTS_SECTION_LABELS}
@@ -26,6 +36,7 @@ export default function DocumentsEditorPage() {
         <DocumentsPageLayout
           data={data}
           editable
+          sections={HOSTED_LINKS}
           onEditSection={onEditSection as (s: DocumentsEditableSection) => void}
         />
       )}

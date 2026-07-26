@@ -10,7 +10,7 @@ import {
   type ContentEditableSection,
 } from "@/components/layout/ContentPageLayout";
 import { ContentPageInspector } from "@/components/admin/ContentPageInspector";
-import { getContentPage } from "@/lib/content-pages";
+import { contentPageUrl, getContentPage } from "@/lib/content-pages";
 import { ContentPageSchema } from "@/lib/validation";
 import type { ContentPageValue } from "@/lib/validation";
 
@@ -38,15 +38,22 @@ export default function ContentPageEditor() {
     );
   }
 
+  // A hosted page's breadcrumb never reaches the public site — the host route
+  // owns the trail — so its quick-jump button is dropped too.
+  const sectionOrder = def.host
+    ? CONTENT_SECTION_ORDER.filter((s) => s !== "breadcrumb")
+    : CONTENT_SECTION_ORDER;
+
   return (
     <LivePageEditor<ContentPageValue>
       key={def.slug}
       configKey={def.configKey}
-      publicPath={def.path}
+      // A hosted page has no URL of its own — link to the panel it renders as.
+      publicPath={contentPageUrl(def)}
       title={`${def.label} Editor`}
       subtitle={def.description}
       emptyValue={() => ContentPageSchema.parse({})}
-      sectionOrder={CONTENT_SECTION_ORDER}
+      sectionOrder={sectionOrder}
       sectionLabels={CONTENT_SECTION_LABELS}
       sectionTitle={contentSectionTitle}
       initialSection="blocks"
@@ -54,6 +61,7 @@ export default function ContentPageEditor() {
         <ContentPageLayout
           data={data}
           editable
+          showBreadcrumb={!def.host}
           onEditSection={onEditSection as (s: ContentEditableSection) => void}
         />
       )}

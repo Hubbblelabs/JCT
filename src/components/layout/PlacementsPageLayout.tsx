@@ -29,6 +29,7 @@ import {
   CalendarDays,
   ArrowLeft,
   ArrowRight,
+  Camera,
   ChevronDown,
   ExternalLink,
   Images,
@@ -39,15 +40,21 @@ import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
+import { ContentPageBody } from "@/components/layout/ContentPageLayout";
 import { EditableRegion } from "@/components/admin/EditableRegion";
 import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
 import { getImageUrl } from "@/lib/utils";
+import { PLACEMENT_GALLERY_ANCHOR } from "@/lib/page-anchors";
 import {
   resolveSidebarItems,
   type ResolvedSidebarItem,
   type SidebarNavDefault,
 } from "@/lib/sidebar-nav";
-import type { PageBodySection, PlacementInfoValue } from "@/lib/validation";
+import type {
+  ContentPageValue,
+  PageBodySection,
+  PlacementInfoValue,
+} from "@/lib/validation";
 import type {
   PublicPlacement,
   PublicNotablePlacement,
@@ -109,6 +116,11 @@ export const PLACEMENT_NAV_DEFAULTS: SidebarNavDefault[] = [
     anchor: "company-wise",
     navLabel: "Placements by Company",
     icon: Briefcase,
+  },
+  {
+    anchor: PLACEMENT_GALLERY_ANCHOR,
+    navLabel: "Placement Gallery",
+    icon: Camera,
   },
 ];
 
@@ -1556,12 +1568,20 @@ export function PlacementsPageLayout({
   institution,
   records,
   info,
+  gallery = null,
   editable = false,
   onEditSection,
 }: {
   institution: string;
   records: PublicPlacement[];
   info: PlacementInfoValue;
+  /**
+   * The placement-gallery content page, which used to live at
+   * `/placements/gallery` and now renders as a section of this page. Edited
+   * separately at /admin/content/placement-gallery, so the admin preview
+   * passes null and the section is absent there.
+   */
+  gallery?: ContentPageValue | null;
 } & EditProps) {
   const label = INSTITUTION_LABELS[institution] ?? "JCT";
   // The current record is the one flagged is_current, else the newest (records
@@ -1590,6 +1610,9 @@ export function PlacementsPageLayout({
     )
       set.add("tpo");
     if (editable || info.process.steps.length > 0) set.add("process");
+    // The gallery is edited on its own page, so it appears only once it has
+    // published content — there is nothing here to click to create it.
+    if ((gallery?.blocks?.length ?? 0) > 0) set.add(PLACEMENT_GALLERY_ANCHOR);
     if (active) {
       set.add("overview");
       if (active.top_recruiters.length > 0) set.add("recruiters");
@@ -1597,7 +1620,7 @@ export function PlacementsPageLayout({
       if (active.company_placements.length > 0) set.add("company-wise");
     }
     return set;
-  }, [info, active, editable]);
+  }, [info, active, editable, gallery]);
 
   const navItems = useMemo(
     () =>
@@ -1609,6 +1632,17 @@ export function PlacementsPageLayout({
 
   const customSections = navItems.filter((it) => it.customSection);
   const [activeId, setActiveId] = useState<string>("");
+  const rootRef = useRef<HTMLElement>(null);
+
+  /**
+   * Sections are looked up inside this page's own subtree, never with
+   * `document.getElementById`. React's streaming leaves a second, hidden copy
+   * of the document in the DOM carrying the same ids, and a document-wide
+   * lookup resolves to that copy — scrolling to an element that is not
+   * displayed, i.e. not scrolling at all.
+   */
+  const findSection = (anchor: string) =>
+    rootRef.current?.querySelector<HTMLElement>(`[id="${anchor}"]`) ?? null;
 
   // Scroll-spy: highlight the sidebar entry whose section is in view. Keyed on
   // the anchor list so the observers are rebuilt only when the nav changes,
@@ -1625,7 +1659,7 @@ export function PlacementsPageLayout({
     setActiveId((prev) => (prev && anchors.includes(prev) ? prev : anchors[0]));
     const observers: IntersectionObserver[] = [];
     for (const anchor of anchors) {
-      const el = document.getElementById(anchor);
+      const el = findSection(anchor);
       if (!el) continue;
       const observer = new IntersectionObserver(
         ([entry]) => {
@@ -1641,12 +1675,29 @@ export function PlacementsPageLayout({
 
   const handleNavigate = (anchor: string) => {
     setActiveId(anchor);
-    const el = document.getElementById(anchor);
+    const el = findSection(anchor);
     if (!el) return;
     const offset = window.innerWidth >= 1024 ? 120 : 90;
     const top = el.getBoundingClientRect().top + window.scrollY - offset;
     window.scrollTo({ top, behavior: "smooth" });
   };
+
+  // A deep link — `…/placements#gallery`, where the retired gallery route now
+  // redirects — has to land on its section. The browser's own fragment scroll
+  // can't do it: it resolves the id to the hidden streamed copy, and even when
+  // it lands it puts the heading under the sticky header.
+  const deepLinked = useRef(false);
+  useEffect(() => {
+    if (deepLinked.current || editable) return;
+    const anchor = decodeURIComponent(window.location.hash.replace(/^#/, ""));
+    if (!anchor || !anchorKey.split(",").includes(anchor)) return;
+    if (!findSection(anchor)) return;
+    deepLinked.current = true;
+    handleNavigate(anchor);
+    // `handleNavigate` is redefined every render; the anchor list is what
+    // decides whether the target exists yet.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [anchorKey, editable]);
 
   // Switching years from the sidebar swaps the record in place; on mobile the
   // year pills sit above the content, so jump to the stats the choice affects.
@@ -1662,7 +1713,7 @@ export function PlacementsPageLayout({
   // `auto`, which makes <main> the sticky sidebar's scroll container — the
   // sidebar would then scroll away with the page instead of pinning.
   return (
-    <main className="bg-background text-foreground min-h-screen">
+    <main ref={rootRef} className="bg-background text-foreground min-h-screen">
       {!editable && <Navbar />}
       <PageHero
         title="Placements"
@@ -1770,6 +1821,22 @@ export function PlacementsPageLayout({
                         <CompanyPlacements record={active} />
                       )}
                     </>
+                  )}
+
+                  {present.has(PLACEMENT_GALLERY_ANCHOR) && gallery && (
+                    <section
+                      id={PLACEMENT_GALLERY_ANCHOR}
+                      className="scroll-mt-28"
+                    >
+                      <SectionHeading
+                        icon={Camera}
+                        eyebrow="Gallery"
+                        title={
+                          gallery.hero?.title?.trim() || "Placement Gallery"
+                        }
+                      />
+                      <ContentPageBody data={gallery} />
+                    </section>
                   )}
 
                   {/* Custom in-page sections defined by admins in the sidebar editor */}

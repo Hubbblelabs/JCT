@@ -40,6 +40,39 @@ const nextConfig: NextConfig = {
     qualities: [75, 90],
   },
 
+  /**
+   * Pages that were folded into a host route (see the `host` entries in
+   * `src/lib/content-pages.ts`). The old URLs are printed in prospectuses and
+   * linked from CMS navbars, so they permanently redirect to the panel that
+   * absorbed them instead of 404ing.
+   */
+  async redirects() {
+    const ENG = "/institutions/engineering";
+    const moved: [string, string][] = [
+      [
+        `${ENG}/accreditations/naac/aqar-report`,
+        `${ENG}/accreditations/naac#aqar-report`,
+      ],
+      [
+        `${ENG}/accreditations/naac/best-practices`,
+        `${ENG}/accreditations/naac#best-practices`,
+      ],
+      [
+        `${ENG}/accreditations/naac/institutional-distinctiveness`,
+        `${ENG}/accreditations/naac#institutional-distinctiveness`,
+      ],
+      [`${ENG}/nirf`, `${ENG}/documents#nirf`],
+      [`${ENG}/financial-statements`, `${ENG}/documents#financial-statements`],
+      [`${ENG}/ict-content`, `${ENG}/documents#ict-content`],
+      [`${ENG}/placements/gallery`, `${ENG}/placements#gallery`],
+    ];
+    return moved.map(([source, destination]) => ({
+      source,
+      destination,
+      permanent: true,
+    }));
+  },
+
   async headers() {
     const isProd = process.env.NODE_ENV === "production";
 

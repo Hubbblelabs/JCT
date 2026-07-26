@@ -14,11 +14,15 @@ export type SeoPageDefault = {
   label: string;
 };
 
-/** SEO rows for the block-based content pages of one institution. */
+/**
+ * SEO rows for the block-based content pages of one institution. Hosted pages
+ * are skipped: they have no route of their own, so the host's row already owns
+ * the meta tags for that URL.
+ */
 function contentPageSeoRows(institution: string): SeoPageDefault[] {
-  return CONTENT_PAGES.filter((p) => p.institution === institution).map(
-    (p) => ({ path: p.path, label: p.seoLabel }),
-  );
+  return CONTENT_PAGES.filter(
+    (p) => p.institution === institution && !p.host,
+  ).map((p) => ({ path: p.path, label: p.seoLabel }));
 }
 
 export const MAIN_SEO_PAGES: SeoPageDefault[] = [

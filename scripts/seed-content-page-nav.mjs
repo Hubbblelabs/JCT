@@ -37,6 +37,9 @@ const POLY = "/institutions/polytechnic";
 // Mirrors CONTENT_PAGES in src/lib/content-pages.ts. `label`/`desc` are the
 // public-facing wording, which is deliberately allowed to differ from the
 // admin-facing labels in the registry.
+//
+// A page with a `host` in the registry has no route of its own — it is a tab of
+// another page — so its link here carries the fragment that opens that tab.
 const ENGINEERING_ENTRIES = [
   {
     label: "Library",
@@ -45,22 +48,22 @@ const ENGINEERING_ENTRIES = [
   },
   {
     label: "NIRF",
-    href: `${ENG}/nirf`,
+    href: `${ENG}/documents#nirf`,
     desc: "Ranking framework reports",
   },
   {
     label: "NAAC — AQAR Report",
-    href: `${ENG}/accreditations/naac/aqar-report`,
+    href: `${ENG}/accreditations/naac#aqar-report`,
     desc: "Annual Quality Assurance Reports",
   },
   {
     label: "NAAC — Best Practices",
-    href: `${ENG}/accreditations/naac/best-practices`,
+    href: `${ENG}/accreditations/naac#best-practices`,
     desc: "Documented institutional best practices",
   },
   {
     label: "NAAC — Institutional Distinctiveness",
-    href: `${ENG}/accreditations/naac/institutional-distinctiveness`,
+    href: `${ENG}/accreditations/naac#institutional-distinctiveness`,
     desc: "What sets the institution apart",
   },
   {
@@ -80,7 +83,7 @@ const ENGINEERING_ENTRIES = [
   },
   {
     label: "ICT Content",
-    href: `${ENG}/ict-content`,
+    href: `${ENG}/documents#ict-content`,
     desc: "Faculty e-learning material",
   },
   {
@@ -90,12 +93,12 @@ const ENGINEERING_ENTRIES = [
   },
   {
     label: "Financial Statements",
-    href: `${ENG}/financial-statements`,
+    href: `${ENG}/documents#financial-statements`,
     desc: "Year-wise balance sheets",
   },
   {
     label: "Placement Gallery",
-    href: `${ENG}/placements/gallery`,
+    href: `${ENG}/placements#gallery`,
     desc: "Photographs from recruitment drives",
   },
   {
@@ -136,7 +139,11 @@ function loadEnv() {
   return out;
 }
 
-const normHref = (h) => String(h ?? "").trim().replace(/\/+$/, "").toLowerCase();
+const normHref = (h) =>
+  String(h ?? "")
+    .trim()
+    .replace(/\/+$/, "")
+    .toLowerCase();
 
 /**
  * Append the missing entries to the "More" item of one navbar value.
@@ -147,7 +154,10 @@ function linkInto(value, entries) {
     return 0;
 
   const parent = value.items.find(
-    (i) => String(i?.label ?? "").trim().toLowerCase() === PARENT_LABEL.toLowerCase(),
+    (i) =>
+      String(i?.label ?? "")
+        .trim()
+        .toLowerCase() === PARENT_LABEL.toLowerCase(),
   );
   if (!parent) throw new Error(`no "${PARENT_LABEL}" item in the navbar`);
   if (!Array.isArray(parent.children)) parent.children = [];
@@ -157,7 +167,8 @@ function linkInto(value, entries) {
   const existing = new Set();
   for (const item of value.items) {
     existing.add(normHref(item?.href));
-    for (const child of item?.children ?? []) existing.add(normHref(child?.href));
+    for (const child of item?.children ?? [])
+      existing.add(normHref(child?.href));
   }
 
   let added = 0;
@@ -181,7 +192,9 @@ async function main() {
   const env = loadEnv();
   const uri = env.MONGODB_URI;
   if (!uri) {
-    console.error("[seed-content-page-nav] MONGODB_URI is required (env or .env).");
+    console.error(
+      "[seed-content-page-nav] MONGODB_URI is required (env or .env).",
+    );
     process.exit(1);
   }
 
@@ -207,7 +220,9 @@ async function main() {
       continue;
     }
 
-    console.log(`\n[seed-content-page-nav] ${DRY ? "DRY-RUN — " : ""}${configKey}:`);
+    console.log(
+      `\n[seed-content-page-nav] ${DRY ? "DRY-RUN — " : ""}${configKey}:`,
+    );
     // The draft and the published copy are updated together, so an admin
     // opening the editor never sees the link vanish.
     const draftAdded = linkInto(doc.value, entries);
@@ -235,7 +250,9 @@ async function main() {
         $inc: { version: 1 },
       },
     );
-    console.log(`  [published] ${added} link(s) added under "${PARENT_LABEL}".`);
+    console.log(
+      `  [published] ${added} link(s) added under "${PARENT_LABEL}".`,
+    );
   }
 
   if (DRY) {

@@ -3,8 +3,12 @@ import { seoMetadata } from "@/lib/seo";
 import { PlacementsPageLayout } from "@/components/layout/PlacementsPageLayout";
 import { listPublicPlacements } from "@/lib/public-placements";
 import { getPlacementInfo } from "@/lib/public-placement-info";
+import { loadHostedContentPage } from "@/lib/hosted-content";
+import { PLACEMENT_GALLERY_ANCHOR } from "@/lib/page-anchors";
 
 export const revalidate = 3600;
+
+const PATH = "/institutions/engineering/placements";
 
 const SEO_FALLBACK: Metadata = {
   title: "Placements | JCT College of Engineering & Technology, Coimbatore",
@@ -13,15 +17,19 @@ const SEO_FALLBACK: Metadata = {
 };
 
 export default async function EngineeringPlacementsPage() {
-  const [records, info] = await Promise.all([
+  // The placement gallery used to be a route of its own; it is now a section
+  // of this page.
+  const [records, info, gallery] = await Promise.all([
     listPublicPlacements("engineering"),
     getPlacementInfo("engineering"),
+    loadHostedContentPage(PATH, PLACEMENT_GALLERY_ANCHOR),
   ]);
   return (
     <PlacementsPageLayout
       institution="engineering"
       records={records}
       info={info}
+      gallery={gallery}
     />
   );
 }

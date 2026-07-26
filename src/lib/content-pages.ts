@@ -8,6 +8,11 @@
  * plus a `page.tsx` that renders `<ContentPage slug="…" />` is the whole job —
  * there is no per-page schema, layout or inspector.
  *
+ * A page with a `host` has no route of its own: it is published as one panel of
+ * the sidebar on `path` (e.g. the NAAC sub-pages live inside the NAAC page).
+ * Those entries carry no `page.tsx` and no SEO row — the host route owns the
+ * URL and the meta tags. Use `contentPageUrl()` for a link to one.
+ *
  * `configKey` must also be registered in `SITE_CONFIG_SCHEMAS`
  * (src/lib/validation/siteConfig.ts) — the API rejects unknown keys.
  */
@@ -29,14 +34,24 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { College } from "@/lib/admin-nav";
+import { PLACEMENT_GALLERY_ANCHOR } from "@/lib/page-anchors";
 
 export type ContentPageDef = {
   /** URL segment for the admin editor: /admin/content/<slug> */
   slug: string;
   configKey: string;
   institution: College;
-  /** Public route this page is published at. */
+  /**
+   * Public route this page is published at. For a hosted page (see `host`)
+   * this is the host's route — several entries then share one `path`.
+   */
   path: string;
+  /**
+   * Set when the page renders as a sidebar panel of `path` rather than at a
+   * route of its own. `anchor` is the URL fragment that deep-links to it and
+   * `navLabel` is what the host's sidebar shows.
+   */
+  host?: { anchor: string; navLabel: string };
   /** Admin editor heading + hub card label. */
   label: string;
   /** Hub card + editor subtitle. */
@@ -74,9 +89,11 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     slug: "nirf",
     configKey: "engineeringNirf",
     institution: "engineering",
-    path: `${ENG}/nirf`,
+    path: `${ENG}/documents`,
+    host: { anchor: "nirf", navLabel: "NIRF" },
     label: "NIRF",
-    description: "NIRF rankings reports and feedback contact.",
+    description:
+      "NIRF rankings reports and feedback contact — a tab of the Documents page.",
     seoLabel: "NIRF",
     seoTitle: `NIRF | ${SUFFIX}`,
     seoDescription:
@@ -130,9 +147,11 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     slug: "naac-best-practices",
     configKey: "engineeringNaacBestPractices",
     institution: "engineering",
-    path: `${ENG}/accreditations/naac/best-practices`,
+    path: `${ENG}/accreditations/naac`,
+    host: { anchor: "best-practices", navLabel: "Best Practices" },
     label: "NAAC — Best Practices",
-    description: "The institution's documented NAAC best practices.",
+    description:
+      "The institution's documented NAAC best practices — a tab of the NAAC page.",
     seoLabel: "NAAC — Institution Best Practices",
     seoTitle: `Institution Best Practices | ${SUFFIX}`,
     seoDescription:
@@ -144,9 +163,14 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     slug: "naac-distinctiveness",
     configKey: "engineeringNaacDistinctiveness",
     institution: "engineering",
-    path: `${ENG}/accreditations/naac/institutional-distinctiveness`,
+    path: `${ENG}/accreditations/naac`,
+    host: {
+      anchor: "institutional-distinctiveness",
+      navLabel: "Institutional Distinctiveness",
+    },
     label: "NAAC — Distinctiveness",
-    description: "What sets the institution apart, as filed with NAAC.",
+    description:
+      "What sets the institution apart, as filed with NAAC — a tab of the NAAC page.",
     seoLabel: "NAAC — Institutional Distinctiveness",
     seoTitle: `Institutional Distinctiveness | ${SUFFIX}`,
     seoDescription:
@@ -158,9 +182,11 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     slug: "naac-aqar",
     configKey: "engineeringNaacAqar",
     institution: "engineering",
-    path: `${ENG}/accreditations/naac/aqar-report`,
+    path: `${ENG}/accreditations/naac`,
+    host: { anchor: "aqar-report", navLabel: "AQAR Reports" },
     label: "NAAC — AQAR Reports",
-    description: "Annual Quality Assurance Reports and criterion evidence.",
+    description:
+      "Annual Quality Assurance Reports and criterion evidence — a tab of the NAAC page.",
     seoLabel: "NAAC — AQAR Report",
     seoTitle: `AQAR Report | ${SUFFIX}`,
     seoDescription:
@@ -172,9 +198,11 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     slug: "financial-statements",
     configKey: "engineeringFinancialStatements",
     institution: "engineering",
-    path: `${ENG}/financial-statements`,
+    path: `${ENG}/documents`,
+    host: { anchor: "financial-statements", navLabel: "Financial Statements" },
     label: "Financial Statements",
-    description: "Year-wise balance sheets and audited statements.",
+    description:
+      "Year-wise balance sheets and audited statements — a tab of the Documents page.",
     seoLabel: "Financial Statements",
     seoTitle: `Financial Statements | ${SUFFIX}`,
     seoDescription:
@@ -186,15 +214,19 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     slug: "ict-content",
     configKey: "engineeringIctContent",
     institution: "engineering",
-    path: `${ENG}/ict-content`,
+    path: `${ENG}/documents`,
+    host: { anchor: "ict-content", navLabel: "ICT Content" },
     label: "ICT Content",
-    description: "Faculty-authored e-learning material, subject by subject.",
+    description:
+      "Faculty-authored e-learning material — a tab of the Documents page.",
     seoLabel: "ICT Content",
     seoTitle: `ICT Content | ${SUFFIX}`,
     seoDescription:
       "ICT-enabled teaching material authored by JCT faculty — subject-wise presentations and e-content across every department.",
     icon: MonitorPlay,
-    group: "Academics",
+    // Hosted by the Documents page, so its card sits with Documents rather
+    // than in Academics where the standalone page used to live.
+    group: "Institution",
   },
   {
     slug: "nss",
@@ -228,9 +260,11 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     slug: "placement-gallery",
     configKey: "engineeringPlacementGallery",
     institution: "engineering",
-    path: `${ENG}/placements/gallery`,
+    path: `${ENG}/placements`,
+    host: { anchor: PLACEMENT_GALLERY_ANCHOR, navLabel: "Placement Gallery" },
     label: "Placement Gallery",
-    description: "Drive-by-drive placement photographs, grouped by year.",
+    description:
+      "Drive-by-drive placement photographs — a section of the Placements page.",
     seoLabel: "Placement Gallery",
     seoTitle: `Placement Gallery | ${SUFFIX}`,
     seoDescription:
@@ -244,7 +278,8 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     institution: "polytechnic",
     path: `${POLY}/fine-arts-club`,
     label: "Fine Arts Club",
-    description: "Movie, cultural, arts and photography clubs and their gallery.",
+    description:
+      "Movie, cultural, arts and photography clubs and their gallery.",
     seoLabel: "Fine Arts Club",
     seoTitle: `Fine Arts Club | ${POLY_SUFFIX}`,
     seoDescription:
@@ -268,10 +303,55 @@ for (const field of ["slug", "configKey"] as const) {
     );
 }
 
+// A hosted page's anchor keys its panel inside the host, so two panels of the
+// same host may not share one — the second would be unreachable.
+{
+  const byHost = new Map<string, Set<string>>();
+  for (const p of CONTENT_PAGES) {
+    if (!p.host) continue;
+    const anchors = byHost.get(p.path) ?? new Set<string>();
+    if (anchors.has(p.host.anchor))
+      throw new Error(
+        `[content-pages] duplicate host anchor "${p.host.anchor}" on ${p.path}`,
+      );
+    anchors.add(p.host.anchor);
+    byHost.set(p.path, anchors);
+  }
+}
+
 export function getContentPage(slug: string): ContentPageDef | undefined {
   return CONTENT_PAGES.find((p) => p.slug === slug);
 }
 
 export function contentPagesFor(institution: College): ContentPageDef[] {
   return CONTENT_PAGES.filter((p) => p.institution === institution);
+}
+
+/** Public link to a page — the host route plus its fragment when hosted. */
+export function contentPageUrl(def: ContentPageDef): string {
+  return def.host ? `${def.path}#${def.host.anchor}` : def.path;
+}
+
+/** The pages published as sidebar panels of `path`, in registry order. */
+export function hostedContentPages(path: string): ContentPageDef[] {
+  return CONTENT_PAGES.filter((p) => p.host && p.path === path);
+}
+
+/**
+ * The same sidebar entries a host renders publicly, but pointing at each
+ * hosted page's own editor. The admin preview shows the real sidebar this way
+ * without having to load four site-config keys into one editor.
+ */
+export function hostedContentEditorLinks(path: string): {
+  id: string;
+  label: string;
+  icon: LucideIcon;
+  href: string;
+}[] {
+  return hostedContentPages(path).map((p) => ({
+    id: p.host!.anchor,
+    label: p.host!.navLabel,
+    icon: p.icon,
+    href: `/admin/content/${p.slug}`,
+  }));
 }

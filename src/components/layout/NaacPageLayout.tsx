@@ -6,6 +6,10 @@ import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EditableRegion } from "@/components/admin/EditableRegion";
+import {
+  SectionedPageShell,
+  type PageSectionItem,
+} from "@/components/layout/SectionedPageShell";
 import { getImageUrl } from "@/lib/utils";
 import type {
   NaacDocValue,
@@ -244,7 +248,12 @@ const TH =
 const TD =
   "border-b border-white/5 px-4 py-4 align-top text-sm text-muted-foreground";
 
-export function NaacPageLayout({
+/**
+ * Everything between the breadcrumb and the footer. Split out so the NAAC page
+ * can render it as the first panel of its sidebar, alongside the content pages
+ * that used to be separate routes (AQAR, best practices, distinctiveness).
+ */
+export function NaacPageBody({
   data,
   editable = false,
   onEditSection,
@@ -279,6 +288,329 @@ export function NaacPageLayout({
     quantitativeRows.length > 0;
 
   return (
+    <>
+      {(intro.length > 0 || editable) && (
+        <EditableRegion
+          as="section"
+          section="intro"
+          label={NAAC_SECTION_LABELS.intro}
+          editable={editable}
+          onEditSection={onEdit}
+          className="max-w-3xl"
+        >
+          {intro.length > 0 ? (
+            <div className="space-y-4">
+              {intro.map((p, i) => (
+                <p
+                  key={i}
+                  className="text-muted-foreground text-base leading-relaxed md:text-lg"
+                >
+                  {p}
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground/60 text-sm italic">
+              Click to add an introduction…
+            </p>
+          )}
+        </EditableRegion>
+      )}
+
+      {(primaryDocs.length > 0 || editable) && (
+        <EditableRegion
+          as="section"
+          section="primaryDocs"
+          label={NAAC_SECTION_LABELS.primaryDocs}
+          editable={editable}
+          onEditSection={onEdit}
+          className="mt-8 first:mt-0"
+        >
+          <SectionHeading title={data.primaryDocs.title} />
+          {primaryDocs.length > 0 ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {primaryDocs.map((doc, i) => (
+                <DocAnchor
+                  key={i}
+                  doc={doc}
+                  editable={editable}
+                  className="hover:border-gold/40 group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:bg-white/10"
+                >
+                  <span className="bg-gold/15 text-gold flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
+                    <FileText size={22} />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="text-foreground group-hover:text-gold block font-serif text-base font-bold transition-colors duration-300">
+                      {docLabel(doc)}
+                    </span>
+                    <span className="text-gold mt-1 flex items-center gap-1.5 text-xs font-bold">
+                      <Download size={12} />
+                      {data.primaryDocs.linkLabel}
+                    </span>
+                  </span>
+                </DocAnchor>
+              ))}
+            </div>
+          ) : (
+            <div className="text-muted-foreground/60 rounded-2xl border border-dashed border-white/15 py-10 text-center text-sm">
+              Click to add the headline documents (SSR, DVV…).
+            </div>
+          )}
+        </EditableRegion>
+      )}
+
+      {showAppeal && (
+        <section className="mt-14">
+          <EditableRegion
+            as="div"
+            section="appeal"
+            label={NAAC_SECTION_LABELS.appeal}
+            editable={editable}
+            onEditSection={onEdit}
+            className="mb-8"
+          >
+            {data.appeal.badge.trim() && (
+              <span className="bg-gold/15 text-gold inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold">
+                <BadgeCheck size={13} />
+                {data.appeal.badge}
+              </span>
+            )}
+            {data.appeal.title.trim() && (
+              <h2 className="text-foreground mt-3 font-serif text-2xl font-bold md:text-3xl">
+                {data.appeal.title}
+              </h2>
+            )}
+            {editable &&
+              !data.appeal.badge.trim() &&
+              !data.appeal.title.trim() && (
+                <p className="text-muted-foreground/60 text-sm italic">
+                  Click to add the appeal heading…
+                </p>
+              )}
+          </EditableRegion>
+
+          {(qualitativeRows.length > 0 || editable) && (
+            <EditableRegion
+              as="div"
+              section="qualitative"
+              label={NAAC_SECTION_LABELS.qualitative}
+              editable={editable}
+              onEditSection={onEdit}
+            >
+              <SectionHeading
+                title={data.qualitative.title}
+                description={data.qualitative.description}
+              />
+              {qualitativeRows.length > 0 ? (
+                <div className="overflow-x-auto rounded-2xl border border-white/10">
+                  <table className="w-full min-w-[900px] border-collapse">
+                    <thead className="bg-white/5">
+                      <tr>
+                        <th className={TH}>
+                          {data.qualitative.columns.metric}
+                        </th>
+                        <th className={TH}>
+                          {data.qualitative.columns.description}
+                        </th>
+                        <th className={TH}>
+                          {data.qualitative.columns.expertsMarks}
+                        </th>
+                        <th className={TH}>
+                          {data.qualitative.columns.marksRequested}
+                        </th>
+                        <th className={TH}>
+                          {data.qualitative.columns.justification}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {qualitativeRows.map((row, i) => (
+                        <tr
+                          key={i}
+                          className="transition-colors hover:bg-white/5"
+                        >
+                          <td className={`${TD} text-foreground font-bold`}>
+                            {row.metric}
+                          </td>
+                          <td className={`${TD} whitespace-pre-line`}>
+                            {row.description}
+                          </td>
+                          <td className={`${TD} text-center`}>
+                            {row.expertsMarks}
+                          </td>
+                          <td
+                            className={`${TD} text-gold text-center font-bold`}
+                          >
+                            {row.marksRequested}
+                          </td>
+                          <td className={TD}>
+                            <span className="block whitespace-pre-line">
+                              {row.justification}
+                            </span>
+                            <DocLinks docs={row.docs} editable={editable} />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-muted-foreground/60 rounded-2xl border border-dashed border-white/15 py-10 text-center text-sm">
+                  Click to add qualitative appeal rows.
+                </div>
+              )}
+            </EditableRegion>
+          )}
+
+          {(quantitativeRows.length > 0 || editable) && (
+            <EditableRegion
+              as="div"
+              section="quantitative"
+              label={NAAC_SECTION_LABELS.quantitative}
+              editable={editable}
+              onEditSection={onEdit}
+              className="mt-12"
+            >
+              <SectionHeading
+                title={data.quantitative.title}
+                description={data.quantitative.description}
+              />
+              {quantitativeRows.length > 0 ? (
+                <div className="overflow-x-auto rounded-2xl border border-white/10">
+                  <table className="w-full min-w-[1000px] border-collapse">
+                    <thead className="bg-white/5">
+                      <tr>
+                        <th className={TH} rowSpan={2}>
+                          {data.quantitative.columns.metric}
+                        </th>
+                        <th className={TH} rowSpan={2}>
+                          {data.quantitative.columns.parameter}
+                        </th>
+                        <th className={`${TH} text-center`} colSpan={2}>
+                          {data.quantitative.columns.values}
+                        </th>
+                        <th className={`${TH} text-center`} colSpan={2}>
+                          {data.quantitative.columns.marks}
+                        </th>
+                        <th className={TH} rowSpan={2}>
+                          {data.quantitative.columns.justification}
+                        </th>
+                      </tr>
+                      <tr>
+                        <th className={`${TH} text-center`}>
+                          {data.quantitative.columns.ssr}
+                        </th>
+                        <th className={`${TH} text-center`}>
+                          {data.quantitative.columns.dvv}
+                        </th>
+                        <th className={`${TH} text-center`}>
+                          {data.quantitative.columns.awarded}
+                        </th>
+                        <th className={`${TH} text-center`}>
+                          {data.quantitative.columns.requested}
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {quantitativeRows.map((row, i) => (
+                        <tr
+                          key={i}
+                          className="transition-colors hover:bg-white/5"
+                        >
+                          <td className={`${TD} text-foreground font-bold`}>
+                            {row.metric}
+                          </td>
+                          <td className={TD}>{row.parameter}</td>
+                          <td className={`${TD} text-center`}>{row.ssr}</td>
+                          <td className={`${TD} text-center`}>{row.dvv}</td>
+                          <td className={`${TD} text-center`}>{row.awarded}</td>
+                          <td
+                            className={`${TD} text-gold text-center font-bold`}
+                          >
+                            {row.requested}
+                          </td>
+                          <td className={TD}>
+                            <span className="block whitespace-pre-line">
+                              {row.justification}
+                            </span>
+                            <DocLinks docs={row.docs} editable={editable} />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <div className="text-muted-foreground/60 rounded-2xl border border-dashed border-white/15 py-10 text-center text-sm">
+                  Click to add quantitative appeal rows.
+                </div>
+              )}
+            </EditableRegion>
+          )}
+        </section>
+      )}
+
+      {docSections.length > 0
+        ? docSections.map((block, i) => (
+            <EditableRegion
+              key={i}
+              as="section"
+              section={`docSection:${i}`}
+              label={block.title.trim() || `Document Section ${i + 1}`}
+              editable={editable}
+              onEditSection={onEdit}
+              className="mt-16"
+            >
+              <DocSectionBlock block={block} editable={editable} />
+            </EditableRegion>
+          ))
+        : editable && (
+            <EditableRegion
+              as="section"
+              section="docSections"
+              label={NAAC_SECTION_LABELS.docSections}
+              editable={editable}
+              onEditSection={onEdit}
+              className="mt-16"
+            >
+              <div className="text-muted-foreground/60 rounded-2xl border border-dashed border-white/15 py-16 text-center text-sm">
+                No document sections yet. Click to add the first one.
+              </div>
+            </EditableRegion>
+          )}
+    </>
+  );
+}
+
+/** Sidebar label for the NAAC page's own panel. */
+export const NAAC_OVERVIEW_SECTION_ID = "naac";
+
+export function NaacPageLayout({
+  data,
+  editable = false,
+  onEditSection,
+  sections = [],
+}: {
+  data: NaacPageValue;
+  editable?: boolean;
+  onEditSection?: (section: NaacEditableSection) => void;
+  /**
+   * The content pages hosted by this route — AQAR, best practices and
+   * institutional distinctiveness. Empty in the admin preview unless the
+   * editor passes link-only entries.
+   */
+  sections?: PageSectionItem[];
+}) {
+  const onEdit = onEditSection as ((s: string) => void) | undefined;
+  const body = (
+    <NaacPageBody
+      data={data}
+      editable={editable}
+      onEditSection={onEditSection}
+    />
+  );
+
+  return (
     <main className="bg-surface text-foreground min-h-screen">
       {!editable && <Navbar forceSolidOnTop />}
 
@@ -304,297 +636,23 @@ export function NaacPageLayout({
           ]}
         />
 
-        {(intro.length > 0 || editable) && (
-          <EditableRegion
-            as="section"
-            section="intro"
-            label={NAAC_SECTION_LABELS.intro}
-            editable={editable}
-            onEditSection={onEdit}
-            className="mt-8 max-w-3xl"
-          >
-            {intro.length > 0 ? (
-              <div className="space-y-4">
-                {intro.map((p, i) => (
-                  <p
-                    key={i}
-                    className="text-muted-foreground text-base leading-relaxed md:text-lg"
-                  >
-                    {p}
-                  </p>
-                ))}
-              </div>
-            ) : (
-              <p className="text-muted-foreground/60 text-sm italic">
-                Click to add an introduction…
-              </p>
-            )}
-          </EditableRegion>
-        )}
-
-        {(primaryDocs.length > 0 || editable) && (
-          <EditableRegion
-            as="section"
-            section="primaryDocs"
-            label={NAAC_SECTION_LABELS.primaryDocs}
-            editable={editable}
-            onEditSection={onEdit}
+        {sections.length > 0 ? (
+          <SectionedPageShell
             className="mt-8"
-          >
-            <SectionHeading title={data.primaryDocs.title} />
-            {primaryDocs.length > 0 ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                {primaryDocs.map((doc, i) => (
-                  <DocAnchor
-                    key={i}
-                    doc={doc}
-                    editable={editable}
-                    className="hover:border-gold/40 group flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 transition-all duration-300 hover:bg-white/10"
-                  >
-                    <span className="bg-gold/15 text-gold flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
-                      <FileText size={22} />
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="text-foreground group-hover:text-gold block font-serif text-base font-bold transition-colors duration-300">
-                        {docLabel(doc)}
-                      </span>
-                      <span className="text-gold mt-1 flex items-center gap-1.5 text-xs font-bold">
-                        <Download size={12} />
-                        {data.primaryDocs.linkLabel}
-                      </span>
-                    </span>
-                  </DocAnchor>
-                ))}
-              </div>
-            ) : (
-              <div className="text-muted-foreground/60 rounded-2xl border border-dashed border-white/15 py-10 text-center text-sm">
-                Click to add the headline documents (SSR, DVV…).
-              </div>
-            )}
-          </EditableRegion>
+            navTitle="NAAC"
+            items={[
+              {
+                id: NAAC_OVERVIEW_SECTION_ID,
+                label: "Accreditation & Appeal",
+                icon: <BadgeCheck />,
+                content: body,
+              },
+              ...sections,
+            ]}
+          />
+        ) : (
+          <div className="mt-8">{body}</div>
         )}
-
-        {showAppeal && (
-          <section className="mt-14">
-            <EditableRegion
-              as="div"
-              section="appeal"
-              label={NAAC_SECTION_LABELS.appeal}
-              editable={editable}
-              onEditSection={onEdit}
-              className="mb-8"
-            >
-              {data.appeal.badge.trim() && (
-                <span className="bg-gold/15 text-gold inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold">
-                  <BadgeCheck size={13} />
-                  {data.appeal.badge}
-                </span>
-              )}
-              {data.appeal.title.trim() && (
-                <h2 className="text-foreground mt-3 font-serif text-2xl font-bold md:text-3xl">
-                  {data.appeal.title}
-                </h2>
-              )}
-              {editable &&
-                !data.appeal.badge.trim() &&
-                !data.appeal.title.trim() && (
-                  <p className="text-muted-foreground/60 text-sm italic">
-                    Click to add the appeal heading…
-                  </p>
-                )}
-            </EditableRegion>
-
-            {(qualitativeRows.length > 0 || editable) && (
-              <EditableRegion
-                as="div"
-                section="qualitative"
-                label={NAAC_SECTION_LABELS.qualitative}
-                editable={editable}
-                onEditSection={onEdit}
-              >
-                <SectionHeading
-                  title={data.qualitative.title}
-                  description={data.qualitative.description}
-                />
-                {qualitativeRows.length > 0 ? (
-                  <div className="overflow-x-auto rounded-2xl border border-white/10">
-                    <table className="w-full min-w-[900px] border-collapse">
-                      <thead className="bg-white/5">
-                        <tr>
-                          <th className={TH}>
-                            {data.qualitative.columns.metric}
-                          </th>
-                          <th className={TH}>
-                            {data.qualitative.columns.description}
-                          </th>
-                          <th className={TH}>
-                            {data.qualitative.columns.expertsMarks}
-                          </th>
-                          <th className={TH}>
-                            {data.qualitative.columns.marksRequested}
-                          </th>
-                          <th className={TH}>
-                            {data.qualitative.columns.justification}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {qualitativeRows.map((row, i) => (
-                          <tr
-                            key={i}
-                            className="transition-colors hover:bg-white/5"
-                          >
-                            <td className={`${TD} text-foreground font-bold`}>
-                              {row.metric}
-                            </td>
-                            <td className={`${TD} whitespace-pre-line`}>
-                              {row.description}
-                            </td>
-                            <td className={`${TD} text-center`}>
-                              {row.expertsMarks}
-                            </td>
-                            <td
-                              className={`${TD} text-gold text-center font-bold`}
-                            >
-                              {row.marksRequested}
-                            </td>
-                            <td className={TD}>
-                              <span className="block whitespace-pre-line">
-                                {row.justification}
-                              </span>
-                              <DocLinks docs={row.docs} editable={editable} />
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <div className="text-muted-foreground/60 rounded-2xl border border-dashed border-white/15 py-10 text-center text-sm">
-                    Click to add qualitative appeal rows.
-                  </div>
-                )}
-              </EditableRegion>
-            )}
-
-            {(quantitativeRows.length > 0 || editable) && (
-              <EditableRegion
-                as="div"
-                section="quantitative"
-                label={NAAC_SECTION_LABELS.quantitative}
-                editable={editable}
-                onEditSection={onEdit}
-                className="mt-12"
-              >
-                <SectionHeading
-                  title={data.quantitative.title}
-                  description={data.quantitative.description}
-                />
-                {quantitativeRows.length > 0 ? (
-                  <div className="overflow-x-auto rounded-2xl border border-white/10">
-                    <table className="w-full min-w-[1000px] border-collapse">
-                      <thead className="bg-white/5">
-                        <tr>
-                          <th className={TH} rowSpan={2}>
-                            {data.quantitative.columns.metric}
-                          </th>
-                          <th className={TH} rowSpan={2}>
-                            {data.quantitative.columns.parameter}
-                          </th>
-                          <th className={`${TH} text-center`} colSpan={2}>
-                            {data.quantitative.columns.values}
-                          </th>
-                          <th className={`${TH} text-center`} colSpan={2}>
-                            {data.quantitative.columns.marks}
-                          </th>
-                          <th className={TH} rowSpan={2}>
-                            {data.quantitative.columns.justification}
-                          </th>
-                        </tr>
-                        <tr>
-                          <th className={`${TH} text-center`}>
-                            {data.quantitative.columns.ssr}
-                          </th>
-                          <th className={`${TH} text-center`}>
-                            {data.quantitative.columns.dvv}
-                          </th>
-                          <th className={`${TH} text-center`}>
-                            {data.quantitative.columns.awarded}
-                          </th>
-                          <th className={`${TH} text-center`}>
-                            {data.quantitative.columns.requested}
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {quantitativeRows.map((row, i) => (
-                          <tr
-                            key={i}
-                            className="transition-colors hover:bg-white/5"
-                          >
-                            <td className={`${TD} text-foreground font-bold`}>
-                              {row.metric}
-                            </td>
-                            <td className={TD}>{row.parameter}</td>
-                            <td className={`${TD} text-center`}>{row.ssr}</td>
-                            <td className={`${TD} text-center`}>{row.dvv}</td>
-                            <td className={`${TD} text-center`}>
-                              {row.awarded}
-                            </td>
-                            <td
-                              className={`${TD} text-gold text-center font-bold`}
-                            >
-                              {row.requested}
-                            </td>
-                            <td className={TD}>
-                              <span className="block whitespace-pre-line">
-                                {row.justification}
-                              </span>
-                              <DocLinks docs={row.docs} editable={editable} />
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                ) : (
-                  <div className="text-muted-foreground/60 rounded-2xl border border-dashed border-white/15 py-10 text-center text-sm">
-                    Click to add quantitative appeal rows.
-                  </div>
-                )}
-              </EditableRegion>
-            )}
-          </section>
-        )}
-
-        {docSections.length > 0
-          ? docSections.map((block, i) => (
-              <EditableRegion
-                key={i}
-                as="section"
-                section={`docSection:${i}`}
-                label={block.title.trim() || `Document Section ${i + 1}`}
-                editable={editable}
-                onEditSection={onEdit}
-                className="mt-16"
-              >
-                <DocSectionBlock block={block} editable={editable} />
-              </EditableRegion>
-            ))
-          : editable && (
-              <EditableRegion
-                as="section"
-                section="docSections"
-                label={NAAC_SECTION_LABELS.docSections}
-                editable={editable}
-                onEditSection={onEdit}
-                className="mt-16"
-              >
-                <div className="text-muted-foreground/60 rounded-2xl border border-dashed border-white/15 py-16 text-center text-sm">
-                  No document sections yet. Click to add the first one.
-                </div>
-              </EditableRegion>
-            )}
       </div>
 
       {!editable && <Footer />}
