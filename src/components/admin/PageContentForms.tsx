@@ -43,6 +43,7 @@ import {
   FLOATING_ELEMENTS_LIMITS,
   NAVBAR_LIMITS,
   SEO_LIMITS,
+  LIMITS_upcomingEvents,
 } from "@/lib/validation";
 
 /* ─── Shared types ─── */
@@ -805,9 +806,27 @@ type PamphletCallNowVal = {
 type PamphletLayoutVal =
   "image-image" | "image-text" | "text-image" | "text-text";
 
+export type PamphletPopupVal = {
+  id: string;
+  /** Admin-facing name only — visitors never see it. */
+  name?: string;
+  layout?: PamphletLayoutVal;
+  leftSlot?: PamphletSlotVal;
+  rightSlot?: PamphletSlotVal;
+  virtualTour?: PamphletVirtualTourVal;
+  callNow?: PamphletCallNowVal;
+  applyEnabled?: boolean;
+  applyLabel?: string;
+  applyHref?: string;
+};
+
 export type PamphletVal = {
   enabled?: boolean;
   delayMs?: number;
+  popups?: PamphletPopupVal[];
+  activePopupId?: string;
+  // Single-popup fields, kept for values saved before multi-popup support.
+  // Editing here migrates them into `popups[0]` and clears them.
   layout?: PamphletLayoutVal;
   leftSlot?: PamphletSlotVal;
   rightSlot?: PamphletSlotVal;
@@ -891,6 +910,260 @@ function PamphletSlotEditor({
   );
 }
 
+/** Id given to the popup a pre-multi-popup value is migrated into. */
+const LEGACY_POPUP_ID = "popup-1";
+
+function newPopupId(): string {
+  return `popup-${Date.now().toString(36)}${Math.random()
+    .toString(36)
+    .slice(2, 6)}`;
+}
+
+/**
+ * The popups to edit. A value saved before multi-popup support has none, so
+ * its single popup — including the even older `images[]` / `videoUrl` fields —
+ * is surfaced as popup #1 rather than being lost.
+ */
+function derivePopups(value: PamphletVal): PamphletPopupVal[] {
+  if (Array.isArray(value.popups) && value.popups.length > 0) {
+    return value.popups;
+  }
+  const legacyImages = Array.isArray(value.images) ? value.images : [];
+  const leftSlot = value.leftSlot ?? {};
+  const rightSlot = value.rightSlot ?? {};
+  const virtualTour = value.virtualTour ?? {};
+  return [
+    {
+      id: LEGACY_POPUP_ID,
+      name: "Popup 1",
+      layout: value.layout ?? "image-image",
+      leftSlot: { ...leftSlot, image: leftSlot.image || legacyImages[0] || "" },
+      rightSlot: {
+        ...rightSlot,
+        image: rightSlot.image || legacyImages[1] || "",
+      },
+      virtualTour: {
+        ...virtualTour,
+        url: virtualTour.url || value.videoUrl || "",
+      },
+      callNow: value.callNow ?? {},
+      applyEnabled: value.applyEnabled !== false,
+      applyLabel: value.applyLabel ?? "Apply Now",
+      applyHref: value.applyHref ?? "",
+    },
+  ];
+}
+
+/**
+ * Writing the popup list clears the single-popup fields it superseded. Leaving
+ * them behind would keep a replaced image referenced from two places, so the
+ * old R2 object would never be cleaned up when the popup is re-pointed.
+ */
+function withPopups(
+  value: PamphletVal,
+  popups: PamphletPopupVal[],
+  activePopupId: string,
+): PamphletVal {
+  return {
+    ...value,
+    popups,
+    activePopupId,
+    layout: undefined,
+    leftSlot: undefined,
+    rightSlot: undefined,
+    virtualTour: undefined,
+    callNow: undefined,
+    applyEnabled: undefined,
+    applyLabel: undefined,
+    applyHref: undefined,
+    images: [],
+    videoUrl: "",
+  };
+}
+
+function PamphletPopupEditor({
+  popup,
+  onChange,
+}: {
+  popup: PamphletPopupVal;
+  onChange: (next: PamphletPopupVal) => void;
+}) {
+  const layout: PamphletLayoutVal = popup.layout ?? "image-image";
+  const leftSlot = popup.leftSlot ?? {};
+  const rightSlot = popup.rightSlot ?? {};
+  const virtualTour = popup.virtualTour ?? {};
+  const callNow = popup.callNow ?? {};
+
+  return (
+    <div className="space-y-4">
+      <Select
+        label="Popup Layout"
+        value={layout}
+        options={LAYOUT_OPTIONS}
+        hint="Choose how the two sides of the popup are filled — images, text, or a mix."
+        onChange={(e) =>
+          onChange({ ...popup, layout: e.target.value as PamphletLayoutVal })
+        }
+      />
+
+      <div className="grid gap-3 md:grid-cols-2">
+        <PamphletSlotEditor
+          side="Left"
+          kind={slotKind(layout, "left")}
+          value={leftSlot}
+          onChange={(next) => onChange({ ...popup, leftSlot: next })}
+        />
+        <PamphletSlotEditor
+          side="Right"
+          kind={slotKind(layout, "right")}
+          value={rightSlot}
+          onChange={(next) => onChange({ ...popup, rightSlot: next })}
+        />
+      </div>
+
+      <Field
+        label="Virtual Tour Button"
+        hint="Optional. If the URL is a YouTube/embed link, the button opens an in-popup video player; otherwise it opens the URL in a new tab."
+      >
+        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={virtualTour.enabled === true}
+              onChange={(e) =>
+                onChange({
+                  ...popup,
+                  virtualTour: {
+                    ...virtualTour,
+                    enabled: e.target.checked,
+                  },
+                })
+              }
+            />
+            Show Virtual Tour button
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <TextInput
+              label="Button Label"
+              value={virtualTour.label ?? ""}
+              maxLength={LIMITS_pamphlet.virtualTourLabelMax}
+              placeholder="Virtual Tour"
+              onChange={(e) =>
+                onChange({
+                  ...popup,
+                  virtualTour: {
+                    ...virtualTour,
+                    label: e.target.value,
+                  },
+                })
+              }
+            />
+            <TextInput
+              label="URL / Video Link"
+              value={virtualTour.url ?? ""}
+              onChange={(e) =>
+                onChange({
+                  ...popup,
+                  virtualTour: {
+                    ...virtualTour,
+                    url: e.target.value,
+                  },
+                })
+              }
+              placeholder="https://www.youtube.com/embed/VIDEO_ID"
+            />
+          </div>
+        </div>
+      </Field>
+
+      <Field
+        label="Call Now Button"
+        hint="Optional. Shows a call button that dials the given phone number on tap."
+      >
+        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={callNow.enabled === true}
+              onChange={(e) =>
+                onChange({
+                  ...popup,
+                  callNow: { ...callNow, enabled: e.target.checked },
+                })
+              }
+            />
+            Show Call Now button
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <TextInput
+              label="Button Label"
+              value={callNow.label ?? ""}
+              maxLength={LIMITS_pamphlet.callNowLabelMax}
+              placeholder="Call Now"
+              onChange={(e) =>
+                onChange({
+                  ...popup,
+                  callNow: { ...callNow, label: e.target.value },
+                })
+              }
+            />
+            <TextInput
+              label="Phone Number"
+              value={callNow.phone ?? ""}
+              maxLength={LIMITS_pamphlet.callNowPhoneMax}
+              placeholder="+91 98765 43210"
+              onChange={(e) =>
+                onChange({
+                  ...popup,
+                  callNow: { ...callNow, phone: e.target.value },
+                })
+              }
+            />
+          </div>
+        </div>
+      </Field>
+
+      <Field
+        label="Apply Now Button"
+        hint="Customize the Apply Now button shown inside the pamphlet popup."
+      >
+        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={popup.applyEnabled !== false}
+              onChange={(e) =>
+                onChange({ ...popup, applyEnabled: e.target.checked })
+              }
+            />
+            Show Apply Now button
+          </label>
+          <div className="grid grid-cols-2 gap-3">
+            <TextInput
+              label="Button Label"
+              value={popup.applyLabel ?? ""}
+              maxLength={LIMITS_pamphlet.applyLabelMax}
+              onChange={(e) =>
+                onChange({ ...popup, applyLabel: e.target.value })
+              }
+              placeholder="Apply Now"
+            />
+            <TextInput
+              label="Button Link"
+              value={popup.applyHref ?? ""}
+              maxLength={LIMITS_pamphlet.applyHrefMax}
+              onChange={(e) =>
+                onChange({ ...popup, applyHref: e.target.value })
+              }
+              placeholder="https://admissions.jct.ac.in"
+            />
+          </div>
+        </div>
+      </Field>
+    </div>
+  );
+}
+
 export function PamphletForm({
   value,
   onChange,
@@ -906,18 +1179,41 @@ export function PamphletForm({
     setRawDelay(String(value.delayMs ?? 2000));
   }, [value.delayMs]);
 
-  const layout: PamphletLayoutVal = value.layout ?? "image-image";
-  const leftSlot = value.leftSlot ?? {};
-  const rightSlot = value.rightSlot ?? {};
-  const virtualTour = value.virtualTour ?? {};
-  const callNow = value.callNow ?? {};
+  const popups = derivePopups(value);
+  // A stale `activePopupId` — one whose popup was deleted — must not blank the
+  // popup out; the public renderer falls back to the first entry, so do the same.
+  const activeId =
+    value.activePopupId && popups.some((p) => p.id === value.activePopupId)
+      ? value.activePopupId
+      : (popups[0]?.id ?? "");
+  const atMax = popups.length >= LIMITS_pamphlet.popups;
 
-  // First-time backfill: if no leftSlot.image but legacy images[] has data,
-  // surface the legacy data so it's visible in the editor (and persists on save).
-  const legacyImages = Array.isArray(value.images) ? value.images : [];
-  const leftImageDisplay = leftSlot.image || legacyImages[0] || "";
-  const rightImageDisplay = rightSlot.image || legacyImages[1] || "";
-  const tourUrlDisplay = virtualTour.url ?? value.videoUrl ?? "";
+  const commit = (next: PamphletPopupVal[], nextActiveId = activeId) =>
+    onChange(
+      withPopups(
+        value,
+        next,
+        next.some((p) => p.id === nextActiveId)
+          ? nextActiveId
+          : (next[0]?.id ?? ""),
+      ),
+    );
+
+  const addPopup = () => {
+    if (atMax) return;
+    const id = newPopupId();
+    commit([
+      ...popups,
+      {
+        id,
+        name: `Popup ${popups.length + 1}`,
+        layout: "image-image",
+        applyEnabled: true,
+        applyLabel: "Apply Now",
+        applyHref: "https://admissions.jct.ac.in",
+      },
+    ]);
+  };
 
   return (
     <div className="space-y-4">
@@ -950,168 +1246,98 @@ export function PamphletForm({
         hint={`Delay in milliseconds before the popup appears (max ${LIMITS_pamphlet.maxDelayMs})`}
       />
 
-      <Select
-        label="Popup Layout"
-        value={layout}
-        options={LAYOUT_OPTIONS}
-        hint="Choose how the two sides of the popup are filled — images, text, or a mix."
-        onChange={(e) =>
-          onChange({ ...value, layout: e.target.value as PamphletLayoutVal })
-        }
-      />
-
-      <div className="grid gap-3 md:grid-cols-2">
-        <PamphletSlotEditor
-          side="Left"
-          kind={slotKind(layout, "left")}
-          value={{ ...leftSlot, image: leftImageDisplay }}
-          onChange={(next) => onChange({ ...value, leftSlot: next })}
-        />
-        <PamphletSlotEditor
-          side="Right"
-          kind={slotKind(layout, "right")}
-          value={{ ...rightSlot, image: rightImageDisplay }}
-          onChange={(next) => onChange({ ...value, rightSlot: next })}
-        />
-      </div>
-
       <Field
-        label="Virtual Tour Button"
-        hint="Optional. If the URL is a YouTube/embed link, the button opens an in-popup video player; otherwise it opens the URL in a new tab."
+        label="Popups"
+        hint={`Keep up to ${LIMITS_pamphlet.popups} popups ready and switch between them. Only the one marked Active is shown to visitors.`}
       >
-        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={virtualTour.enabled === true}
-              onChange={(e) =>
-                onChange({
-                  ...value,
-                  virtualTour: {
-                    ...virtualTour,
-                    enabled: e.target.checked,
-                  },
-                })
-              }
-            />
-            Show Virtual Tour button
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <TextInput
-              label="Button Label"
-              value={virtualTour.label ?? ""}
-              maxLength={LIMITS_pamphlet.virtualTourLabelMax}
-              placeholder="Virtual Tour"
-              onChange={(e) =>
-                onChange({
-                  ...value,
-                  virtualTour: {
-                    ...virtualTour,
-                    label: e.target.value,
-                  },
-                })
-              }
-            />
-            <TextInput
-              label="URL / Video Link"
-              value={tourUrlDisplay}
-              onChange={(e) =>
-                onChange({
-                  ...value,
-                  virtualTour: {
-                    ...virtualTour,
-                    url: e.target.value,
-                  },
-                })
-              }
-              placeholder="https://www.youtube.com/embed/VIDEO_ID"
-            />
-          </div>
-        </div>
-      </Field>
+        <div className="space-y-3">
+          {popups.map((popup, i) => {
+            const isActive = popup.id === activeId;
+            return (
+              <div
+                key={popup.id}
+                className={`rounded-lg border p-3 ${
+                  isActive
+                    ? "border-gold bg-gold/5"
+                    : "border-gray-200 bg-white"
+                }`}
+              >
+                <div className="flex flex-wrap items-center gap-3">
+                  <label className="flex shrink-0 items-center gap-2 text-sm font-semibold">
+                    <input
+                      type="radio"
+                      name="pamphlet-active-popup"
+                      checked={isActive}
+                      onChange={() => commit(popups, popup.id)}
+                    />
+                    {isActive ? "Active" : "Set active"}
+                  </label>
+                  <div className="min-w-45 flex-1">
+                    <TextInput
+                      label=""
+                      value={popup.name ?? ""}
+                      maxLength={LIMITS_pamphlet.popupNameMax}
+                      placeholder={`Popup ${i + 1}`}
+                      onChange={(e) =>
+                        commit(
+                          popups.map((p) =>
+                            p.id === popup.id
+                              ? { ...p, name: e.target.value }
+                              : p,
+                          ),
+                        )
+                      }
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      commit(popups.filter((p) => p.id !== popup.id))
+                    }
+                    disabled={popups.length <= 1}
+                    title={
+                      popups.length <= 1
+                        ? "At least one popup is required"
+                        : "Delete this popup"
+                    }
+                    className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
 
-      <Field
-        label="Call Now Button"
-        hint="Optional. Shows a call button that dials the given phone number on tap."
-      >
-        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={callNow.enabled === true}
-              onChange={(e) =>
-                onChange({
-                  ...value,
-                  callNow: { ...callNow, enabled: e.target.checked },
-                })
-              }
-            />
-            Show Call Now button
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <TextInput
-              label="Button Label"
-              value={callNow.label ?? ""}
-              maxLength={LIMITS_pamphlet.callNowLabelMax}
-              placeholder="Call Now"
-              onChange={(e) =>
-                onChange({
-                  ...value,
-                  callNow: { ...callNow, label: e.target.value },
-                })
-              }
-            />
-            <TextInput
-              label="Phone Number"
-              value={callNow.phone ?? ""}
-              maxLength={LIMITS_pamphlet.callNowPhoneMax}
-              placeholder="+91 98765 43210"
-              onChange={(e) =>
-                onChange({
-                  ...value,
-                  callNow: { ...callNow, phone: e.target.value },
-                })
-              }
-            />
-          </div>
-        </div>
-      </Field>
+                <div className="mt-3">
+                  <Accordion
+                    title={`Edit “${popup.name || `Popup ${i + 1}`}”`}
+                    defaultOpen={isActive}
+                  >
+                    <PamphletPopupEditor
+                      popup={popup}
+                      onChange={(next) =>
+                        commit(
+                          popups.map((p) => (p.id === popup.id ? next : p)),
+                        )
+                      }
+                    />
+                  </Accordion>
+                </div>
+              </div>
+            );
+          })}
 
-      <Field
-        label="Apply Now Button"
-        hint="Customize the Apply Now button shown inside the pamphlet popup."
-      >
-        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={value.applyEnabled !== false}
-              onChange={(e) =>
-                onChange({ ...value, applyEnabled: e.target.checked })
-              }
-            />
-            Show Apply Now button
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <TextInput
-              label="Button Label"
-              value={value.applyLabel ?? ""}
-              maxLength={LIMITS_pamphlet.applyLabelMax}
-              onChange={(e) =>
-                onChange({ ...value, applyLabel: e.target.value })
-              }
-              placeholder="Apply Now"
-            />
-            <TextInput
-              label="Button Link"
-              value={value.applyHref ?? ""}
-              maxLength={LIMITS_pamphlet.applyHrefMax}
-              onChange={(e) =>
-                onChange({ ...value, applyHref: e.target.value })
-              }
-              placeholder="https://admissions.jct.ac.in"
-            />
-          </div>
+          <button
+            type="button"
+            onClick={addPopup}
+            disabled={atMax}
+            className="admin-btn admin-btn-outline admin-btn-sm"
+          >
+            <Plus size={12} /> Add popup
+          </button>
+          {atMax && (
+            <p className="text-xs text-gray-400">
+              Maximum of {LIMITS_pamphlet.popups} popups reached.
+            </p>
+          )}
         </div>
       </Field>
     </div>
@@ -1364,6 +1590,149 @@ export function AnnouncementForm({
           placeholder="https://..."
         />
       </div>
+    </div>
+  );
+}
+
+/* ─── News & Events ─── */
+
+export type UpcomingEventsVal = {
+  enabled?: boolean;
+  eyebrow?: string;
+  heading?: string;
+  description?: string;
+  maxItems?: number;
+  ctaLabel?: string;
+  ctaHref?: string;
+  emptyText?: string;
+  fallbackToRecent?: boolean;
+  upcomingBadge?: string;
+};
+
+export function UpcomingEventsForm({
+  value,
+  onChange,
+  eventsHref,
+}: {
+  value: UpcomingEventsVal;
+  onChange: (v: UpcomingEventsVal) => void;
+  /** The college's own /events route — the default the button links to. */
+  eventsHref: string;
+}) {
+  const maxItems = value.maxItems ?? 3;
+
+  return (
+    <div className="space-y-4">
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={value.enabled !== false}
+          onChange={(e) => onChange({ ...value, enabled: e.target.checked })}
+        />
+        Show the News &amp; Events section on the landing page
+      </label>
+
+      <p className="rounded-lg bg-gray-50 p-3 text-xs text-gray-500">
+        The events themselves are managed under{" "}
+        <span className="font-semibold">News &amp; Events</span>. This section
+        shows the events still to come, soonest first, and tops the row up with
+        the latest past events so it is never part empty — only its wording is
+        set here.
+      </p>
+
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="Eyebrow"
+          value={value.eyebrow ?? ""}
+          maxLength={LIMITS_upcomingEvents.eyebrowMax}
+          placeholder="Happenings"
+          onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
+        />
+        <TextInput
+          label="Heading"
+          value={value.heading ?? ""}
+          maxLength={LIMITS_upcomingEvents.headingMax}
+          placeholder="News & Events"
+          onChange={(e) => onChange({ ...value, heading: e.target.value })}
+        />
+      </div>
+
+      <TextArea
+        label="Description (optional)"
+        rows={3}
+        value={value.description ?? ""}
+        maxLength={LIMITS_upcomingEvents.descriptionMax}
+        placeholder="One or two lines shown under the heading"
+        onChange={(e) => onChange({ ...value, description: e.target.value })}
+      />
+
+      <div className="grid grid-cols-2 gap-3">
+        <TextInput
+          label="Button Label"
+          value={value.ctaLabel ?? ""}
+          maxLength={LIMITS_upcomingEvents.ctaLabelMax}
+          placeholder="News & Events"
+          onChange={(e) => onChange({ ...value, ctaLabel: e.target.value })}
+        />
+        <TextInput
+          label="Button Link"
+          value={value.ctaHref ?? ""}
+          maxLength={500}
+          placeholder={eventsHref}
+          hint={`Leave blank to link to ${eventsHref}`}
+          onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
+        />
+      </div>
+
+      <TextInput
+        label="Events Shown"
+        type="number"
+        min={LIMITS_upcomingEvents.minItems}
+        max={LIMITS_upcomingEvents.maxItems}
+        value={String(maxItems)}
+        hint={`Between ${LIMITS_upcomingEvents.minItems} and ${LIMITS_upcomingEvents.maxItems} cards.`}
+        onChange={(e) => {
+          const parsed = parseInt(e.target.value, 10);
+          onChange({
+            ...value,
+            maxItems: Number.isFinite(parsed)
+              ? Math.min(
+                  LIMITS_upcomingEvents.maxItems,
+                  Math.max(LIMITS_upcomingEvents.minItems, parsed),
+                )
+              : maxItems,
+          });
+        }}
+      />
+
+      <TextInput
+        label="Upcoming Badge"
+        value={value.upcomingBadge ?? ""}
+        maxLength={LIMITS_upcomingEvents.badgeMax}
+        placeholder="Upcoming"
+        hint="Marks the cards whose event has not happened yet. Leave blank to show no badge."
+        onChange={(e) => onChange({ ...value, upcomingBadge: e.target.value })}
+      />
+
+      <TextInput
+        label="Empty-state Text (optional)"
+        value={value.emptyText ?? ""}
+        maxLength={LIMITS_upcomingEvents.emptyTextMax}
+        placeholder="e.g. New events are announced here each term."
+        hint="Shown when there is nothing to list at all. Leave blank to hide the whole section instead."
+        onChange={(e) => onChange({ ...value, emptyText: e.target.value })}
+      />
+
+      <label className="flex items-center gap-2 text-sm">
+        <input
+          type="checkbox"
+          checked={value.fallbackToRecent !== false}
+          onChange={(e) =>
+            onChange({ ...value, fallbackToRecent: e.target.checked })
+          }
+        />
+        Fill any spare card slots with the latest past events
+      </label>
     </div>
   );
 }

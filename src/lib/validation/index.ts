@@ -5,6 +5,7 @@ export * from "./_primitives";
 
 export {
   PamphletSchema,
+  PamphletPopupSchema,
   PamphletSlotSchema,
   PamphletVirtualTourSchema,
   PamphletCallNowSchema,
@@ -14,6 +15,7 @@ export {
 } from "./pamphlet";
 export type {
   PamphletValue,
+  PamphletPopup,
   PamphletSlot,
   PamphletVirtualTour,
   PamphletCallNow,
@@ -42,6 +44,12 @@ export {
   LIMITS as LIMITS_announcement,
 } from "./announcement";
 export type { AnnouncementValue } from "./announcement";
+
+export {
+  UpcomingEventsSchema,
+  LIMITS as LIMITS_upcomingEvents,
+} from "./upcomingEvents";
+export type { UpcomingEventsValue } from "./upcomingEvents";
 
 export { LifeAtJctSchema, LIMITS as LIMITS_lifeAtJct } from "./lifeAtJct";
 export type { LifeAtJctValue } from "./lifeAtJct";

@@ -5,6 +5,10 @@ export const LIMITS = {
   // Legacy — older saved values still carry an `images[]` array.
   images: 2,
   ctas: 2,
+  /** How many popups may be configured. Only one of them is ever shown. */
+  popups: 3,
+  popupIdMax: 40,
+  popupNameMax: 60,
   minDelayMs: 0,
   maxDelayMs: 60_000,
   applyLabelMax: 40,
@@ -63,8 +67,44 @@ export const PamphletCallNowSchema = z.object({
 });
 export type PamphletCallNow = z.infer<typeof PamphletCallNowSchema>;
 
+/**
+ * One configurable popup. Several may be stored so an admin can keep, say, an
+ * admissions popup and an event popup side by side, but only the one named by
+ * `activePopupId` is ever rendered.
+ */
+export const PamphletPopupSchema = z.object({
+  id: zClampedString(1, LIMITS.popupIdMax, "Popup id"),
+  /** Admin-facing name only — never shown to visitors. */
+  name: zClampedString(0, LIMITS.popupNameMax, "Popup name").optional(),
+  layout: PamphletLayoutSchema.optional().default("image-image"),
+  leftSlot: PamphletSlotSchema.optional(),
+  rightSlot: PamphletSlotSchema.optional(),
+  virtualTour: PamphletVirtualTourSchema.optional(),
+  callNow: PamphletCallNowSchema.optional(),
+  applyEnabled: z.boolean().optional().default(true),
+  applyLabel: zClampedString(0, LIMITS.applyLabelMax, "Apply label")
+    .optional()
+    .default("Apply Now"),
+  applyHref: zUrl.optional().or(z.literal("")),
+});
+export type PamphletPopup = z.infer<typeof PamphletPopupSchema>;
+
 export const PamphletSchema = z.object({
   enabled: z.boolean().optional().default(true),
+
+  /**
+   * The configured popups. Empty on values saved before multi-popup support —
+   * the renderer then falls back to the single popup described by the
+   * `layout`/`leftSlot`/`rightSlot`/… fields below.
+   */
+  popups: z
+    .array(PamphletPopupSchema)
+    .max(LIMITS.popups, `At most ${LIMITS.popups} popups`)
+    .optional()
+    .default([]),
+  /** Which popup is live. Falls back to the first one when unset or stale. */
+  activePopupId: zClampedString(0, LIMITS.popupIdMax, "Active popup").optional(),
+
   delayMs: z
     .number()
     .int("Delay must be a whole number")

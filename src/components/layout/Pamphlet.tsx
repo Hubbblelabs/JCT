@@ -58,9 +58,38 @@ function readSlot(raw: unknown): Slot {
   };
 }
 
+/**
+ * The popup to render. Several may be configured but only one is ever live:
+ * the one named by `activePopupId`, falling back to the first. A value saved
+ * before multi-popup support has no `popups[]` — its single popup is described
+ * by the top-level fields, which is exactly the shape a popup entry has, so
+ * the object itself stands in.
+ */
+function selectPopup(r: Record<string, unknown>): Record<string, unknown> {
+  const popups = Array.isArray(r.popups)
+    ? (r.popups.filter(
+        (p) => p && typeof p === "object",
+      ) as Record<string, unknown>[])
+    : [];
+  if (popups.length === 0) return r;
+
+  const activeId = asString(r.activePopupId);
+  const active = activeId
+    ? popups.find((p) => asString(p.id) === activeId)
+    : null;
+  return active ?? popups[0];
+}
+
 function normalizePamphlet(raw: unknown): PamphletConfig | null {
   if (!raw || typeof raw !== "object") return null;
-  const r = raw as Record<string, unknown>;
+  const outer = raw as Record<string, unknown>;
+  // `enabled` and `delayMs` are settings for the popup slot as a whole; every
+  // other field describes the one live popup.
+  const r: Record<string, unknown> = {
+    ...selectPopup(outer),
+    enabled: outer.enabled,
+    delayMs: outer.delayMs,
+  };
 
   const legacyImages = Array.isArray(r.images)
     ? r.images.filter((s): s is string => typeof s === "string" && s.length > 0)

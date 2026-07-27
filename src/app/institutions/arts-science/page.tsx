@@ -28,6 +28,7 @@ import { AdmissionProcess } from "@/modules/arts-science/AdmissionProcess";
 import { CampusLife } from "@/components/layout/CampusLife";
 import { Testimonials } from "@/modules/arts-science/Testimonials";
 import { Placements } from "@/components/layout/Placements";
+import { NewsEvents } from "@/components/layout/NewsEvents";
 
 export default async function ArtsSciencePage() {
   const configs = await getPublishedConfigs([...ARTS_SCIENCE_CONFIG_KEYS]);
@@ -42,6 +43,7 @@ export default async function ArtsSciencePage() {
         <div id="main-content" tabIndex={-1} className="outline-none" />
         <Hero />
         <UgPrograms />
+        <NewsEvents institution="arts-science" />
         <AdmissionProcess />
         <Placements institution="arts-science" />
         <CampusLife

@@ -84,10 +84,6 @@ export const engineeringNavigation: NavItem[] = [
     href: "/institutions/engineering/about",
   },
   {
-    name: "Accreditations",
-    href: "/institutions/engineering/accreditations",
-  },
-  {
     name: "Admissions",
     href: "/institutions/engineering#admissions",
   },
@@ -103,10 +99,23 @@ export const engineeringNavigation: NavItem[] = [
     name: "COE",
     href: "/institutions/engineering/coe",
   },
+  // The long tail of institutional pages. The first three entries are fixed by
+  // how often visitors ask for them — accreditation status, then NAAC, then
+  // research; everything else follows in whatever order the CMS holds.
   {
-    name: "Campus",
+    name: "More",
     href: "#",
     children: [
+      {
+        name: "Affiliation & Accreditation",
+        href: "/institutions/engineering/accreditations",
+        desc: "Affiliation, approvals and accreditation status",
+      },
+      {
+        name: "NAAC",
+        href: "/institutions/engineering/naac",
+        desc: "Appeal tables and supporting documents",
+      },
       {
         name: "Research",
         href: "/institutions/engineering/research",
@@ -123,9 +132,9 @@ export const engineeringNavigation: NavItem[] = [
         desc: "Statutory and institutional committees",
       },
       {
-        name: "Documents",
+        name: "Reports & Downloads",
         href: "/institutions/engineering/documents",
-        desc: "Disclosures, forms and downloads",
+        desc: "Reports, disclosures, forms and downloads",
       },
     ],
   },
@@ -215,10 +224,6 @@ export const polytechnicNavigation: NavItem[] = [
     href: "/institutions/polytechnic/about",
   },
   {
-    name: "Accreditations",
-    href: "/institutions/polytechnic/accreditations",
-  },
-  {
     name: "Admissions",
     href: "/institutions/polytechnic#admissions",
   },
@@ -229,5 +234,28 @@ export const polytechnicNavigation: NavItem[] = [
   {
     name: "Placements",
     href: "/institutions/polytechnic#placements",
+  },
+  // Same fixed head as the engineering "More" menu: affiliation first, then
+  // the committee and club pages.
+  {
+    name: "More",
+    href: "#",
+    children: [
+      {
+        name: "Affiliation & Accreditation",
+        href: "/institutions/polytechnic/accreditations",
+        desc: "Affiliation, approvals and accreditation status",
+      },
+      {
+        name: "Committees & Cells",
+        href: "/institutions/polytechnic/committees",
+        desc: "Committees and cells across the college",
+      },
+      {
+        name: "Fine Arts Club",
+        href: "/institutions/polytechnic/fine-arts-club",
+        desc: "Movie, cultural, arts and photography wings",
+      },
+    ],
   },
 ];

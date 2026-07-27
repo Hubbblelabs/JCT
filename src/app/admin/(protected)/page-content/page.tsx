@@ -23,6 +23,7 @@ import {
   LifeAtJctForm,
   MetricsForm,
   NavbarAdminSection,
+  UpcomingEventsForm,
   SeoPagesForm,
   type SeoPagesVal,
   type EngHeroVal,
@@ -34,6 +35,7 @@ import {
   type LifeAtJctVal,
   type Metric,
   type NavbarVal,
+  type UpcomingEventsVal,
 } from "@/components/admin/PageContentForms";
 import {
   ImageUploadInput,
@@ -67,6 +69,43 @@ function seoSection(college: College): SectionDef {
     defaultValue: seoPagesDefaultValue(college) as SeoPagesVal,
     render: (v, onChange) => (
       <SeoPagesForm value={(v as SeoPagesVal) ?? {}} onChange={onChange} />
+    ),
+  };
+}
+
+const UPCOMING_EVENTS_CONFIG_KEY: Record<College, string> = {
+  engineering: "engineeringUpcomingEvents",
+  "arts-science": "artsScienceUpcomingEvents",
+  polytechnic: "polytechnicUpcomingEvents",
+};
+
+/**
+ * Wording for the landing-page "News & Events" strip. The entries it lists are
+ * Event records edited under /admin/events — only the copy lives here.
+ */
+function upcomingEventsSection(college: College): SectionDef {
+  const eventsHref = `/institutions/${college}/events`;
+  return {
+    id: "upcomingEvents",
+    label: "News & Events",
+    kind: "form",
+    configKey: UPCOMING_EVENTS_CONFIG_KEY[college],
+    defaultValue: {
+      enabled: true,
+      eyebrow: "Happenings",
+      heading: "News & Events",
+      maxItems: 3,
+      ctaLabel: "News & Events",
+      ctaHref: eventsHref,
+      fallbackToRecent: true,
+      upcomingBadge: "Upcoming",
+    } as UpcomingEventsVal,
+    render: (v, onChange) => (
+      <UpcomingEventsForm
+        value={(v as UpcomingEventsVal) ?? {}}
+        onChange={onChange}
+        eventsHref={eventsHref}
+      />
     ),
   };
 }
@@ -599,6 +638,7 @@ function sectionsFor(college: College): SectionDef[] {
           />
         ),
       },
+      upcomingEventsSection("engineering"),
       {
         id: "testimonials",
         label: "Voices / Testimonials",
@@ -661,6 +701,7 @@ function sectionsFor(college: College): SectionDef[] {
           />
         ),
       },
+      upcomingEventsSection("arts-science"),
       {
         id: "testimonials",
         label: "Testimonials",
@@ -719,6 +760,7 @@ function sectionsFor(college: College): SectionDef[] {
         <LifeAtJctForm value={(v as LifeAtJctVal) ?? {}} onChange={onChange} />
       ),
     },
+    upcomingEventsSection("polytechnic"),
     {
       id: "testimonials",
       label: "Testimonials",

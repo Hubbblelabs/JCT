@@ -219,12 +219,15 @@ h6 {
   }
 }
 
+/* Recruiter-logo carousel (home + every institution landing page). The rows
+   run deliberately slowly so a visitor can read each logo as it passes — the
+   two durations differ so the opposing rows never lock into step. */
 .animate-scroll-left {
-  animation: scroll-left 60s linear infinite;
+  animation: scroll-left 140s linear infinite;
   width: max-content;
 }
 .animate-scroll-right {
-  animation: scroll-right 70s linear infinite;
+  animation: scroll-right 165s linear infinite;
   width: max-content;
 }
 .animate-scroll-left:hover,

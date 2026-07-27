@@ -14,6 +14,7 @@ export const revalidate = 86400;
 import { DiplomaPrograms } from "@/modules/polytechnic/DiplomaPrograms";
 import { Admissions } from "@/modules/polytechnic/Admissions";
 import { Placements } from "@/components/layout/Placements";
+import { NewsEvents } from "@/components/layout/NewsEvents";
 import { CampusLife } from "@/components/layout/CampusLife";
 import { Testimonials } from "@/modules/polytechnic/Testimonials";
 
@@ -43,6 +44,7 @@ export default async function PolytechnicPage() {
         <div id="main-content" tabIndex={-1} className="outline-none" />
         <Hero />
         <DiplomaPrograms />
+        <NewsEvents institution="polytechnic" />
         <Admissions />
         <Placements institution="polytechnic" />
         <CampusLife

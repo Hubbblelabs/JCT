@@ -1,5 +1,6 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Placements } from "@/components/layout/Placements";
+import { NewsEvents } from "@/components/layout/NewsEvents";
 import { Footer } from "@/components/layout/Footer";
 import { SiteConfigProvider } from "@/contexts/SiteConfigContext";
 import {
@@ -28,6 +29,7 @@ export default async function EngineeringPage() {
         <EngineeringHero />
         <EngineeringDomains />
         <EngineeringMetrics />
+        <NewsEvents institution="engineering" />
         <Admissions />
         <Placements institution="engineering" />
         <CampusLife

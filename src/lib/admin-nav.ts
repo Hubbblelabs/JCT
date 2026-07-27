@@ -160,6 +160,13 @@ function collegeGroups(college: College): AdminNavGroup[] {
       description: "Photo gallery categories and images.",
     },
     {
+      label: "News & Events Section",
+      href: pc("upcomingEvents"),
+      icon: CalendarDays,
+      description:
+        "Wording of the landing-page events strip. The entries come from News & Events.",
+    },
+    {
       label: "Testimonials",
       href: pc("testimonials"),
       icon: MessageSquare,
@@ -273,7 +280,9 @@ function collegeGroups(college: College): AdminNavGroup[] {
           // now also hosts the NIRF, financial statements and ICT content tabs,
           // whose cards are in this group.
           {
-            label: "Documents",
+            // Public label is "Reports & Downloads" — kept in step here so the
+            // admin card and the navbar entry name the same page.
+            label: "Reports & Downloads",
             href: "/admin/documents",
             icon: FolderOpen,
             description:

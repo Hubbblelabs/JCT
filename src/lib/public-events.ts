@@ -72,6 +72,69 @@ export async function listPublicEvents({
   return docs.map(asCard);
 }
 
+/** A card that knows whether its event is still to come. */
+export type NewsEventCard = PublicEventCard & { isUpcoming: boolean };
+
+/**
+ * Cards for the landing-page "News & Events" strip: everything still to come,
+ * soonest first. "Upcoming" is measured from the start of today, so an event
+ * happening later today still counts.
+ *
+ * A college with two events scheduled shouldn't get a row with a hole in it, so
+ * unless `fallbackToRecent` is off the remaining slots are topped up with the
+ * most recent past events, newest first. Each card carries `isUpcoming` so the
+ * two can be told apart on screen.
+ */
+export async function listNewsEvents({
+  institution,
+  limit = 3,
+  fallbackToRecent = true,
+}: {
+  institution: string;
+  limit?: number;
+  fallbackToRecent?: boolean;
+}): Promise<{ events: NewsEventCard[]; upcomingCount: number }> {
+  await connectDB();
+
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const base = { is_active: true, institution };
+  const select =
+    "title slug excerpt category event_date location image institution";
+
+  const upcoming = await Event.find({
+    ...base,
+    event_date: { $gte: startOfToday },
+  })
+    .select(select)
+    .sort({ event_date: 1, sort_order: 1 })
+    .limit(limit)
+    .lean<EventLean[]>();
+
+  const events: NewsEventCard[] = upcoming.map((doc) => ({
+    ...asCard(doc),
+    isUpcoming: true,
+  }));
+
+  const shortfall = limit - events.length;
+  if (shortfall <= 0 || !fallbackToRecent) {
+    return { events, upcomingCount: events.length };
+  }
+
+  const recent = await Event.find({
+    ...base,
+    event_date: { $lt: startOfToday },
+  })
+    .select(select)
+    .sort({ event_date: -1, sort_order: 1 })
+    .limit(shortfall)
+    .lean<EventLean[]>();
+
+  events.push(...recent.map((doc) => ({ ...asCard(doc), isUpcoming: false })));
+  return { events, upcomingCount: upcoming.length };
+}
+
 export async function listPublicEventSlugs(): Promise<{ slug: string }[]> {
   // Runs inside generateStaticParams at build time. If the DB is briefly
   // unreachable during `next build`, degrade to zero prerendered slugs —

@@ -487,6 +487,106 @@ const GALLERY_COLS: Record<number, string> = {
   4: "sm:grid-cols-2 lg:grid-cols-4",
 };
 
+/**
+ * A gallery is revealed in two steps, because the placement gallery alone runs
+ * to thirty albums and ~300 photographs — rendering it whole pushed every
+ * section below it off the page and downloaded hundreds of images nobody
+ * scrolled to. Albums past the first few are hidden behind one button, and a
+ * long album is itself capped until its own button is pressed.
+ */
+const GALLERY_PAGE_SIZE = 12;
+const GALLERY_GROUP_PAGE_SIZE = 2;
+
+/** "1 photo" / "5 photos" — the counts are user-facing. */
+function plural(count: number, noun: string): string {
+  return `${count} ${noun}${count === 1 ? "" : "s"}`;
+}
+
+function GalleryGroup({
+  group,
+  columns,
+  viewerIndexes,
+  onOpen,
+  editable,
+}: {
+  group: { title: string; images: ContentImageValue[] };
+  columns: number;
+  /** Lightbox index per image, or -1 when the image can't be opened. */
+  viewerIndexes: number[];
+  onOpen: (index: number) => void;
+  editable: boolean;
+}) {
+  // In the editor every photo stays on screen — a hidden one can't be clicked
+  // to edit, and the inspector's list has to match what the preview shows.
+  const [expanded, setExpanded] = useState(false);
+  const collapsed = !editable && !expanded;
+  const hidden = collapsed
+    ? Math.max(0, group.images.length - GALLERY_PAGE_SIZE)
+    : 0;
+  const images = collapsed
+    ? group.images.slice(0, GALLERY_PAGE_SIZE)
+    : group.images;
+
+  return (
+    <div>
+      <GroupHeading title={group.title} />
+      <div className={`grid gap-4 ${GALLERY_COLS[columns] ?? GALLERY_COLS[3]}`}>
+        {images.map((image, ii) => {
+          const viewerIndex = viewerIndexes[ii];
+          return (
+            <figure
+              key={ii}
+              className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+            >
+              {viewerIndex >= 0 ? (
+                <button
+                  type="button"
+                  onClick={() => onOpen(viewerIndex)}
+                  aria-label="View full image"
+                  className="relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden"
+                >
+                  <ContentImg image={image} />
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                    <Expand size={22} className="text-white" />
+                  </span>
+                </button>
+              ) : (
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <ContentImg image={image} />
+                </div>
+              )}
+              {image.caption.trim() && (
+                <figcaption className="text-muted-foreground px-4 py-3 text-xs leading-relaxed">
+                  {image.caption}
+                </figcaption>
+              )}
+            </figure>
+          );
+        })}
+      </div>
+
+      {!editable && group.images.length > GALLERY_PAGE_SIZE && (
+        <div className="mt-5 flex justify-center">
+          <button
+            type="button"
+            onClick={() => setExpanded((v) => !v)}
+            aria-expanded={expanded}
+            className="border-border text-navy inline-flex items-center gap-2 rounded-full border bg-white px-6 py-2.5 font-sans text-sm font-semibold shadow-sm transition-colors hover:bg-stone-50"
+          >
+            {expanded
+              ? "Show fewer photos"
+              : `Show ${plural(hidden, "more photo")}`}
+            <ChevronDown
+              size={15}
+              className={`transition-transform ${expanded ? "rotate-180" : ""}`}
+            />
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function GalleryBlockView({
   block,
   editable,
@@ -518,52 +618,50 @@ function GalleryBlockView({
   );
   const { open, overlay } = useLightbox(flat, !editable);
 
+  // As with the per-album cap, the editor shows everything — a hidden album
+  // can't be clicked to edit.
+  const [allGroups, setAllGroups] = useState(false);
+  const groupsCollapsed =
+    !editable && !allGroups && groups.length > GALLERY_GROUP_PAGE_SIZE;
+  const visibleGroups = groupsCollapsed
+    ? groups.slice(0, GALLERY_GROUP_PAGE_SIZE)
+    : groups;
+  const hiddenGroups = groups.length - visibleGroups.length;
+
   return (
     <>
       <BlockHeading title={block.title} description={block.description} />
       {groups.length > 0 ? (
         <div className="space-y-10">
-          {groups.map((group, gi) => (
-            <div key={gi}>
-              <GroupHeading title={group.title} />
-              <div
-                className={`grid gap-4 ${GALLERY_COLS[block.columns] ?? GALLERY_COLS[3]}`}
-              >
-                {group.images.map((image, ii) => {
-                  const viewerIndex = indexOf[gi][ii];
-                  return (
-                    <figure
-                      key={ii}
-                      className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5"
-                    >
-                      {viewerIndex >= 0 ? (
-                        <button
-                          type="button"
-                          onClick={() => open(viewerIndex)}
-                          aria-label="View full image"
-                          className="relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden"
-                        >
-                          <ContentImg image={image} />
-                          <span className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-                            <Expand size={22} className="text-white" />
-                          </span>
-                        </button>
-                      ) : (
-                        <div className="relative aspect-[4/3] overflow-hidden">
-                          <ContentImg image={image} />
-                        </div>
-                      )}
-                      {image.caption.trim() && (
-                        <figcaption className="text-muted-foreground px-4 py-3 text-xs leading-relaxed">
-                          {image.caption}
-                        </figcaption>
-                      )}
-                    </figure>
-                  );
-                })}
-              </div>
-            </div>
+          {visibleGroups.map((group, gi) => (
+            <GalleryGroup
+              key={gi}
+              group={group}
+              columns={block.columns}
+              viewerIndexes={indexOf[gi]}
+              onOpen={open}
+              editable={editable}
+            />
           ))}
+
+          {!editable && groups.length > GALLERY_GROUP_PAGE_SIZE && (
+            <div className="flex justify-center">
+              <button
+                type="button"
+                onClick={() => setAllGroups((v) => !v)}
+                aria-expanded={allGroups}
+                className="bg-navy hover:bg-navy-light inline-flex items-center gap-2 rounded-full px-7 py-3 font-sans text-sm font-bold text-white shadow-md transition-colors"
+              >
+                {allGroups
+                  ? "Show fewer albums"
+                  : `Show ${plural(hiddenGroups, "more album")}`}
+                <ChevronDown
+                  size={15}
+                  className={`transition-transform ${allGroups ? "rotate-180" : ""}`}
+                />
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <EmptyHint>Click to add photographs.</EmptyHint>

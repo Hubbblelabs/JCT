@@ -16,6 +16,7 @@ import {
   CoePageSchema,
 } from "./aboutPage";
 import { AnnouncementSchema } from "./announcement";
+import { UpcomingEventsSchema } from "./upcomingEvents";
 import { LifeAtJctSchema } from "./lifeAtJct";
 import { PolytechnicAdmissionsSchema } from "./polytechnicAdmissions";
 import {
@@ -76,6 +77,9 @@ export const SITE_CONFIG_SCHEMAS = {
   engineeringResearchHighlights: ResearchHighlightsSchema,
   engineeringAdmissions: AdmissionsSchema,
   engineeringLifeAtJct: LifeAtJctSchema,
+  engineeringUpcomingEvents: UpcomingEventsSchema,
+  artsScienceUpcomingEvents: UpcomingEventsSchema,
+  polytechnicUpcomingEvents: UpcomingEventsSchema,
   artsScienceHero: ArtsScienceHeroSchema,
   artsScienceHeroStats: HeroStatsListSchema,
   artsScienceLifeAtJct: LifeAtJctSchema,
@@ -193,6 +197,9 @@ export const SITE_CONFIG_KEY_INSTITUTION: Partial<
   engineeringHeader: "engineering",
   engineeringNavbar: "engineering",
   engineeringLifeAtJct: "engineering",
+  engineeringUpcomingEvents: "engineering",
+  artsScienceUpcomingEvents: "arts-science",
+  polytechnicUpcomingEvents: "polytechnic",
   engineeringPlacementHighlights: "engineering",
   artsSciencePlacementHighlights: "arts-science",
   polytechnicPlacementHighlights: "polytechnic",
