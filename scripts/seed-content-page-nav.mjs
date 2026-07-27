@@ -68,7 +68,7 @@ const ENGINEERING_ENTRIES = [
   },
   {
     label: "Timeline",
-    href: `${ENG}/timeline`,
+    href: `${ENG}/about#timeline`,
     desc: "Milestones year by year",
   },
   {

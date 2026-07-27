@@ -65,6 +65,7 @@ const nextConfig: NextConfig = {
       [`${ENG}/financial-statements`, `${ENG}/documents#financial-statements`],
       [`${ENG}/ict-content`, `${ENG}/documents#ict-content`],
       [`${ENG}/placements/gallery`, `${ENG}/placements#gallery`],
+      [`${ENG}/timeline`, `${ENG}/about#timeline`],
     ];
     return moved.map(([source, destination]) => ({
       source,

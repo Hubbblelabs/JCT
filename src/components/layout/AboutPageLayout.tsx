@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useState, type MouseEvent, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -40,8 +40,13 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EditableRegion } from "@/components/admin/EditableRegion";
 import { getImageUrl } from "@/lib/utils";
-import type { AboutPageValue, PageBodySection } from "@/lib/validation";
+import type {
+  AboutPageValue,
+  ContentPageValue,
+  PageBodySection,
+} from "@/lib/validation";
 import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
+import { ContentPageBody } from "@/components/layout/ContentPageLayout";
 import {
   resolveSidebarItems,
   type ResolvedSidebarItem,
@@ -49,6 +54,27 @@ import {
 } from "@/lib/sidebar-nav";
 
 type Institution = "main" | "engineering" | "arts-science" | "polytechnic";
+
+/**
+ * A content page (see `content-pages.ts`) hosted as a panel of this page's
+ * sidebar instead of a route of its own — e.g. Engineering's Timeline.
+ * Exactly one of `data`/`href` is set: the public route resolves the
+ * published content, while the admin preview only links across to the
+ * page's own editor (it is edited at /admin/content/<slug>, not here).
+ *
+ * `icon` arrives pre-rendered (`<Icon />`), not as a component reference: the
+ * public route builds this on the server and a bare component reference
+ * cannot cross into this client component, only a rendered element can. The
+ * wrapper sets size/colour via CSS, which lucide icons pick up through
+ * `currentColor`.
+ */
+export type AboutHostedItem = {
+  anchor: string;
+  navLabel: string;
+  icon: ReactNode;
+  data?: ContentPageValue;
+  href?: string;
+};
 
 type PersonModalData = {
   name: string;
@@ -298,6 +324,7 @@ function AboutSideNav({
   activeId,
   setActiveId,
   visibleAnchors,
+  hosted,
   editable,
   onEditSection,
 }: {
@@ -308,6 +335,8 @@ function AboutSideNav({
   /** Built-in anchors that actually render — others are dropped from the nav
    * so a link never scrolls to a section hidden for lack of content. */
   visibleAnchors: Set<string>;
+  /** Content pages hosted as extra panels of this sidebar (e.g. Timeline). */
+  hosted?: AboutHostedItem[];
   editable?: boolean;
   onEditSection?: (section: string) => void;
 }) {
@@ -318,11 +347,14 @@ function AboutSideNav({
     (n) => n.customHref || n.customSection || visibleAnchors.has(n.anchor),
   );
   const builtins = navItems.filter((n) => !n.customHref);
+  // Only the entries with real content render an element to observe — the
+  // admin-preview link-only entries have no in-page anchor.
+  const hostedPanels = (hosted ?? []).filter((h) => !h.href);
 
   useEffect(() => {
     if (typeof window === "undefined" || window.innerWidth < 1024) return;
     const observers: IntersectionObserver[] = [];
-    builtins.forEach(({ anchor }) => {
+    [...builtins, ...hostedPanels].forEach(({ anchor }) => {
       const el = document.getElementById(anchor);
       if (!el) return;
       const observer = new IntersectionObserver(
@@ -335,7 +367,7 @@ function AboutSideNav({
       observers.push(observer);
     });
     return () => observers.forEach((obs) => obs.disconnect());
-  }, [setActiveId, builtins]);
+  }, [setActiveId, builtins, hostedPanels]);
 
   const handleClick = (id: string) => {
     setActiveId(id);
@@ -393,6 +425,37 @@ function AboutSideNav({
               >
                 <Icon size={13} className="shrink-0" />
                 {it.navLabel}
+              </button>
+            );
+          })}
+          {(hosted ?? []).map((h) => {
+            const isActive = !h.href && activeId === h.anchor;
+            const cls = `flex items-center gap-1.5 rounded-full border px-3.5 py-2 text-xs font-semibold whitespace-nowrap transition-all ${
+              isActive
+                ? theme.navActivePill
+                : "text-muted-foreground hover:text-foreground border-white/10 bg-white/5 hover:border-white/20"
+            }`;
+            const icon = (
+              <span className="shrink-0 [&>svg]:size-3.5">{h.icon}</span>
+            );
+            // A hosted page's link (admin preview only) always navigates —
+            // it opens the page's own editor, not a link an admin authored.
+            if (h.href) {
+              return (
+                <Link key={`h:${h.anchor}`} href={h.href} className={cls}>
+                  {icon}
+                  {h.navLabel}
+                </Link>
+              );
+            }
+            return (
+              <button
+                key={`h:${h.anchor}`}
+                onClick={editable ? undefined : () => handleClick(h.anchor)}
+                className={cls}
+              >
+                {icon}
+                {h.navLabel}
               </button>
             );
           })}
@@ -456,6 +519,42 @@ function AboutSideNav({
               </button>
             );
           })}
+          {(hosted ?? []).map((h) => {
+            const isActive = !h.href && activeId === h.anchor;
+            const cls = `group flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition-all ${
+              isActive
+                ? theme.navActive
+                : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+            }`;
+            const iconCls = `shrink-0 transition-colors [&>svg]:size-4 ${
+              isActive
+                ? theme.accentText
+                : "text-muted-foreground group-hover:text-foreground"
+            }`;
+            if (h.href) {
+              return (
+                <Link key={`h:${h.anchor}`} href={h.href} className={cls}>
+                  <span className={iconCls}>{h.icon}</span>
+                  <span>{h.navLabel}</span>
+                </Link>
+              );
+            }
+            return (
+              <button
+                key={`h:${h.anchor}`}
+                onClick={editable ? undefined : () => handleClick(h.anchor)}
+                className={cls}
+              >
+                <span className={iconCls}>{h.icon}</span>
+                <span>{h.navLabel}</span>
+                {isActive && (
+                  <span
+                    className={`${theme.accentDot} ml-auto h-1.5 w-1.5 rounded-full`}
+                  />
+                )}
+              </button>
+            );
+          })}
         </nav>
 
         <div className="mt-6 space-y-4 border-t border-white/10 pt-6">
@@ -509,11 +608,14 @@ export function AboutPageLayout({
   institution,
   editable = false,
   onEditSection,
+  hosted = [],
 }: {
   data: AboutPageValue;
   institution: Institution;
   editable?: boolean;
   onEditSection?: (section: string) => void;
+  /** Content pages hosted as extra panels of this sidebar (e.g. Timeline). */
+  hosted?: AboutHostedItem[];
 }) {
   const theme = THEME[institution];
   const meta = INSTITUTION_META[institution];
@@ -662,6 +764,7 @@ export function AboutPageLayout({
             activeId={activeId}
             setActiveId={setActiveId}
             visibleAnchors={visibleBuiltins}
+            hosted={hosted}
             editable={editable}
             onEditSection={onEditSection}
           />
@@ -676,6 +779,7 @@ export function AboutPageLayout({
                 activeId={activeId}
                 setActiveId={setActiveId}
                 visibleAnchors={visibleBuiltins}
+                hosted={hosted}
                 editable={editable}
                 onEditSection={onEditSection}
               />
@@ -1381,6 +1485,31 @@ export function AboutPageLayout({
                 )}
               </EditableRegion>
             ))}
+
+            {/* Hosted content pages (e.g. Timeline) — edited at their own
+                /admin/content/<slug> editor, so they render inline here only
+                on the public route; the admin preview only links to it. */}
+            {hosted
+              .filter((h): h is AboutHostedItem & { data: ContentPageValue } =>
+                Boolean(h.data),
+              )
+              .map((h) => (
+                <section
+                  key={h.anchor}
+                  id={h.anchor}
+                  className={`scroll-mt-28 transition-all duration-300 ${mobileVis(h.anchor)}`}
+                >
+                  <h2 className="text-foreground mb-5 flex items-center gap-3 font-serif text-2xl font-bold md:text-3xl">
+                    <span
+                      className={`${theme.iconBg20} flex h-10 w-10 shrink-0 items-center justify-center rounded-xl [&>svg]:size-5`}
+                    >
+                      {h.icon}
+                    </span>
+                    {h.data.hero?.title?.trim() || h.navLabel}
+                  </h2>
+                  <ContentPageBody data={h.data} />
+                </section>
+              ))}
           </div>
         </div>
       </div>

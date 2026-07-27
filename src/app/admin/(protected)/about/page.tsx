@@ -7,8 +7,10 @@ import {
   AboutPageLayout,
   ABOUT_SECTION_LABELS,
   type AboutEditableSection,
+  type AboutHostedItem,
 } from "@/components/layout/AboutPageLayout";
 import { AboutSectionInspector } from "@/components/admin/AboutSectionInspector";
+import { hostedContentEditorLinks } from "@/lib/content-pages";
 import {
   EngineeringAboutSchema,
   ArtsScienceAboutSchema,
@@ -76,6 +78,18 @@ function AboutEditorInner() {
   const college = searchParams.get("college") ?? "engineering";
   const config = INSTITUTION_MAP[college] ?? INSTITUTION_MAP["engineering"];
   const { institution, configKey, publicPath, label } = config;
+
+  // Content pages hosted as panels of this college's About page (e.g.
+  // Timeline, engineering-only) — they keep their own editor, so the preview
+  // just links across to it rather than loading their content here too.
+  const hosted: AboutHostedItem[] = hostedContentEditorLinks(publicPath).map(
+    ({ id, label: navLabel, icon: Icon, href }) => ({
+      anchor: id,
+      navLabel,
+      icon: <Icon />,
+      href,
+    }),
+  );
 
   const [draft, setDraft] = useState<AboutPageValue | null>(null);
   const [loading, setLoading] = useState(true);
@@ -224,6 +238,7 @@ function AboutEditorInner() {
             institution={institution}
             editable
             onEditSection={selectSection}
+            hosted={hosted}
           />
         </div>
       )}

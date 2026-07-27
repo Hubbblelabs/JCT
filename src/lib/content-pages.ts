@@ -105,9 +105,11 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     slug: "timeline",
     configKey: "engineeringTimeline",
     institution: "engineering",
-    path: `${ENG}/timeline`,
+    path: `${ENG}/about`,
+    host: { anchor: "timeline", navLabel: "Timeline" },
     label: "Timeline",
-    description: "Year-by-year milestones since the college was founded.",
+    description:
+      "Year-by-year milestones since the college was founded — a tab of the About page.",
     seoLabel: "Timeline",
     seoTitle: `Timeline | ${SUFFIX}`,
     seoDescription:
