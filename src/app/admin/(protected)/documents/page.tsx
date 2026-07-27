@@ -27,7 +27,7 @@ export default function DocumentsEditorPage() {
       configKey="engineeringDocuments"
       publicPath={PUBLIC_PATH}
       title="Documents Page Editor"
-      subtitle="Engineering — downloads, disclosures and the NIRF / financial / ICT tabs"
+      subtitle="Engineering — downloads and the NIRF / financial / ICT tabs"
       emptyValue={() => DocumentsPageSchema.parse({})}
       sectionOrder={DOCUMENTS_SECTION_ORDER}
       sectionLabels={DOCUMENTS_SECTION_LABELS}

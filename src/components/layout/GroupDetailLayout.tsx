@@ -91,7 +91,7 @@ export function GroupDetailLayout({
           {/* Main column */}
           <div className="min-w-0">
             {group.description && (
-              <p className="text-muted-foreground text-base leading-relaxed md:text-lg">
+              <p className="text-muted-foreground text-justify text-base leading-relaxed md:text-lg">
                 {group.description}
               </p>
             )}

@@ -49,17 +49,17 @@ const nextConfig: NextConfig = {
   async redirects() {
     const ENG = "/institutions/engineering";
     const moved: [string, string][] = [
-      [
-        `${ENG}/accreditations/naac/aqar-report`,
-        `${ENG}/accreditations/naac#aqar-report`,
-      ],
+      // NAAC moved out from under /accreditations to its own top-level route,
+      // reached from the navbar's "More" dropdown.
+      [`${ENG}/accreditations/naac`, `${ENG}/naac`],
+      [`${ENG}/accreditations/naac/aqar-report`, `${ENG}/naac#aqar-report`],
       [
         `${ENG}/accreditations/naac/best-practices`,
-        `${ENG}/accreditations/naac#best-practices`,
+        `${ENG}/naac#best-practices`,
       ],
       [
         `${ENG}/accreditations/naac/institutional-distinctiveness`,
-        `${ENG}/accreditations/naac#institutional-distinctiveness`,
+        `${ENG}/naac#institutional-distinctiveness`,
       ],
       [`${ENG}/nirf`, `${ENG}/documents#nirf`],
       [`${ENG}/financial-statements`, `${ENG}/documents#financial-statements`],

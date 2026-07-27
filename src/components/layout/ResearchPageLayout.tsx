@@ -86,7 +86,7 @@ function TabSectionRenderer({ section }: { section: ResearchTabSectionValue }) {
     // Authenticated-but-untrusted CMS HTML — sanitize before injecting.
     return (
       <div
-        className="text-muted-foreground [&_a]:text-gold [&_h2]:text-foreground [&_h3]:text-foreground [&_strong]:text-foreground [&_td]:border-border [&_th]:border-border [&_th]:text-foreground text-base leading-relaxed [&_a]:underline [&_a]:underline-offset-2 [&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:font-serif [&_h3]:text-xl [&_h3]:font-bold [&_li]:mb-1.5 [&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:mb-4 [&_table]:mb-4 [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:px-3 [&_td]:py-2 [&_th]:border [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-6"
+        className="text-muted-foreground text-justify [&_a]:text-gold [&_h2]:text-foreground [&_h3]:text-foreground [&_strong]:text-foreground [&_td]:border-border [&_th]:border-border [&_th]:text-foreground text-base leading-relaxed [&_a]:underline [&_a]:underline-offset-2 [&_h2]:mt-8 [&_h2]:mb-3 [&_h2]:font-serif [&_h2]:text-2xl [&_h2]:font-bold [&_h3]:mt-6 [&_h3]:mb-2 [&_h3]:font-serif [&_h3]:text-xl [&_h3]:font-bold [&_li]:mb-1.5 [&_ol]:mb-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_p]:mb-4 [&_table]:mb-4 [&_table]:w-full [&_table]:border-collapse [&_td]:border [&_td]:px-3 [&_td]:py-2 [&_th]:border [&_th]:px-3 [&_th]:py-2 [&_th]:text-left [&_ul]:mb-4 [&_ul]:list-disc [&_ul]:pl-6"
         dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.html) }}
       />
     );
@@ -387,7 +387,7 @@ export function ResearchPageLayout({
                   {intro.map((p, i) => (
                     <p
                       key={i}
-                      className="text-muted-foreground text-base leading-relaxed md:text-lg"
+                      className="text-muted-foreground text-justify text-base leading-relaxed md:text-lg"
                     >
                       {p}
                     </p>

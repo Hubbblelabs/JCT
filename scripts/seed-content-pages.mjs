@@ -63,6 +63,8 @@ const CONFIG_KEYS = {
   "naac-aqar": "engineeringNaacAqar",
   "financial-statements": "engineeringFinancialStatements",
   "ict-content": "engineeringIctContent",
+  "mandatory-disclosures": "engineeringMandatoryDisclosures",
+  "hr-manual": "engineeringHrManual",
   nss: "engineeringNss",
   "feedback-system": "engineeringFeedbackSystem",
   "fine-arts-club": "polytechnicFineArtsClub",

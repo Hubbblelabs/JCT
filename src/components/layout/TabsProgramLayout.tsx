@@ -160,7 +160,7 @@ function SectionRenderer({
   if (section.kind === "richText") {
     return (
       <div
-        className="prose prose-slate max-w-none rounded-xl border border-slate-200 bg-white p-6 leading-relaxed"
+        className="prose prose-slate max-w-none rounded-xl border border-slate-200 bg-white p-6 text-justify leading-relaxed"
         dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.html) }}
       />
     );

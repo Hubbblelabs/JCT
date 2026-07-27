@@ -18,7 +18,7 @@ const ENGINEERING_PATHS = [
   "/institutions/engineering/clubs-and-cells",
   "/institutions/engineering/committees",
   "/institutions/engineering/documents",
-  "/institutions/engineering/accreditations/naac",
+  "/institutions/engineering/naac",
   // Block-based content pages (Library, NIRF, Timeline, …) — sourced from the
   // registry so a page added there can't drift out of the institution target.
   ...CONTENT_PAGES.filter((p) => p.institution === "engineering").map(

@@ -17,6 +17,8 @@ import {
   X,
   Loader2,
   Check,
+  ChevronLeft,
+  ChevronRight,
   ExternalLink,
 } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
@@ -194,6 +196,17 @@ function EventsPageInner() {
 
   const removeGalleryAt = (i: number) =>
     setForm((f) => ({ ...f, gallery: f.gallery.filter((_, j) => j !== i) }));
+
+  // Gallery order is the order the public lightbox steps through, so the
+  // editor needs a way to change it without re-uploading.
+  const moveGallery = (i: number, delta: number) =>
+    setForm((f) => {
+      const to = i + delta;
+      if (to < 0 || to >= f.gallery.length) return f;
+      const next = [...f.gallery];
+      [next[i], next[to]] = [next[to], next[i]];
+      return { ...f, gallery: next };
+    });
 
   const save = async () => {
     setSaving(true);
@@ -458,7 +471,8 @@ function EventsPageInner() {
                       <span className="admin-label mb-0">Gallery images</span>
                       <p className="mt-0.5 text-xs text-gray-400">
                         Shown as a grid on the event detail page, below the
-                        content.
+                        content. Visitors click a photo to open it full size —
+                        this order is the order they page through.
                       </p>
                     </div>
                     <div className="flex shrink-0 items-center gap-2">
@@ -487,14 +501,34 @@ function EventsPageInner() {
                           key={i}
                           className="relative rounded-lg border border-gray-200 p-3"
                         >
-                          <button
-                            type="button"
-                            onClick={() => removeGalleryAt(i)}
-                            aria-label={`Remove image ${i + 1}`}
-                            className="admin-btn admin-btn-danger admin-btn-sm absolute top-2 right-2 z-10"
-                          >
-                            <Trash2 size={13} />
-                          </button>
+                          <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => moveGallery(i, -1)}
+                              disabled={i === 0}
+                              aria-label={`Move image ${i + 1} earlier`}
+                              className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              <ChevronLeft size={13} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => moveGallery(i, 1)}
+                              disabled={i === form.gallery.length - 1}
+                              aria-label={`Move image ${i + 1} later`}
+                              className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+                            >
+                              <ChevronRight size={13} />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => removeGalleryAt(i)}
+                              aria-label={`Remove image ${i + 1}`}
+                              className="admin-btn admin-btn-danger admin-btn-sm"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          </div>
                           <ImageUploadInput
                             label={`Image ${i + 1}`}
                             ratio="card"

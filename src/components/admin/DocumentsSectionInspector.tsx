@@ -69,7 +69,7 @@ export function DocumentsSectionInspector({
               <TextInput
                 label="Category Title"
                 value={category.title}
-                placeholder="Mandatory Disclosures"
+                placeholder="Audit Reports"
                 onChange={(e) =>
                   ocCategory({ ...category, title: e.target.value })
                 }
@@ -97,7 +97,7 @@ export function DocumentsSectionInspector({
                     <TextInput
                       label="Document Title"
                       value={doc.title}
-                      placeholder="Mandatory Disclosure 2026"
+                      placeholder="Campus Security Audit Report 2026"
                       onChange={(e) => ocDoc({ ...doc, title: e.target.value })}
                     />
                     <TextArea

@@ -41,10 +41,7 @@ export const ENGINEERING_SEO_PAGES: SeoPageDefault[] = [
   { path: "/institutions/engineering/placements", label: "Placements" },
   { path: "/institutions/engineering/events", label: "News & Events" },
   { path: "/institutions/engineering/accreditations", label: "Accreditations" },
-  {
-    path: "/institutions/engineering/accreditations/naac",
-    label: "Accreditations — NAAC",
-  },
+  { path: "/institutions/engineering/naac", label: "NAAC" },
   { path: "/institutions/engineering/research", label: "Research" },
   {
     path: "/institutions/engineering/clubs-and-cells",

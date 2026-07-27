@@ -36,7 +36,7 @@ function BodySection({ section }: { section: PageBodySection }) {
           {section.paragraphs.map((p, i) => (
             <p
               key={i}
-              className="text-base leading-relaxed whitespace-pre-line text-gray-700"
+              className="text-justify text-base leading-relaxed whitespace-pre-line text-gray-700"
             >
               {p}
             </p>
@@ -317,7 +317,7 @@ function ContactLayout({ content }: { content: PageContent }) {
   return (
     <article className="container mx-auto max-w-4xl px-4 py-10 md:px-6 md:py-14">
       {c?.intro && (
-        <p className="mb-6 text-base leading-relaxed text-gray-700">
+        <p className="mb-6 text-justify text-base leading-relaxed text-gray-700">
           {c.intro}
         </p>
       )}

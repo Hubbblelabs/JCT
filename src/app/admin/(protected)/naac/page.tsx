@@ -13,7 +13,7 @@ import { hostedContentEditorLinks } from "@/lib/content-pages";
 import { NaacPageSchema } from "@/lib/validation";
 import type { NaacPageValue } from "@/lib/validation";
 
-const PUBLIC_PATH = "/institutions/engineering/accreditations/naac";
+const PUBLIC_PATH = "/institutions/engineering/naac";
 
 // AQAR, best practices and distinctiveness are panels of the public NAAC page
 // but keep their own editors, so the preview's sidebar links across to them.

@@ -6,7 +6,7 @@ import type { NaacPageValue } from "@/lib/validation";
 
 export const revalidate = 3600;
 
-const PATH = "/institutions/engineering/accreditations/naac";
+const PATH = "/institutions/engineering/naac";
 
 const DEFAULT: NaacPageValue = NaacPageSchema.parse({});
 

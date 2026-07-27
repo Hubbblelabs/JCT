@@ -4,10 +4,13 @@
  * "More" dropdown.
  *
  * A navbar is CMS data — the `<college>Navbar` SiteConfig key, edited at
- * /admin/page-content?college=<college>&section=navbar. This script only
- * appends the entries that are missing, matched by `href` across the whole
- * navbar, so it is safe to re-run and never touches links the admin has added,
- * renamed or reordered.
+ * /admin/page-content?college=<college>&section=navbar. This script does two
+ * things and is safe to re-run:
+ *   1. retargets links whose route moved (HREF_REWRITES) in place, so the
+ *      admin's own label and position survive;
+ *   2. appends the entries that are still missing, matched by `href` across
+ *      the whole navbar.
+ * Links the admin added, renamed or reordered are otherwise left alone.
  *
  * Usage:
  *   node scripts/seed-content-page-nav.mjs [--dry-run] [--only=<configKey>]
@@ -52,19 +55,34 @@ const ENGINEERING_ENTRIES = [
     desc: "Ranking framework reports",
   },
   {
+    label: "NAAC",
+    href: `${ENG}/naac`,
+    desc: "Appeal tables and supporting documents",
+  },
+  {
     label: "NAAC — AQAR Report",
-    href: `${ENG}/accreditations/naac#aqar-report`,
+    href: `${ENG}/naac#aqar-report`,
     desc: "Annual Quality Assurance Reports",
   },
   {
     label: "NAAC — Best Practices",
-    href: `${ENG}/accreditations/naac#best-practices`,
+    href: `${ENG}/naac#best-practices`,
     desc: "Documented institutional best practices",
   },
   {
     label: "NAAC — Institutional Distinctiveness",
-    href: `${ENG}/accreditations/naac#institutional-distinctiveness`,
+    href: `${ENG}/naac#institutional-distinctiveness`,
     desc: "What sets the institution apart",
+  },
+  {
+    label: "Mandatory Disclosures",
+    href: `${ENG}/mandatory-disclosures`,
+    desc: "Mandatory disclosure filings",
+  },
+  {
+    label: "HR Manual",
+    href: `${ENG}/hr-manual`,
+    desc: "The human resources manual",
   },
   {
     label: "Timeline",
@@ -121,6 +139,30 @@ const POLYTECHNIC_ENTRIES = [
   },
 ];
 
+/**
+ * Links whose route moved after they were seeded. Matched on the stored href
+ * (trailing slash and case insensitive) and rewritten in place, so an entry the
+ * admin renamed or reordered keeps its label and position — only the target
+ * changes. Without this the append pass would add a second copy alongside the
+ * dead one.
+ */
+const HREF_REWRITES = {
+  // NAAC moved out from under /accreditations to its own top-level route.
+  [`${ENG}/accreditations/naac`]: `${ENG}/naac`,
+  [`${ENG}/accreditations/naac/aqar-report`]: `${ENG}/naac#aqar-report`,
+  [`${ENG}/accreditations/naac/best-practices`]: `${ENG}/naac#best-practices`,
+  [`${ENG}/accreditations/naac/institutional-distinctiveness`]: `${ENG}/naac#institutional-distinctiveness`,
+  [`${ENG}/accreditations/naac#aqar-report`]: `${ENG}/naac#aqar-report`,
+  [`${ENG}/accreditations/naac#best-practices`]: `${ENG}/naac#best-practices`,
+  [`${ENG}/accreditations/naac#institutional-distinctiveness`]: `${ENG}/naac#institutional-distinctiveness`,
+  // Pages folded into a host route keep their fragment, not a route of their own.
+  [`${ENG}/nirf`]: `${ENG}/documents#nirf`,
+  [`${ENG}/financial-statements`]: `${ENG}/documents#financial-statements`,
+  [`${ENG}/ict-content`]: `${ENG}/documents#ict-content`,
+  [`${ENG}/timeline`]: `${ENG}/about#timeline`,
+  [`${ENG}/placements/gallery`]: `${ENG}/placements#gallery`,
+};
+
 /** One navbar config key per college, with the links it should carry. */
 const NAV_PLAN = [
   { configKey: "engineeringNavbar", entries: ENGINEERING_ENTRIES },
@@ -144,6 +186,34 @@ const normHref = (h) =>
     .trim()
     .replace(/\/+$/, "")
     .toLowerCase();
+
+const REWRITE_BY_NORM = new Map(
+  Object.entries(HREF_REWRITES).map(([from, to]) => [normHref(from), to]),
+);
+
+/**
+ * Point links whose route moved at the new one, in place. Runs before the
+ * append pass so a rewritten link is recognised as already present.
+ * Returns the number of links rewritten.
+ */
+function rewriteIn(value) {
+  if (!value || typeof value !== "object" || !Array.isArray(value.items))
+    return 0;
+  let changed = 0;
+  const visit = (node) => {
+    if (!node) return;
+    const to = REWRITE_BY_NORM.get(normHref(node.href));
+    if (!to || node.href === to) return;
+    console.log(`  [move] ${node.label ?? "(unlabelled)"}: ${node.href} → ${to}`);
+    node.href = to;
+    changed += 1;
+  };
+  for (const item of value.items) {
+    visit(item);
+    for (const child of item?.children ?? []) visit(child);
+  }
+  return changed;
+}
 
 /**
  * Append the missing entries to the "More" item of one navbar value.
@@ -225,9 +295,13 @@ async function main() {
     );
     // The draft and the published copy are updated together, so an admin
     // opening the editor never sees the link vanish.
+    const draftMoved = rewriteIn(doc.value);
+    const publishedMoved = rewriteIn(doc.published_value);
     const draftAdded = linkInto(doc.value, entries);
     const publishedAdded = linkInto(doc.published_value, entries);
-    const added = Math.max(draftAdded, publishedAdded);
+    const added =
+      Math.max(draftAdded, publishedAdded) +
+      Math.max(draftMoved, publishedMoved);
 
     if (added === 0) {
       console.log(`  [skip] already linked.`);
@@ -250,21 +324,19 @@ async function main() {
         $inc: { version: 1 },
       },
     );
-    console.log(
-      `  [published] ${added} link(s) added under "${PARENT_LABEL}".`,
-    );
+    console.log(`  [published] ${added} link(s) added or retargeted.`);
   }
 
   if (DRY) {
     console.log(
-      `\n[seed-content-page-nav] dry-run — would add ${total} link(s).`,
+      `\n[seed-content-page-nav] dry-run — would change ${total} link(s).`,
     );
     await mongoose.disconnect();
     return;
   }
 
   console.log(
-    `\n[seed-content-page-nav] Linked ${total} page(s). ` +
+    `\n[seed-content-page-nav] Updated ${total} link(s). ` +
       "Reorder or reword them at /admin/page-content?college=<college>&section=navbar.",
   );
   console.log(

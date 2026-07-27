@@ -147,7 +147,7 @@ export function AccreditationsSectionInspector({
               <TextInput
                 label="Dedicated Page (optional)"
                 value={item.detailHref}
-                placeholder="/institutions/engineering/accreditations/naac"
+                placeholder="/institutions/engineering/naac"
                 onChange={(e) => oc({ ...item, detailHref: e.target.value })}
               />
             </div>

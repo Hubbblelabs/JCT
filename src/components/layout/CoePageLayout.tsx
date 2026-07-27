@@ -403,7 +403,7 @@ export function CoePageLayout({
             >
               <SectionHeading icon={Landmark} title="Office of the COE" />
 
-              <div className="text-muted-foreground mb-8 space-y-4 text-base leading-relaxed md:text-lg">
+              <div className="text-muted-foreground mb-8 space-y-4 text-justify text-base leading-relaxed md:text-lg">
                 {data.overview.paragraphs.map((p, i) => (
                   <p key={i}>{p}</p>
                 ))}

@@ -303,7 +303,7 @@ export function NaacPageBody({
               {intro.map((p, i) => (
                 <p
                   key={i}
-                  className="text-muted-foreground text-base leading-relaxed md:text-lg"
+                  className="text-muted-foreground text-justify text-base leading-relaxed md:text-lg"
                 >
                   {p}
                 </p>
@@ -628,10 +628,6 @@ export function NaacPageLayout({
         <Breadcrumb
           items={[
             { label: "Engineering", href: "/institutions/engineering" },
-            {
-              label: "Accreditations",
-              href: "/institutions/engineering/accreditations",
-            },
             { label: "NAAC" },
           ]}
         />

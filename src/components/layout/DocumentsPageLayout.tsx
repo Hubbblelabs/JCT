@@ -96,7 +96,7 @@ export function DocumentsPageBody({
               {intro.map((p, i) => (
                 <p
                   key={i}
-                  className="text-muted-foreground text-base leading-relaxed md:text-lg"
+                  className="text-muted-foreground text-justify text-base leading-relaxed md:text-lg"
                 >
                   {p}
                 </p>
@@ -262,7 +262,7 @@ export function DocumentsPageLayout({
             items={[
               {
                 id: DOCUMENTS_OVERVIEW_SECTION_ID,
-                label: "Downloads & Disclosures",
+                label: "Downloads",
                 icon: <FolderOpen />,
                 content: body,
               },

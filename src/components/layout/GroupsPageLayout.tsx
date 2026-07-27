@@ -290,7 +290,7 @@ export function GroupsPageLayout({
                 {intro.map((p, i) => (
                   <p
                     key={i}
-                    className="text-muted-foreground text-base leading-relaxed md:text-lg"
+                    className="text-muted-foreground text-justify text-base leading-relaxed md:text-lg"
                   >
                     {p}
                   </p>

@@ -20,7 +20,7 @@ export default function EngineeringNaacLayout({
 export async function generateMetadata(): Promise<Metadata> {
   const seo = await seoMetadata({
     scope: "engineering",
-    path: "/institutions/engineering/accreditations/naac",
+    path: "/institutions/engineering/naac",
   });
   return { ...SEO_FALLBACK, ...seo };
 }

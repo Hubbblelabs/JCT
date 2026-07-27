@@ -277,7 +277,7 @@ function collegeGroups(college: College): AdminNavGroup[] {
             href: "/admin/documents",
             icon: FolderOpen,
             description:
-              "Downloads, mandatory disclosures and the NIRF / financial / ICT tabs.",
+              "Downloads and the NIRF / financial / ICT tabs. Mandatory disclosures and the HR manual have pages of their own.",
           },
         ]
       : []),

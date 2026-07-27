@@ -802,7 +802,7 @@ export function AboutPageLayout({
                 title="About the Institution"
                 theme={theme}
               />
-              <div className="text-muted-foreground space-y-4 text-base leading-relaxed md:text-lg">
+              <div className="text-muted-foreground space-y-4 text-justify text-base leading-relaxed md:text-lg">
                 {data.about.paragraphs.map((p, i) => (
                   <p key={i}>{p}</p>
                 ))}

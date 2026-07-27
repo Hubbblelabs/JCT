@@ -5,6 +5,7 @@ import Image from "next/image";
 import {
   ChevronDown,
   Download,
+  Expand,
   ExternalLink,
   FileText,
   FolderOpen,
@@ -16,6 +17,7 @@ import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EditableRegion } from "@/components/admin/EditableRegion";
+import { useLightbox } from "@/components/ui/Lightbox";
 import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
 import { getImageUrl } from "@/lib/utils";
 import { CONTENT_BLOCK_LABELS } from "@/lib/validation";
@@ -144,7 +146,7 @@ function BlockHeading({
         </h2>
       )}
       {description?.trim() && (
-        <p className="text-muted-foreground mt-2 text-sm leading-relaxed md:text-base">
+        <p className="text-muted-foreground mt-2 text-justify text-sm leading-relaxed md:text-base">
           {description}
         </p>
       )}
@@ -225,7 +227,7 @@ function TextBlockView({
           {paragraphs.map((p, i) => (
             <p
               key={i}
-              className="text-muted-foreground text-base leading-relaxed whitespace-pre-line"
+              className="text-muted-foreground text-justify text-base leading-relaxed whitespace-pre-line"
             >
               {p}
             </p>
@@ -253,7 +255,10 @@ function ListBlockView({
           } marker:text-gold pl-5`}
         >
           {items.map((item, i) => (
-            <li key={i} className="leading-relaxed whitespace-pre-line">
+            <li
+              key={i}
+              className="text-justify text-base leading-relaxed whitespace-pre-line"
+            >
               {item}
             </li>
           ))}
@@ -495,6 +500,24 @@ function GalleryBlockView({
         .map((g) => ({ ...g, images: g.images.filter((i) => i.src.trim()) }))
         .filter((g) => g.images.length > 0);
 
+  // One viewer list across every group of the block, so prev/next walks the
+  // whole gallery. Pending uploads have no public URL yet, so they open
+  // nothing — and in the admin preview a click belongs to the inspector.
+  const flat: { src: string; alt: string; caption: string }[] = [];
+  const indexOf: number[][] = groups.map((group) =>
+    group.images.map((image) => {
+      const url = editable ? "" : getImageUrl(image.src.trim());
+      if (!url) return -1;
+      flat.push({
+        src: url,
+        alt: image.alt.trim() || image.caption.trim() || "",
+        caption: image.caption.trim(),
+      });
+      return flat.length - 1;
+    }),
+  );
+  const { open, overlay } = useLightbox(flat, !editable);
+
   return (
     <>
       <BlockHeading title={block.title} description={block.description} />
@@ -506,21 +529,38 @@ function GalleryBlockView({
               <div
                 className={`grid gap-4 ${GALLERY_COLS[block.columns] ?? GALLERY_COLS[3]}`}
               >
-                {group.images.map((image, ii) => (
-                  <figure
-                    key={ii}
-                    className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5"
-                  >
-                    <div className="relative aspect-[4/3] overflow-hidden">
-                      <ContentImg image={image} />
-                    </div>
-                    {image.caption.trim() && (
-                      <figcaption className="text-muted-foreground px-4 py-3 text-xs leading-relaxed">
-                        {image.caption}
-                      </figcaption>
-                    )}
-                  </figure>
-                ))}
+                {group.images.map((image, ii) => {
+                  const viewerIndex = indexOf[gi][ii];
+                  return (
+                    <figure
+                      key={ii}
+                      className="group overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+                    >
+                      {viewerIndex >= 0 ? (
+                        <button
+                          type="button"
+                          onClick={() => open(viewerIndex)}
+                          aria-label="View full image"
+                          className="relative block aspect-[4/3] w-full cursor-zoom-in overflow-hidden"
+                        >
+                          <ContentImg image={image} />
+                          <span className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
+                            <Expand size={22} className="text-white" />
+                          </span>
+                        </button>
+                      ) : (
+                        <div className="relative aspect-[4/3] overflow-hidden">
+                          <ContentImg image={image} />
+                        </div>
+                      )}
+                      {image.caption.trim() && (
+                        <figcaption className="text-muted-foreground px-4 py-3 text-xs leading-relaxed">
+                          {image.caption}
+                        </figcaption>
+                      )}
+                    </figure>
+                  );
+                })}
               </div>
             </div>
           ))}
@@ -528,6 +568,7 @@ function GalleryBlockView({
       ) : (
         <EmptyHint>Click to add photographs.</EmptyHint>
       )}
+      {overlay}
     </>
   );
 }
@@ -626,15 +667,15 @@ function AccordionBlockView({
                     {paragraphs.map((p, pi) => (
                       <p
                         key={pi}
-                        className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line"
+                        className="text-muted-foreground text-justify text-base leading-relaxed whitespace-pre-line"
                       >
                         {p}
                       </p>
                     ))}
                     {bullets.length > 0 && (
-                      <ul className="text-muted-foreground marker:text-gold list-disc space-y-2 pl-5 text-sm">
+                      <ul className="text-muted-foreground marker:text-gold list-disc space-y-2 pl-5 text-base">
                         {bullets.map((b, bi) => (
-                          <li key={bi} className="leading-relaxed">
+                          <li key={bi} className="text-justify leading-relaxed">
                             {b}
                           </li>
                         ))}
@@ -668,7 +709,7 @@ function ContactBlockView({
         </h2>
       )}
       {block.text.trim() && (
-        <p className="text-muted-foreground mt-2 text-sm leading-relaxed md:text-base">
+        <p className="text-muted-foreground mt-2 text-justify text-sm leading-relaxed md:text-base">
           {block.text}
         </p>
       )}
@@ -771,7 +812,7 @@ export function ContentPageBody({
               {intro.map((p, i) => (
                 <p
                   key={i}
-                  className="text-muted-foreground text-base leading-relaxed whitespace-pre-line md:text-lg"
+                  className="text-muted-foreground text-justify text-base leading-relaxed whitespace-pre-line md:text-lg"
                 >
                   {p}
                 </p>

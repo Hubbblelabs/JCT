@@ -38,7 +38,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       "/institutions/engineering/courses",
       "/institutions/engineering/coe",
       "/institutions/engineering/accreditations",
-      "/institutions/engineering/accreditations/naac",
+      "/institutions/engineering/naac",
       "/institutions/engineering/placements",
       "/institutions/arts-science",
       "/institutions/arts-science/about",

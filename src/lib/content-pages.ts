@@ -20,6 +20,7 @@ import {
   Award,
   BadgeCheck,
   BookOpen,
+  BookUser,
   Camera,
   FileBarChart,
   FileSpreadsheet,
@@ -28,6 +29,7 @@ import {
   MessageSquare,
   MonitorPlay,
   Palette,
+  ScrollText,
   ShieldCheck,
   Sparkles,
   Users,
@@ -149,7 +151,7 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     slug: "naac-best-practices",
     configKey: "engineeringNaacBestPractices",
     institution: "engineering",
-    path: `${ENG}/accreditations/naac`,
+    path: `${ENG}/naac`,
     host: { anchor: "best-practices", navLabel: "Best Practices" },
     label: "NAAC — Best Practices",
     description:
@@ -165,7 +167,7 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     slug: "naac-distinctiveness",
     configKey: "engineeringNaacDistinctiveness",
     institution: "engineering",
-    path: `${ENG}/accreditations/naac`,
+    path: `${ENG}/naac`,
     host: {
       anchor: "institutional-distinctiveness",
       navLabel: "Institutional Distinctiveness",
@@ -184,7 +186,7 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     slug: "naac-aqar",
     configKey: "engineeringNaacAqar",
     institution: "engineering",
-    path: `${ENG}/accreditations/naac`,
+    path: `${ENG}/naac`,
     host: { anchor: "aqar-report", navLabel: "AQAR Reports" },
     label: "NAAC — AQAR Reports",
     description:
@@ -228,6 +230,36 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     icon: MonitorPlay,
     // Hosted by the Documents page, so its card sits with Documents rather
     // than in Academics where the standalone page used to live.
+    group: "Institution",
+  },
+  {
+    slug: "mandatory-disclosures",
+    configKey: "engineeringMandatoryDisclosures",
+    institution: "engineering",
+    path: `${ENG}/mandatory-disclosures`,
+    label: "Mandatory Disclosures",
+    description:
+      "Mandatory disclosure filings — moved off the Documents page to a page of their own.",
+    seoLabel: "Mandatory Disclosures",
+    seoTitle: `Mandatory Disclosures | ${SUFFIX}`,
+    seoDescription:
+      "Mandatory disclosure filings of JCT College of Engineering & Technology, Coimbatore.",
+    icon: ScrollText,
+    group: "Institution",
+  },
+  {
+    slug: "hr-manual",
+    configKey: "engineeringHrManual",
+    institution: "engineering",
+    path: `${ENG}/hr-manual`,
+    label: "HR Manual",
+    description:
+      "The human resources manual — moved off the Documents page to a page of its own.",
+    seoLabel: "HR Manual",
+    seoTitle: `HR Manual | ${SUFFIX}`,
+    seoDescription:
+      "The human resources manual of JCT College of Engineering & Technology, Coimbatore.",
+    icon: BookUser,
     group: "Institution",
   },
   {

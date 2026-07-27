@@ -44,8 +44,8 @@ const AccreditationItemSchema = z.object({
   certificate: s(ACCREDITATIONS_PAGE_LIMITS.certificateMax), // R2 doc key / URL
   certificateLabel: s(ACCREDITATIONS_PAGE_LIMITS.certificateLabelMax),
   // Optional dedicated page for this accreditation, e.g.
-  // "/institutions/engineering/accreditations/naac". Blank falls back to
-  // ACCREDITATION_DETAIL_PAGES in AccreditationsPageLayout.
+  // "/institutions/engineering/naac". Blank renders the card without a
+  // "View …" link — there is no implicit route mapping.
   detailHref: s(ACCREDITATIONS_PAGE_LIMITS.detailHrefMax),
 });
 

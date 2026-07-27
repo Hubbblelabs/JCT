@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 // ──────────────────────────────────────────────────────────────────────────
-// The standalone NAAC page (/institutions/engineering/accreditations/naac),
+// The standalone NAAC page (/institutions/engineering/naac),
 // backed by the `engineeringNaac` SiteConfig key. Every string on the page —
 // headings, table column labels, rows and document links — lives here so the
 // admin editor can change all of it; nothing is hard-coded in the layout.

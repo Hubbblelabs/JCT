@@ -87,26 +87,14 @@ const INSTITUTION_META: Record<
 };
 
 /**
- * Accreditations that have a dedicated page on this site. Keyed by
- * `<institution>:<lowercased item name>`; used when the CMS entry has no
- * explicit `detailHref`, so existing seeded data links through without needing
- * a re-seed.
+ * A card links to a dedicated page only when the CMS entry sets `detailHref`.
+ * NAAC used to be mapped implicitly here; it now lives under "More" in the
+ * navbar at /institutions/engineering/naac, so this page no longer links to it.
  */
-const ACCREDITATION_DETAIL_PAGES: Record<string, string> = {
-  "engineering:naac": "/institutions/engineering/accreditations/naac",
-};
-
 function detailPageFor(
   item: AccreditationsPageValue["items"][number],
-  institution: Institution,
 ): string {
-  const explicit = item.detailHref?.trim();
-  if (explicit) return explicit;
-  return (
-    ACCREDITATION_DETAIL_PAGES[
-      `${institution}:${item.name.trim().toLowerCase()}`
-    ] ?? ""
-  );
+  return item.detailHref?.trim() ?? "";
 }
 
 function validityLabel(from: string, to: string): string {
@@ -121,18 +109,16 @@ function validityLabel(from: string, to: string): string {
 function AccreditationCard({
   item,
   theme,
-  institution,
   editable,
 }: {
   item: AccreditationsPageValue["items"][number];
   theme: (typeof THEME)[Institution];
-  institution: Institution;
   editable: boolean;
 }) {
   const logo = getImageUrl(item.logo) || "";
   const certificate = getImageUrl(item.certificate) || "";
   const validity = validityLabel(item.validFrom, item.validTo);
-  const detailHref = detailPageFor(item, institution);
+  const detailHref = detailPageFor(item);
 
   return (
     <div className="bg-card flex h-full flex-col rounded-2xl border border-white/10 p-6 shadow-sm transition-all hover:border-white/20 hover:shadow-md">
@@ -298,7 +284,7 @@ export function AccreditationsPageLayout({
                 {intro.map((p, i) => (
                   <p
                     key={i}
-                    className="text-muted-foreground text-base leading-relaxed md:text-lg"
+                    className="text-muted-foreground text-justify text-base leading-relaxed md:text-lg"
                   >
                     {p}
                   </p>
@@ -327,7 +313,6 @@ export function AccreditationsPageLayout({
                   key={i}
                   item={item}
                   theme={theme}
-                  institution={institution}
                   editable={editable}
                 />
               ))}

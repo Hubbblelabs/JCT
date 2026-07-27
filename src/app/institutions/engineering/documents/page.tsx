@@ -19,13 +19,14 @@ export async function generateMetadata(): Promise<Metadata> {
     fallbackTitle:
       "Documents & Downloads | JCT College of Engineering & Technology",
     fallbackDescription:
-      "Downloadable documents, disclosures, NIRF reports, financial statements and ICT content published by JCT College of Engineering & Technology, Coimbatore.",
+      "Downloadable documents, NIRF reports, financial statements and ICT content published by JCT College of Engineering & Technology, Coimbatore.",
   });
 }
 
 export default async function EngineeringDocumentsPage() {
   // NIRF, financial statements and ICT content used to be routes of their own;
-  // they are now panels of this page's sidebar.
+  // they are now panels of this page's sidebar. Mandatory disclosures and the
+  // HR manual went the other way — each has a route of its own now.
   const [value, sections] = await Promise.all([
     getPublishedConfigValue("engineeringDocuments"),
     loadHostedSections(PATH),

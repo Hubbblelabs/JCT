@@ -763,7 +763,7 @@ function OverviewTab({
           />
           <FadeUp delay={0.05}>
             <Card hover={false} className="p-6 sm:p-8">
-              <div className="space-y-4 text-sm leading-relaxed text-gray-600 sm:text-[15px]">
+              <div className="space-y-4 text-justify text-sm leading-relaxed text-gray-600 sm:text-[15px]">
                 {dept.about.paragraphs.map((p, i) => (
                   <p key={i}>{p}</p>
                 ))}
@@ -838,7 +838,7 @@ function OverviewTab({
                   className="mb-4 h-8 w-8 opacity-10"
                   style={{ color: ac }}
                 />
-                <div className="space-y-4 text-sm leading-relaxed text-gray-700 sm:text-[15px]">
+                <div className="space-y-4 text-justify text-sm leading-relaxed text-gray-700 sm:text-[15px]">
                   {dept.hod.message.map((para, i) => (
                     <p key={i}>{para}</p>
                   ))}
@@ -1147,7 +1147,7 @@ function AcademicsTab({
           />
           <FadeUp>
             <Card hover={false} className="mb-6 p-6 sm:p-8">
-              <p className="text-sm leading-relaxed text-gray-700 sm:text-[15px]">
+              <p className="text-justify text-sm leading-relaxed text-gray-700 sm:text-[15px]">
                 {dept.teachingLearning.overview}
               </p>
             </Card>
@@ -1561,7 +1561,7 @@ function FacilitiesTab({
           />
           <FadeUp>
             <Card hover={false} className="mb-5 p-6 sm:p-8">
-              <p className="text-sm leading-relaxed text-gray-700 sm:text-[15px]">
+              <p className="text-justify text-sm leading-relaxed text-gray-700 sm:text-[15px]">
                 {dept.library.description}
               </p>
             </Card>
