@@ -2280,8 +2280,15 @@ export function ProgramPageLayout({
     }
   };
 
-  const degreePrefix =
+  const rawDegreePrefix =
     typeof dept.degreePrefix === "string" ? dept.degreePrefix : "";
+  const degreePrefix = dept.name
+    .trim()
+    .toLowerCase()
+    .startsWith(rawDegreePrefix.trim().toLowerCase())
+    ? ""
+    : rawDegreePrefix;
+
 
   const heroPills =
     dept.heroMeta && dept.heroMeta.length > 0
