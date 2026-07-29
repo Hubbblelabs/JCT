@@ -19,7 +19,11 @@ export interface BackupCollection {
 }
 
 export const BACKUP_COLLECTIONS: BackupCollection[] = [
-  { name: "programs", label: "Programs", naturalKey: ["slug"] },
+  // Must match Program's unique index, which is {institution, slug} — slug
+  // alone stopped being unique when program slugs became per-institution.
+  // A slug-only fallback could overwrite Engineering's "computer-science"
+  // with Polytechnic's during a restore collision.
+  { name: "programs", label: "Programs", naturalKey: ["institution", "slug"] },
   { name: "pages", label: "Pages", naturalKey: ["institution", "slug"] },
   {
     name: "placements",

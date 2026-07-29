@@ -91,6 +91,30 @@ function chunkBySize(
 export type RestoreMode = "merge" | "replace";
 
 /**
+ * First archive version in which an empty `collections/<name>.json` reliably
+ * means the collection really was empty. Before 2.2 the backup route caught a
+ * collection read error and archived `[]` anyway, so an empty file could just
+ * as easily mean "the read failed" — and letting replace mode act on that
+ * would delete every document in a live collection.
+ */
+const EMPTY_PRUNE_MIN_VERSION = 2.2;
+
+/** Archive format version from manifest.json; 0 when absent or unparseable. */
+async function readArchiveVersion(zip: JSZip): Promise<number> {
+  const file = zip.file("manifest.json");
+  if (!file) return 0;
+  try {
+    const parsed = JSON.parse(await file.async("string")) as {
+      version?: unknown;
+    };
+    const v = Number.parseFloat(String(parsed.version ?? ""));
+    return Number.isFinite(v) ? v : 0;
+  } catch {
+    return 0;
+  }
+}
+
+/**
  * Push every content collection back, chunk by chunk. Failures are collected
  * rather than thrown so one bad collection can't strand the rest of a restore.
  *
@@ -109,6 +133,7 @@ async function restoreCollections(
   let rejected = 0;
   let pruned = 0;
   const errors: string[] = [];
+  const archiveVersion = await readArchiveVersion(zip);
 
   const post = async (body: Record<string, unknown>, label: string) => {
     const res = await fetch("/api/admin/site-config/restore-collections", {
@@ -139,6 +164,19 @@ async function restoreCollections(
     // into a collection that used to have nothing in it.
     if (docs === null) continue;
     if (docs.length === 0 && mode !== "replace") continue;
+    // An empty archive file in replace mode means "delete everything in this
+    // collection". Only trust that from an archive new enough to guarantee an
+    // empty file isn't just a swallowed read error (see EMPTY_PRUNE_MIN_VERSION).
+    if (
+      docs.length === 0 &&
+      mode === "replace" &&
+      archiveVersion < EMPTY_PRUNE_MIN_VERSION
+    ) {
+      errors.push(
+        `${col.label}: kept existing documents — this archive (format ${archiveVersion || "unknown"}) records the collection as empty, but archives before ${EMPTY_PRUNE_MIN_VERSION} also wrote an empty file when the backup could not read the collection. Refusing to delete on that basis.`,
+      );
+      continue;
+    }
     onProgress(col.label);
 
     const writtenIds: string[] = [];
@@ -358,6 +396,8 @@ export default function SettingsPage() {
         });
         return;
       }
+      const assetsSkipped = res.headers.get("X-Backup-Assets-Skipped");
+      const assetsIncomplete = res.headers.get("X-Backup-Assets-Incomplete");
       const blob = await res.blob();
       const disposition = res.headers.get("Content-Disposition") ?? "";
       const match = disposition.match(/filename="([^"]+)"/);
@@ -375,10 +415,23 @@ export default function SettingsPage() {
       a.click();
       a.remove();
       window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
-      setExportStatus({
-        type: "success",
-        message: `Backup downloaded (${formatBytes(blob.size)}).`,
-      });
+      const size = formatBytes(blob.size);
+      setExportStatus(
+        assetsSkipped
+          ? {
+              type: "warning",
+              message: `Backup downloaded (${size}), but WITHOUT images or documents — R2 storage is not configured on this deployment. This archive cannot restore media on its own.`,
+            }
+          : assetsIncomplete
+            ? {
+                type: "warning",
+                message: `Backup downloaded (${size}), but the storage bucket could not be listed for: ${assetsIncomplete}. Files with no media-library record are MISSING from this archive. Retry before relying on it.`,
+              }
+            : {
+                type: "success",
+                message: `Backup downloaded (${size}).`,
+              },
+      );
     } catch {
       setExportStatus({ type: "error", message: "Export failed. Try again." });
     } finally {

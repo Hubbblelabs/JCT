@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import JSZip from "jszip";
 import { connectDB } from "@/lib/mongodb";
 import { SiteConfig, ImageAsset, DocumentAsset } from "@/lib/models";
-import { requireRole, serverError, badRequest } from "@/lib/api-helpers";
+import { requireRole, serverError } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import mongoose from "mongoose";
 import { getR2AsBuffer, isR2Configured, listR2Objects } from "@/lib/r2";
@@ -69,8 +69,9 @@ async function fetchAsset(
 async function collectAssetKeys(
   prefix: string,
   dbKeys: string[],
-): Promise<string[]> {
+): Promise<{ keys: string[]; listingFailed: boolean }> {
   const keys = new Set<string>();
+  let listingFailed = false;
   try {
     for (const obj of await listR2Objects(prefix)) {
       // Reserved manifest names are written from the DB, never copied from R2.
@@ -78,12 +79,16 @@ async function collectAssetKeys(
       keys.add(obj.key);
     }
   } catch (err) {
+    // Reported rather than swallowed. Falling back to DB-tracked keys alone
+    // silently drops exactly what the union exists to catch — objects with no
+    // tracking row — and the archive would still look complete.
     console.error(`[backup] Could not list R2 prefix ${prefix}:`, err);
+    listingFailed = true;
   }
   for (const key of dbKeys) {
     if (typeof key === "string" && key.startsWith(prefix)) keys.add(key);
   }
-  return [...keys].sort();
+  return { keys: [...keys].sort(), listingFailed };
 }
 
 // Pulling several hundred objects out of R2 outlasts the default limit.
@@ -94,20 +99,25 @@ export async function GET(req: NextRequest) {
   if (error) return error;
 
   const url = new URL(req.url);
-  const includeImages = url.searchParams.get("includeImages") === "1";
-  const includeDocs = url.searchParams.get("includeDocs") === "1";
+  const wantImages = url.searchParams.get("includeImages") === "1";
+  const wantDocs = url.searchParams.get("includeDocs") === "1";
 
-  if ((includeImages || includeDocs) && !isR2Configured()) {
-    return badRequest(
-      "R2 storage is not configured — cannot include images or documents in backup",
-    );
-  }
+  // Asset inclusion is now ON by default, so an unconfigured-R2 deployment
+  // would hit this on the primary "Download Backup" action. Failing the whole
+  // request there would leave the operator with no backup at all, which is
+  // strictly worse than a database-only one — so degrade and report instead.
+  const r2 = isR2Configured();
+  const assetsUnavailable = (wantImages || wantDocs) && !r2;
+  const includeImages = wantImages && r2;
+  const includeDocs = wantDocs && r2;
 
   try {
     await connectDB();
     const zip = new JSZip();
     let imagesSkipped = 0;
     let docsSkipped = 0;
+    /** Prefixes whose R2 listing failed — the archive is incomplete for these. */
+    const listingFailures: string[] = [];
 
     // 1. Site config (always included)
     const configs = await SiteConfig.find().sort({ config_key: 1 }).lean();
@@ -133,14 +143,23 @@ export async function GET(req: NextRequest) {
     // model was removed, and a backup must not silently skip it.
     const collectionCounts: Record<string, number> = {};
     const db = mongoose.connection.db;
+    if (!db) return serverError("No database connection");
     for (const col of BACKUP_COLLECTIONS) {
-      let docs: Record<string, unknown>[] = [];
+      let docs: Record<string, unknown>[];
       try {
-        docs = db
-          ? await db.collection(col.name).find({}).toArray()
-          : [];
+        docs = await db.collection(col.name).find({}).toArray();
       } catch (err) {
-        console.warn(`[backup] Could not read collection ${col.name}:`, err);
+        // MUST NOT fall back to an empty array. An archive cannot distinguish
+        // "this collection was empty" from "we failed to read it", and a
+        // restore in *replace* mode treats an empty collection file as an
+        // instruction to delete every document in that collection. Writing
+        // `[]` here would turn a transient read error into a silent, total
+        // data loss the next time someone restores this archive.
+        console.error(`[backup] Could not read collection ${col.name}:`, err);
+        return serverError(
+          `Backup aborted: could not read the "${col.name}" collection. ` +
+            "No archive was produced — retry rather than keeping a partial backup.",
+        );
       }
       collectionCounts[col.name] = docs.length;
       zip.file(
@@ -175,10 +194,11 @@ export async function GET(req: NextRequest) {
       // Archive what the bucket actually holds, not just what the media
       // library tracks: seeded files (images/programs/…, images/hod/…) have no
       // ImageAsset row and were being left out of every backup.
-      const keys = await collectAssetKeys(
+      const { keys, listingFailed } = await collectAssetKeys(
         "images/",
         images.map((img) => img.storage_key as string),
       );
+      if (listingFailed) listingFailures.push("images");
       const fetched = await mapWithConcurrency(
         keys,
         R2_FETCH_CONCURRENCY,
@@ -211,10 +231,11 @@ export async function GET(req: NextRequest) {
         compression: "DEFLATE",
       });
 
-      const keys = await collectAssetKeys(
+      const { keys, listingFailed } = await collectAssetKeys(
         "documents/",
         docs.map((doc) => doc.storage_key as string),
       );
+      if (listingFailed) listingFailures.push("documents");
       const fetched = await mapWithConcurrency(
         keys,
         R2_FETCH_CONCURRENCY,
@@ -236,13 +257,25 @@ export async function GET(req: NextRequest) {
       "manifest.json",
       JSON.stringify(
         {
-          version: "2.1",
+          // 2.2 is the first version in which an empty `collections/<name>.json`
+          // reliably means "this collection was empty" rather than possibly
+          // "the read failed" — earlier versions archived `[]` on error. Restore
+          // uses this to decide whether an empty file may prune a collection.
+          version: "2.2",
           exported_at: configData.exported_at,
           exported_by: configData.exported_by,
           config_entries: configs.length,
           collections: collectionCounts,
           images: { archived: imagesArchived, unreadable: imagesSkipped },
           documents: { archived: docsArchived, unreadable: docsSkipped },
+          // Recorded so a restore operator can tell "this archive has no
+          // assets because none were requested" from "because R2 was down".
+          assets_unavailable: assetsUnavailable || undefined,
+          // Non-empty means the bucket could not be enumerated for these
+          // prefixes, so untracked objects are missing from this archive.
+          asset_listing_failed: listingFailures.length
+            ? listingFailures
+            : undefined,
         },
         null,
         2,
@@ -288,6 +321,14 @@ export async function GET(req: NextRequest) {
       headers: {
         "Content-Type": "application/zip",
         "Content-Disposition": `attachment; filename="${filename}"`,
+        // The client surfaces this so a degraded backup isn't mistaken for a
+        // complete one. Header rather than body: the body is the ZIP itself.
+        ...(assetsUnavailable
+          ? { "X-Backup-Assets-Skipped": "r2-not-configured" }
+          : {}),
+        ...(listingFailures.length
+          ? { "X-Backup-Assets-Incomplete": listingFailures.join(",") }
+          : {}),
       },
     });
   } catch (e) {
