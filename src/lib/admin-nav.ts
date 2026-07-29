@@ -631,3 +631,66 @@ export function isSectionActive(
     isItemActive(i.href, pathname, url),
   );
 }
+
+/**
+ * Where the user currently is, as section → group → item.
+ *
+ * The sidebar uses it to expand and highlight the right branch, and the topbar
+ * turns it into breadcrumbs. Before this, no admin screen told you where you
+ * were: every editor page rendered a bare title with a Back button hardcoded
+ * to `/admin/dashboard` — a page editors are redirected away from.
+ */
+export type NavTrail = {
+  section?: AdminNavSection;
+  group?: AdminNavGroup;
+  item?: AdminNavItem;
+};
+
+export function findNavTrail(
+  role: string,
+  institution: string,
+  pathname: string,
+  url: NavScope,
+): NavTrail {
+  for (const section of visibleSections(role, institution)) {
+    if (pathname === hubHref(section.id)) return { section };
+    for (const group of visibleGroups(section, role)) {
+      for (const item of group.items) {
+        if (isItemActive(item.href, pathname, url))
+          return { section, group, item };
+      }
+    }
+  }
+  return {};
+}
+
+/**
+ * Routes that render the public page edge-to-edge for live preview. The
+ * sidebar collapses to its icon rail on these so the preview gets the width,
+ * but it is no longer removed outright — the old top nav hid itself entirely
+ * here, which left the editor with no way out of the page except the browser's
+ * Back button.
+ */
+const IMMERSIVE_ROUTES = [
+  "/admin/about",
+  "/admin/coe",
+  "/admin/campus-life",
+  "/admin/research",
+  "/admin/clubs",
+  "/admin/committees",
+  "/admin/documents",
+  "/admin/naac",
+  "/admin/accreditations",
+  "/admin/placements-page",
+];
+
+export function isImmersiveRoute(pathname: string): boolean {
+  if (IMMERSIVE_ROUTES.includes(pathname)) return true;
+  // The program builder and the Page editor are split-pane too.
+  if (pathname.startsWith("/admin/programs/") && pathname !== "/admin/programs")
+    return true;
+  if (pathname.startsWith("/admin/pages/") && pathname !== "/admin/pages")
+    return true;
+  if (pathname.startsWith("/admin/content/")) return true;
+  return false;
+}

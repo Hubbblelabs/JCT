@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
 import { SessionProvider } from "next-auth/react";
-import { AdminTabNav } from "@/components/admin/AdminTabNav";
+import { AdminShell } from "@/components/admin/shell/AdminShell";
 import { ToastProvider } from "@/components/ui/Toast";
 import { ConfirmProvider } from "@/components/ui/ConfirmDialog";
 import "@/styles/admin.css";
@@ -19,8 +19,7 @@ export default async function ProtectedLayout({
       <ToastProvider>
         <ConfirmProvider>
           <div className="admin-layout">
-            <AdminTabNav />
-            <main className="admin-main">{children}</main>
+            <AdminShell>{children}</AdminShell>
           </div>
         </ConfirmProvider>
       </ToastProvider>

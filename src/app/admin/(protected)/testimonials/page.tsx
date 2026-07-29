@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense, useCallback } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   TextInput,
@@ -8,7 +8,7 @@ import {
   Select,
   ImageUploadInput,
 } from "@/components/admin/inputs";
-import { Plus, Pencil, Trash2, X, Loader2, Check } from "lucide-react";
+import { Check, Eye, EyeOff, Loader2, MessageSquare, Pencil, Plus, Trash2 } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 import {
@@ -17,6 +17,14 @@ import {
 } from "@/lib/deferred-uploads";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { PageShell } from "@/components/admin/kit/PageShell";
+import { DataTable, type Column } from "@/components/admin/kit/DataTable";
+import { Drawer } from "@/components/admin/kit/Drawer";
+import {
+  Banner,
+  StatusBadge,
+  VisibilityBadge,
+} from "@/components/admin/kit/primitives";
 
 interface Testimonial {
   _id: string;
@@ -51,41 +59,60 @@ const CATEGORIES = [
   { value: "Industry", label: "Industry" },
 ];
 
-const _INSTITUTIONS = [
+const INSTITUTIONS = [
   { value: "all", label: "All / Home page" },
   { value: "engineering", label: "Engineering" },
   { value: "arts-science", label: "Arts & Science" },
   { value: "polytechnic", label: "Polytechnic" },
 ];
 
+const instLabel = (v: string) =>
+  INSTITUTIONS.find((i) => i.value === v)?.label ?? v;
+
 function TestimonialsPageInner() {
   const { flush, discardAll } = useDeferredUploads();
   const toast = useToast();
   const confirm = useConfirm();
   const searchParams = useSearchParams();
+
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [editing, setEditing] = useState<Testimonial | null>(null);
   const [form, setForm] = useState<Omit<Testimonial, "_id">>(EMPTY);
   const [saving, setSaving] = useState(false);
-  const [filterInst, _setFilterInst] = useState(
+  const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
+
+  // The institution filter existed but its setter was never wired up, so the
+  // dropdown could not actually be changed. It is a real control now.
+  const [filterInst, setFilterInst] = useState(
     () => searchParams.get("college") ?? "",
   );
-  const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
-    const url = filterInst
-      ? `/api/admin/testimonials?institution=${filterInst}`
-      : "/api/admin/testimonials";
-    const r = await fetch(url);
-    setTestimonials(await r.json());
-    setLoading(false);
+    setLoadError(null);
+    try {
+      const url = filterInst
+        ? `/api/admin/testimonials?institution=${filterInst}`
+        : "/api/admin/testimonials";
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`Request failed (${r.status})`);
+      const data = await r.json();
+      setTestimonials(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setTestimonials([]);
+      setLoadError(
+        err instanceof Error ? err.message : "Could not load testimonials.",
+      );
+    } finally {
+      setLoading(false);
+    }
   }, [filterInst]);
 
   useEffect(() => {
-    load();
-  }, [filterInst, load]);
+    void load();
+  }, [load]);
 
   const openNew = () => {
     setEditing({ _id: "", ...EMPTY });
@@ -122,6 +149,7 @@ function TestimonialsPageInner() {
         body: JSON.stringify(flushedForm),
       });
       if (r.ok) {
+        toast.success(isNew ? "Testimonial added." : "Testimonial updated.");
         await load();
         close();
       } else {
@@ -135,211 +163,310 @@ function TestimonialsPageInner() {
     setSaving(false);
   };
 
-  const del = async (id: string) => {
+  const runBulk = async (
+    label: string,
+    rows: Testimonial[],
+    run: (t: Testimonial) => Promise<Response>,
+  ) => {
+    const results = await Promise.all(rows.map((t) => run(t).catch(() => null)));
+    const failed = results.filter((r) => !r || !r.ok).length;
+    if (failed === 0) toast.success(`${label} ${rows.length} testimonial(s).`);
+    else
+      toast.error(
+        `${label} ${rows.length - failed} of ${rows.length}. ${failed} failed — those were left unchanged.`,
+      );
+    await load();
+  };
+
+  const setActive = (rows: Testimonial[], is_active: boolean) =>
+    runBulk(is_active ? "Showing" : "Hidden", rows, (t) =>
+      fetch(`/api/admin/testimonials/${t._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_active }),
+      }),
+    );
+
+  const remove = async (rows: Testimonial[]) => {
     const ok = await confirm({
-      title: "Delete testimonial",
-      message: "This testimonial will be permanently removed. Continue?",
+      title:
+        rows.length === 1
+          ? "Delete testimonial"
+          : `Delete ${rows.length} testimonials`,
+      message:
+        rows.length === 1
+          ? `Permanently delete the testimonial from “${rows[0].name}”? This cannot be undone.`
+          : `Permanently delete ${rows.length} testimonials? This cannot be undone.`,
       confirmLabel: "Delete",
       destructive: true,
     });
     if (!ok) return;
-    await fetch(`/api/admin/testimonials/${id}`, { method: "DELETE" });
-    toast.success("Testimonial deleted.");
-    await load();
+    await runBulk("Deleted", rows, (t) =>
+      fetch(`/api/admin/testimonials/${t._id}`, { method: "DELETE" }),
+    );
   };
 
+  const columns: Column<Testimonial>[] = [
+    {
+      key: "name",
+      header: "Name",
+      sortable: true,
+      value: (t) => `${t.name} ${t.batch} ${t.course} ${t.company} ${t.quote}`,
+      render: (t) => (
+        <span className="block">
+          <span className="block font-medium text-[var(--admin-text)]">
+            {t.name}
+          </span>
+          <span className="admin-help block">
+            {[t.batch, t.course].filter(Boolean).join(" · ") || "—"}
+          </span>
+        </span>
+      ),
+    },
+    {
+      key: "company",
+      header: "Company",
+      sortable: true,
+      hideOnMobile: true,
+      value: (t) => t.company ?? "",
+      render: (t) => t.company || "—",
+    },
+    {
+      key: "category",
+      header: "Category",
+      sortable: true,
+      value: (t) => t.category,
+      render: (t) => <StatusBadge tone="info" label={t.category} />,
+    },
+    {
+      key: "institution",
+      header: "Shown on",
+      sortable: true,
+      hideOnMobile: true,
+      value: (t) => instLabel(t.institution),
+      render: (t) => (
+        <span className="text-[var(--admin-text-secondary)]">
+          {instLabel(t.institution)}
+        </span>
+      ),
+    },
+    {
+      key: "is_active",
+      header: "Status",
+      sortable: true,
+      value: (t) => (t.is_active ? 1 : 0),
+      render: (t) => <VisibilityBadge isActive={t.is_active} />,
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "right",
+      width: "1%",
+      render: (t) => (
+        <span className="flex justify-end gap-1">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              openEdit(t);
+            }}
+            className="admin-btn admin-btn-outline admin-btn-sm"
+            aria-label={`Edit testimonial from ${t.name}`}
+          >
+            <Pencil size={13} />
+          </button>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              void remove([t]);
+            }}
+            className="admin-btn admin-btn-danger admin-btn-sm"
+            aria-label={`Delete testimonial from ${t.name}`}
+          >
+            <Trash2 size={13} />
+          </button>
+        </span>
+      ),
+    },
+  ];
+
   return (
-    <>
-      <div className="admin-content">
-        <div className="admin-page-header">
-          <div>
-            <h1 className="admin-page-title">Testimonials & Stories</h1>
-            <p className="admin-page-subtitle">
-              {testimonials.filter((t) => t.is_active).length} active
-              testimonials
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={openNew} className="admin-btn admin-btn-primary">
-              <Plus size={16} /> Add Testimonial
-            </button>
-          </div>
-        </div>
-
-        <div className="admin-card overflow-x-auto p-0">
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 size={24} className="animate-spin text-gray-400" />
-            </div>
-          ) : (
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Batch / Course</th>
-                  <th>Company</th>
-                  <th>Category</th>
-                  <th>College</th>
-                  <th>Status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {testimonials.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="py-10 text-center text-gray-400">
-                      No testimonials yet.
-                    </td>
-                  </tr>
-                )}
-                {testimonials.map((t) => (
-                  <tr key={t._id}>
-                    <td className="font-medium">{t.name}</td>
-                    <td className="text-sm text-gray-500">
-                      {t.batch}
-                      {t.course ? ` · ${t.course}` : ""}
-                    </td>
-                    <td className="text-sm">{t.company || "—"}</td>
-                    <td>
-                      <span className="admin-badge admin-badge-blue">
-                        {t.category}
-                      </span>
-                    </td>
-                    <td className="text-sm text-gray-500 capitalize">
-                      {t.institution}
-                    </td>
-                    <td>
-                      <span
-                        className={`admin-badge ${t.is_active ? "admin-badge-green" : "admin-badge-red"}`}
-                      >
-                        {t.is_active ? "Active" : "Hidden"}
-                      </span>
-                    </td>
-                    <td>
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => openEdit(t)}
-                          className="admin-btn admin-btn-outline admin-btn-sm"
-                        >
-                          <Pencil size={13} />
-                        </button>
-                        <button
-                          onClick={() => del(t._id)}
-                          className="admin-btn admin-btn-danger admin-btn-sm"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
-
-      {editing && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 pt-10">
-          <div className="w-full max-w-lg rounded-xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <h2 className="font-semibold text-gray-900">
-                {editing._id ? "Edit Testimonial" : "New Testimonial"}
-              </h2>
+    <PageShell
+      title="Testimonials"
+      description="Alumni, student and industry quotes. Each one can be shown on the home page or scoped to a single college."
+      actions={
+        <button onClick={openNew} className="admin-btn admin-btn-primary">
+          <Plus size={15} /> Add testimonial
+        </button>
+      }
+    >
+      {loadError && (
+        <div className="mb-4">
+          <Banner
+            tone="danger"
+            title="Could not load testimonials"
+            action={
               <button
-                onClick={close}
+                onClick={() => void load()}
                 className="admin-btn admin-btn-outline admin-btn-sm"
               >
-                <X size={14} />
+                Retry
               </button>
-            </div>
-            <div className="space-y-1 p-6">
-              {apiError && (
-                <ValidationErrors
-                  error={apiError.message ?? apiError.error}
-                  details={apiError.details}
-                />
-              )}
-              <div className="grid grid-cols-2 gap-4">
-                <TextInput
-                  label="Name"
-                  value={form.name}
-                  onChange={(e) => set("name", e.target.value)}
-                  required
-                />
-                <TextInput
-                  label="Batch (year)"
-                  value={form.batch}
-                  onChange={(e) => set("batch", e.target.value)}
-                  placeholder="2024"
-                  required
-                />
-                <TextInput
-                  label="Course"
-                  value={form.course}
-                  onChange={(e) => set("course", e.target.value)}
-                  placeholder="B.E. CSE"
-                />
-                <TextInput
-                  label="Company"
-                  value={form.company}
-                  onChange={(e) => set("company", e.target.value)}
-                  placeholder="Infosys"
-                />
-                <Select
-                  label="Category"
-                  value={form.category}
-                  options={CATEGORIES}
-                  onChange={(e) => set("category", e.target.value)}
-                />
-                <ImageUploadInput
-                  label="Avatar"
-                  ratio="square"
-                  value={form.avatar}
-                  onChange={(url) => set("avatar", url)}
-                  hideUrlField
-                />
-              </div>
-              <TextArea
-                label="Quote"
-                value={form.quote}
-                onChange={(e) => set("quote", e.target.value)}
-                required
-                rows={4}
-              />
-              <div className="flex items-center gap-2 pt-2">
-                <input
-                  type="checkbox"
-                  id="t_active"
-                  checked={form.is_active}
-                  onChange={(e) => set("is_active", e.target.checked)}
-                />
-                <label htmlFor="t_active" className="text-sm text-gray-700">
-                  Active (shown on website)
-                </label>
-              </div>
-            </div>
-            <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
-              <button onClick={close} className="admin-btn admin-btn-outline">
-                Cancel
-              </button>
-              <button
-                onClick={save}
-                disabled={saving}
-                className="admin-btn admin-btn-gold"
-              >
-                {saving ? (
-                  <Loader2 size={15} className="animate-spin" />
-                ) : (
-                  <Check size={15} />
-                )}
-                {saving ? "Saving…" : "Save"}
-              </button>
-            </div>
-          </div>
+            }
+          >
+            {loadError}
+          </Banner>
         </div>
       )}
-    </>
+
+      <DataTable
+        rows={testimonials}
+        columns={columns}
+        rowKey={(t) => t._id}
+        loading={loading}
+        searchPlaceholder="Search name, company or quote…"
+        onRowClick={openEdit}
+        initialSort={{ key: "name", dir: "asc" }}
+        filters={
+          <select
+            value={filterInst}
+            onChange={(e) => setFilterInst(e.target.value)}
+            aria-label="Filter by college"
+            className="admin-select w-auto"
+          >
+            <option value="">Every college</option>
+            {INSTITUTIONS.map((i) => (
+              <option key={i.value} value={i.value}>
+                {i.label}
+              </option>
+            ))}
+          </select>
+        }
+        empty={{
+          title: "No testimonials yet",
+          body: "Quotes from alumni, current students and recruiters. They appear on the home page and on each college's landing page.",
+          action: (
+            <button onClick={openNew} className="admin-btn admin-btn-primary">
+              <Plus size={15} /> Add the first one
+            </button>
+          ),
+        }}
+        bulkActions={[
+          { label: "Show", icon: Eye, onRun: (s) => setActive(s, true) },
+          { label: "Hide", icon: EyeOff, onRun: (s) => setActive(s, false) },
+          {
+            label: "Delete",
+            icon: Trash2,
+            destructive: true,
+            onRun: (s) => remove(s),
+          },
+        ]}
+      />
+
+      <Drawer
+        open={!!editing}
+        onClose={close}
+        eyebrow={editing?._id ? "Edit" : "New"}
+        title={editing?._id ? editing.name || "Testimonial" : "New testimonial"}
+        description="Shown as a quote card on the public site."
+        icon={MessageSquare}
+        footer={
+          <div className="flex justify-end gap-2">
+            <button onClick={close} className="admin-btn admin-btn-outline">
+              Cancel
+            </button>
+            <button
+              onClick={save}
+              disabled={saving}
+              className="admin-btn admin-btn-primary"
+            >
+              {saving ? (
+                <Loader2 size={15} className="animate-spin" />
+              ) : (
+                <Check size={15} />
+              )}
+              {saving ? "Saving…" : "Save"}
+            </button>
+          </div>
+        }
+      >
+        {apiError && (
+          <ValidationErrors
+            error={apiError.message ?? apiError.error}
+            details={apiError.details}
+          />
+        )}
+
+        <div className="grid grid-cols-2 gap-x-4">
+          <TextInput
+            label="Name"
+            value={form.name}
+            onChange={(e) => set("name", e.target.value)}
+            required
+          />
+          <TextInput
+            label="Batch (year)"
+            value={form.batch}
+            onChange={(e) => set("batch", e.target.value)}
+            placeholder="2024"
+            required
+          />
+          <TextInput
+            label="Course"
+            value={form.course}
+            onChange={(e) => set("course", e.target.value)}
+            placeholder="B.E. CSE"
+          />
+          <TextInput
+            label="Company"
+            value={form.company}
+            onChange={(e) => set("company", e.target.value)}
+            placeholder="Infosys"
+          />
+          <Select
+            label="Category"
+            value={form.category}
+            options={CATEGORIES}
+            onChange={(e) => set("category", e.target.value)}
+          />
+          <Select
+            label="Shown on"
+            value={form.institution}
+            options={INSTITUTIONS}
+            onChange={(e) => set("institution", e.target.value)}
+            hint="Pick a college to limit where this quote appears."
+          />
+        </div>
+
+        <ImageUploadInput
+          label="Photo"
+          ratio="square"
+          value={form.avatar}
+          onChange={(url) => set("avatar", url)}
+          hideUrlField
+          hint="Optional. A square headshot works best."
+        />
+
+        <TextArea
+          label="Quote"
+          value={form.quote}
+          onChange={(e) => set("quote", e.target.value)}
+          required
+          rows={5}
+          hint="Written in the person's own voice. Quotation marks are added automatically."
+        />
+
+        <label className="mt-2 flex items-center gap-2">
+          <input
+            type="checkbox"
+            checked={form.is_active}
+            onChange={(e) => set("is_active", e.target.checked)}
+          />
+          <span className="text-[length:var(--admin-text-body)] text-[var(--admin-text-secondary)]">
+            Show this testimonial on the public site
+          </span>
+        </label>
+      </Drawer>
+    </PageShell>
   );
 }
 

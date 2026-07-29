@@ -1,397 +1,1546 @@
-/* Admin panel styles — loaded only in admin layout */
+/*
+ * Admin panel styles — loaded only by the admin layout.
+ *
+ * Structure:
+ *   1. Tokens          — every colour, space, radius and shadow the panel uses
+ *   2. Shell           — sidebar + topbar + content grid
+ *   3. Sidebar         — section tree navigation
+ *   4. Topbar          — breadcrumbs, page title, user menu
+ *   5. Command palette — Cmd+K overlay
+ *   6. Surfaces        — cards, sections, dividers
+ *   7. Controls        — buttons, badges
+ *   8. Forms           — inputs, labels, help, errors
+ *   9. Data            — tables, list rows
+ *  10. Feedback        — empty states, skeletons, save bar, drawer
+ *  11. Responsive      — tablet and mobile behaviour
+ *  12. Motion & a11y   — reduced motion, focus, screen readers
+ *
+ * Rule: components style themselves through these tokens, never through raw
+ * hex values. A colour that appears in a component file is a bug to fix, not a
+ * decision to respect.
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   1. TOKENS
+   ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  --admin-brand-h: 56px;
-  --admin-nav-total: var(--admin-brand-h);
+  /* ── Brand ──────────────────────────────────────────────────────────────
+     JCT navy and gold. These two are the only "brand" values; everything
+     else below is a semantic role that happens to be derived from them. */
   --admin-navy: #0a1628;
+  --admin-navy-raised: #14243c;
+  --admin-navy-hover: #1a2a42;
   --admin-gold: #c9a84c;
   --admin-gold-hover: #e0bf6b;
-  --admin-surface: #f4f6f9;
-  --admin-border: #d1d5db;
+  --admin-gold-deep: #8a6f1f;
+
+  /* ── Surfaces ───────────────────────────────────────────────────────────
+     `canvas` is the page background, `raised` is a card on top of it, `sunken`
+     is a well inside a card (repeater rows, code blocks, previews). */
+  --admin-canvas: #f4f6f9;
+  --admin-raised: #ffffff;
+  --admin-sunken: #f8fafc;
+  --admin-hover: #f1f5f9;
+  --admin-selected: rgb(201 168 76 / 0.12);
+
+  /* ── Borders ────────────────────────────────────────────────────────────
+     `subtle` separates content inside a card; `default` outlines a card
+     against the canvas; `strong` marks an active or focused boundary. */
+  --admin-border-subtle: #e8ecf1;
+  --admin-border: #d5dbe3;
+  --admin-border-strong: #9aa5b4;
+
+  /* ── Text ───────────────────────────────────────────────────────────────
+     Contrast ratios on --admin-raised are noted; all body-size roles clear
+     WCAG AA 4.5:1. The old palette used gray-400 (#9ca3af, 2.8:1) for hints
+     and metadata, which failed — `muted` replaces it. */
+  --admin-text: #0f172a; /* 16.8:1 */
+  --admin-text-secondary: #3f4a5a; /*  9.4:1 */
+  --admin-text-muted: #5b6675; /*  6.0:1 */
+  --admin-text-faint: #6b7684; /*  4.9:1 — smallest passing role */
+  --admin-text-inverse: #ffffff;
+  --admin-text-on-navy: rgb(255 255 255 / 0.82);
+  --admin-text-on-navy-muted: rgb(255 255 255 / 0.52);
+
+  /* ── Status ─────────────────────────────────────────────────────────────
+     Each state carries a foreground, a background and a border so badges,
+     banners and inline messages stay consistent. */
+  --admin-success: #15803d;
+  --admin-success-bg: #dcfce7;
+  --admin-success-border: #86efac;
+
+  --admin-warning: #a16207;
+  --admin-warning-bg: #fef9c3;
+  --admin-warning-border: #fde047;
+
+  --admin-danger: #b91c1c;
+  --admin-danger-bg: #fee2e2;
+  --admin-danger-border: #fca5a5;
+
+  --admin-info: #1d4ed8;
+  --admin-info-bg: #dbeafe;
+  --admin-info-border: #93c5fd;
+
+  --admin-neutral: #374151;
+  --admin-neutral-bg: #eef1f5;
+  --admin-neutral-border: #d5dbe3;
+
+  /* Draft vs published — the single most important distinction in this CMS,
+     so it gets its own roles rather than borrowing warning/success. */
+  --admin-draft: #a16207;
+  --admin-draft-bg: #fef3c7;
+  --admin-draft-border: #fcd34d;
+  --admin-published: #15803d;
+  --admin-published-bg: #dcfce7;
+  --admin-published-border: #86efac;
+
+  /* ── Spacing ────────────────────────────────────────────────────────────
+     4px base. Use these instead of arbitrary rem values so density can be
+     retuned in one place. */
+  --admin-space-1: 0.25rem;
+  --admin-space-2: 0.5rem;
+  --admin-space-3: 0.75rem;
+  --admin-space-4: 1rem;
+  --admin-space-5: 1.25rem;
+  --admin-space-6: 1.5rem;
+  --admin-space-8: 2rem;
+  --admin-space-10: 2.5rem;
+  --admin-space-12: 3rem;
+
+  /* ── Radii ──────────────────────────────────────────────────────────────*/
+  --admin-radius-sm: 0.375rem;
+  --admin-radius: 0.5rem;
+  --admin-radius-md: 0.625rem;
+  --admin-radius-lg: 0.75rem;
+  --admin-radius-xl: 1rem;
+  --admin-radius-full: 9999px;
+
+  /* ── Typography ─────────────────────────────────────────────────────────*/
+  --admin-text-xs: 0.6875rem; /* 11px — badges, metadata */
+  --admin-text-sm: 0.75rem; /* 12px — help text, table headers */
+  --admin-text-base: 0.8125rem; /* 13px — dense UI chrome */
+  --admin-text-body: 0.875rem; /* 14px — the panel's default */
+  --admin-text-lg: 1rem;
+  --admin-text-xl: 1.25rem;
+  --admin-text-2xl: 1.5rem;
+
+  /* ── Elevation ──────────────────────────────────────────────────────────*/
+  --admin-shadow-sm: 0 1px 2px rgb(15 23 42 / 0.05);
+  --admin-shadow: 0 1px 3px rgb(15 23 42 / 0.08), 0 1px 2px rgb(15 23 42 / 0.04);
+  --admin-shadow-md:
+    0 4px 12px -2px rgb(15 23 42 / 0.1), 0 2px 6px -2px rgb(15 23 42 / 0.05);
+  --admin-shadow-lg:
+    0 12px 32px -8px rgb(15 23 42 / 0.18), 0 4px 12px -4px rgb(15 23 42 / 0.08);
+  --admin-shadow-xl: 0 24px 56px -12px rgb(15 23 42 / 0.28);
+
+  /* ── Focus ──────────────────────────────────────────────────────────────
+     One ring for the whole panel. Gold on light surfaces reads clearly and
+     matches the brand; the offset keeps it off the control's own border. */
+  --admin-focus-ring: 0 0 0 2px var(--admin-raised), 0 0 0 4px var(--admin-gold);
+  --admin-focus-ring-tight: 0 0 0 3px rgb(201 168 76 / 0.35);
+  --admin-focus-ring-navy: 0 0 0 2px var(--admin-navy), 0 0 0 4px
+    var(--admin-gold);
+
+  /* ── Layout metrics ─────────────────────────────────────────────────────*/
+  --admin-sidebar-w: 264px;
+  --admin-sidebar-w-collapsed: 60px;
+  --admin-topbar-h: 52px;
+  --admin-savebar-h: 60px;
+  --admin-content-max: 1400px;
+
+  /* ── Z-index scale ──────────────────────────────────────────────────────
+     Named so nothing has to guess whether 50 beats 40. */
+  --admin-z-sticky: 20;
+  --admin-z-topbar: 30;
+  --admin-z-sidebar: 40;
+  --admin-z-savebar: 45;
+  --admin-z-drawer: 60;
+  --admin-z-modal: 70;
+  --admin-z-palette: 80;
+  --admin-z-toast: 90;
+
+  /* ── Motion ─────────────────────────────────────────────────────────────*/
+  --admin-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --admin-duration-fast: 120ms;
+  --admin-duration: 180ms;
+  --admin-duration-slow: 280ms;
+
+  /* ── Legacy aliases ─────────────────────────────────────────────────────
+     Kept so the pages not yet migrated keep rendering identically. Remove
+     once every admin file reads the tokens above. */
+  --admin-brand-h: var(--admin-topbar-h);
+  --admin-nav-total: var(--admin-topbar-h);
+  --admin-surface: var(--admin-canvas);
 }
 
-/* ── Top navigation ─────────────────────────────────── */
-.admin-top-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 40;
-}
+/* ═══════════════════════════════════════════════════════════════════════════
+   2. SHELL
+   ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Brand bar: logo | nav items | user */
-.admin-brand-bar {
-  height: var(--admin-brand-h);
-  background: var(--admin-navy);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 1.5rem;
-  gap: 1rem;
-}
-
-/* ── Nav triggers (tab buttons + dropdown buttons) ── */
-.admin-nav-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.375rem 0.875rem;
-  border-radius: 9999px;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: rgba(255, 255, 255, 0.78);
-  text-decoration: none;
-  white-space: nowrap;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  transition:
-    background 0.15s,
-    color 0.15s;
-}
-
-.admin-nav-trigger:hover {
-  background: rgba(255, 255, 255, 0.11);
-  color: #fff;
-}
-
-.admin-nav-trigger.active {
-  background: rgba(201, 168, 76, 0.22);
-  color: var(--admin-gold);
-  font-weight: 600;
-}
-
-/* ── Dropdown ────────────────────────────────────── */
-.admin-nav-item {
-  position: relative;
-}
-
-.admin-nav-dropdown-menu {
-  display: none;
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
-  background: #fff;
-  border: 1px solid var(--admin-border);
-  border-radius: 0.625rem;
-  padding: 0.3rem;
-  min-width: 170px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.14);
-  z-index: 100;
-}
-
-/* Arrow pointer */
-.admin-nav-dropdown-menu::before {
-  content: "";
-  position: absolute;
-  top: -6px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 10px;
-  height: 10px;
-  background: #fff;
-  border-left: 1px solid var(--admin-border);
-  border-top: 1px solid var(--admin-border);
-  rotate: 45deg;
-}
-
-/* Right-anchored variant — use on nav items near the right edge */
-.admin-nav-item--right .admin-nav-dropdown-menu {
-  left: auto;
-  right: 0;
-  transform: none;
-}
-
-.admin-nav-item--right .admin-nav-dropdown-menu::before {
-  left: auto;
-  right: 1rem;
-  transform: none;
-}
-
-/* Invisible bridge so hovering the gap between trigger and menu
-   keeps .admin-nav-item:hover alive */
-.admin-nav-item::after {
-  content: "";
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  height: 12px; /* matches dropdown-menu top offset */
-  pointer-events: auto;
-}
-
-/* Open state is JS-controlled (hover, focus, and click all funnel through a
-   single `openMenu` key in AdminTabNav) so only one dropdown can ever show at
-   once — pure CSS :hover + :focus-within could leave two menus open and
-   overlapping. */
-.admin-nav-dropdown-menu.open {
-  display: block;
-}
-
-.admin-nav-dropdown-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.4rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #1f2937;
-  text-decoration: none;
-  transition:
-    background 0.1s,
-    color 0.1s;
-  white-space: nowrap;
-}
-
-.admin-nav-dropdown-item:hover {
-  background: #f3f4f6;
-  color: #111827;
-}
-
-.admin-nav-dropdown-item.active {
-  background: rgba(201, 168, 76, 0.13);
-  color: var(--admin-navy);
-  font-weight: 600;
-}
-
-/* ── Main content ───────────────────────────────────── */
-.admin-main {
-  padding-top: var(--admin-nav-total);
+.admin-layout {
   min-height: 100vh;
-  background: var(--admin-surface);
+  min-height: 100dvh;
+  background: var(--admin-canvas);
+  color: var(--admin-text);
+  font-size: var(--admin-text-body);
+}
+
+/* Sidebar is fixed; the main column is offset by its width so content can
+   scroll independently without the nav leaving the viewport. */
+.admin-shell {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+
+.admin-shell-main {
+  flex: 1;
+  min-width: 0; /* lets wide tables scroll inside instead of pushing the page */
   display: flex;
   flex-direction: column;
+  margin-left: var(--admin-sidebar-w);
+  transition: margin-left var(--admin-duration) var(--admin-ease);
 }
 
-.admin-topbar {
-  height: 48px;
-  background: white;
-  border-bottom: 1px solid var(--admin-border);
+.admin-shell[data-collapsed="true"] .admin-shell-main {
+  margin-left: var(--admin-sidebar-w-collapsed);
+}
+
+/* Full-bleed editors (live preview builders) hide the sidebar entirely. */
+.admin-shell[data-chrome="none"] .admin-shell-main {
+  margin-left: 0;
+}
+
+.admin-main {
+  flex: 1;
   display: flex;
-  align-items: center;
-  padding: 0 1.5rem;
-  position: sticky;
-  top: var(--admin-nav-total);
-  z-index: 29;
+  flex-direction: column;
+  background: var(--admin-canvas);
 }
 
 .admin-content {
   flex: 1;
-  padding: 1.5rem;
+  width: 100%;
+  max-width: var(--admin-content-max);
+  padding: var(--admin-space-6);
 }
 
-/* ── Cards ──────────────────────────────────────────── */
-.admin-card {
-  background: white;
+.admin-content--wide {
+  max-width: none;
+}
+
+.admin-content--flush {
+  padding: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   3. SIDEBAR
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.admin-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: var(--admin-sidebar-w);
+  z-index: var(--admin-z-sidebar);
+  background: var(--admin-navy);
+  color: var(--admin-text-on-navy);
+  display: flex;
+  flex-direction: column;
+  transition: width var(--admin-duration) var(--admin-ease);
+  overscroll-behavior: contain;
+}
+
+.admin-shell[data-collapsed="true"] .admin-sidebar {
+  width: var(--admin-sidebar-w-collapsed);
+}
+
+.admin-sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-2);
+  height: var(--admin-topbar-h);
+  padding: 0 var(--admin-space-4);
+  flex-shrink: 0;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.admin-sidebar-brand-text {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.admin-sidebar-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--admin-space-3) var(--admin-space-2) var(--admin-space-4);
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 0.16) transparent;
+}
+
+.admin-sidebar-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+.admin-sidebar-scroll::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 0.16);
+  border-radius: var(--admin-radius-full);
+}
+
+/* Section header — the collapsible parent row (Engineering, Main Website, …) */
+.admin-sidebar-section {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-2);
+  width: 100%;
+  padding: var(--admin-space-2) var(--admin-space-3);
+  border: none;
+  border-radius: var(--admin-radius);
+  background: transparent;
+  color: var(--admin-text-on-navy);
+  font-size: var(--admin-text-base);
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--admin-duration-fast),
+    color var(--admin-duration-fast);
+}
+
+.admin-sidebar-section:hover {
+  background: rgb(255 255 255 / 0.08);
+  color: var(--admin-text-inverse);
+}
+
+.admin-sidebar-section[data-active="true"] {
+  background: rgb(201 168 76 / 0.16);
+  color: var(--admin-gold);
+}
+
+.admin-sidebar-section-chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  transition: transform var(--admin-duration) var(--admin-ease);
+}
+
+.admin-sidebar-section[aria-expanded="true"] .admin-sidebar-section-chevron {
+  transform: rotate(90deg);
+}
+
+/* Group label inside an expanded section (Landing Page, Academics, …) */
+.admin-sidebar-group {
+  padding: var(--admin-space-3) var(--admin-space-3) var(--admin-space-1);
+  font-size: var(--admin-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--admin-text-on-navy-muted);
+  white-space: nowrap;
+}
+
+/* Leaf link — an actual editor page */
+.admin-sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-2);
+  padding: var(--admin-space-2) var(--admin-space-3);
+  margin-left: var(--admin-space-2);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-text-on-navy);
+  font-size: var(--admin-text-base);
+  text-decoration: none;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition:
+    background var(--admin-duration-fast),
+    color var(--admin-duration-fast);
+}
+
+.admin-sidebar-link:hover {
+  background: rgb(255 255 255 / 0.08);
+  color: var(--admin-text-inverse);
+}
+
+.admin-sidebar-link[aria-current="page"] {
+  background: rgb(201 168 76 / 0.18);
+  color: var(--admin-gold);
+  font-weight: 600;
+}
+
+.admin-sidebar-footer {
+  flex-shrink: 0;
+  padding: var(--admin-space-3);
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+}
+
+/* Collapsed rail — labels are hidden, icons stay centred and tooltipped. */
+.admin-shell[data-collapsed="true"] .admin-sidebar-brand-text,
+.admin-shell[data-collapsed="true"] .admin-sidebar-label,
+.admin-shell[data-collapsed="true"] .admin-sidebar-group,
+.admin-shell[data-collapsed="true"] .admin-sidebar-section-chevron {
+  display: none;
+}
+
+.admin-shell[data-collapsed="true"] .admin-sidebar-section,
+.admin-shell[data-collapsed="true"] .admin-sidebar-link {
+  justify-content: center;
+  margin-left: 0;
+  padding-left: var(--admin-space-2);
+  padding-right: var(--admin-space-2);
+}
+
+/* Focus is always visible on the navy background. */
+.admin-sidebar-section:focus-visible,
+.admin-sidebar-link:focus-visible,
+.admin-sidebar-brand:focus-visible {
+  outline: none;
+  box-shadow: var(--admin-focus-ring-navy);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   4. TOPBAR
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.admin-topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--admin-z-topbar);
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-3);
+  height: var(--admin-topbar-h);
+  padding: 0 var(--admin-space-6);
+  background: var(--admin-raised);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-1);
+  min-width: 0;
+  font-size: var(--admin-text-base);
+  color: var(--admin-text-muted);
+}
+
+.admin-breadcrumb a {
+  color: var(--admin-text-muted);
+  text-decoration: none;
+  border-radius: var(--admin-radius-sm);
+  padding: 2px 4px;
+  white-space: nowrap;
+  transition: color var(--admin-duration-fast);
+}
+
+.admin-breadcrumb a:hover {
+  color: var(--admin-text);
+  background: var(--admin-hover);
+}
+
+.admin-breadcrumb-current {
+  color: var(--admin-text);
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-breadcrumb-sep {
+  color: var(--admin-border-strong);
+  flex-shrink: 0;
+}
+
+/* Icon-only chrome button used in the topbar (menu toggle, search, help). */
+.admin-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--admin-radius);
+  background: transparent;
+  color: var(--admin-text-muted);
+  cursor: pointer;
+  transition:
+    background var(--admin-duration-fast),
+    color var(--admin-duration-fast);
+}
+
+.admin-icon-btn:hover {
+  background: var(--admin-hover);
+  color: var(--admin-text);
+}
+
+.admin-icon-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--admin-focus-ring);
+}
+
+.admin-icon-btn--on-navy {
+  color: var(--admin-text-on-navy);
+}
+
+.admin-icon-btn--on-navy:hover {
+  background: rgb(255 255 255 / 0.1);
+  color: var(--admin-text-inverse);
+}
+
+.admin-icon-btn--on-navy:focus-visible {
+  box-shadow: var(--admin-focus-ring-navy);
+}
+
+/* The Cmd+K affordance in the topbar. */
+.admin-search-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--admin-space-2);
+  height: 32px;
+  min-width: 200px;
+  padding: 0 var(--admin-space-2) 0 var(--admin-space-3);
   border: 1px solid var(--admin-border);
-  border-radius: 0.75rem;
-  padding: 1.25rem;
+  border-radius: var(--admin-radius);
+  background: var(--admin-sunken);
+  color: var(--admin-text-muted);
+  font-size: var(--admin-text-base);
+  cursor: pointer;
+  transition:
+    border-color var(--admin-duration-fast),
+    background var(--admin-duration-fast);
 }
 
-/* ── Buttons ────────────────────────────────────────── */
+.admin-search-trigger:hover {
+  border-color: var(--admin-border-strong);
+  background: var(--admin-raised);
+}
+
+.admin-search-trigger:focus-visible {
+  outline: none;
+  box-shadow: var(--admin-focus-ring);
+}
+
+.admin-kbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 1px;
+  padding: 2px 5px;
+  border: 1px solid var(--admin-border);
+  border-bottom-width: 2px;
+  border-radius: var(--admin-radius-sm);
+  background: var(--admin-raised);
+  font-family: inherit;
+  font-size: var(--admin-text-xs);
+  font-weight: 600;
+  color: var(--admin-text-muted);
+  line-height: 1.4;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   5. COMMAND PALETTE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.admin-palette-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--admin-z-palette);
+  display: flex;
+  justify-content: center;
+  padding: 12vh var(--admin-space-4) var(--admin-space-4);
+  background: rgb(15 23 42 / 0.45);
+  backdrop-filter: blur(2px);
+}
+
+.admin-palette {
+  width: 100%;
+  max-width: 620px;
+  max-height: 68vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--admin-raised);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-xl);
+  box-shadow: var(--admin-shadow-xl);
+}
+
+.admin-palette-input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-4);
+  border-bottom: 1px solid var(--admin-border-subtle);
+  flex-shrink: 0;
+}
+
+.admin-palette-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: var(--admin-text-lg);
+  color: var(--admin-text);
+}
+
+.admin-palette-input::placeholder {
+  color: var(--admin-text-faint);
+}
+
+.admin-palette-results {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--admin-space-2);
+  overscroll-behavior: contain;
+}
+
+.admin-palette-group {
+  padding: var(--admin-space-3) var(--admin-space-3) var(--admin-space-1);
+  font-size: var(--admin-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--admin-text-faint);
+}
+
+.admin-palette-item {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-3);
+  width: 100%;
+  padding: var(--admin-space-2) var(--admin-space-3);
+  border: none;
+  border-radius: var(--admin-radius);
+  background: transparent;
+  color: var(--admin-text);
+  font-size: var(--admin-text-body);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+/* Highlight follows the keyboard cursor, not the mouse, so arrow keys and
+   hover can't disagree about which row is "the" active one. */
+.admin-palette-item[data-active="true"] {
+  background: var(--admin-selected);
+}
+
+.admin-palette-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  border-radius: var(--admin-radius-sm);
+  background: var(--admin-neutral-bg);
+  color: var(--admin-text-secondary);
+}
+
+.admin-palette-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-4);
+  padding: var(--admin-space-2) var(--admin-space-4);
+  border-top: 1px solid var(--admin-border-subtle);
+  background: var(--admin-sunken);
+  font-size: var(--admin-text-sm);
+  color: var(--admin-text-muted);
+  flex-shrink: 0;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   6. SURFACES
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.admin-card {
+  background: var(--admin-raised);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-lg);
+  padding: var(--admin-space-5);
+}
+
+.admin-card--flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.admin-card--interactive {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition:
+    border-color var(--admin-duration-fast),
+    box-shadow var(--admin-duration-fast),
+    transform var(--admin-duration-fast);
+}
+
+.admin-card--interactive:hover {
+  border-color: var(--admin-gold);
+  box-shadow: var(--admin-shadow-md);
+}
+
+.admin-card--interactive:focus-visible {
+  outline: none;
+  box-shadow: var(--admin-focus-ring);
+}
+
+.admin-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-4) var(--admin-space-5);
+  border-bottom: 1px solid var(--admin-border-subtle);
+}
+
+.admin-card-title {
+  font-size: var(--admin-text-body);
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+/* Well — a recessed area inside a card (repeater rows, previews, code). */
+.admin-well {
+  background: var(--admin-sunken);
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--admin-radius);
+  padding: var(--admin-space-3);
+}
+
+/* ── Page header ──────────────────────────────────────────────────────────*/
+.admin-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--admin-space-4);
+  margin-bottom: var(--admin-space-6);
+}
+
+.admin-page-title {
+  font-size: var(--admin-text-xl);
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--admin-text);
+}
+
+.admin-page-subtitle {
+  margin-top: var(--admin-space-1);
+  font-size: var(--admin-text-body);
+  line-height: 1.5;
+  color: var(--admin-text-muted);
+  max-width: 68ch;
+}
+
+.admin-section-label {
+  font-size: var(--admin-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--admin-text-faint);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   7. CONTROLS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 .admin-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
+  justify-content: center;
+  gap: var(--admin-space-2);
+  padding: 0.5rem var(--admin-space-4);
+  border: 1px solid transparent;
+  border-radius: var(--admin-radius);
+  font-size: var(--admin-text-body);
   font-weight: 500;
+  line-height: 1.25;
+  white-space: nowrap;
   cursor: pointer;
-  transition: all 0.15s;
-  border: none;
+  transition:
+    background var(--admin-duration-fast),
+    border-color var(--admin-duration-fast),
+    color var(--admin-duration-fast),
+    box-shadow var(--admin-duration-fast);
+}
+
+.admin-btn:disabled,
+.admin-btn[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .admin-btn-primary {
   background: var(--admin-navy);
-  color: white;
+  border-color: var(--admin-navy);
+  color: var(--admin-text-inverse);
 }
-.admin-btn-primary:hover {
-  background: #1a2a42;
+.admin-btn-primary:hover:not(:disabled) {
+  background: var(--admin-navy-hover);
+  border-color: var(--admin-navy-hover);
 }
 
 .admin-btn-gold {
   background: var(--admin-gold);
+  border-color: var(--admin-gold);
   color: var(--admin-navy);
   font-weight: 600;
 }
-.admin-btn-gold:hover {
+.admin-btn-gold:hover:not(:disabled) {
   background: var(--admin-gold-hover);
+  border-color: var(--admin-gold-hover);
 }
 
 .admin-btn-outline {
-  background: transparent;
-  border: 1px solid var(--admin-border);
-  color: #111827;
+  background: var(--admin-raised);
+  border-color: var(--admin-border);
+  color: var(--admin-text);
 }
-.admin-btn-outline:hover {
-  background: #f3f4f6;
+.admin-btn-outline:hover:not(:disabled) {
+  background: var(--admin-hover);
+  border-color: var(--admin-border-strong);
+}
+
+.admin-btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--admin-text-secondary);
+}
+.admin-btn-ghost:hover:not(:disabled) {
+  background: var(--admin-hover);
+  color: var(--admin-text);
 }
 
 .admin-btn-danger {
-  background: #fee2e2;
-  color: #7f1d1d;
-  border: 1px solid #fca5a5;
+  background: var(--admin-danger-bg);
+  border-color: var(--admin-danger-border);
+  color: var(--admin-danger);
 }
-.admin-btn-danger:hover {
+.admin-btn-danger:hover:not(:disabled) {
   background: #fecaca;
+  border-color: var(--admin-danger);
+}
+
+/* Solid destructive — for the confirm step of a delete, where the button must
+   read as the point of no return rather than as one option among two. */
+.admin-btn-danger-solid {
+  background: var(--admin-danger);
+  border-color: var(--admin-danger);
+  color: var(--admin-text-inverse);
+}
+.admin-btn-danger-solid:hover:not(:disabled) {
+  background: #991b1b;
+  border-color: #991b1b;
 }
 
 .admin-btn-sm {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.8125rem;
+  padding: 0.3125rem var(--admin-space-3);
+  font-size: var(--admin-text-base);
+  gap: var(--admin-space-1);
 }
 
-/* Visible keyboard focus for all admin controls */
-.admin-btn:focus-visible,
-.admin-nav-trigger:focus-visible,
-.admin-nav-dropdown-item:focus-visible {
-  outline: 2px solid var(--admin-gold);
-  outline-offset: 2px;
+.admin-btn-lg {
+  padding: 0.625rem var(--admin-space-5);
+  font-size: var(--admin-text-lg);
 }
 
-/* ── Badges ─────────────────────────────────────────── */
+.admin-btn-block {
+  width: 100%;
+}
+
+/* ── Badges ───────────────────────────────────────────────────────────────*/
 .admin-badge {
   display: inline-flex;
   align-items: center;
-  padding: 0.2rem 0.6rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
+  gap: var(--admin-space-1);
+  padding: 0.1875rem var(--admin-space-2);
+  border: 1px solid transparent;
+  border-radius: var(--admin-radius-full);
+  font-size: var(--admin-text-xs);
   font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
 .admin-badge-green {
-  background: #dcfce7;
-  color: #14532d;
+  background: var(--admin-success-bg);
+  border-color: var(--admin-success-border);
+  color: var(--admin-success);
 }
 .admin-badge-yellow {
-  background: #fef9c3;
-  color: #713f12;
+  background: var(--admin-warning-bg);
+  border-color: var(--admin-warning-border);
+  color: var(--admin-warning);
 }
 .admin-badge-red {
-  background: #fee2e2;
-  color: #7f1d1d;
+  background: var(--admin-danger-bg);
+  border-color: var(--admin-danger-border);
+  color: var(--admin-danger);
 }
 .admin-badge-gray {
-  background: #e5e7eb;
-  color: #1f2937;
+  background: var(--admin-neutral-bg);
+  border-color: var(--admin-neutral-border);
+  color: var(--admin-neutral);
 }
 .admin-badge-blue {
-  background: #dbeafe;
-  color: #1e3a8a;
+  background: var(--admin-info-bg);
+  border-color: var(--admin-info-border);
+  color: var(--admin-info);
+}
+.admin-badge-draft {
+  background: var(--admin-draft-bg);
+  border-color: var(--admin-draft-border);
+  color: var(--admin-draft);
+}
+.admin-badge-published {
+  background: var(--admin-published-bg);
+  border-color: var(--admin-published-border);
+  color: var(--admin-published);
 }
 
-/* ── Form elements ──────────────────────────────────── */
-.admin-input {
+/* ═══════════════════════════════════════════════════════════════════════════
+   8. FORMS
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.admin-input,
+.admin-select,
+.admin-textarea {
   width: 100%;
-  padding: 0.5rem 0.75rem;
+  padding: 0.5rem var(--admin-space-3);
   border: 1px solid var(--admin-border);
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-  color: #111827;
+  border-radius: var(--admin-radius);
+  background: var(--admin-raised);
+  color: var(--admin-text);
+  font-size: var(--admin-text-body);
+  font-family: inherit;
+  line-height: 1.5;
   outline: none;
-  transition: border-color 0.15s;
-}
-
-.admin-input:focus {
-  border-color: var(--admin-gold);
-  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
-}
-
-.admin-label {
-  display: block;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 0.375rem;
-}
-
-.admin-select {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--admin-border);
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-  color: #111827;
-  outline: none;
-}
-
-.admin-select:focus {
-  border-color: var(--admin-gold);
-  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+  transition:
+    border-color var(--admin-duration-fast),
+    box-shadow var(--admin-duration-fast);
 }
 
 .admin-textarea {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--admin-border);
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  background: white;
-  color: #111827;
-  outline: none;
   resize: vertical;
   min-height: 96px;
 }
 
-.admin-textarea:focus {
-  border-color: var(--admin-gold);
-  box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+.admin-input::placeholder,
+.admin-textarea::placeholder {
+  color: var(--admin-text-faint);
 }
 
-/* ── Table ──────────────────────────────────────────── */
+.admin-input:hover:not(:disabled),
+.admin-select:hover:not(:disabled),
+.admin-textarea:hover:not(:disabled) {
+  border-color: var(--admin-border-strong);
+}
+
+.admin-input:focus,
+.admin-select:focus,
+.admin-textarea:focus {
+  border-color: var(--admin-gold);
+  box-shadow: var(--admin-focus-ring-tight);
+}
+
+.admin-input:disabled,
+.admin-select:disabled,
+.admin-textarea:disabled {
+  background: var(--admin-sunken);
+  color: var(--admin-text-muted);
+  cursor: not-allowed;
+}
+
+.admin-input[aria-invalid="true"],
+.admin-select[aria-invalid="true"],
+.admin-textarea[aria-invalid="true"] {
+  border-color: var(--admin-danger);
+}
+
+.admin-input[aria-invalid="true"]:focus,
+.admin-select[aria-invalid="true"]:focus,
+.admin-textarea[aria-invalid="true"]:focus {
+  box-shadow: 0 0 0 3px rgb(185 28 28 / 0.18);
+}
+
+.admin-label {
+  display: block;
+  margin-bottom: var(--admin-space-1);
+  font-size: var(--admin-text-base);
+  font-weight: 600;
+  color: var(--admin-text-secondary);
+}
+
+.admin-required {
+  margin-left: 2px;
+  color: var(--admin-danger);
+}
+
+/* Help text sits under the control it explains. Muted, but still readable —
+   this is where a non-technical editor learns what a field does. */
+.admin-help {
+  margin-top: var(--admin-space-1);
+  font-size: var(--admin-text-sm);
+  line-height: 1.5;
+  color: var(--admin-text-muted);
+}
+
+.admin-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--admin-space-1);
+  margin-top: var(--admin-space-1);
+  font-size: var(--admin-text-sm);
+  line-height: 1.5;
+  color: var(--admin-danger);
+}
+
+/* Fieldset — groups a long form into named chunks. */
+.admin-fieldset {
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--admin-radius-lg);
+  padding: var(--admin-space-4);
+  margin-bottom: var(--admin-space-4);
+}
+
+.admin-fieldset-legend {
+  padding: 0 var(--admin-space-2);
+  margin-left: calc(var(--admin-space-2) * -1);
+  font-size: var(--admin-text-base);
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   9. DATA
+   ═══════════════════════════════════════════════════════════════════════════ */
+
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: var(--admin-text-body);
 }
 
 .admin-table th {
-  padding: 0.75rem 1rem;
+  padding: var(--admin-space-3) var(--admin-space-4);
   text-align: left;
+  font-size: var(--admin-text-sm);
   font-weight: 700;
-  color: #374151;
-  font-size: 0.75rem;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  border-bottom: 2px solid var(--admin-border);
-  background: #f9fafb;
+  color: var(--admin-text-secondary);
+  background: var(--admin-sunken);
+  border-bottom: 1px solid var(--admin-border);
+  white-space: nowrap;
+}
+
+/* Sortable header — the whole cell is the button target. */
+.admin-table th[aria-sort] {
+  cursor: pointer;
+  user-select: none;
+}
+
+.admin-table th[aria-sort]:hover {
+  color: var(--admin-text);
+  background: var(--admin-hover);
 }
 
 .admin-table td {
-  padding: 0.875rem 1rem;
-  border-bottom: 1px solid #e5e7eb;
-  color: #111827;
+  padding: var(--admin-space-3) var(--admin-space-4);
+  border-bottom: 1px solid var(--admin-border-subtle);
+  color: var(--admin-text);
+  vertical-align: middle;
 }
 
-.admin-table tr:last-child td {
+.admin-table tbody tr:last-child td {
   border-bottom: none;
 }
 
-.admin-table tr:hover td {
-  background: #f9fafb;
+.admin-table tbody tr:hover td {
+  background: var(--admin-sunken);
 }
 
-/* ── Page header ────────────────────────────────────── */
-.admin-page-header {
+.admin-table tbody tr[data-selected="true"] td {
+  background: var(--admin-selected);
+}
+
+/* Sticky header for long tables inside a scrolling card. */
+.admin-table--sticky th {
+  position: sticky;
+  top: 0;
+  z-index: var(--admin-z-sticky);
+}
+
+.admin-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Bulk-action bar that appears above a table once rows are selected. */
+.admin-bulk-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-2) var(--admin-space-4);
+  background: var(--admin-selected);
+  border-bottom: 1px solid var(--admin-border);
+  font-size: var(--admin-text-base);
+  font-weight: 500;
+  color: var(--admin-text);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   10. FEEDBACK
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Empty state ──────────────────────────────────────────────────────────*/
+.admin-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-12) var(--admin-space-6);
+  text-align: center;
+}
+
+.admin-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--admin-radius-full);
+  background: var(--admin-neutral-bg);
+  color: var(--admin-text-muted);
+}
+
+.admin-empty-title {
+  font-size: var(--admin-text-lg);
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+.admin-empty-body {
+  max-width: 46ch;
+  font-size: var(--admin-text-body);
+  line-height: 1.6;
+  color: var(--admin-text-muted);
+}
+
+/* ── Skeleton ─────────────────────────────────────────────────────────────*/
+.admin-skeleton {
+  border-radius: var(--admin-radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--admin-neutral-bg) 25%,
+    var(--admin-hover) 37%,
+    var(--admin-neutral-bg) 63%
+  );
+  background-size: 400% 100%;
+  animation: admin-shimmer 1.4s ease infinite;
+}
+
+@keyframes admin-shimmer {
+  0% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0 50%;
+  }
+}
+
+/* ── Save bar ─────────────────────────────────────────────────────────────
+   Sticks to the bottom of the editor while there are unsaved changes. The
+   panel previously had no dirty-state signal at all — content could be lost
+   by navigating away with no warning. */
+.admin-savebar {
+  position: sticky;
+  bottom: 0;
+  z-index: var(--admin-z-savebar);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
+  gap: var(--admin-space-4);
+  min-height: var(--admin-savebar-h);
+  padding: var(--admin-space-3) var(--admin-space-6);
+  background: var(--admin-raised);
+  border-top: 1px solid var(--admin-border);
+  box-shadow: 0 -4px 16px -8px rgb(15 23 42 / 0.18);
 }
 
-.admin-page-title {
-  font-size: 1.375rem;
+.admin-savebar[data-dirty="true"] {
+  border-top-color: var(--admin-gold);
+}
+
+.admin-savebar-status {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-2);
+  font-size: var(--admin-text-base);
+  color: var(--admin-text-muted);
+}
+
+.admin-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--admin-radius-full);
+  flex-shrink: 0;
+}
+
+.admin-dot--dirty {
+  background: var(--admin-gold);
+}
+.admin-dot--saved {
+  background: var(--admin-success);
+}
+.admin-dot--error {
+  background: var(--admin-danger);
+}
+
+/* ── Drawer / inspector ───────────────────────────────────────────────────*/
+.admin-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--admin-z-drawer);
+  display: flex;
+  justify-content: flex-end;
+  background: rgb(15 23 42 / 0.4);
+}
+
+.admin-drawer {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 440px;
+  height: 100%;
+  background: var(--admin-raised);
+  border-left: 1px solid var(--admin-border);
+  box-shadow: var(--admin-shadow-xl);
+  animation: admin-slide-in var(--admin-duration-slow) var(--admin-ease);
+}
+
+@keyframes admin-slide-in {
+  from {
+    transform: translateX(16px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.admin-drawer-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-4) var(--admin-space-5);
+  border-bottom: 1px solid var(--admin-border-subtle);
+  flex-shrink: 0;
+}
+
+.admin-drawer-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--admin-space-5);
+  overscroll-behavior: contain;
+}
+
+.admin-drawer-footer {
+  flex-shrink: 0;
+  padding: var(--admin-space-3) var(--admin-space-5);
+  border-top: 1px solid var(--admin-border-subtle);
+  background: var(--admin-raised);
+}
+
+/* Drag handle for a resizable drawer. */
+.admin-drawer-resize {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: col-resize;
+  background: transparent;
+}
+
+.admin-drawer-resize:hover,
+.admin-drawer-resize[data-dragging="true"] {
+  background: var(--admin-gold);
+}
+
+/* ── Editable region ──────────────────────────────────────────────────────
+   Marks a clickable section in a live-preview editor. Previously these were
+   invisible until hovered, so editors could not tell what was editable. */
+.admin-editable {
+  position: relative;
+  cursor: pointer;
+  outline: 1px dashed rgb(201 168 76 / 0.5);
+  outline-offset: -1px;
+  transition: outline-color var(--admin-duration-fast);
+}
+
+.admin-editable:hover,
+.admin-editable:focus-visible {
+  outline: 2px solid var(--admin-gold);
+  outline-offset: -2px;
+}
+
+.admin-editable-tag {
+  position: absolute;
+  top: var(--admin-space-2);
+  left: var(--admin-space-2);
+  z-index: var(--admin-z-sticky);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--admin-space-1);
+  padding: 2px var(--admin-space-2);
+  border-radius: var(--admin-radius-sm);
+  background: var(--admin-gold);
+  color: var(--admin-navy);
+  font-size: var(--admin-text-xs);
   font-weight: 700;
-  color: #0f172a;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--admin-duration-fast);
 }
 
-.admin-page-subtitle {
-  font-size: 0.875rem;
-  color: #4b5563;
-  margin-top: 0.25rem;
+.admin-editable:hover .admin-editable-tag,
+.admin-editable:focus-visible .admin-editable-tag {
+  opacity: 1;
+}
+
+/* ── Inline banner ────────────────────────────────────────────────────────*/
+.admin-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-3) var(--admin-space-4);
+  border: 1px solid;
+  border-radius: var(--admin-radius);
+  font-size: var(--admin-text-body);
+  line-height: 1.5;
+}
+
+.admin-banner--info {
+  background: var(--admin-info-bg);
+  border-color: var(--admin-info-border);
+  color: var(--admin-info);
+}
+.admin-banner--success {
+  background: var(--admin-success-bg);
+  border-color: var(--admin-success-border);
+  color: var(--admin-success);
+}
+.admin-banner--warning {
+  background: var(--admin-warning-bg);
+  border-color: var(--admin-warning-border);
+  color: var(--admin-warning);
+}
+.admin-banner--danger {
+  background: var(--admin-danger-bg);
+  border-color: var(--admin-danger-border);
+  color: var(--admin-danger);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   11. RESPONSIVE
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Tablet — the sidebar auto-collapses to a rail so content keeps its width. */
+@media (max-width: 1024px) {
+  :root {
+    --admin-sidebar-w: var(--admin-sidebar-w-collapsed);
+  }
+
+  .admin-content {
+    padding: var(--admin-space-4);
+  }
+
+  .admin-topbar {
+    padding: 0 var(--admin-space-4);
+  }
+}
+
+/* Mobile — the sidebar leaves the flow entirely and becomes a drawer opened
+   from the topbar's menu button. */
+@media (max-width: 640px) {
+  .admin-shell-main,
+  .admin-shell[data-collapsed="true"] .admin-shell-main {
+    margin-left: 0;
+  }
+
+  .admin-sidebar {
+    width: var(--admin-sidebar-w-expanded-mobile, 264px);
+    transform: translateX(-100%);
+    transition: transform var(--admin-duration) var(--admin-ease);
+    box-shadow: var(--admin-shadow-xl);
+  }
+
+  .admin-shell[data-drawer="open"] .admin-sidebar {
+    transform: translateX(0);
+  }
+
+  /* Labels always show in the mobile drawer — the collapsed rail styling
+     would otherwise hide them the moment the tablet breakpoint applied. */
+  .admin-shell[data-drawer="open"] .admin-sidebar-brand-text,
+  .admin-shell[data-drawer="open"] .admin-sidebar-label,
+  .admin-shell[data-drawer="open"] .admin-sidebar-group,
+  .admin-shell[data-drawer="open"] .admin-sidebar-section-chevron {
+    display: revert;
+  }
+
+  .admin-shell[data-drawer="open"] .admin-sidebar-section,
+  .admin-shell[data-drawer="open"] .admin-sidebar-link {
+    justify-content: flex-start;
+    padding-left: var(--admin-space-3);
+    padding-right: var(--admin-space-3);
+  }
+
+  .admin-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--admin-z-sidebar) - 1);
+    background: rgb(15 23 42 / 0.45);
+  }
+
+  .admin-content {
+    padding: var(--admin-space-3);
+  }
+
+  .admin-page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-savebar {
+    padding: var(--admin-space-3) var(--admin-space-4);
+  }
+
+  .admin-drawer {
+    max-width: 100%;
+  }
+
+  .admin-palette-backdrop {
+    padding: var(--admin-space-4);
+  }
+
+  /* Tables become stacked cards: each row is a block, each cell is labelled
+     from its column header via a data attribute the DataTable sets. */
+  .admin-table--stack thead {
+    display: none;
+  }
+
+  .admin-table--stack tbody tr {
+    display: block;
+    margin-bottom: var(--admin-space-3);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius);
+    background: var(--admin-raised);
+  }
+
+  .admin-table--stack tbody td {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--admin-space-3);
+    padding: var(--admin-space-2) var(--admin-space-3);
+    border-bottom: 1px solid var(--admin-border-subtle);
+    text-align: right;
+  }
+
+  .admin-table--stack tbody td::before {
+    content: attr(data-label);
+    flex-shrink: 0;
+    font-size: var(--admin-text-sm);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--admin-text-faint);
+    text-align: left;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   12. MOTION & A11Y
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Every interactive admin control gets the same visible focus treatment. */
+.admin-btn:focus-visible,
+.admin-card--interactive:focus-visible,
+.admin-palette-item:focus-visible {
+  outline: none;
+  box-shadow: var(--admin-focus-ring);
+}
+
+/* Skip link — first tab stop, jumps past the sidebar to the page content. */
+.admin-skip-link {
+  position: absolute;
+  left: var(--admin-space-4);
+  top: calc(var(--admin-space-4) * -1);
+  z-index: var(--admin-z-toast);
+  padding: var(--admin-space-2) var(--admin-space-4);
+  border-radius: var(--admin-radius);
+  background: var(--admin-navy);
+  color: var(--admin-text-inverse);
+  font-size: var(--admin-text-body);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+  transition: transform var(--admin-duration-fast);
+}
+
+.admin-skip-link:focus {
+  transform: translateY(calc(var(--admin-space-4) * 2));
+}
+
+.admin-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-sidebar,
+  .admin-shell-main,
+  .admin-drawer,
+  .admin-skeleton,
+  .admin-sidebar-section-chevron {
+    transition: none;
+    animation: none;
+  }
+
+  .admin-skeleton {
+    background: var(--admin-neutral-bg);
+  }
+}
+
+/* Windows high-contrast / forced-colors: restore real borders where we rely
+   on background colour alone to convey state. */
+@media (forced-colors: active) {
+  .admin-btn,
+  .admin-badge,
+  .admin-card {
+    border: 1px solid currentColor;
+  }
+
+  .admin-sidebar-link[aria-current="page"],
+  .admin-palette-item[data-active="true"] {
+    outline: 2px solid currentColor;
+  }
 }

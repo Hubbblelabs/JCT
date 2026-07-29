@@ -1,10 +1,18 @@
 "use client";
 
-import { useEffect, useState, Suspense, type MouseEvent } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Plus, ChevronRight, Trash2, Loader2, Search } from "lucide-react";
+import { Eye, EyeOff, GraduationCap, Loader2, Plus, Send, Trash2 } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { COLLEGE_LABELS, type College } from "@/lib/admin-nav";
+import { PageShell } from "@/components/admin/kit/PageShell";
+import { DataTable, type Column } from "@/components/admin/kit/DataTable";
+import {
+  Banner,
+  PublishBadge,
+  VisibilityBadge,
+} from "@/components/admin/kit/primitives";
 
 interface Program {
   _id: string;
@@ -19,75 +27,66 @@ interface Program {
   status: "draft" | "published" | "archived";
 }
 
+const collegeLabel = (id: string) =>
+  COLLEGE_LABELS[id as College] ?? id ?? "—";
+
 function ProgramsPageInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const toast = useToast();
   const confirm = useConfirm();
+
   const [programs, setPrograms] = useState<Program[]>([]);
   const [loading, setLoading] = useState(true);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [creatingNew, setCreatingNew] = useState(false);
-  const [filter, setFilter] = useState(() => searchParams.get("college") ?? "");
-  const [query, setQuery] = useState("");
+  const [busy, setBusy] = useState(false);
 
-  const load = async () => {
+  const college = searchParams.get("college") ?? "";
+
+  // The old loader had no `r.ok` check and no catch, so a failed request left
+  // the page showing an empty table — indistinguishable from "no programs".
+  const load = useCallback(async () => {
     setLoading(true);
-    const r = await fetch("/api/admin/programs");
-    const data = await r.json();
-    if (Array.isArray(data)) setPrograms(data);
-    else setPrograms([]);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
-  useEffect(() => {
-    setFilter(searchParams.get("college") ?? "");
-  }, [searchParams]);
-
-  const handleDelete = async (e: MouseEvent, program: Program) => {
-    e.stopPropagation();
-    const ok = await confirm({
-      title: "Delete program",
-      message: `Permanently delete "${program.name}"? This removes it completely and cannot be undone.`,
-      confirmLabel: "Delete",
-      destructive: true,
-    });
-    if (!ok) return;
-    setDeletingId(program._id);
+    setLoadError(null);
     try {
-      const r = await fetch(`/api/admin/programs/${program._id}`, {
-        method: "DELETE",
-      });
-      if (r.ok) {
-        setPrograms((prev) => prev.filter((p) => p._id !== program._id));
-        toast.success(`Deleted "${program.name}".`);
-      } else {
-        toast.error("Failed to delete program.");
-      }
-    } catch {
-      toast.error("Failed to delete program.");
+      const r = await fetch("/api/admin/programs");
+      if (!r.ok) throw new Error(`Request failed (${r.status})`);
+      const data = await r.json();
+      setPrograms(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setPrograms([]);
+      setLoadError(
+        err instanceof Error ? err.message : "Could not load programs.",
+      );
     } finally {
-      setDeletingId(null);
+      setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const open = (p: Program) =>
+    router.push(`/admin/programs/${p._id}?college=${p.institution}`);
+
+  const rows = college
+    ? programs.filter((p) => p.institution === college)
+    : programs;
 
   const handleCreateNew = async () => {
     setCreatingNew(true);
     try {
-      const college = filter || "engineering";
-      // Generate unique slug from timestamp
-      const timestamp = Date.now();
+      const institution = college || "engineering";
       const r = await fetch("/api/admin/programs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: "Untitled Program",
           abbr: "UP",
-          slug: `untitled-program-${timestamp}`,
-          institution: college,
+          slug: `untitled-program-${Date.now()}`,
+          institution,
           image: "",
           outcomes: [],
           is_active: true,
@@ -95,183 +94,211 @@ function ProgramsPageInner() {
           content: {},
         }),
       });
-      if (r.ok) {
-        const data = await r.json();
-        router.push(`/admin/programs/${data._id}?college=${college}`);
-      } else {
-        toast.error("Failed to create program.");
-        setCreatingNew(false);
-      }
+      if (!r.ok) throw new Error();
+      const data = await r.json();
+      router.push(`/admin/programs/${data._id}?college=${institution}`);
     } catch {
-      toast.error("Failed to create program.");
+      toast.error("Could not create the program. Nothing was saved.");
       setCreatingNew(false);
     }
   };
 
-  const q = query.trim().toLowerCase();
-  const filtered = (programs || []).filter(
-    (p) =>
-      (!filter || p.institution === filter) &&
-      (!q ||
-        p.name.toLowerCase().includes(q) ||
-        p.abbr.toLowerCase().includes(q) ||
-        p.slug.toLowerCase().includes(q)),
-  );
+  /** Runs one request per row and reports how many actually succeeded. */
+  const runBulk = async (
+    label: string,
+    selected: Program[],
+    run: (p: Program) => Promise<Response>,
+  ) => {
+    setBusy(true);
+    try {
+      const results = await Promise.all(
+        selected.map((p) => run(p).catch(() => null)),
+      );
+      const failed = results.filter((r) => !r || !r.ok).length;
+      if (failed === 0) {
+        toast.success(`${label} ${selected.length} program(s).`);
+      } else {
+        toast.error(
+          `${label} ${selected.length - failed} of ${selected.length}. ${failed} failed — they were left unchanged.`,
+        );
+      }
+      await load();
+    } finally {
+      setBusy(false);
+    }
+  };
 
-  const collegeLabel =
-    filter === "engineering"
-      ? "Engineering"
-      : filter === "arts-science"
-        ? "Arts & Science"
-        : filter === "polytechnic"
-          ? "Polytechnic"
-          : "All";
+  const setActive = (selected: Program[], is_active: boolean) =>
+    runBulk(is_active ? "Published to site:" : "Hidden from site:", selected, (p) =>
+      fetch(`/api/admin/programs/${p._id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_active }),
+      }),
+    );
+
+  const publish = (selected: Program[]) =>
+    runBulk("Published", selected, (p) =>
+      fetch(`/api/admin/programs/${p._id}/publish`, { method: "POST" }),
+    );
+
+  const remove = async (selected: Program[]) => {
+    const ok = await confirm({
+      title:
+        selected.length === 1 ? "Delete program" : `Delete ${selected.length} programs`,
+      message:
+        selected.length === 1
+          ? `Permanently delete “${selected[0].name}”? Its page content and uploaded images go with it. This cannot be undone.`
+          : `Permanently delete ${selected.length} programs, including their page content and uploaded images? This cannot be undone.`,
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
+    await runBulk("Deleted", selected, (p) =>
+      fetch(`/api/admin/programs/${p._id}`, { method: "DELETE" }),
+    );
+  };
+
+  const columns: Column<Program>[] = [
+    {
+      key: "name",
+      header: "Program",
+      sortable: true,
+      value: (p) => `${p.name} ${p.abbr} ${p.slug}`,
+      render: (p) => (
+        <span className="block">
+          <span className="block font-medium text-[var(--admin-text)]">
+            {p.name}
+          </span>
+          <span className="block font-mono text-[length:var(--admin-text-sm)] text-[var(--admin-text-faint)]">
+            {p.abbr}
+          </span>
+        </span>
+      ),
+    },
+    {
+      key: "institution",
+      header: "College",
+      sortable: true,
+      hideOnMobile: true,
+      value: (p) => collegeLabel(p.institution),
+      render: (p) => (
+        <span className="text-[var(--admin-text-secondary)]">
+          {collegeLabel(p.institution)}
+        </span>
+      ),
+    },
+    {
+      key: "status",
+      header: "Page content",
+      sortable: true,
+      value: (p) => p.status ?? "draft",
+      render: (p) => <PublishBadge status={p.status} />,
+    },
+    {
+      key: "is_active",
+      header: "On public site",
+      sortable: true,
+      value: (p) => (p.is_active ? 1 : 0),
+      render: (p) => <VisibilityBadge isActive={p.is_active} />,
+    },
+  ];
 
   return (
-    <div className="admin-content">
-      <div className="admin-page-header">
-        <div>
-          <h1 className="admin-page-title">Programs</h1>
-          <p className="admin-page-subtitle">
-            {filtered.filter((p) => p.is_active).length} active · {collegeLabel}
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <div className="relative">
-            <Search
-              size={15}
-              className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-gray-400"
-            />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search programs…"
-              aria-label="Search programs by name, abbreviation, or slug"
-              className="admin-input w-56 pl-9"
-            />
-          </div>
-          <button
-            onClick={handleCreateNew}
-            disabled={creatingNew}
-            className="admin-btn admin-btn-primary disabled:cursor-not-allowed disabled:opacity-50"
+    <PageShell
+      title="Programs"
+      description={
+        college
+          ? `Course cards and full page content for ${collegeLabel(college)}.`
+          : "Course cards and full page content across all three colleges."
+      }
+      actions={
+        <button
+          onClick={handleCreateNew}
+          disabled={creatingNew}
+          className="admin-btn admin-btn-primary"
+        >
+          {creatingNew ? (
+            <Loader2 size={15} className="animate-spin" />
+          ) : (
+            <Plus size={15} />
+          )}
+          {creatingNew ? "Creating…" : "New program"}
+        </button>
+      }
+    >
+      {loadError && (
+        <div className="mb-4">
+          <Banner
+            tone="danger"
+            title="Could not load programs"
+            action={
+              <button
+                onClick={() => void load()}
+                className="admin-btn admin-btn-outline admin-btn-sm"
+              >
+                Retry
+              </button>
+            }
           >
-            {creatingNew ? (
-              <>
-                <Loader2 size={16} className="animate-spin" /> Creating...
-              </>
-            ) : (
-              <>
-                <Plus size={16} /> New Program
-              </>
-            )}
-          </button>
+            {loadError}
+          </Banner>
         </div>
-      </div>
+      )}
 
-      <div className="admin-card overflow-x-auto p-0">
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 size={24} className="animate-spin text-gray-400" />
-          </div>
-        ) : (
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>Program</th>
-                <th>Institution</th>
-                <th>Draft / Published</th>
-                <th>Active</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 && (
-                <tr>
-                  <td colSpan={5} className="py-10 text-center text-gray-400">
-                    No programs found.
-                  </td>
-                </tr>
-              )}
-              {filtered.map((p) => (
-                <tr key={p._id} className="transition-colors hover:bg-gray-50">
-                  <td>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        router.push(
-                          `/admin/programs/${p._id}?college=${p.institution}`,
-                        )
-                      }
-                      className="text-left hover:underline"
-                    >
-                      <div className="font-medium text-gray-900">{p.name}</div>
-                      <div className="mt-0.5 font-mono text-xs text-gray-400">
-                        {p.abbr}
-                      </div>
-                    </button>
-                  </td>
-                  <td className="text-sm text-gray-600 capitalize">
-                    {p.institution === "arts-science"
-                      ? "Arts & Science"
-                      : p.institution}
-                  </td>
-                  <td>
-                    <span
-                      className={`admin-badge ${
-                        p.status === "published"
-                          ? "admin-badge-green"
-                          : p.status === "archived"
-                            ? "admin-badge-red"
-                            : "admin-badge-yellow"
-                      }`}
-                    >
-                      {p.status ?? "draft"}
-                    </span>
-                  </td>
-                  <td>
-                    <span
-                      className={`admin-badge ${p.is_active ? "admin-badge-green" : "admin-badge-red"}`}
-                    >
-                      {p.is_active ? "Active" : "Inactive"}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="flex items-center justify-end gap-1">
-                      <button
-                        type="button"
-                        onClick={(e) => handleDelete(e, p)}
-                        disabled={deletingId === p._id}
-                        title="Delete program"
-                        className="admin-btn admin-btn-danger admin-btn-sm"
-                      >
-                        {deletingId === p._id ? (
-                          <Loader2 size={13} className="animate-spin" />
-                        ) : (
-                          <Trash2 size={13} />
-                        )}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          router.push(
-                            `/admin/programs/${p._id}?college=${p.institution}`,
-                          )
-                        }
-                        title="Open CMS editor"
-                        className="admin-btn admin-btn-outline admin-btn-sm"
-                      >
-                        <ChevronRight size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </div>
+      <DataTable
+        rows={rows}
+        columns={columns}
+        rowKey={(p) => p._id}
+        loading={loading}
+        searchPlaceholder="Search by name, code or slug…"
+        onRowClick={open}
+        initialSort={{ key: "name", dir: "asc" }}
+        empty={{
+          title: college
+            ? `No programs for ${collegeLabel(college)} yet`
+            : "No programs yet",
+          body: "A program is one course entry — its card on the listing page and its full tabbed detail page.",
+          action: (
+            <button
+              onClick={handleCreateNew}
+              className="admin-btn admin-btn-primary"
+            >
+              <Plus size={15} /> New program
+            </button>
+          ),
+        }}
+        bulkActions={
+          busy
+            ? []
+            : [
+                { label: "Publish", icon: Send, onRun: (s) => publish(s) },
+                {
+                  label: "Show on site",
+                  icon: Eye,
+                  onRun: (s) => setActive(s, true),
+                },
+                {
+                  label: "Hide from site",
+                  icon: EyeOff,
+                  onRun: (s) => setActive(s, false),
+                },
+                {
+                  label: "Delete",
+                  icon: Trash2,
+                  destructive: true,
+                  onRun: (s) => remove(s),
+                },
+              ]
+        }
+        toolbar={
+          <span className="admin-help hidden sm:inline">
+            <GraduationCap size={12} className="mr-1 inline" />
+            Select rows to publish or hide several at once
+          </span>
+        }
+      />
+    </PageShell>
   );
 }
 

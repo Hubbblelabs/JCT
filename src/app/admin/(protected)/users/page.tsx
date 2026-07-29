@@ -1,12 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TextInput, Select } from "@/components/admin/inputs";
-import { Plus, Pencil, Trash2, X, Loader2, Check, Shield } from "lucide-react";
+import { Check, Loader2, Pencil, Plus, Shield, UserPlus, Users } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { PageShell } from "@/components/admin/kit/PageShell";
+import { DataTable, type Column } from "@/components/admin/kit/DataTable";
+import { Drawer } from "@/components/admin/kit/Drawer";
+import { Banner, StatusBadge } from "@/components/admin/kit/primitives";
 
 interface User {
   _id: string;
@@ -19,24 +23,27 @@ interface User {
   created_at: string;
 }
 
-const EMPTY_NEW = {
+type Form = {
+  email: string;
+  full_name: string;
+  password: string;
+  role: string;
+  institution: string;
+  is_active: boolean;
+};
+
+const EMPTY: Form = {
   email: "",
   full_name: "",
   password: "",
   role: "editor",
   institution: "engineering",
-};
-const EMPTY_EDIT = {
-  full_name: "",
-  role: "editor",
-  institution: "engineering",
   is_active: true,
-  password: "",
 };
 
 const ROLES = [
-  { value: "editor", label: "Editor" },
-  { value: "admin", label: "Admin" },
+  { value: "editor", label: "Editor — one college" },
+  { value: "admin", label: "Admin — everything" },
 ];
 
 const EDITOR_INSTITUTIONS = [
@@ -45,423 +52,411 @@ const EDITOR_INSTITUTIONS = [
   { value: "polytechnic", label: "Polytechnic" },
 ];
 
+const instLabel = (v: string) =>
+  v === "all"
+    ? "All colleges"
+    : (EDITOR_INSTITUTIONS.find((i) => i.value === v)?.label ?? v);
+
 export default function UsersPage() {
   const toast = useToast();
   const confirm = useConfirm();
+
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showNew, setShowNew] = useState(false);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [newForm, setNewForm] = useState(EMPTY_NEW);
-  const [editForm, setEditForm] = useState(EMPTY_EDIT);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  // One form for both create and edit. The two flows were separate components
+  // with separate state, separate error channels and separate copies of the
+  // role/institution coupling rule — so a fix to one silently skipped the other.
+  const [editing, setEditing] = useState<User | null>(null);
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState<Form>(EMPTY);
   const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState("");
-  const [editMsg, setEditMsg] = useState("");
-  const [newApiError, setNewApiError] = useState<ApiErrorPayload | null>(null);
-  const [editApiError, setEditApiError] = useState<ApiErrorPayload | null>(
-    null,
-  );
+  const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true);
-    const r = await fetch("/api/admin/users");
-    if (r.ok) setUsers(await r.json());
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    load();
+    setLoadError(null);
+    try {
+      const r = await fetch("/api/admin/users");
+      if (!r.ok) throw new Error(`Request failed (${r.status})`);
+      const data = await r.json();
+      setUsers(Array.isArray(data) ? data : []);
+    } catch (err) {
+      setUsers([]);
+      setLoadError(err instanceof Error ? err.message : "Could not load users.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  const setN = (key: string, val: unknown) =>
-    setNewForm((f) => ({ ...f, [key]: val }));
-  const setE = (key: string, val: unknown) =>
-    setEditForm((f) => ({ ...f, [key]: val }));
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  const set = (key: keyof Form, val: unknown) =>
+    setForm((f) => ({ ...f, [key]: val }));
+
+  /** Admins are stored with institution "all"; editors must name one college. */
+  const setRole = (role: string) =>
+    setForm((f) => ({
+      ...f,
+      role,
+      institution:
+        role === "admin"
+          ? "all"
+          : f.institution === "all"
+            ? "engineering"
+            : f.institution,
+    }));
+
+  const openNew = () => {
+    setEditing(null);
+    setForm(EMPTY);
+    setApiError(null);
+    setOpen(true);
+  };
 
   const openEdit = (u: User) => {
-    setEditingUser(u);
-    const inst =
-      u.role === "admin"
-        ? "all"
-        : u.institution === "all"
-          ? "engineering"
-          : u.institution;
-    setEditForm({
+    setEditing(u);
+    setForm({
+      email: u.email,
       full_name: u.full_name,
-      role: u.role,
-      institution: inst,
-      is_active: u.is_active,
       password: "",
+      role: u.role,
+      institution:
+        u.role === "admin"
+          ? "all"
+          : u.institution === "all"
+            ? "engineering"
+            : u.institution,
+      is_active: u.is_active,
     });
-    setEditMsg("");
-    setEditApiError(null);
+    setApiError(null);
+    setOpen(true);
   };
 
-  const createUser = async () => {
+  const close = () => {
+    setOpen(false);
+    setEditing(null);
+    setApiError(null);
+  };
+
+  const save = async () => {
     setSaving(true);
-    setMsg("");
-    setNewApiError(null);
-    const r = await fetch("/api/admin/users", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newForm),
-    });
-    if (r.ok) {
-      setShowNew(false);
-      setNewForm(EMPTY_NEW);
-      toast.success("User created.");
-      await load();
-    } else {
-      const err = await parseApiError(r);
-      setNewApiError(err);
-      if (!err?.details?.length)
-        setMsg(err?.message ?? err?.error ?? "Error creating user");
+    setApiError(null);
+    try {
+      const isNew = !editing;
+      const body: Record<string, unknown> = isNew
+        ? {
+            email: form.email,
+            full_name: form.full_name,
+            password: form.password,
+            role: form.role,
+            institution: form.institution,
+          }
+        : {
+            full_name: form.full_name,
+            role: form.role,
+            institution: form.institution,
+            is_active: form.is_active,
+          };
+      // Only send a password on edit when one was actually typed — an empty
+      // string would otherwise overwrite the stored hash.
+      if (!isNew && form.password) body.password = form.password;
+
+      const r = await fetch(
+        isNew ? "/api/admin/users" : `/api/admin/users/${editing._id}`,
+        {
+          method: isNew ? "POST" : "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        },
+      );
+      if (r.ok) {
+        toast.success(isNew ? "User created." : "User updated.");
+        await load();
+        close();
+      } else {
+        setApiError(await parseApiError(r));
+      }
+    } catch (err) {
+      setApiError({
+        error: err instanceof Error ? err.message : "Request failed",
+      } as ApiErrorPayload);
     }
     setSaving(false);
   };
 
-  const updateUser = async () => {
-    if (!editingUser) return;
-    setSaving(true);
-    setEditMsg("");
-    setEditApiError(null);
-    const body: Record<string, unknown> = {
-      full_name: editForm.full_name,
-      role: editForm.role,
-      institution: editForm.institution,
-      is_active: editForm.is_active,
-    };
-    if (editForm.password) body.password = editForm.password;
-    const r = await fetch(`/api/admin/users/${editingUser._id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    if (r.ok) {
-      setEditingUser(null);
-      toast.success("User updated.");
-      await load();
-    } else {
-      const err = await parseApiError(r);
-      setEditApiError(err);
-      if (!err?.details?.length)
-        setEditMsg(err?.message ?? err?.error ?? "Error updating user");
-    }
-    setSaving(false);
-  };
-
-  const deactivate = async (id: string) => {
+  const deactivate = async (u: User) => {
     const ok = await confirm({
-      title: "Deactivate user",
-      message: "This user will lose access until reactivated. Continue?",
-      confirmLabel: "Deactivate",
+      title: "Revoke access",
+      message: `${u.full_name || u.email} will be signed out and unable to sign in again until reactivated. Their past changes stay in the audit log.`,
+      confirmLabel: "Revoke access",
       destructive: true,
     });
     if (!ok) return;
-    await fetch(`/api/admin/users/${id}`, { method: "DELETE" });
-    toast.success("User deactivated.");
-    await load();
+    const r = await fetch(`/api/admin/users/${u._id}`, { method: "DELETE" });
+    if (r.ok) {
+      toast.success("Access revoked.");
+      await load();
+    } else {
+      toast.error("Could not revoke access. Nothing was changed.");
+    }
   };
 
-  return (
-    <>
-      <div className="admin-content">
-        <div className="admin-page-header">
-          <div>
-            <h1 className="admin-page-title">Admin Users</h1>
-            <p className="admin-page-subtitle">
-              {users.filter((u) => u.is_active).length} active users
-            </p>
-          </div>
+  const columns: Column<User>[] = [
+    {
+      key: "full_name",
+      header: "Person",
+      sortable: true,
+      value: (u) => `${u.full_name} ${u.email}`,
+      render: (u) => (
+        <span className="block">
+          <span className="block font-medium text-[var(--admin-text)]">
+            {u.full_name || "—"}
+          </span>
+          <span className="admin-help block">{u.email}</span>
+        </span>
+      ),
+    },
+    {
+      key: "role",
+      header: "Role",
+      sortable: true,
+      value: (u) => u.role,
+      render: (u) => (
+        <StatusBadge tone="info" label={u.role} icon={<Shield size={11} />} />
+      ),
+    },
+    {
+      key: "institution",
+      header: "Can edit",
+      sortable: true,
+      hideOnMobile: true,
+      value: (u) => instLabel(u.institution),
+      render: (u) => (
+        <span className="text-[var(--admin-text-secondary)]">
+          {instLabel(u.institution)}
+        </span>
+      ),
+    },
+    {
+      key: "is_active",
+      header: "Access",
+      sortable: true,
+      value: (u) => (u.is_active ? 1 : 0),
+      render: (u) => (
+        <StatusBadge
+          tone={u.is_active ? "active" : "inactive"}
+          label={u.is_active ? "Active" : "Revoked"}
+        />
+      ),
+    },
+    {
+      key: "last_login",
+      header: "Last signed in",
+      sortable: true,
+      hideOnMobile: true,
+      value: (u) => (u.last_login ? +new Date(u.last_login) : 0),
+      render: (u) => (
+        <span className="text-[length:var(--admin-text-sm)] text-[var(--admin-text-faint)]">
+          {u.last_login
+            ? new Date(u.last_login).toLocaleDateString("en-IN")
+            : "Never"}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "right",
+      width: "1%",
+      render: (u) => (
+        <span className="flex justify-end gap-1">
           <button
-            onClick={() => setShowNew(true)}
-            className="admin-btn admin-btn-primary"
+            onClick={(e) => {
+              e.stopPropagation();
+              openEdit(u);
+            }}
+            className="admin-btn admin-btn-outline admin-btn-sm"
+            aria-label={`Edit ${u.full_name || u.email}`}
           >
-            <Plus size={16} /> New User
+            <Pencil size={13} />
           </button>
-        </div>
+          {u.is_active && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                void deactivate(u);
+              }}
+              className="admin-btn admin-btn-danger admin-btn-sm"
+              aria-label={`Revoke access for ${u.full_name || u.email}`}
+            >
+              Revoke
+            </button>
+          )}
+        </span>
+      ),
+    },
+  ];
 
-        {msg && (
-          <p
-            role="alert"
-            className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+  return (
+    <PageShell
+      title="People"
+      description="Who can sign in to this panel and what they are allowed to change. Editors are limited to one college; admins can edit everything."
+      actions={
+        <button onClick={openNew} className="admin-btn admin-btn-primary">
+          <Plus size={15} /> Add person
+        </button>
+      }
+    >
+      {loadError && (
+        <div className="mb-4">
+          <Banner
+            tone="danger"
+            title="Could not load users"
+            action={
+              <button
+                onClick={() => void load()}
+                className="admin-btn admin-btn-outline admin-btn-sm"
+              >
+                Retry
+              </button>
+            }
           >
-            {msg}
-          </p>
+            {loadError}
+          </Banner>
+        </div>
+      )}
+
+      <DataTable
+        rows={users}
+        columns={columns}
+        rowKey={(u) => u._id}
+        loading={loading}
+        searchPlaceholder="Search by name or email…"
+        onRowClick={openEdit}
+        initialSort={{ key: "full_name", dir: "asc" }}
+        empty={{
+          title: "No accounts yet",
+          body: "Add the people who will maintain the site. Give each one the narrowest role that lets them do their job.",
+          action: (
+            <button onClick={openNew} className="admin-btn admin-btn-primary">
+              <UserPlus size={15} /> Add the first person
+            </button>
+          ),
+        }}
+      />
+
+      <Drawer
+        open={open}
+        onClose={close}
+        icon={Users}
+        eyebrow={editing ? "Edit" : "New"}
+        title={editing ? editing.email : "Add a person"}
+        description={
+          editing
+            ? "Changes take effect the next time they load a page."
+            : "They will sign in at /admin/login with this email and password."
+        }
+        footer={
+          <div className="flex justify-end gap-2">
+            <button onClick={close} className="admin-btn admin-btn-outline">
+              Cancel
+            </button>
+            <button
+              onClick={save}
+              disabled={saving}
+              className="admin-btn admin-btn-primary"
+            >
+              {saving ? (
+                <Loader2 size={15} className="animate-spin" />
+              ) : (
+                <Check size={15} />
+              )}
+              {saving ? "Saving…" : editing ? "Save changes" : "Create account"}
+            </button>
+          </div>
+        }
+      >
+        {apiError && (
+          <ValidationErrors
+            error={apiError.message ?? apiError.error}
+            details={apiError.details}
+          />
         )}
 
-        <div className="admin-card overflow-x-auto p-0">
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 size={24} className="animate-spin text-gray-400" />
-            </div>
-          ) : (
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>College</th>
-                  <th>Status</th>
-                  <th>Last Login</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((u) => (
-                  <tr key={u._id}>
-                    <td className="font-medium">{u.full_name}</td>
-                    <td className="text-gray-600">{u.email}</td>
-                    <td>
-                      <span className="admin-badge admin-badge-blue flex w-fit items-center gap-1 capitalize">
-                        <Shield size={10} />
-                        {u.role.replace("_", " ")}
-                      </span>
-                    </td>
-                    <td className="text-sm text-gray-500 capitalize">
-                      {u.institution}
-                    </td>
-                    <td>
-                      <span
-                        className={`admin-badge ${u.is_active ? "admin-badge-green" : "admin-badge-red"}`}
-                      >
-                        {u.is_active ? "Active" : "Inactive"}
-                      </span>
-                    </td>
-                    <td className="text-xs text-gray-400">
-                      {u.last_login
-                        ? new Date(u.last_login).toLocaleDateString("en-IN")
-                        : "Never"}
-                    </td>
-                    <td>
-                      <div className="flex gap-1">
-                        <button
-                          onClick={() => openEdit(u)}
-                          className="admin-btn admin-btn-outline admin-btn-sm"
-                        >
-                          <Pencil size={13} />
-                        </button>
-                        <button
-                          onClick={() => deactivate(u._id)}
-                          className="admin-btn admin-btn-danger admin-btn-sm"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
-      </div>
+        <TextInput
+          label="Full name"
+          value={form.full_name}
+          onChange={(e) => set("full_name", e.target.value)}
+          required
+        />
 
-      {/* New user modal */}
-      {showNew && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <h2 className="font-semibold text-gray-900">New Admin User</h2>
-              <button
-                onClick={() => {
-                  setShowNew(false);
-                  setMsg("");
-                }}
-                className="admin-btn admin-btn-outline admin-btn-sm"
-              >
-                <X size={14} />
-              </button>
-            </div>
-            <div className="space-y-1 p-6">
-              {newApiError && (
-                <ValidationErrors
-                  error={newApiError.message ?? newApiError.error}
-                  details={newApiError.details}
-                />
-              )}
-              <TextInput
-                label="Full Name"
-                value={newForm.full_name}
-                onChange={(e) => setN("full_name", e.target.value)}
-                required
-              />
-              <TextInput
-                label="Email"
-                type="email"
-                value={newForm.email}
-                onChange={(e) => setN("email", e.target.value)}
-                required
-              />
-              <TextInput
-                label="Password"
-                type="password"
-                value={newForm.password}
-                onChange={(e) => setN("password", e.target.value)}
-                required
-                hint="Min 8 characters"
-              />
-              <Select
-                label="Role"
-                value={newForm.role}
-                options={ROLES}
-                onChange={(e) => {
-                  const r = e.target.value;
-                  setN("role", r);
-                  if (r === "admin") setN("institution", "all");
-                  else if (newForm.institution === "all")
-                    setN("institution", "engineering");
-                }}
-              />
-              {newForm.role === "editor" && (
-                <Select
-                  label="College Access"
-                  value={newForm.institution}
-                  options={EDITOR_INSTITUTIONS}
-                  onChange={(e) => setN("institution", e.target.value)}
-                />
-              )}
-              {newForm.role === "admin" && (
-                <p className="text-sm text-gray-500">
-                  College Access:{" "}
-                  <span className="font-medium text-gray-700">
-                    All Colleges
-                  </span>
-                </p>
-              )}
-              {msg && !newApiError?.details?.length && (
-                <p className="text-sm text-red-600">{msg}</p>
-              )}
-            </div>
-            <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
-              <button
-                onClick={() => {
-                  setShowNew(false);
-                  setMsg("");
-                }}
-                className="admin-btn admin-btn-outline"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={createUser}
-                disabled={saving}
-                className="admin-btn admin-btn-gold"
-              >
-                {saving ? (
-                  <Loader2 size={15} className="animate-spin" />
-                ) : (
-                  <Check size={15} />
-                )}
-                {saving ? "Creating…" : "Create User"}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+        {!editing && (
+          <TextInput
+            label="Email"
+            type="email"
+            value={form.email}
+            onChange={(e) => set("email", e.target.value)}
+            required
+            hint="This is also their sign-in name and cannot be changed later."
+          />
+        )}
 
-      {/* Edit user modal */}
-      {editingUser && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <h2 className="font-semibold text-gray-900">
-                Edit User — {editingUser.email}
-              </h2>
-              <button
-                onClick={() => setEditingUser(null)}
-                className="admin-btn admin-btn-outline admin-btn-sm"
-              >
-                <X size={14} />
-              </button>
-            </div>
-            <div className="space-y-1 p-6">
-              {editApiError && (
-                <ValidationErrors
-                  error={editApiError.message ?? editApiError.error}
-                  details={editApiError.details}
-                />
-              )}
-              <TextInput
-                label="Full Name"
-                value={editForm.full_name}
-                onChange={(e) => setE("full_name", e.target.value)}
-                required
-              />
-              <Select
-                label="Role"
-                value={editForm.role}
-                options={ROLES}
-                onChange={(e) => {
-                  const r = e.target.value;
-                  setE("role", r);
-                  if (r === "admin") setE("institution", "all");
-                  else if (editForm.institution === "all")
-                    setE("institution", "engineering");
-                }}
-              />
-              {editForm.role === "editor" && (
-                <Select
-                  label="College Access"
-                  value={editForm.institution}
-                  options={EDITOR_INSTITUTIONS}
-                  onChange={(e) => setE("institution", e.target.value)}
-                />
-              )}
-              {editForm.role === "admin" && (
-                <p className="text-sm text-gray-500">
-                  College Access:{" "}
-                  <span className="font-medium text-gray-700">
-                    All Colleges
-                  </span>
-                </p>
-              )}
-              <TextInput
-                label="New Password"
-                type="password"
-                value={editForm.password}
-                onChange={(e) => setE("password", e.target.value)}
-                hint="Leave blank to keep current password"
-              />
-              <div className="flex items-center gap-2 pt-1">
-                <input
-                  type="checkbox"
-                  id="edit_active"
-                  checked={editForm.is_active}
-                  onChange={(e) => setE("is_active", e.target.checked)}
-                />
-                <label htmlFor="edit_active" className="text-sm text-gray-700">
-                  Active
-                </label>
-              </div>
-              {editMsg && !editApiError?.details?.length && (
-                <p className="text-sm text-red-600">{editMsg}</p>
-              )}
-            </div>
-            <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
-              <button
-                onClick={() => setEditingUser(null)}
-                className="admin-btn admin-btn-outline"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={updateUser}
-                disabled={saving}
-                className="admin-btn admin-btn-gold"
-              >
-                {saving ? (
-                  <Loader2 size={15} className="animate-spin" />
-                ) : (
-                  <Check size={15} />
-                )}
-                {saving ? "Saving…" : "Save Changes"}
-              </button>
-            </div>
+        <TextInput
+          label={editing ? "New password" : "Password"}
+          type="password"
+          value={form.password}
+          onChange={(e) => set("password", e.target.value)}
+          required={!editing}
+          autoComplete="new-password"
+          hint={
+            editing
+              ? "Leave blank to keep their current password."
+              : "At least 8 characters."
+          }
+        />
+
+        <Select
+          label="Role"
+          value={form.role}
+          options={ROLES}
+          onChange={(e) => setRole(e.target.value)}
+          hint="Admins can also manage people, settings and the audit log."
+        />
+
+        {form.role === "editor" ? (
+          <Select
+            label="College they can edit"
+            value={form.institution}
+            options={EDITOR_INSTITUTIONS}
+            onChange={(e) => set("institution", e.target.value)}
+            hint="They will not be able to open or change any other college's content."
+          />
+        ) : (
+          <div className="mb-4">
+            <Banner tone="warning" title="Full access">
+              Admins can edit every college, manage accounts, and restore or
+              reset site configuration.
+            </Banner>
           </div>
-        </div>
-      )}
-    </>
+        )}
+
+        {editing && (
+          <label className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              checked={form.is_active}
+              onChange={(e) => set("is_active", e.target.checked)}
+            />
+            <span className="text-[length:var(--admin-text-body)] text-[var(--admin-text-secondary)]">
+              Allow this person to sign in
+            </span>
+          </label>
+        )}
+      </Drawer>
+    </PageShell>
   );
 }
