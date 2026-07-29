@@ -28,6 +28,14 @@ type CallNow = {
   phone: string;
 };
 
+type Countdown = {
+  enabled: boolean;
+  label: string;
+  /** ISO-8601 with an explicit offset, or "" when unset. */
+  startsAt: string;
+  endsAt: string;
+};
+
 type PamphletConfig = {
   enabled: boolean;
   delayMs: number;
@@ -36,6 +44,7 @@ type PamphletConfig = {
   rightSlot: Slot;
   virtualTour: VirtualTour;
   callNow: CallNow;
+  countdown: Countdown;
   applyEnabled: boolean;
   applyLabel: string;
   applyHref: string;
@@ -144,6 +153,14 @@ function normalizePamphlet(raw: unknown): PamphletConfig | null {
     phone: (cn && asString(cn.phone)) || "",
   };
 
+  const cd = (r.countdown ?? null) as Record<string, unknown> | null;
+  const countdown: Countdown = {
+    enabled: Boolean(cd?.enabled),
+    label: (cd && asString(cd.label)) || "Ends in",
+    startsAt: (cd && asString(cd.startsAt)) || "",
+    endsAt: (cd && asString(cd.endsAt)) || "",
+  };
+
   return {
     enabled: r.enabled !== false,
     delayMs: typeof r.delayMs === "number" ? r.delayMs : 2000,
@@ -152,6 +169,7 @@ function normalizePamphlet(raw: unknown): PamphletConfig | null {
     rightSlot,
     virtualTour,
     callNow,
+    countdown,
     applyEnabled: r.applyEnabled !== false,
     applyLabel: asString(r.applyLabel) || "Apply Now",
     applyHref: asString(r.applyHref) || "https://admissions.jct.ac.in",
@@ -230,6 +248,101 @@ function TextSlot({ slot, accent }: { slot: Slot; accent: boolean }) {
   );
 }
 
+function parseInstant(value: string): number | null {
+  if (!value) return null;
+  const ms = Date.parse(value);
+  return Number.isNaN(ms) ? null : ms;
+}
+
+function pad(n: number): string {
+  return n < 10 ? `0${n}` : String(n);
+}
+
+/**
+ * Live countdown to `endsAt`. Hidden before `startsAt`, and hidden again the
+ * moment the deadline passes — the popup itself stays up either way, so an
+ * un-renewed deadline degrades to "no timer" rather than to a dead popup.
+ */
+function CountdownBar({
+  label,
+  startsAt,
+  endsAt,
+}: {
+  label: string;
+  startsAt: string;
+  endsAt: string;
+}) {
+  const startMs = parseInstant(startsAt);
+  const endMs = parseInstant(endsAt);
+  // Read the clock only after mount: the server has no business rendering a
+  // value that is stale by the time it reaches the browser.
+  const [nowMs, setNowMs] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (endMs === null) return;
+    setNowMs(Date.now());
+    const id = setInterval(() => setNowMs(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [endMs]);
+
+  if (endMs === null || nowMs === null) return null;
+  if (startMs !== null && nowMs < startMs) return null;
+
+  const remainingMs = endMs - nowMs;
+  if (remainingMs <= 0) return null;
+
+  const totalSeconds = Math.floor(remainingMs / 1000);
+  const totalHours = Math.floor(totalSeconds / 3600);
+  // Under two days a plain hour count reads better than "1 Day 3 Hrs".
+  const showDays = totalHours >= 48;
+  const blocks = showDays
+    ? [
+        { value: Math.floor(totalHours / 24), unit: "Days" },
+        { value: totalHours % 24, unit: "Hrs" },
+        { value: Math.floor((totalSeconds % 3600) / 60), unit: "Min" },
+      ]
+    : [
+        { value: totalHours, unit: "Hrs" },
+        { value: Math.floor((totalSeconds % 3600) / 60), unit: "Min" },
+        { value: totalSeconds % 60, unit: "Sec" },
+      ];
+
+  const spoken = blocks.map((b) => `${b.value} ${b.unit}`).join(" ");
+
+  return (
+    <div
+      role="timer"
+      aria-label={`${label}: ${spoken}`}
+      className="bg-navy/95 flex items-center gap-2 rounded-2xl px-3 py-2 text-white shadow-[0_12px_28px_-10px_rgba(0,0,0,0.6)] ring-1 ring-white/15 backdrop-blur-md sm:gap-3 sm:px-4 sm:py-2.5"
+    >
+      {label && (
+        <span className="text-gold text-[10px] font-bold tracking-[0.18em] uppercase sm:text-xs">
+          {label}
+        </span>
+      )}
+      <div aria-hidden className="flex items-end gap-1 sm:gap-1.5">
+        {blocks.map((block, i) => (
+          <div key={block.unit} className="flex items-end gap-1 sm:gap-1.5">
+            {i > 0 && (
+              <span className="pb-4 text-sm font-bold text-white/40 sm:text-base">
+                :
+              </span>
+            )}
+            <div className="flex flex-col items-center">
+              <span className="min-w-9 rounded-lg bg-white/12 px-1.5 py-1 text-center text-base font-extrabold tabular-nums sm:min-w-11 sm:text-xl">
+                {pad(block.value)}
+              </span>
+              <span className="mt-0.5 text-[9px] font-semibold tracking-wider text-white/60 uppercase sm:text-[10px]">
+                {block.unit}
+              </span>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function Pamphlet() {
   const { data } = useSiteConfig("homePamphlet");
   const config = normalizePamphlet(data);
@@ -250,6 +363,12 @@ export function Pamphlet() {
     enabled: false,
     label: "Call Now",
     phone: "",
+  };
+  const countdown = config?.countdown ?? {
+    enabled: false,
+    label: "Ends in",
+    startsAt: "",
+    endsAt: "",
   };
   const applyEnabled = config?.applyEnabled ?? true;
   const applyLabel = config?.applyLabel ?? "Apply Now";
@@ -282,6 +401,7 @@ export function Pamphlet() {
   const tourEmbeds = showVirtualTour && isEmbeddableVideo(virtualTour.url);
   const showCallNow = callNow.enabled && Boolean(callNow.phone);
   const showApply = applyEnabled && Boolean(applyHref);
+  const showCountdown = countdown.enabled && Boolean(countdown.endsAt);
 
   const leftSplit = layout === "image-text" ? "md:w-[45%]" : "md:w-1/2";
   const rightSplit = layout === "image-text" ? "md:w-[55%]" : "md:w-1/2";
@@ -337,7 +457,16 @@ export function Pamphlet() {
                 )}
               </div>
 
-              <div className="absolute inset-x-3 bottom-3 z-50 flex flex-wrap items-center justify-center gap-2 sm:inset-x-auto sm:right-6 sm:bottom-4 sm:justify-end sm:gap-3 md:right-8 md:bottom-6">
+              <div className="absolute inset-x-3 bottom-3 z-50 flex flex-col items-center gap-2 sm:inset-x-auto sm:right-6 sm:bottom-4 sm:items-end sm:gap-3 md:right-8 md:bottom-6">
+                {showCountdown && (
+                  <CountdownBar
+                    label={countdown.label}
+                    startsAt={countdown.startsAt}
+                    endsAt={countdown.endsAt}
+                  />
+                )}
+
+                <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end sm:gap-3">
                 {showVirtualTour && tourEmbeds && (
                   <button
                     onClick={() => setIsVideoOpen(true)}
@@ -383,6 +512,7 @@ export function Pamphlet() {
                     />
                   </Link>
                 )}
+                </div>
               </div>
             </div>
 

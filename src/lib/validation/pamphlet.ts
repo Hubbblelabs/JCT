@@ -19,6 +19,8 @@ export const LIMITS = {
   virtualTourLabelMax: 40,
   callNowLabelMax: 40,
   callNowPhoneMax: 20,
+  countdownLabelMax: 40,
+  countdownInstantMax: 40,
 } as const;
 
 const zPhone = z
@@ -60,6 +62,32 @@ export const PamphletVirtualTourSchema = z.object({
 });
 export type PamphletVirtualTour = z.infer<typeof PamphletVirtualTourSchema>;
 
+/**
+ * An absolute instant, stored ISO-8601 with an explicit offset
+ * (`2026-07-30T10:30:00+05:30`). The offset is what makes the countdown tick to
+ * the same moment for every visitor regardless of their device timezone — a
+ * bare local string like `2026-07-30T10:30` would mean a different instant in
+ * each one.
+ */
+const zInstant = z
+  .string()
+  .max(LIMITS.countdownInstantMax)
+  .refine((v) => !Number.isNaN(Date.parse(v)), "Must be a valid date and time");
+
+export const PamphletCountdownSchema = z.object({
+  enabled: z.boolean().optional(),
+  label: zClampedString(
+    0,
+    LIMITS.countdownLabelMax,
+    "Countdown label",
+  ).optional(),
+  /** Optional. Before this instant the countdown is hidden. */
+  startsAt: zInstant.optional().or(z.literal("")),
+  /** The deadline counted down to. The countdown hides once it passes. */
+  endsAt: zInstant.optional().or(z.literal("")),
+});
+export type PamphletCountdown = z.infer<typeof PamphletCountdownSchema>;
+
 export const PamphletCallNowSchema = z.object({
   enabled: z.boolean().optional(),
   label: zClampedString(0, LIMITS.callNowLabelMax, "Call Now label").optional(),
@@ -81,6 +109,7 @@ export const PamphletPopupSchema = z.object({
   rightSlot: PamphletSlotSchema.optional(),
   virtualTour: PamphletVirtualTourSchema.optional(),
   callNow: PamphletCallNowSchema.optional(),
+  countdown: PamphletCountdownSchema.optional(),
   applyEnabled: z.boolean().optional().default(true),
   applyLabel: zClampedString(0, LIMITS.applyLabelMax, "Apply label")
     .optional()
@@ -117,6 +146,7 @@ export const PamphletSchema = z.object({
   rightSlot: PamphletSlotSchema.optional(),
   virtualTour: PamphletVirtualTourSchema.optional(),
   callNow: PamphletCallNowSchema.optional(),
+  countdown: PamphletCountdownSchema.optional(),
   applyEnabled: z.boolean().optional().default(true),
   applyLabel: zClampedString(0, LIMITS.applyLabelMax, "Apply label").default(
     "Apply Now",

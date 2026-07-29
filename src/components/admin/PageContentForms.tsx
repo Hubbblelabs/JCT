@@ -803,6 +803,14 @@ type PamphletCallNowVal = {
   phone?: string;
 };
 
+type PamphletCountdownVal = {
+  enabled?: boolean;
+  label?: string;
+  /** ISO-8601 with an explicit offset, e.g. `2026-07-30T10:30:00+05:30`. */
+  startsAt?: string;
+  endsAt?: string;
+};
+
 type PamphletLayoutVal =
   "image-image" | "image-text" | "text-image" | "text-text";
 
@@ -815,6 +823,7 @@ export type PamphletPopupVal = {
   rightSlot?: PamphletSlotVal;
   virtualTour?: PamphletVirtualTourVal;
   callNow?: PamphletCallNowVal;
+  countdown?: PamphletCountdownVal;
   applyEnabled?: boolean;
   applyLabel?: string;
   applyHref?: string;
@@ -832,6 +841,7 @@ export type PamphletVal = {
   rightSlot?: PamphletSlotVal;
   virtualTour?: PamphletVirtualTourVal;
   callNow?: PamphletCallNowVal;
+  countdown?: PamphletCountdownVal;
   applyEnabled?: boolean;
   applyLabel?: string;
   applyHref?: string;
@@ -947,6 +957,7 @@ function derivePopups(value: PamphletVal): PamphletPopupVal[] {
         url: virtualTour.url || value.videoUrl || "",
       },
       callNow: value.callNow ?? {},
+      countdown: value.countdown ?? {},
       applyEnabled: value.applyEnabled !== false,
       applyLabel: value.applyLabel ?? "Apply Now",
       applyHref: value.applyHref ?? "",
@@ -973,12 +984,37 @@ function withPopups(
     rightSlot: undefined,
     virtualTour: undefined,
     callNow: undefined,
+    countdown: undefined,
     applyEnabled: undefined,
     applyLabel: undefined,
     applyHref: undefined,
     images: [],
     videoUrl: "",
   };
+}
+
+/**
+ * The college announces deadlines in IST, so a typed "10:30" must mean 10:30
+ * IST no matter what timezone the admin's own machine is set to. Both helpers
+ * pin the wall-clock the `datetime-local` input shows to +05:30; what gets
+ * stored is the resulting absolute instant.
+ */
+const IST_OFFSET = "+05:30";
+const IST_OFFSET_MS = 330 * 60_000;
+
+function instantToIstInput(iso: string | undefined): string {
+  if (!iso) return "";
+  const ms = Date.parse(iso);
+  if (Number.isNaN(ms)) return "";
+  // Shifting by the offset makes toISOString print the IST wall-clock.
+  return new Date(ms + IST_OFFSET_MS).toISOString().slice(0, 16);
+}
+
+function istInputToInstant(local: string): string {
+  if (!local) return "";
+  const withSeconds = local.length === 16 ? `${local}:00` : local;
+  const iso = `${withSeconds}${IST_OFFSET}`;
+  return Number.isNaN(Date.parse(iso)) ? "" : iso;
 }
 
 function PamphletPopupEditor({
@@ -993,6 +1029,7 @@ function PamphletPopupEditor({
   const rightSlot = popup.rightSlot ?? {};
   const virtualTour = popup.virtualTour ?? {};
   const callNow = popup.callNow ?? {};
+  const countdown = popup.countdown ?? {};
 
   return (
     <div className="space-y-4">
@@ -1116,6 +1153,71 @@ function PamphletPopupEditor({
                 onChange({
                   ...popup,
                   callNow: { ...callNow, phone: e.target.value },
+                })
+              }
+            />
+          </div>
+        </div>
+      </Field>
+
+      <Field
+        label="Countdown Timer"
+        hint="Optional. Shows a live countdown strip just above the popup buttons. Times are entered and stored in IST. The timer stays hidden before the start time and disappears once the deadline passes — the popup itself keeps showing either way."
+      >
+        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={countdown.enabled === true}
+              onChange={(e) =>
+                onChange({
+                  ...popup,
+                  countdown: { ...countdown, enabled: e.target.checked },
+                })
+              }
+            />
+            Show countdown timer
+          </label>
+          <TextInput
+            label="Label"
+            value={countdown.label ?? ""}
+            maxLength={LIMITS_pamphlet.countdownLabelMax}
+            placeholder="Ends in"
+            onChange={(e) =>
+              onChange({
+                ...popup,
+                countdown: { ...countdown, label: e.target.value },
+              })
+            }
+          />
+          <div className="grid grid-cols-2 gap-3">
+            <TextInput
+              label="Start (IST)"
+              type="datetime-local"
+              value={instantToIstInput(countdown.startsAt)}
+              hint="Optional. Timer is hidden before this."
+              onChange={(e) =>
+                onChange({
+                  ...popup,
+                  countdown: {
+                    ...countdown,
+                    startsAt: istInputToInstant(e.target.value),
+                  },
+                })
+              }
+            />
+            <TextInput
+              label="Deadline (IST)"
+              type="datetime-local"
+              value={instantToIstInput(countdown.endsAt)}
+              hint="Required for the timer to show."
+              onChange={(e) =>
+                onChange({
+                  ...popup,
+                  countdown: {
+                    ...countdown,
+                    endsAt: istInputToInstant(e.target.value),
+                  },
                 })
               }
             />
