@@ -101,101 +101,7 @@ export const ProgramUpdateSchema = ProgramBaseSchema.partial();
 
 export type ProgramValue = z.infer<typeof ProgramSchema>;
 
-// ── Rich page content (custom-tab override + structured fields) ─────────────
-
-const TabIdSchema = z
-  .string()
-  .min(1, "Tab ID is required")
-  .max(LIMITS.tabIdMax)
-  .regex(
-    /^[a-z0-9-]+$/i,
-    "Tab ID may contain letters, numbers, and dashes only",
-  );
-
-const SectionSchema = z.discriminatedUnion("kind", [
-  z.object({
-    kind: z.literal("richText"),
-    html: zClampedString(0, LIMITS.richTextMax, "Rich text").default(""),
-  }),
-  z.object({
-    kind: z.literal("stats"),
-    items: z
-      .array(
-        z.object({
-          label: zClampedString(0, LIMITS.statLabelMax, "Stat label").default(
-            "",
-          ),
-          value: zClampedString(0, LIMITS.statValueMax, "Stat value").default(
-            "",
-          ),
-          sub: zOptionalString(LIMITS.statSubMax).default(""),
-        }),
-      )
-      .max(LIMITS.statsItemsMax)
-      .default([]),
-  }),
-  z.object({
-    kind: z.literal("list"),
-    title: zOptionalString(LIMITS.cardTitleMax).default(""),
-    items: z
-      .array(zClampedString(0, LIMITS.listItemMax, "Item"))
-      .max(LIMITS.listItemsMax)
-      .default([]),
-  }),
-  z.object({
-    kind: z.literal("cards"),
-    title: zOptionalString(LIMITS.cardTitleMax).default(""),
-    items: z
-      .array(
-        z.object({
-          title: zClampedString(0, LIMITS.cardTitleMax, "Card title").default(
-            "",
-          ),
-          description: zOptionalString(LIMITS.cardDescriptionMax).default(""),
-          image: zUrl.optional().or(z.literal("")),
-        }),
-      )
-      .max(LIMITS.cardsMax)
-      .default([]),
-  }),
-  z.object({
-    kind: z.literal("image"),
-    src: zUrl,
-    caption: zOptionalString(LIMITS.imageCaptionMax).default(""),
-  }),
-  z.object({
-    kind: z.literal("people"),
-    items: z
-      .array(
-        z.object({
-          name: zClampedString(1, LIMITS.personNameMax, "Name"),
-          title: zClampedString(0, LIMITS.personTitleMax, "Title").default(""),
-          image: zUrl.optional().or(z.literal("")),
-          email: z
-            .string()
-            .max(200)
-            .refine(
-              (v) => v === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
-              "Must be a valid email",
-            )
-            .optional()
-            .or(z.literal("")),
-          qualifications: zOptionalString(
-            LIMITS.personQualificationsMax,
-          ).default(""),
-        }),
-      )
-      .max(LIMITS.peopleMax)
-      .default([]),
-  }),
-]);
-
-const TabSchema = z.object({
-  id: TabIdSchema,
-  label: zClampedString(1, LIMITS.tabLabelMax, "Tab label"),
-  icon: zOptionalString(40).default(""),
-  sections: z.array(SectionSchema).max(LIMITS.sectionsPerTabMax).default([]),
-});
+// -- Rich page content (structured fields) ----------------------------------
 
 const HeroMetaItemSchema = z.object({
   icon: zOptionalString(LIMITS.iconNameMax).default(""),
@@ -420,7 +326,9 @@ const LabelsTreeSchema = z
 export const ProgramContentSchema = z
   .object({
     heroImage: zUrl.optional().or(z.literal("")),
-    tabs: z.array(TabSchema).max(LIMITS.tabsMax).optional(),
+    // `tabs` used to be declared here — a second content model that no public
+    // layout ever rendered. Removed with its editor and renderer; any legacy
+    // key still on a stored document passes through untouched below.
     heroMeta: z.array(HeroMetaItemSchema).max(LIMITS.heroMetaMax).optional(),
     tabsConfig: z
       .array(TabConfigItemSchema)
@@ -456,5 +364,3 @@ export const ProgramFullUpdateSchema = ProgramBaseSchema.partial().extend({
 });
 
 export type ProgramContentValue = z.infer<typeof ProgramContentSchema>;
-export type SectionValue = z.infer<typeof SectionSchema>;
-export type TabValue = z.infer<typeof TabSchema>;

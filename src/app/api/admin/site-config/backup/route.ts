@@ -273,7 +273,16 @@ export async function GET(req: NextRequest) {
       `Exported backup: ${parts.join(", ")}`,
     );
 
-    const filename = `jct-backup-${new Date().toISOString().slice(0, 10)}.zip`;
+    // Timestamped to the minute, not just the date. With a date-only name two
+    // backups on the same day silently overwrite each other in the operator's
+    // downloads folder — and the one that survives is the one taken *after*
+    // whatever went wrong.
+    const stamp = new Date()
+      .toISOString()
+      .replace(/[:-]/g, "")
+      .replace(/\.\d{3}Z$/, "Z")
+      .slice(0, 13); // YYYYMMDDTHHmm
+    const filename = `jct-backup-${stamp}Z.zip`;
     return new NextResponse(new Uint8Array(zipBuffer), {
       status: 200,
       headers: {

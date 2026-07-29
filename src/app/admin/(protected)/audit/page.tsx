@@ -43,7 +43,11 @@ export default async function AuditPage() {
   const role = (session?.user as Record<string, unknown> | undefined)?.role as
     | string
     | undefined;
-  if (!session?.user || !hasMinRole(role ?? "", "admin")) {
+  // Checked here, before the query, rather than relying on the layout's
+  // redirect — layout and page render in parallel, so a layout-only guard
+  // still lets this segment read the audit trail and stream it.
+  if (!session?.user) redirect("/admin/login");
+  if (!hasMinRole(role ?? "", "admin")) {
     redirect("/admin/dashboard");
   }
 

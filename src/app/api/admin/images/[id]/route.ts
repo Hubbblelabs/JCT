@@ -9,6 +9,7 @@ import {
   notFound,
   serverError,
   validateBody,
+  invalidId,
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { ImageAssetPatchSchema } from "@/lib/validation";
@@ -23,6 +24,8 @@ export async function DELETE(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const doc = await ImageAsset.findById(id);
     if (!doc) return notFound();
 
@@ -63,6 +66,8 @@ export async function PATCH(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
 
     const existing = await ImageAsset.findById(id)
       .select("institution")
@@ -79,7 +84,7 @@ export async function PATCH(
     const doc = await ImageAsset.findByIdAndUpdate(
       id,
       { $set: update },
-      { new: true },
+      { returnDocument: "after" },
     );
     if (!doc) return notFound();
     await logAudit(

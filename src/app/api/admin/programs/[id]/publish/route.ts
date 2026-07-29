@@ -1,7 +1,13 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Program } from "@/lib/models";
-import { requireRole, json, notFound, serverError } from "@/lib/api-helpers";
+import {
+  requireRole,
+  json,
+  notFound,
+  serverError,
+  invalidId,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { revalidatePaths } from "@/lib/revalidate";
 
@@ -15,6 +21,8 @@ export async function POST(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const current = await Program.findById(id);
     if (!current) return notFound("Program not found");
 
@@ -27,7 +35,7 @@ export async function POST(
         $inc: { version: 1 },
         updated_by: session!.user?.email,
       },
-      { new: true },
+      { returnDocument: "after" },
     );
     if (!doc) return notFound("Program not found");
 

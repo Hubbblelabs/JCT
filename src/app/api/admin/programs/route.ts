@@ -65,8 +65,16 @@ export async function POST(req: NextRequest) {
 
   try {
     await connectDB();
-    const existing = await Program.findOne({ slug: body.slug });
-    if (existing) return badRequest("Program with this slug already exists");
+    // Scoped to the institution — slugs only need to be unique within a college.
+    const existing = await Program.findOne({
+      slug: body.slug,
+      institution: body.institution,
+    });
+    if (existing) {
+      return badRequest(
+        "A program with this slug already exists for this institution",
+      );
+    }
 
     const doc = await Program.create({
       ...body,

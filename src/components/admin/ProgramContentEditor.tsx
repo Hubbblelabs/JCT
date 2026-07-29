@@ -28,10 +28,6 @@ import {
   CurriculumEditor,
   type CurriculumRegulation,
 } from "@/components/admin/CurriculumEditor";
-import {
-  ProgramTabsEditor,
-  type Tab as CustomTab,
-} from "@/components/admin/ProgramTabsEditor";
 import { ProgramLabelsEditor } from "@/components/admin/ProgramLabelsEditor";
 import { PageBodySectionsEditor } from "@/components/admin/PageBodySectionsEditor";
 import { SeoFields } from "@/components/admin/SeoFields";
@@ -1779,8 +1775,6 @@ export function ProgramContentEditor({
     career: CareerBody,
   };
 
-  const customTabs = (content.tabs as CustomTab[] | undefined) ?? [];
-
   return (
     <div className="space-y-4">
       {/* ── Page Settings (above tabs) ─────────────────────────────────── */}
@@ -1927,17 +1921,15 @@ export function ProgramContentEditor({
       </Accordion>
 
       {/* ── Advanced (collapsed) ──────────────────────────────────────── */}
+      {/* The "Custom Page Tabs" editor used to live here. It wrote
+          `content.tabs`, which no public layout reads — ProgramPageLayout
+          renders `tabsConfig` + `blocks`. Its UI claimed those tabs would
+          "override the structured fields above", so every edit made through it
+          was silently discarded. Removed along with TabsProgramLayout (the only
+          component that rendered that shape, imported nowhere) and the
+          migrate-tabs route (which produced the same unrenderable content). */}
       <Accordion title="Advanced">
-        <p className="mb-3 text-xs text-gray-500">
-          Custom tabs override the structured fields above on the public page.
-          Use these only if the standard six-tab layout is insufficient.
-        </p>
-        <p className="admin-label mb-2">Custom Page Tabs</p>
-        <ProgramTabsEditor
-          tabs={customTabs}
-          onChange={(next) => set("tabs", next)}
-        />
-        <div className="mt-6">
+        <div>
           <p className="admin-label mb-2">Raw JSON</p>
           <p className="mb-2 text-xs text-gray-400">
             Full department content as JSON. Editing this overwrites all fields

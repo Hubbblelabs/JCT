@@ -163,6 +163,12 @@ function StatCard({
 export default async function DashboardPage() {
   const session = await auth();
 
+  // App Router renders layout and page in parallel, so the `redirect()` in
+  // (protected)/layout.tsx does NOT stop this segment — without this check the
+  // page went on to query Mongo and flushed real counts into the RSC payload
+  // of an unauthenticated 200. The layout guard is defence in depth, not a gate.
+  if (!session?.user) redirect("/admin/login");
+
   const role = (session?.user as Record<string, unknown>)?.role as string;
   if (role === "editor") {
     const institution = (session?.user as Record<string, unknown>)

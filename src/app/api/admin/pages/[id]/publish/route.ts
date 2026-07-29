@@ -1,7 +1,13 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Page } from "@/lib/models";
-import { requireRole, json, notFound, serverError } from "@/lib/api-helpers";
+import {
+  requireRole,
+  json,
+  notFound,
+  serverError,
+  invalidId,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import {
   revalidateTargets,
@@ -35,6 +41,8 @@ export async function POST(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const doc = await Page.findById(id);
     if (!doc) return notFound();
 

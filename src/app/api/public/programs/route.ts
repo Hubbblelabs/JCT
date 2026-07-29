@@ -10,7 +10,10 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const institution = searchParams.get("institution");
   const degree = searchParams.get("degree");
-  const publishedOnly = searchParams.get("published") === "true";
+  // Published-only is the default; drafts are opt-out, not opt-in. An opt-in
+  // default made every unpublished program publicly enumerable on this
+  // endpoint (embargoed courses, seat counts) with no auth.
+  const publishedOnly = searchParams.get("published") !== "false";
 
   const cacheKey = `programs:${institution ?? "*"}:${degree ?? "*"}:${publishedOnly}`;
   const cached = publicCacheGet<{ source: string; data: unknown }>(cacheKey);

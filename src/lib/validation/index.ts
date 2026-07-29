@@ -128,12 +128,7 @@ export {
   INSTITUTIONS as PROGRAM_INSTITUTIONS,
   LIMITS as LIMITS_program,
 } from "./programs";
-export type {
-  ProgramValue,
-  ProgramContentValue,
-  SectionValue,
-  TabValue,
-} from "./programs";
+export type { ProgramValue, ProgramContentValue } from "./programs";
 
 export {
   UserCreateSchema,

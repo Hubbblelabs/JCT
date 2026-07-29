@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Types } from "mongoose";
 import type { ZodIssue, ZodType } from "zod";
 import { auth } from "@/auth";
 import { hasMinRole, canAccessInstitution, type Role } from "@/lib/permissions";
@@ -96,6 +97,20 @@ export function serverError(message = "Internal server error") {
   return json({ error: message }, 500);
 }
 
+/**
+ * Guard for `[id]` route params. An unparseable id would otherwise reach
+ * Mongoose and throw a CastError into the generic catch, reporting a client
+ * error as a 500 and filling production logs with crawler-triggered noise.
+ * Returns a ready-to-return 404 when the id isn't a valid ObjectId, else null:
+ *
+ *   const { id } = await params;
+ *   const bad = invalidId(id);
+ *   if (bad) return bad;
+ */
+export function invalidId(id: string): NextResponse | null {
+  return Types.ObjectId.isValid(id) ? null : notFound();
+}
+
 export function tooManyRequests(retryAfterSec: number) {
   return NextResponse.json(
     { error: "Too many requests" },
@@ -157,6 +172,14 @@ export function enforceInstitutionScope(
   const user = (session?.user ?? {}) as Record<string, unknown>;
   const role = (user.role as string) ?? "";
   const userInstitution = (user.institution as string) ?? "";
+  // Reject empty on either side rather than letting both fall back to "" and
+  // compare equal. An editor with no institution would otherwise pass the
+  // check against any resource that also has none. Not reachable while the
+  // User schema defaults `institution` to "all", but it is a fail-open by
+  // construction and the guard is one line.
+  if (role !== "admin" && (!userInstitution || !targetInstitution)) {
+    return forbidden();
+  }
   if (!canAccessInstitution(role, userInstitution, targetInstitution ?? "")) {
     return forbidden();
   }

@@ -22,6 +22,8 @@ type PageRow = {
   status: "draft" | "published" | "archived";
   updated_at?: string;
   version: number;
+  /** False when no navbar links to this page. Absent if navbars were unreadable. */
+  in_navigation?: boolean;
 };
 
 const INSTITUTION_FILTERS: { value: string; label: string }[] = [
@@ -161,6 +163,18 @@ function PagesInner() {
                       <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-gray-600 uppercase">
                         {row.template}
                       </span>
+                      {/* A published page nothing links to is reachable only
+                          by direct URL — invisible to visitors, still indexed
+                          by search engines. */}
+                      {row.status === "published" &&
+                        row.in_navigation === false && (
+                          <span
+                            className="rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-orange-700 uppercase"
+                            title="No navbar links to this page — visitors can only reach it by typing the URL."
+                          >
+                            Not in navigation
+                          </span>
+                        )}
                     </div>
                     <p className="mt-0.5 text-xs text-gray-500">
                       {row.institution} · /{row.slug} · v{row.version}

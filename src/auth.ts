@@ -2,6 +2,7 @@ import NextAuth, { type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/mongodb";
+import { validateServerEnv } from "@/lib/env";
 import { User } from "@/lib/models";
 import {
   consumeLoginAttempt,
@@ -15,25 +16,12 @@ import {
 const DUMMY_BCRYPT_HASH =
   "$2b$12$C6UzMDM.H6dfI/f/IKcEeO3iJqM4xK1pV0bq1qVxZ8pQ0e7qkq3Hy";
 
-const SECRET_PLACEHOLDER = "replace-with-32-byte-random-string";
-const authSecret = process.env.NEXTAUTH_SECRET;
-const secretInvalid =
-  !authSecret || authSecret === SECRET_PLACEHOLDER || authSecret.length < 32;
+// Fail fast on bad configuration. This module is loaded by src/proxy.ts, so
+// the check runs at boot rather than surfacing as a 500 on the first login.
+// It no-ops during `next build` (see validateServerEnv).
+validateServerEnv();
 
-if (secretInvalid) {
-  const msg =
-    "NEXTAUTH_SECRET is missing, set to the placeholder, or shorter than 32 chars. " +
-    "Generate one with: openssl rand -base64 32";
-  // Skip throwing during the build itself — the build only collects page
-  // data and would otherwise fail on misconfigured local .env files. The
-  // running server still refuses to start (next start / next dev set
-  // NEXT_PHASE to phase-production-server / phase-development-server).
-  if (process.env.NEXT_PHASE === "phase-production-build") {
-    console.warn(`[auth] WARNING (build): ${msg}`);
-  } else {
-    throw new Error(msg);
-  }
-}
+const authSecret = process.env.NEXTAUTH_SECRET;
 
 declare module "next-auth" {
   interface User {
@@ -52,6 +40,13 @@ declare module "next-auth" {
 }
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
+  // NextAuth v5 defaults `trustHost` to false outside development, which makes
+  // every /api/auth/* call throw UntrustedHost in a production build — login
+  // becomes impossible. Set here rather than relying on AUTH_TRUST_HOST so an
+  // incomplete .env on a new host can't silently take the admin panel down.
+  // Safe because the app sits behind our own reverse proxy; if it were ever
+  // directly internet-facing, pin the expected host instead.
+  trustHost: true,
   providers: [
     Credentials({
       credentials: {

@@ -8,6 +8,7 @@ import {
   notFound,
   serverError,
   validateBody,
+  invalidId,
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { TestimonialUpdateSchema } from "@/lib/validation";
@@ -35,6 +36,8 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const doc = await Testimonial.findById(id);
     if (!doc) return notFound();
     // Shared ("all") testimonials are readable by any editor; another
@@ -64,6 +67,8 @@ export async function PATCH(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
 
     // Load existing doc up-front to enforce institution scope and reuse the
     // avatar key for orphan cleanup in a single query.
@@ -87,7 +92,7 @@ export async function PATCH(
     const doc = await Testimonial.findByIdAndUpdate(
       id,
       { $set: { ...updateFields, updated_by: session!.user?.email } },
-      { new: true },
+      { returnDocument: "after" },
     );
     if (!doc) return notFound();
 
@@ -119,6 +124,8 @@ export async function DELETE(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const doc = await Testimonial.findByIdAndDelete(id);
     if (!doc) return notFound();
 

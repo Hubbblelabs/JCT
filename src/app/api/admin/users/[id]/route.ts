@@ -9,6 +9,7 @@ import {
   notFound,
   serverError,
   validateBody,
+  invalidId,
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { UserUpdateSchema } from "@/lib/validation";
@@ -49,6 +50,8 @@ export async function PATCH(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const selfId = currentUserId(session);
 
     // Look up the target up-front to make multi-field guards possible.
@@ -98,7 +101,7 @@ export async function PATCH(
     const user = await User.findByIdAndUpdate(
       id,
       { $set: update },
-      { new: true },
+      { returnDocument: "after" },
     ).select("-password_hash");
     if (!user) return notFound("User not found");
 
@@ -142,6 +145,8 @@ export async function DELETE(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const selfId = currentUserId(session);
 
     const target = await User.findById(id).lean<{
@@ -167,7 +172,7 @@ export async function DELETE(
     const user = await User.findByIdAndUpdate(
       id,
       { is_active: false },
-      { new: true },
+      { returnDocument: "after" },
     ).select("-password_hash");
     if (!user) return notFound("User not found");
 

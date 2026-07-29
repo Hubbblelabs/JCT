@@ -296,7 +296,7 @@ export async function POST(req: NextRequest) {
         update,
         {
           upsert: true,
-          new: true,
+          returnDocument: "after",
         },
       );
       revalidateForConfigKey(seed.config_key);

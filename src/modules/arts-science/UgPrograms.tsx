@@ -288,7 +288,7 @@ export function UgPrograms() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/public/programs?institution=arts-science")
+    fetch("/api/public/programs?institution=arts-science&published=true")
       .then((r) => r.json())
       .then((res) => {
         if (cancelled) return;

@@ -8,6 +8,7 @@ import {
   notFound,
   serverError,
   validateBody,
+  invalidId,
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { ProgramFullUpdateSchema } from "@/lib/validation";
@@ -39,6 +40,8 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const doc = await Program.findById(id);
     if (!doc) return notFound();
     // Reads expose draft content — keep them institution-scoped like writes.
@@ -65,6 +68,8 @@ export async function PATCH(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
 
     // Load the existing doc up-front so we can both enforce institution
     // scope and reuse its image key for orphan cleanup (one query).
@@ -86,7 +91,7 @@ export async function PATCH(
     const doc = await Program.findByIdAndUpdate(
       id,
       { $set: { ...body, updated_by: session!.user?.email } },
-      { new: true },
+      { returnDocument: "after" },
     );
     if (!doc) return notFound();
 
@@ -122,6 +127,8 @@ export async function DELETE(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const doc = await Program.findByIdAndDelete(id);
     if (!doc) return notFound();
 

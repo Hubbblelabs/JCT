@@ -103,7 +103,7 @@ export default function PolytechnicCoursesPage() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/public/programs?institution=polytechnic")
+    fetch("/api/public/programs?institution=polytechnic&published=true")
       .then((r) => r.json())
       .then((res) => {
         if (!cancelled) setCourses(normalizePrograms(res?.data));

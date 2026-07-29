@@ -60,7 +60,10 @@ export default [
 
   // Custom rule configurations
   {
-    files: ["**/*.{js,jsx,ts,tsx}"],
+    // Must match the base config's extension list above — omitting mjs/cjs
+    // left every .mjs seed/migration script linted against a globals list
+    // without URL/crypto/fetch, failing `pnpm lint` on no-undef.
+    files: ["**/*.{js,jsx,mjs,cjs,ts,tsx}"],
     rules: {
       // Disable JS version, use TS version
       "no-unused-vars": "off",

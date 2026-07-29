@@ -32,7 +32,9 @@ const ProgramSchema = new Schema<IProgram>(
   {
     name: { type: String, required: true },
     abbr: { type: String, required: true },
-    slug: { type: String, required: true, unique: true },
+    // Uniqueness is per-institution (see the compound index below), not
+    // global — three colleges must each be able to have `computer-science`.
+    slug: { type: String, required: true },
     institution: {
       type: String,
       required: true,
@@ -69,6 +71,10 @@ const ProgramSchema = new Schema<IProgram>(
 
 ProgramSchema.index({ institution: 1, is_active: 1 });
 ProgramSchema.index({ institution: 1, status: 1 });
+// Matches the Page model's scoping. Existing databases still carry the old
+// global `slug_1` index and must drop it once:
+//   db.programs.dropIndex("slug_1")
+ProgramSchema.index({ institution: 1, slug: 1 }, { unique: true });
 
 export const Program =
   mongoose.models.Program ?? mongoose.model<IProgram>("Program", ProgramSchema);

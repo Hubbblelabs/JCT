@@ -265,7 +265,7 @@ export function DiplomaPrograms() {
 
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/public/programs?institution=polytechnic")
+    fetch("/api/public/programs?institution=polytechnic&published=true")
       .then((r) => r.json())
       .then((res) => {
         if (cancelled) return;

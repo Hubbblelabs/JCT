@@ -2,7 +2,13 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { DocumentAsset } from "@/lib/models";
 import { deleteFromR2 } from "@/lib/r2";
-import { requireRole, json, notFound, serverError } from "@/lib/api-helpers";
+import {
+  requireRole,
+  json,
+  notFound,
+  serverError,
+  invalidId,
+} from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 
 export async function DELETE(
@@ -15,6 +21,8 @@ export async function DELETE(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const doc = await DocumentAsset.findById(id);
     if (!doc) return notFound("Document not found");
 

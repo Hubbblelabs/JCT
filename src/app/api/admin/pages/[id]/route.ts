@@ -9,6 +9,7 @@ import {
   serverError,
   validateBody,
   badRequest,
+  invalidId,
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { PageUpdateSchema } from "@/lib/validation";
@@ -46,6 +47,8 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const doc = await Page.findById(id);
     if (!doc) return notFound();
     // Reads expose draft content — keep them institution-scoped like writes.
@@ -72,6 +75,8 @@ export async function PATCH(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
 
     const current = await Page.findById(id).lean();
     if (!current) return notFound();
@@ -104,7 +109,7 @@ export async function PATCH(
     const doc = await Page.findByIdAndUpdate(
       id,
       { $set: { ...body, updated_by: session!.user?.email } },
-      { new: true },
+      { returnDocument: "after" },
     );
     if (!doc) return notFound();
 
@@ -136,6 +141,8 @@ export async function DELETE(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const doc = await Page.findByIdAndDelete(id);
     if (!doc) return notFound();
 

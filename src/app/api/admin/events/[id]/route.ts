@@ -9,6 +9,7 @@ import {
   notFound,
   serverError,
   validateBody,
+  invalidId,
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { EventUpdateSchema } from "@/lib/validation";
@@ -52,6 +53,8 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const doc = await Event.findById(id);
     if (!doc) return notFound();
     // Events are college-scoped — an editor may only read their own college's.
@@ -78,6 +81,8 @@ export async function PATCH(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
 
     // Load existing doc up-front to enforce institution scope and reuse the
     // image key / old slug for cleanup and revalidation in a single query.
@@ -109,7 +114,7 @@ export async function PATCH(
     const doc = await Event.findByIdAndUpdate(
       id,
       { $set: { ...updateFields, updated_by: session!.user?.email } },
-      { new: true },
+      { returnDocument: "after" },
     );
     if (!doc) return notFound();
 
@@ -154,6 +159,8 @@ export async function DELETE(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
 
     const existing = await Event.findById(id)
       .select("institution")

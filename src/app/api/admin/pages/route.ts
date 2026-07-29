@@ -12,6 +12,7 @@ import {
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { PageCreateSchema } from "@/lib/validation";
+import { collectNavHrefs, isPageLinked } from "@/lib/page-nav-links";
 import { revalidateTargets, type RevalidateTarget } from "@/lib/revalidate";
 
 function institutionTarget(inst: string): RevalidateTarget | null {
@@ -43,11 +44,35 @@ export async function GET(req: NextRequest) {
       // Editors only see their own college's pages — list responses include
       // full draft content, which must not leak across colleges.
       ...institutionReadFilter(session),
-    }).sort({
-      institution: 1,
-      updated_at: -1,
-    });
-    return json(docs);
+    })
+      .sort({
+        institution: 1,
+        updated_at: -1,
+      })
+      .lean<Record<string, unknown>[]>();
+
+    // Flag pages no navbar links to. Best-effort: if the navbars can't be
+    // read, omit the field entirely rather than reporting every page as
+    // orphaned, which would be worse than not reporting at all.
+    let navHrefs: Set<string> | null = null;
+    try {
+      navHrefs = await collectNavHrefs();
+    } catch {
+      navHrefs = null;
+    }
+
+    return json(
+      navHrefs
+        ? docs.map((doc) => ({
+            ...doc,
+            in_navigation: isPageLinked(
+              navHrefs,
+              String(doc.institution ?? ""),
+              String(doc.slug ?? ""),
+            ),
+          }))
+        : docs,
+    );
   } catch (e) {
     console.error(e);
     return serverError();

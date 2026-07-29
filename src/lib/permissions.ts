@@ -22,12 +22,11 @@ export function canAccessInstitution(
   return userInstitution === targetInstitution;
 }
 
-export function canAccessProgram(
-  userRole: string,
-  userInstitution: string,
-  _userPrograms: string[],
-  _targetProgram: string,
-  targetInstitution: string,
-): boolean {
-  return canAccessInstitution(userRole, userInstitution, targetInstitution);
-}
+// `canAccessProgram` used to live here. It took a `programs[]` allowlist and a
+// target program and then ignored both, delegating to canAccessInstitution —
+// so a caller reading the signature would believe program-level authorisation
+// existed when scope is, and only ever was, institution-level. Nothing called
+// it. Removed rather than left as a trap.
+//
+// The `User.programs[]` field and its session/JWT copy still exist but are
+// read by nothing; the admin UI no longer offers per-program permissions.

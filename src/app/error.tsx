@@ -4,7 +4,10 @@ import { useEffect } from "react";
 import { RotateCcw, Home } from "lucide-react";
 import Link from "next/link";
 
-export default function GlobalError({
+// Route-level error boundary, NOT the global one — despite the name this file
+// used to carry. An exception in the root layout escapes this boundary and is
+// caught by app/global-error.tsx instead.
+export default function RouteError({
   error,
   reset,
 }: {

@@ -87,47 +87,97 @@ function chunkBySize(
   return chunks;
 }
 
+/** How a restore treats documents that exist now but aren't in the archive. */
+export type RestoreMode = "merge" | "replace";
+
 /**
  * Push every content collection back, chunk by chunk. Failures are collected
  * rather than thrown so one bad collection can't strand the rest of a restore.
+ *
+ * In `replace` mode each collection gets one extra request after its chunks,
+ * carrying every `_id` the server reported writing; the server deletes
+ * everything else. The ids have to come from the server rather than from the
+ * archive because a duplicate-key collision can land a document on a different
+ * `_id` than the one it was backed up under.
  */
 async function restoreCollections(
   zip: JSZip,
+  mode: RestoreMode,
   onProgress: (label: string) => void,
-): Promise<{ restored: number; errors: string[] }> {
+): Promise<{ restored: number; rejected: number; pruned: number; errors: string[] }> {
   let restored = 0;
+  let rejected = 0;
+  let pruned = 0;
   const errors: string[] = [];
+
+  const post = async (body: Record<string, unknown>, label: string) => {
+    const res = await fetch("/api/admin/site-config/restore-collections", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = (await res.json()) as Record<string, unknown>;
+    if (!res.ok) {
+      errors.push(`${label}: ${(data.error as string) ?? `HTTP ${res.status}`}`);
+      return null;
+    }
+    restored += (data.restored as number) ?? 0;
+    rejected += (data.rejected as number) ?? 0;
+    pruned += (data.pruned as number) ?? 0;
+    const chunkErrors = data.errors as string[] | undefined;
+    if (chunkErrors?.length) errors.push(...chunkErrors);
+    return data;
+  };
 
   for (const col of BACKUP_COLLECTIONS) {
     const docs = await readCollection(zip, col.name);
-    if (docs === null || docs.length === 0) continue;
+    // `null` means the archive has no file for this collection at all (it
+    // predates collection support) — there is nothing to say about it, so it
+    // is left alone even in replace mode. An empty *array* is different: the
+    // archive asserts this collection was empty, and replace mode must honour
+    // that, otherwise restoring a known-good backup can't undo a bad import
+    // into a collection that used to have nothing in it.
+    if (docs === null) continue;
+    if (docs.length === 0 && mode !== "replace") continue;
     onProgress(col.label);
+
+    const writtenIds: string[] = [];
+    const errorsBefore = errors.length;
     for (const chunk of chunkBySize(docs, DOC_BATCH_BYTES)) {
       try {
-        const res = await fetch(
-          "/api/admin/site-config/restore-collections",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ collection: col.name, docs: chunk }),
-          },
+        const data = await post(
+          { collection: col.name, docs: chunk },
+          col.label,
         );
-        const data = (await res.json()) as Record<string, unknown>;
-        if (!res.ok) {
-          errors.push(
-            `${col.label}: ${(data.error as string) ?? `HTTP ${res.status}`}`,
-          );
-          continue;
-        }
-        restored += (data.restored as number) ?? 0;
-        const chunkErrors = data.errors as string[] | undefined;
-        if (chunkErrors?.length) errors.push(...chunkErrors);
+        const ids = data?.writtenIds as string[] | undefined;
+        if (ids?.length) writtenIds.push(...ids);
       } catch (err) {
         errors.push(`${col.label}: ${String(err)}`);
       }
     }
+    const cleanRun = errors.length === errorsBefore;
+
+    if (mode === "replace") {
+      // Never prune off a partial run. A failed or rejected chunk means
+      // `writtenIds` is missing rows that belong in the collection, and
+      // pruning against it would delete live data the archive does contain.
+      if (!cleanRun) {
+        errors.push(
+          `${col.label}: kept existing documents — replace mode skipped because part of this collection failed to restore.`,
+        );
+      } else {
+        try {
+          await post(
+            { collection: col.name, docs: [], pruneToIds: writtenIds },
+            `${col.label} (replace)`,
+          );
+        } catch (err) {
+          errors.push(`${col.label} (replace): ${String(err)}`);
+        }
+      }
+    }
   }
-  return { restored, errors };
+  return { restored, rejected, pruned, errors };
 }
 
 function formatBytes(bytes: number): string {
@@ -250,13 +300,20 @@ export default function SettingsPage() {
 
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Export state
-  const [includeImages, setIncludeImages] = useState(false);
-  const [includeDocs, setIncludeDocs] = useState(false);
+  // Export state. Assets default ON: a DB-only archive restores into a bucket
+  // with no image bytes and no images/_metadata.json, so every image reference
+  // dangles with nothing in the archive to even enumerate what's missing —
+  // and "restore the backup" is exactly the recovery path after a bad delete,
+  // which cascades into R2 object removal.
+  const [includeImages, setIncludeImages] = useState(true);
+  const [includeDocs, setIncludeDocs] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [exportStatus, setExportStatus] = useState<Status | null>(null);
 
-  // Restore state
+  // Restore state. Merge is the default because it is the non-destructive
+  // option; replace is what actually undoes a bad import, so it is offered
+  // explicitly rather than left implicit.
+  const [restoreMode, setRestoreMode] = useState<RestoreMode>("merge");
   const [preview, setPreview] = useState<BackupPreview | null>(null);
   const [restoreFile, setRestoreFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
@@ -468,11 +525,19 @@ export default function SettingsPage() {
 
       // Content collections (programs, placements, testimonials, …). Without
       // this a "full" restore rebuilt the settings but left the site empty.
-      const content = await restoreCollections(zip, (label) =>
+      const content = await restoreCollections(zip, restoreMode, (label) =>
         setAssetProgress({ label, done: 0, total: 0 }),
       );
       if (content.restored > 0) {
         parts.push(`${content.restored} content documents`);
+      }
+      // Rejections are the loud half of the fix for silently-corrupting
+      // restores — they must never be buried in the warnings list alone.
+      if (content.rejected > 0) {
+        parts.push(`${content.rejected} document(s) REJECTED (not written)`);
+      }
+      if (content.pruned > 0) {
+        parts.push(`${content.pruned} document(s) removed by replace mode`);
       }
       warnings.push(...content.errors);
 
@@ -599,10 +664,17 @@ export default function SettingsPage() {
               <FileText size={14} className="text-gray-400" />
               Uploaded documents / files
             </label>
-            {(includeImages || includeDocs) && (
+            {includeImages || includeDocs ? (
               <p className="pt-1 text-xs text-amber-600">
                 Including assets may take longer and produce a large ZIP file.
                 Requires R2 storage to be configured.
+              </p>
+            ) : (
+              <p className="pt-1 text-xs text-red-600">
+                Without assets this archive is <strong>not restorable</strong> on
+                its own — it carries no image or document files, and no list of
+                which ones are missing. Only uncheck these if the storage bucket
+                is being backed up separately.
               </p>
             )}
           </div>
@@ -669,6 +741,56 @@ export default function SettingsPage() {
             </label>
 
             {fileError && <p className="text-sm text-red-600">{fileError}</p>}
+
+            {/* Restore mode. Upserts alone never delete, so a plain restore is
+                additive: rows created after the backup survive it. That is the
+                wrong default for undoing a bad import, so state it explicitly
+                rather than leaving the operator to discover it. */}
+            <div className="space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-3">
+              <p className="text-xs font-medium tracking-wide text-gray-500 uppercase">
+                Content restore mode
+              </p>
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-gray-700">
+                <input
+                  type="radio"
+                  name="restoreMode"
+                  checked={restoreMode === "merge"}
+                  onChange={() => setRestoreMode("merge")}
+                  className="mt-0.5 h-4 w-4 border-gray-300"
+                />
+                <span>
+                  <span className="font-medium">Merge</span> — restore the
+                  archive&apos;s documents over the current ones.
+                  <span className="block text-xs text-gray-500">
+                    Anything created after the backup is kept.
+                  </span>
+                </span>
+              </label>
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-gray-700">
+                <input
+                  type="radio"
+                  name="restoreMode"
+                  checked={restoreMode === "replace"}
+                  onChange={() => setRestoreMode("replace")}
+                  className="mt-0.5 h-4 w-4 border-gray-300"
+                />
+                <span>
+                  <span className="font-medium">Replace</span> — make content
+                  match the archive exactly.
+                  <span className="block text-xs text-gray-500">
+                    Programs, pages, placements, testimonials and events created
+                    after the backup are <strong>deleted</strong>.
+                  </span>
+                </span>
+              </label>
+              {restoreMode === "replace" && (
+                <p className="pt-1 text-xs text-red-600">
+                  Replace deletes content permanently. It is skipped for any
+                  collection that does not restore cleanly, so a partial failure
+                  cannot wipe live data.
+                </p>
+              )}
+            </div>
 
             {preview && (
               <div className="space-y-1 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm">

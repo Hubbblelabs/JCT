@@ -9,6 +9,7 @@ import {
   notFound,
   serverError,
   validateBody,
+  invalidId,
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { PlacementUpdateSchema } from "@/lib/validation";
@@ -34,6 +35,8 @@ export async function GET(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
     const doc = await Placement.findById(id);
     if (!doc) return notFound();
     const scope = enforceInstitutionScope(session, doc.institution);
@@ -59,6 +62,8 @@ export async function PATCH(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
 
     const existing = await Placement.findById(id).lean<{
       institution?: string;
@@ -92,7 +97,7 @@ export async function PATCH(
     const doc = await Placement.findByIdAndUpdate(
       id,
       { $set: { ...updateFields, updated_by: session!.user?.email } },
-      { new: true },
+      { returnDocument: "after" },
     );
     if (!doc) return notFound();
 
@@ -135,6 +140,8 @@ export async function DELETE(
   try {
     await connectDB();
     const { id } = await params;
+    const badId = invalidId(id);
+    if (badId) return badId;
 
     const existing = await Placement.findById(id)
       .select("institution")

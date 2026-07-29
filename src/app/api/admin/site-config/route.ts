@@ -87,7 +87,7 @@ export async function PUT(req: NextRequest) {
         },
         $inc: { version: 1 },
       },
-      { upsert: true, new: true },
+      { upsert: true, returnDocument: "after" },
     );
 
     // Delete any stored assets (R2 object + tracking row) that were present

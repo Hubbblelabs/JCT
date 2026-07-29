@@ -109,7 +109,8 @@ function publishedQuery(publishedOnly: boolean): Record<string, unknown> {
 export async function listPublicPrograms({
   institution,
   degree,
-  publishedOnly = false,
+  // Safe-by-default: a caller that forgets this flag gets published rows only.
+  publishedOnly = true,
 }: {
   institution?: string | null;
   degree?: string | null;

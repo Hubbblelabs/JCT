@@ -38,9 +38,14 @@ Data seeding scripts (bootstrap a fresh DB; `:dry` variants preview without writ
 
 ```bash
 pnpm seed:admin                       # create initial admin user
-pnpm seed:programs:engineering        # seed Program card rows
-pnpm seed:deptcontent:<inst>[:dry]    # seed rich Program.content per institution
+pnpm seed:deptcontent:eee[:dry]       # seed rich Program.content for EEE
+pnpm seed:placements[:dry]            # and ~15 more seed:* / migrate:* entries
 ```
+
+Run `pnpm run` for the full list. Every entry in `package.json` points at a file
+that exists — entries for deleted scripts (`seed:programs:engineering`,
+`seed:deptcontent:{engineering,polytechnic,arts-science}`) were removed, so
+following these instructions no longer fails on a missing file.
 
 There is **no test framework** configured — no test runner, no test files, no `test` script. Verify changes with `pnpm build` + `pnpm lint` and by exercising the feature in the browser.
 
@@ -56,9 +61,10 @@ There is **no test framework** configured — no test runner, no test files, no 
 
 ### Authentication & authorization
 
-- **`src/proxy.ts` is the Next.js 16 middleware** (Next 16 renamed `middleware.ts` → `proxy.ts`). It wraps NextAuth `auth()` and gates `/admin/:path*` + `/api/admin/:path*`: unauthenticated page requests redirect to `/admin/login?callbackUrl=...`, unauthenticated `/api/admin/*` requests get a JSON 401 (a redirect would hand `fetch()` callers login-page HTML with status 200); an authenticated user hitting the login page is sent to `/admin/dashboard`. This proxy is the real route gate — admin layouts also check the session as defense-in-depth.
+- **`src/proxy.ts` is the Next.js 16 middleware** (Next 16 renamed `middleware.ts` → `proxy.ts`). It wraps NextAuth `auth()` and gates `/admin/:path*` + `/api/admin/:path*`: unauthenticated page requests redirect to `/admin/login?callbackUrl=...`, unauthenticated `/api/admin/*` requests get a JSON 401 (a redirect would hand `fetch()` callers login-page HTML with status 200); an authenticated user hitting the login page is sent to `/admin/dashboard`. This proxy is the real route gate — admin layouts also check the session as defense-in-depth. It **fails closed**: the `auth()` call is wrapped so any throw during session resolution denies the request rather than falling through to `NextResponse.next()`.
+- **A `redirect()` in an admin `layout.tsx` does not stop the page segment.** App Router renders layout and page in parallel, so a layout-only guard still lets the page query Mongo and stream the result into a 200. Any admin page that reads the DB server-side must check the session itself before querying (see `dashboard/page.tsx`, `audit/page.tsx`).
 - **`src/auth.ts`** configures NextAuth: Credentials provider only (email + password, bcrypt compare), JWT session with 24h `maxAge`. The session/JWT carries `role`, `institution`, and `programs[]`.
-- **Roles** (`src/lib/permissions.ts`): only two — `editor` (0) < `admin` (1). Helpers: `hasMinRole`, `canManageUsers` (admin), `canAccessInstitution`, `canAccessProgram`. Editors are scoped to their `institution`; admins act on everything (and are stored with `institution: "all"`). NOTE: the `programs[]` allowlist is **not** enforced — `canAccessProgram` delegates to `canAccessInstitution` and ignores the program list (the `programs[]` params are dead). Scope is institution-level only. For shared media assets, use `enforceAssetScope` (allows own-institution + the shared `"all"` pool).
+- **Roles** (`src/lib/permissions.ts`): only two — `editor` (0) < `admin` (1). Helpers: `hasMinRole`, `canManageUsers` (admin), `canAccessInstitution`. Editors are scoped to their `institution`; admins act on everything (and are stored with `institution: "all"`). **Scope is institution-level only.** `User.programs[]` still exists on the model and rides in the JWT, but nothing reads it and the admin UI does not collect it; the `canAccessProgram` helper that pretended otherwise has been removed. For shared media assets, use `enforceAssetScope` (allows own-institution + the shared `"all"` pool).
 - In API routes, call `requireRole(req, minRole)` from `src/lib/api-helpers.ts`. It returns `{ session, error }`; if `error` is truthy, return it directly.
 - **Editor scope enforcement**: editors with a restricted `institution` must call `enforceInstitutionScope(session, targetInstitution)` in write routes. This prevents an editor scoped to Engineering from writing to Arts & Science data. Call it early after `requireRole` to fail fast. **Reads are scoped too**: list GETs merge `institutionReadFilter(session)` into the Mongo query and detail GETs re-check `enforceInstitutionScope` — admin list/detail responses include draft content, which must not leak across colleges.
 
@@ -72,7 +78,8 @@ There is **no test framework** configured — no test runner, no test files, no 
 ### Database & connection
 
 - **`connectDB()`** (`src/lib/mongodb.ts`): a globally cached Mongoose connection (`global._mongooseConn`), guarded by `readyState === 1`, with a 15s server-selection timeout and `bufferCommands: false`. Call it at the start of any route that touches the DB.
-- Models use the singleton guard `mongoose.models.X ?? mongoose.model(...)` to survive hot reload. Exported from `src/lib/models/index.ts`: `User`, `SiteConfig`, `ImageAsset`, `DocumentAsset`, `Program`, `Page`, `Recruiter`, `Testimonial`, `AuditLog`.
+- Models use the singleton guard `mongoose.models.X ?? mongoose.model(...)` to survive hot reload. Exported from `src/lib/models/index.ts`: `User`, `SiteConfig`, `ImageAsset`, `DocumentAsset`, `Program`, `Page`, `Event`, `Placement`, `Testimonial`, `AuditLog`.
+- **There is no `Recruiter` model and no `/api/admin/recruiters` route.** The recruiter carousel is derived from `Placement.top_recruiters` (see `src/app/api/public/recruiters/route.ts`), deduped by name across colleges. `/admin/recruiters` is a page over that data; `RecruitersSectionSchema` is a SiteConfig section, not a collection.
 
 ### Visual page editors
 
@@ -92,33 +99,35 @@ Public page layouts wrap each section in `EditableRegion`, which is inert unless
 There is **no `Department` model** anymore. Rich page content that used to live on a Department now lives on **`Program`** — the `Program.content` field's schema comment notes it "was previously stored on Department.content". If you encounter "department" in older branches/docs, that concept is folded into Program.
 
 - A **`Program`** (`src/lib/models/Program.ts`) has card-level fields (`name`, `abbr`, `slug`, `institution`, `degree`, `duration`, `seats`, `image`, `highlight`, `description`, `outcomes`, `sort_order`, `is_active`) **plus** a rich-content draft/publish pair: `content` (draft, `Mixed`), `published_content` (live snapshot), `status: "draft" | "published" | "archived"`, `version`, `published_at`.
-- **Content shape** (`src/lib/program-tabs.ts`): a `TabsProgram` has `tabs[]`; each `Tab` has `id`, `label`, optional `icon`, and `sections[]`; each `Section` is one of `richText`, `stats`, `list`, `cards`, `image`, `people`. Example:
+- **Content shape** (`ProgramContentSchema` in `src/lib/validation/programs.ts`): `content` is `Mixed`, and the schema validates only the parts the public page renders — everything else passes through, so legacy fields keep working. The renderer is `src/components/layout/ProgramPageLayout.tsx`. The keys that matter:
+  - `heroImage`, `heroMeta[]` — hero image and the `{icon,label,value}` strip under the title.
+  - `tabsConfig[]` — the **sidebar**. Each entry is `{ id, label, icon, visible, href?, blocks? }`. It overrides the six built-in tabs (reorder / relabel / hide), adds external or CMS-page links via `href`, and adds a fully custom tab via `blocks[]` (`PageBodySection[]`, rendered by `PageBlocksRenderer`).
+  - `labels` — per-section title and column-header overrides for the built-in tabs.
+  - `seo` — meta title/description for the program's public page, so it follows the draft → publish cycle.
+  - plus the structured built-in fields (about, stats, HOD, curriculum, faculty, …) consumed by the six default tabs.
 
 ```typescript
 {
-  tabs: [
+  heroImage: "images/eee-hero.webp",
+  tabsConfig: [
+    { id: "overview", label: "Overview", icon: "BookOpen", visible: true },
+    { id: "syllabus", label: "Syllabus", href: "/institutions/engineering/p/eee-syllabus" },
     {
-      id: "overview",
-      label: "Overview",
-      icon: "BookOpen",
-      sections: [
-        { type: "richText", content: "<p>Program description...</p>" },
-        { type: "stats", items: [{ label: "Duration", value: "4 Years" }] },
-      ],
+      id: "outreach",
+      label: "Outreach",
+      blocks: [{ kind: "richText", html: "<p>Community projects…</p>" }],
     },
-    {
-      id: "curriculum",
-      label: "Curriculum",
-      sections: [{ type: "list", items: ["Core Subjects", "Electives"] }],
-    },
-  ];
+  ],
+  labels: { overview: { about: { title: "About the Department" } } },
 }
 ```
 
-- **The editor** (`src/app/admin/(protected)/programs/[id]/page.tsx` with `ProgramContentEditor`, `ProgramTabsEditor`, `CurriculumEditor`, `ProgramLabelsEditor` in `src/components/admin/`) is a **live-preview builder**: edit content on one side, see the rendered public page on the other.
+> There is **no `content.tabs`**. A second model (`tabs[] → sections[]`, rendered by `TabsProgramLayout`) once existed alongside this one but nothing ever rendered it — the layout was imported nowhere, so the "Custom Page Tabs" editor that wrote it discarded every edit. The layout, that editor panel, the `migrate-tabs` route that generated the same unrenderable shape, and the `tabs` key in `ProgramContentSchema` were all removed. `src/lib/program-tabs.ts` now exports only the `Section`/`Tab` **editing** types, which the Engineering Research page reuses via `<ProgramTabsEditor />`.
+
+- **The editor** (`src/app/admin/(protected)/programs/[id]/page.tsx` with `ProgramContentEditor`, `CurriculumEditor`, `ProgramLabelsEditor` in `src/components/admin/`) is a **live-preview builder**: edit content on one side, see the rendered public page on the other.
 - **Publish flow**: `POST /api/admin/programs/[id]/publish` copies `content` → `published_content`, sets `status: "published"`, bumps `version`.
-- **Migration**: `POST /api/admin/programs/[id]/migrate-tabs` converts legacy content (flat arrays or old section types) into the current `TabsProgram` shape. It is a standalone manual endpoint — nothing calls it automatically (publish does **not** migrate). Idempotent — it no-ops when `tabs` already exist.
-- **Public reads** go through `src/lib/public-programs.ts` (`listPublicPrograms`, `getPublishedProgramBySlug`, `listPublishedProgramSlugs`). These only return docs with `status: "published"` and non-null `published_content`, then run the content through `src/lib/normalize-program-data.ts` to produce the typed `ProgramData` the public pages render.
+- **Slug uniqueness is per-institution.** `Program` indexes `{institution, slug}` unique, matching `Page` — three colleges can each have `computer-science`. Databases created before this change still carry the old global `slug_1` index and must drop it once: `db.programs.dropIndex("slug_1")`.
+- **Public reads** go through `src/lib/public-programs.ts` (`listPublicPrograms`, `getPublishedProgramBySlug`, `listPublishedProgramSlugs`). `listPublicPrograms` defaults `publishedOnly` to **true** — drafts are opt-out (`?published=false`), not opt-in. It was the other way round, which made every unpublished program publicly enumerable on `/api/public/programs`. These only return docs with `status: "published"` and non-null `published_content`, then run the content through `src/lib/normalize-program-data.ts` to produce the typed `ProgramData` the public pages render.
 
 ### Page CMS — generic standalone pages
 
@@ -247,6 +256,7 @@ The codebase is indexed using ccc. Use ccc for codebase knowledge.
 
 - Use proxy.ts instead of middleware.ts
 - useSearchParams requires Suspense boundary
+- **Never add a root `src/app/loading.tsx`.** It streams a skeleton on every route, and once HTML is flushed the HTTP status is locked — so `notFound()` renders the 404 body with status **200** across the whole site. Removing it is what makes missing pages return a real 404; ISR is unaffected. See `src/app/README-loading.md`. Segment-scoped `loading.tsx` is fine only where the pages never call `notFound()`; otherwise use `<Suspense>` inside the page, below the fetch that decides.
 
 ## Zod 4
 
