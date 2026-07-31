@@ -2,12 +2,21 @@
 
 import {
   useDeferredValue,
+  useEffect,
   useMemo,
   useState,
   type ComponentType,
   type ReactNode,
 } from "react";
-import { ArrowDown, ArrowUp, ChevronsUpDown, Search, X } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowUp,
+  ChevronLeft,
+  ChevronRight,
+  ChevronsUpDown,
+  Search,
+  X,
+} from "lucide-react";
 import { EmptyState, SkeletonRows } from "./primitives";
 
 export type Column<T> = {
@@ -42,7 +51,9 @@ export type BulkAction<T> = {
  * on more than one row, which made term-rollover work needlessly manual.
  *
  * Everything here is client-side: these lists are tens to low hundreds of rows,
- * so paging the server would add latency and complexity for no gain.
+ * so paging the server would add latency and complexity for no gain. `pageSize`
+ * still chunks the rendering for the one list that isn't that shape — the audit
+ * log, which is capped at hundreds of near-identical rows.
  */
 export function DataTable<T>({
   rows,
@@ -57,6 +68,7 @@ export function DataTable<T>({
   toolbar,
   onRowClick,
   initialSort,
+  pageSize,
 }: {
   rows: T[];
   columns: Column<T>[];
@@ -71,10 +83,13 @@ export function DataTable<T>({
   toolbar?: ReactNode;
   onRowClick?: (row: T) => void;
   initialSort?: { key: string; dir: "asc" | "desc" };
+  /** Rows per page. Omit to render every row, which is the default. */
+  pageSize?: number;
 }) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState(initialSort ?? null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(1);
 
   // Keeps typing responsive on the larger lists — filtering runs against the
   // deferred value while the input itself stays on the urgent path.
@@ -110,18 +125,43 @@ export function DataTable<T>({
     });
   }, [filtered, sort, columns]);
 
+  // Paging is a rendering concern only — search, sort and bulk actions all
+  // still see the whole filtered set.
+  const totalPages = pageSize
+    ? Math.max(1, Math.ceil(sorted.length / pageSize))
+    : 1;
+  const safePage = Math.min(page, totalPages);
+  const visible = useMemo(
+    () =>
+      pageSize
+        ? sorted.slice((safePage - 1) * pageSize, safePage * pageSize)
+        : sorted,
+    [sorted, pageSize, safePage],
+  );
+
+  // A narrowed result set must not leave the reader stranded on a page that no
+  // longer exists — or worse, on page 4 of a 2-page result.
+  useEffect(() => {
+    setPage(1);
+  }, [deferredQuery, rows]);
+
   const selectedRows = useMemo(
     () => sorted.filter((r) => selected.has(rowKey(r))),
     [sorted, selected, rowKey],
   );
 
   const allVisibleSelected =
-    sorted.length > 0 && sorted.every((r) => selected.has(rowKey(r)));
+    visible.length > 0 && visible.every((r) => selected.has(rowKey(r)));
 
   const toggleAll = () => {
-    setSelected(
-      allVisibleSelected ? new Set() : new Set(sorted.map((r) => rowKey(r))),
-    );
+    setSelected((prev) => {
+      const next = new Set(prev);
+      for (const r of visible) {
+        if (allVisibleSelected) next.delete(rowKey(r));
+        else next.add(rowKey(r));
+      }
+      return next;
+    });
   };
 
   const toggleOne = (key: string) => {
@@ -147,13 +187,13 @@ export function DataTable<T>({
   return (
     <div className="admin-card admin-card--flush">
       {(searchable_ || filters || toolbar) && (
-        <div className="flex flex-wrap items-center gap-2 border-b border-[var(--admin-border-subtle)] p-3">
+        <div className="admin-toolbar">
           {searchable_ && (
-            <div className="relative min-w-0 flex-1 sm:max-w-xs">
+            <div className="admin-search-field min-w-0 flex-1 sm:max-w-xs">
               <Search
                 size={14}
                 aria-hidden="true"
-                className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-[var(--admin-text-faint)]"
+                className="admin-search-field-icon"
               />
               <input
                 type="search"
@@ -161,22 +201,24 @@ export function DataTable<T>({
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder={searchPlaceholder}
                 aria-label={searchPlaceholder}
-                className="admin-input pr-8 pl-8"
+                className="admin-input"
               />
               {query && (
                 <button
                   type="button"
                   onClick={() => setQuery("")}
                   aria-label="Clear search"
-                  className="admin-icon-btn absolute top-1/2 right-1 h-6 w-6 -translate-y-1/2"
+                  className="admin-icon-btn admin-search-field-clear"
                 >
                   <X size={13} />
                 </button>
               )}
             </div>
           )}
-          {filters}
-          <div className="ml-auto flex items-center gap-2">{toolbar}</div>
+          {filters && <div className="admin-toolbar-filters">{filters}</div>}
+          {toolbar && (
+            <div className="ml-auto flex items-center gap-2">{toolbar}</div>
+          )}
         </div>
       )}
 
@@ -285,7 +327,7 @@ export function DataTable<T>({
               </tr>
             </thead>
             <tbody>
-              {sorted.map((row) => {
+              {visible.map((row) => {
                 const key = rowKey(row);
                 return (
                   <tr
@@ -330,11 +372,45 @@ export function DataTable<T>({
       )}
 
       {!loading && sorted.length > 0 && (
-        <p className="border-t border-[var(--admin-border-subtle)] px-4 py-2 text-[length:var(--admin-text-sm)] text-[var(--admin-text-muted)]">
-          {sorted.length === rows.length
-            ? `${rows.length} ${rows.length === 1 ? "item" : "items"}`
-            : `${sorted.length} of ${rows.length} items`}
-        </p>
+        <div className="admin-pagination">
+          <span>
+            {pageSize
+              ? `${(safePage - 1) * pageSize + 1}–${
+                  (safePage - 1) * pageSize + visible.length
+                } of ${sorted.length}${
+                  sorted.length === rows.length ? "" : ` (${rows.length} total)`
+                }`
+              : sorted.length === rows.length
+                ? `${rows.length} ${rows.length === 1 ? "item" : "items"}`
+                : `${sorted.length} of ${rows.length} items`}
+          </span>
+
+          {pageSize && totalPages > 1 && (
+            <nav aria-label="Pagination" className="admin-pagination-controls">
+              <button
+                type="button"
+                onClick={() => setPage(safePage - 1)}
+                disabled={safePage <= 1}
+                className="admin-btn admin-btn-outline admin-btn-sm"
+              >
+                <ChevronLeft size={13} />
+                Previous
+              </button>
+              <span aria-live="polite">
+                Page {safePage} of {totalPages}
+              </span>
+              <button
+                type="button"
+                onClick={() => setPage(safePage + 1)}
+                disabled={safePage >= totalPages}
+                className="admin-btn admin-btn-outline admin-btn-sm"
+              >
+                Next
+                <ChevronRight size={13} />
+              </button>
+            </nav>
+          )}
+        </div>
       )}
     </div>
   );

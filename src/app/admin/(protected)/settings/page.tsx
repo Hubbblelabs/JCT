@@ -5,6 +5,7 @@ import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import JSZip from "jszip";
 import { BACKUP_COLLECTIONS } from "@/lib/backup-collections";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
 import {
   Download,
   Upload,
@@ -337,6 +338,7 @@ export default function SettingsPage() {
   }
 
   const fileRef = useRef<HTMLInputElement>(null);
+  const confirm = useConfirm();
 
   // Export state. Assets default ON: a DB-only archive restores into a bucket
   // with no image bytes and no images/_metadata.json, so every image reference
@@ -630,6 +632,18 @@ export default function SettingsPage() {
 
   const handleReset = async () => {
     if (resetConfirm !== "RESET") return;
+    // Typing RESET proves intent to fill the box; it does not prove intent to
+    // press the button. This step names what is about to be destroyed, and it
+    // is the last one — the request deletes config, images and documents from
+    // both Mongo and R2 with no undo.
+    const ok = await confirm({
+      title: "Delete all site data",
+      message:
+        "Every site config entry, uploaded image and uploaded document will be deleted from the database and from storage. Public pages will fall back to hard-coded defaults. This cannot be undone.",
+      confirmLabel: "Delete everything",
+      destructive: true,
+    });
+    if (!ok) return;
     setResetting(true);
     setResetStatus(null);
     try {
@@ -669,9 +683,10 @@ export default function SettingsPage() {
     <div className="admin-content">
       <div className="admin-page-header">
         <div>
-          <h1 className="admin-page-title">Site Settings</h1>
+          <h1 className="admin-page-title">Backup &amp; restore</h1>
           <p className="admin-page-subtitle">
-            Backup, restore, or reset all site configuration data
+            Export an archive of everything on this site, restore one, or reset
+            the site back to its defaults.
           </p>
         </div>
       </div>

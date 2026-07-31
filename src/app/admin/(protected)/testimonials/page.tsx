@@ -331,7 +331,7 @@ function TestimonialsPageInner() {
             value={filterInst}
             onChange={(e) => setFilterInst(e.target.value)}
             aria-label="Filter by college"
-            className="admin-select w-auto"
+            className="admin-select admin-select--auto"
           >
             <option value="">Every college</option>
             {INSTITUTIONS.map((i) => (

@@ -83,8 +83,15 @@ const nextConfig: NextConfig = {
       "object-src 'none'",
       "frame-ancestors 'none'",
       "form-action 'self'",
-      `script-src 'self' 'unsafe-inline' https://*.nopaperforms.com${isProd ? "" : " 'unsafe-eval'"}`,
-      "style-src 'self' 'unsafe-inline'",
+      // chatcdn.npfs.co is not optional: the Meritto bot script's first act is
+      // `if (typeof jQuery == 'undefined')` → inject jQuery from that host and
+      // build the whole widget in its onload. Blocked there, the script still
+      // parses and defines its globals but never creates the launcher, the
+      // indicator or the chat iframe — which is exactly how the chatbot came to
+      // be silently absent on every public page.
+      `script-src 'self' 'unsafe-inline' https://*.nopaperforms.com https://*.npfs.co${isProd ? "" : " 'unsafe-eval'"}`,
+      // The widget also pulls a per-account icon stylesheet over <link>.
+      "style-src 'self' 'unsafe-inline' https://*.nopaperforms.com https://*.npfs.co",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data:",
       `connect-src 'self' https:${isProd ? "" : " ws: wss:"}`,

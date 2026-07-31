@@ -44,11 +44,14 @@ export function MerittoScript() {
 
   return (
     <>
-      <div
-        className="npf_chatbots"
-        data-w="77d56c9f31934de79df36d3ca503d338"
-        style={{ display: "none" }}
-      />
+      {/* No inline `display: none` here, unlike Meritto's copy-paste snippet.
+          That snippet relies on the widget's own `jQuery(".npf_chatbots").show()`
+          to undo it — but React owns this element's style prop and re-applies
+          `display: none` on the next render (a client-side route change is
+          enough), which hides the chat window again mid-session. The div is
+          empty until the widget fills it and the widget's CSS parks it
+          off-screen with `translateY(110%)`, so there is nothing to flash. */}
+      <div className="npf_chatbots" data-w="77d56c9f31934de79df36d3ca503d338" />
       <Script
         src="https://chatbot.in6.nopaperforms.com/en-gb/backend/bots/niaachtbtscpt.js/b4363a08fed64030ae3ab79c8be5848c/77d56c9f31934de79df36d3ca503d338"
         strategy="afterInteractive"

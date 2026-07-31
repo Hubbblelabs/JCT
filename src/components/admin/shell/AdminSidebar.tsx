@@ -6,23 +6,23 @@ import { BookOpen, ChevronRight, LayoutDashboard } from "lucide-react";
 import { hasMinRole } from "@/lib/permissions";
 import {
   findNavTrail,
-  hubHref,
+  firstNavHref,
   isItemActive,
   visibleGroups,
   visibleSections,
   type NavScope,
 } from "@/lib/admin-nav";
 
-const EXPANDED_KEY = "jct-admin-sidebar-expanded";
+// New key on purpose: the old one held a JSON array of open sections, which is
+// not a shape this reader understands.
+const EXPANDED_KEY = "jct-admin-sidebar-section";
 
 /**
- * Persistent section tree.
+ * Persistent section tree — the only navigation in the panel.
  *
- * The panel used to reach every editor through a top nav of section triggers,
- * each opening a hub page of cards — so every destination was two clicks and a
- * full page load away, and once you arrived nothing on screen said where you
- * were or what else lived nearby. The tree puts all ~120 destinations one
- * click away and keeps the current branch visible while you work.
+ * Every destination lives here, one click from anywhere. Sections open one at
+ * a time: with six of them expanded at once the tree ran to several screens of
+ * scrolling, which buried the branch the user was actually working in.
  */
 export function AdminSidebar({
   role,
@@ -50,32 +50,28 @@ export function AdminSidebar({
     [role, institution, pathname, url],
   );
 
-  const [expanded, setExpanded] = useState<string[]>([]);
+  // Exactly one section is open at a time — opening one closes the rest.
+  const [expanded, setExpanded] = useState<string | null>(null);
 
-  // Restore the editor's open sections, then make sure the branch they are
-  // actually on is open regardless of what was stored.
+  // The branch the user is actually on always wins over what was stored.
   useEffect(() => {
-    let stored: string[] = [];
-    try {
-      const raw = window.localStorage.getItem(EXPANDED_KEY);
-      if (raw) stored = JSON.parse(raw) as string[];
-    } catch {
-      stored = [];
+    if (trail.section) {
+      setExpanded(trail.section.id);
+      return;
     }
-    setExpanded(
-      trail.section && !stored.includes(trail.section.id)
-        ? [...stored, trail.section.id]
-        : stored,
-    );
+    try {
+      setExpanded(window.localStorage.getItem(EXPANDED_KEY) || null);
+    } catch {
+      setExpanded(null);
+    }
   }, [trail.section]);
 
   const toggle = (id: string) => {
     setExpanded((prev) => {
-      const next = prev.includes(id)
-        ? prev.filter((s) => s !== id)
-        : [...prev, id];
+      const next = prev === id ? null : id;
       try {
-        window.localStorage.setItem(EXPANDED_KEY, JSON.stringify(next));
+        if (next) window.localStorage.setItem(EXPANDED_KEY, next);
+        else window.localStorage.removeItem(EXPANDED_KEY);
       } catch {
         /* storage unavailable — the tree still works, it just won't persist */
       }
@@ -88,7 +84,7 @@ export function AdminSidebar({
   return (
     <aside className="admin-sidebar" aria-label="Admin sections">
       <Link
-        href={isAdmin ? "/admin/dashboard" : hubHref(sections[0]?.id ?? "")}
+        href={isAdmin ? "/admin/dashboard" : firstNavHref(role, institution)}
         className="admin-sidebar-brand"
         onClick={onNavigate}
       >
@@ -118,7 +114,7 @@ export function AdminSidebar({
         )}
 
         {sections.map((section) => {
-          const open = expanded.includes(section.id);
+          const open = expanded === section.id;
           const groups = visibleGroups(section, role);
           const isCurrent = trail.section?.id === section.id;
 
@@ -141,23 +137,11 @@ export function AdminSidebar({
                 />
               </button>
 
-              {open && !collapsed && (
-                <div className="mt-0.5 mb-2">
-                  {/* The hub still exists as an overview of the section — it is
-                      just no longer the only way in. */}
-                  <Link
-                    href={hubHref(section.id)}
-                    onClick={onNavigate}
-                    className="admin-sidebar-link"
-                    aria-current={
-                      pathname === hubHref(section.id) ? "page" : undefined
-                    }
-                  >
-                    <span className="admin-sidebar-label italic">
-                      All {section.navLabel} pages
-                    </span>
-                  </Link>
-
+              {/* Rendered whenever the section is open, collapsed or not —
+                  the rail hides this in CSS and reveals it again on hover, so
+                  it has to exist in the DOM to be revealable. */}
+              {open && (
+                <div className="admin-sidebar-sub mt-0.5 mb-2">
                   {groups.map((group) => (
                     <div key={group.title}>
                       <p className="admin-sidebar-group">{group.title}</p>

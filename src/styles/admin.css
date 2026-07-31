@@ -127,7 +127,8 @@
 
   /* ── Elevation ──────────────────────────────────────────────────────────*/
   --admin-shadow-sm: 0 1px 2px rgb(15 23 42 / 0.05);
-  --admin-shadow: 0 1px 3px rgb(15 23 42 / 0.08), 0 1px 2px rgb(15 23 42 / 0.04);
+  --admin-shadow:
+    0 1px 3px rgb(15 23 42 / 0.08), 0 1px 2px rgb(15 23 42 / 0.04);
   --admin-shadow-md:
     0 4px 12px -2px rgb(15 23 42 / 0.1), 0 2px 6px -2px rgb(15 23 42 / 0.05);
   --admin-shadow-lg:
@@ -137,10 +138,11 @@
   /* ── Focus ──────────────────────────────────────────────────────────────
      One ring for the whole panel. Gold on light surfaces reads clearly and
      matches the brand; the offset keeps it off the control's own border. */
-  --admin-focus-ring: 0 0 0 2px var(--admin-raised), 0 0 0 4px var(--admin-gold);
+  --admin-focus-ring:
+    0 0 0 2px var(--admin-raised), 0 0 0 4px var(--admin-gold);
   --admin-focus-ring-tight: 0 0 0 3px rgb(201 168 76 / 0.35);
-  --admin-focus-ring-navy: 0 0 0 2px var(--admin-navy), 0 0 0 4px
-    var(--admin-gold);
+  --admin-focus-ring-navy:
+    0 0 0 2px var(--admin-navy), 0 0 0 4px var(--admin-gold);
 
   /* ── Layout metrics ─────────────────────────────────────────────────────*/
   --admin-sidebar-w: 264px;
@@ -385,6 +387,7 @@
 .admin-shell[data-collapsed="true"] .admin-sidebar-brand-text,
 .admin-shell[data-collapsed="true"] .admin-sidebar-label,
 .admin-shell[data-collapsed="true"] .admin-sidebar-group,
+.admin-shell[data-collapsed="true"] .admin-sidebar-sub,
 .admin-shell[data-collapsed="true"] .admin-sidebar-section-chevron {
   display: none;
 }
@@ -395,6 +398,44 @@
   margin-left: 0;
   padding-left: var(--admin-space-2);
   padding-right: var(--admin-space-2);
+}
+
+/* Hovering the collapsed rail expands it over the content for as long as the
+   pointer stays on it. The open section's links are in the DOM either way —
+   only their visibility is collapsed — so hovering reveals the whole branch
+   rather than an icon column with no way to read it. */
+@media (min-width: 641px) and (hover: hover) {
+  .admin-shell[data-collapsed="true"] .admin-sidebar:hover {
+    width: var(--admin-sidebar-w);
+    box-shadow: var(--admin-shadow-xl);
+  }
+
+  .admin-shell[data-collapsed="true"]
+    .admin-sidebar:hover
+    .admin-sidebar-brand-text,
+  .admin-shell[data-collapsed="true"] .admin-sidebar:hover .admin-sidebar-label,
+  .admin-shell[data-collapsed="true"] .admin-sidebar:hover .admin-sidebar-group,
+  .admin-shell[data-collapsed="true"] .admin-sidebar:hover .admin-sidebar-sub,
+  .admin-shell[data-collapsed="true"]
+    .admin-sidebar:hover
+    .admin-sidebar-section-chevron {
+    display: revert;
+  }
+
+  .admin-shell[data-collapsed="true"]
+    .admin-sidebar:hover
+    .admin-sidebar-section {
+    justify-content: flex-start;
+    padding-left: var(--admin-space-3);
+    padding-right: var(--admin-space-3);
+  }
+
+  .admin-shell[data-collapsed="true"] .admin-sidebar:hover .admin-sidebar-link {
+    justify-content: flex-start;
+    margin-left: var(--admin-space-2);
+    padding-left: var(--admin-space-3);
+    padding-right: var(--admin-space-3);
+  }
 }
 
 /* Focus is always visible on the navy background. */
@@ -443,6 +484,13 @@
 .admin-breadcrumb a:hover {
   color: var(--admin-text);
   background: var(--admin-hover);
+}
+
+/* Ancestor crumb. Not a link: the sidebar is the only navigation now, so a
+   crumb that led anywhere would be leading somewhere that no longer exists. */
+.admin-breadcrumb-crumb {
+  padding: 2px 4px;
+  white-space: nowrap;
 }
 
 .admin-breadcrumb-current {
@@ -542,6 +590,42 @@
   font-weight: 600;
   color: var(--admin-text-muted);
   line-height: 1.4;
+}
+
+/* ── Topbar breakpoint visibility ─────────────────────────────────────────
+   These are media queries rather than Tailwind's `hidden md:inline-flex` for
+   the same reason the search-field padding is: `.admin-icon-btn` and
+   `.admin-search-trigger` set `display` from unlayered CSS, which outranks a
+   layered utility — so `hidden` was silently discarded and all of this chrome
+   stayed visible at every width, phone search bar included. They must also stay
+   *after* those component rules, since both sides have one class of
+   specificity and the later declaration is the one that wins. */
+.admin-topbar-only-md,
+.admin-topbar-only-sm,
+.admin-topbar-only-lg {
+  display: none;
+}
+
+/* Public-site link: tablet and up. */
+@media (min-width: 768px) {
+  .admin-topbar-only-md {
+    display: inline-flex;
+  }
+}
+
+/* Compact search button: only in the band where the full trigger will not fit
+   but the row still has room for it. Phones get neither form of search. */
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .admin-topbar-only-sm {
+    display: inline-flex;
+  }
+}
+
+/* Full Ctrl-K search trigger: desktop only. */
+@media (min-width: 1024px) {
+  .admin-topbar-only-lg {
+    display: inline-flex;
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -971,6 +1055,90 @@
   box-shadow: 0 0 0 3px rgb(185 28 28 / 0.18);
 }
 
+/* The base rule above sets `width: 100%` from unlayered CSS, which outranks a
+   layered Tailwind `w-auto` — so a filter select needs its own opt-out. Without
+   it every filter took a full row and a four-filter toolbar became four rows of
+   two words each. */
+.admin-select--auto {
+  width: auto;
+  min-width: 9rem;
+}
+
+/* ── Search field ─────────────────────────────────────────────────────────
+   Icon inside the box, text clear of it. The padding has to live here for the
+   same cascade reason: `.admin-input` sets the `padding` shorthand unlayered,
+   so a layered `pl-8` utility was discarded and the placeholder rendered
+   underneath the magnifier. */
+.admin-search-field {
+  position: relative;
+}
+
+.admin-search-field .admin-input {
+  padding-left: calc(var(--admin-space-3) + 1.25rem);
+  padding-right: calc(var(--admin-space-3) + 1.25rem);
+}
+
+.admin-search-field-icon {
+  position: absolute;
+  top: 50%;
+  left: var(--admin-space-3);
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--admin-text-faint);
+}
+
+.admin-search-field-clear {
+  position: absolute;
+  top: 50%;
+  right: var(--admin-space-1);
+  width: 24px;
+  height: 24px;
+  transform: translateY(-50%);
+}
+
+/* Chrome's own clear affordance would sit alongside ours. */
+.admin-search-field .admin-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+/* ── Pagination ───────────────────────────────────────────────────────────*/
+.admin-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-2) var(--admin-space-4);
+  border-top: 1px solid var(--admin-border-subtle);
+  font-size: var(--admin-text-sm);
+  color: var(--admin-text-muted);
+}
+
+.admin-pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-2);
+}
+
+/* Toolbar above a table: search takes the leftover width, filters sit beside
+   it and wrap as a group rather than one per line. */
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--admin-space-2);
+  padding: var(--admin-space-3);
+  border-bottom: 1px solid var(--admin-border-subtle);
+}
+
+.admin-toolbar-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--admin-space-2);
+  min-width: 0;
+}
+
 .admin-label {
   display: block;
   margin-bottom: var(--admin-space-1);
@@ -1356,12 +1524,11 @@
    11. RESPONSIVE
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* Tablet — the sidebar auto-collapses to a rail so content keeps its width. */
+/* Tablet — the rail is the default here, but that is decided in AdminShell so
+   the rendered tree and the width agree. Overriding --admin-sidebar-w from CSS
+   alone left the shell thinking it was expanded: labels and sub-links stayed in
+   the DOM at full size inside a 60px column and were simply clipped. */
 @media (max-width: 1024px) {
-  :root {
-    --admin-sidebar-w: var(--admin-sidebar-w-collapsed);
-  }
-
   .admin-content {
     padding: var(--admin-space-4);
   }
@@ -1395,6 +1562,7 @@
   .admin-shell[data-drawer="open"] .admin-sidebar-brand-text,
   .admin-shell[data-drawer="open"] .admin-sidebar-label,
   .admin-shell[data-drawer="open"] .admin-sidebar-group,
+  .admin-shell[data-drawer="open"] .admin-sidebar-sub,
   .admin-shell[data-drawer="open"] .admin-sidebar-section-chevron {
     display: revert;
   }

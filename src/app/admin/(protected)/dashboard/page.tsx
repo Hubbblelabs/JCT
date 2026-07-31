@@ -12,7 +12,7 @@ import {
   Send,
   UploadCloud,
 } from "lucide-react";
-import { hubHref, sectionItems, visibleSections } from "@/lib/admin-nav";
+import { firstNavHref, sectionItems, visibleSections } from "@/lib/admin-nav";
 import { PageShell } from "@/components/admin/kit/PageShell";
 import {
   Banner,
@@ -173,7 +173,10 @@ export default async function DashboardPage() {
   if (role === "editor") {
     const institution = (session?.user as Record<string, unknown>)
       ?.institution as string;
-    redirect(`/admin/hub/${institution || "engineering"}`);
+    // Editors have no dashboard. Send them to the first page their scope can
+    // open — resolved from the nav registry, so a stale institution value
+    // lands somewhere real instead of on a section they cannot view.
+    redirect(firstNavHref(role, institution));
   }
 
   const d = await getDashboardData();
@@ -210,8 +213,8 @@ export default async function DashboardPage() {
               <div className="admin-bulk-bar">
                 <span>
                   {d.pending.length}{" "}
-                  {d.pending.length === 1 ? "item has" : "items have"} edits that
-                  are not on the public site yet
+                  {d.pending.length === 1 ? "item has" : "items have"} edits
+                  that are not on the public site yet
                 </span>
               </div>
               <ul>
@@ -288,7 +291,9 @@ export default async function DashboardPage() {
           {visibleSections(role ?? "admin", "all").map((s) => (
             <Link
               key={s.id}
-              href={hubHref(s.id)}
+              // No hub page any more — the card opens the section's first page
+              // and the sidebar carries the rest.
+              href={sectionItems(s, role ?? "admin")[0]?.href ?? "#"}
               className="admin-card admin-card--interactive"
             >
               <div className="flex items-start gap-3">

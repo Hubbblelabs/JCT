@@ -50,8 +50,18 @@ function ShellInner({ children }: { children: ReactNode }) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
 
+  // Below the tablet breakpoint the rail is the default, but it is decided
+  // here rather than in CSS: the stylesheet used to shrink the sidebar width
+  // on its own while this component still believed it was expanded, so labels
+  // and sub-links kept rendering at full size inside a 60px column and were
+  // merely clipped. A stored preference still wins — the toggle has to work.
   useEffect(() => {
-    setUserCollapsed(window.localStorage.getItem(COLLAPSED_KEY) === "1");
+    const stored = window.localStorage.getItem(COLLAPSED_KEY);
+    if (stored !== null) {
+      setUserCollapsed(stored === "1");
+      return;
+    }
+    setUserCollapsed(window.matchMedia("(max-width: 1024px)").matches);
   }, []);
 
   // Live-preview editors need the width, so the rail collapses automatically
@@ -60,7 +70,15 @@ function ShellInner({ children }: { children: ReactNode }) {
   const immersive = isImmersiveRoute(pathname);
   const collapsed = userCollapsed || immersive;
 
+  // One button now does both jobs: below the drawer breakpoint the rail is
+  // off-screen (transformed, not just narrowed), so "collapse" has nothing to
+  // toggle — open the drawer instead. Matches the CSS breakpoint in
+  // admin.css's mobile section.
   const toggleCollapse = () => {
+    if (typeof window !== "undefined" && window.innerWidth < 640) {
+      setDrawerOpen((prev) => !prev);
+      return;
+    }
     setUserCollapsed((prev) => {
       const next = !prev;
       window.localStorage.setItem(COLLAPSED_KEY, next ? "1" : "0");
@@ -115,7 +133,6 @@ function ShellInner({ children }: { children: ReactNode }) {
           userRole={role}
           collapsed={collapsed}
           onToggleCollapse={toggleCollapse}
-          onOpenDrawer={() => setDrawerOpen(true)}
           onOpenPalette={() => setPaletteOpen(true)}
         />
         <main id="admin-main" className="admin-main">

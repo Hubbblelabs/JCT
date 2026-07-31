@@ -1,19 +1,17 @@
 "use client";
 
-import Link from "next/link";
 import { Fragment, useEffect, useRef, useState } from "react";
 import {
   ChevronRight,
   ExternalLink,
   LogOut,
-  Menu,
   PanelLeftClose,
   PanelLeftOpen,
   Search,
   User,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
-import { hubHref, type NavTrail } from "@/lib/admin-nav";
+import { type NavTrail } from "@/lib/admin-nav";
 
 /**
  * Breadcrumbs, search and the account menu.
@@ -29,7 +27,6 @@ export function AdminTopbar({
   userRole,
   collapsed,
   onToggleCollapse,
-  onOpenDrawer,
   onOpenPalette,
 }: {
   trail: NavTrail;
@@ -37,7 +34,6 @@ export function AdminTopbar({
   userRole: string;
   collapsed: boolean;
   onToggleCollapse: () => void;
-  onOpenDrawer: () => void;
   onOpenPalette: () => void;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -63,17 +59,8 @@ export function AdminTopbar({
     <header className="admin-topbar">
       <button
         type="button"
-        onClick={onOpenDrawer}
-        className="admin-icon-btn sm:hidden"
-        aria-label="Open navigation"
-      >
-        <Menu size={17} />
-      </button>
-
-      <button
-        type="button"
         onClick={onToggleCollapse}
-        className="admin-icon-btn hidden sm:inline-flex"
+        className="admin-icon-btn"
         aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         aria-pressed={collapsed}
       >
@@ -83,7 +70,9 @@ export function AdminTopbar({
       <nav aria-label="Breadcrumb" className="admin-breadcrumb min-w-0">
         {trail.section ? (
           <Fragment>
-            <Link href={hubHref(trail.section.id)}>{trail.section.label}</Link>
+            <span className="admin-breadcrumb-crumb">
+              {trail.section.label}
+            </span>
             {trail.group && (
               <Fragment>
                 <ChevronRight
@@ -117,7 +106,7 @@ export function AdminTopbar({
           href="/"
           target="_blank"
           rel="noopener noreferrer"
-          className="admin-icon-btn hidden md:inline-flex"
+          className="admin-icon-btn admin-topbar-only-md"
           aria-label="Open the public site in a new tab"
           title="Open the public site"
         >
@@ -127,17 +116,19 @@ export function AdminTopbar({
         <button
           type="button"
           onClick={onOpenPalette}
-          className="admin-search-trigger hidden lg:inline-flex"
+          className="admin-search-trigger admin-topbar-only-lg"
         >
           <Search size={14} aria-hidden="true" />
           <span>Search pages…</span>
           <kbd className="admin-kbd ml-auto">Ctrl K</kbd>
         </button>
 
+        {/* Phones get neither form of the page search: the breadcrumb already
+            eats the row, and the drawer lists every destination anyway. */}
         <button
           type="button"
           onClick={onOpenPalette}
-          className="admin-icon-btn lg:hidden"
+          className="admin-icon-btn admin-topbar-only-sm"
           aria-label="Search pages"
         >
           <Search size={16} />

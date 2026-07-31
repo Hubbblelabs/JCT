@@ -2,7 +2,16 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { TextInput, Select } from "@/components/admin/inputs";
-import { Check, Loader2, Pencil, Plus, Shield, UserPlus, Users } from "lucide-react";
+import {
+  Check,
+  Loader2,
+  Pencil,
+  Plus,
+  Shield,
+  Trash2,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 import { useToast } from "@/components/ui/Toast";
@@ -188,20 +197,23 @@ export default function UsersPage() {
     setSaving(false);
   };
 
-  const deactivate = async (u: User) => {
+  const remove = async (u: User) => {
     const ok = await confirm({
-      title: "Revoke access",
-      message: `${u.full_name || u.email} will be signed out and unable to sign in again until reactivated. Their past changes stay in the audit log.`,
-      confirmLabel: "Revoke access",
+      title: "Delete this account",
+      message: `${u.full_name || u.email} will be removed permanently and cannot sign in again. This cannot be undone — their past changes stay in the audit log.`,
+      confirmLabel: "Delete permanently",
       destructive: true,
     });
     if (!ok) return;
     const r = await fetch(`/api/admin/users/${u._id}`, { method: "DELETE" });
     if (r.ok) {
-      toast.success("Access revoked.");
+      toast.success("Account deleted.");
       await load();
     } else {
-      toast.error("Could not revoke access. Nothing was changed.");
+      const payload = await parseApiError(r);
+      toast.error(
+        payload?.message ?? payload?.error ?? "Could not delete this account.",
+      );
     }
   };
 
@@ -284,18 +296,16 @@ export default function UsersPage() {
           >
             <Pencil size={13} />
           </button>
-          {u.is_active && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                void deactivate(u);
-              }}
-              className="admin-btn admin-btn-danger admin-btn-sm"
-              aria-label={`Revoke access for ${u.full_name || u.email}`}
-            >
-              Revoke
-            </button>
-          )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              void remove(u);
+            }}
+            className="admin-btn admin-btn-danger admin-btn-sm"
+            aria-label={`Delete ${u.full_name || u.email}`}
+          >
+            <Trash2 size={13} />
+          </button>
         </span>
       ),
     },

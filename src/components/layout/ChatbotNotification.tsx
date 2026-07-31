@@ -3,27 +3,16 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import Image from "next/image";
 
+/**
+ * Opens the chat by clicking Meritto's launcher.
+ *
+ * The launcher has a stable id, so this asks for it by name rather than
+ * sweeping the document for a small square fixed-position box — a heuristic
+ * that would happily click any unrelated FAB that happened to match.
+ */
 function clickMerittoLauncher() {
-  for (const el of document.querySelectorAll<HTMLElement>("*")) {
-    if (el.dataset.ownFixed !== undefined) continue;
-    const style = window.getComputedStyle(el);
-    if (style.position !== "fixed") continue;
-    const rect = el.getBoundingClientRect();
-    // Launcher is small and square-ish; the positioner has moved it to the
-    // bottom-right. Size guard (≤120) mirrors MerittoPositioner's isLauncher.
-    if (
-      rect.width > 0 &&
-      rect.width <= 120 &&
-      rect.height <= 120 &&
-      rect.right > window.innerWidth - 140 &&
-      rect.bottom > window.innerHeight * 0.5
-    ) {
-      el.click();
-      return;
-    }
-  }
+  document.querySelector<HTMLElement>("#__eechatIcon")?.click();
 }
 
 export function ChatbotNotification() {
@@ -79,17 +68,6 @@ export function ChatbotNotification() {
             onClick={open}
             className="flex max-w-[220px] items-center gap-3 rounded-2xl border border-slate-200 bg-white px-3.5 py-3 text-left shadow-xl shadow-slate-900/10 transition-all hover:border-[#d4a024]/50 hover:shadow-2xl focus:outline-none"
           >
-            {/* College Logo */}
-            <div className="relative flex h-8 w-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-slate-100 bg-slate-50 p-0.5">
-              <Image
-                src="/logo/jct_logo.webp"
-                alt="JCT Logo"
-                width={24}
-                height={24}
-                className="object-contain"
-              />
-            </div>
-
             <div className="min-w-0 flex-1">
               <p className="text-[12.5px] leading-tight font-bold text-[#0a1628]">
                 Hey! I&apos;m Lumina -AI

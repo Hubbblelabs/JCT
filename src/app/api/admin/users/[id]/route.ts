@@ -158,43 +158,33 @@ export async function DELETE(
     if (!target) return notFound("User not found");
 
     if (selfId && String(target._id) === selfId) {
-      return badRequest("You cannot deactivate your own account");
+      return badRequest("You cannot delete your own account");
     }
 
+    // Same lockout guard as before, but it now has to hold unconditionally:
+    // deleting an inactive admin is harmless, deleting the last active one is
+    // not, and there is no undo once the document is gone.
     if (
       target.role === "admin" &&
       target.is_active &&
       (await isLastActiveAdminExcluding(id))
     ) {
-      return badRequest("Cannot deactivate the last active admin");
+      return badRequest("Cannot delete the last active admin");
     }
 
-    const user = await User.findByIdAndUpdate(
-      id,
-      { is_active: false },
-      { returnDocument: "after" },
-    ).select("-password_hash");
+    const user = await User.findByIdAndDelete(id).select("-password_hash");
     if (!user) return notFound("User not found");
 
-    // Compensating check — see PATCH above.
-    if (target.role === "admin" && target.is_active) {
-      const remaining = await User.countDocuments({
-        role: "admin",
-        is_active: true,
-      });
-      if (remaining === 0) {
-        await User.updateOne({ _id: id }, { $set: { is_active: true } });
-        return badRequest("Cannot deactivate the last active admin");
-      }
-    }
-
+    // The account is gone; its history is not. logAudit runs after the delete
+    // so the trail records what actually happened rather than what was
+    // attempted.
     await logAudit(
       "user",
-      "deactivated",
+      "deleted",
       currentUserEmail(session),
-      `Deactivated user ${user.email}`,
+      `Deleted user ${user.email}`,
     );
-    return json({ message: "Deactivated" });
+    return json({ message: "Deleted" });
   } catch (e) {
     console.error(e);
     return serverError();

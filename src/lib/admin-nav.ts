@@ -1,10 +1,13 @@
 /**
  * Single source of truth for admin navigation.
  *
- * The top nav used to carry every content link inside per-section dropdowns,
- * which grew far past a usable length. Now the nav only links to one hub page
- * per section (`/admin/hub/[section]`), and this registry drives both the nav
- * triggers and the grouped card grid rendered on each hub.
+ * Every destination is reachable from the sidebar tree alone — there is no
+ * per-section hub page in between any more, so this registry is what the
+ * sidebar, the breadcrumbs and the Ctrl+K palette all read.
+ *
+ * Item order inside a group follows the order the sections appear on the
+ * public page it edits, so scanning the sidebar top-to-bottom walks the live
+ * page top-to-bottom.
  */
 import {
   Award,
@@ -15,6 +18,7 @@ import {
   CalendarDays,
   Camera,
   ClipboardList,
+  DatabaseBackup,
   FileEdit,
   FlaskConical,
   FolderOpen,
@@ -30,7 +34,6 @@ import {
   PanelBottom,
   PanelTop,
   ScrollText,
-  Settings,
   Sparkles,
   TreePalm,
   Users,
@@ -62,10 +65,10 @@ export type AdminNavGroup = {
 };
 
 export type AdminNavSection = {
-  /** URL segment: /admin/hub/<id> */
+  /** Stable key — used for the sidebar's expanded-branch state. */
   id: string;
   label: string;
-  /** Short label for the top nav trigger. */
+  /** Short label for the sidebar row. */
   navLabel: string;
   description: string;
   icon: AdminNavIcon;
@@ -114,6 +117,9 @@ function collegeGroups(college: College): AdminNavGroup[] {
       description: p.description,
     }));
 
+  // Ordered as every college landing page renders: hero, programs (in the
+  // Academics group), metrics, news & events, admissions, placements (own
+  // group), campus life, testimonials.
   const homePage: AdminNavItem[] = [
     {
       label: "Navbar",
@@ -148,6 +154,13 @@ function collegeGroups(college: College): AdminNavGroup[] {
         ]
       : []),
     {
+      label: "News & Events Section",
+      href: pc("upcomingEvents"),
+      icon: CalendarDays,
+      description:
+        "Wording of the landing-page events strip. The entries come from News & Events.",
+    },
+    {
       label: "Admissions",
       href: pc("admissions"),
       icon: ClipboardList,
@@ -158,13 +171,6 @@ function collegeGroups(college: College): AdminNavGroup[] {
       href: pc("lifeAtJct"),
       icon: Camera,
       description: "Photo gallery categories and images.",
-    },
-    {
-      label: "News & Events Section",
-      href: pc("upcomingEvents"),
-      icon: CalendarDays,
-      description:
-        "Wording of the landing-page events strip. The entries come from News & Events.",
     },
     {
       label: "Testimonials",
@@ -304,6 +310,10 @@ function collegeGroups(college: College): AdminNavGroup[] {
 
 const MAIN_GROUPS: AdminNavGroup[] = [
   {
+    // Ordered as the home page renders: hero (with its cards and accreditation
+    // strip inside it), statistics, why-choose, placements, campus life,
+    // testimonials, admissions. News & Events has no home section of its own,
+    // so it sits at the end.
     title: "Landing Page",
     items: [
       {
@@ -325,6 +335,12 @@ const MAIN_GROUPS: AdminNavGroup[] = [
         description: "Home banner headline, media and buttons.",
       },
       {
+        label: "Card",
+        href: "/admin/main/page-content?section=card",
+        icon: LayoutGrid,
+        description: "Institution cards linking to each college.",
+      },
+      {
         label: "Accreditation Logos",
         href: "/admin/main/page-content?section=accreditations",
         icon: Award,
@@ -343,12 +359,6 @@ const MAIN_GROUPS: AdminNavGroup[] = [
         description: "Value-proposition block.",
       },
       {
-        label: "Card",
-        href: "/admin/main/page-content?section=card",
-        icon: LayoutGrid,
-        description: "Institution cards linking to each college.",
-      },
-      {
         label: "Placement Highlights",
         href: "/admin/recruiters?scope=main",
         icon: Award,
@@ -361,12 +371,6 @@ const MAIN_GROUPS: AdminNavGroup[] = [
         description: "Home page photo gallery.",
       },
       {
-        label: "News & Events",
-        href: "/admin/events?scope=main",
-        icon: CalendarDays,
-        description: "Site-wide news and event entries.",
-      },
-      {
         label: "Testimonials",
         href: "/admin/main/page-content?section=testimonials",
         icon: MessageSquare,
@@ -377,6 +381,12 @@ const MAIN_GROUPS: AdminNavGroup[] = [
         href: "/admin/main/page-content?section=homeAdmissions",
         icon: ClipboardList,
         description: "Home page admissions block.",
+      },
+      {
+        label: "News & Events",
+        href: "/admin/events?scope=main",
+        icon: CalendarDays,
+        description: "Site-wide news and event entries.",
       },
     ],
   },
@@ -456,25 +466,28 @@ const ADMIN_GROUPS: AdminNavGroup[] = [
         minRole: "admin",
       },
       {
-        label: "Settings",
+        label: "Backup & restore",
         href: "/admin/settings",
-        icon: Settings,
-        description: "Backup, restore and reset site configuration.",
+        icon: DatabaseBackup,
+        description: "Export an archive, restore one, or reset everything.",
         minRole: "admin",
       },
     ],
   },
 ];
 
+/**
+ * Sidebar order: tools first, then content from the widest scope inwards —
+ * global (every page of every site) → main site → each college.
+ */
 export const ADMIN_SECTIONS: AdminNavSection[] = [
   {
-    id: "main",
-    label: "Main Website",
-    navLabel: "Main",
-    description: "Home page sections and the institution-wide pages.",
-    icon: Home,
-    adminOnly: true,
-    groups: MAIN_GROUPS,
+    id: "admin",
+    label: "Admin Tools",
+    navLabel: "Admin",
+    description: "Dynamic pages, users, audit trail and site settings.",
+    icon: Wrench,
+    groups: ADMIN_GROUPS,
   },
   {
     id: "global",
@@ -484,6 +497,15 @@ export const ADMIN_SECTIONS: AdminNavSection[] = [
     icon: Globe,
     adminOnly: true,
     groups: GLOBAL_GROUPS,
+  },
+  {
+    id: "main",
+    label: "Main Website",
+    navLabel: "Main",
+    description: "Home page sections and the institution-wide pages.",
+    icon: Home,
+    adminOnly: true,
+    groups: MAIN_GROUPS,
   },
   {
     id: "engineering",
@@ -512,19 +534,7 @@ export const ADMIN_SECTIONS: AdminNavSection[] = [
     institution: "polytechnic",
     groups: collegeGroups("polytechnic"),
   },
-  {
-    id: "admin",
-    label: "Admin Tools",
-    navLabel: "Admin",
-    description: "Dynamic pages, users, audit trail and site settings.",
-    icon: Wrench,
-    groups: ADMIN_GROUPS,
-  },
 ];
-
-export function hubHref(sectionId: string): string {
-  return `/admin/hub/${sectionId}`;
-}
 
 export function getAdminSection(id: string): AdminNavSection | undefined {
   return ADMIN_SECTIONS.find((s) => s.id === id);
@@ -619,17 +629,36 @@ export function isItemActive(
   return true;
 }
 
-/** A section is active on its own hub page or on any page it links to. */
+/** A section is active on any page it links to. */
 export function isSectionActive(
   section: AdminNavSection,
   role: string,
   pathname: string,
   url: NavScope,
 ): boolean {
-  if (pathname === hubHref(section.id)) return true;
   return sectionItems(section, role).some((i) =>
     isItemActive(i.href, pathname, url),
   );
+}
+
+/**
+ * First page this user can actually open — where an editor lands, now that
+ * there is no per-section hub to send them to.
+ */
+export function firstNavHref(role: string, institution: string): string {
+  const sections = visibleSections(role, institution);
+  // An editor's own college comes first even though Admin Tools sits above it
+  // in the tree — landing them on Dynamic Pages instead of their college would
+  // be a worse start than the college hub they used to get.
+  const ordered = [
+    ...sections.filter((s) => s.institution === institution),
+    ...sections.filter((s) => s.institution !== institution),
+  ];
+  for (const section of ordered) {
+    const first = sectionItems(section, role)[0];
+    if (first) return first.href;
+  }
+  return "/admin/programs";
 }
 
 /**
@@ -653,7 +682,6 @@ export function findNavTrail(
   url: NavScope,
 ): NavTrail {
   for (const section of visibleSections(role, institution)) {
-    if (pathname === hubHref(section.id)) return { section };
     for (const group of visibleGroups(section, role)) {
       for (const item of group.items) {
         if (isItemActive(item.href, pathname, url))

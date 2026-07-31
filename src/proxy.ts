@@ -40,18 +40,11 @@ const gate = auth((req) => {
     return denied(pathname, req.url);
   }
 
-  // Redirect already-authenticated users away from login
+  // Redirect already-authenticated users away from login. Editors go to the
+  // dashboard too — it forwards them to the first page their scope can open,
+  // resolved from the nav registry, which this edge-side gate should not have
+  // to import.
   if (isLoginPage && user) {
-    const userRole = (user as Record<string, unknown>)?.role as string;
-    const institution = (user as Record<string, unknown>)
-      ?.institution as string;
-    if (userRole === "editor") {
-      // Their college hub — the hub itself re-routes if the institution value
-      // doesn't name a section they can open.
-      return NextResponse.redirect(
-        new URL(`/admin/hub/${institution || "engineering"}`, req.url),
-      );
-    }
     return NextResponse.redirect(new URL("/admin/dashboard", req.url));
   }
 
@@ -73,10 +66,9 @@ export default async function proxy(
   ctx: unknown,
 ): Promise<NextResponse> {
   try {
-    const res = (await (gate as unknown as (r: NextRequest, c: unknown) => unknown)(
-      req,
-      ctx,
-    )) as NextResponse | undefined;
+    const res = (await (
+      gate as unknown as (r: NextRequest, c: unknown) => unknown
+    )(req, ctx)) as NextResponse | undefined;
     return res ?? NextResponse.next();
   } catch (err) {
     console.error("[proxy] auth resolution failed:", err);
