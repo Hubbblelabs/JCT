@@ -5,10 +5,11 @@ import { AuditLog } from "@/lib/models";
 import {
   requireRole,
   json,
+  badRequest,
   serverError,
   validateBody,
 } from "@/lib/api-helpers";
-import { logAudit } from "@/lib/audit";
+import { logAudit, AUDIT_PAGE_SIZE } from "@/lib/audit";
 
 /**
  * Retention windows the UI offers, in days. Deliberately a closed set with a
@@ -29,18 +30,58 @@ const AuditPurgeSchema = z.object({
     ),
 });
 
+const MAX_PAGE_SIZE = 200;
+
+/**
+ * One page of the trail, newest first.
+ *
+ * `before` is the `created_at` of the oldest row the caller already holds —
+ * keyset paging rather than skip/limit, so a purge or a new write between
+ * requests cannot make a row appear twice or be skipped.
+ */
 export async function GET(req: NextRequest) {
   // Audit history exposes other users' actions/emails. Editors are
   // institution-scoped and should not see global admin activity.
   const { error } = await requireRole(req, "admin");
   if (error) return error;
 
+  const params = req.nextUrl.searchParams;
+  const rawLimit = Number(params.get("limit"));
+  const limit =
+    Number.isFinite(rawLimit) && rawLimit > 0
+      ? Math.min(Math.trunc(rawLimit), MAX_PAGE_SIZE)
+      : AUDIT_PAGE_SIZE;
+  const beforeRaw = params.get("before");
+  const before = beforeRaw ? new Date(beforeRaw) : null;
+  if (before && Number.isNaN(before.getTime())) {
+    return badRequest("Invalid `before` timestamp");
+  }
+
   try {
     await connectDB();
-    const logs = await AuditLog.find().sort({ created_at: -1 }).limit(200);
-    return json(logs);
+    // One extra row decides `hasMore` without a second count query.
+    const docs = await AuditLog.find(
+      before ? { created_at: { $lt: before } } : {},
+    )
+      .sort({ created_at: -1 })
+      .limit(limit + 1)
+      .lean();
+
+    const hasMore = docs.length > limit;
+    const page = hasMore ? docs.slice(0, limit) : docs;
+    return json({
+      rows: page.map((d: Record<string, unknown>) => ({
+        id: String(d._id),
+        entityType: String(d.entity_type ?? ""),
+        action: String(d.action ?? ""),
+        userEmail: String(d.user_email ?? ""),
+        summary: String(d.summary ?? ""),
+        createdAt: new Date(d.created_at as string).toISOString(),
+      })),
+      hasMore,
+    });
   } catch (e) {
-    console.error(e);
+    console.error("[admin/audit] list failed", e);
     return serverError();
   }
 }

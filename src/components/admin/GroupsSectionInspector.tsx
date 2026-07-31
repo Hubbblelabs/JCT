@@ -2,6 +2,8 @@
 
 import { Plus, Trash2 } from "lucide-react";
 import {
+  Field,
+  FormGrid,
   TextInput,
   TextArea,
   TextAreaList,
@@ -47,7 +49,7 @@ function GalleryEditor({
 }) {
   const max = GROUPS_PAGE_LIMITS.galleryMax;
   return (
-    <div className="mt-4">
+    <div className="admin-col-full">
       <div className="mb-2 flex items-center justify-between gap-3">
         <span className="admin-label mb-0">Gallery (shown in the sidebar)</span>
         <div className="flex shrink-0 items-center gap-2">
@@ -70,11 +72,11 @@ function GalleryEditor({
           No gallery photos. Add up to {max}.
         </p>
       ) : (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="admin-form-grid admin-form-grid--tight">
           {values.map((url, i) => (
             <div
               key={i}
-              className="relative rounded-lg border border-gray-200 p-3"
+              className="admin-col-4 relative rounded-lg border border-gray-200 p-3"
             >
               <button
                 type="button"
@@ -135,15 +137,19 @@ function GroupFields({
   onChange: (next: GroupValue) => void;
 }) {
   const autoSlug = slugifyGroupName(group.name || "");
+  // Identity → description/photo → the people → what they do, matching the
+  // order the public detail page presents them in.
   return (
-    <div className="space-y-1">
+    <FormGrid>
       <TextInput
         label="Name"
+        span={4}
         value={group.name}
         onChange={(e) => onChange({ ...group, name: e.target.value })}
       />
       <TextInput
         label="Category"
+        span={4}
         value={group.category}
         placeholder={
           variant === "clubs" ? "Technical Clubs" : "Statutory Committees"
@@ -153,6 +159,7 @@ function GroupFields({
       />
       <TextInput
         label="URL Slug (optional)"
+        span={4}
         value={group.slug}
         placeholder={autoSlug || "auto-generated-from-name"}
         hint={`Page URL: ${basePath}/${resolvedSlug || "…"} — leave blank to follow the name. Set it only to keep an existing link working after a rename.`}
@@ -160,68 +167,95 @@ function GroupFields({
       />
       <TextArea
         label="Description"
-        rows={4}
+        span={7}
+        rows={5}
         value={group.description}
         onChange={(e) => onChange({ ...group, description: e.target.value })}
       />
       <ImageUploadInput
         label="Logo / Photo"
+        span={5}
         ratio="square"
         value={group.image}
         onChange={(image) => onChange({ ...group, image })}
         hideUrlField
       />
-      <GalleryEditor
-        values={group.gallery ?? []}
-        onChange={(gallery) => onChange({ ...group, gallery })}
-      />
       <TextInput
         label={meta.convenorFallback}
+        span={4}
         value={group.convenor}
         onChange={(e) => onChange({ ...group, convenor: e.target.value })}
       />
       <TextInput
         label="Their Designation"
+        span={4}
         value={group.convenorRole}
         placeholder={meta.convenorFallback}
         onChange={(e) => onChange({ ...group, convenorRole: e.target.value })}
       />
       <TextInput
         label="Contact Email (optional)"
+        span={4}
         value={group.email}
         placeholder="club@jct.ac.in"
         onChange={(e) => onChange({ ...group, email: e.target.value })}
       />
 
-      <div className="admin-label mt-4 mb-2 border-t border-gray-100 pt-3">
-        {meta.membersLabel}
-      </div>
-      <ItemsEditor
-        items={group.members as unknown as Record<string, unknown>[]}
-        onChange={(v) =>
-          onChange({ ...group, members: v as unknown as Member[] })
-        }
-        fields={[
-          { key: "name", label: "Name", placeholder: "Dr. K. Geetha" },
-          { key: "role", label: "Designation", placeholder: "Member" },
-          {
-            key: "dept",
-            label: "Department / Affiliation",
-            placeholder: "Associate Professor - S&H",
-          },
-          { key: "contact", label: "Contact", placeholder: "9789650151" },
-        ]}
-        emptyItem={{ name: "", role: "", dept: "", contact: "" }}
-        addLabel="Add member"
-      />
+      <Field
+        label={meta.membersLabel}
+        span="full"
+        className="border-t border-gray-100 pt-3"
+      >
+        <ItemsEditor
+          items={group.members as unknown as Record<string, unknown>[]}
+          onChange={(v) =>
+            onChange({ ...group, members: v as unknown as Member[] })
+          }
+          fields={[
+            {
+              key: "name",
+              label: "Name",
+              placeholder: "Dr. K. Geetha",
+              span: 3,
+            },
+            {
+              key: "role",
+              label: "Designation",
+              placeholder: "Member",
+              span: 3,
+            },
+            {
+              key: "dept",
+              label: "Department / Affiliation",
+              placeholder: "Associate Professor - S&H",
+              span: 3,
+            },
+            {
+              key: "contact",
+              label: "Contact",
+              placeholder: "9789650151",
+              span: 3,
+            },
+          ]}
+          emptyItem={{ name: "", role: "", dept: "", contact: "" }}
+          addLabel="Add member"
+        />
+      </Field>
 
       <StringList
         label={meta.activitiesLabel}
+        span="full"
+        columns
         values={group.activities}
         onChange={(activities) => onChange({ ...group, activities })}
         placeholder={variant === "clubs" ? "Hackathons" : "Grievance redressal"}
       />
-    </div>
+
+      <GalleryEditor
+        values={group.gallery ?? []}
+        onChange={(gallery) => onChange({ ...group, gallery })}
+      />
+    </FormGrid>
   );
 }
 
@@ -274,9 +308,10 @@ export function GroupsSectionInspector({
   switch (section) {
     case "hero":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Hero Title"
+            span={5}
             value={data.hero.title}
             placeholder={meta.defaultHeroTitle}
             onChange={(e) =>
@@ -285,13 +320,14 @@ export function GroupsSectionInspector({
           />
           <TextArea
             label="Hero Subtitle"
+            span={7}
             rows={3}
             value={data.hero.subtitle}
             onChange={(e) =>
               patch({ hero: { ...data.hero, subtitle: e.target.value } })
             }
           />
-        </>
+        </FormGrid>
       );
 
     case "intro":
@@ -313,18 +349,21 @@ export function GroupsSectionInspector({
           </p>
           <Repeater<GroupValue>
             label={meta.sectionLabel}
+            itemSpan={6}
             items={data.groups}
             onChange={(groups) => patch({ groups })}
             newItem={newGroup}
             renderItem={(item, i, oc) => (
-              <div className="space-y-1">
+              <FormGrid tight>
                 <TextInput
                   label="Name"
+                  span={6}
                   value={item.name}
                   onChange={(e) => oc({ ...item, name: e.target.value })}
                 />
                 <TextInput
                   label="Category"
+                  span={6}
                   value={item.category}
                   placeholder={
                     variant === "clubs"
@@ -333,11 +372,11 @@ export function GroupsSectionInspector({
                   }
                   onChange={(e) => oc({ ...item, category: e.target.value })}
                 />
-                <p className="pt-1 text-xs text-gray-400">
+                <p className="admin-col-full text-xs text-gray-400">
                   {item.members.length} {meta.membersLabel.toLowerCase()} ·{" "}
                   <span className="font-mono">/{slugs[i]}</span>
                 </p>
-              </div>
+              </FormGrid>
             )}
           />
         </>

@@ -445,13 +445,16 @@ export function ProgramLabelsEditor({
                     Show this section on the public page
                   </label>
                 )}
-                <div className="grid grid-cols-2 gap-3">
+                {/* Column-header overrides are short: three to a row. */}
+                <div className="admin-form-grid admin-form-grid--tight">
                   {section.fields.map((f) => {
                     const fieldId = `pl-${group.key}-${section.key}-${f.key}`;
                     return (
                       <div
                         key={f.key}
-                        className={f.key === "title" ? "col-span-2" : ""}
+                        className={
+                          f.key === "title" ? "admin-col-full" : "admin-col-4"
+                        }
                       >
                         <label htmlFor={fieldId} className="admin-label">
                           {f.label}

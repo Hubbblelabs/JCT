@@ -11,8 +11,11 @@ import {
 import { X } from "lucide-react";
 
 const MIN_WIDTH = 340;
-const MAX_WIDTH = 900;
-const DEFAULT_WIDTH = 440;
+const MAX_WIDTH = 1200;
+// Wide enough for the two-column `admin-form-grid` inside an inspector to
+// actually be two columns. At the old 440px every inspector was a single
+// column of full-width controls no matter how much screen was free.
+const DEFAULT_WIDTH = 760;
 const WIDTH_KEY = "jct-admin-drawer-width";
 
 /**

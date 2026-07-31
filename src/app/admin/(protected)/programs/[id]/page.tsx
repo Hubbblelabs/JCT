@@ -2,7 +2,11 @@
 
 import { useEffect, useMemo, useState, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { TextInput, ImageUploadInput } from "@/components/admin/inputs";
+import {
+  FormGrid,
+  TextInput,
+  ImageUploadInput,
+} from "@/components/admin/inputs";
 import {
   PROGRAM_CONTENT_SECTION_LABELS,
   ProgramSectionInspector,
@@ -12,6 +16,7 @@ import { ProgramPageLayout } from "@/components/layout/ProgramPageLayout";
 import { normalizeProgramData } from "@/lib/normalize-program-data";
 import {
   Send,
+  Save,
   Trash2,
   EyeOff,
   ArrowLeft,
@@ -148,7 +153,8 @@ function ProgramDetailInner() {
         selectedSection as ProgramContentSection
       ] ?? "Section");
 
-  const save = async () => {
+  /** Returns whether the write landed — "Save & Publish" needs to know. */
+  const save = async (): Promise<boolean> => {
     setSaving(true);
     setMsg(null);
     setApiError(null);
@@ -173,13 +179,13 @@ function ProgramDetailInner() {
             text: err?.message ?? err?.error ?? "Error creating program",
             ok: false,
           });
-          return;
+          return false;
         }
         const data = await r.json();
         router.replace(
           `/admin/programs/${data._id}?college=${prog.institution}`,
         );
-        return;
+        return true;
       }
 
       const pRes = await fetch(`/api/admin/programs/${id}`, {
@@ -198,23 +204,27 @@ function ProgramDetailInner() {
           text: err?.message ?? err?.error ?? "Error saving program",
           ok: false,
         });
-        return;
+        return false;
       }
 
       setStatus("draft");
       setMsg({ text: "Draft saved successfully", ok: true });
+      return true;
     } catch (err) {
       setMsg({
         text: err instanceof Error ? err.message : "Save failed",
         ok: false,
       });
+      return false;
     } finally {
       setSaving(false);
     }
   };
 
+  /** Save first, then publish — publishing a stale draft was too easy to do. */
   const publish = async () => {
     if (isNew) return;
+    if (!(await save())) return;
     setPublishing(true);
     setMsg(null);
     setApiError(null);
@@ -415,29 +425,29 @@ function ProgramDetailInner() {
             </button>
           )}
           <button
-            onClick={save}
-            disabled={saving}
-            className="admin-btn admin-btn-primary"
+            onClick={() => void save()}
+            disabled={saving || publishing}
+            className="admin-btn admin-btn-outline"
           >
             {saving ? (
               <Loader2 size={15} className="animate-spin" />
             ) : (
-              <Check size={15} />
+              <Save size={15} />
             )}
-            {saving ? "Saving…" : isNew ? "Create Program" : "Save Draft"}
+            {saving ? "Saving…" : isNew ? "Create Program" : "Save"}
           </button>
           {!isNew && (
             <button
-              onClick={publish}
-              disabled={publishing}
-              className="admin-btn admin-btn-gold"
+              onClick={() => void publish()}
+              disabled={publishing || saving}
+              className="admin-btn admin-btn-primary"
             >
               {publishing ? (
                 <Loader2 size={15} className="animate-spin" />
               ) : (
                 <Send size={15} />
               )}
-              {publishing ? "Publishing…" : "Publish"}
+              {publishing ? "Publishing…" : "Save & Publish"}
             </button>
           )}
         </div>
@@ -475,39 +485,45 @@ function ProgramDetailInner() {
               }}
             />
           ) : (
-            <div className="px-6 py-28 text-sm text-gray-400">
-              <div className="mx-auto max-w-md space-y-4 text-left">
+            <div className="px-6 py-16 text-sm text-gray-400">
+              <div className="mx-auto max-w-4xl text-left">
                 <h3 className="mb-6 text-xl font-bold text-gray-900">
                   Create New Program
                 </h3>
-                <TextInput
-                  label="Program Name"
-                  value={prog.name}
-                  onChange={(e) => setP("name", e.target.value)}
-                  placeholder="e.g. Artificial Intelligence"
-                  required
-                />
-                <TextInput
-                  label="Abbreviation / Short Name"
-                  value={prog.abbr}
-                  onChange={(e) => setP("abbr", e.target.value)}
-                  placeholder="e.g. AI"
-                  required
-                />
-                <TextInput
-                  label="Slug"
-                  value={prog.slug}
-                  onChange={(e) => setP("slug", e.target.value)}
-                  placeholder="e.g. artificial-intelligence"
-                  required
-                />
-                <ImageUploadInput
-                  label="Program Photo"
-                  ratio="hero"
-                  value={prog.image}
-                  onChange={(v) => setP("image", v)}
-                  hideUrlField
-                />
+                <FormGrid>
+                  <TextInput
+                    label="Program Name"
+                    span={5}
+                    value={prog.name}
+                    onChange={(e) => setP("name", e.target.value)}
+                    placeholder="e.g. Artificial Intelligence"
+                    required
+                  />
+                  <TextInput
+                    label="Abbreviation / Short Name"
+                    span={3}
+                    value={prog.abbr}
+                    onChange={(e) => setP("abbr", e.target.value)}
+                    placeholder="e.g. AI"
+                    required
+                  />
+                  <TextInput
+                    label="Slug"
+                    span={4}
+                    value={prog.slug}
+                    onChange={(e) => setP("slug", e.target.value)}
+                    placeholder="e.g. artificial-intelligence"
+                    required
+                  />
+                  <ImageUploadInput
+                    label="Program Photo"
+                    span="full"
+                    ratio="hero"
+                    value={prog.image}
+                    onChange={(v) => setP("image", v)}
+                    hideUrlField
+                  />
+                </FormGrid>
               </div>
             </div>
           )}
@@ -515,7 +531,8 @@ function ProgramDetailInner() {
 
         {isInspectorOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 p-0 sm:p-4">
-            <aside className="flex h-full w-full flex-col overflow-y-auto bg-white shadow-2xl sm:max-w-md sm:rounded-xl">
+            {/* Wide enough for the inspector's two-column form grid. */}
+            <aside className="flex h-full w-full flex-col overflow-y-auto bg-white shadow-2xl sm:max-w-3xl sm:rounded-xl">
               <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
                 <div>
                   <p className="text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">

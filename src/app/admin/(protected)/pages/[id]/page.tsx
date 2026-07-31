@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import {
   Field,
+  FormGrid,
   ImageUploadInput,
   TextArea,
   TextInput,
@@ -255,19 +256,19 @@ function PageEditorInner({ id }: { id: string }) {
             ) : (
               <Save size={14} />
             )}
-            Save Draft
+            Save
           </button>
           <button
             onClick={publish}
             disabled={publishing || saving}
-            className="admin-btn admin-btn-gold"
+            className="admin-btn admin-btn-primary"
           >
             {publishing ? (
               <Loader2 size={14} className="animate-spin" />
             ) : (
               <Send size={14} />
             )}
-            Publish
+            Save &amp; Publish
           </button>
         </div>
       </div>
@@ -307,40 +308,41 @@ function PageEditorInner({ id }: { id: string }) {
         </div>
 
         {activeTab === "basic" && (
-          <div className="space-y-3">
+          <FormGrid>
             <TextInput
               label="Title"
+              span={4}
               value={doc.title}
               onChange={(e) => setDoc({ ...doc, title: e.target.value })}
             />
-            <div className="grid grid-cols-2 gap-3">
-              <TextInput
-                label="Slug (URL)"
-                value={doc.slug}
-                onChange={(e) => setDoc({ ...doc, slug: e.target.value })}
-                hint="Lowercase letters, numbers, and dashes."
+            <TextInput
+              label="Slug (URL)"
+              span={4}
+              value={doc.slug}
+              onChange={(e) => setDoc({ ...doc, slug: e.target.value })}
+              hint="Lowercase letters, numbers, and dashes."
+            />
+            <Field label="Public URL" span={4}>
+              <input
+                className="admin-input"
+                value={publicPathFor(doc.institution, doc.slug)}
+                disabled
               />
-              <Field label="Public URL">
-                <input
-                  className="admin-input"
-                  value={publicPathFor(doc.institution, doc.slug)}
-                  disabled
-                />
-              </Field>
-            </div>
+            </Field>
             <Link
               href="/admin/pages"
-              className="text-sm text-amber-700 hover:underline"
+              className="admin-col-full text-sm text-amber-700 hover:underline"
             >
               ← Back to pages
             </Link>
-          </div>
+          </FormGrid>
         )}
 
         {activeTab === "seo" && (
-          <div className="space-y-3">
+          <FormGrid>
             <TextInput
               label="Meta Title"
+              span={5}
               value={seo.metaTitle ?? ""}
               onChange={(e) =>
                 patchContent({ seo: { ...seo, metaTitle: e.target.value } })
@@ -349,6 +351,7 @@ function PageEditorInner({ id }: { id: string }) {
             />
             <TextArea
               label="Meta Description"
+              span={7}
               rows={3}
               value={seo.metaDescription ?? ""}
               onChange={(e) =>
@@ -357,14 +360,7 @@ function PageEditorInner({ id }: { id: string }) {
                 })
               }
             />
-            <ImageUploadInput
-              label="Open Graph Image (optional)"
-              ratio="hero"
-              value={seo.ogImage ?? ""}
-              onChange={(ogImage) => patchContent({ seo: { ...seo, ogImage } })}
-              hideUrlField
-            />
-            <Field label="Keywords (comma-separated)">
+            <Field label="Keywords (comma-separated)" span={8}>
               <input
                 className="admin-input"
                 value={(seo.keywords ?? []).join(", ")}
@@ -381,23 +377,34 @@ function PageEditorInner({ id }: { id: string }) {
                 }
               />
             </Field>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={seo.noindex === true}
-                onChange={(e) =>
-                  patchContent({ seo: { ...seo, noindex: e.target.checked } })
-                }
-              />
-              Hide from search engines (noindex)
-            </label>
-          </div>
+            <Field label="Indexing" span={4}>
+              <label className="flex items-center gap-2 pt-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={seo.noindex === true}
+                  onChange={(e) =>
+                    patchContent({ seo: { ...seo, noindex: e.target.checked } })
+                  }
+                />
+                Hide from search engines (noindex)
+              </label>
+            </Field>
+            <ImageUploadInput
+              label="Open Graph Image (optional)"
+              span="full"
+              ratio="hero"
+              value={seo.ogImage ?? ""}
+              onChange={(ogImage) => patchContent({ seo: { ...seo, ogImage } })}
+              hideUrlField
+            />
+          </FormGrid>
         )}
 
         {activeTab === "hero" && (
-          <div className="space-y-3">
+          <FormGrid>
             <TextInput
               label="Hero Title"
+              span={5}
               value={hero.title ?? ""}
               onChange={(e) =>
                 patchContent({ hero: { ...hero, title: e.target.value } })
@@ -405,40 +412,42 @@ function PageEditorInner({ id }: { id: string }) {
             />
             <TextArea
               label="Hero Subtitle"
+              span={7}
               rows={3}
               value={hero.subtitle ?? ""}
               onChange={(e) =>
                 patchContent({ hero: { ...hero, subtitle: e.target.value } })
               }
             />
+            <TextInput
+              label="CTA Label"
+              span={4}
+              value={hero.ctaLabel ?? ""}
+              onChange={(e) =>
+                patchContent({
+                  hero: { ...hero, ctaLabel: e.target.value },
+                })
+              }
+            />
+            <TextInput
+              label="CTA URL"
+              span={8}
+              value={hero.ctaHref ?? ""}
+              onChange={(e) =>
+                patchContent({
+                  hero: { ...hero, ctaHref: e.target.value },
+                })
+              }
+            />
             <ImageUploadInput
               label="Hero Image"
+              span="full"
               ratio="hero"
               value={hero.image ?? ""}
               onChange={(image) => patchContent({ hero: { ...hero, image } })}
               hideUrlField
             />
-            <div className="grid grid-cols-2 gap-3">
-              <TextInput
-                label="CTA Label"
-                value={hero.ctaLabel ?? ""}
-                onChange={(e) =>
-                  patchContent({
-                    hero: { ...hero, ctaLabel: e.target.value },
-                  })
-                }
-              />
-              <TextInput
-                label="CTA URL"
-                value={hero.ctaHref ?? ""}
-                onChange={(e) =>
-                  patchContent({
-                    hero: { ...hero, ctaHref: e.target.value },
-                  })
-                }
-              />
-            </div>
-          </div>
+          </FormGrid>
         )}
 
         {activeTab === "sections" && (
@@ -454,11 +463,11 @@ function PageEditorInner({ id }: { id: string }) {
               Add a left-side navigation list of links. Body sections render to
               the right of this sidebar.
             </p>
-            <div className="space-y-2">
+            <div className="admin-form-grid admin-form-grid--tight">
               {sidebarItems.map((it, i) => (
                 <div
                   key={i}
-                  className="rounded-lg border border-gray-200 bg-white p-3"
+                  className="admin-col-6 rounded-lg border border-gray-200 bg-white p-3"
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-xs font-medium text-gray-500">
@@ -511,9 +520,10 @@ function PageEditorInner({ id }: { id: string }) {
                       </button>
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <FormGrid tight>
                     <TextInput
                       label="Label"
+                      span={5}
                       value={it.label ?? ""}
                       onChange={(e) =>
                         patchContent({
@@ -528,6 +538,7 @@ function PageEditorInner({ id }: { id: string }) {
                     />
                     <TextInput
                       label="URL"
+                      span={7}
                       value={it.href ?? ""}
                       onChange={(e) =>
                         patchContent({
@@ -540,7 +551,7 @@ function PageEditorInner({ id }: { id: string }) {
                         })
                       }
                     />
-                  </div>
+                  </FormGrid>
                 </div>
               ))}
               <button
@@ -556,14 +567,15 @@ function PageEditorInner({ id }: { id: string }) {
                     },
                   })
                 }
-                className="admin-btn admin-btn-outline admin-btn-sm"
+                className="admin-btn admin-btn-outline admin-btn-sm admin-col-full"
               >
                 <Plus size={12} /> Add Sidebar Item
               </button>
             </div>
-            <div className="grid grid-cols-2 gap-3">
+            <FormGrid>
               <TextInput
                 label="CTA Button Label (optional)"
+                span={4}
                 value={sidebar.ctaLabel ?? ""}
                 onChange={(e) =>
                   patchContent({
@@ -573,6 +585,7 @@ function PageEditorInner({ id }: { id: string }) {
               />
               <TextInput
                 label="CTA Button URL"
+                span={8}
                 value={sidebar.ctaHref ?? ""}
                 onChange={(e) =>
                   patchContent({
@@ -580,7 +593,7 @@ function PageEditorInner({ id }: { id: string }) {
                   })
                 }
               />
-            </div>
+            </FormGrid>
             <div className="mt-6">
               <p className="admin-label mb-2">Body Sections</p>
               <PageBodySectionsEditor
@@ -603,11 +616,11 @@ function PageEditorInner({ id }: { id: string }) {
                 })
               }
             />
-            <div className="space-y-2">
+            <div className="admin-form-grid admin-form-grid--tight">
               {galleryImages.map((img, i) => (
                 <div
                   key={i}
-                  className="rounded-lg border border-gray-200 bg-white p-3"
+                  className="admin-col-4 rounded-lg border border-gray-200 bg-white p-3"
                 >
                   <div className="mb-2 flex items-center justify-between">
                     <span className="text-xs font-medium text-gray-500">
@@ -644,9 +657,10 @@ function PageEditorInner({ id }: { id: string }) {
                     }
                     hideUrlField
                   />
-                  <div className="grid grid-cols-2 gap-3">
+                  <FormGrid tight>
                     <TextInput
                       label="Alt Text"
+                      span="full"
                       value={img.alt ?? ""}
                       onChange={(e) =>
                         patchContent({
@@ -661,6 +675,7 @@ function PageEditorInner({ id }: { id: string }) {
                     />
                     <TextInput
                       label="Caption (optional)"
+                      span="full"
                       value={img.caption ?? ""}
                       onChange={(e) =>
                         patchContent({
@@ -673,7 +688,7 @@ function PageEditorInner({ id }: { id: string }) {
                         })
                       }
                     />
-                  </div>
+                  </FormGrid>
                 </div>
               ))}
               <button
@@ -689,7 +704,7 @@ function PageEditorInner({ id }: { id: string }) {
                     },
                   })
                 }
-                className="admin-btn admin-btn-outline admin-btn-sm"
+                className="admin-btn admin-btn-outline admin-btn-sm admin-col-full"
               >
                 <Plus size={12} /> Add Image
               </button>
@@ -698,10 +713,11 @@ function PageEditorInner({ id }: { id: string }) {
         )}
 
         {activeTab === "contact" && (
-          <div className="space-y-3">
+          <FormGrid>
             <TextArea
               label="Intro (optional)"
-              rows={3}
+              span="full"
+              rows={2}
               value={contact.intro ?? ""}
               onChange={(e) =>
                 patchContent({
@@ -709,27 +725,27 @@ function PageEditorInner({ id }: { id: string }) {
                 })
               }
             />
-            <div className="grid grid-cols-2 gap-3">
-              <TextInput
-                label="Phone"
-                value={contact.phone ?? ""}
-                onChange={(e) =>
-                  patchContent({
-                    contact: { ...contact, phone: e.target.value },
-                  })
-                }
-              />
-              <TextInput
-                label="Email"
-                value={contact.email ?? ""}
-                onChange={(e) =>
-                  patchContent({
-                    contact: { ...contact, email: e.target.value },
-                  })
-                }
-              />
-            </div>
-            <Field label="Address Lines">
+            <TextInput
+              label="Phone"
+              span={4}
+              value={contact.phone ?? ""}
+              onChange={(e) =>
+                patchContent({
+                  contact: { ...contact, phone: e.target.value },
+                })
+              }
+            />
+            <TextInput
+              label="Email"
+              span={4}
+              value={contact.email ?? ""}
+              onChange={(e) =>
+                patchContent({
+                  contact: { ...contact, email: e.target.value },
+                })
+              }
+            />
+            <Field label="Address Lines" span={4}>
               <textarea
                 className="admin-textarea"
                 rows={4}
@@ -750,6 +766,7 @@ function PageEditorInner({ id }: { id: string }) {
             </Field>
             <TextInput
               label="Google Map Embed URL (optional)"
+              span="full"
               value={contact.mapEmbedUrl ?? ""}
               onChange={(e) =>
                 patchContent({
@@ -758,7 +775,7 @@ function PageEditorInner({ id }: { id: string }) {
               }
               placeholder="https://www.google.com/maps/embed?pb=..."
             />
-          </div>
+          </FormGrid>
         )}
       </div>
 

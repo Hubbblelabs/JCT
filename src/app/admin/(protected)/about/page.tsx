@@ -2,7 +2,13 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Check, Loader2, X, ExternalLink } from "lucide-react";
+import { ArrowLeft, Loader2, X, ExternalLink } from "lucide-react";
+import { SaveButtons } from "@/components/admin/LivePageEditor";
+import {
+  loadEditableConfig,
+  saveEditableConfig,
+  type SaveMode,
+} from "@/lib/admin-site-config";
 import {
   AboutPageLayout,
   ABOUT_SECTION_LABELS,
@@ -93,7 +99,7 @@ function AboutEditorInner() {
 
   const [draft, setDraft] = useState<AboutPageValue | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = useState<SaveMode | null>(null);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [selected, setSelected] = useState<string>("hero");
   const [inspectorOpen, setInspectorOpen] = useState(false);
@@ -103,15 +109,10 @@ function AboutEditorInner() {
     setLoading(true);
     setDraft(null);
     setMsg(null);
-    fetch(`/api/public/site-config?key=${configKey}`)
-      .then((r) => r.json())
+    loadEditableConfig<AboutPageValue>(configKey)
       .then((res) => {
         if (cancelled) return;
-        if (res?.data && typeof res.data === "object") {
-          setDraft(res.data as AboutPageValue);
-        } else {
-          setDraft(getDefaultDraft(institution));
-        }
+        setDraft(res.value ?? getDefaultDraft(institution));
       })
       .catch((err) => {
         if (!cancelled) {
@@ -143,36 +144,24 @@ function AboutEditorInner() {
     return ABOUT_SECTION_LABELS[selected as AboutEditableSection] ?? "Section";
   })();
 
-  const save = async () => {
-    setSaving(true);
+  const save = async (mode: SaveMode) => {
+    setSaving(mode);
     setMsg(null);
     try {
       const flushedDraft = await flush(draft);
       setDraft(flushedDraft as AboutPageValue);
-      const r = await fetch("/api/admin/site-config", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          config_key: configKey,
-          value: flushedDraft,
-        }),
+      await saveEditableConfig(configKey, flushedDraft, mode);
+      setMsg({
+        text: mode === "publish" ? "Saved & published" : "Draft saved",
+        ok: true,
       });
-      if (r.ok) {
-        setMsg({ text: "Saved & published", ok: true });
-      } else {
-        const e = await r.json().catch(() => null);
-        setMsg({
-          text: e?.message ?? e?.error ?? "Save failed",
-          ok: false,
-        });
-      }
     } catch (err) {
       setMsg({
         text: err instanceof Error ? err.message : "Save failed",
         ok: false,
       });
     } finally {
-      setSaving(false);
+      setSaving(null);
     }
   };
 
@@ -212,18 +201,7 @@ function AboutEditorInner() {
               {msg.text}
             </span>
           )}
-          <button
-            onClick={save}
-            disabled={saving || loading}
-            className="admin-btn admin-btn-primary"
-          >
-            {saving ? (
-              <Loader2 size={15} className="animate-spin" />
-            ) : (
-              <Check size={15} />
-            )}
-            {saving ? "Saving…" : "Save & Publish"}
-          </button>
+          <SaveButtons saving={saving} disabled={loading} onSave={save} />
         </div>
       </div>
 
@@ -245,7 +223,7 @@ function AboutEditorInner() {
 
       {inspectorOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 p-0 sm:p-4">
-          <aside className="flex h-full w-full flex-col overflow-y-auto bg-white shadow-2xl sm:max-w-md sm:rounded-xl">
+          <aside className="flex h-full w-full flex-col overflow-y-auto bg-white shadow-2xl sm:max-w-3xl sm:rounded-xl">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
               <div>
                 <p className="text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">
@@ -271,18 +249,7 @@ function AboutEditorInner() {
               />
             </div>
             <div className="sticky bottom-0 mt-auto border-t border-gray-100 bg-white px-6 py-3">
-              <button
-                onClick={save}
-                disabled={saving}
-                className="admin-btn admin-btn-primary w-full justify-center"
-              >
-                {saving ? (
-                  <Loader2 size={15} className="animate-spin" />
-                ) : (
-                  <Check size={15} />
-                )}
-                {saving ? "Saving…" : "Save & Publish"}
-              </button>
+              <SaveButtons saving={saving} onSave={save} full />
             </div>
           </aside>
         </div>

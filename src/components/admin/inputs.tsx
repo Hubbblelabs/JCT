@@ -67,12 +67,54 @@ function validateDocumentFile(file: File): string | null {
   return null;
 }
 
+/* ── Grid layout ────────────────────────────────────────────────────────────
+   Every control below renders inside a `Field` wrapper. When that wrapper is a
+   direct child of a `FormGrid`, its `span` decides how much of the 12-column
+   row it takes; outside a grid the class is inert and the field stacks as
+   before. See the `.admin-form-grid` block in admin.css. */
+
+export type FieldSpan = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | "full";
+
+export function colClass(span?: FieldSpan): string {
+  if (span === undefined) return "";
+  return span === "full" ? "admin-col-full" : `admin-col-${span}`;
+}
+
+/**
+ * Row container for form fields. Children declare their own width via `span`;
+ * anything that does not declare one takes half a row.
+ */
+export function FormGrid({
+  children,
+  tight,
+  span = "full",
+  className = "",
+}: {
+  children: ReactNode;
+  /** Tighter gap, for repeater rows inside an already-bordered card. */
+  tight?: boolean;
+  /** Width of the grid itself when it is nested inside another grid. */
+  span?: FieldSpan;
+  className?: string;
+}) {
+  return (
+    <div
+      className={`admin-form-grid ${tight ? "admin-form-grid--tight" : ""} ${colClass(span)} ${className}`.trim()}
+    >
+      {children}
+    </div>
+  );
+}
+
 interface FieldProps {
   label: string;
   required?: boolean;
   hint?: string;
   /** Associates the label with its control for a11y (screen readers + click-to-focus). */
   htmlFor?: string;
+  /** Columns of a parent `FormGrid` this field occupies. */
+  span?: FieldSpan;
+  className?: string;
   children: ReactNode;
 }
 
@@ -81,16 +123,20 @@ export function Field({
   required,
   hint,
   htmlFor,
+  span,
+  className = "",
   children,
 }: FieldProps) {
   return (
-    <div className="mb-4">
-      <label className="admin-label" htmlFor={htmlFor}>
-        {label}
-        {required && <span className="ml-1 text-red-500">*</span>}
-      </label>
+    <div className={`mb-4 ${colClass(span)} ${className}`.trim()}>
+      {label && (
+        <label className="admin-label" htmlFor={htmlFor}>
+          {label}
+          {required && <span className="ml-1 text-red-500">*</span>}
+        </label>
+      )}
       {children}
-      {hint && <p className="mt-1 text-xs text-gray-400">{hint}</p>}
+      {hint && <p className="admin-help">{hint}</p>}
     </div>
   );
 }
@@ -98,9 +144,10 @@ export function Field({
 interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   hint?: string;
+  span?: FieldSpan;
 }
 
-export function TextInput({ label, hint, id, ...props }: TextInputProps) {
+export function TextInput({ label, hint, span, id, ...props }: TextInputProps) {
   const generatedId = useId();
   const fieldId = id ?? generatedId;
   return (
@@ -109,6 +156,7 @@ export function TextInput({ label, hint, id, ...props }: TextInputProps) {
       required={props.required}
       hint={hint}
       htmlFor={fieldId}
+      span={span}
     >
       <input id={fieldId} className="admin-input" {...props} />
     </Field>
@@ -118,9 +166,16 @@ export function TextInput({ label, hint, id, ...props }: TextInputProps) {
 interface NumberInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   hint?: string;
+  span?: FieldSpan;
 }
 
-export function NumberInput({ label, hint, id, ...props }: NumberInputProps) {
+export function NumberInput({
+  label,
+  hint,
+  span,
+  id,
+  ...props
+}: NumberInputProps) {
   const generatedId = useId();
   const fieldId = id ?? generatedId;
   return (
@@ -129,18 +184,21 @@ export function NumberInput({ label, hint, id, ...props }: NumberInputProps) {
       required={props.required}
       hint={hint}
       htmlFor={fieldId}
+      span={span}
     >
       <input type="number" id={fieldId} className="admin-input" {...props} />
     </Field>
   );
 }
 
-interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+interface TextAreaProps
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   hint?: string;
+  span?: FieldSpan;
 }
 
-export function TextArea({ label, hint, id, ...props }: TextAreaProps) {
+export function TextArea({ label, hint, span, id, ...props }: TextAreaProps) {
   const generatedId = useId();
   const fieldId = id ?? generatedId;
   return (
@@ -149,6 +207,7 @@ export function TextArea({ label, hint, id, ...props }: TextAreaProps) {
       required={props.required}
       hint={hint}
       htmlFor={fieldId}
+      span={span}
     >
       <textarea id={fieldId} className="admin-textarea" {...props} />
     </Field>
@@ -158,10 +217,18 @@ export function TextArea({ label, hint, id, ...props }: TextAreaProps) {
 interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   label: string;
   hint?: string;
+  span?: FieldSpan;
   options: { value: string; label: string }[];
 }
 
-export function Select({ label, hint, options, id, ...props }: SelectProps) {
+export function Select({
+  label,
+  hint,
+  span,
+  options,
+  id,
+  ...props
+}: SelectProps) {
   const generatedId = useId();
   const fieldId = id ?? generatedId;
   return (
@@ -170,6 +237,7 @@ export function Select({ label, hint, options, id, ...props }: SelectProps) {
       required={props.required}
       hint={hint}
       htmlFor={fieldId}
+      span={span}
     >
       <select id={fieldId} className="admin-select" {...props}>
         {options.map((o) => (
@@ -187,6 +255,10 @@ interface StringListProps {
   values: string[];
   onChange: (values: string[]) => void;
   placeholder?: string;
+  hint?: string;
+  span?: FieldSpan;
+  /** Lay the entries out in columns instead of one per row. */
+  columns?: boolean;
 }
 
 export function StringList({
@@ -194,9 +266,51 @@ export function StringList({
   values,
   onChange,
   placeholder,
+  hint,
+  span,
+  columns,
 }: StringListProps) {
+  if (columns) {
+    return (
+      <Field label={label} hint={hint} span={span}>
+        <div className="admin-form-grid admin-form-grid--tight">
+          {values.map((v, i) => (
+            <div key={i} className="admin-col-4 flex gap-2">
+              <input
+                className="admin-input"
+                value={v}
+                placeholder={placeholder}
+                onChange={(e) => {
+                  const next = [...values];
+                  next[i] = e.target.value;
+                  onChange(next);
+                }}
+              />
+              <button
+                type="button"
+                onClick={() => onChange(values.filter((_, j) => j !== i))}
+                className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+                aria-label="Remove item"
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+          ))}
+          <div className="admin-col-full">
+            <button
+              type="button"
+              onClick={() => onChange([...values, ""])}
+              className="admin-btn admin-btn-outline admin-btn-sm"
+            >
+              <Plus size={14} /> Add item
+            </button>
+          </div>
+        </div>
+      </Field>
+    );
+  }
   return (
-    <Field label={label}>
+    <Field label={label} hint={hint} span={span}>
       <div className="space-y-2">
         {values.map((v, i) => (
           <div key={i} className="flex gap-2">
@@ -273,6 +387,7 @@ interface ImageUploadInputProps {
    * the pre-ratio behaviour (cap width, keep the source shape).
    */
   ratio?: RatioType;
+  span?: FieldSpan;
 }
 
 /** Dimensions + ratio shown under the preview once they are known. */
@@ -310,6 +425,7 @@ export function ImageUploadInput({
   hint,
   hideUrlField,
   ratio = "auto",
+  span,
 }: ImageUploadInputProps) {
   const deferred = useDeferredUploadsOptional();
   const [uploading, setUploading] = useState(false);
@@ -446,10 +562,12 @@ export function ImageUploadInput({
   const staleRatio = meta !== null && meta.ratioType !== ratioType;
 
   return (
-    <Field label={label} hint={hint}>
-      <div className="space-y-2">
+    <Field label={label} hint={hint} span={span}>
+      {/* Preview beside the controls rather than above them — stacked, a single
+          image field ran to ~320px of vertical space on its own. */}
+      <div className="flex flex-wrap items-start gap-3">
         {value && (
-          <div className="space-y-1">
+          <div className="shrink-0 space-y-1">
             <div
               className={`relative overflow-hidden rounded-lg border border-gray-200 bg-gray-50 ${previewFrame}`}
             >
@@ -498,111 +616,112 @@ export function ImageUploadInput({
           </div>
         )}
 
-        <div>
-          <label
-            htmlFor={selectId}
-            className="mb-1 block text-[11px] font-medium text-gray-600"
-          >
-            Image ratio
-          </label>
-          <select
-            id={selectId}
-            className="admin-select"
-            value={ratioType}
-            onChange={(e) => setRatioType(e.target.value as RatioType)}
-          >
-            {RATIO_TYPES.map((key) => {
-              const r = IMAGE_RATIOS[key];
-              return (
-                <option key={key} value={key}>
-                  {r.label}
-                  {r.height === null
-                    ? " — original shape"
-                    : ` — ${r.ratio} (${r.width}×${r.height})`}
-                </option>
-              );
-            })}
-          </select>
-          <p className="mt-1 text-[11px] leading-tight text-gray-500">
-            <span className="font-medium text-gray-700">Selected:</span>{" "}
-            {rule.label}
-            {rule.height !== null && (
-              <>
-                {" · "}
-                <span className="font-medium text-gray-700">
-                  Required:
-                </span>{" "}
-                {rule.ratio} — at least {rule.width}×{rule.height}px
-              </>
-            )}
-            <span className="block">{rule.hint}</span>
-            {staleRatio && (
-              <span className="block text-amber-700">
-                Ratio changed — re-upload to apply it to this image.
-              </span>
-            )}
-          </p>
-        </div>
+        <div className="min-w-[16rem] flex-1 space-y-2">
+          <input
+            type="file"
+            ref={fileRef}
+            accept="image/*"
+            className="hidden"
+            onChange={handleFileChange}
+          />
 
-        <input
-          type="file"
-          ref={fileRef}
-          accept="image/*"
-          className="hidden"
-          onChange={handleFileChange}
-        />
-        {hideUrlField ? (
-          <button
-            type="button"
-            onClick={() => fileRef.current?.click()}
-            disabled={uploading}
-            className="admin-btn admin-btn-outline admin-btn-sm"
-          >
-            {uploading ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              <Upload size={14} />
-            )}
-            {uploading
-              ? "Uploading…"
-              : value
-                ? "Replace Image"
-                : "Upload Image"}
-          </button>
-        ) : (
-          <div className="flex gap-2">
-            <input
-              className="admin-input min-w-0 flex-1"
-              value={isPending ? "" : value}
-              readOnly={!!isPending}
-              onChange={(e) => onChange(e.target.value)}
-              placeholder={
-                isPending
-                  ? "Pending upload — save to confirm"
-                  : "Paste URL or upload a file"
-              }
-            />
+          {hideUrlField ? (
             <button
               type="button"
               onClick={() => fileRef.current?.click()}
               disabled={uploading}
-              className="admin-btn admin-btn-outline admin-btn-sm shrink-0"
+              className="admin-btn admin-btn-outline admin-btn-sm"
             >
               {uploading ? (
                 <Loader2 size={14} className="animate-spin" />
               ) : (
                 <Upload size={14} />
               )}
-              {uploading ? "…" : "Upload"}
+              {uploading
+                ? "Uploading…"
+                : value
+                  ? "Replace Image"
+                  : "Upload Image"}
             </button>
+          ) : (
+            <div className="flex gap-2">
+              <input
+                className="admin-input min-w-0 flex-1"
+                value={isPending ? "" : value}
+                readOnly={!!isPending}
+                onChange={(e) => onChange(e.target.value)}
+                placeholder={
+                  isPending
+                    ? "Pending upload — save to confirm"
+                    : "Paste URL or upload a file"
+                }
+              />
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+                className="admin-btn admin-btn-outline admin-btn-sm shrink-0"
+              >
+                {uploading ? (
+                  <Loader2 size={14} className="animate-spin" />
+                ) : (
+                  <Upload size={14} />
+                )}
+                {uploading ? "…" : "Upload"}
+              </button>
+            </div>
+          )}
+
+          <div className="flex flex-wrap items-start gap-2">
+            <div className="min-w-[12rem] flex-1">
+              <label
+                htmlFor={selectId}
+                className="mb-1 block text-[11px] font-medium text-gray-600"
+              >
+                Image ratio
+              </label>
+              <select
+                id={selectId}
+                className="admin-select"
+                value={ratioType}
+                onChange={(e) => setRatioType(e.target.value as RatioType)}
+              >
+                {RATIO_TYPES.map((key) => {
+                  const r = IMAGE_RATIOS[key];
+                  return (
+                    <option key={key} value={key}>
+                      {r.label}
+                      {r.height === null
+                        ? " — original shape"
+                        : ` — ${r.ratio} (${r.width}×${r.height})`}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <p className="min-w-[12rem] flex-1 pt-4 text-[11px] leading-tight text-gray-500">
+              {rule.height !== null && (
+                <>
+                  <span className="font-medium text-gray-700">Required:</span>{" "}
+                  {rule.ratio} — at least {rule.width}×{rule.height}px
+                </>
+              )}
+              <span className="block">{rule.hint}</span>
+              {staleRatio && (
+                <span className="block text-amber-700">
+                  Ratio changed — re-upload to apply it to this image.
+                </span>
+              )}
+            </p>
           </div>
-        )}
-        {uploadError && (
-          <p className="mt-1 flex items-start gap-1 text-xs text-red-600">
-            <AlertCircle size={12} className="mt-0.5 shrink-0" />
-            <span>{uploadError}</span>
-          </p>
-        )}
+
+          {uploadError && (
+            <p className="flex items-start gap-1 text-xs text-red-600">
+              <AlertCircle size={12} className="mt-0.5 shrink-0" />
+              <span>{uploadError}</span>
+            </p>
+          )}
+        </div>
       </div>
     </Field>
   );
@@ -614,6 +733,8 @@ interface TextAreaListProps {
   onChange: (values: string[]) => void;
   placeholder?: string;
   rows?: number;
+  hint?: string;
+  span?: FieldSpan;
 }
 
 export function TextAreaList({
@@ -622,10 +743,14 @@ export function TextAreaList({
   onChange,
   placeholder,
   rows = 3,
+  hint,
+  span,
 }: TextAreaListProps) {
   return (
-    <Field label={label}>
-      <div className="space-y-2">
+    <Field label={label} hint={hint} span={span}>
+      {/* Paragraphs sit two-up: they are short enough that one per row wasted
+          the right half of the form and pushed the "Add" button off-screen. */}
+      <div className="admin-form-grid admin-form-grid--tight">
         {values.map((v, i) => (
           <div key={i} className="flex items-start gap-2">
             <textarea
@@ -643,18 +768,21 @@ export function TextAreaList({
               type="button"
               onClick={() => onChange(values.filter((_, j) => j !== i))}
               className="admin-btn admin-btn-danger admin-btn-sm mt-1 shrink-0"
+              aria-label="Remove paragraph"
             >
               <Trash2 size={14} />
             </button>
           </div>
         ))}
-        <button
-          type="button"
-          onClick={() => onChange([...values, ""])}
-          className="admin-btn admin-btn-outline admin-btn-sm"
-        >
-          <Plus size={14} /> Add paragraph
-        </button>
+        <div className="admin-col-full">
+          <button
+            type="button"
+            onClick={() => onChange([...values, ""])}
+            className="admin-btn admin-btn-outline admin-btn-sm"
+          >
+            <Plus size={14} /> Add paragraph
+          </button>
+        </div>
       </div>
     </Field>
   );
@@ -665,6 +793,7 @@ interface DocumentUploadInputProps {
   value: string;
   onChange: (key: string) => void;
   hint?: string;
+  span?: FieldSpan;
 }
 
 export function DocumentUploadInput({
@@ -672,6 +801,7 @@ export function DocumentUploadInput({
   value,
   onChange,
   hint,
+  span,
 }: DocumentUploadInputProps) {
   const deferred = useDeferredUploadsOptional();
   const [uploading, setUploading] = useState(false);
@@ -747,10 +877,10 @@ export function DocumentUploadInput({
       : "";
 
   return (
-    <Field label={label} hint={hint}>
-      <div className="space-y-2">
+    <Field label={label} hint={hint} span={span}>
+      <div className="flex flex-wrap items-center gap-2">
         {value && (
-          <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+          <div className="flex min-w-[16rem] flex-1 items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
             <span className="flex-1 truncate text-sm text-gray-700">
               {displayName || value}
             </span>
@@ -794,7 +924,7 @@ export function DocumentUploadInput({
               : "Upload document"}
         </button>
         {uploadError && (
-          <p className="mt-1 flex items-start gap-1 text-xs text-red-600">
+          <p className="mt-1 flex w-full items-start gap-1 text-xs text-red-600">
             <AlertCircle size={12} className="mt-0.5 shrink-0" />
             <span>{uploadError}</span>
           </p>
@@ -810,7 +940,10 @@ export type FieldDef = {
   key: string;
   label: string;
   type?: "text" | "textarea" | "number";
+  /** @deprecated use `span` — kept so existing call sites keep compiling. */
   span2?: boolean;
+  /** Columns of the 12-column row this field takes. Defaults to half a row. */
+  span?: FieldSpan;
   placeholder?: string;
 };
 
@@ -820,12 +953,15 @@ export function ItemsEditor({
   fields,
   emptyItem,
   addLabel = "Add item",
+  /** Cards per row. Repeated short items (stats, links) read better in a grid. */
+  cardSpan = "full",
 }: {
   items: Record<string, unknown>[];
   onChange: (v: Record<string, unknown>[]) => void;
   fields: FieldDef[];
   emptyItem: Record<string, unknown>;
   addLabel?: string;
+  cardSpan?: FieldSpan;
 }) {
   const baseId = useId();
   const upd = (i: number, key: string, val: unknown) =>
@@ -833,17 +969,18 @@ export function ItemsEditor({
   const rem = (i: number) => onChange(items.filter((_, idx) => idx !== i));
 
   return (
-    <div className="space-y-3">
+    <div className="admin-form-grid admin-form-grid--tight">
       {items.map((item, i) => (
         <div
           key={i}
-          className="rounded-lg border border-gray-200 bg-gray-50/50 p-3"
+          className={`rounded-lg border border-gray-200 bg-gray-50/50 p-3 ${colClass(cardSpan)}`}
         >
-          <div className="grid grid-cols-2 gap-3">
+          <div className="admin-form-grid admin-form-grid--tight">
             {fields.map((f) => {
               const fieldId = `${baseId}-${i}-${f.key}`;
+              const span = f.span ?? (f.span2 ? "full" : undefined);
               return (
-                <div key={f.key} className={f.span2 ? "col-span-2" : ""}>
+                <div key={f.key} className={colClass(span)}>
                   <label className="admin-label" htmlFor={fieldId}>
                     {f.label}
                   </label>
@@ -887,13 +1024,15 @@ export function ItemsEditor({
           </button>
         </div>
       ))}
-      <button
-        type="button"
-        onClick={() => onChange([...items, { ...emptyItem }])}
-        className="admin-btn admin-btn-outline admin-btn-sm mt-1 w-full justify-center"
-      >
-        <Plus size={13} /> {addLabel}
-      </button>
+      <div className="admin-col-full">
+        <button
+          type="button"
+          onClick={() => onChange([...items, { ...emptyItem }])}
+          className="admin-btn admin-btn-outline admin-btn-sm w-full justify-center"
+        >
+          <Plus size={13} /> {addLabel}
+        </button>
+      </div>
     </div>
   );
 }
@@ -924,27 +1063,31 @@ export function LabsEditor({
       {labs.map((lab, i) => (
         <div
           key={i}
-          className="space-y-3 rounded-lg border border-gray-200 bg-gray-50/50 p-3"
+          className="rounded-lg border border-gray-200 bg-gray-50/50 p-3"
         >
-          <div className="grid grid-cols-2 gap-3">
+          <FormGrid tight>
             <TextInput
               label="Lab Name"
+              span={4}
               value={lab.name}
               onChange={(e) => upd(i, "name", e.target.value)}
             />
             <TextArea
               label="Description"
+              span={8}
               value={lab.description}
               onChange={(e) => upd(i, "description", e.target.value)}
               rows={2}
             />
-          </div>
-          <StringList
-            label="Equipment"
-            values={lab.equipment ?? []}
-            onChange={(v) => upd(i, "equipment", v)}
-            placeholder="Equipment / software…"
-          />
+            <StringList
+              label="Equipment"
+              span="full"
+              columns
+              values={lab.equipment ?? []}
+              onChange={(v) => upd(i, "equipment", v)}
+              placeholder="Equipment / software…"
+            />
+          </FormGrid>
           <button
             type="button"
             onClick={() => rem(i)}
@@ -976,6 +1119,11 @@ interface RepeaterProps<T> {
     index: number,
     onChange: (item: T) => void,
   ) => ReactNode;
+  hint?: string;
+  /** Width of the repeater itself inside a parent `FormGrid`. */
+  span?: FieldSpan;
+  /** Width of each item card on the repeater's own row. Defaults to full. */
+  itemSpan?: FieldSpan;
 }
 
 export function Repeater<T>({
@@ -985,6 +1133,9 @@ export function Repeater<T>({
   onItemRemove,
   newItem,
   renderItem,
+  hint,
+  span,
+  itemSpan = "full",
 }: RepeaterProps<T>) {
   const handleRemove = (i: number) => {
     const removedItem = items[i];
@@ -993,27 +1144,29 @@ export function Repeater<T>({
   };
 
   return (
-    <div className="mb-4">
-      <div className="mb-2 flex items-center justify-between">
+    <div className={`mb-4 ${colClass(span)}`.trim()}>
+      <div className="mb-2 flex items-center justify-between gap-3">
         <span className="admin-label mb-0">{label}</span>
         <button
           type="button"
           onClick={() => onChange([...items, newItem()])}
-          className="admin-btn admin-btn-outline admin-btn-sm"
+          className="admin-btn admin-btn-outline admin-btn-sm shrink-0"
         >
           <Plus size={14} /> Add
         </button>
       </div>
-      <div className="space-y-3">
+      {hint && <p className="admin-help mb-2">{hint}</p>}
+      <div className="admin-form-grid admin-form-grid--tight">
         {items.map((item, i) => (
           <div
             key={i}
-            className="relative rounded-lg border border-gray-200 p-3"
+            className={`relative rounded-lg border border-gray-200 p-3 pr-12 ${colClass(itemSpan)}`}
           >
             <button
               type="button"
               onClick={() => handleRemove(i)}
               className="admin-btn admin-btn-danger admin-btn-sm absolute top-2 right-2"
+              aria-label={`Remove item ${i + 1}`}
             >
               <Trash2 size={13} />
             </button>
@@ -1025,7 +1178,7 @@ export function Repeater<T>({
           </div>
         ))}
         {items.length === 0 && (
-          <p className="rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-400">
+          <p className="admin-col-full rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-400">
             No items yet. Click "Add" to get started.
           </p>
         )}

@@ -13,11 +13,13 @@ import {
 import {
   Accordion,
   Field,
+  FormGrid,
   ImageUploadInput,
   DocumentUploadInput,
   Select,
   TextArea,
   TextInput,
+  type FieldSpan,
 } from "@/components/admin/inputs";
 import { SeoFields } from "@/components/admin/SeoFields";
 import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
@@ -76,21 +78,25 @@ function ImageList({
   onChange,
   max,
   hint,
+  span = "full",
 }: {
   label: string;
   value: string[];
   onChange: (next: string[]) => void;
   max?: number;
   hint?: string;
+  span?: FieldSpan;
 }) {
   const safe = Array.isArray(value) ? value : [];
   const atMax = max !== undefined && safe.length >= max;
   return (
-    <Field label={label} hint={hint}>
-      <div className="space-y-2">
+    <Field label={label} hint={hint} span={span}>
+      {/* Carousel slides read as a strip, not a queue — six of them stacked one
+          per row buried every field below the fold. */}
+      <div className="admin-form-grid admin-form-grid--tight">
         {safe.map((src, i) => (
-          <div key={i} className="flex items-start gap-2">
-            <div className="flex-1">
+          <div key={i} className="admin-col-4 flex items-start gap-2">
+            <div className="min-w-0 flex-1">
               <ImageUploadInput
                 label=""
                 value={src}
@@ -105,13 +111,14 @@ function ImageList({
               onClick={() => {
                 onChange(safe.filter((_, j) => j !== i));
               }}
-              className="admin-btn admin-btn-danger admin-btn-sm"
+              className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+              aria-label={`Remove image ${i + 1}`}
             >
               <Trash2 size={13} />
             </button>
           </div>
         ))}
-        <div className="flex items-center justify-between">
+        <div className="admin-col-full flex items-center justify-between">
           <button
             type="button"
             onClick={() => onChange([...safe, ""])}
@@ -132,21 +139,27 @@ function CtaList({
   value,
   onChange,
   max,
+  span = "full",
 }: {
   value: Cta[];
   onChange: (next: Cta[]) => void;
   max?: number;
+  span?: FieldSpan;
 }) {
   const safe = Array.isArray(value) ? value : [];
   const atMax = max !== undefined && safe.length >= max;
   return (
-    <Field label="Call-to-Action Buttons">
-      <div className="space-y-3">
+    <Field label="Call-to-Action Buttons" span={span}>
+      <div className="admin-form-grid admin-form-grid--tight">
         {safe.map((cta, i) => (
-          <div key={i} className="rounded-lg border border-gray-200 p-3">
-            <div className="grid grid-cols-2 gap-3 pr-12">
+          <div
+            key={i}
+            className="admin-col-6 rounded-lg border border-gray-200 p-3"
+          >
+            <FormGrid tight>
               <TextInput
                 label="Label"
+                span={5}
                 value={cta.label}
                 maxLength={40}
                 onChange={(e) =>
@@ -159,6 +172,7 @@ function CtaList({
               />
               <TextInput
                 label="Href"
+                span={7}
                 value={cta.href}
                 maxLength={500}
                 onChange={(e) =>
@@ -169,31 +183,33 @@ function CtaList({
                   )
                 }
               />
+            </FormGrid>
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={cta.primary}
+                  onChange={(e) =>
+                    onChange(
+                      safe.map((c, j) =>
+                        j === i ? { ...c, primary: e.target.checked } : c,
+                      ),
+                    )
+                  }
+                />
+                Primary style
+              </label>
+              <button
+                type="button"
+                onClick={() => onChange(safe.filter((_, j) => j !== i))}
+                className="admin-btn admin-btn-danger admin-btn-sm"
+              >
+                <Trash2 size={13} /> Remove
+              </button>
             </div>
-            <label className="mt-2 flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={cta.primary}
-                onChange={(e) =>
-                  onChange(
-                    safe.map((c, j) =>
-                      j === i ? { ...c, primary: e.target.checked } : c,
-                    ),
-                  )
-                }
-              />
-              Primary style
-            </label>
-            <button
-              type="button"
-              onClick={() => onChange(safe.filter((_, j) => j !== i))}
-              className="admin-btn admin-btn-danger admin-btn-sm mt-2"
-            >
-              <Trash2 size={13} /> Remove
-            </button>
           </div>
         ))}
-        <div className="flex items-center justify-between">
+        <div className="admin-col-full flex items-center justify-between">
           <button
             type="button"
             onClick={() =>
@@ -219,11 +235,13 @@ function IntervalInput({
   onChange,
   min,
   max,
+  span,
 }: {
   value: number | undefined;
   onChange: (v: number) => void;
   min: number;
   max: number;
+  span?: FieldSpan;
 }) {
   const [draft, setDraft] = useState(() => String(value ?? 6000));
 
@@ -234,6 +252,7 @@ function IntervalInput({
   return (
     <TextInput
       label="Carousel Speed (ms)"
+      span={span}
       type="number"
       min={min}
       max={max}
@@ -272,21 +291,16 @@ function AccreditationList({
   const safe = Array.isArray(value) ? value : [];
   const atMax = safe.length >= max;
   return (
-    <div className="space-y-3">
+    <div className="admin-form-grid admin-form-grid--tight">
       {safe.map((item, i) => (
-        <div key={i} className="rounded-lg border border-gray-200 p-3">
-          <ImageUploadInput
-            label="Logo"
-            ratio="square"
-            value={item.logo}
-            onChange={(url) =>
-              onChange(safe.map((a, j) => (j === i ? { ...a, logo: url } : a)))
-            }
-            hideUrlField
-          />
-          <div className="grid grid-cols-2 gap-3">
+        <div
+          key={i}
+          className="admin-col-6 rounded-lg border border-gray-200 p-3"
+        >
+          <FormGrid tight>
             <TextInput
               label="Name"
+              span={5}
               value={item.name}
               maxLength={ACCREDITATIONS_LIMITS.nameMax}
               placeholder="e.g. NAAC Accredited"
@@ -300,6 +314,7 @@ function AccreditationList({
             />
             <TextInput
               label="Description"
+              span={7}
               value={item.description ?? ""}
               maxLength={ACCREDITATIONS_LIMITS.descriptionMax}
               placeholder="Short note shown under the name"
@@ -311,17 +326,27 @@ function AccreditationList({
                 )
               }
             />
-          </div>
+            <ImageUploadInput
+              label="Logo"
+              span="full"
+              ratio="square"
+              value={item.logo}
+              onChange={(url) =>
+                onChange(safe.map((a, j) => (j === i ? { ...a, logo: url } : a)))
+              }
+              hideUrlField
+            />
+          </FormGrid>
           <button
             type="button"
             onClick={() => onChange(safe.filter((_, j) => j !== i))}
-            className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+            className="admin-btn admin-btn-danger admin-btn-sm"
           >
             <Trash2 size={13} /> Remove
           </button>
         </div>
       ))}
-      <div className="flex items-center justify-between">
+      <div className="admin-col-full flex items-center justify-between">
         <button
           type="button"
           onClick={() =>
@@ -360,17 +385,14 @@ export function EngineeringHeroForm({
   value: EngHeroVal;
   onChange: (v: EngHeroVal) => void;
 }) {
+  // Field order follows the public hero top to bottom: headline, subtitle,
+  // buttons, the badge/counselling strip, then the accreditation row. The
+  // background carousel is the backdrop, so it sits last with its own speed.
   return (
-    <div className="space-y-4">
-      <ImageList
-        label="Background Carousel Images"
-        max={ENG_HERO_LIMITS.backgroundImages}
-        hint="Images rotate behind the hero (up to 6). Upload, replace, or remove each one."
-        value={value.backgroundImages ?? []}
-        onChange={(next) => onChange({ ...value, backgroundImages: next })}
-      />
+    <FormGrid>
       <TextInput
         label="Hero Title"
+        span={5}
         value={value.title ?? ""}
         maxLength={ENG_HERO_LIMITS.titleMax}
         onChange={(e) => onChange({ ...value, title: e.target.value })}
@@ -378,6 +400,7 @@ export function EngineeringHeroForm({
       />
       <TextArea
         label="Subtitle"
+        span={7}
         value={value.subtitle ?? ""}
         rows={3}
         maxLength={ENG_HERO_LIMITS.subtitleMax}
@@ -388,26 +411,27 @@ export function EngineeringHeroForm({
         max={ENG_HERO_LIMITS.ctas}
         onChange={(next) => onChange({ ...value, ctas: next })}
       />
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Badge Text"
-          value={value.badgeText ?? ""}
-          maxLength={ENG_HERO_LIMITS.badgeTextMax}
-          onChange={(e) => onChange({ ...value, badgeText: e.target.value })}
-          hint='e.g. "An Autonomous Institution"'
-        />
-        <TextInput
-          label="Counselling Label"
-          value={value.counsellingLabel ?? ""}
-          maxLength={ENG_HERO_LIMITS.counsellingLabelMax}
-          onChange={(e) =>
-            onChange({ ...value, counsellingLabel: e.target.value })
-          }
-          hint='e.g. "Counselling Code:"'
-        />
-      </div>
+      <TextInput
+        label="Badge Text"
+        span={4}
+        value={value.badgeText ?? ""}
+        maxLength={ENG_HERO_LIMITS.badgeTextMax}
+        onChange={(e) => onChange({ ...value, badgeText: e.target.value })}
+        hint='e.g. "An Autonomous Institution"'
+      />
+      <TextInput
+        label="Counselling Label"
+        span={4}
+        value={value.counsellingLabel ?? ""}
+        maxLength={ENG_HERO_LIMITS.counsellingLabelMax}
+        onChange={(e) =>
+          onChange({ ...value, counsellingLabel: e.target.value })
+        }
+        hint='e.g. "Counselling Code:"'
+      />
       <TextInput
         label="Counselling Code"
+        span={4}
         value={value.counsellingCode ?? ""}
         maxLength={ENG_HERO_LIMITS.counsellingCodeMax}
         onChange={(e) =>
@@ -415,14 +439,19 @@ export function EngineeringHeroForm({
         }
         hint="e.g. 2724"
       />
-      <IntervalInput
-        value={value.intervalMs}
-        min={ENG_HERO_LIMITS.minIntervalMs}
-        max={ENG_HERO_LIMITS.maxIntervalMs}
-        onChange={(intervalMs) => onChange({ ...value, intervalMs })}
+      <TextInput
+        label="Accreditation Caption"
+        span="full"
+        value={value.accreditationsCaption ?? ""}
+        maxLength={ENG_HERO_LIMITS.accreditationCaptionMax}
+        onChange={(e) =>
+          onChange({ ...value, accreditationsCaption: e.target.value })
+        }
+        hint='Text shown next to the logos, e.g. "Top accreditations & approvals"'
       />
       <Field
         label="Accreditation Logos"
+        span="full"
         hint={`Logos shown in the hero accreditation strip (up to ${ENG_HERO_LIMITS.accreditationsMax}).`}
       >
         <AccreditationList
@@ -431,16 +460,21 @@ export function EngineeringHeroForm({
           onChange={(next) => onChange({ ...value, accreditations: next })}
         />
       </Field>
-      <TextInput
-        label="Accreditation Caption"
-        value={value.accreditationsCaption ?? ""}
-        maxLength={ENG_HERO_LIMITS.accreditationCaptionMax}
-        onChange={(e) =>
-          onChange({ ...value, accreditationsCaption: e.target.value })
-        }
-        hint='Text shown next to the logos, e.g. "Top accreditations & approvals"'
+      <ImageList
+        label="Background Carousel Images"
+        max={ENG_HERO_LIMITS.backgroundImages}
+        hint="Images rotate behind the hero (up to 6). Upload, replace, or remove each one."
+        value={value.backgroundImages ?? []}
+        onChange={(next) => onChange({ ...value, backgroundImages: next })}
       />
-    </div>
+      <IntervalInput
+        span={4}
+        value={value.intervalMs}
+        min={ENG_HERO_LIMITS.minIntervalMs}
+        max={ENG_HERO_LIMITS.maxIntervalMs}
+        onChange={(intervalMs) => onChange({ ...value, intervalMs })}
+      />
+    </FormGrid>
   );
 }
 
@@ -474,12 +508,16 @@ function ArtsSubsectionList({
   const safe = Array.isArray(value) ? value : [];
   const atMax = safe.length >= max;
   return (
-    <div className="space-y-3">
+    <div className="admin-form-grid admin-form-grid--tight">
       {safe.map((item, i) => (
-        <div key={i} className="rounded-lg border border-gray-200 p-3">
-          <div className="grid grid-cols-2 gap-3">
+        <div
+          key={i}
+          className="admin-col-4 rounded-lg border border-gray-200 p-3"
+        >
+          <FormGrid tight>
             <TextInput
               label="Icon"
+              span={4}
               value={item.icon}
               maxLength={ARTS_HERO_LIMITS.subsectionIconMax}
               placeholder="Award"
@@ -493,6 +531,7 @@ function ArtsSubsectionList({
             />
             <TextInput
               label="Title"
+              span={8}
               value={item.title}
               maxLength={ARTS_HERO_LIMITS.subsectionTitleMax}
               placeholder="Quality"
@@ -504,30 +543,31 @@ function ArtsSubsectionList({
                 )
               }
             />
-          </div>
-          <TextArea
-            label="Description"
-            rows={2}
-            value={item.description}
-            maxLength={ARTS_HERO_LIMITS.subsectionDescMax}
-            onChange={(e) =>
-              onChange(
-                safe.map((s, j) =>
-                  j === i ? { ...s, description: e.target.value } : s,
-                ),
-              )
-            }
-          />
+            <TextArea
+              label="Description"
+              span="full"
+              rows={2}
+              value={item.description}
+              maxLength={ARTS_HERO_LIMITS.subsectionDescMax}
+              onChange={(e) =>
+                onChange(
+                  safe.map((s, j) =>
+                    j === i ? { ...s, description: e.target.value } : s,
+                  ),
+                )
+              }
+            />
+          </FormGrid>
           <button
             type="button"
             onClick={() => onChange(safe.filter((_, j) => j !== i))}
-            className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+            className="admin-btn admin-btn-danger admin-btn-sm"
           >
             <Trash2 size={13} /> Remove
           </button>
         </div>
       ))}
-      <div className="flex items-center justify-between">
+      <div className="admin-col-full flex items-center justify-between">
         <button
           type="button"
           onClick={() =>
@@ -551,44 +591,39 @@ export function ArtsScienceHeroForm({
   value: ArtsHeroVal;
   onChange: (v: ArtsHeroVal) => void;
 }) {
+  // Ordered as the public hero renders: three-part headline, subtitle, CTAs,
+  // stat row, then the feature blocks below it. Backdrop settings come last.
   return (
-    <div className="space-y-4">
-      <ImageList
-        label="Background Carousel Images"
-        max={ARTS_HERO_LIMITS.backgroundImages}
-        hint="Images rotate behind the hero. Upload, replace, or remove each one."
-        value={value.backgroundImages ?? []}
-        onChange={(next) => onChange({ ...value, backgroundImages: next })}
+    <FormGrid>
+      <TextInput
+        label="Title Line 1"
+        span={4}
+        value={value.titleLine1 ?? ""}
+        maxLength={ARTS_HERO_LIMITS.partMax}
+        onChange={(e) => onChange({ ...value, titleLine1: e.target.value })}
+        hint="e.g. Good Education"
       />
-      <div className="grid grid-cols-3 gap-3">
-        <TextInput
-          label="Title Line 1"
-          value={value.titleLine1 ?? ""}
-          maxLength={ARTS_HERO_LIMITS.partMax}
-          onChange={(e) => onChange({ ...value, titleLine1: e.target.value })}
-          hint="e.g. Good Education"
-        />
-        <TextInput
-          label="Accent Word"
-          value={value.titleHighlight ?? ""}
-          maxLength={ARTS_HERO_LIMITS.partMax}
-          onChange={(e) =>
-            onChange({ ...value, titleHighlight: e.target.value })
-          }
-          hint='Rendered in orange (e.g. "for")'
-        />
-        <TextInput
-          label="Title Line 2 Rest"
-          value={value.titleLine2 ?? ""}
-          maxLength={ARTS_HERO_LIMITS.partMax}
-          onChange={(e) => onChange({ ...value, titleLine2: e.target.value })}
-          hint="e.g. A Better Future"
-        />
-      </div>
+      <TextInput
+        label="Accent Word"
+        span={4}
+        value={value.titleHighlight ?? ""}
+        maxLength={ARTS_HERO_LIMITS.partMax}
+        onChange={(e) => onChange({ ...value, titleHighlight: e.target.value })}
+        hint='Rendered in orange (e.g. "for")'
+      />
+      <TextInput
+        label="Title Line 2 Rest"
+        span={4}
+        value={value.titleLine2 ?? ""}
+        maxLength={ARTS_HERO_LIMITS.partMax}
+        onChange={(e) => onChange({ ...value, titleLine2: e.target.value })}
+        hint="e.g. A Better Future"
+      />
       <TextArea
         label="Subtitle"
+        span="full"
         value={value.subtitle ?? ""}
-        rows={3}
+        rows={2}
         maxLength={ARTS_HERO_LIMITS.subtitleMax}
         onChange={(e) => onChange({ ...value, subtitle: e.target.value })}
       />
@@ -597,34 +632,42 @@ export function ArtsScienceHeroForm({
         max={ARTS_HERO_LIMITS.ctas}
         onChange={(next) => onChange({ ...value, ctas: next })}
       />
-      <div className="grid grid-cols-2 gap-6">
-        <Field
-          label="Hero Stat Cards"
-          hint="The numbers shown in the hero stat row."
-        >
-          <HeroStatsForm
-            value={value.stats ?? []}
-            onChange={(next) => onChange({ ...value, stats: next })}
-          />
-        </Field>
-        <Field
-          label="Hero Subsections"
-          hint={`Feature blocks below the hero — Quality, Leadership, Experience (up to ${ARTS_HERO_LIMITS.subsectionsMax}). Icon is a Lucide icon name.`}
-        >
-          <ArtsSubsectionList
-            value={value.subsections ?? []}
-            max={ARTS_HERO_LIMITS.subsectionsMax}
-            onChange={(next) => onChange({ ...value, subsections: next })}
-          />
-        </Field>
-      </div>
+      <Field
+        label="Hero Stat Cards"
+        span={5}
+        hint="The numbers shown in the hero stat row."
+      >
+        <HeroStatsForm
+          value={value.stats ?? []}
+          onChange={(next) => onChange({ ...value, stats: next })}
+        />
+      </Field>
+      <Field
+        label="Hero Subsections"
+        span={7}
+        hint={`Feature blocks below the hero — Quality, Leadership, Experience (up to ${ARTS_HERO_LIMITS.subsectionsMax}). Icon is a Lucide icon name.`}
+      >
+        <ArtsSubsectionList
+          value={value.subsections ?? []}
+          max={ARTS_HERO_LIMITS.subsectionsMax}
+          onChange={(next) => onChange({ ...value, subsections: next })}
+        />
+      </Field>
+      <ImageList
+        label="Background Carousel Images"
+        max={ARTS_HERO_LIMITS.backgroundImages}
+        hint="Images rotate behind the hero. Upload, replace, or remove each one."
+        value={value.backgroundImages ?? []}
+        onChange={(next) => onChange({ ...value, backgroundImages: next })}
+      />
       <IntervalInput
+        span={4}
         value={value.intervalMs}
         min={ARTS_HERO_LIMITS.minIntervalMs}
         max={ARTS_HERO_LIMITS.maxIntervalMs}
         onChange={(intervalMs) => onChange({ ...value, intervalMs })}
       />
-    </div>
+    </FormGrid>
   );
 }
 
@@ -642,12 +685,16 @@ export function HeroStatsForm({
   const safe = Array.isArray(value) ? value : [];
   const atMax = safe.length >= HERO_STATS_LIMITS.itemsMax;
   return (
-    <div className="space-y-3">
+    <div className="admin-form-grid admin-form-grid--tight">
       {safe.map((item, i) => (
-        <div key={i} className="rounded-lg border border-gray-200 p-3">
-          <div className="grid grid-cols-2 gap-3">
+        <div
+          key={i}
+          className="admin-col-6 rounded-lg border border-gray-200 p-3"
+        >
+          <FormGrid tight>
             <TextInput
               label="Value"
+              span={5}
               value={item.value}
               maxLength={HERO_STATS_LIMITS.valueMax}
               placeholder="e.g. 2,500+"
@@ -661,6 +708,7 @@ export function HeroStatsForm({
             />
             <TextInput
               label="Label"
+              span={7}
               value={item.label}
               maxLength={HERO_STATS_LIMITS.labelMax}
               placeholder="e.g. Students"
@@ -672,31 +720,33 @@ export function HeroStatsForm({
                 )
               }
             />
+          </FormGrid>
+          <div className="mt-2 flex items-center justify-between gap-3">
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={Boolean(item.accent)}
+                onChange={(e) =>
+                  onChange(
+                    safe.map((s, j) =>
+                      j === i ? { ...s, accent: e.target.checked } : s,
+                    ),
+                  )
+                }
+              />
+              Accent color
+            </label>
+            <button
+              type="button"
+              onClick={() => onChange(safe.filter((_, j) => j !== i))}
+              className="admin-btn admin-btn-danger admin-btn-sm"
+            >
+              <Trash2 size={13} /> Remove
+            </button>
           </div>
-          <label className="mt-2 flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={Boolean(item.accent)}
-              onChange={(e) =>
-                onChange(
-                  safe.map((s, j) =>
-                    j === i ? { ...s, accent: e.target.checked } : s,
-                  ),
-                )
-              }
-            />
-            Highlight in accent color
-          </label>
-          <button
-            type="button"
-            onClick={() => onChange(safe.filter((_, j) => j !== i))}
-            className="admin-btn admin-btn-danger admin-btn-sm mt-2"
-          >
-            <Trash2 size={13} /> Remove
-          </button>
         </div>
       ))}
-      <div className="flex items-center justify-between">
+      <div className="admin-col-full flex items-center justify-between">
         <button
           type="button"
           onClick={() =>
@@ -730,40 +780,36 @@ export function PolytechnicHeroForm({
   value: PolyHeroVal;
   onChange: (v: PolyHeroVal) => void;
 }) {
+  // Eyebrow → two title lines → subtitle → CTAs, matching the public hero.
   return (
-    <div className="space-y-4">
-      <ImageList
-        label="Background Carousel Images"
-        max={POLY_HERO_LIMITS.backgroundImagesMax}
-        hint="The carousel rotates through every image. 3 is the design default."
-        value={value.backgroundImages ?? []}
-        onChange={(next) => onChange({ ...value, backgroundImages: next })}
-      />
+    <FormGrid>
       <TextInput
         label="Eyebrow"
+        span={4}
         value={value.eyebrow ?? ""}
         maxLength={POLY_HERO_LIMITS.eyebrowMax}
         onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
         hint="Small label above the title"
       />
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Title Line 1"
-          value={value.titleLine1 ?? ""}
-          maxLength={POLY_HERO_LIMITS.titleLineMax}
-          onChange={(e) => onChange({ ...value, titleLine1: e.target.value })}
-        />
-        <TextInput
-          label="Title Line 2 (italic)"
-          value={value.titleLine2 ?? ""}
-          maxLength={POLY_HERO_LIMITS.titleLineMax}
-          onChange={(e) => onChange({ ...value, titleLine2: e.target.value })}
-        />
-      </div>
+      <TextInput
+        label="Title Line 1"
+        span={4}
+        value={value.titleLine1 ?? ""}
+        maxLength={POLY_HERO_LIMITS.titleLineMax}
+        onChange={(e) => onChange({ ...value, titleLine1: e.target.value })}
+      />
+      <TextInput
+        label="Title Line 2 (italic)"
+        span={4}
+        value={value.titleLine2 ?? ""}
+        maxLength={POLY_HERO_LIMITS.titleLineMax}
+        onChange={(e) => onChange({ ...value, titleLine2: e.target.value })}
+      />
       <TextArea
         label="Subtitle"
+        span="full"
         value={value.subtitle ?? ""}
-        rows={3}
+        rows={2}
         maxLength={POLY_HERO_LIMITS.subtitleMax}
         onChange={(e) => onChange({ ...value, subtitle: e.target.value })}
       />
@@ -772,13 +818,21 @@ export function PolytechnicHeroForm({
         max={POLY_HERO_LIMITS.ctas}
         onChange={(next) => onChange({ ...value, ctas: next })}
       />
+      <ImageList
+        label="Background Carousel Images"
+        max={POLY_HERO_LIMITS.backgroundImagesMax}
+        hint="The carousel rotates through every image. 3 is the design default."
+        value={value.backgroundImages ?? []}
+        onChange={(next) => onChange({ ...value, backgroundImages: next })}
+      />
       <IntervalInput
+        span={4}
         value={value.intervalMs}
         min={POLY_HERO_LIMITS.minIntervalMs}
         max={POLY_HERO_LIMITS.maxIntervalMs}
         onChange={(intervalMs) => onChange({ ...value, intervalMs })}
       />
-    </div>
+    </FormGrid>
   );
 }
 
@@ -891,7 +945,7 @@ function PamphletSlotEditor({
           hideUrlField
         />
       ) : (
-        <div className="space-y-2">
+        <FormGrid tight>
           <TextInput
             label="Heading"
             value={value.heading ?? ""}
@@ -908,13 +962,14 @@ function PamphletSlotEditor({
           />
           <TextArea
             label="Description"
-            rows={5}
+            span="full"
+            rows={4}
             value={value.body ?? ""}
             maxLength={LIMITS_pamphlet.bodyMax}
             placeholder="Detail text shown inside the popup"
             onChange={(e) => onChange({ ...value, body: e.target.value })}
           />
-        </div>
+        </FormGrid>
       )}
     </div>
   );
@@ -1031,10 +1086,13 @@ function PamphletPopupEditor({
   const callNow = popup.callNow ?? {};
   const countdown = popup.countdown ?? {};
 
+  // Layout first, then the two slots side by side as they appear in the popup,
+  // then the countdown strip and the button row that sit beneath them.
   return (
-    <div className="space-y-4">
+    <FormGrid>
       <Select
         label="Popup Layout"
+        span="full"
         value={layout}
         options={LAYOUT_OPTIONS}
         hint="Choose how the two sides of the popup are filled — images, text, or a mix."
@@ -1043,13 +1101,15 @@ function PamphletPopupEditor({
         }
       />
 
-      <div className="grid gap-3 md:grid-cols-2">
+      <div className="admin-col-6">
         <PamphletSlotEditor
           side="Left"
           kind={slotKind(layout, "left")}
           value={leftSlot}
           onChange={(next) => onChange({ ...popup, leftSlot: next })}
         />
+      </div>
+      <div className="admin-col-6">
         <PamphletSlotEditor
           side="Right"
           kind={slotKind(layout, "right")}
@@ -1059,113 +1119,12 @@ function PamphletPopupEditor({
       </div>
 
       <Field
-        label="Virtual Tour Button"
-        hint="Optional. If the URL is a YouTube/embed link, the button opens an in-popup video player; otherwise it opens the URL in a new tab."
-      >
-        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={virtualTour.enabled === true}
-              onChange={(e) =>
-                onChange({
-                  ...popup,
-                  virtualTour: {
-                    ...virtualTour,
-                    enabled: e.target.checked,
-                  },
-                })
-              }
-            />
-            Show Virtual Tour button
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <TextInput
-              label="Button Label"
-              value={virtualTour.label ?? ""}
-              maxLength={LIMITS_pamphlet.virtualTourLabelMax}
-              placeholder="Virtual Tour"
-              onChange={(e) =>
-                onChange({
-                  ...popup,
-                  virtualTour: {
-                    ...virtualTour,
-                    label: e.target.value,
-                  },
-                })
-              }
-            />
-            <TextInput
-              label="URL / Video Link"
-              value={virtualTour.url ?? ""}
-              onChange={(e) =>
-                onChange({
-                  ...popup,
-                  virtualTour: {
-                    ...virtualTour,
-                    url: e.target.value,
-                  },
-                })
-              }
-              placeholder="https://www.youtube.com/embed/VIDEO_ID"
-            />
-          </div>
-        </div>
-      </Field>
-
-      <Field
-        label="Call Now Button"
-        hint="Optional. Shows a call button that dials the given phone number on tap."
-      >
-        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={callNow.enabled === true}
-              onChange={(e) =>
-                onChange({
-                  ...popup,
-                  callNow: { ...callNow, enabled: e.target.checked },
-                })
-              }
-            />
-            Show Call Now button
-          </label>
-          <div className="grid grid-cols-2 gap-3">
-            <TextInput
-              label="Button Label"
-              value={callNow.label ?? ""}
-              maxLength={LIMITS_pamphlet.callNowLabelMax}
-              placeholder="Call Now"
-              onChange={(e) =>
-                onChange({
-                  ...popup,
-                  callNow: { ...callNow, label: e.target.value },
-                })
-              }
-            />
-            <TextInput
-              label="Phone Number"
-              value={callNow.phone ?? ""}
-              maxLength={LIMITS_pamphlet.callNowPhoneMax}
-              placeholder="+91 98765 43210"
-              onChange={(e) =>
-                onChange({
-                  ...popup,
-                  callNow: { ...callNow, phone: e.target.value },
-                })
-              }
-            />
-          </div>
-        </div>
-      </Field>
-
-      <Field
         label="Countdown Timer"
+        span="full"
         hint="Optional. Shows a live countdown strip just above the popup buttons. Times are entered and stored in IST. The timer stays hidden before the start time and disappears once the deadline passes — the popup itself keeps showing either way."
       >
-        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
-          <label className="flex items-center gap-2 text-sm">
+        <div className="rounded-lg border border-gray-200 p-3">
+          <label className="mb-2 flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={countdown.enabled === true}
@@ -1178,21 +1137,23 @@ function PamphletPopupEditor({
             />
             Show countdown timer
           </label>
-          <TextInput
-            label="Label"
-            value={countdown.label ?? ""}
-            maxLength={LIMITS_pamphlet.countdownLabelMax}
-            placeholder="Ends in"
-            onChange={(e) =>
-              onChange({
-                ...popup,
-                countdown: { ...countdown, label: e.target.value },
-              })
-            }
-          />
-          <div className="grid grid-cols-2 gap-3">
+          <FormGrid tight>
+            <TextInput
+              label="Label"
+              span={4}
+              value={countdown.label ?? ""}
+              maxLength={LIMITS_pamphlet.countdownLabelMax}
+              placeholder="Ends in"
+              onChange={(e) =>
+                onChange({
+                  ...popup,
+                  countdown: { ...countdown, label: e.target.value },
+                })
+              }
+            />
             <TextInput
               label="Start (IST)"
+              span={4}
               type="datetime-local"
               value={instantToIstInput(countdown.startsAt)}
               hint="Optional. Timer is hidden before this."
@@ -1208,6 +1169,7 @@ function PamphletPopupEditor({
             />
             <TextInput
               label="Deadline (IST)"
+              span={4}
               type="datetime-local"
               value={instantToIstInput(countdown.endsAt)}
               hint="Required for the timer to show."
@@ -1221,16 +1183,19 @@ function PamphletPopupEditor({
                 })
               }
             />
-          </div>
+          </FormGrid>
         </div>
       </Field>
 
+      {/* The three popup buttons are one row on the public popup, so they are
+          one row here too rather than three stacked bordered blocks. */}
       <Field
         label="Apply Now Button"
-        hint="Customize the Apply Now button shown inside the pamphlet popup."
+        span={4}
+        hint="The primary button inside the pamphlet popup."
       >
-        <div className="space-y-2 rounded-lg border border-gray-200 p-3">
-          <label className="flex items-center gap-2 text-sm">
+        <div className="rounded-lg border border-gray-200 p-3">
+          <label className="mb-2 flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={popup.applyEnabled !== false}
@@ -1240,29 +1205,123 @@ function PamphletPopupEditor({
             />
             Show Apply Now button
           </label>
-          <div className="grid grid-cols-2 gap-3">
-            <TextInput
-              label="Button Label"
-              value={popup.applyLabel ?? ""}
-              maxLength={LIMITS_pamphlet.applyLabelMax}
-              onChange={(e) =>
-                onChange({ ...popup, applyLabel: e.target.value })
-              }
-              placeholder="Apply Now"
-            />
-            <TextInput
-              label="Button Link"
-              value={popup.applyHref ?? ""}
-              maxLength={LIMITS_pamphlet.applyHrefMax}
-              onChange={(e) =>
-                onChange({ ...popup, applyHref: e.target.value })
-              }
-              placeholder="https://admissions.jct.ac.in"
-            />
-          </div>
+          <TextInput
+            label="Button Label"
+            value={popup.applyLabel ?? ""}
+            maxLength={LIMITS_pamphlet.applyLabelMax}
+            onChange={(e) => onChange({ ...popup, applyLabel: e.target.value })}
+            placeholder="Apply Now"
+          />
+          <TextInput
+            label="Button Link"
+            value={popup.applyHref ?? ""}
+            maxLength={LIMITS_pamphlet.applyHrefMax}
+            onChange={(e) => onChange({ ...popup, applyHref: e.target.value })}
+            placeholder="https://admissions.jct.ac.in"
+          />
         </div>
       </Field>
-    </div>
+
+      <Field
+        label="Virtual Tour Button"
+        span={4}
+        hint="Optional. A YouTube/embed link opens an in-popup player; any other URL opens in a new tab."
+      >
+        <div className="rounded-lg border border-gray-200 p-3">
+          <label className="mb-2 flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={virtualTour.enabled === true}
+              onChange={(e) =>
+                onChange({
+                  ...popup,
+                  virtualTour: {
+                    ...virtualTour,
+                    enabled: e.target.checked,
+                  },
+                })
+              }
+            />
+            Show Virtual Tour button
+          </label>
+          <TextInput
+            label="Button Label"
+            value={virtualTour.label ?? ""}
+            maxLength={LIMITS_pamphlet.virtualTourLabelMax}
+            placeholder="Virtual Tour"
+            onChange={(e) =>
+              onChange({
+                ...popup,
+                virtualTour: {
+                  ...virtualTour,
+                  label: e.target.value,
+                },
+              })
+            }
+          />
+          <TextInput
+            label="URL / Video Link"
+            value={virtualTour.url ?? ""}
+            onChange={(e) =>
+              onChange({
+                ...popup,
+                virtualTour: {
+                  ...virtualTour,
+                  url: e.target.value,
+                },
+              })
+            }
+            placeholder="https://www.youtube.com/embed/VIDEO_ID"
+          />
+        </div>
+      </Field>
+
+      <Field
+        label="Call Now Button"
+        span={4}
+        hint="Optional. Dials the given phone number on tap."
+      >
+        <div className="rounded-lg border border-gray-200 p-3">
+          <label className="mb-2 flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={callNow.enabled === true}
+              onChange={(e) =>
+                onChange({
+                  ...popup,
+                  callNow: { ...callNow, enabled: e.target.checked },
+                })
+              }
+            />
+            Show Call Now button
+          </label>
+          <TextInput
+            label="Button Label"
+            value={callNow.label ?? ""}
+            maxLength={LIMITS_pamphlet.callNowLabelMax}
+            placeholder="Call Now"
+            onChange={(e) =>
+              onChange({
+                ...popup,
+                callNow: { ...callNow, label: e.target.value },
+              })
+            }
+          />
+          <TextInput
+            label="Phone Number"
+            value={callNow.phone ?? ""}
+            maxLength={LIMITS_pamphlet.callNowPhoneMax}
+            placeholder="+91 98765 43210"
+            onChange={(e) =>
+              onChange({
+                ...popup,
+                callNow: { ...callNow, phone: e.target.value },
+              })
+            }
+          />
+        </div>
+      </Field>
+    </FormGrid>
   );
 }
 
@@ -1318,18 +1377,21 @@ export function PamphletForm({
   };
 
   return (
-    <div className="space-y-4">
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={value.enabled !== false}
-          onChange={(e) => onChange({ ...value, enabled: e.target.checked })}
-        />
-        Show popup on page load
-      </label>
+    <FormGrid>
+      <Field label="Visibility" span={4}>
+        <label className="flex items-center gap-2 pt-2 text-sm">
+          <input
+            type="checkbox"
+            checked={value.enabled !== false}
+            onChange={(e) => onChange({ ...value, enabled: e.target.checked })}
+          />
+          Show popup on page load
+        </label>
+      </Field>
 
       <TextInput
         label="Show after (ms)"
+        span={4}
         type="number"
         min={LIMITS_pamphlet.minDelayMs}
         max={LIMITS_pamphlet.maxDelayMs}
@@ -1350,6 +1412,7 @@ export function PamphletForm({
 
       <Field
         label="Popups"
+        span="full"
         hint={`Keep up to ${LIMITS_pamphlet.popups} popups ready and switch between them. Only the one marked Active is shown to visitors.`}
       >
         <div className="space-y-3">
@@ -1442,7 +1505,7 @@ export function PamphletForm({
           )}
         </div>
       </Field>
-    </div>
+    </FormGrid>
   );
 }
 
@@ -1471,19 +1534,23 @@ export function LifeAtJctForm({
   const photos = Array.isArray(value.photos) ? value.photos : [];
   const catsAtMax = categories.length >= LIMITS_lifeAtJct.categories;
   const photosAtMax = photos.length >= LIMITS_lifeAtJct.photos;
+  // Category tabs sit above the gallery on the public page, and the tour
+  // button below it — the editor follows the same top-to-bottom order.
   return (
-    <div className="space-y-5">
+    <FormGrid>
       <Field
         label="Filter Categories"
+        span={5}
         hint={`The first category is the 'All' tab — photos marked 'Show in All' show up there. Max ${LIMITS_lifeAtJct.categories}.`}
       >
-        <div className="space-y-2">
+        <div className="admin-form-grid admin-form-grid--tight">
           {categories.map((cat, i) => (
-            <div key={i} className="flex gap-2">
+            <div key={i} className="admin-col-6 flex gap-2">
               <input
                 className="admin-input"
                 value={cat}
                 maxLength={LIMITS_lifeAtJct.categoryLabelMax}
+                aria-label={`Category ${i + 1}`}
                 onChange={(e) =>
                   onChange({
                     ...value,
@@ -1502,12 +1569,13 @@ export function LifeAtJctForm({
                   })
                 }
                 className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+                aria-label={`Remove category ${i + 1}`}
               >
                 <Trash2 size={14} />
               </button>
             </div>
           ))}
-          <div className="flex items-center justify-between">
+          <div className="admin-col-full flex items-center justify-between">
             <button
               type="button"
               onClick={() =>
@@ -1526,27 +1594,31 @@ export function LifeAtJctForm({
         </div>
       </Field>
 
-      <Field label="Photos" hint={`Max ${LIMITS_lifeAtJct.photos} photos.`}>
-        <div className="space-y-3">
+      <TextInput
+        label="Virtual Tour Video URL"
+        span={7}
+        value={value.videoUrl ?? ""}
+        maxLength={500}
+        onChange={(e) => onChange({ ...value, videoUrl: e.target.value })}
+        placeholder="https://www.youtube.com/embed/..."
+        hint="YouTube embed URL — used for the 'Take a Virtual Campus Tour' button."
+      />
+
+      <Field
+        label="Photos"
+        span="full"
+        hint={`Max ${LIMITS_lifeAtJct.photos} photos.`}
+      >
+        <div className="admin-form-grid admin-form-grid--tight">
           {photos.map((photo, i) => (
-            <div key={i} className="rounded-lg border border-gray-200 p-3">
-              <ImageUploadInput
-                label="Image"
-                ratio="card"
-                value={photo.src}
-                onChange={(url) =>
-                  onChange({
-                    ...value,
-                    photos: photos.map((p, j) =>
-                      j === i ? { ...p, src: url } : p,
-                    ),
-                  })
-                }
-                hideUrlField
-              />
-              <div className="grid grid-cols-2 gap-3">
+            <div
+              key={i}
+              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+            >
+              <FormGrid tight>
                 <TextInput
                   label="Caption"
+                  span={7}
                   value={photo.caption}
                   maxLength={LIMITS_lifeAtJct.captionMax}
                   onChange={(e) =>
@@ -1560,6 +1632,7 @@ export function LifeAtJctForm({
                 />
                 <Select
                   label="Category"
+                  span={5}
                   value={photo.category}
                   options={categories
                     .filter((c) => c && c !== "All")
@@ -1573,37 +1646,54 @@ export function LifeAtJctForm({
                     })
                   }
                 />
-              </div>
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={Boolean(photo.isAll)}
-                  onChange={(e) =>
+                <ImageUploadInput
+                  label="Image"
+                  span="full"
+                  ratio="card"
+                  value={photo.src}
+                  onChange={(url) =>
                     onChange({
                       ...value,
                       photos: photos.map((p, j) =>
-                        j === i ? { ...p, isAll: e.target.checked } : p,
+                        j === i ? { ...p, src: url } : p,
                       ),
                     })
                   }
+                  hideUrlField
                 />
-                Show in &quot;All&quot; tab
-              </label>
-              <button
-                type="button"
-                onClick={() =>
-                  onChange({
-                    ...value,
-                    photos: photos.filter((_, j) => j !== i),
-                  })
-                }
-                className="admin-btn admin-btn-danger admin-btn-sm mt-2"
-              >
-                <Trash2 size={13} /> Remove
-              </button>
+              </FormGrid>
+              <div className="flex items-center justify-between gap-3">
+                <label className="flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={Boolean(photo.isAll)}
+                    onChange={(e) =>
+                      onChange({
+                        ...value,
+                        photos: photos.map((p, j) =>
+                          j === i ? { ...p, isAll: e.target.checked } : p,
+                        ),
+                      })
+                    }
+                  />
+                  Show in &quot;All&quot;
+                </label>
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChange({
+                      ...value,
+                      photos: photos.filter((_, j) => j !== i),
+                    })
+                  }
+                  className="admin-btn admin-btn-danger admin-btn-sm"
+                >
+                  <Trash2 size={13} /> Remove
+                </button>
+              </div>
             </div>
           ))}
-          <div className="flex items-center justify-between">
+          <div className="admin-col-full flex items-center justify-between">
             <button
               type="button"
               onClick={() =>
@@ -1630,16 +1720,7 @@ export function LifeAtJctForm({
           </div>
         </div>
       </Field>
-
-      <TextInput
-        label="Virtual Tour Video URL"
-        value={value.videoUrl ?? ""}
-        maxLength={500}
-        onChange={(e) => onChange({ ...value, videoUrl: e.target.value })}
-        placeholder="https://www.youtube.com/embed/..."
-        hint="YouTube embed URL — used for the 'Take a Virtual Campus Tour' button."
-      />
-    </div>
+    </FormGrid>
   );
 }
 
@@ -1659,40 +1740,44 @@ export function AnnouncementForm({
   value: AnnouncementVal;
   onChange: (v: AnnouncementVal) => void;
 }) {
+  // Reads left to right exactly as the bar renders: message, then its button.
   return (
-    <div className="space-y-4">
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={value.enabled !== false}
-          onChange={(e) => onChange({ ...value, enabled: e.target.checked })}
-        />
-        Show the announcement bar
-      </label>
+    <FormGrid>
+      <Field label="Visibility" span={2}>
+        <label className="flex items-center gap-2 pt-2 text-sm">
+          <input
+            type="checkbox"
+            checked={value.enabled !== false}
+            onChange={(e) => onChange({ ...value, enabled: e.target.checked })}
+          />
+          Show bar
+        </label>
+      </Field>
       <TextInput
         label="Announcement Text"
+        span={4}
         value={value.text ?? ""}
         maxLength={120}
         onChange={(e) => onChange({ ...value, text: e.target.value })}
         placeholder="e.g. Admissions open for 2025–26 batch"
       />
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="CTA Label (optional)"
-          value={value.ctaLabel ?? ""}
-          maxLength={24}
-          onChange={(e) => onChange({ ...value, ctaLabel: e.target.value })}
-          placeholder="e.g. Apply Now"
-        />
-        <TextInput
-          label="CTA Link (optional)"
-          value={value.ctaHref ?? ""}
-          maxLength={500}
-          onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
-          placeholder="https://..."
-        />
-      </div>
-    </div>
+      <TextInput
+        label="CTA Label (optional)"
+        span={2}
+        value={value.ctaLabel ?? ""}
+        maxLength={24}
+        onChange={(e) => onChange({ ...value, ctaLabel: e.target.value })}
+        placeholder="e.g. Apply Now"
+      />
+      <TextInput
+        label="CTA Link (optional)"
+        span={4}
+        value={value.ctaHref ?? ""}
+        maxLength={500}
+        onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
+        placeholder="https://..."
+      />
+    </FormGrid>
   );
 }
 
@@ -1723,18 +1808,11 @@ export function UpcomingEventsForm({
 }) {
   const maxItems = value.maxItems ?? 3;
 
+  // Section heading first (eyebrow → heading → description), then the card row
+  // settings, then the button under it, then the fallback behaviour.
   return (
-    <div className="space-y-4">
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={value.enabled !== false}
-          onChange={(e) => onChange({ ...value, enabled: e.target.checked })}
-        />
-        Show the News &amp; Events section on the landing page
-      </label>
-
-      <p className="rounded-lg bg-gray-50 p-3 text-xs text-gray-500">
+    <FormGrid>
+      <p className="admin-col-full rounded-lg bg-gray-50 p-3 text-xs text-gray-500">
         The events themselves are managed under{" "}
         <span className="font-semibold">News &amp; Events</span>. This section
         shows the events still to come, soonest first, and tops the row up with
@@ -1742,52 +1820,46 @@ export function UpcomingEventsForm({
         set here.
       </p>
 
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Eyebrow"
-          value={value.eyebrow ?? ""}
-          maxLength={LIMITS_upcomingEvents.eyebrowMax}
-          placeholder="Happenings"
-          onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
-        />
-        <TextInput
-          label="Heading"
-          value={value.heading ?? ""}
-          maxLength={LIMITS_upcomingEvents.headingMax}
-          placeholder="News & Events"
-          onChange={(e) => onChange({ ...value, heading: e.target.value })}
-        />
-      </div>
+      <Field label="Visibility" span={3}>
+        <label className="flex items-center gap-2 pt-2 text-sm">
+          <input
+            type="checkbox"
+            checked={value.enabled !== false}
+            onChange={(e) => onChange({ ...value, enabled: e.target.checked })}
+          />
+          Show on landing page
+        </label>
+      </Field>
+      <TextInput
+        label="Eyebrow"
+        span={4}
+        value={value.eyebrow ?? ""}
+        maxLength={LIMITS_upcomingEvents.eyebrowMax}
+        placeholder="Happenings"
+        onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
+      />
+      <TextInput
+        label="Heading"
+        span={5}
+        value={value.heading ?? ""}
+        maxLength={LIMITS_upcomingEvents.headingMax}
+        placeholder="News & Events"
+        onChange={(e) => onChange({ ...value, heading: e.target.value })}
+      />
 
       <TextArea
         label="Description (optional)"
-        rows={3}
+        span="full"
+        rows={2}
         value={value.description ?? ""}
         maxLength={LIMITS_upcomingEvents.descriptionMax}
         placeholder="One or two lines shown under the heading"
         onChange={(e) => onChange({ ...value, description: e.target.value })}
       />
 
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Button Label"
-          value={value.ctaLabel ?? ""}
-          maxLength={LIMITS_upcomingEvents.ctaLabelMax}
-          placeholder="News & Events"
-          onChange={(e) => onChange({ ...value, ctaLabel: e.target.value })}
-        />
-        <TextInput
-          label="Button Link"
-          value={value.ctaHref ?? ""}
-          maxLength={500}
-          placeholder={eventsHref}
-          hint={`Leave blank to link to ${eventsHref}`}
-          onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
-        />
-      </div>
-
       <TextInput
         label="Events Shown"
+        span={3}
         type="number"
         min={LIMITS_upcomingEvents.minItems}
         max={LIMITS_upcomingEvents.maxItems}
@@ -1806,18 +1878,18 @@ export function UpcomingEventsForm({
           });
         }}
       />
-
       <TextInput
         label="Upcoming Badge"
+        span={4}
         value={value.upcomingBadge ?? ""}
         maxLength={LIMITS_upcomingEvents.badgeMax}
         placeholder="Upcoming"
         hint="Marks the cards whose event has not happened yet. Leave blank to show no badge."
         onChange={(e) => onChange({ ...value, upcomingBadge: e.target.value })}
       />
-
       <TextInput
         label="Empty-state Text (optional)"
+        span={5}
         value={value.emptyText ?? ""}
         maxLength={LIMITS_upcomingEvents.emptyTextMax}
         placeholder="e.g. New events are announced here each term."
@@ -1825,17 +1897,36 @@ export function UpcomingEventsForm({
         onChange={(e) => onChange({ ...value, emptyText: e.target.value })}
       />
 
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={value.fallbackToRecent !== false}
-          onChange={(e) =>
-            onChange({ ...value, fallbackToRecent: e.target.checked })
-          }
-        />
-        Fill any spare card slots with the latest past events
-      </label>
-    </div>
+      <TextInput
+        label="Button Label"
+        span={4}
+        value={value.ctaLabel ?? ""}
+        maxLength={LIMITS_upcomingEvents.ctaLabelMax}
+        placeholder="News & Events"
+        onChange={(e) => onChange({ ...value, ctaLabel: e.target.value })}
+      />
+      <TextInput
+        label="Button Link"
+        span={4}
+        value={value.ctaHref ?? ""}
+        maxLength={500}
+        placeholder={eventsHref}
+        hint={`Leave blank to link to ${eventsHref}`}
+        onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
+      />
+      <Field label="Spare Slots" span={4}>
+        <label className="flex items-center gap-2 pt-2 text-sm">
+          <input
+            type="checkbox"
+            checked={value.fallbackToRecent !== false}
+            onChange={(e) =>
+              onChange({ ...value, fallbackToRecent: e.target.checked })
+            }
+          />
+          Fill with the latest past events
+        </label>
+      </Field>
+    </FormGrid>
   );
 }
 
@@ -1864,51 +1955,60 @@ export function PolytechnicAdmissionsForm({
   const criteria = Array.isArray(value.criteria) ? value.criteria : [];
   const criteriaAtMax =
     criteria.length >= LIMITS_polytechnicAdmissions.criteriaMax;
+  // Heading → CTA → the criteria columns → the contact strip beneath them,
+  // which is the order the public admissions section renders in.
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Eyebrow"
-          value={value.eyebrow ?? ""}
-          maxLength={LIMITS_polytechnicAdmissions.eyebrowMax}
-          onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
-        />
-        <TextInput
-          label="Title"
-          value={value.title ?? ""}
-          maxLength={LIMITS_polytechnicAdmissions.titleMax}
-          onChange={(e) => onChange({ ...value, title: e.target.value })}
-        />
-      </div>
+    <FormGrid>
+      <TextInput
+        label="Eyebrow"
+        span={3}
+        value={value.eyebrow ?? ""}
+        maxLength={LIMITS_polytechnicAdmissions.eyebrowMax}
+        onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
+      />
+      <TextInput
+        label="Title"
+        span={5}
+        value={value.title ?? ""}
+        maxLength={LIMITS_polytechnicAdmissions.titleMax}
+        onChange={(e) => onChange({ ...value, title: e.target.value })}
+      />
       <TextArea
         label="Description"
+        span={4}
         rows={2}
         value={value.description ?? ""}
         maxLength={LIMITS_polytechnicAdmissions.descriptionMax}
         onChange={(e) => onChange({ ...value, description: e.target.value })}
       />
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="CTA Label"
-          value={value.ctaLabel ?? ""}
-          maxLength={LIMITS_polytechnicAdmissions.ctaLabelMax}
-          onChange={(e) => onChange({ ...value, ctaLabel: e.target.value })}
-        />
-        <TextInput
-          label="CTA Href"
-          value={value.ctaHref ?? ""}
-          maxLength={500}
-          onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
-        />
-      </div>
+      <TextInput
+        label="CTA Label"
+        span={4}
+        value={value.ctaLabel ?? ""}
+        maxLength={LIMITS_polytechnicAdmissions.ctaLabelMax}
+        onChange={(e) => onChange({ ...value, ctaLabel: e.target.value })}
+      />
+      <TextInput
+        label="CTA Href"
+        span={8}
+        value={value.ctaHref ?? ""}
+        maxLength={500}
+        onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
+      />
 
       <Field
         label="Admission Criteria Blocks"
+        span="full"
         hint={`The frontend renders exactly ${LIMITS_polytechnicAdmissions.criteriaMax} columns. Extra blocks will be saved but never displayed.`}
       >
-        <div className="space-y-3">
+        {/* One editor column per rendered column, so the admin sees the same
+            three-across layout the visitor does. */}
+        <div className="admin-form-grid admin-form-grid--tight">
           {criteria.map((block, i) => (
-            <div key={i} className="rounded-lg border border-gray-200 p-3">
+            <div
+              key={i}
+              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+            >
               <TextInput
                 label="Block Title"
                 value={block.title}
@@ -1933,6 +2033,7 @@ export function PolytechnicAdmissionsForm({
                         className="admin-input"
                         value={item}
                         maxLength={LIMITS_polytechnicAdmissions.itemMax}
+                        aria-label={`Item ${k + 1}`}
                         onChange={(e) =>
                           onChange({
                             ...value,
@@ -1965,6 +2066,7 @@ export function PolytechnicAdmissionsForm({
                           })
                         }
                         className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+                        aria-label={`Remove item ${k + 1}`}
                       >
                         <Trash2 size={13} />
                       </button>
@@ -2004,7 +2106,7 @@ export function PolytechnicAdmissionsForm({
               </button>
             </div>
           ))}
-          <div className="flex items-center justify-between">
+          <div className="admin-col-full flex items-center justify-between">
             <button
               type="button"
               onClick={() =>
@@ -2026,35 +2128,32 @@ export function PolytechnicAdmissionsForm({
         </div>
       </Field>
 
-      <Field
-        label="Contact Strip"
-        hint="Phone, email, and address shown below the admission criteria."
-      >
-        <div className="space-y-3">
-          <TextInput
-            label="Phone"
-            value={value.phone ?? ""}
-            maxLength={LIMITS_polytechnicAdmissions.phoneMax}
-            onChange={(e) => onChange({ ...value, phone: e.target.value })}
-            placeholder="+91 93614 88801"
-          />
-          <TextInput
-            label="Email"
-            value={value.email ?? ""}
-            maxLength={LIMITS_polytechnicAdmissions.emailMax}
-            onChange={(e) => onChange({ ...value, email: e.target.value })}
-            placeholder="admissions@jct.ac.in"
-          />
-          <TextInput
-            label="Address"
-            value={value.address ?? ""}
-            maxLength={LIMITS_polytechnicAdmissions.addressMax}
-            onChange={(e) => onChange({ ...value, address: e.target.value })}
-            placeholder="Knowledge Park, Pichanur, Coimbatore - 641105"
-          />
-        </div>
-      </Field>
-    </div>
+      <TextInput
+        label="Contact Phone"
+        span={3}
+        value={value.phone ?? ""}
+        maxLength={LIMITS_polytechnicAdmissions.phoneMax}
+        onChange={(e) => onChange({ ...value, phone: e.target.value })}
+        placeholder="+91 93614 88801"
+        hint="Shown in the strip below the admission criteria."
+      />
+      <TextInput
+        label="Contact Email"
+        span={4}
+        value={value.email ?? ""}
+        maxLength={LIMITS_polytechnicAdmissions.emailMax}
+        onChange={(e) => onChange({ ...value, email: e.target.value })}
+        placeholder="admissions@jct.ac.in"
+      />
+      <TextInput
+        label="Contact Address"
+        span={5}
+        value={value.address ?? ""}
+        maxLength={LIMITS_polytechnicAdmissions.addressMax}
+        onChange={(e) => onChange({ ...value, address: e.target.value })}
+        placeholder="Knowledge Park, Pichanur, Coimbatore - 641105"
+      />
+    </FormGrid>
   );
 }
 
@@ -2071,13 +2170,18 @@ export function MetricsForm({
 }) {
   const safe = Array.isArray(value) ? value : [];
   const atMax = safe.length >= METRICS_LIMITS.itemsMax;
+  // Metric cards render as a row on the public page; they edit as one too.
   return (
-    <div className="space-y-3">
+    <div className="admin-form-grid admin-form-grid--tight">
       {safe.map((item, i) => (
-        <div key={i} className="rounded-lg border border-gray-200 p-3">
-          <div className="grid grid-cols-3 gap-3 pr-12">
+        <div
+          key={i}
+          className="admin-col-4 rounded-lg border border-gray-200 p-3"
+        >
+          <FormGrid tight>
             <TextInput
               label="Value"
+              span={4}
               value={item.value}
               maxLength={METRICS_LIMITS.valueMax}
               onChange={(e) =>
@@ -2090,6 +2194,7 @@ export function MetricsForm({
             />
             <TextInput
               label="Label"
+              span={8}
               value={item.label}
               maxLength={METRICS_LIMITS.labelMax}
               onChange={(e) =>
@@ -2102,6 +2207,7 @@ export function MetricsForm({
             />
             <TextInput
               label="Sub"
+              span="full"
               value={item.sub ?? ""}
               maxLength={METRICS_LIMITS.subMax}
               onChange={(e) =>
@@ -2112,17 +2218,18 @@ export function MetricsForm({
                 )
               }
             />
-          </div>
+          </FormGrid>
           <button
             type="button"
             onClick={() => onChange(safe.filter((_, j) => j !== i))}
-            className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+            className="admin-btn admin-btn-danger admin-btn-sm"
+            aria-label={`Remove metric ${i + 1}`}
           >
-            <Trash2 size={13} />
+            <Trash2 size={13} /> Remove
           </button>
         </div>
       ))}
-      <div className="flex items-center justify-between">
+      <div className="admin-col-full flex items-center justify-between">
         <button
           type="button"
           onClick={() => onChange([...safe, { value: "", label: "", sub: "" }])}
@@ -2149,9 +2256,12 @@ export function FacilitiesForm({
   const safe = Array.isArray(value) ? value : [];
   const atMax = safe.length >= FACILITIES_LIMITS.itemsMax;
   return (
-    <div className="space-y-3">
+    <div className="admin-form-grid admin-form-grid--tight">
       {safe.map((item, i) => (
-        <div key={i} className="rounded-lg border border-gray-200 p-3">
+        <div
+          key={i}
+          className="admin-col-4 rounded-lg border border-gray-200 p-3"
+        >
           <TextInput
             label="Title"
             value={item.title}
@@ -2180,13 +2290,13 @@ export function FacilitiesForm({
           <button
             type="button"
             onClick={() => onChange(safe.filter((_, j) => j !== i))}
-            className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+            className="admin-btn admin-btn-danger admin-btn-sm"
           >
-            <Trash2 size={13} />
+            <Trash2 size={13} /> Remove
           </button>
         </div>
       ))}
-      <div className="flex items-center justify-between">
+      <div className="admin-col-full flex items-center justify-between">
         <button
           type="button"
           onClick={() => onChange([...safe, { title: "", desc: "" }])}
@@ -2211,13 +2321,14 @@ export function StringListForm({
   const safe = Array.isArray(value) ? value : [];
   const atMax = safe.length >= RESEARCH_HIGHLIGHTS_LIMITS.itemsMax;
   return (
-    <div className="space-y-2">
+    <div className="admin-form-grid admin-form-grid--tight">
       {safe.map((item, i) => (
-        <div key={i} className="flex gap-2">
+        <div key={i} className="admin-col-4 flex gap-2">
           <input
             className="admin-input"
             value={item}
             maxLength={RESEARCH_HIGHLIGHTS_LIMITS.itemMax}
+            aria-label={`Item ${i + 1}`}
             onChange={(e) =>
               onChange(safe.map((v, j) => (j === i ? e.target.value : v)))
             }
@@ -2226,12 +2337,13 @@ export function StringListForm({
             type="button"
             onClick={() => onChange(safe.filter((_, j) => j !== i))}
             className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+            aria-label={`Remove item ${i + 1}`}
           >
             <Trash2 size={13} />
           </button>
         </div>
       ))}
-      <div className="flex items-center justify-between">
+      <div className="admin-col-full flex items-center justify-between">
         <button
           type="button"
           onClick={() => onChange([...safe, ""])}
@@ -2275,54 +2387,60 @@ export function AdmissionsForm({
 }) {
   const criteria = Array.isArray(value.criteria) ? value.criteria : [];
   const criteriaAtMax = criteria.length >= ADMISSIONS_LIMITS.criteriaMax;
+  // Heading → CTA → criteria columns → contact strip, as rendered publicly.
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Eyebrow"
-          value={value.eyebrow ?? ""}
-          maxLength={ADMISSIONS_LIMITS.eyebrowMax}
-          onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
-          hint='Small label above the title (e.g. "Admissions")'
-        />
-        <TextInput
-          label="Title"
-          value={value.title ?? ""}
-          maxLength={ADMISSIONS_LIMITS.titleMax}
-          onChange={(e) => onChange({ ...value, title: e.target.value })}
-        />
-      </div>
+    <FormGrid>
+      <TextInput
+        label="Eyebrow"
+        span={3}
+        value={value.eyebrow ?? ""}
+        maxLength={ADMISSIONS_LIMITS.eyebrowMax}
+        onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
+        hint='Small label above the title (e.g. "Admissions")'
+      />
+      <TextInput
+        label="Title"
+        span={5}
+        value={value.title ?? ""}
+        maxLength={ADMISSIONS_LIMITS.titleMax}
+        onChange={(e) => onChange({ ...value, title: e.target.value })}
+      />
       <TextArea
         label="Description"
+        span={4}
         rows={2}
         value={value.description ?? ""}
         maxLength={ADMISSIONS_LIMITS.descriptionMax}
         onChange={(e) => onChange({ ...value, description: e.target.value })}
       />
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="CTA Label"
-          value={value.ctaLabel ?? ""}
-          maxLength={ADMISSIONS_LIMITS.ctaLabelMax}
-          onChange={(e) => onChange({ ...value, ctaLabel: e.target.value })}
-          placeholder="Apply Now"
-        />
-        <TextInput
-          label="CTA Href"
-          value={value.ctaHref ?? ""}
-          maxLength={500}
-          onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
-          placeholder="https://admissions.jct.ac.in"
-        />
-      </div>
+      <TextInput
+        label="CTA Label"
+        span={4}
+        value={value.ctaLabel ?? ""}
+        maxLength={ADMISSIONS_LIMITS.ctaLabelMax}
+        onChange={(e) => onChange({ ...value, ctaLabel: e.target.value })}
+        placeholder="Apply Now"
+      />
+      <TextInput
+        label="CTA Href"
+        span={8}
+        value={value.ctaHref ?? ""}
+        maxLength={500}
+        onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
+        placeholder="https://admissions.jct.ac.in"
+      />
 
       <Field
         label="Admission Criteria Blocks"
+        span="full"
         hint={`Renders as ${ADMISSIONS_LIMITS.criteriaMax} columns on the page. Up to ${ADMISSIONS_LIMITS.itemsPerBlockMax} items per block.`}
       >
-        <div className="space-y-3">
+        <div className="admin-form-grid admin-form-grid--tight">
           {criteria.map((block, i) => (
-            <div key={i} className="rounded-lg border border-gray-200 p-3">
+            <div
+              key={i}
+              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+            >
               <TextInput
                 label="Block Title"
                 value={block.title}
@@ -2344,6 +2462,7 @@ export function AdmissionsForm({
                         className="admin-input"
                         value={item}
                         maxLength={ADMISSIONS_LIMITS.itemMax}
+                        aria-label={`Item ${k + 1}`}
                         onChange={(e) =>
                           onChange({
                             ...value,
@@ -2414,7 +2533,7 @@ export function AdmissionsForm({
               </button>
             </div>
           ))}
-          <div className="flex items-center justify-between">
+          <div className="admin-col-full flex items-center justify-between">
             <button
               type="button"
               onClick={() =>
@@ -2437,36 +2556,35 @@ export function AdmissionsForm({
       </Field>
 
       {showContact && (
-        <Field
-          label="Contact Strip"
-          hint="Phone, email, and address displayed below the criteria."
-        >
-          <div className="space-y-3">
-            <TextInput
-              label="Phone"
-              value={value.phone ?? ""}
-              maxLength={ADMISSIONS_LIMITS.phoneMax}
-              onChange={(e) => onChange({ ...value, phone: e.target.value })}
-              placeholder="+91 93614 88801"
-            />
-            <TextInput
-              label="Email"
-              value={value.email ?? ""}
-              maxLength={ADMISSIONS_LIMITS.emailMax}
-              onChange={(e) => onChange({ ...value, email: e.target.value })}
-              placeholder="admissions@jct.ac.in"
-            />
-            <TextInput
-              label="Address"
-              value={value.address ?? ""}
-              maxLength={ADMISSIONS_LIMITS.addressMax}
-              onChange={(e) => onChange({ ...value, address: e.target.value })}
-              placeholder="Knowledge Park, Pichanur, Coimbatore - 641105"
-            />
-          </div>
-        </Field>
+        <>
+          <TextInput
+            label="Contact Phone"
+            span={3}
+            value={value.phone ?? ""}
+            maxLength={ADMISSIONS_LIMITS.phoneMax}
+            onChange={(e) => onChange({ ...value, phone: e.target.value })}
+            placeholder="+91 93614 88801"
+            hint="Shown in the strip below the criteria."
+          />
+          <TextInput
+            label="Contact Email"
+            span={4}
+            value={value.email ?? ""}
+            maxLength={ADMISSIONS_LIMITS.emailMax}
+            onChange={(e) => onChange({ ...value, email: e.target.value })}
+            placeholder="admissions@jct.ac.in"
+          />
+          <TextInput
+            label="Contact Address"
+            span={5}
+            value={value.address ?? ""}
+            maxLength={ADMISSIONS_LIMITS.addressMax}
+            onChange={(e) => onChange({ ...value, address: e.target.value })}
+            placeholder="Knowledge Park, Pichanur, Coimbatore - 641105"
+          />
+        </>
       )}
-    </div>
+    </FormGrid>
   );
 }
 
@@ -2495,32 +2613,32 @@ export function WhyChooseJctForm({
   const features = Array.isArray(value.features) ? value.features : [];
   const atMax = features.length >= WHY_CHOOSE_JCT_LIMITS.featuresMax;
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Eyebrow"
-          value={value.eyebrow ?? ""}
-          maxLength={WHY_CHOOSE_JCT_LIMITS.eyebrowMax}
-          onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
-        />
-        <TextInput
-          label="Title Highlight"
-          value={value.titleHighlight ?? ""}
-          maxLength={WHY_CHOOSE_JCT_LIMITS.titleHighlightMax}
-          onChange={(e) =>
-            onChange({ ...value, titleHighlight: e.target.value })
-          }
-          hint="Rendered in accent color within the title"
-        />
-      </div>
+    <FormGrid>
+      <TextInput
+        label="Eyebrow"
+        span={3}
+        value={value.eyebrow ?? ""}
+        maxLength={WHY_CHOOSE_JCT_LIMITS.eyebrowMax}
+        onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
+      />
       <TextInput
         label="Title"
+        span={5}
         value={value.title ?? ""}
         maxLength={WHY_CHOOSE_JCT_LIMITS.titleMax}
         onChange={(e) => onChange({ ...value, title: e.target.value })}
       />
+      <TextInput
+        label="Title Highlight"
+        span={4}
+        value={value.titleHighlight ?? ""}
+        maxLength={WHY_CHOOSE_JCT_LIMITS.titleHighlightMax}
+        onChange={(e) => onChange({ ...value, titleHighlight: e.target.value })}
+        hint="Rendered in accent color within the title"
+      />
       <TextArea
         label="Description"
+        span="full"
         rows={2}
         value={value.description ?? ""}
         maxLength={WHY_CHOOSE_JCT_LIMITS.descriptionMax}
@@ -2528,14 +2646,19 @@ export function WhyChooseJctForm({
       />
       <Field
         label="Feature Cards"
+        span="full"
         hint={`Up to ${WHY_CHOOSE_JCT_LIMITS.featuresMax} cards. Icon is a Lucide icon name (e.g. BookOpen, Award).`}
       >
-        <div className="space-y-3">
+        <div className="admin-form-grid admin-form-grid--tight">
           {features.map((feat, i) => (
-            <div key={i} className="rounded-lg border border-gray-200 p-3">
-              <div className="grid grid-cols-2 gap-3">
+            <div
+              key={i}
+              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+            >
+              <FormGrid tight>
                 <TextInput
                   label="Icon"
+                  span={5}
                   value={feat.icon}
                   maxLength={WHY_CHOOSE_JCT_LIMITS.featureIconMax}
                   onChange={(e) =>
@@ -2550,6 +2673,7 @@ export function WhyChooseJctForm({
                 />
                 <TextInput
                   label="Title"
+                  span={7}
                   value={feat.title}
                   maxLength={WHY_CHOOSE_JCT_LIMITS.featureTitleMax}
                   onChange={(e) =>
@@ -2561,21 +2685,22 @@ export function WhyChooseJctForm({
                     })
                   }
                 />
-              </div>
-              <TextArea
-                label="Description"
-                rows={2}
-                value={feat.description}
-                maxLength={WHY_CHOOSE_JCT_LIMITS.featureDescMax}
-                onChange={(e) =>
-                  onChange({
-                    ...value,
-                    features: features.map((f, j) =>
-                      j === i ? { ...f, description: e.target.value } : f,
-                    ),
-                  })
-                }
-              />
+                <TextArea
+                  label="Description"
+                  span="full"
+                  rows={2}
+                  value={feat.description}
+                  maxLength={WHY_CHOOSE_JCT_LIMITS.featureDescMax}
+                  onChange={(e) =>
+                    onChange({
+                      ...value,
+                      features: features.map((f, j) =>
+                        j === i ? { ...f, description: e.target.value } : f,
+                      ),
+                    })
+                  }
+                />
+              </FormGrid>
               <button
                 type="button"
                 onClick={() =>
@@ -2584,13 +2709,13 @@ export function WhyChooseJctForm({
                     features: features.filter((_, j) => j !== i),
                   })
                 }
-                className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+                className="admin-btn admin-btn-danger admin-btn-sm"
               >
                 <Trash2 size={13} /> Remove
               </button>
             </div>
           ))}
-          <div className="flex items-center justify-between">
+          <div className="admin-col-full flex items-center justify-between">
             <button
               type="button"
               onClick={() =>
@@ -2614,7 +2739,7 @@ export function WhyChooseJctForm({
           </div>
         </div>
       </Field>
-    </div>
+    </FormGrid>
   );
 }
 
@@ -2648,82 +2773,88 @@ export function HomeAdmissionsForm({
 }) {
   const pathways = Array.isArray(value.pathways) ? value.pathways : [];
   const atMax = pathways.length >= HOME_ADMISSIONS_LIMITS.pathwaysMax;
+  // Heading block, then the two buttons under it, then the pathway card row.
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Eyebrow"
-          value={value.eyebrow ?? ""}
-          maxLength={HOME_ADMISSIONS_LIMITS.eyebrowMax}
-          onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
-        />
-        <TextInput
-          label="Title Highlight"
-          value={value.titleHighlight ?? ""}
-          maxLength={HOME_ADMISSIONS_LIMITS.titleHighlightMax}
-          onChange={(e) =>
-            onChange({ ...value, titleHighlight: e.target.value })
-          }
-          hint="Rendered in accent color"
-        />
-      </div>
+    <FormGrid>
+      <TextInput
+        label="Eyebrow"
+        span={3}
+        value={value.eyebrow ?? ""}
+        maxLength={HOME_ADMISSIONS_LIMITS.eyebrowMax}
+        onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
+      />
       <TextInput
         label="Title"
+        span={5}
         value={value.title ?? ""}
         maxLength={HOME_ADMISSIONS_LIMITS.titleMax}
         onChange={(e) => onChange({ ...value, title: e.target.value })}
       />
+      <TextInput
+        label="Title Highlight"
+        span={4}
+        value={value.titleHighlight ?? ""}
+        maxLength={HOME_ADMISSIONS_LIMITS.titleHighlightMax}
+        onChange={(e) => onChange({ ...value, titleHighlight: e.target.value })}
+        hint="Rendered in accent color"
+      />
       <TextArea
         label="Description"
+        span="full"
         rows={2}
         value={value.description ?? ""}
         maxLength={HOME_ADMISSIONS_LIMITS.descriptionMax}
         onChange={(e) => onChange({ ...value, description: e.target.value })}
       />
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Apply Button Label"
-          value={value.applyLabel ?? ""}
-          maxLength={HOME_ADMISSIONS_LIMITS.applyLabelMax}
-          onChange={(e) => onChange({ ...value, applyLabel: e.target.value })}
-          placeholder="Apply Now"
-        />
-        <TextInput
-          label="Apply Button Href"
-          value={value.applyHref ?? ""}
-          maxLength={500}
-          onChange={(e) => onChange({ ...value, applyHref: e.target.value })}
-          placeholder="https://admissions.jct.ac.in"
-        />
-      </div>
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="PDF Button Label"
-          value={value.prospectusLabel ?? ""}
-          maxLength={HOME_ADMISSIONS_LIMITS.prospectusLabelMax}
-          onChange={(e) =>
-            onChange({ ...value, prospectusLabel: e.target.value })
-          }
-          placeholder="Download Prospectus"
-          hint="Label shown on the prospectus download button"
-        />
-        <DocumentUploadInput
-          label="Prospectus PDF"
-          value={value.prospectusUrl ?? ""}
-          onChange={(url) => onChange({ ...value, prospectusUrl: url })}
-        />
-      </div>
+      <TextInput
+        label="Apply Button Label"
+        span={3}
+        value={value.applyLabel ?? ""}
+        maxLength={HOME_ADMISSIONS_LIMITS.applyLabelMax}
+        onChange={(e) => onChange({ ...value, applyLabel: e.target.value })}
+        placeholder="Apply Now"
+      />
+      <TextInput
+        label="Apply Button Href"
+        span={5}
+        value={value.applyHref ?? ""}
+        maxLength={500}
+        onChange={(e) => onChange({ ...value, applyHref: e.target.value })}
+        placeholder="https://admissions.jct.ac.in"
+      />
+      <TextInput
+        label="PDF Button Label"
+        span={4}
+        value={value.prospectusLabel ?? ""}
+        maxLength={HOME_ADMISSIONS_LIMITS.prospectusLabelMax}
+        onChange={(e) =>
+          onChange({ ...value, prospectusLabel: e.target.value })
+        }
+        placeholder="Download Prospectus"
+        hint="Label shown on the prospectus download button"
+      />
+      <DocumentUploadInput
+        label="Prospectus PDF"
+        span="full"
+        value={value.prospectusUrl ?? ""}
+        onChange={(url) => onChange({ ...value, prospectusUrl: url })}
+      />
 
       <Field
         label="Pathway Cards"
+        span="full"
         hint={`Up to ${HOME_ADMISSIONS_LIMITS.pathwaysMax} cards. Icon is a Lucide icon name.`}
       >
-        <div className="space-y-3">
+        <div className="admin-form-grid admin-form-grid--tight">
           {pathways.map((p, i) => (
-            <div key={i} className="rounded-lg border border-gray-200 p-3">
-              <div className="grid grid-cols-2 gap-3">
+            <div
+              key={i}
+              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+            >
+              <FormGrid tight>
                 <TextInput
                   label="Icon"
+                  span={5}
                   value={p.icon}
                   maxLength={HOME_ADMISSIONS_LIMITS.pathwayIconMax}
                   onChange={(e) =>
@@ -2738,6 +2869,7 @@ export function HomeAdmissionsForm({
                 />
                 <TextInput
                   label="Title"
+                  span={7}
                   value={p.title}
                   maxLength={HOME_ADMISSIONS_LIMITS.pathwayTitleMax}
                   onChange={(e) =>
@@ -2749,24 +2881,24 @@ export function HomeAdmissionsForm({
                     })
                   }
                 />
-              </div>
-              <TextArea
-                label="Description"
-                rows={2}
-                value={p.description}
-                maxLength={HOME_ADMISSIONS_LIMITS.pathwayDescMax}
-                onChange={(e) =>
-                  onChange({
-                    ...value,
-                    pathways: pathways.map((pw, j) =>
-                      j === i ? { ...pw, description: e.target.value } : pw,
-                    ),
-                  })
-                }
-              />
-              <div className="grid grid-cols-2 gap-3">
+                <TextArea
+                  label="Description"
+                  span="full"
+                  rows={2}
+                  value={p.description}
+                  maxLength={HOME_ADMISSIONS_LIMITS.pathwayDescMax}
+                  onChange={(e) =>
+                    onChange({
+                      ...value,
+                      pathways: pathways.map((pw, j) =>
+                        j === i ? { ...pw, description: e.target.value } : pw,
+                      ),
+                    })
+                  }
+                />
                 <TextInput
                   label="CTA Label"
+                  span={5}
                   value={p.ctaLabel}
                   maxLength={HOME_ADMISSIONS_LIMITS.pathwayCtaLabelMax}
                   onChange={(e) =>
@@ -2780,6 +2912,7 @@ export function HomeAdmissionsForm({
                 />
                 <TextInput
                   label="CTA Href"
+                  span={7}
                   value={p.ctaHref}
                   maxLength={500}
                   onChange={(e) =>
@@ -2791,7 +2924,7 @@ export function HomeAdmissionsForm({
                     })
                   }
                 />
-              </div>
+              </FormGrid>
               <button
                 type="button"
                 onClick={() =>
@@ -2800,13 +2933,13 @@ export function HomeAdmissionsForm({
                     pathways: pathways.filter((_, j) => j !== i),
                   })
                 }
-                className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+                className="admin-btn admin-btn-danger admin-btn-sm"
               >
                 <Trash2 size={13} /> Remove
               </button>
             </div>
           ))}
-          <div className="flex items-center justify-between">
+          <div className="admin-col-full flex items-center justify-between">
             <button
               type="button"
               onClick={() =>
@@ -2836,7 +2969,7 @@ export function HomeAdmissionsForm({
           </div>
         </div>
       </Field>
-    </div>
+    </FormGrid>
   );
 }
 
@@ -2856,30 +2989,36 @@ export function HeaderForm({
   value: HeaderVal;
   onChange: (v: HeaderVal) => void;
 }) {
+  // The header is a single strip — phone on the left, login button on the
+  // right — so its whole configuration fits one row.
   return (
-    <div className="space-y-4">
+    <FormGrid>
       <TextInput
         label="Phone Number"
+        span={3}
         value={value.phone ?? ""}
         maxLength={HEADER_LIMITS.phoneMax}
         onChange={(e) => onChange({ ...value, phone: e.target.value })}
         placeholder="+91 93614 88801"
         hint="Shown in the public site header."
       />
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={value.showStudentLogin !== false}
-          onChange={(e) =>
-            onChange({ ...value, showStudentLogin: e.target.checked })
-          }
-        />
-        Show Student Login button
-      </label>
+      <Field label="Student Login" span={3}>
+        <label className="flex items-center gap-2 pt-2 text-sm">
+          <input
+            type="checkbox"
+            checked={value.showStudentLogin !== false}
+            onChange={(e) =>
+              onChange({ ...value, showStudentLogin: e.target.checked })
+            }
+          />
+          Show the button
+        </label>
+      </Field>
       {value.showStudentLogin !== false && (
-        <div className="grid grid-cols-2 gap-3">
+        <>
           <TextInput
             label="Student Login Label"
+            span={2}
             value={value.studentLoginLabel ?? ""}
             maxLength={HEADER_LIMITS.ctaLabelMax}
             onChange={(e) =>
@@ -2889,6 +3028,7 @@ export function HeaderForm({
           />
           <TextInput
             label="Student Login URL"
+            span={4}
             value={value.studentLoginUrl ?? ""}
             maxLength={500}
             onChange={(e) =>
@@ -2896,9 +3036,9 @@ export function HeaderForm({
             }
             placeholder="https://..."
           />
-        </div>
+        </>
       )}
-    </div>
+    </FormGrid>
   );
 }
 
@@ -2986,15 +3126,17 @@ function ChildEditor({
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-3">
+      <FormGrid tight>
         <TextInput
           label="Label"
+          span={3}
           value={child.label ?? ""}
           maxLength={NAVBAR_LIMITS.labelMax}
           onChange={(e) => onChange({ ...child, label: e.target.value })}
         />
         <TextInput
           label="URL / Href"
+          span={4}
           value={child.href ?? ""}
           disabled={!!child.file}
           onChange={(e) => onChange({ ...child, href: e.target.value })}
@@ -3002,27 +3144,33 @@ function ChildEditor({
             child.file ? "Using uploaded PDF" : "/path or https://..."
           }
         />
-      </div>
-      <DocumentUploadInput
-        label="PDF (optional)"
-        hint="Upload a PDF to make this submenu item open the file in a new tab instead of following the URL."
-        value={child.file ?? ""}
-        onChange={(file) => onChange({ ...child, file })}
-      />
-      <TextInput
-        label="Description (optional)"
-        value={child.desc ?? ""}
-        maxLength={NAVBAR_LIMITS.descMax}
-        onChange={(e) => onChange({ ...child, desc: e.target.value })}
-      />
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={child.visible !== false}
-          onChange={(e) => onChange({ ...child, visible: e.target.checked })}
+        <TextInput
+          label="Description (optional)"
+          span={3}
+          value={child.desc ?? ""}
+          maxLength={NAVBAR_LIMITS.descMax}
+          onChange={(e) => onChange({ ...child, desc: e.target.value })}
         />
-        Visible
-      </label>
+        <Field label="Visibility" span={2}>
+          <label className="flex items-center gap-2 pt-2 text-sm">
+            <input
+              type="checkbox"
+              checked={child.visible !== false}
+              onChange={(e) =>
+                onChange({ ...child, visible: e.target.checked })
+              }
+            />
+            Visible
+          </label>
+        </Field>
+        <DocumentUploadInput
+          label="PDF (optional)"
+          span="full"
+          hint="Upload a PDF to make this submenu item open the file in a new tab instead of following the URL."
+          value={child.file ?? ""}
+          onChange={(file) => onChange({ ...child, file })}
+        />
+      </FormGrid>
     </div>
   );
 }
@@ -3092,16 +3240,18 @@ function NavbarItemEditor({
         </div>
       </div>
       {expanded && (
-        <div className="space-y-3 border-t border-gray-200 pt-3">
-          <div className="grid grid-cols-2 gap-3">
+        <div className="border-t border-gray-200 pt-3">
+          <FormGrid tight>
             <TextInput
               label="Label"
+              span={3}
               value={item.label ?? ""}
               maxLength={NAVBAR_LIMITS.labelMax}
               onChange={(e) => onChange({ ...item, label: e.target.value })}
             />
             <TextInput
               label="URL / Href"
+              span={4}
               value={item.href ?? ""}
               disabled={!!item.file}
               onChange={(e) => onChange({ ...item, href: e.target.value })}
@@ -3111,31 +3261,33 @@ function NavbarItemEditor({
                   : "/path or # for dropdown only"
               }
             />
-          </div>
-          <DocumentUploadInput
-            label="PDF (optional)"
-            hint="Upload a PDF to make this menu item open the file in a new tab instead of following the URL."
-            value={item.file ?? ""}
-            onChange={(file) => onChange({ ...item, file })}
-          />
-          <TextInput
-            label="Description (optional)"
-            value={item.desc ?? ""}
-            maxLength={NAVBAR_LIMITS.descMax}
-            onChange={(e) => onChange({ ...item, desc: e.target.value })}
-          />
-          <div className="flex flex-wrap gap-4">
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={item.visible !== false}
-                onChange={(e) =>
-                  onChange({ ...item, visible: e.target.checked })
-                }
-              />
-              Visible
-            </label>
-          </div>
+            <TextInput
+              label="Description (optional)"
+              span={3}
+              value={item.desc ?? ""}
+              maxLength={NAVBAR_LIMITS.descMax}
+              onChange={(e) => onChange({ ...item, desc: e.target.value })}
+            />
+            <Field label="Visibility" span={2}>
+              <label className="flex items-center gap-2 pt-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={item.visible !== false}
+                  onChange={(e) =>
+                    onChange({ ...item, visible: e.target.checked })
+                  }
+                />
+                Visible
+              </label>
+            </Field>
+            <DocumentUploadInput
+              label="PDF (optional)"
+              span="full"
+              hint="Upload a PDF to make this menu item open the file in a new tab instead of following the URL."
+              value={item.file ?? ""}
+              onChange={(file) => onChange({ ...item, file })}
+            />
+          </FormGrid>
           <Field
             label="Submenu Items"
             hint="Optional. If present, this item renders as a dropdown of these children."
@@ -3355,30 +3507,34 @@ export function NavbarAdminSection({
 
   return (
     <div className="space-y-8">
-      <div className="flex items-center justify-end gap-3">
-        {msg && (
-          <span
-            className={`text-sm font-medium ${msg.ok ? "text-green-600" : "text-red-500"}`}
-          >
-            {msg.text}
-          </span>
-        )}
-        <button
-          type="button"
-          onClick={save}
-          disabled={saving}
-          className="admin-btn admin-btn-gold"
-        >
-          {saving ? (
-            <Loader2 size={15} className="animate-spin" />
-          ) : (
-            <Save size={15} />
-          )}
-          {saving ? "Saving…" : "Save Navbar"}
-        </button>
-      </div>
+      {/* The save button shares the "Header Bar" row rather than owning a bare
+          row of its own, which left a band of empty space above the form. */}
       <div>
-        <h3 className="mb-3 font-semibold text-gray-800">Header Bar</h3>
+        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+          <h3 className="font-semibold text-gray-800">Header Bar</h3>
+          <div className="flex items-center gap-3">
+            {msg && (
+              <span
+                className={`text-sm font-medium ${msg.ok ? "text-green-600" : "text-red-500"}`}
+              >
+                {msg.text}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={save}
+              disabled={saving}
+              className="admin-btn admin-btn-gold admin-btn-sm"
+            >
+              {saving ? (
+                <Loader2 size={15} className="animate-spin" />
+              ) : (
+                <Save size={15} />
+              )}
+              {saving ? "Saving…" : "Save Navbar"}
+            </button>
+          </div>
+        </div>
         <HeaderForm value={headerVal} onChange={setHeaderVal} />
       </div>
       <hr className="border-gray-200" />
@@ -3417,128 +3573,123 @@ export function FooterForm({
     : [];
   const addressAtMax = addressLines.length >= FOOTER_LIMITS.addressLinesMax;
 
+  // The footer's own columns — helpline card, Contact Us, socials — become the
+  // editor's columns, so the shape on screen matches the shape on the page.
   return (
-    <div className="space-y-5">
-      <Field
-        label="Admissions Helpline Box"
+    <FormGrid>
+      <TextInput
+        label="Helpline Label"
+        span={4}
+        value={value.helplineLabel ?? ""}
+        maxLength={FOOTER_LIMITS.labelMax}
+        onChange={(e) => onChange({ ...value, helplineLabel: e.target.value })}
+        placeholder="Admissions Helpline"
         hint="The highlighted contact card shown in the footer."
-      >
-        <div className="space-y-3">
-          <TextInput
-            label="Helpline Label"
-            value={value.helplineLabel ?? ""}
-            maxLength={FOOTER_LIMITS.labelMax}
-            onChange={(e) =>
-              onChange({ ...value, helplineLabel: e.target.value })
-            }
-            placeholder="Admissions Helpline"
-          />
-          <TextInput
-            label="Phone"
-            value={value.phone ?? ""}
-            maxLength={FOOTER_LIMITS.phoneMax}
-            onChange={(e) => onChange({ ...value, phone: e.target.value })}
-            placeholder="+91 93614 88801"
-          />
-          <TextInput
-            label="Admissions Email"
-            value={value.admissionsEmail ?? ""}
-            maxLength={FOOTER_LIMITS.emailMax}
-            onChange={(e) =>
-              onChange({ ...value, admissionsEmail: e.target.value })
-            }
-            placeholder="admissions@jct.ac.in"
-          />
-        </div>
-      </Field>
+      />
+      <TextInput
+        label="Helpline Phone"
+        span={4}
+        value={value.phone ?? ""}
+        maxLength={FOOTER_LIMITS.phoneMax}
+        onChange={(e) => onChange({ ...value, phone: e.target.value })}
+        placeholder="+91 93614 88801"
+        hint="Reused in the Contact Us column."
+      />
+      <TextInput
+        label="Admissions Email"
+        span={4}
+        value={value.admissionsEmail ?? ""}
+        maxLength={FOOTER_LIMITS.emailMax}
+        onChange={(e) =>
+          onChange({ ...value, admissionsEmail: e.target.value })
+        }
+        placeholder="admissions@jct.ac.in"
+      />
 
+      <TextInput
+        label="General Email"
+        span={4}
+        value={value.email ?? ""}
+        maxLength={FOOTER_LIMITS.emailMax}
+        onChange={(e) => onChange({ ...value, email: e.target.value })}
+        placeholder="info@jct.ac.in"
+        hint="Shown in the footer's Contact Us column."
+      />
       <Field
-        label="Contact Us Column"
-        hint="Email and address shown in the footer's Contact Us column. The helpline phone above is reused here."
+        label="Address Lines"
+        span={8}
+        hint={`Up to ${FOOTER_LIMITS.addressLinesMax} lines.`}
       >
-        <div className="space-y-3">
-          <TextInput
-            label="General Email"
-            value={value.email ?? ""}
-            maxLength={FOOTER_LIMITS.emailMax}
-            onChange={(e) => onChange({ ...value, email: e.target.value })}
-            placeholder="info@jct.ac.in"
-          />
-          <Field
-            label="Address Lines"
-            hint={`Up to ${FOOTER_LIMITS.addressLinesMax} lines.`}
-          >
-            <div className="space-y-2">
-              {addressLines.map((line, i) => (
-                <div key={i} className="flex gap-2">
-                  <input
-                    className="admin-input"
-                    value={line}
-                    maxLength={FOOTER_LIMITS.addressLineMax}
-                    onChange={(e) =>
-                      onChange({
-                        ...value,
-                        addressLines: addressLines.map((l, j) =>
-                          j === i ? e.target.value : l,
-                        ),
-                      })
-                    }
-                  />
-                  <button
-                    type="button"
-                    onClick={() =>
-                      onChange({
-                        ...value,
-                        addressLines: addressLines.filter((_, j) => j !== i),
-                      })
-                    }
-                    className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
-                  >
-                    <Trash2 size={13} />
-                  </button>
-                </div>
-              ))}
+        <div className="admin-form-grid admin-form-grid--tight">
+          {addressLines.map((line, i) => (
+            <div key={i} className="admin-col-6 flex gap-2">
+              <input
+                className="admin-input"
+                value={line}
+                maxLength={FOOTER_LIMITS.addressLineMax}
+                aria-label={`Address line ${i + 1}`}
+                onChange={(e) =>
+                  onChange({
+                    ...value,
+                    addressLines: addressLines.map((l, j) =>
+                      j === i ? e.target.value : l,
+                    ),
+                  })
+                }
+              />
               <button
                 type="button"
                 onClick={() =>
                   onChange({
                     ...value,
-                    addressLines: [...addressLines, ""],
+                    addressLines: addressLines.filter((_, j) => j !== i),
                   })
                 }
-                disabled={addressAtMax}
-                className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+                className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+                aria-label={`Remove address line ${i + 1}`}
               >
-                <Plus size={14} /> Add Line
+                <Trash2 size={13} />
               </button>
             </div>
-          </Field>
+          ))}
+          <div className="admin-col-full">
+            <button
+              type="button"
+              onClick={() =>
+                onChange({
+                  ...value,
+                  addressLines: [...addressLines, ""],
+                })
+              }
+              disabled={addressAtMax}
+              className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus size={14} /> Add Line
+            </button>
+          </div>
         </div>
       </Field>
 
-      <Field label="Social Links">
-        <div className="space-y-2">
-          {(
-            [
-              { key: "facebook", label: "Facebook" },
-              { key: "instagram", label: "Instagram" },
-              { key: "twitter", label: "X / Twitter" },
-              { key: "linkedin", label: "LinkedIn" },
-              { key: "youtube", label: "YouTube" },
-            ] as { key: keyof FooterVal; label: string }[]
-          ).map(({ key, label }) => (
-            <TextInput
-              key={key}
-              label={label}
-              value={(value[key] as string) ?? ""}
-              maxLength={500}
-              onChange={(e) => onChange({ ...value, [key]: e.target.value })}
-              placeholder="https://..."
-            />
-          ))}
-        </div>
-      </Field>
-    </div>
+      {(
+        [
+          { key: "facebook", label: "Facebook" },
+          { key: "instagram", label: "Instagram" },
+          { key: "twitter", label: "X / Twitter" },
+          { key: "linkedin", label: "LinkedIn" },
+          { key: "youtube", label: "YouTube" },
+        ] as { key: keyof FooterVal; label: string }[]
+      ).map(({ key, label }) => (
+        <TextInput
+          key={key}
+          label={label}
+          span={4}
+          value={(value[key] as string) ?? ""}
+          maxLength={500}
+          onChange={(e) => onChange({ ...value, [key]: e.target.value })}
+          placeholder="https://..."
+        />
+      ))}
+    </FormGrid>
   );
 }
 
@@ -3580,16 +3731,20 @@ export function StatisticsForm({
   const safe = Array.isArray(value) ? value : [];
   const atMax = safe.length >= HOME_STATISTICS_LIMITS.itemsMax;
   return (
-    <div className="space-y-3">
-      <p className="text-xs text-gray-400">
+    <div className="admin-form-grid admin-form-grid--tight">
+      <p className="admin-col-full text-xs text-gray-500">
         The row of badges shown directly beneath the home hero. Icon is one of:
         laurel, users, cap, badge, growth.
       </p>
       {safe.map((item, i) => (
-        <div key={i} className="rounded-lg border border-gray-200 p-3">
-          <div className="grid grid-cols-2 gap-3">
+        <div
+          key={i}
+          className="admin-col-4 rounded-lg border border-gray-200 p-3"
+        >
+          <FormGrid tight>
             <TextInput
               label="Icon"
+              span={5}
               value={item.icon}
               maxLength={HOME_STATISTICS_LIMITS.iconMax}
               placeholder="laurel"
@@ -3603,6 +3758,7 @@ export function StatisticsForm({
             />
             <TextInput
               label="Label"
+              span={7}
               value={item.label}
               maxLength={HOME_STATISTICS_LIMITS.labelMax}
               placeholder="NAAC Accredited"
@@ -3614,17 +3770,17 @@ export function StatisticsForm({
                 )
               }
             />
-          </div>
+          </FormGrid>
           <button
             type="button"
             onClick={() => onChange(safe.filter((_, j) => j !== i))}
-            className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+            className="admin-btn admin-btn-danger admin-btn-sm"
           >
             <Trash2 size={13} /> Remove
           </button>
         </div>
       ))}
-      <div className="flex items-center justify-between">
+      <div className="admin-col-full flex items-center justify-between">
         <button
           type="button"
           onClick={() => onChange([...safe, { icon: "laurel", label: "" }])}
@@ -3666,14 +3822,16 @@ export function FloatingElementsForm({
   const wa = value.whatsapp ?? {};
   const ap = value.applyNow ?? {};
   const mt = value.meritto ?? {};
+  // Three independent floating widgets — one column each.
   return (
-    <div className="space-y-6">
+    <FormGrid>
       <Field
         label="WhatsApp Button"
+        span={4}
         hint="Floating WhatsApp icon shown on all public pages."
       >
-        <div className="space-y-3">
-          <label className="flex items-center gap-2 text-sm">
+        <div className="rounded-lg border border-gray-200 p-3">
+          <label className="mb-2 flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={wa.enabled !== false}
@@ -3701,10 +3859,11 @@ export function FloatingElementsForm({
 
       <Field
         label="Apply Now Button"
+        span={4}
         hint="Floating Apply Now button shown on all public pages."
       >
-        <div className="space-y-3">
-          <label className="flex items-center gap-2 text-sm">
+        <div className="rounded-lg border border-gray-200 p-3">
+          <label className="mb-2 flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={ap.enabled !== false}
@@ -3740,9 +3899,10 @@ export function FloatingElementsForm({
 
       <Field
         label="Meritto Chat"
+        span={4}
         hint="Show/hide the Meritto chatbot on public pages."
       >
-        <div className="space-y-3">
+        <div className="rounded-lg border border-gray-200 p-3">
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -3758,7 +3918,7 @@ export function FloatingElementsForm({
           </label>
         </div>
       </Field>
-    </div>
+    </FormGrid>
   );
 }
 
@@ -3788,47 +3948,49 @@ export function RecruitersSectionForm({
   const stats = Array.isArray(value.stats) ? value.stats : [];
   const atMax = stats.length >= RECRUITERS_SECTION_LIMITS.statsMax;
   return (
-    <div className="space-y-4">
-      <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 p-3">
-        <input
-          type="checkbox"
-          checked={value.show_section !== false}
-          onChange={(e) =>
-            onChange({ ...value, show_section: e.target.checked })
-          }
-          className="h-4 w-4 rounded border-gray-300 accent-amber-500"
-        />
-        <span className="text-sm font-medium text-gray-700">
-          Show Placement Highlights section on public pages
-        </span>
-      </label>
-      <div className="grid grid-cols-2 gap-3">
-        <TextInput
-          label="Eyebrow"
-          value={value.eyebrow ?? ""}
-          maxLength={RECRUITERS_SECTION_LIMITS.eyebrowMax}
-          onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
-          placeholder="Placement Highlights"
-        />
-        <TextInput
-          label="Title Highlight"
-          value={value.titleHighlight ?? ""}
-          maxLength={RECRUITERS_SECTION_LIMITS.titleHighlightMax}
-          onChange={(e) =>
-            onChange({ ...value, titleHighlight: e.target.value })
-          }
-          hint="Rendered in italic accent within the title"
-        />
-      </div>
+    <FormGrid>
+      <Field label="Visibility" span={3}>
+        <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 p-3">
+          <input
+            type="checkbox"
+            checked={value.show_section !== false}
+            onChange={(e) =>
+              onChange({ ...value, show_section: e.target.checked })
+            }
+            className="h-4 w-4 rounded border-gray-300 accent-amber-500"
+          />
+          <span className="text-sm font-medium text-gray-700">
+            Show on public pages
+          </span>
+        </label>
+      </Field>
+      <TextInput
+        label="Eyebrow"
+        span={3}
+        value={value.eyebrow ?? ""}
+        maxLength={RECRUITERS_SECTION_LIMITS.eyebrowMax}
+        onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
+        placeholder="Placement Highlights"
+      />
       <TextInput
         label="Title"
+        span={3}
         value={value.title ?? ""}
         maxLength={RECRUITERS_SECTION_LIMITS.titleMax}
         onChange={(e) => onChange({ ...value, title: e.target.value })}
         placeholder="Our Recruiters"
       />
+      <TextInput
+        label="Title Highlight"
+        span={3}
+        value={value.titleHighlight ?? ""}
+        maxLength={RECRUITERS_SECTION_LIMITS.titleHighlightMax}
+        onChange={(e) => onChange({ ...value, titleHighlight: e.target.value })}
+        hint="Rendered in italic accent within the title"
+      />
       <TextArea
         label="Description"
+        span="full"
         rows={2}
         value={value.description ?? ""}
         maxLength={RECRUITERS_SECTION_LIMITS.descriptionMax}
@@ -3836,14 +3998,19 @@ export function RecruitersSectionForm({
       />
       <Field
         label="Stat Cards"
+        span="full"
         hint={`Up to ${RECRUITERS_SECTION_LIMITS.statsMax} cards. Icon is one of: trend, award, building, users.`}
       >
-        <div className="space-y-3">
+        <div className="admin-form-grid admin-form-grid--tight">
           {stats.map((stat, i) => (
-            <div key={i} className="rounded-lg border border-gray-200 p-3">
-              <div className="grid grid-cols-3 gap-3">
+            <div
+              key={i}
+              className="admin-col-3 rounded-lg border border-gray-200 p-3"
+            >
+              <FormGrid tight>
                 <TextInput
                   label="Icon"
+                  span={5}
                   value={stat.icon}
                   maxLength={RECRUITERS_SECTION_LIMITS.statIconMax}
                   placeholder="trend"
@@ -3858,6 +4025,7 @@ export function RecruitersSectionForm({
                 />
                 <TextInput
                   label="Value"
+                  span={7}
                   value={stat.value}
                   maxLength={RECRUITERS_SECTION_LIMITS.statValueMax}
                   placeholder="98%"
@@ -3872,6 +4040,7 @@ export function RecruitersSectionForm({
                 />
                 <TextInput
                   label="Label"
+                  span="full"
                   value={stat.label}
                   maxLength={RECRUITERS_SECTION_LIMITS.statLabelMax}
                   placeholder="Placement Rate"
@@ -3884,7 +4053,7 @@ export function RecruitersSectionForm({
                     })
                   }
                 />
-              </div>
+              </FormGrid>
               <button
                 type="button"
                 onClick={() =>
@@ -3893,13 +4062,13 @@ export function RecruitersSectionForm({
                     stats: stats.filter((_, j) => j !== i),
                   })
                 }
-                className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+                className="admin-btn admin-btn-danger admin-btn-sm"
               >
                 <Trash2 size={13} /> Remove
               </button>
             </div>
           ))}
-          <div className="flex items-center justify-between">
+          <div className="admin-col-full flex items-center justify-between">
             <button
               type="button"
               onClick={() =>
@@ -3920,7 +4089,7 @@ export function RecruitersSectionForm({
           </div>
         </div>
       </Field>
-    </div>
+    </FormGrid>
   );
 }
 
@@ -3983,9 +4152,10 @@ export function SeoPagesForm({
             </span>
           }
         >
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <FormGrid>
             <TextInput
               label="Page Name"
+              span={4}
               value={page.label ?? ""}
               maxLength={SEO_LIMITS.labelMax}
               placeholder="e.g. Landing page"
@@ -3993,18 +4163,19 @@ export function SeoPagesForm({
             />
             <TextInput
               label="Path"
+              span={8}
               value={page.path ?? ""}
               maxLength={SEO_LIMITS.pathMax}
               placeholder="/institutions/engineering"
               onChange={(e) => setPage(i, { path: e.target.value })}
             />
-          </div>
-          <SeoFields
-            title={page.title ?? ""}
-            description={page.description ?? ""}
-            path={page.path}
-            onChange={(patch) => setPage(i, patch)}
-          />
+            <SeoFields
+              title={page.title ?? ""}
+              description={page.description ?? ""}
+              path={page.path}
+              onChange={(patch) => setPage(i, patch)}
+            />
+          </FormGrid>
           <button
             type="button"
             onClick={() =>

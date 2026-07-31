@@ -22,9 +22,16 @@ export async function GET(req: NextRequest) {
   const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
+  // A single key can be asked for by name — that is how the live-page editors
+  // load the *draft* they are about to edit, which the public endpoint will
+  // never hand out.
+  const key = req.nextUrl.searchParams.get("key");
+
   try {
     await connectDB();
-    const docs = await SiteConfig.find().sort({ config_key: 1 });
+    const docs = await SiteConfig.find(key ? { config_key: key } : {}).sort({
+      config_key: 1,
+    });
 
     // Editors may read global keys and their own college's keys, but not
     // other colleges' drafts.
@@ -58,6 +65,8 @@ export async function PUT(req: NextRequest) {
   const parsed = await validateBody(req, SiteConfigPutSchema);
   if (!parsed.ok) return parsed.response;
   const { config_key, value } = parsed.data;
+  // Absent means publish — see the schema note.
+  const publish = parsed.data.publish !== false;
 
   const userRole = (session!.user as Record<string, unknown>).role as string;
   if (!hasMinRole(userRole, "admin")) {
@@ -79,12 +88,20 @@ export async function PUT(req: NextRequest) {
     const doc = await SiteConfig.findOneAndUpdate(
       { config_key },
       {
-        $set: {
-          value,
-          published_value: value,
-          status: "published",
-          updated_by: session!.user?.email,
-        },
+        $set: publish
+          ? {
+              value,
+              published_value: value,
+              status: "published",
+              updated_by: session!.user?.email,
+            }
+          : // Draft save: the live page keeps serving `published_value`
+            // untouched, and `status` records that a newer draft is waiting.
+            {
+              value,
+              status: "draft",
+              updated_by: session!.user?.email,
+            },
         $inc: { version: 1 },
       },
       { upsert: true, returnDocument: "after" },
@@ -93,18 +110,26 @@ export async function PUT(req: NextRequest) {
     // Delete any stored assets (R2 object + tracking row) that were present
     // in the old value but are no longer referenced by the new value.
     // Non-fatal — a failed cleanup never blocks the save.
-    const newKeys = new Set([...extractR2Keys(value)]);
-    cleanupStorageKeys(
-      oldKeys.filter((k) => !newKeys.has(k)),
-      "site-config",
-    );
+    //
+    // Only on publish: on a draft save the dropped asset may still be
+    // referenced by `published_value`, and deleting it would break the live
+    // page for a change that has not gone live.
+    if (publish) {
+      const newKeys = new Set([...extractR2Keys(value)]);
+      cleanupStorageKeys(
+        oldKeys.filter((k) => !newKeys.has(k)),
+        "site-config",
+      );
+      revalidateForConfigKey(config_key);
+    }
 
-    revalidateForConfigKey(config_key);
     await logAudit(
       "site-config",
-      "updated",
+      publish ? "updated" : "draft-saved",
       session!.user?.email ?? "",
-      `Updated config: ${config_key}`,
+      publish
+        ? `Updated config: ${config_key}`
+        : `Saved draft for config: ${config_key}`,
     );
     return json(doc);
   } catch (e) {

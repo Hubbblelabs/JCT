@@ -155,8 +155,9 @@ export default function NewPagePage() {
         </p>
       )}
 
-      <div className="admin-card mb-4 space-y-4">
-        <div>
+      {/* Title, slug and scope are one row — they are three short values. */}
+      <div className="admin-card admin-form-grid mb-4">
+        <div className="admin-col-5">
           <label htmlFor="new-page-title" className="admin-label">
             Title
           </label>
@@ -168,48 +169,46 @@ export default function NewPagePage() {
             placeholder="e.g. NIRF Disclosure 2026"
           />
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label htmlFor="new-page-slug" className="admin-label">
-              Slug (URL)
-            </label>
-            <input
-              id="new-page-slug"
-              className="admin-input"
-              value={slug}
-              onChange={(e) => {
-                setSlug(e.target.value);
-                setSlugTouched(true);
-              }}
-              placeholder="nirf-disclosure-2026"
-            />
-            <p className="mt-1 text-xs text-gray-400">
-              Lowercase letters, numbers, and dashes only.
-            </p>
-          </div>
-          <div>
-            <label htmlFor="new-page-institution" className="admin-label">
-              Institution
-            </label>
-            <select
-              id="new-page-institution"
-              className="admin-select"
-              value={institution}
-              onChange={(e) => setInstitution(e.target.value as Institution)}
-            >
-              {INSTITUTIONS.map((i) => (
-                <option key={i.value} value={i.value}>
-                  {i.label}
-                </option>
-              ))}
-            </select>
-          </div>
+        <div className="admin-col-4">
+          <label htmlFor="new-page-slug" className="admin-label">
+            Slug (URL)
+          </label>
+          <input
+            id="new-page-slug"
+            className="admin-input"
+            value={slug}
+            onChange={(e) => {
+              setSlug(e.target.value);
+              setSlugTouched(true);
+            }}
+            placeholder="nirf-disclosure-2026"
+          />
+          <p className="admin-help">
+            Lowercase letters, numbers, and dashes only.
+          </p>
+        </div>
+        <div className="admin-col-3">
+          <label htmlFor="new-page-institution" className="admin-label">
+            Institution
+          </label>
+          <select
+            id="new-page-institution"
+            className="admin-select"
+            value={institution}
+            onChange={(e) => setInstitution(e.target.value as Institution)}
+          >
+            {INSTITUTIONS.map((i) => (
+              <option key={i.value} value={i.value}>
+                {i.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 
       <div className="mb-4">
         <p className="admin-label mb-3">Template</p>
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+        <div className="admin-form-grid admin-form-grid--tight">
           {TEMPLATES.map((t) => {
             const Icon = t.icon;
             const active = template === t.id;
@@ -218,7 +217,7 @@ export default function NewPagePage() {
                 key={t.id}
                 type="button"
                 onClick={() => setTemplate(t.id)}
-                className={`flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${
+                className={`admin-col-4 flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${
                   active
                     ? "border-amber-400 bg-amber-50/40 ring-2 ring-amber-200"
                     : "border-gray-200 bg-white hover:border-gray-300"

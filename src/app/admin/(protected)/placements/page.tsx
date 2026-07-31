@@ -3,6 +3,8 @@
 import { useEffect, useState, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import {
+  Field,
+  FormGrid,
   TextInput,
   TextArea,
   Select,
@@ -321,7 +323,7 @@ function PlacementsPageInner() {
 
       {editing && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 pt-10">
-          <div className="w-full max-w-4xl rounded-xl bg-white shadow-2xl">
+          <div className="w-full max-w-6xl rounded-xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
               <h2 className="font-semibold text-gray-900">
                 {editing._id ? "Edit Placement Record" : "New Placement Record"}
@@ -368,39 +370,39 @@ function PlacementsPageInner() {
                 )}
 
                 {section === "general" && (
-                  <div className="space-y-1">
-                    <div className="grid grid-cols-2 gap-4">
-                      <Select
-                        label="College"
-                        value={form.institution}
-                        options={INSTITUTIONS}
-                        onChange={(e) => set("institution", e.target.value)}
-                        disabled={!!filterInst}
-                      />
-                      <TextInput
-                        label="Academic Year"
-                        value={form.year}
-                        onChange={(e) => set("year", e.target.value)}
-                        placeholder="2024-2025"
-                        required
-                      />
-                      <NumberInput
-                        label="Sort order"
-                        value={form.sort_order}
-                        onChange={(e) =>
-                          set("sort_order", Number(e.target.value))
-                        }
-                        min={0}
-                      />
-                    </div>
+                  <FormGrid>
+                    <Select
+                      label="College"
+                      span={4}
+                      value={form.institution}
+                      options={INSTITUTIONS}
+                      onChange={(e) => set("institution", e.target.value)}
+                      disabled={!!filterInst}
+                    />
+                    <TextInput
+                      label="Academic Year"
+                      span={4}
+                      value={form.year}
+                      onChange={(e) => set("year", e.target.value)}
+                      placeholder="2024-2025"
+                      required
+                    />
+                    <NumberInput
+                      label="Sort order"
+                      span={4}
+                      value={form.sort_order}
+                      onChange={(e) => set("sort_order", Number(e.target.value))}
+                      min={0}
+                    />
                     <TextArea
                       label="Summary"
+                      span={8}
                       value={form.summary}
                       onChange={(e) => set("summary", e.target.value)}
                       rows={3}
                       hint="Short intro shown at the top of this year's section."
                     />
-                    <div className="flex flex-wrap gap-6 pt-1">
+                    <Field label="Visibility" span={4}>
                       <label className="flex items-center gap-2 text-sm text-gray-700">
                         <input
                           type="checkbox"
@@ -409,7 +411,7 @@ function PlacementsPageInner() {
                         />
                         Current year (highlighted at top)
                       </label>
-                      <label className="flex items-center gap-2 text-sm text-gray-700">
+                      <label className="mt-2 flex items-center gap-2 text-sm text-gray-700">
                         <input
                           type="checkbox"
                           checked={form.is_active}
@@ -417,37 +419,41 @@ function PlacementsPageInner() {
                         />
                         Active (shown on website)
                       </label>
-                    </div>
-                  </div>
+                    </Field>
+                  </FormGrid>
                 )}
 
                 {section === "packages" && (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <FormGrid>
                     <TextInput
                       label="Highest Package"
+                      span={4}
                       value={form.highest_package}
                       onChange={(e) => set("highest_package", e.target.value)}
                       placeholder="45 LPA"
                     />
                     <TextInput
                       label="Average Package"
+                      span={4}
                       value={form.average_package}
                       onChange={(e) => set("average_package", e.target.value)}
                       placeholder="8.5 LPA"
                     />
                     <TextInput
                       label="Median Package"
+                      span={4}
                       value={form.median_package}
                       onChange={(e) => set("median_package", e.target.value)}
                       placeholder="6 LPA"
                     />
-                  </div>
+                  </FormGrid>
                 )}
 
                 {section === "counts" && (
-                  <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  <FormGrid>
                     <NumberInput
                       label="Students Placed"
+                      span={3}
                       value={form.students_placed}
                       onChange={(e) =>
                         set("students_placed", Number(e.target.value))
@@ -456,6 +462,7 @@ function PlacementsPageInner() {
                     />
                     <NumberInput
                       label="Total Eligible"
+                      span={3}
                       value={form.total_students}
                       onChange={(e) =>
                         set("total_students", Number(e.target.value))
@@ -464,6 +471,7 @@ function PlacementsPageInner() {
                     />
                     <NumberInput
                       label="Placement %"
+                      span={2}
                       value={form.placement_percentage}
                       onChange={(e) =>
                         set("placement_percentage", Number(e.target.value))
@@ -472,6 +480,7 @@ function PlacementsPageInner() {
                     />
                     <NumberInput
                       label="Offers Made"
+                      span={2}
                       value={form.offers_made}
                       onChange={(e) =>
                         set("offers_made", Number(e.target.value))
@@ -480,13 +489,14 @@ function PlacementsPageInner() {
                     />
                     <NumberInput
                       label="Companies Visited"
+                      span={2}
                       value={form.companies_visited}
                       onChange={(e) =>
                         set("companies_visited", Number(e.target.value))
                       }
                       min={0}
                     />
-                  </div>
+                  </FormGrid>
                 )}
 
                 {section === "recruiters" && (
@@ -502,6 +512,7 @@ function PlacementsPageInner() {
                     </p>
                     <Repeater<TopRecruiter>
                       label="Top Recruiters"
+                      itemSpan={6}
                       items={form.top_recruiters}
                       onChange={(v) => set("top_recruiters", v)}
                       onItemRemove={(item) => {
@@ -509,9 +520,10 @@ function PlacementsPageInner() {
                       }}
                       newItem={() => ({ name: "", logo: "" })}
                       renderItem={(item, _i, onItemChange) => (
-                        <div className="grid grid-cols-1 gap-3 pr-8 sm:grid-cols-2">
+                        <FormGrid tight>
                           <TextInput
                             label="Company Name"
+                            span="full"
                             value={item.name}
                             onChange={(e) =>
                               onItemChange({ ...item, name: e.target.value })
@@ -519,6 +531,7 @@ function PlacementsPageInner() {
                           />
                           <ImageUploadInput
                             label="Logo"
+                            span="full"
                             ratio="square"
                             value={item.logo}
                             onChange={(url) =>
@@ -526,7 +539,7 @@ function PlacementsPageInner() {
                             }
                             hideUrlField
                           />
-                        </div>
+                        </FormGrid>
                       )}
                     />
                   </div>
@@ -535,6 +548,7 @@ function PlacementsPageInner() {
                 {section === "notable" && (
                   <Repeater<NotablePlacement>
                     label="Notable Placements"
+                    itemSpan={6}
                     items={form.notable_placements}
                     onChange={(v) => set("notable_placements", v)}
                     onItemRemove={(item) => {
@@ -548,9 +562,10 @@ function PlacementsPageInner() {
                       image: "",
                     })}
                     renderItem={(item, _i, onItemChange) => (
-                      <div className="grid grid-cols-1 gap-3 pr-8 sm:grid-cols-2">
+                      <FormGrid tight>
                         <TextInput
                           label="Student Name"
+                          span={7}
                           value={item.name}
                           onChange={(e) =>
                             onItemChange({ ...item, name: e.target.value })
@@ -558,6 +573,7 @@ function PlacementsPageInner() {
                         />
                         <TextInput
                           label="Program"
+                          span={5}
                           value={item.program}
                           onChange={(e) =>
                             onItemChange({ ...item, program: e.target.value })
@@ -566,6 +582,7 @@ function PlacementsPageInner() {
                         />
                         <TextInput
                           label="Company"
+                          span={7}
                           value={item.company}
                           onChange={(e) =>
                             onItemChange({ ...item, company: e.target.value })
@@ -573,24 +590,24 @@ function PlacementsPageInner() {
                         />
                         <TextInput
                           label="Package"
+                          span={5}
                           value={item.package}
                           onChange={(e) =>
                             onItemChange({ ...item, package: e.target.value })
                           }
                           placeholder="12 LPA"
                         />
-                        <div className="sm:col-span-2">
-                          <ImageUploadInput
-                            label="Photo"
-                            ratio="portrait"
-                            value={item.image}
-                            onChange={(url) =>
-                              onItemChange({ ...item, image: url })
-                            }
-                            hideUrlField
-                          />
-                        </div>
-                      </div>
+                        <ImageUploadInput
+                          label="Photo"
+                          span="full"
+                          ratio="portrait"
+                          value={item.image}
+                          onChange={(url) =>
+                            onItemChange({ ...item, image: url })
+                          }
+                          hideUrlField
+                        />
+                      </FormGrid>
                     )}
                   />
                 )}
@@ -612,32 +629,33 @@ function PlacementsPageInner() {
                       }}
                       newItem={() => ({ company: "", logo: "", students: [] })}
                       renderItem={(item, _i, onItemChange) => (
-                        <div className="space-y-3 pr-8">
-                          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                            <TextInput
-                              label="Company Name"
-                              value={item.company}
-                              onChange={(e) =>
-                                onItemChange({
-                                  ...item,
-                                  company: e.target.value,
-                                })
-                              }
-                              placeholder="Tata Consultancy Services"
-                            />
-                            <ImageUploadInput
-                              label="Company Logo"
-                              ratio="square"
-                              value={item.logo}
-                              onChange={(url) =>
-                                onItemChange({ ...item, logo: url })
-                              }
-                              hideUrlField
-                            />
-                          </div>
-                          <div className="rounded-lg border border-gray-100 bg-gray-50/60 p-3">
+                        <FormGrid tight>
+                          <TextInput
+                            label="Company Name"
+                            span={5}
+                            value={item.company}
+                            onChange={(e) =>
+                              onItemChange({
+                                ...item,
+                                company: e.target.value,
+                              })
+                            }
+                            placeholder="Tata Consultancy Services"
+                          />
+                          <ImageUploadInput
+                            label="Company Logo"
+                            span={7}
+                            ratio="square"
+                            value={item.logo}
+                            onChange={(url) =>
+                              onItemChange({ ...item, logo: url })
+                            }
+                            hideUrlField
+                          />
+                          <div className="admin-col-full rounded-lg border border-gray-100 bg-gray-50/60 p-3">
                             <Repeater<CompanyStudent>
                               label="Placed Students"
+                              itemSpan={4}
                               items={item.students}
                               onChange={(students) =>
                                 onItemChange({ ...item, students })
@@ -648,9 +666,10 @@ function PlacementsPageInner() {
                                 package: "",
                               })}
                               renderItem={(stu, _si, onStuChange) => (
-                                <div className="grid grid-cols-1 gap-3 pr-8 sm:grid-cols-3">
+                                <FormGrid tight>
                                   <TextInput
                                     label="Student Name"
+                                    span="full"
                                     value={stu.name}
                                     onChange={(e) =>
                                       onStuChange({
@@ -661,6 +680,7 @@ function PlacementsPageInner() {
                                   />
                                   <TextInput
                                     label="Program"
+                                    span={7}
                                     value={stu.program}
                                     onChange={(e) =>
                                       onStuChange({
@@ -672,6 +692,7 @@ function PlacementsPageInner() {
                                   />
                                   <TextInput
                                     label="Package"
+                                    span={5}
                                     value={stu.package}
                                     onChange={(e) =>
                                       onStuChange({
@@ -681,11 +702,11 @@ function PlacementsPageInner() {
                                     }
                                     placeholder="6 LPA"
                                   />
-                                </div>
+                                </FormGrid>
                               )}
                             />
                           </div>
-                        </div>
+                        </FormGrid>
                       )}
                     />
                   </div>

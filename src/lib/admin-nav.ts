@@ -310,18 +310,12 @@ function collegeGroups(college: College): AdminNavGroup[] {
 
 const MAIN_GROUPS: AdminNavGroup[] = [
   {
-    // Ordered as the home page renders: hero (with its cards and accreditation
-    // strip inside it), statistics, why-choose, placements, campus life,
-    // testimonials, admissions. News & Events has no home section of its own,
-    // so it sits at the end.
+    // Ordered as the home page renders: the pamphlet popup that greets the
+    // visitor, the header, then hero, accreditation strip, statistics,
+    // why-choose, institution cards, placements, campus life, testimonials and
+    // admissions.
     title: "Landing Page",
     items: [
-      {
-        label: "Navbar",
-        href: "/admin/main/page-content?section=navbar",
-        icon: PanelTop,
-        description: "Top-level site navigation links.",
-      },
       {
         label: "Pamphlet Popup",
         href: "/admin/main/page-content?section=pamphlet",
@@ -329,16 +323,16 @@ const MAIN_GROUPS: AdminNavGroup[] = [
         description: "Entry popup with the downloadable pamphlet.",
       },
       {
+        label: "Navbar",
+        href: "/admin/main/page-content?section=navbar",
+        icon: PanelTop,
+        description: "Top-level site navigation links.",
+      },
+      {
         label: "Hero",
         href: "/admin/main/page-content?section=hero",
         icon: FileEdit,
         description: "Home banner headline, media and buttons.",
-      },
-      {
-        label: "Card",
-        href: "/admin/main/page-content?section=card",
-        icon: LayoutGrid,
-        description: "Institution cards linking to each college.",
       },
       {
         label: "Accreditation Logos",
@@ -357,6 +351,12 @@ const MAIN_GROUPS: AdminNavGroup[] = [
         href: "/admin/main/page-content?section=whyChooseJct",
         icon: Sparkles,
         description: "Value-proposition block.",
+      },
+      {
+        label: "Card",
+        href: "/admin/main/page-content?section=card",
+        icon: LayoutGrid,
+        description: "Institution cards linking to each college.",
       },
       {
         label: "Placement Highlights",
@@ -382,12 +382,6 @@ const MAIN_GROUPS: AdminNavGroup[] = [
         icon: ClipboardList,
         description: "Home page admissions block.",
       },
-      {
-        label: "News & Events",
-        href: "/admin/events?scope=main",
-        icon: CalendarDays,
-        description: "Site-wide news and event entries.",
-      },
     ],
   },
   {
@@ -404,6 +398,14 @@ const MAIN_GROUPS: AdminNavGroup[] = [
         href: "/admin/accreditations?college=main",
         icon: Award,
         description: "Group-level accreditations page.",
+      },
+      {
+        // Has no section of its own on the home page, so it lives here rather
+        // than in the Landing Page group.
+        label: "News & Events",
+        href: "/admin/events?scope=main",
+        icon: CalendarDays,
+        description: "Site-wide news and event entries.",
       },
       {
         label: "Campus Life",

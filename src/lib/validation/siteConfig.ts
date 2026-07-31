@@ -158,6 +158,12 @@ export const SiteConfigPutSchema = z
       error: () => `Unknown config_key. Allowed: ${allKeys.join(", ")}`,
     }),
     value: z.unknown(),
+    /**
+     * Whether this write also becomes the live version. Omitted means "yes":
+     * every caller that predates the draft/publish split saves and publishes
+     * in one step, and must keep doing so.
+     */
+    publish: z.boolean().optional(),
   })
   .superRefine((payload, ctx) => {
     const schema = SITE_CONFIG_SCHEMAS[payload.config_key as SiteConfigKey];

@@ -2,7 +2,12 @@
 
 import { useMemo } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
-import { Field, Select, TextInput } from "@/components/admin/inputs";
+import {
+  Field,
+  FormGrid,
+  Select,
+  TextInput,
+} from "@/components/admin/inputs";
 import {
   defaultsAsOverrides,
   SIDEBAR_ICON_OPTIONS,
@@ -84,7 +89,8 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
         in-page section you fill with content blocks. Removing a built-in only
         hides it — toggle visibility instead.
       </p>
-      <div className="space-y-2">
+      {/* Two nav rows at a time: each is four short fields, not a page. */}
+      <div className="admin-form-grid admin-form-grid--tight">
         {seeded.map((item, i) => {
           const isBuiltin = !!item.key && builtinSet.has(item.key);
           const isSection = !isBuiltin && Array.isArray(item.blocks);
@@ -99,7 +105,7 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
           return (
             <div
               key={item.id ?? `${item.key ?? "c"}-${i}`}
-              className="rounded-lg border border-gray-200 bg-white p-3"
+              className="admin-col-6 rounded-lg border border-gray-200 bg-white p-3"
             >
               <div className="mb-2 flex items-center justify-between gap-2">
                 <span className="text-xs font-medium text-gray-500">
@@ -133,9 +139,10 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                   )}
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <FormGrid tight>
                 <TextInput
                   label="Label"
+                  span={6}
                   value={item.label ?? ""}
                   placeholder={placeholderLabel ?? "Item Label"}
                   onChange={(e) =>
@@ -147,7 +154,7 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                   }
                 />
                 {isBuiltin ? (
-                  <Field label="Anchor (read-only)">
+                  <Field label="Anchor (read-only)" span={6}>
                     <input
                       className="admin-input"
                       value={item.key ?? ""}
@@ -155,7 +162,7 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                     />
                   </Field>
                 ) : isSection ? (
-                  <Field label="Content">
+                  <Field label="Content" span={6}>
                     <p className="flex h-9 items-center text-xs text-gray-500">
                       Edit blocks by clicking the section in the live preview.
                     </p>
@@ -163,6 +170,7 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                 ) : (
                   <TextInput
                     label="URL / Href"
+                    span={6}
                     value={item.href ?? ""}
                     placeholder="/path or https://..."
                     onChange={(e) =>
@@ -174,10 +182,9 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                     }
                   />
                 )}
-              </div>
-              <div className="grid grid-cols-2 gap-3">
                 <Select
                   label="Icon (optional)"
+                  span={6}
                   value={item.icon ?? ""}
                   options={ICON_SELECT_OPTIONS}
                   onChange={(e) =>
@@ -188,7 +195,7 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                     )
                   }
                 />
-                <Field label="Visibility">
+                <Field label="Visibility" span={6}>
                   <label className="flex h-9 items-center gap-2 text-sm">
                     <input
                       type="checkbox"
@@ -204,7 +211,7 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                     Visible on public page
                   </label>
                 </Field>
-              </div>
+              </FormGrid>
             </div>
           );
         })}

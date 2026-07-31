@@ -3,6 +3,7 @@
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import {
   Field,
+  FormGrid,
   ImageUploadInput,
   Select,
   TextArea,
@@ -60,16 +61,16 @@ function SectionEditor({
   switch (section.type) {
     case "heading":
       return (
-        <div className="grid grid-cols-3 gap-3">
-          <div className="col-span-2">
-            <TextInput
-              label="Heading Text"
-              value={section.text}
-              onChange={(e) => onChange({ ...section, text: e.target.value })}
-            />
-          </div>
+        <FormGrid>
+          <TextInput
+            label="Heading Text"
+            span={8}
+            value={section.text}
+            onChange={(e) => onChange({ ...section, text: e.target.value })}
+          />
           <Select
             label="Level"
+            span={4}
             value={String(section.level ?? 2)}
             options={[
               { value: "2", label: "H2" },
@@ -83,14 +84,14 @@ function SectionEditor({
               })
             }
           />
-        </div>
+        </FormGrid>
       );
     case "text":
       return (
-        <div className="space-y-2">
+        <div className="admin-form-grid admin-form-grid--tight">
           {section.paragraphs.map((p, i) => (
             <div key={i} className="flex items-start gap-2">
-              <div className="flex-1">
+              <div className="min-w-0 flex-1">
                 <TextArea
                   label={`Paragraph ${i + 1}`}
                   rows={4}
@@ -114,6 +115,7 @@ function SectionEditor({
                   })
                 }
                 className="admin-btn admin-btn-danger admin-btn-sm mt-7"
+                aria-label={`Remove paragraph ${i + 1}`}
               >
                 <Trash2 size={12} />
               </button>
@@ -127,7 +129,7 @@ function SectionEditor({
                 paragraphs: [...section.paragraphs, ""],
               })
             }
-            className="admin-btn admin-btn-outline admin-btn-sm"
+            className="admin-btn admin-btn-outline admin-btn-sm admin-col-full"
           >
             <Plus size={12} /> Add Paragraph
           </button>
@@ -135,30 +137,33 @@ function SectionEditor({
       );
     case "image":
       return (
-        <>
-          <ImageUploadInput
-            label="Image"
-            ratio="card"
-            value={section.src ?? ""}
-            onChange={(src) => onChange({ ...section, src })}
-            hideUrlField
-          />
+        <FormGrid>
           <TextInput
             label="Alt Text"
+            span={6}
             value={section.alt ?? ""}
             onChange={(e) => onChange({ ...section, alt: e.target.value })}
           />
           <TextInput
             label="Caption (optional)"
+            span={6}
             value={section.caption ?? ""}
             onChange={(e) => onChange({ ...section, caption: e.target.value })}
           />
-        </>
+          <ImageUploadInput
+            label="Image"
+            span="full"
+            ratio="card"
+            value={section.src ?? ""}
+            onChange={(src) => onChange({ ...section, src })}
+            hideUrlField
+          />
+        </FormGrid>
       );
     case "list":
       return (
         <>
-          <label className="flex items-center gap-2 text-sm">
+          <label className="mb-2 flex items-center gap-2 text-sm">
             <input
               type="checkbox"
               checked={section.ordered === true}
@@ -168,12 +173,13 @@ function SectionEditor({
             />
             Numbered list (otherwise bullet)
           </label>
-          <div className="space-y-2">
+          <div className="admin-form-grid admin-form-grid--tight">
             {section.items.map((it, i) => (
-              <div key={i} className="flex items-center gap-2">
+              <div key={i} className="admin-col-4 flex items-center gap-2">
                 <input
                   className="admin-input"
                   value={it}
+                  aria-label={`Item ${i + 1}`}
                   onChange={(e) =>
                     onChange({
                       ...section,
@@ -191,7 +197,8 @@ function SectionEditor({
                       items: section.items.filter((_, j) => j !== i),
                     })
                   }
-                  className="admin-btn admin-btn-danger admin-btn-sm"
+                  className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+                  aria-label={`Remove item ${i + 1}`}
                 >
                   <Trash2 size={12} />
                 </button>
@@ -202,7 +209,7 @@ function SectionEditor({
               onClick={() =>
                 onChange({ ...section, items: [...section.items, ""] })
               }
-              className="admin-btn admin-btn-outline admin-btn-sm"
+              className="admin-btn admin-btn-outline admin-btn-sm admin-col-full"
             >
               <Plus size={12} /> Add Item
             </button>
@@ -227,11 +234,11 @@ function SectionEditor({
               })
             }
           />
-          <div className="space-y-3">
+          <div className="admin-form-grid admin-form-grid--tight">
             {section.items.map((card, i) => (
               <div
                 key={i}
-                className="rounded-lg border border-gray-200 bg-white p-3"
+                className="admin-col-4 rounded-lg border border-gray-200 bg-white p-3"
               >
                 <div className="mb-2 flex items-center justify-between">
                   <span className="text-xs font-medium text-gray-500">
@@ -250,23 +257,10 @@ function SectionEditor({
                     <Trash2 size={12} />
                   </button>
                 </div>
-                <ImageUploadInput
-                  label="Image (optional)"
-                  ratio="card"
-                  value={card.image ?? ""}
-                  onChange={(image) =>
-                    onChange({
-                      ...section,
-                      items: section.items.map((c, j) =>
-                        j === i ? { ...c, image } : c,
-                      ),
-                    })
-                  }
-                  hideUrlField
-                />
-                <div className="grid grid-cols-2 gap-3">
+                <FormGrid tight>
                   <TextInput
                     label="Title"
+                    span="full"
                     value={card.title}
                     onChange={(e) =>
                       onChange({
@@ -279,6 +273,7 @@ function SectionEditor({
                   />
                   <TextInput
                     label="Link URL (optional)"
+                    span="full"
                     value={card.href ?? ""}
                     onChange={(e) =>
                       onChange({
@@ -289,20 +284,36 @@ function SectionEditor({
                       })
                     }
                   />
-                </div>
-                <TextArea
-                  label="Description"
-                  rows={3}
-                  value={card.desc}
-                  onChange={(e) =>
-                    onChange({
-                      ...section,
-                      items: section.items.map((c, j) =>
-                        j === i ? { ...c, desc: e.target.value } : c,
-                      ),
-                    })
-                  }
-                />
+                  <TextArea
+                    label="Description"
+                    span="full"
+                    rows={3}
+                    value={card.desc}
+                    onChange={(e) =>
+                      onChange({
+                        ...section,
+                        items: section.items.map((c, j) =>
+                          j === i ? { ...c, desc: e.target.value } : c,
+                        ),
+                      })
+                    }
+                  />
+                  <ImageUploadInput
+                    label="Image (optional)"
+                    span="full"
+                    ratio="card"
+                    value={card.image ?? ""}
+                    onChange={(image) =>
+                      onChange({
+                        ...section,
+                        items: section.items.map((c, j) =>
+                          j === i ? { ...c, image } : c,
+                        ),
+                      })
+                    }
+                    hideUrlField
+                  />
+                </FormGrid>
               </div>
             ))}
             <button
@@ -316,7 +327,7 @@ function SectionEditor({
                   ],
                 })
               }
-              className="admin-btn admin-btn-outline admin-btn-sm"
+              className="admin-btn admin-btn-outline admin-btn-sm admin-col-full"
             >
               <Plus size={12} /> Add Card
             </button>
@@ -325,22 +336,23 @@ function SectionEditor({
       );
     case "cta":
       return (
-        <>
-          <div className="grid grid-cols-2 gap-3">
-            <TextInput
-              label="Button Label"
-              value={section.label}
-              onChange={(e) => onChange({ ...section, label: e.target.value })}
-            />
-            <TextInput
-              label="URL"
-              value={section.href ?? ""}
-              onChange={(e) => onChange({ ...section, href: e.target.value })}
-              placeholder="/path or https://..."
-            />
-          </div>
+        <FormGrid>
+          <TextInput
+            label="Button Label"
+            span={4}
+            value={section.label}
+            onChange={(e) => onChange({ ...section, label: e.target.value })}
+          />
+          <TextInput
+            label="URL"
+            span={5}
+            value={section.href ?? ""}
+            onChange={(e) => onChange({ ...section, href: e.target.value })}
+            placeholder="/path or https://..."
+          />
           <Select
             label="Style"
+            span={3}
             value={section.variant ?? "primary"}
             options={[
               { value: "primary", label: "Primary (gold)" },
@@ -353,7 +365,7 @@ function SectionEditor({
               })
             }
           />
-        </>
+        </FormGrid>
       );
   }
 }

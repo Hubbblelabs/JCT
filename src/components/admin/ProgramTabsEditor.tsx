@@ -149,12 +149,13 @@ function ListSectionEditor({
         onChange={(e) => onChange({ ...section, title: e.target.value })}
       />
       <Field label="Items">
-        <div className="space-y-2">
+        <div className="admin-form-grid admin-form-grid--tight">
           {section.items.map((item, i) => (
-            <div key={i} className="flex gap-2">
+            <div key={i} className="admin-col-4 flex gap-2">
               <input
                 className="admin-input"
                 value={item}
+                aria-label={`Item ${i + 1}`}
                 onChange={(e) =>
                   onChange({
                     ...section,
@@ -173,6 +174,7 @@ function ListSectionEditor({
                   })
                 }
                 className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+                aria-label={`Remove item ${i + 1}`}
               >
                 <Trash2 size={13} />
               </button>
@@ -183,7 +185,7 @@ function ListSectionEditor({
             onClick={() =>
               onChange({ ...section, items: [...section.items, ""] })
             }
-            className="admin-btn admin-btn-outline admin-btn-sm"
+            className="admin-btn admin-btn-outline admin-btn-sm admin-col-full"
           >
             <Plus size={14} /> Add Item
           </button>
@@ -208,9 +210,12 @@ function CardsSectionEditor({
         onChange={(e) => onChange({ ...section, title: e.target.value })}
       />
       <Field label="Cards">
-        <div className="space-y-2">
+        <div className="admin-form-grid admin-form-grid--tight">
           {section.items.map((item, i) => (
-            <div key={i} className="rounded-md border border-slate-100 p-3">
+            <div
+              key={i}
+              className="admin-col-4 rounded-md border border-slate-100 p-3"
+            >
               <TextInput
                 label="Title"
                 value={item.title}
@@ -275,7 +280,7 @@ function CardsSectionEditor({
                 ],
               })
             }
-            className="admin-btn admin-btn-outline admin-btn-sm"
+            className="admin-btn admin-btn-outline admin-btn-sm admin-col-full"
           >
             <Plus size={14} /> Add Card
           </button>
@@ -294,10 +299,13 @@ function PeopleSectionEditor({
 }) {
   return (
     <Field label="People">
-      <div className="space-y-2">
+      <div className="admin-form-grid admin-form-grid--tight">
         {section.items.map((p, i) => (
-          <div key={i} className="rounded-md border border-slate-100 p-3">
-            <div className="grid grid-cols-2 gap-3">
+          <div
+            key={i}
+            className="admin-col-6 rounded-md border border-slate-100 p-3"
+          >
+            <div className="admin-form-grid admin-form-grid--tight">
               <TextInput
                 label="Name"
                 value={p.name}
@@ -392,7 +400,7 @@ function PeopleSectionEditor({
               ],
             })
           }
-          className="admin-btn admin-btn-outline admin-btn-sm"
+          className="admin-btn admin-btn-outline admin-btn-sm admin-col-full"
         >
           <Plus size={14} /> Add Person
         </button>

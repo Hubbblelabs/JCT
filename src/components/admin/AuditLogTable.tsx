@@ -1,12 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ClipboardList, Loader2, Trash2 } from "lucide-react";
+import { AlertTriangle, Loader2, Trash2 } from "lucide-react";
 import { DataTable, type Column } from "@/components/admin/kit/DataTable";
 import { StatusBadge } from "@/components/admin/kit/primitives";
 import { useToast } from "@/components/ui/Toast";
-import { useConfirm } from "@/components/ui/ConfirmDialog";
 
 export type AuditRow = {
   id: string;
@@ -49,48 +48,64 @@ const ACTION_TONE: Record<string, "active" | "info" | "draft" | "neutral"> = {
 /**
  * Filterable view of the audit trail.
  *
- * The log recorded everything but could only be read as a flat list of the 200
- * newest rows, which made it useless for the question people actually bring to
- * an audit log: "who changed this, and when?". Actor, entity, action and date
- * are all filterable now, and the row cap is stated rather than silent.
+ * Only the newest page arrives with the document; walking past the end of what
+ * is loaded fetches the next chunk from `/api/admin/audit`. Reading the whole
+ * trail up-front was the slowest query in the panel and almost none of it was
+ * ever looked at.
+ *
+ * Actor, entity, action and date filters apply to the rows that are loaded —
+ * which is why the footer says how many that is.
  */
 export function AuditLogTable({
-  rows,
-  cap,
+  initialRows,
+  initialHasMore,
 }: {
-  rows: AuditRow[];
-  cap: number;
+  initialRows: AuditRow[];
+  initialHasMore: boolean;
 }) {
   const router = useRouter();
   const toast = useToast();
-  const confirm = useConfirm();
+
+  const [rows, setRows] = useState<AuditRow[]>(initialRows);
+  const [hasMore, setHasMore] = useState(initialHasMore);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const [actor, setActor] = useState("");
   const [entity, setEntity] = useState("");
   const [action, setAction] = useState("");
   const [range, setRange] = useState("");
 
+  const [purgeOpen, setPurgeOpen] = useState(false);
   const [purgeWindow, setPurgeWindow] = useState(String(PURGE_WINDOWS[0].value));
   const [purging, setPurging] = useState(false);
 
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    const oldest = rows[rows.length - 1];
+    setLoadingMore(true);
+    try {
+      const qs = oldest ? `?before=${encodeURIComponent(oldest.createdAt)}` : "";
+      const res = await fetch(`/api/admin/audit${qs}`);
+      if (!res.ok) throw new Error();
+      const data = (await res.json()) as {
+        rows: AuditRow[];
+        hasMore: boolean;
+      };
+      // Guard against a row arriving twice if a purge shifted the window.
+      setRows((prev) => {
+        const seen = new Set(prev.map((r) => r.id));
+        return [...prev, ...data.rows.filter((r) => !seen.has(r.id))];
+      });
+      setHasMore(Boolean(data.hasMore));
+    } catch {
+      toast.error("Could not load older entries.");
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [rows, hasMore, loadingMore, toast]);
+
   const purge = async () => {
     const days = Number(purgeWindow);
-    const chosen = PURGE_WINDOWS.find((w) => w.value === days);
-    const affected = rows.filter(
-      (r) => +new Date(r.createdAt) < Date.now() - days * 24 * 60 * 60 * 1000,
-    ).length;
-
-    const ok = await confirm({
-      title: "Delete old audit entries",
-      // The count is qualified rather than stated flatly: this list is capped
-      // at the newest `cap` rows, so older entries the operator cannot see here
-      // are still inside the cutoff and will go too.
-      message: `Every entry created more than ${days} days ago will be deleted permanently — at least ${affected} of the ${rows.length} shown, plus any older ones beyond this view. This cannot be undone.`,
-      confirmLabel: `Delete ${chosen?.label.toLowerCase() ?? `older than ${days} days`}`,
-      destructive: true,
-    });
-    if (!ok) return;
-
     setPurging(true);
     try {
       const res = await fetch("/api/admin/audit", {
@@ -109,6 +124,7 @@ export function AuditLogTable({
       }
       const n = (data.deleted as number) ?? 0;
       toast.success(`Deleted ${n} ${n === 1 ? "entry" : "entries"}.`);
+      setPurgeOpen(false);
       // The page is a server component; re-fetch rather than patch local state.
       router.refresh();
     } catch {
@@ -222,69 +238,157 @@ export function AuditLogTable({
   );
 
   return (
-    <DataTable
-      rows={filtered}
-      columns={columns}
-      rowKey={(r) => r.id}
-      searchPlaceholder="Search summaries…"
-      initialSort={{ key: "createdAt", dir: "desc" }}
-      pageSize={PAGE_SIZE}
-      filters={
-        <>
-          {select("Filter by person", actor, setActor, [
-            { value: "", label: "Anyone" },
-            ...actors.map((a) => ({ value: a, label: a })),
-          ])}
-          {select("Filter by content type", entity, setEntity, [
-            { value: "", label: "Any type" },
-            ...entities.map((e) => ({ value: e, label: e })),
-          ])}
-          {select("Filter by action", action, setAction, [
-            { value: "", label: "Any action" },
-            ...actions.map((a) => ({ value: a, label: a })),
-          ])}
-          {select("Filter by date", range, setRange, RANGES)}
-        </>
-      }
-      empty={{
-        title: "No matching activity",
-        body: "Every content change made in this panel is recorded here for a year. Widen the filters to see more.",
-      }}
-      toolbar={
-        <>
-          {rows.length >= cap && (
-            <span className="admin-help">
-              <ClipboardList size={12} className="mr-1 inline" />
-              Showing the {cap} most recent entries
-            </span>
-          )}
-          <select
-            value={purgeWindow}
-            onChange={(e) => setPurgeWindow(e.target.value)}
-            aria-label="Retention window to delete"
-            className="admin-select admin-select--auto"
-          >
-            {PURGE_WINDOWS.map((w) => (
-              <option key={w.value} value={w.value}>
-                {w.label}
-              </option>
-            ))}
-          </select>
+    <>
+      <DataTable
+        rows={filtered}
+        columns={columns}
+        rowKey={(r) => r.id}
+        searchPlaceholder="Search summaries…"
+        initialSort={{ key: "createdAt", dir: "desc" }}
+        pageSize={PAGE_SIZE}
+        hasMore={hasMore}
+        loadingMore={loadingMore}
+        onLoadMore={() => void loadMore()}
+        filters={
+          <>
+            {select("Filter by person", actor, setActor, [
+              { value: "", label: "Anyone" },
+              ...actors.map((a) => ({ value: a, label: a })),
+            ])}
+            {select("Filter by content type", entity, setEntity, [
+              { value: "", label: "Any type" },
+              ...entities.map((e) => ({ value: e, label: e })),
+            ])}
+            {select("Filter by action", action, setAction, [
+              { value: "", label: "Any action" },
+              ...actions.map((a) => ({ value: a, label: a })),
+            ])}
+            {select("Filter by date", range, setRange, RANGES)}
+          </>
+        }
+        empty={{
+          title: "No matching activity",
+          body: "Every content change made in this panel is recorded here for a year. Widen the filters to see more.",
+        }}
+        toolbar={
           <button
             type="button"
-            onClick={() => void purge()}
-            disabled={purging}
+            onClick={() => setPurgeOpen(true)}
             className="admin-btn admin-btn-danger admin-btn-sm"
           >
-            {purging ? (
-              <Loader2 size={13} className="animate-spin" />
-            ) : (
-              <Trash2 size={13} />
-            )}
-            {purging ? "Deleting…" : "Delete"}
+            <Trash2 size={13} />
+            Delete old entries
           </button>
-        </>
-      }
-    />
+        }
+      />
+
+      {purgeOpen && (
+        <PurgeDialog
+          window={purgeWindow}
+          onWindowChange={setPurgeWindow}
+          purging={purging}
+          onCancel={() => setPurgeOpen(false)}
+          onConfirm={() => void purge()}
+        />
+      )}
+    </>
+  );
+}
+
+/**
+ * The retention window is chosen inside the confirmation, not in the toolbar:
+ * a dropdown sitting next to a Delete button reads as a filter, and picking
+ * the cutoff at the moment of confirming is what makes the choice deliberate.
+ */
+function PurgeDialog({
+  window: value,
+  onWindowChange,
+  purging,
+  onCancel,
+  onConfirm,
+}: {
+  window: string;
+  onWindowChange: (v: string) => void;
+  purging: boolean;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  const days = Number(value);
+  return (
+    <div
+      className="fixed inset-0 z-[300] flex items-center justify-center bg-black/50 p-4"
+      onClick={purging ? undefined : onCancel}
+    >
+      <div
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="audit-purge-title"
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+      >
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
+            <AlertTriangle size={20} className="text-red-600" />
+          </div>
+          <div className="flex-1">
+            <h2
+              id="audit-purge-title"
+              className="text-base font-bold text-gray-900"
+            >
+              Delete old audit entries
+            </h2>
+            <p className="mt-1 text-sm text-gray-600">
+              Choose how far back to keep. Everything older is deleted
+              permanently, including entries not loaded into this view. This
+              cannot be undone.
+            </p>
+          </div>
+        </div>
+
+        <label
+          htmlFor="audit-purge-window"
+          className="admin-label mt-5 mb-1 block"
+        >
+          Delete entries
+        </label>
+        <select
+          id="audit-purge-window"
+          value={value}
+          onChange={(e) => onWindowChange(e.target.value)}
+          disabled={purging}
+          className="admin-select w-full"
+        >
+          {PURGE_WINDOWS.map((w) => (
+            <option key={w.value} value={w.value}>
+              {w.label}
+            </option>
+          ))}
+        </select>
+
+        <div className="mt-6 flex justify-end gap-2">
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={purging}
+            className="admin-btn admin-btn-outline"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            disabled={purging}
+            className="admin-btn admin-btn-danger"
+          >
+            {purging ? (
+              <Loader2 size={14} className="animate-spin" />
+            ) : (
+              <Trash2 size={14} />
+            )}
+            {purging ? "Deleting…" : `Delete older than ${days} days`}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

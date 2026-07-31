@@ -149,7 +149,11 @@
   --admin-sidebar-w-collapsed: 60px;
   --admin-topbar-h: 52px;
   --admin-savebar-h: 60px;
-  --admin-content-max: 1400px;
+  /* Sized so a 1920px display is filled edge to edge once the sidebar and the
+     content padding are subtracted, instead of leaving a dead column on the
+     right. Forms lay out on a grid (see `.admin-form-grid`), so the extra width
+     buys more fields per row rather than longer line lengths. */
+  --admin-content-max: 1680px;
 
   /* ── Z-index scale ──────────────────────────────────────────────────────
      Named so nothing has to guess whether 50 beats 40. */
@@ -1139,6 +1143,113 @@
   min-width: 0;
 }
 
+/* ── Form grid ────────────────────────────────────────────────────────────
+   Every admin form used to be a single column of `width: 100%` controls, so a
+   four-character "Counselling Code" box stretched the full content column and
+   the next twelve fields queued below it off-screen. Fields now sit on a
+   12-column grid and declare how much of a row they need.
+
+   The breakpoints are *container* queries, not viewport ones: the same form
+   renders both in the full-width content column and inside a 440px inspector
+   drawer, and only the container knows which. `container-type: inline-size` on
+   the grid makes it the query container for its own children — an element
+   cannot query itself, but its descendants can query it. */
+.admin-form-grid {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--admin-space-4);
+  align-items: start;
+}
+
+/* Denser variant for the repeater rows inside a card, where the surrounding
+   border already does the visual grouping the wider gap would provide. */
+.admin-form-grid--tight {
+  gap: var(--admin-space-3);
+}
+
+/* Half a row is the default: two short fields side by side. `margin-bottom` is
+   zeroed because `Field` carries `mb-4` for the stacked (non-grid) callers —
+   inside a grid the `gap` owns the spacing. */
+.admin-form-grid > * {
+  grid-column: span 6;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.admin-form-grid > .admin-col-2 {
+  grid-column: span 2;
+}
+.admin-form-grid > .admin-col-3 {
+  grid-column: span 3;
+}
+.admin-form-grid > .admin-col-4 {
+  grid-column: span 4;
+}
+.admin-form-grid > .admin-col-5 {
+  grid-column: span 5;
+}
+.admin-form-grid > .admin-col-6 {
+  grid-column: span 6;
+}
+.admin-form-grid > .admin-col-7 {
+  grid-column: span 7;
+}
+.admin-form-grid > .admin-col-8 {
+  grid-column: span 8;
+}
+.admin-form-grid > .admin-col-9 {
+  grid-column: span 9;
+}
+.admin-form-grid > .admin-col-10 {
+  grid-column: span 10;
+}
+.admin-form-grid > .admin-col-full {
+  grid-column: 1 / -1;
+}
+
+/* A field that should start its own row even though it is not full width —
+   used to keep a logical group from being tailgated by the next field. */
+.admin-form-grid > .admin-col-break {
+  grid-column-start: 1;
+}
+
+/* Medium container: thirds and quarters become halves, wide fields go full. */
+@container (max-width: 960px) {
+  .admin-form-grid > .admin-col-2,
+  .admin-form-grid > .admin-col-3,
+  .admin-form-grid > .admin-col-4,
+  .admin-form-grid > .admin-col-5 {
+    grid-column: span 6;
+  }
+
+  .admin-form-grid > .admin-col-7,
+  .admin-form-grid > .admin-col-8,
+  .admin-form-grid > .admin-col-9,
+  .admin-form-grid > .admin-col-10 {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Narrow container (a dragged-in inspector drawer, phones): one field per row,
+   which is what the whole panel used to do everywhere. The span classes are
+   listed out because the medium block above sets them at the same specificity
+   as this rule would otherwise have — `> *` alone loses to `> .admin-col-3`. */
+@container (max-width: 620px) {
+  .admin-form-grid > *,
+  .admin-form-grid > .admin-col-2,
+  .admin-form-grid > .admin-col-3,
+  .admin-form-grid > .admin-col-4,
+  .admin-form-grid > .admin-col-5,
+  .admin-form-grid > .admin-col-6,
+  .admin-form-grid > .admin-col-7,
+  .admin-form-grid > .admin-col-8,
+  .admin-form-grid > .admin-col-9,
+  .admin-form-grid > .admin-col-10 {
+    grid-column: 1 / -1;
+  }
+}
+
 .admin-label {
   display: block;
   margin-bottom: var(--admin-space-1);
@@ -1387,7 +1498,9 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  max-width: 440px;
+  /* Overridden inline by Drawer's remembered width; this is only the value
+     used before that state resolves. Keep it in step with DEFAULT_WIDTH. */
+  max-width: 760px;
   height: 100%;
   background: var(--admin-raised);
   border-left: 1px solid var(--admin-border);

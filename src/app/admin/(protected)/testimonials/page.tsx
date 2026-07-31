@@ -3,6 +3,8 @@
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import {
+  Field,
+  FormGrid,
   TextInput,
   TextArea,
   Select,
@@ -396,15 +398,19 @@ function TestimonialsPageInner() {
           />
         )}
 
-        <div className="grid grid-cols-2 gap-x-4">
+        {/* Who they are, then where the quote runs, then the quote itself —
+            the order the card presents them in. */}
+        <FormGrid>
           <TextInput
             label="Name"
+            span={4}
             value={form.name}
             onChange={(e) => set("name", e.target.value)}
             required
           />
           <TextInput
             label="Batch (year)"
+            span={2}
             value={form.batch}
             onChange={(e) => set("batch", e.target.value)}
             placeholder="2024"
@@ -412,59 +418,65 @@ function TestimonialsPageInner() {
           />
           <TextInput
             label="Course"
+            span={3}
             value={form.course}
             onChange={(e) => set("course", e.target.value)}
             placeholder="B.E. CSE"
           />
           <TextInput
             label="Company"
+            span={3}
             value={form.company}
             onChange={(e) => set("company", e.target.value)}
             placeholder="Infosys"
           />
           <Select
             label="Category"
+            span={4}
             value={form.category}
             options={CATEGORIES}
             onChange={(e) => set("category", e.target.value)}
           />
           <Select
             label="Shown on"
+            span={4}
             value={form.institution}
             options={INSTITUTIONS}
             onChange={(e) => set("institution", e.target.value)}
             hint="Pick a college to limit where this quote appears."
           />
-        </div>
+          <Field label="Visibility" span={4}>
+            <label className="flex items-center gap-2 pt-2">
+              <input
+                type="checkbox"
+                checked={form.is_active}
+                onChange={(e) => set("is_active", e.target.checked)}
+              />
+              <span className="text-[length:var(--admin-text-body)] text-[var(--admin-text-secondary)]">
+                Show on the public site
+              </span>
+            </label>
+          </Field>
 
-        <ImageUploadInput
-          label="Photo"
-          ratio="square"
-          value={form.avatar}
-          onChange={(url) => set("avatar", url)}
-          hideUrlField
-          hint="Optional. A square headshot works best."
-        />
-
-        <TextArea
-          label="Quote"
-          value={form.quote}
-          onChange={(e) => set("quote", e.target.value)}
-          required
-          rows={5}
-          hint="Written in the person's own voice. Quotation marks are added automatically."
-        />
-
-        <label className="mt-2 flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={form.is_active}
-            onChange={(e) => set("is_active", e.target.checked)}
+          <TextArea
+            label="Quote"
+            span={7}
+            value={form.quote}
+            onChange={(e) => set("quote", e.target.value)}
+            required
+            rows={5}
+            hint="Written in the person's own voice. Quotation marks are added automatically."
           />
-          <span className="text-[length:var(--admin-text-body)] text-[var(--admin-text-secondary)]">
-            Show this testimonial on the public site
-          </span>
-        </label>
+          <ImageUploadInput
+            label="Photo"
+            span={5}
+            ratio="square"
+            value={form.avatar}
+            onChange={(url) => set("avatar", url)}
+            hideUrlField
+            hint="Optional. A square headshot works best."
+          />
+        </FormGrid>
       </Drawer>
     </PageShell>
   );

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Playfair_Display, Inter } from "next/font/google";
 import "@/styles/globals.css";
 import { GlobalElements } from "@/components/layout/GlobalElements";
@@ -7,6 +8,9 @@ import { MerittoScript } from "@/components/layout/MerittoScript";
 import { InstitutionProvider } from "@/contexts/InstitutionContext";
 
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://jct.ac.in";
+
+/** Google Analytics 4 measurement id. */
+const GA_MEASUREMENT_ID = "G-ME2FVQ6817";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -101,6 +105,19 @@ export default function RootLayout({
 
         {/* Meritto Chatbot - conditionally loaded on public pages only */}
         <MerittoScript />
+
+        {/* Google Analytics (gtag.js) — googletagmanager.com must stay
+            allowlisted in the CSP script-src in next.config.ts. */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga-gtag" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_MEASUREMENT_ID}');`}
+        </Script>
       </body>
     </html>
   );

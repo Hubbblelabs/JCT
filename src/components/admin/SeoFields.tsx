@@ -1,6 +1,11 @@
 "use client";
 
-import { TextArea, TextInput } from "@/components/admin/inputs";
+import {
+  FormGrid,
+  TextArea,
+  TextInput,
+  type FieldSpan,
+} from "@/components/admin/inputs";
 import { SEO_LIMITS, SEO_RECOMMENDED } from "@/lib/validation";
 
 const SITE_ORIGIN = "jct.ac.in";
@@ -46,7 +51,7 @@ function SerpPreview({
     description.trim() ||
     "No description set — search engines will pick their own snippet.";
   return (
-    <div className="mb-4 rounded-lg border border-gray-100 bg-gray-50 p-3">
+    <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
       <p className="mb-1 text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase">
         Search preview
       </p>
@@ -73,6 +78,7 @@ export function SeoFields({
   titleLabel = "Meta Title",
   descriptionLabel = "Meta Description",
   showPreview = true,
+  span = "full",
 }: {
   title: string;
   description: string;
@@ -82,37 +88,44 @@ export function SeoFields({
   titleLabel?: string;
   descriptionLabel?: string;
   showPreview?: boolean;
+  span?: FieldSpan;
 }) {
+  // Preview beside the fields, not above them: the two are read together, and
+  // stacked they pushed the description box below the fold in a drawer.
   return (
-    <div>
+    <FormGrid span={span}>
       {showPreview && (
-        <SerpPreview title={title} description={description} path={path} />
+        <div className="admin-col-5">
+          <SerpPreview title={title} description={description} path={path} />
+        </div>
       )}
-      <TextInput
-        label={titleLabel}
-        value={title}
-        maxLength={SEO_LIMITS.titleMax}
-        onChange={(e) => onChange({ title: e.target.value })}
-        placeholder="e.g. Engineering college in coimbatore | JCT College"
-      />
-      <Counter
-        count={title.length}
-        recommended={SEO_RECOMMENDED.titleMax}
-        max={SEO_LIMITS.titleMax}
-      />
-      <TextArea
-        label={descriptionLabel}
-        value={description}
-        rows={3}
-        maxLength={SEO_LIMITS.descriptionMax}
-        onChange={(e) => onChange({ description: e.target.value })}
-        placeholder="One or two sentences describing this page for search results."
-      />
-      <Counter
-        count={description.length}
-        recommended={SEO_RECOMMENDED.descriptionMax}
-        max={SEO_LIMITS.descriptionMax}
-      />
-    </div>
+      <div className={showPreview ? "admin-col-7" : "admin-col-full"}>
+        <TextInput
+          label={titleLabel}
+          value={title}
+          maxLength={SEO_LIMITS.titleMax}
+          onChange={(e) => onChange({ title: e.target.value })}
+          placeholder="e.g. Engineering college in coimbatore | JCT College"
+        />
+        <Counter
+          count={title.length}
+          recommended={SEO_RECOMMENDED.titleMax}
+          max={SEO_LIMITS.titleMax}
+        />
+        <TextArea
+          label={descriptionLabel}
+          value={description}
+          rows={3}
+          maxLength={SEO_LIMITS.descriptionMax}
+          onChange={(e) => onChange({ description: e.target.value })}
+          placeholder="One or two sentences describing this page for search results."
+        />
+        <Counter
+          count={description.length}
+          recommended={SEO_RECOMMENDED.descriptionMax}
+          max={SEO_LIMITS.descriptionMax}
+        />
+      </div>
+    </FormGrid>
   );
 }

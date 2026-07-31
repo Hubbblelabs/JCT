@@ -2,8 +2,8 @@
 
 import { useEffect, useState, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
-import Link from "next/link";
 import {
+  FormGrid,
   TextInput,
   TextArea,
   Select,
@@ -19,7 +19,6 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  ExternalLink,
 } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
@@ -106,13 +105,14 @@ function EventsPageInner() {
   const [form, setForm] = useState<Omit<EventItem, "_id">>(EMPTY);
   const [slugTouched, setSlugTouched] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [filterInst] = useState(() => searchParams.get("college") ?? "");
+  // Read straight off the URL, not frozen into state: the sidebar links every
+  // scope at this same path (`?scope=main` vs `?college=X`), so a mounted-once
+  // snapshot left the page showing the previous college's list after a click.
+  const filterInst = searchParams.get("college") ?? "";
   const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
   // Main view (?scope=main, no college) is a read-only aggregate of every
   // college's events. Authoring only happens inside a college scope.
   const isMain = !filterInst;
-  const editParam = searchParams.get("edit");
-  const [editHandled, setEditHandled] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -127,18 +127,6 @@ function EventsPageInner() {
   useEffect(() => {
     load();
   }, [filterInst, load]);
-
-  // Click-through from the main aggregate lands here as ?college=X&edit=<id>;
-  // auto-open that event's editor once its record has loaded.
-  useEffect(() => {
-    if (editHandled || isMain || !editParam || loading) return;
-    const target = events.find((e) => e._id === editParam);
-    if (target) {
-      openEdit(target);
-      setEditHandled(true);
-    }
-    // openEdit is a stable local closure; deps intentionally omit it.
-  }, [editParam, events, loading, editHandled, isMain]);
 
   const openNew = () => {
     setEditing({ _id: "", ...EMPTY });
@@ -271,8 +259,9 @@ function EventsPageInner() {
             <p className="admin-page-subtitle">
               {isMain ? (
                 <>
-                  Latest events across all colleges (read-only). Click an event
-                  to edit it in its college.
+                  Latest events across all colleges (read-only). The College
+                  column shows which college each entry belongs to — edit it
+                  from that college&apos;s News &amp; Events page.
                 </>
               ) : (
                 <>
@@ -333,8 +322,10 @@ function EventsPageInner() {
                         {e.category}
                       </span>
                     </td>
-                    <td className="text-sm text-gray-500 capitalize">
-                      {e.institution}
+                    <td className="text-sm text-gray-500">
+                      <span className="admin-badge admin-badge-gray">
+                        {INSTITUTION_LABELS[e.institution] ?? e.institution}
+                      </span>
                     </td>
                     <td>
                       <span
@@ -344,15 +335,9 @@ function EventsPageInner() {
                       </span>
                     </td>
                     <td>
-                      {isMain ? (
-                        <Link
-                          href={`/admin/events?college=${e.institution}&edit=${e._id}`}
-                          className="admin-btn admin-btn-outline admin-btn-sm"
-                        >
-                          <ExternalLink size={13} /> Edit in{" "}
-                          {INSTITUTION_LABELS[e.institution] ?? e.institution}
-                        </Link>
-                      ) : (
+                      {/* The main aggregate is read-only — it names the source
+                          college instead of linking away to it. */}
+                      {!isMain && (
                         <div className="flex gap-1">
                           <button
                             onClick={() => openEdit(e)}
@@ -379,7 +364,7 @@ function EventsPageInner() {
 
       {editing && (
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 pt-10">
-          <div className="w-full max-w-2xl rounded-xl bg-white shadow-2xl">
+          <div className="w-full max-w-5xl rounded-xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
               <h2 className="font-semibold text-gray-900">
                 {editing._id ? "Edit Event" : "New Event"}
@@ -398,17 +383,19 @@ function EventsPageInner() {
                   details={apiError.details}
                 />
               )}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2">
-                  <TextInput
-                    label="Title"
-                    value={form.title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    required
-                  />
-                </div>
+              {/* Identity and scheduling first, then the imagery, then the
+                  copy that fills the detail page. */}
+              <FormGrid>
+                <TextInput
+                  label="Title"
+                  span={5}
+                  value={form.title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                />
                 <TextInput
                   label="Slug (URL)"
+                  span={4}
                   value={form.slug}
                   onChange={(e) => {
                     setSlugTouched(true);
@@ -419,6 +406,7 @@ function EventsPageInner() {
                 />
                 <TextInput
                   label="Date"
+                  span={3}
                   type="date"
                   value={form.event_date}
                   onChange={(e) => set("event_date", e.target.value)}
@@ -426,6 +414,7 @@ function EventsPageInner() {
                 />
                 <TextInput
                   label="Category"
+                  span={3}
                   value={form.category}
                   onChange={(e) => set("category", e.target.value)}
                   list="event-category-suggestions"
@@ -438,12 +427,14 @@ function EventsPageInner() {
                 </datalist>
                 <TextInput
                   label="Location"
+                  span={4}
                   value={form.location}
                   onChange={(e) => set("location", e.target.value)}
                   placeholder="Main Auditorium"
                 />
                 <Select
                   label="College"
+                  span={3}
                   value={form.institution}
                   options={INSTITUTIONS}
                   onChange={(e) => set("institution", e.target.value)}
@@ -451,21 +442,21 @@ function EventsPageInner() {
                 />
                 <NumberInput
                   label="Sort order"
+                  span={2}
                   value={form.sort_order}
                   onChange={(e) => set("sort_order", Number(e.target.value))}
                   min={0}
                 />
-                <div className="col-span-2">
-                  <ImageUploadInput
-                    label="Cover image"
-                    ratio="hero"
-                    value={form.image}
-                    onChange={(url) => set("image", url)}
-                    hideUrlField
-                  />
-                </div>
+                <ImageUploadInput
+                  label="Cover image"
+                  span="full"
+                  ratio="hero"
+                  value={form.image}
+                  onChange={(url) => set("image", url)}
+                  hideUrlField
+                />
 
-                <div className="col-span-2">
+                <div className="admin-col-full">
                   <div className="mb-2 flex items-center justify-between gap-3">
                     <div>
                       <span className="admin-label mb-0">Gallery images</span>
@@ -495,11 +486,11 @@ function EventsPageInner() {
                       No gallery images. Add up to {GALLERY_MAX}.
                     </p>
                   ) : (
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="admin-form-grid admin-form-grid--tight">
                       {form.gallery.map((url, i) => (
                         <div
                           key={i}
-                          className="relative rounded-lg border border-gray-200 p-3"
+                          className="admin-col-4 relative rounded-lg border border-gray-200 p-3"
                         >
                           <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
                             <button
@@ -541,31 +532,34 @@ function EventsPageInner() {
                     </div>
                   )}
                 </div>
-              </div>
-              <TextArea
-                label="Excerpt (card summary)"
-                value={form.excerpt}
-                onChange={(e) => set("excerpt", e.target.value)}
-                rows={2}
-              />
-              <TextArea
-                label="Detail content"
-                value={form.description}
-                onChange={(e) => set("description", e.target.value)}
-                rows={8}
-                hint="Shown on the event detail page. Basic HTML is supported (<p>, <h2>, <ul>, <a>…) and is sanitized on render."
-              />
-              <div className="flex items-center gap-2 pt-2">
-                <input
-                  type="checkbox"
-                  id="e_active"
-                  checked={form.is_active}
-                  onChange={(e) => set("is_active", e.target.checked)}
+
+                <TextArea
+                  label="Excerpt (card summary)"
+                  span={4}
+                  value={form.excerpt}
+                  onChange={(e) => set("excerpt", e.target.value)}
+                  rows={8}
                 />
-                <label htmlFor="e_active" className="text-sm text-gray-700">
-                  Active (shown on website)
-                </label>
-              </div>
+                <TextArea
+                  label="Detail content"
+                  span={8}
+                  value={form.description}
+                  onChange={(e) => set("description", e.target.value)}
+                  rows={8}
+                  hint="Shown on the event detail page. Basic HTML is supported (<p>, <h2>, <ul>, <a>…) and is sanitized on render."
+                />
+                <div className="admin-col-full flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="e_active"
+                    checked={form.is_active}
+                    onChange={(e) => set("is_active", e.target.checked)}
+                  />
+                  <label htmlFor="e_active" className="text-sm text-gray-700">
+                    Active (shown on website)
+                  </label>
+                </div>
+              </FormGrid>
             </div>
             <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
               <button onClick={close} className="admin-btn admin-btn-outline">

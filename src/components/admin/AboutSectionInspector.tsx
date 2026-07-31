@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  Field,
+  FormGrid,
   TextInput,
   TextArea,
   StringList,
@@ -58,31 +60,32 @@ export function AboutSectionInspector({
         },
       });
     return (
-      <div className="space-y-4">
+      <FormGrid>
         <TextInput
           label="Sidebar Label"
+          span={5}
           value={item.label ?? ""}
           placeholder="Section name shown in the sidebar"
           onChange={(e) => updateItem({ label: e.target.value })}
         />
-        <div>
-          <div className="admin-label mb-2">Content Blocks</div>
+        <Field label="Content Blocks" span="full">
           <PageBodySectionsEditor
             value={(item.blocks ?? []) as PageBodySection[]}
             onChange={(blocks) => updateItem({ blocks })}
             allowedTypes={["heading", "text", "image", "list", "cards"]}
           />
-        </div>
-      </div>
+        </Field>
+      </FormGrid>
     );
   }
 
   switch (section) {
     case "hero":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Hero Title"
+            span={5}
             value={data.hero.title}
             onChange={(e) =>
               patch({ hero: { ...data.hero, title: e.target.value } })
@@ -90,50 +93,55 @@ export function AboutSectionInspector({
           />
           <TextArea
             label="Hero Subtitle"
+            span={7}
             rows={3}
             value={data.hero.subtitle}
             onChange={(e) =>
               patch({ hero: { ...data.hero, subtitle: e.target.value } })
             }
           />
-        </>
+        </FormGrid>
       );
 
     case "about":
       return (
-        <>
+        <FormGrid>
           <TextAreaList
             label="Paragraphs"
+            span="full"
             values={data.about.paragraphs}
             onChange={(paragraphs) =>
               patch({ about: { ...data.about, paragraphs } })
             }
             placeholder="A paragraph about the institution…"
           />
-          <div className="admin-label mt-4 mb-2">Statistics</div>
-          <ItemsEditor
-            items={data.about.stats as unknown as Record<string, unknown>[]}
-            onChange={(v) =>
-              patch({
-                about: { ...data.about, stats: v as unknown as Stat[] },
-              })
-            }
-            fields={[
-              { key: "value", label: "Value", placeholder: "98%" },
-              { key: "label", label: "Label", placeholder: "Placement Rate" },
-            ]}
-            emptyItem={{ value: "", label: "" }}
-            addLabel="Add statistic"
-          />
-        </>
+          <Field label="Statistics" span="full">
+            <ItemsEditor
+              items={data.about.stats as unknown as Record<string, unknown>[]}
+              onChange={(v) =>
+                patch({
+                  about: { ...data.about, stats: v as unknown as Stat[] },
+                })
+              }
+              fields={[
+                { key: "value", label: "Value", placeholder: "98%" },
+                { key: "label", label: "Label", placeholder: "Placement Rate" },
+              ]}
+              emptyItem={{ value: "", label: "" }}
+              addLabel="Add statistic"
+              cardSpan={4}
+            />
+          </Field>
+        </FormGrid>
       );
 
     case "visionMission":
       return (
-        <>
+        <FormGrid>
           <TextArea
             label="Vision Statement"
-            rows={4}
+            span={5}
+            rows={6}
             value={data.visionMission.visionText}
             onChange={(e) =>
               patch({
@@ -146,6 +154,7 @@ export function AboutSectionInspector({
           />
           <StringList
             label="Mission Points"
+            span={7}
             values={data.visionMission.missionPoints}
             onChange={(missionPoints) =>
               patch({
@@ -154,7 +163,7 @@ export function AboutSectionInspector({
             }
             placeholder="A mission point…"
           />
-        </>
+        </FormGrid>
       );
 
     case "qualityPolicy": {
@@ -164,10 +173,11 @@ export function AboutSectionInspector({
         points: data.qualityPolicy?.points ?? [],
       };
       return (
-        <>
+        <FormGrid>
           <TextArea
             label="Intro (optional — shown above the policy points)"
-            rows={3}
+            span="full"
+            rows={2}
             value={qp.intro}
             onChange={(e) =>
               patch({ qualityPolicy: { ...qp, intro: e.target.value } })
@@ -175,11 +185,12 @@ export function AboutSectionInspector({
           />
           <TextAreaList
             label="Policy Points"
+            span="full"
             values={qp.points}
             onChange={(points) => patch({ qualityPolicy: { ...qp, points } })}
             placeholder="A quality policy statement…"
           />
-        </>
+        </FormGrid>
       );
     }
 
@@ -189,58 +200,73 @@ export function AboutSectionInspector({
         members: data.planningBoard?.members ?? [],
       };
       return (
-        <>
+        <FormGrid>
           <TextAreaList
             label="Description Paragraphs"
+            span="full"
             values={pb.paragraphs}
             onChange={(paragraphs) =>
               patch({ planningBoard: { ...pb, paragraphs } })
             }
             placeholder="What this committee does…"
           />
-          <div className="admin-label mt-4 mb-2">Members</div>
-          <ItemsEditor
-            items={pb.members as unknown as Record<string, unknown>[]}
-            onChange={(v) =>
-              patch({
-                planningBoard: {
-                  ...pb,
-                  members: v as unknown as BoardMember[],
+          <Field label="Members" span="full">
+            <ItemsEditor
+              items={pb.members as unknown as Record<string, unknown>[]}
+              onChange={(v) =>
+                patch({
+                  planningBoard: {
+                    ...pb,
+                    members: v as unknown as BoardMember[],
+                  },
+                })
+              }
+              fields={[
+                {
+                  key: "name",
+                  label: "Name",
+                  placeholder: "Dr. MANOHARAN S",
+                  span: 3,
                 },
-              })
-            }
-            fields={[
-              { key: "name", label: "Name", placeholder: "Dr. MANOHARAN S" },
-              { key: "position", label: "Position", placeholder: "Chairman" },
-              {
-                key: "category",
-                label: "Category",
-                placeholder: "Senior faculty member of the College",
-                span2: true,
-              },
-              {
-                key: "qualification",
-                label: "Qualification",
-                placeholder: "Ph.D. — Electrical Machines",
-              },
-            ]}
-            emptyItem={{
-              name: "",
-              position: "",
-              category: "",
-              qualification: "",
-            }}
-            addLabel="Add member"
-          />
-        </>
+                {
+                  key: "position",
+                  label: "Position",
+                  placeholder: "Chairman",
+                  span: 3,
+                },
+                {
+                  key: "qualification",
+                  label: "Qualification",
+                  placeholder: "Ph.D. — Electrical Machines",
+                  span: 3,
+                },
+                {
+                  key: "category",
+                  label: "Category",
+                  placeholder: "Senior faculty member of the College",
+                  span: 3,
+                },
+              ]}
+              emptyItem={{
+                name: "",
+                position: "",
+                category: "",
+                qualification: "",
+              }}
+              addLabel="Add member"
+            />
+          </Field>
+        </FormGrid>
       );
     }
 
     case "principal":
+      // Identity → contact → the message itself, as the card reads.
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Name"
+            span={4}
             value={data.principal.name}
             onChange={(e) =>
               patch({
@@ -250,6 +276,7 @@ export function AboutSectionInspector({
           />
           <TextInput
             label="Role"
+            span={4}
             value={data.principal.role}
             onChange={(e) =>
               patch({
@@ -259,6 +286,7 @@ export function AboutSectionInspector({
           />
           <TextInput
             label="Institution"
+            span={4}
             value={data.principal.institution}
             onChange={(e) =>
               patch({
@@ -266,27 +294,9 @@ export function AboutSectionInspector({
               })
             }
           />
-          <ImageUploadInput
-            label="Photo"
-            ratio="portrait"
-            value={data.principal.image}
-            onChange={(image) =>
-              patch({ principal: { ...data.principal, image } })
-            }
-            hideUrlField
-          />
-          <TextInput
-            label="LinkedIn URL"
-            value={data.principal.linkedin}
-            placeholder="https://linkedin.com/in/…"
-            onChange={(e) =>
-              patch({
-                principal: { ...data.principal, linkedin: e.target.value },
-              })
-            }
-          />
           <TextInput
             label="Email"
+            span={4}
             value={data.principal.email}
             placeholder="principal@jct.ac.in"
             onChange={(e) =>
@@ -295,9 +305,31 @@ export function AboutSectionInspector({
               })
             }
           />
+          <TextInput
+            label="LinkedIn URL"
+            span={8}
+            value={data.principal.linkedin}
+            placeholder="https://linkedin.com/in/…"
+            onChange={(e) =>
+              patch({
+                principal: { ...data.principal, linkedin: e.target.value },
+              })
+            }
+          />
+          <ImageUploadInput
+            label="Photo"
+            span="full"
+            ratio="portrait"
+            value={data.principal.image}
+            onChange={(image) =>
+              patch({ principal: { ...data.principal, image } })
+            }
+            hideUrlField
+          />
           <TextArea
             label="Pull Quote"
-            rows={3}
+            span={4}
+            rows={5}
             value={data.principal.quote}
             onChange={(e) =>
               patch({
@@ -307,20 +339,22 @@ export function AboutSectionInspector({
           />
           <TextAreaList
             label="Message Paragraphs"
+            span={8}
             values={data.principal.messages}
             onChange={(messages) =>
               patch({ principal: { ...data.principal, messages } })
             }
             placeholder="A paragraph of the principal's message…"
           />
-        </>
+        </FormGrid>
       );
 
     case "management":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading"
+            span={5}
             value={data.management.tagline}
             placeholder="Great Minds. Passionate Leaders. One Vision."
             onChange={(e) =>
@@ -331,7 +365,8 @@ export function AboutSectionInspector({
           />
           <TextArea
             label="Section Description"
-            rows={3}
+            span={7}
+            rows={2}
             value={data.management.description}
             onChange={(e) =>
               patch({
@@ -344,6 +379,8 @@ export function AboutSectionInspector({
           />
           <Repeater<MgmtMember>
             label="Management Members"
+            span="full"
+            itemSpan={6}
             items={data.management.members}
             onChange={(members) =>
               patch({ management: { ...data.management, members } })
@@ -351,19 +388,22 @@ export function AboutSectionInspector({
             onItemRemove={undefined}
             newItem={() => ({ name: "", role: "", image: "", bio: "" })}
             renderItem={(item, _i, oc) => (
-              <div className="space-y-1">
+              <FormGrid tight>
                 <TextInput
                   label="Name"
+                  span={6}
                   value={item.name}
                   onChange={(e) => oc({ ...item, name: e.target.value })}
                 />
                 <TextInput
                   label="Role"
+                  span={6}
                   value={item.role}
                   onChange={(e) => oc({ ...item, role: e.target.value })}
                 />
                 <ImageUploadInput
                   label="Photo"
+                  span="full"
                   ratio="portrait"
                   value={item.image}
                   onChange={(image) => oc({ ...item, image })}
@@ -371,22 +411,24 @@ export function AboutSectionInspector({
                 />
                 <TextArea
                   label="Bio"
-                  rows={4}
+                  span="full"
+                  rows={3}
                   value={item.bio}
                   onChange={(e) => oc({ ...item, bio: e.target.value })}
                 />
-              </div>
+              </FormGrid>
             )}
           />
-        </>
+        </FormGrid>
       );
 
     case "hod":
       return (
-        <>
+        <FormGrid>
           <TextArea
             label="Section Description"
-            rows={3}
+            span="full"
+            rows={2}
             value={data.hod.description}
             onChange={(e) =>
               patch({ hod: { ...data.hod, description: e.target.value } })
@@ -394,6 +436,8 @@ export function AboutSectionInspector({
           />
           <Repeater<HodMember>
             label="Heads of Department"
+            span="full"
+            itemSpan={6}
             items={data.hod.members}
             onChange={(members) => patch({ hod: { ...data.hod, members } })}
             onItemRemove={undefined}
@@ -405,46 +449,52 @@ export function AboutSectionInspector({
               avatar: "",
             })}
             renderItem={(item, _i, oc) => (
-              <div className="space-y-1">
+              <FormGrid tight>
                 <TextInput
                   label="Name"
+                  span={6}
                   value={item.name}
                   onChange={(e) => oc({ ...item, name: e.target.value })}
                 />
                 <TextInput
                   label="Designation"
+                  span={6}
                   value={item.designation}
                   onChange={(e) => oc({ ...item, designation: e.target.value })}
                 />
                 <TextInput
                   label="Department"
+                  span={8}
                   value={item.dept}
                   onChange={(e) => oc({ ...item, dept: e.target.value })}
                 />
                 <TextInput
                   label="Abbreviation"
+                  span={4}
                   value={item.abbr}
                   onChange={(e) => oc({ ...item, abbr: e.target.value })}
                 />
                 <ImageUploadInput
                   label="Avatar"
+                  span="full"
                   ratio="square"
                   value={item.avatar}
                   onChange={(avatar) => oc({ ...item, avatar })}
                   hideUrlField
                 />
-              </div>
+              </FormGrid>
             )}
           />
-        </>
+        </FormGrid>
       );
 
     case "governingCouncil":
       return (
-        <>
+        <FormGrid>
           <TextArea
             label="Section Description"
-            rows={3}
+            span="full"
+            rows={2}
             value={data.governingCouncil.description}
             onChange={(e) =>
               patch({
@@ -455,122 +505,137 @@ export function AboutSectionInspector({
               })
             }
           />
-          <div className="admin-label mt-4 mb-2">Council Members</div>
-          <ItemsEditor
-            items={
-              data.governingCouncil.members as unknown as Record<
-                string,
-                unknown
-              >[]
-            }
-            onChange={(v) =>
-              patch({
-                governingCouncil: {
-                  ...data.governingCouncil,
-                  members: v as unknown as CouncilMember[],
-                },
-              })
-            }
-            fields={[
-              { key: "name", label: "Member", span2: true },
-              { key: "category", label: "Category", span2: true },
-            ]}
-            emptyItem={{ name: "", category: "" }}
-            addLabel="Add member"
-          />
-        </>
+          <Field label="Council Members" span="full">
+            <ItemsEditor
+              items={
+                data.governingCouncil.members as unknown as Record<
+                  string,
+                  unknown
+                >[]
+              }
+              onChange={(v) =>
+                patch({
+                  governingCouncil: {
+                    ...data.governingCouncil,
+                    members: v as unknown as CouncilMember[],
+                  },
+                })
+              }
+              fields={[
+                { key: "name", label: "Member", span: 5 },
+                { key: "category", label: "Category", span: 7 },
+              ]}
+              emptyItem={{ name: "", category: "" }}
+              addLabel="Add member"
+              cardSpan={6}
+            />
+          </Field>
+        </FormGrid>
       );
 
     case "coreValues":
       return (
-        <>
-          <div className="admin-label mb-2">Core Values</div>
-          <ItemsEditor
-            items={data.coreValues as unknown as Record<string, unknown>[]}
-            onChange={(v) => patch({ coreValues: v as unknown as ValueItem[] })}
-            fields={[
-              { key: "title", label: "Title", span2: true },
-              {
-                key: "desc",
-                label: "Description",
-                type: "textarea",
-                span2: true,
-              },
-            ]}
-            emptyItem={{ title: "", desc: "" }}
-            addLabel="Add value"
-          />
-          <p className="mt-2 text-xs text-gray-400">
-            Icons are assigned automatically by position.
-          </p>
-        </>
+        <FormGrid>
+          <Field
+            label="Core Values"
+            span="full"
+            hint="Icons are assigned automatically by position."
+          >
+            <ItemsEditor
+              items={data.coreValues as unknown as Record<string, unknown>[]}
+              onChange={(v) =>
+                patch({ coreValues: v as unknown as ValueItem[] })
+              }
+              fields={[
+                { key: "title", label: "Title", span: "full" },
+                {
+                  key: "desc",
+                  label: "Description",
+                  type: "textarea",
+                  span: "full",
+                },
+              ]}
+              emptyItem={{ title: "", desc: "" }}
+              addLabel="Add value"
+              cardSpan={4}
+            />
+          </Field>
+        </FormGrid>
       );
 
     case "accreditations":
       return (
         <Repeater<Accreditation>
           label="Accreditations"
+          itemSpan={4}
           items={data.accreditations}
           onChange={(accreditations) => patch({ accreditations })}
           onItemRemove={undefined}
           newItem={() => ({ name: "", desc: "", logo: "" })}
           renderItem={(item, _i, oc) => (
-            <div className="space-y-1">
+            <FormGrid tight>
               <TextInput
                 label="Name"
+                span="full"
                 value={item.name}
                 onChange={(e) => oc({ ...item, name: e.target.value })}
               />
               <TextInput
                 label="Description"
+                span="full"
                 value={item.desc}
                 onChange={(e) => oc({ ...item, desc: e.target.value })}
               />
               <ImageUploadInput
                 label="Logo"
+                span="full"
                 ratio="square"
                 value={item.logo}
                 onChange={(logo) => oc({ ...item, logo })}
                 hideUrlField
               />
-            </div>
+            </FormGrid>
           )}
         />
       );
 
     case "campusHighlights":
       return (
-        <>
-          <div className="admin-label mb-2">Campus Highlights</div>
-          <ItemsEditor
-            items={
-              data.campusHighlights as unknown as Record<string, unknown>[]
-            }
-            onChange={(v) =>
-              patch({ campusHighlights: v as unknown as Highlight[] })
-            }
-            fields={[
-              { key: "title", label: "Title", span2: true },
-              {
-                key: "desc",
-                label: "Description",
-                type: "textarea",
-                span2: true,
-              },
-            ]}
-            emptyItem={{ title: "", desc: "" }}
-            addLabel="Add highlight"
-          />
-          <p className="mt-2 text-xs text-gray-400">
-            Icons are assigned automatically by position.
-          </p>
-        </>
+        <FormGrid>
+          <Field
+            label="Campus Highlights"
+            span="full"
+            hint="Icons are assigned automatically by position."
+          >
+            <ItemsEditor
+              items={
+                data.campusHighlights as unknown as Record<string, unknown>[]
+              }
+              onChange={(v) =>
+                patch({ campusHighlights: v as unknown as Highlight[] })
+              }
+              fields={[
+                { key: "title", label: "Title", span: "full" },
+                {
+                  key: "desc",
+                  label: "Description",
+                  type: "textarea",
+                  span: "full",
+                },
+              ]}
+              emptyItem={{ title: "", desc: "" }}
+              addLabel="Add highlight"
+              cardSpan={4}
+            />
+          </Field>
+        </FormGrid>
       );
 
     case "whyJct":
       return (
         <StringList
           label="Why Choose JCT — Points"
+          columns
           values={data.whyJct}
           onChange={(whyJct) => patch({ whyJct })}
           placeholder="A reason to choose JCT…"
@@ -578,44 +643,49 @@ export function AboutSectionInspector({
       );
 
     case "sidebar":
+      // Quick facts, then the CTA block, then the nav list — top to bottom of
+      // the rendered sidebar.
       return (
-        <>
-          <div className="admin-label mb-2">Quick Facts</div>
-          <ItemsEditor
-            items={
-              data.sidebar.quickFacts as unknown as Record<string, unknown>[]
-            }
-            onChange={(v) =>
-              patch({
-                sidebar: {
-                  ...data.sidebar,
-                  quickFacts: v as unknown as QuickFact[],
-                },
-              })
-            }
-            fields={[
-              { key: "label", label: "Label", placeholder: "Established" },
-              { key: "value", label: "Value", placeholder: "2009" },
-            ]}
-            emptyItem={{ label: "", value: "" }}
-            addLabel="Add quick fact"
-          />
-          <div className="mt-4">
-            <TextInput
-              label="Counselling Code (optional — leave blank to hide)"
-              value={data.sidebar.counsellingCode}
-              onChange={(e) =>
+        <FormGrid>
+          <Field label="Quick Facts" span="full">
+            <ItemsEditor
+              items={
+                data.sidebar.quickFacts as unknown as Record<string, unknown>[]
+              }
+              onChange={(v) =>
                 patch({
                   sidebar: {
                     ...data.sidebar,
-                    counsellingCode: e.target.value,
+                    quickFacts: v as unknown as QuickFact[],
                   },
                 })
               }
+              fields={[
+                { key: "label", label: "Label", placeholder: "Established" },
+                { key: "value", label: "Value", placeholder: "2009" },
+              ]}
+              emptyItem={{ label: "", value: "" }}
+              addLabel="Add quick fact"
+              cardSpan={4}
             />
-          </div>
+          </Field>
+          <TextInput
+            label="Counselling Code"
+            span={3}
+            hint="Leave blank to hide."
+            value={data.sidebar.counsellingCode}
+            onChange={(e) =>
+              patch({
+                sidebar: {
+                  ...data.sidebar,
+                  counsellingCode: e.target.value,
+                },
+              })
+            }
+          />
           <TextInput
             label="CTA Button Label"
+            span={4}
             value={data.sidebar.ctaLabel}
             onChange={(e) =>
               patch({
@@ -625,6 +695,7 @@ export function AboutSectionInspector({
           />
           <TextInput
             label="CTA Button Link"
+            span={5}
             value={data.sidebar.ctaHref}
             onChange={(e) =>
               patch({
@@ -633,8 +704,7 @@ export function AboutSectionInspector({
             }
             placeholder="https://admissions.jct.ac.in/"
           />
-          <div className="mt-6">
-            <div className="admin-label mb-2">Sidebar Navigation Items</div>
+          <Field label="Sidebar Navigation Items" span="full">
             <SidebarNavEditor
               defaults={ABOUT_NAV_DEFAULTS}
               value={data.sidebar.navItems as SidebarNavItemRaw[] | undefined}
@@ -647,8 +717,8 @@ export function AboutSectionInspector({
                 })
               }
             />
-          </div>
-        </>
+          </Field>
+        </FormGrid>
       );
 
     default:

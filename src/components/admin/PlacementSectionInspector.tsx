@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  Field,
+  FormGrid,
   TextInput,
   TextArea,
   Repeater,
@@ -38,8 +40,8 @@ export function PlacementSectionInspector({
   switch (section) {
     case "banner":
       return (
-        <>
-          <p className="mb-3 text-xs text-gray-500">
+        <FormGrid>
+          <p className="admin-col-full text-xs text-gray-500">
             Poster-style images for the &ldquo;Highlights&rdquo; section — the
             first item in the page&apos;s sidebar — e.g. the annual
             &ldquo;Distinguished Alumni Students&rdquo; sheet. Each one renders
@@ -49,6 +51,7 @@ export function PlacementSectionInspector({
           </p>
           <TextInput
             label="Heading (optional)"
+            span={5}
             value={data.banner.heading}
             onChange={(e) =>
               patch({ banner: { ...data.banner, heading: e.target.value } })
@@ -58,7 +61,8 @@ export function PlacementSectionInspector({
           />
           <TextArea
             label="Intro (optional)"
-            rows={3}
+            span={7}
+            rows={2}
             value={data.banner.description}
             onChange={(e) =>
               patch({ banner: { ...data.banner, description: e.target.value } })
@@ -66,6 +70,8 @@ export function PlacementSectionInspector({
           />
           <Repeater<BannerImage>
             label="Banner Images"
+            span="full"
+            itemSpan={6}
             items={data.banner.images}
             onChange={(images) => patch({ banner: { ...data.banner, images } })}
             onItemRemove={(item) => {
@@ -73,9 +79,10 @@ export function PlacementSectionInspector({
             }}
             newItem={() => ({ image: "", alt: "", caption: "", href: "" })}
             renderItem={(item, i, onItemChange) => (
-              <div className="space-y-3 pr-8">
+              <FormGrid tight>
                 <ImageUploadInput
                   label={`Image ${i + 1}`}
+                  span="full"
                   ratio="auto"
                   value={item.image}
                   onChange={(url) => onItemChange({ ...item, image: url })}
@@ -83,6 +90,7 @@ export function PlacementSectionInspector({
                 />
                 <TextInput
                   label="Alt text"
+                  span="full"
                   value={item.alt}
                   onChange={(e) =>
                     onItemChange({ ...item, alt: e.target.value })
@@ -92,6 +100,7 @@ export function PlacementSectionInspector({
                 />
                 <TextInput
                   label="Caption (optional)"
+                  span={6}
                   value={item.caption}
                   onChange={(e) =>
                     onItemChange({ ...item, caption: e.target.value })
@@ -100,6 +109,7 @@ export function PlacementSectionInspector({
                 />
                 <TextInput
                   label="Link (optional)"
+                  span={6}
                   value={item.href}
                   onChange={(e) =>
                     onItemChange({ ...item, href: e.target.value })
@@ -107,17 +117,18 @@ export function PlacementSectionInspector({
                   placeholder="https://…"
                   hint="Makes the whole banner clickable."
                 />
-              </div>
+              </FormGrid>
             )}
           />
-        </>
+        </FormGrid>
       );
 
     case "process":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading"
+            span={5}
             value={data.process.heading}
             onChange={(e) =>
               patch({ process: { ...data.process, heading: e.target.value } })
@@ -126,7 +137,8 @@ export function PlacementSectionInspector({
           />
           <TextArea
             label="Intro"
-            rows={3}
+            span={7}
+            rows={2}
             value={data.process.description}
             onChange={(e) =>
               patch({
@@ -136,13 +148,16 @@ export function PlacementSectionInspector({
           />
           <Repeater<ProcessStep>
             label="Steps"
+            span="full"
+            itemSpan={4}
             items={data.process.steps}
             onChange={(steps) => patch({ process: { ...data.process, steps } })}
             newItem={() => ({ title: "", desc: "" })}
             renderItem={(item, i, onItemChange) => (
-              <div className="space-y-3 pr-8">
+              <FormGrid tight>
                 <TextInput
                   label={`Step ${i + 1} title`}
+                  span="full"
                   value={item.title}
                   onChange={(e) =>
                     onItemChange({ ...item, title: e.target.value })
@@ -151,23 +166,25 @@ export function PlacementSectionInspector({
                 />
                 <TextArea
                   label="Description"
+                  span="full"
                   rows={3}
                   value={item.desc}
                   onChange={(e) =>
                     onItemChange({ ...item, desc: e.target.value })
                   }
                 />
-              </div>
+              </FormGrid>
             )}
           />
-        </>
+        </FormGrid>
       );
 
     case "tpo":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading"
+            span={5}
             value={data.tpo.heading}
             onChange={(e) =>
               patch({ tpo: { ...data.tpo, heading: e.target.value } })
@@ -176,76 +193,85 @@ export function PlacementSectionInspector({
           />
           <TextArea
             label="Intro"
-            rows={3}
+            span={7}
+            rows={2}
             value={data.tpo.description}
             onChange={(e) =>
               patch({ tpo: { ...data.tpo, description: e.target.value } })
             }
           />
 
-          <label className="mb-4 flex items-start gap-2 rounded-lg border border-gray-100 bg-gray-50/60 p-3 text-sm text-gray-700">
-            <input
-              type="checkbox"
-              className="mt-0.5"
-              checked={data.tpo.showPhotos}
-              onChange={(e) =>
-                patch({ tpo: { ...data.tpo, showPhotos: e.target.checked } })
-              }
-            />
-            <span>
-              Show officer photos
-              <span className="mt-0.5 block text-xs text-gray-500">
-                Off hides the photo (and its initials placeholder) on every
-                officer card, leaving name, designation and contact details.
-              </span>
-            </span>
-          </label>
+          <Field label="Placement Office" span={7}>
+            <div className="admin-form-grid admin-form-grid--tight rounded-lg border border-gray-100 bg-gray-50/60 p-3">
+              <TextArea
+                label="Address"
+                span="full"
+                rows={2}
+                value={data.tpo.office.address}
+                onChange={(e) =>
+                  patch({
+                    tpo: {
+                      ...data.tpo,
+                      office: { ...data.tpo.office, address: e.target.value },
+                    },
+                  })
+                }
+              />
+              <TextInput
+                label="Phone"
+                span={5}
+                value={data.tpo.office.phone}
+                onChange={(e) =>
+                  patch({
+                    tpo: {
+                      ...data.tpo,
+                      office: { ...data.tpo.office, phone: e.target.value },
+                    },
+                  })
+                }
+                placeholder="+91 98765 43210"
+              />
+              <TextInput
+                label="Email"
+                span={7}
+                value={data.tpo.office.email}
+                onChange={(e) =>
+                  patch({
+                    tpo: {
+                      ...data.tpo,
+                      office: { ...data.tpo.office, email: e.target.value },
+                    },
+                  })
+                }
+                placeholder="placements@jct.ac.in"
+              />
+            </div>
+          </Field>
 
-          <div className="mb-4 rounded-lg border border-gray-100 bg-gray-50/60 p-3">
-            <div className="admin-label mb-2">Placement Office</div>
-            <TextArea
-              label="Address"
-              rows={2}
-              value={data.tpo.office.address}
-              onChange={(e) =>
-                patch({
-                  tpo: {
-                    ...data.tpo,
-                    office: { ...data.tpo.office, address: e.target.value },
-                  },
-                })
-              }
-            />
-            <TextInput
-              label="Phone"
-              value={data.tpo.office.phone}
-              onChange={(e) =>
-                patch({
-                  tpo: {
-                    ...data.tpo,
-                    office: { ...data.tpo.office, phone: e.target.value },
-                  },
-                })
-              }
-              placeholder="+91 98765 43210"
-            />
-            <TextInput
-              label="Email"
-              value={data.tpo.office.email}
-              onChange={(e) =>
-                patch({
-                  tpo: {
-                    ...data.tpo,
-                    office: { ...data.tpo.office, email: e.target.value },
-                  },
-                })
-              }
-              placeholder="placements@jct.ac.in"
-            />
-          </div>
+          <Field label="Officer Photos" span={5}>
+            <label className="flex items-start gap-2 rounded-lg border border-gray-100 bg-gray-50/60 p-3 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                className="mt-0.5"
+                checked={data.tpo.showPhotos}
+                onChange={(e) =>
+                  patch({ tpo: { ...data.tpo, showPhotos: e.target.checked } })
+                }
+              />
+              <span>
+                Show officer photos
+                <span className="mt-0.5 block text-xs text-gray-500">
+                  Off hides the photo (and its initials placeholder) on every
+                  officer card, leaving name, designation and contact details.
+                </span>
+              </span>
+            </label>
+          </Field>
 
           <Repeater<TpoContact>
             label="Officers"
+            span="full"
+            itemSpan={6}
             items={data.tpo.contacts}
             onChange={(contacts) => patch({ tpo: { ...data.tpo, contacts } })}
             onItemRemove={(item) => {
@@ -259,9 +285,10 @@ export function PlacementSectionInspector({
               image: "",
             })}
             renderItem={(item, _i, onItemChange) => (
-              <div className="space-y-3 pr-8">
+              <FormGrid tight>
                 <TextInput
                   label="Name"
+                  span={5}
                   value={item.name}
                   onChange={(e) =>
                     onItemChange({ ...item, name: e.target.value })
@@ -269,6 +296,7 @@ export function PlacementSectionInspector({
                 />
                 <TextInput
                   label="Designation / Department"
+                  span={7}
                   value={item.designation}
                   onChange={(e) =>
                     onItemChange({ ...item, designation: e.target.value })
@@ -277,6 +305,7 @@ export function PlacementSectionInspector({
                 />
                 <TextInput
                   label="Phone"
+                  span={5}
                   value={item.phone}
                   onChange={(e) =>
                     onItemChange({ ...item, phone: e.target.value })
@@ -284,6 +313,7 @@ export function PlacementSectionInspector({
                 />
                 <TextInput
                   label="Email"
+                  span={7}
                   value={item.email}
                   onChange={(e) =>
                     onItemChange({ ...item, email: e.target.value })
@@ -291,6 +321,7 @@ export function PlacementSectionInspector({
                 />
                 <ImageUploadInput
                   label="Photo"
+                  span="full"
                   ratio="portrait"
                   value={item.image}
                   onChange={(url) => onItemChange({ ...item, image: url })}
@@ -301,17 +332,18 @@ export function PlacementSectionInspector({
                       : "Photos are currently hidden for this section."
                   }
                 />
-              </div>
+              </FormGrid>
             )}
           />
-        </>
+        </FormGrid>
       );
 
     case "mou":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading"
+            span={5}
             value={data.mou.heading}
             onChange={(e) =>
               patch({ mou: { ...data.mou, heading: e.target.value } })
@@ -320,7 +352,8 @@ export function PlacementSectionInspector({
           />
           <TextArea
             label="Intro"
-            rows={3}
+            span={7}
+            rows={2}
             value={data.mou.description}
             onChange={(e) =>
               patch({ mou: { ...data.mou, description: e.target.value } })
@@ -328,6 +361,8 @@ export function PlacementSectionInspector({
           />
           <Repeater<MouItem>
             label="MoUs"
+            span="full"
+            itemSpan={6}
             items={data.mou.items}
             onChange={(items) => patch({ mou: { ...data.mou, items } })}
             onItemRemove={(item) => {
@@ -342,24 +377,19 @@ export function PlacementSectionInspector({
               href: "",
             })}
             renderItem={(item, _i, onItemChange) => (
-              <div className="space-y-3 pr-8">
+              <FormGrid tight>
                 <TextInput
                   label="Organization"
+                  span="full"
                   value={item.organization}
                   onChange={(e) =>
                     onItemChange({ ...item, organization: e.target.value })
                   }
                   placeholder="Infosys Ltd."
                 />
-                <ImageUploadInput
-                  label="Logo"
-                  ratio="square"
-                  value={item.logo}
-                  onChange={(url) => onItemChange({ ...item, logo: url })}
-                  hideUrlField
-                />
                 <TextArea
                   label="Purpose"
+                  span="full"
                   rows={2}
                   value={item.purpose}
                   onChange={(e) =>
@@ -369,6 +399,7 @@ export function PlacementSectionInspector({
                 />
                 <TextInput
                   label="Signed On"
+                  span={6}
                   value={item.signedOn}
                   onChange={(e) =>
                     onItemChange({ ...item, signedOn: e.target.value })
@@ -377,6 +408,7 @@ export function PlacementSectionInspector({
                 />
                 <TextInput
                   label="Validity"
+                  span={6}
                   value={item.validity}
                   onChange={(e) =>
                     onItemChange({ ...item, validity: e.target.value })
@@ -385,6 +417,7 @@ export function PlacementSectionInspector({
                 />
                 <TextInput
                   label="Link (optional)"
+                  span="full"
                   value={item.href}
                   onChange={(e) =>
                     onItemChange({ ...item, href: e.target.value })
@@ -392,17 +425,26 @@ export function PlacementSectionInspector({
                   placeholder="https://…"
                   hint="Makes the whole card clickable."
                 />
-              </div>
+                <ImageUploadInput
+                  label="Logo"
+                  span="full"
+                  ratio="square"
+                  value={item.logo}
+                  onChange={(url) => onItemChange({ ...item, logo: url })}
+                  hideUrlField
+                />
+              </FormGrid>
             )}
           />
-        </>
+        </FormGrid>
       );
 
     case "why-recruit":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading"
+            span={5}
             value={data.whyRecruit.heading}
             onChange={(e) =>
               patch({
@@ -413,7 +455,8 @@ export function PlacementSectionInspector({
           />
           <TextArea
             label="Intro"
-            rows={3}
+            span={7}
+            rows={2}
             value={data.whyRecruit.description}
             onChange={(e) =>
               patch({
@@ -423,15 +466,18 @@ export function PlacementSectionInspector({
           />
           <Repeater<WhyPoint>
             label="Reasons"
+            span="full"
+            itemSpan={4}
             items={data.whyRecruit.points}
             onChange={(points) =>
               patch({ whyRecruit: { ...data.whyRecruit, points } })
             }
             newItem={() => ({ title: "", desc: "" })}
             renderItem={(item, _i, onItemChange) => (
-              <div className="space-y-3 pr-8">
+              <FormGrid tight>
                 <TextInput
                   label="Title"
+                  span="full"
                   value={item.title}
                   onChange={(e) =>
                     onItemChange({ ...item, title: e.target.value })
@@ -440,16 +486,17 @@ export function PlacementSectionInspector({
                 />
                 <TextArea
                   label="Description"
+                  span="full"
                   rows={3}
                   value={item.desc}
                   onChange={(e) =>
                     onItemChange({ ...item, desc: e.target.value })
                   }
                 />
-              </div>
+              </FormGrid>
             )}
           />
-        </>
+        </FormGrid>
       );
 
     case "sidebar":

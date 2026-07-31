@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  FormGrid,
   TextInput,
   TextArea,
   TextAreaList,
@@ -41,9 +42,10 @@ export function AccreditationsSectionInspector({
   switch (section) {
     case "hero":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Hero Title"
+            span={5}
             value={data.hero.title}
             placeholder="Approvals & Accreditations"
             onChange={(e) =>
@@ -52,13 +54,14 @@ export function AccreditationsSectionInspector({
           />
           <TextArea
             label="Hero Subtitle"
+            span={7}
             rows={3}
             value={data.hero.subtitle}
             onChange={(e) =>
               patch({ hero: { ...data.hero, subtitle: e.target.value } })
             }
           />
-        </>
+        </FormGrid>
       );
 
     case "intro":
@@ -79,65 +82,67 @@ export function AccreditationsSectionInspector({
           onChange={(items) => patch({ items })}
           newItem={() => ({ ...EMPTY_ITEM })}
           renderItem={(item, _i, oc) => (
-            <div className="space-y-2 pr-8">
+            <FormGrid tight>
               <TextInput
                 label="Name"
+                span={3}
                 value={item.name}
                 placeholder="NAAC, NBA, AICTE…"
                 onChange={(e) => oc({ ...item, name: e.target.value })}
               />
               <TextInput
                 label="Full Name / Expansion"
+                span={6}
                 value={item.fullName}
                 placeholder="National Assessment and Accreditation Council"
                 onChange={(e) => oc({ ...item, fullName: e.target.value })}
               />
-              <ImageUploadInput
-                label="Logo"
-                ratio="square"
-                value={item.logo}
-                onChange={(logo) => oc({ ...item, logo })}
-                hideUrlField
-              />
               <TextInput
                 label="Grade / Score"
+                span={3}
                 value={item.grade}
                 placeholder="A+, CGPA 3.51…"
                 onChange={(e) => oc({ ...item, grade: e.target.value })}
               />
               <TextArea
                 label="Description"
+                span={7}
                 rows={3}
                 value={item.description}
                 onChange={(e) => oc({ ...item, description: e.target.value })}
               />
+              <ImageUploadInput
+                label="Logo"
+                span={5}
+                ratio="square"
+                value={item.logo}
+                onChange={(logo) => oc({ ...item, logo })}
+                hideUrlField
+              />
               <TextInput
                 label="Accredited By"
+                span={6}
                 value={item.accreditedBy}
                 placeholder="Issuing authority"
                 onChange={(e) => oc({ ...item, accreditedBy: e.target.value })}
               />
-              <div className="grid grid-cols-2 gap-2">
-                <TextInput
-                  label="Valid From"
-                  value={item.validFrom}
-                  placeholder="2022"
-                  onChange={(e) => oc({ ...item, validFrom: e.target.value })}
-                />
-                <TextInput
-                  label="Valid To"
-                  value={item.validTo}
-                  placeholder="2027"
-                  onChange={(e) => oc({ ...item, validTo: e.target.value })}
-                />
-              </div>
-              <DocumentUploadInput
-                label="Certificate (PDF)"
-                value={item.certificate}
-                onChange={(certificate) => oc({ ...item, certificate })}
+              <TextInput
+                label="Valid From"
+                span={3}
+                value={item.validFrom}
+                placeholder="2022"
+                onChange={(e) => oc({ ...item, validFrom: e.target.value })}
+              />
+              <TextInput
+                label="Valid To"
+                span={3}
+                value={item.validTo}
+                placeholder="2027"
+                onChange={(e) => oc({ ...item, validTo: e.target.value })}
               />
               <TextInput
                 label="Certificate Link Label"
+                span={6}
                 value={item.certificateLabel}
                 placeholder="View Certificate"
                 onChange={(e) =>
@@ -146,11 +151,18 @@ export function AccreditationsSectionInspector({
               />
               <TextInput
                 label="Dedicated Page (optional)"
+                span={6}
                 value={item.detailHref}
                 placeholder="/institutions/engineering/naac"
                 onChange={(e) => oc({ ...item, detailHref: e.target.value })}
               />
-            </div>
+              <DocumentUploadInput
+                label="Certificate (PDF)"
+                span="full"
+                value={item.certificate}
+                onChange={(certificate) => oc({ ...item, certificate })}
+              />
+            </FormGrid>
           )}
         />
       );

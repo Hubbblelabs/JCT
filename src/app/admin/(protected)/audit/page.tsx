@@ -11,19 +11,31 @@ import {
   AuditLogTable,
   type AuditRow,
 } from "@/components/admin/AuditLogTable";
+import { AUDIT_PAGE_SIZE } from "@/lib/audit";
 
-const CAP = 500;
-
-async function getLogs(): Promise<{ rows: AuditRow[]; ok: boolean }> {
+/**
+ * Only the newest page is rendered on the server. The trail grows without
+ * bound between purges, and reading all of it to draw one screen was the
+ * slowest query in the panel — older pages are fetched from
+ * `/api/admin/audit` as the reader walks back through them.
+ */
+async function getLogs(): Promise<{
+  rows: AuditRow[];
+  hasMore: boolean;
+  ok: boolean;
+}> {
   try {
     await connectDB();
+    // One extra row decides whether there is an older page to fetch.
     const docs = (await AuditLog.find()
       .sort({ created_at: -1 })
-      .limit(CAP)
+      .limit(AUDIT_PAGE_SIZE + 1)
       .lean()) as unknown as Record<string, unknown>[];
+    const hasMore = docs.length > AUDIT_PAGE_SIZE;
     return {
       ok: true,
-      rows: docs.map((d) => ({
+      hasMore,
+      rows: (hasMore ? docs.slice(0, AUDIT_PAGE_SIZE) : docs).map((d) => ({
         id: String(d._id),
         entityType: String(d.entity_type ?? ""),
         action: String(d.action ?? ""),
@@ -34,7 +46,7 @@ async function getLogs(): Promise<{ rows: AuditRow[]; ok: boolean }> {
     };
   } catch (err) {
     console.error("[admin/audit] load failed", err);
-    return { ok: false, rows: [] };
+    return { ok: false, hasMore: false, rows: [] };
   }
 }
 
@@ -51,7 +63,7 @@ export default async function AuditPage() {
     redirect("/admin/dashboard");
   }
 
-  const { rows, ok } = await getLogs();
+  const { rows, hasMore, ok } = await getLogs();
 
   return (
     <PageShell
@@ -66,7 +78,7 @@ export default async function AuditPage() {
           </Banner>
         </div>
       )}
-      <AuditLogTable rows={rows} cap={CAP} />
+      <AuditLogTable initialRows={rows} initialHasMore={hasMore} />
     </PageShell>
   );
 }

@@ -38,6 +38,8 @@ import {
   type UpcomingEventsVal,
 } from "@/components/admin/PageContentForms";
 import {
+  Field,
+  FormGrid,
   ImageUploadInput,
   Select,
   TextArea,
@@ -251,67 +253,78 @@ function TestimonialFormInner({
   const busy = saving || flushing;
 
   return (
-    <div className="space-y-3 rounded-lg border border-blue-100 bg-blue-50/40 p-4">
-      <div className="grid grid-cols-2 gap-3">
+    <div className="rounded-lg border border-blue-100 bg-blue-50/40 p-4">
+      <FormGrid>
         <TextInput
           label="Name"
+          span={4}
           required
           value={draft.name}
           onChange={(e) => onChange({ ...draft, name: e.target.value })}
         />
         <TextInput
           label="Batch"
+          span={2}
           value={draft.batch}
           placeholder="e.g. 2024"
           onChange={(e) => onChange({ ...draft, batch: e.target.value })}
         />
         <TextInput
           label="Course"
+          span={3}
           value={draft.course}
           placeholder="e.g. B.E. CSE"
           onChange={(e) => onChange({ ...draft, course: e.target.value })}
         />
         <TextInput
           label="Company"
+          span={3}
           value={draft.company}
           placeholder="e.g. Infosys"
           onChange={(e) => onChange({ ...draft, company: e.target.value })}
         />
-      </div>
-      <TextArea
-        label="Quote"
-        required
-        value={draft.quote}
-        rows={3}
-        onChange={(e) => onChange({ ...draft, quote: e.target.value })}
-      />
-      <Select
-        label="Category"
-        options={CATEGORY_OPTIONS}
-        value={draft.category}
-        onChange={(e) =>
-          onChange({
-            ...draft,
-            category: e.target.value as TestimonialDraft["category"],
-          })
-        }
-      />
-      <ImageUploadInput
-        label="Avatar"
-        ratio="square"
-        value={draft.avatar}
-        onChange={(url) => onChange({ ...draft, avatar: url })}
-        hideUrlField
-      />
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={draft.is_active}
-          onChange={(e) => onChange({ ...draft, is_active: e.target.checked })}
+        <Select
+          label="Category"
+          span={4}
+          options={CATEGORY_OPTIONS}
+          value={draft.category}
+          onChange={(e) =>
+            onChange({
+              ...draft,
+              category: e.target.value as TestimonialDraft["category"],
+            })
+          }
         />
-        Active (visible on site)
-      </label>
-      {flushError && <p className="text-xs text-red-600">{flushError}</p>}
+        <Field label="Visibility" span={4}>
+          <label className="flex items-center gap-2 pt-2 text-sm">
+            <input
+              type="checkbox"
+              checked={draft.is_active}
+              onChange={(e) =>
+                onChange({ ...draft, is_active: e.target.checked })
+              }
+            />
+            Active (visible on site)
+          </label>
+        </Field>
+        <TextArea
+          label="Quote"
+          span={7}
+          required
+          value={draft.quote}
+          rows={4}
+          onChange={(e) => onChange({ ...draft, quote: e.target.value })}
+        />
+        <ImageUploadInput
+          label="Avatar"
+          span={5}
+          ratio="square"
+          value={draft.avatar}
+          onChange={(url) => onChange({ ...draft, avatar: url })}
+          hideUrlField
+        />
+      </FormGrid>
+      {flushError && <p className="mb-2 text-xs text-red-600">{flushError}</p>}
       <div className="flex gap-2">
         <button
           type="button"

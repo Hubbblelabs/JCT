@@ -29,6 +29,8 @@ import {
 import { mainNavigation } from "@/data/all-navigations";
 import { seoPagesDefaultValue } from "@/lib/seo-pages";
 import {
+  Field,
+  FormGrid,
   TextArea,
   TextInput,
   Select,
@@ -167,17 +169,25 @@ function HomeHeroForm({
   const setCards = (next: HeroCard[]) => onChange({ ...value, cards: next });
 
   return (
+    // Every group lays out on the 12-column form grid — the panel is wide, and
+    // one field per row pushed the institution cards several screens down.
     <div className="space-y-6">
-      {/* Tour Video URL */}
-      <div>
+      <FormGrid>
         <TextInput
           label="Tour Video URL"
+          span={8}
           hint="YouTube embed URL — e.g. https://www.youtube.com/embed/VIDEO_ID"
           value={value.tourVideoUrl ?? ""}
           onChange={(e) => onChange({ ...value, tourVideoUrl: e.target.value })}
           placeholder="https://www.youtube.com/embed/..."
         />
-      </div>
+        <div className="admin-col-4">
+          <CarouselSpeedInput
+            value={value.intervalMs}
+            onChange={(intervalMs) => onChange({ ...value, intervalMs })}
+          />
+        </div>
+      </FormGrid>
 
       {/* Background Images — up to 6, add / replace / remove */}
       <div>
@@ -188,10 +198,10 @@ function HomeHeroForm({
         <p className="mb-3 text-xs text-gray-400">
           Images rotate behind the hero. Upload, replace, or remove each one.
         </p>
-        <div className="space-y-2">
+        <div className="admin-form-grid admin-form-grid--tight">
           {bg.map((src, i) => (
-            <div key={i} className="flex items-start gap-2">
-              <div className="flex-1">
+            <div key={i} className="admin-col-4 flex items-start gap-2">
+              <div className="min-w-0 flex-1">
                 <ImageUploadInput
                   label={`Slide ${i + 1}`}
                   ratio="hero"
@@ -219,36 +229,29 @@ function HomeHeroForm({
               </button>
             </div>
           ))}
-          <button
-            type="button"
-            onClick={() =>
-              onChange({ ...value, backgroundImages: [...bg, ""] })
-            }
-            disabled={bg.length >= BG_LIMIT}
-            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Plus size={14} /> Add Background Image
-          </button>
         </div>
+        <button
+          type="button"
+          onClick={() => onChange({ ...value, backgroundImages: [...bg, ""] })}
+          disabled={bg.length >= BG_LIMIT}
+          className="admin-btn admin-btn-outline admin-btn-sm mt-2 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Plus size={14} /> Add Background Image
+        </button>
       </div>
 
-      {/* Carousel speed */}
-      <CarouselSpeedInput
-        value={value.intervalMs}
-        onChange={(intervalMs) => onChange({ ...value, intervalMs })}
-      />
-
-      {/* Title Lines (exactly 3, fixed count) */}
+      {/* Title Lines (exactly 3, fixed count) — one row, as they render */}
       <div>
         <h3 className="mb-2 text-sm font-semibold text-gray-700">
           Title Lines{" "}
           <span className="font-normal text-gray-400">(fixed — 3 lines)</span>
         </h3>
-        <div className="space-y-2">
+        <FormGrid tight>
           {titles.map((line, i) => (
             <TextInput
               key={i}
               label={`Line ${i + 1}`}
+              span={4}
               value={line}
               onChange={(e) => {
                 const next = [...titles];
@@ -257,10 +260,10 @@ function HomeHeroForm({
               }}
             />
           ))}
-        </div>
+        </FormGrid>
       </div>
 
-      {/* Institution Cards (3 fixed) */}
+      {/* Institution Cards (3 fixed) — side by side, as the home page shows them */}
       <div>
         <h3 className="mb-1 text-sm font-semibold text-gray-700">
           Institution Cards{" "}
@@ -269,9 +272,12 @@ function HomeHeroForm({
         <p className="mb-3 text-xs text-gray-400">
           Edit the title, description, and highlights for each institution card.
         </p>
-        <div className="space-y-3">
+        <div className="admin-form-grid admin-form-grid--tight">
           {cards.map((card, i) => (
-            <div key={i} className="rounded-lg border border-gray-200 p-3">
+            <div
+              key={i}
+              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+            >
               <p className="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
                 Card {i + 1}
               </p>
@@ -298,7 +304,7 @@ function HomeHeroForm({
               <TextArea
                 label="Description"
                 value={card.description}
-                rows={2}
+                rows={3}
                 onChange={(e) => {
                   const next = [...cards];
                   next[i] = { ...card, description: e.target.value };
@@ -357,34 +363,32 @@ function HomeStatsForm({
   onChange: (v: HomeStatsVal) => void;
 }) {
   return (
-    <div className="space-y-4">
-      <p className="text-xs text-gray-400">
+    // The stat cards render as a row on the home page; they edit as one too.
+    <div className="admin-form-grid admin-form-grid--tight">
+      <p className="admin-col-full text-xs text-gray-500">
         Each card shows a value (e.g. &ldquo;60+&rdquo;) and a label (e.g.
         &ldquo;Years of Excellence&rdquo;). Both are fully customizable.
       </p>
       {STAT_CARD_FIELDS.map(({ valueKey, labelKey, defaultLabel }, i) => (
-        <div key={valueKey} className="rounded-lg border border-gray-200 p-3">
+        <div
+          key={valueKey}
+          className="admin-col-3 rounded-lg border border-gray-200 p-3"
+        >
           <p className="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
             Card {i + 1}
           </p>
-          <div className="grid grid-cols-2 gap-3">
-            <TextInput
-              label="Value"
-              value={(value[valueKey] as string) ?? ""}
-              onChange={(e) =>
-                onChange({ ...value, [valueKey]: e.target.value })
-              }
-              placeholder="e.g. 60+"
-            />
-            <TextInput
-              label="Label"
-              value={(value[labelKey] as string) ?? ""}
-              onChange={(e) =>
-                onChange({ ...value, [labelKey]: e.target.value })
-              }
-              placeholder={defaultLabel}
-            />
-          </div>
+          <TextInput
+            label="Value"
+            value={(value[valueKey] as string) ?? ""}
+            onChange={(e) => onChange({ ...value, [valueKey]: e.target.value })}
+            placeholder="e.g. 60+"
+          />
+          <TextInput
+            label="Label"
+            value={(value[labelKey] as string) ?? ""}
+            onChange={(e) => onChange({ ...value, [labelKey]: e.target.value })}
+            placeholder={defaultLabel}
+          />
         </div>
       ))}
     </div>
@@ -490,67 +494,78 @@ function TestimonialFormInner({
   const busy = saving || flushing;
 
   return (
-    <div className="space-y-3 rounded-lg border border-blue-100 bg-blue-50/40 p-4">
-      <div className="grid grid-cols-2 gap-3">
+    <div className="rounded-lg border border-blue-100 bg-blue-50/40 p-4">
+      <FormGrid>
         <TextInput
           label="Name"
+          span={4}
           required
           value={draft.name}
           onChange={(e) => onChange({ ...draft, name: e.target.value })}
         />
         <TextInput
           label="Batch"
+          span={2}
           value={draft.batch}
           placeholder="e.g. 2024"
           onChange={(e) => onChange({ ...draft, batch: e.target.value })}
         />
         <TextInput
           label="Course"
+          span={3}
           value={draft.course}
           placeholder="e.g. B.E. CSE"
           onChange={(e) => onChange({ ...draft, course: e.target.value })}
         />
         <TextInput
           label="Company"
+          span={3}
           value={draft.company}
           placeholder="e.g. Infosys"
           onChange={(e) => onChange({ ...draft, company: e.target.value })}
         />
-      </div>
-      <TextArea
-        label="Quote"
-        required
-        value={draft.quote}
-        rows={3}
-        onChange={(e) => onChange({ ...draft, quote: e.target.value })}
-      />
-      <Select
-        label="Category"
-        options={CATEGORY_OPTIONS}
-        value={draft.category}
-        onChange={(e) =>
-          onChange({
-            ...draft,
-            category: e.target.value as TestimonialDraft["category"],
-          })
-        }
-      />
-      <ImageUploadInput
-        label="Avatar"
-        ratio="square"
-        value={draft.avatar}
-        onChange={(url) => onChange({ ...draft, avatar: url })}
-        hideUrlField
-      />
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={draft.is_active}
-          onChange={(e) => onChange({ ...draft, is_active: e.target.checked })}
+        <Select
+          label="Category"
+          span={4}
+          options={CATEGORY_OPTIONS}
+          value={draft.category}
+          onChange={(e) =>
+            onChange({
+              ...draft,
+              category: e.target.value as TestimonialDraft["category"],
+            })
+          }
         />
-        Active (visible on site)
-      </label>
-      {flushError && <p className="text-xs text-red-600">{flushError}</p>}
+        <Field label="Visibility" span={4}>
+          <label className="flex items-center gap-2 pt-2 text-sm">
+            <input
+              type="checkbox"
+              checked={draft.is_active}
+              onChange={(e) =>
+                onChange({ ...draft, is_active: e.target.checked })
+              }
+            />
+            Active (visible on site)
+          </label>
+        </Field>
+        <TextArea
+          label="Quote"
+          span={7}
+          required
+          value={draft.quote}
+          rows={4}
+          onChange={(e) => onChange({ ...draft, quote: e.target.value })}
+        />
+        <ImageUploadInput
+          label="Avatar"
+          span={5}
+          ratio="square"
+          value={draft.avatar}
+          onChange={(url) => onChange({ ...draft, avatar: url })}
+          hideUrlField
+        />
+      </FormGrid>
+      {flushError && <p className="mb-2 text-xs text-red-600">{flushError}</p>}
       <div className="flex gap-2">
         <button
           type="button"
@@ -957,19 +972,9 @@ const MAIN_NAVBAR_DEFAULT: NavbarVal = {
 };
 
 function Inner() {
+  // Same order as the Main section of the sidebar (see MAIN_GROUPS in
+  // src/lib/admin-nav.ts) — the two lists are read together.
   const sections: SectionDef[] = [
-    {
-      id: "navbar",
-      label: "Navbar",
-      kind: "custom",
-      customRender: () => (
-        <NavbarAdminSection
-          headerConfigKey="mainHeader"
-          navbarConfigKey="mainNavbar"
-          navDefault={MAIN_NAVBAR_DEFAULT}
-        />
-      ),
-    },
     {
       id: "pamphlet",
       label: "Pamphlet Popup",
@@ -980,6 +985,18 @@ function Inner() {
         <PamphletForm
           value={(v as PamphletVal) ?? {}}
           onChange={(next) => onChange(next)}
+        />
+      ),
+    },
+    {
+      id: "navbar",
+      label: "Navbar",
+      kind: "custom",
+      customRender: () => (
+        <NavbarAdminSection
+          headerConfigKey="mainHeader"
+          navbarConfigKey="mainNavbar"
+          navDefault={MAIN_NAVBAR_DEFAULT}
         />
       ),
     },

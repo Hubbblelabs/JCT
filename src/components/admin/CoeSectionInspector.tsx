@@ -1,6 +1,8 @@
 "use client";
 
 import {
+  Field,
+  FormGrid,
   TextInput,
   TextArea,
   StringList,
@@ -66,31 +68,32 @@ export function CoeSectionInspector({
         },
       });
     return (
-      <div className="space-y-4">
+      <FormGrid>
         <TextInput
           label="Sidebar Label"
+          span={5}
           value={item.label ?? ""}
           placeholder="Section name shown in the sidebar"
           onChange={(e) => updateItem({ label: e.target.value })}
         />
-        <div>
-          <div className="admin-label mb-2">Content Blocks</div>
+        <Field label="Content Blocks" span="full">
           <PageBodySectionsEditor
             value={(item.blocks ?? []) as PageBodySection[]}
             onChange={(blocks) => updateItem({ blocks })}
             allowedTypes={["heading", "text", "image", "list", "cards"]}
           />
-        </div>
-      </div>
+        </Field>
+      </FormGrid>
     );
   }
 
   switch (section) {
     case "hero":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Hero Title"
+            span={5}
             value={data.hero.title}
             onChange={(e) =>
               patch({ hero: { ...data.hero, title: e.target.value } })
@@ -98,22 +101,24 @@ export function CoeSectionInspector({
           />
           <TextArea
             label="Hero Subtitle"
+            span={7}
             rows={3}
             value={data.hero.subtitle}
             onChange={(e) =>
               patch({ hero: { ...data.hero, subtitle: e.target.value } })
             }
           />
-        </>
+        </FormGrid>
       );
 
     case "overview": {
       const ov = data.overview;
       const ctrl = ov.controller;
       return (
-        <>
+        <FormGrid>
           <TextAreaList
             label="Intro Paragraphs"
+            span="full"
             values={ov.paragraphs}
             onChange={(paragraphs) =>
               patch({ overview: { ...ov, paragraphs } })
@@ -121,11 +126,12 @@ export function CoeSectionInspector({
             placeholder="A paragraph about the COE office…"
           />
 
-          <div className="admin-label mt-5 mb-2 border-t border-gray-100 pt-4">
+          <h3 className="admin-col-full admin-section-label border-t border-gray-100 pt-4">
             Controller Profile
-          </div>
+          </h3>
           <TextInput
             label="Name"
+            span={4}
             value={ctrl.name}
             onChange={(e) =>
               patch({
@@ -138,6 +144,7 @@ export function CoeSectionInspector({
           />
           <TextInput
             label="Title"
+            span={4}
             value={ctrl.title}
             onChange={(e) =>
               patch({
@@ -150,6 +157,7 @@ export function CoeSectionInspector({
           />
           <TextInput
             label="Qualification"
+            span={4}
             value={ctrl.qual}
             onChange={(e) =>
               patch({
@@ -162,6 +170,7 @@ export function CoeSectionInspector({
           />
           <ImageUploadInput
             label="Photo"
+            span="full"
             ratio="portrait"
             value={ctrl.image}
             onChange={(image) =>
@@ -171,7 +180,8 @@ export function CoeSectionInspector({
           />
           <TextArea
             label="Pull Quote"
-            rows={3}
+            span={4}
+            rows={5}
             value={ctrl.quote}
             onChange={(e) =>
               patch({
@@ -184,6 +194,7 @@ export function CoeSectionInspector({
           />
           <TextAreaList
             label="Message Paragraphs"
+            span={8}
             values={ctrl.messages}
             onChange={(messages) =>
               patch({ overview: { ...ov, controller: { ...ctrl, messages } } })
@@ -191,35 +202,37 @@ export function CoeSectionInspector({
             placeholder="A paragraph of the controller's message…"
           />
 
-          <div className="admin-label mt-5 mb-2 border-t border-gray-100 pt-4">
-            Autonomous Academic Governance
-          </div>
-          <ItemsEditor
-            items={ov.governance as unknown as Record<string, unknown>[]}
-            onChange={(v) =>
-              patch({
-                overview: {
-                  ...ov,
-                  governance: v as unknown as Governance[],
+          <Field
+            label="Autonomous Academic Governance"
+            span="full"
+            className="border-t border-gray-100 pt-4"
+            hint="Icons are assigned automatically by position."
+          >
+            <ItemsEditor
+              items={ov.governance as unknown as Record<string, unknown>[]}
+              onChange={(v) =>
+                patch({
+                  overview: {
+                    ...ov,
+                    governance: v as unknown as Governance[],
+                  },
+                })
+              }
+              fields={[
+                { key: "title", label: "Body Name", span: "full" },
+                {
+                  key: "desc",
+                  label: "Description",
+                  type: "textarea",
+                  span: "full",
                 },
-              })
-            }
-            fields={[
-              { key: "title", label: "Body Name", span2: true },
-              {
-                key: "desc",
-                label: "Description",
-                type: "textarea",
-                span2: true,
-              },
-            ]}
-            emptyItem={{ title: "", desc: "" }}
-            addLabel="Add governance body"
-          />
-          <p className="mt-2 text-xs text-gray-400">
-            Icons are assigned automatically by position.
-          </p>
-        </>
+              ]}
+              emptyItem={{ title: "", desc: "" }}
+              addLabel="Add governance body"
+              cardSpan={4}
+            />
+          </Field>
+        </FormGrid>
       );
     }
 
@@ -227,37 +240,42 @@ export function CoeSectionInspector({
       return (
         <Repeater<Phase>
           label="Examination Phases"
+          itemSpan={6}
           items={data.responsibilities.phases}
           onChange={(phases) => patch({ responsibilities: { phases } })}
           newItem={() => ({ name: "", subtitle: "", items: [] })}
           renderItem={(item, _i, oc) => (
-            <div className="space-y-1">
+            <FormGrid tight>
               <TextInput
                 label="Phase Name"
+                span={5}
                 value={item.name}
                 onChange={(e) => oc({ ...item, name: e.target.value })}
               />
               <TextInput
                 label="Subtitle"
+                span={7}
                 value={item.subtitle}
                 onChange={(e) => oc({ ...item, subtitle: e.target.value })}
               />
               <StringList
                 label="Responsibility Items"
+                span="full"
                 values={item.items}
                 onChange={(items) => oc({ ...item, items })}
                 placeholder="A responsibility…"
               />
-            </div>
+            </FormGrid>
           )}
         />
       );
 
     case "obe":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading"
+            span={4}
             value={data.obe.heading}
             onChange={(e) =>
               patch({ obe: { ...data.obe, heading: e.target.value } })
@@ -265,7 +283,8 @@ export function CoeSectionInspector({
           />
           <TextArea
             label="Pull Quote"
-            rows={3}
+            span={8}
+            rows={2}
             value={data.obe.quote}
             onChange={(e) =>
               patch({ obe: { ...data.obe, quote: e.target.value } })
@@ -273,13 +292,14 @@ export function CoeSectionInspector({
           />
           <TextAreaList
             label="Paragraphs"
+            span="full"
             values={data.obe.paragraphs}
             onChange={(paragraphs) =>
               patch({ obe: { ...data.obe, paragraphs } })
             }
             placeholder="A paragraph about OBE…"
           />
-        </>
+        </FormGrid>
       );
 
     case "academicCalendar": {
@@ -287,22 +307,25 @@ export function CoeSectionInspector({
       const patchCal = (p: Partial<Calendar>) =>
         patch({ academicCalendar: { ...cal, ...p } });
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Section Heading"
+            span={4}
             value={cal.heading}
             placeholder="Academic Calendar"
             onChange={(e) => patchCal({ heading: e.target.value })}
           />
           <TextInput
             label="Academic Year"
+            span={3}
             value={cal.academicYear}
             placeholder="2025 – 2026"
             onChange={(e) => patchCal({ academicYear: e.target.value })}
           />
           <TextArea
             label="Section Description"
-            rows={3}
+            span={5}
+            rows={2}
             value={cal.description}
             placeholder="Key dates for the current academic year…"
             onChange={(e) => patchCal({ description: e.target.value })}
@@ -310,65 +333,75 @@ export function CoeSectionInspector({
 
           <Repeater<CalendarEvent>
             label="Calendar Dates"
+            span="full"
+            itemSpan={6}
             items={cal.events}
             onChange={(events) => patchCal({ events })}
             newItem={() => ({ title: "", date: "", note: "" })}
             renderItem={(item, _i, oc) => (
-              <div className="space-y-1">
+              <FormGrid tight>
                 <TextInput
                   label="Event"
+                  span={7}
                   value={item.title}
                   placeholder="Commencement of Classes"
                   onChange={(e) => oc({ ...item, title: e.target.value })}
                 />
                 <TextInput
                   label="Date / Period"
+                  span={5}
                   value={item.date}
                   placeholder="01 Jul 2026"
                   onChange={(e) => oc({ ...item, date: e.target.value })}
                 />
                 <TextArea
                   label="Note (optional)"
+                  span="full"
                   rows={2}
                   value={item.note}
                   onChange={(e) => oc({ ...item, note: e.target.value })}
                 />
-              </div>
+              </FormGrid>
             )}
           />
 
           <Repeater<CalendarDownload>
             label="Downloadable Calendars"
+            span="full"
+            itemSpan={6}
             items={cal.downloads}
             onChange={(downloads) => patchCal({ downloads })}
             newItem={() => ({ label: "", href: "" })}
             renderItem={(item, _i, oc) => (
-              <div className="space-y-1">
+              <FormGrid tight>
                 <TextInput
                   label="Label"
+                  span="full"
                   value={item.label}
                   placeholder="Odd Semester 2025–26"
                   onChange={(e) => oc({ ...item, label: e.target.value })}
                 />
                 <DocumentUploadInput
                   label="Calendar (PDF)"
+                  span="full"
                   value={item.href}
                   onChange={(href) => oc({ ...item, href })}
                   hint="Upload the calendar PDF — its link powers the Download button."
                 />
-              </div>
+              </FormGrid>
             )}
           />
-        </>
+        </FormGrid>
       );
     }
 
     case "downloads":
       return (
-        <>
+        <FormGrid>
           <TextArea
             label="Section Description"
-            rows={3}
+            span="full"
+            rows={2}
             value={data.downloads.description}
             onChange={(e) =>
               patch({
@@ -381,6 +414,8 @@ export function CoeSectionInspector({
           />
           <Repeater<CoeForm>
             label="Downloadable Forms"
+            span="full"
+            itemSpan={6}
             items={data.downloads.forms}
             onChange={(forms) =>
               patch({ downloads: { ...data.downloads, forms } })
@@ -388,70 +423,75 @@ export function CoeSectionInspector({
             onItemRemove={undefined}
             newItem={() => ({ title: "", desc: "", href: "" })}
             renderItem={(item, _i, oc) => (
-              <div className="space-y-1">
+              <FormGrid tight>
                 <TextInput
                   label="Form Title"
+                  span="full"
                   value={item.title}
                   onChange={(e) => oc({ ...item, title: e.target.value })}
                 />
                 <TextArea
                   label="Description"
+                  span="full"
                   rows={2}
                   value={item.desc}
                   onChange={(e) => oc({ ...item, desc: e.target.value })}
                 />
                 <DocumentUploadInput
                   label="Document (PDF)"
+                  span="full"
                   value={item.href}
                   onChange={(href) => oc({ ...item, href })}
                   hint="Upload the form PDF — its link powers the Download button."
                 />
-              </div>
+              </FormGrid>
             )}
           />
-        </>
+        </FormGrid>
       );
 
     case "sidebar":
       return (
-        <>
-          <div className="admin-label mb-2">Quick Facts</div>
-          <ItemsEditor
-            items={
-              data.sidebar.quickFacts as unknown as Record<string, unknown>[]
-            }
-            onChange={(v) =>
-              patch({
-                sidebar: {
-                  ...data.sidebar,
-                  quickFacts: v as unknown as QuickFact[],
-                },
-              })
-            }
-            fields={[
-              { key: "label", label: "Label", placeholder: "Controller" },
-              {
-                key: "value",
-                label: "Value",
-                placeholder: "Dr. D. Elangovan",
-              },
-            ]}
-            emptyItem={{ label: "", value: "" }}
-            addLabel="Add quick fact"
-          />
-          <div className="mt-4">
-            <TextInput
-              label="CTA Button Label"
-              value={data.sidebar.ctaLabel}
-              onChange={(e) =>
+        <FormGrid>
+          <Field label="Quick Facts" span="full">
+            <ItemsEditor
+              items={
+                data.sidebar.quickFacts as unknown as Record<string, unknown>[]
+              }
+              onChange={(v) =>
                 patch({
-                  sidebar: { ...data.sidebar, ctaLabel: e.target.value },
+                  sidebar: {
+                    ...data.sidebar,
+                    quickFacts: v as unknown as QuickFact[],
+                  },
                 })
               }
+              fields={[
+                { key: "label", label: "Label", placeholder: "Controller" },
+                {
+                  key: "value",
+                  label: "Value",
+                  placeholder: "Dr. D. Elangovan",
+                },
+              ]}
+              emptyItem={{ label: "", value: "" }}
+              addLabel="Add quick fact"
+              cardSpan={4}
             />
-          </div>
+          </Field>
+          <TextInput
+            label="CTA Button Label"
+            span={4}
+            value={data.sidebar.ctaLabel}
+            onChange={(e) =>
+              patch({
+                sidebar: { ...data.sidebar, ctaLabel: e.target.value },
+              })
+            }
+          />
           <TextInput
             label="CTA Button Link"
+            span={8}
             value={data.sidebar.ctaHref}
             onChange={(e) =>
               patch({
@@ -460,8 +500,7 @@ export function CoeSectionInspector({
             }
             placeholder="http://erp.jct.ac.in/…"
           />
-          <div className="mt-6">
-            <div className="admin-label mb-2">Sidebar Navigation Items</div>
+          <Field label="Sidebar Navigation Items" span="full">
             <SidebarNavEditor
               defaults={COE_NAV_DEFAULTS}
               value={data.sidebar.navItems as SidebarNavItemRaw[] | undefined}
@@ -474,8 +513,8 @@ export function CoeSectionInspector({
                 })
               }
             />
-          </div>
-        </>
+          </Field>
+        </FormGrid>
       );
 
     default:

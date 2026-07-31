@@ -89,7 +89,9 @@ const nextConfig: NextConfig = {
       // parses and defines its globals but never creates the launcher, the
       // indicator or the chat iframe — which is exactly how the chatbot came to
       // be silently absent on every public page.
-      `script-src 'self' 'unsafe-inline' https://*.nopaperforms.com https://*.npfs.co${isProd ? "" : " 'unsafe-eval'"}`,
+      // googletagmanager.com serves gtag.js (Google Analytics 4) — see the
+      // <Script> pair in src/app/layout.tsx.
+      `script-src 'self' 'unsafe-inline' https://*.nopaperforms.com https://*.npfs.co https://www.googletagmanager.com${isProd ? "" : " 'unsafe-eval'"}`,
       // The widget also pulls a per-account icon stylesheet over <link>.
       "style-src 'self' 'unsafe-inline' https://*.nopaperforms.com https://*.npfs.co",
       "img-src 'self' data: blob: https:",

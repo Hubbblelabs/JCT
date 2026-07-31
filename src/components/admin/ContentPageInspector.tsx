@@ -3,6 +3,7 @@
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import {
   DocumentUploadInput,
+  FormGrid,
   ImageUploadInput,
   Repeater,
   Select,
@@ -60,13 +61,15 @@ function DocRepeater({
   return (
     <Repeater<ContentDocValue>
       label={label}
+      itemSpan={6}
       items={docs}
       onChange={onChange}
       newItem={emptyDoc}
       renderItem={(doc, _i, oc) => (
-        <div className="space-y-1">
+        <FormGrid tight>
           <TextArea
             label="Link Label"
+            span="full"
             rows={2}
             value={doc.label}
             placeholder="Balance Sheet 2023-2024"
@@ -74,22 +77,25 @@ function DocRepeater({
           />
           <TextInput
             label="Caption (optional)"
+            span={6}
             value={doc.description}
             onChange={(e) => oc({ ...doc, description: e.target.value })}
           />
-          <DocumentUploadInput
-            label="File"
-            value={doc.file}
-            onChange={(file) => oc({ ...doc, file })}
-            hint="Upload the file, or paste a storage key / external URL below."
-          />
           <TextInput
             label="File link"
+            span={6}
             value={doc.file}
             placeholder="documents/… or https://…"
             onChange={(e) => oc({ ...doc, file: e.target.value })}
           />
-        </div>
+          <DocumentUploadInput
+            label="File"
+            span="full"
+            value={doc.file}
+            onChange={(file) => oc({ ...doc, file })}
+            hint="Upload the file, or paste a storage key / external URL above."
+          />
+        </FormGrid>
       )}
     />
   );
@@ -107,28 +113,32 @@ function ImageRepeater({
   return (
     <Repeater<ContentImageValue>
       label={label}
+      itemSpan={6}
       items={images}
       onChange={onChange}
       newItem={emptyImage}
       renderItem={(image, _i, oc) => (
-        <div className="space-y-1">
+        <FormGrid tight>
           <ImageUploadInput
             label="Image"
+            span="full"
             value={image.src}
             onChange={(src) => oc({ ...image, src })}
           />
           <TextInput
             label="Caption"
+            span={6}
             value={image.caption}
             onChange={(e) => oc({ ...image, caption: e.target.value })}
           />
           <TextInput
             label="Alt Text"
+            span={6}
             value={image.alt}
             onChange={(e) => oc({ ...image, alt: e.target.value })}
             hint="Describes the photo for screen readers."
           />
-        </div>
+        </FormGrid>
       )}
     />
   );
@@ -146,36 +156,41 @@ function BlockEditor({
   switch (block.type) {
     case "text":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading (optional)"
+            span={5}
             value={block.title}
             onChange={(e) => onChange({ ...block, title: e.target.value })}
           />
           <TextAreaList
             label="Paragraphs"
+            span="full"
             values={block.paragraphs}
             onChange={(paragraphs) => onChange({ ...block, paragraphs })}
           />
-        </>
+        </FormGrid>
       );
 
     case "list":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading (optional)"
+            span={4}
             value={block.title}
             onChange={(e) => onChange({ ...block, title: e.target.value })}
           />
           <TextArea
             label="Intro (optional)"
+            span={5}
             rows={2}
             value={block.intro}
             onChange={(e) => onChange({ ...block, intro: e.target.value })}
           />
           <Select
             label="Marker"
+            span={3}
             value={block.ordered ? "ordered" : "bulleted"}
             options={[
               { value: "bulleted", label: "Bulleted" },
@@ -187,29 +202,33 @@ function BlockEditor({
           />
           <TextAreaList
             label="Items"
+            span="full"
             rows={2}
             values={block.items}
             onChange={(items) => onChange({ ...block, items })}
           />
-        </>
+        </FormGrid>
       );
 
     case "docs":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading (optional)"
+            span={4}
             value={block.title}
             onChange={(e) => onChange({ ...block, title: e.target.value })}
           />
           <TextArea
             label="Description (optional)"
+            span={8}
             rows={2}
             value={block.description}
             onChange={(e) => onChange({ ...block, description: e.target.value })}
           />
           <Select
             label="Layout"
+            span={4}
             value={block.layout}
             options={[
               { value: "cards", label: "Cards — full titles" },
@@ -225,19 +244,22 @@ function BlockEditor({
           />
           <TextInput
             label="Link Text"
+            span={4}
             value={block.linkLabel}
             placeholder="Download"
             onChange={(e) => onChange({ ...block, linkLabel: e.target.value })}
           />
           <Repeater<ContentDocGroupValue>
             label="Groups"
+            span="full"
             items={block.groups}
             onChange={(groups) => onChange({ ...block, groups })}
             newItem={emptyDocGroup}
             renderItem={(group, _i, oc) => (
-              <div className="space-y-1">
+              <FormGrid tight>
                 <TextInput
                   label="Group Title (optional)"
+                  span={4}
                   value={group.title}
                   placeholder="Criterion 1"
                   onChange={(e) => oc({ ...group, title: e.target.value })}
@@ -247,34 +269,39 @@ function BlockEditor({
                   docs={group.docs}
                   onChange={(docs) => oc({ ...group, docs })}
                 />
-              </div>
+              </FormGrid>
             )}
           />
-        </>
+        </FormGrid>
       );
 
     case "table":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading (optional)"
+            span={4}
             value={block.title}
             onChange={(e) => onChange({ ...block, title: e.target.value })}
           />
           <TextArea
             label="Description (optional)"
+            span={8}
             rows={2}
             value={block.description}
             onChange={(e) => onChange({ ...block, description: e.target.value })}
           />
           <StringList
             label="Column Headings"
+            span="full"
+            columns
             values={block.columns}
             onChange={(columns) => onChange({ ...block, columns })}
             placeholder="S.No"
           />
           <Repeater<ContentTableRowValue>
             label="Rows"
+            span="full"
             items={block.rows}
             onChange={(rows) => onChange({ ...block, rows })}
             newItem={() => ({
@@ -282,7 +309,7 @@ function BlockEditor({
               cells: block.columns.map(() => ({ text: "", href: "" })),
             })}
             renderItem={(row, _i, oc) => (
-              <div className="space-y-1">
+              <>
                 <label className="mb-2 flex items-center gap-2 text-xs font-semibold text-gray-600">
                   <input
                     type="checkbox"
@@ -291,45 +318,52 @@ function BlockEditor({
                   />
                   Sub-heading row (spans every column)
                 </label>
-                {row.cells.map((cell, ci) => (
-                  <div
-                    key={ci}
-                    className="rounded-lg border border-gray-100 p-2"
-                  >
-                    <TextArea
-                      label={block.columns[ci]?.trim() || `Column ${ci + 1}`}
-                      rows={2}
-                      value={cell.text}
-                      onChange={(e) =>
-                        oc({
-                          ...row,
-                          cells: row.cells.map((c, j) =>
-                            j === ci ? { ...c, text: e.target.value } : c,
-                          ),
-                        })
-                      }
-                    />
-                    <TextInput
-                      label="Link (optional)"
-                      value={cell.href}
-                      placeholder="https://… or documents/…"
-                      onChange={(e) =>
-                        oc({
-                          ...row,
-                          cells: row.cells.map((c, j) =>
-                            j === ci ? { ...c, href: e.target.value } : c,
-                          ),
-                        })
-                      }
-                    />
-                  </div>
-                ))}
+                {/* One editor column per table column, so a five-column table
+                    edits as a row rather than as fifteen stacked fields. */}
+                <div className="admin-form-grid admin-form-grid--tight">
+                  {row.cells.map((cell, ci) => (
+                    <div
+                      key={ci}
+                      className="admin-col-4 rounded-lg border border-gray-100 p-2"
+                    >
+                      <TextArea
+                        label={block.columns[ci]?.trim() || `Column ${ci + 1}`}
+                        rows={2}
+                        value={cell.text}
+                        onChange={(e) =>
+                          oc({
+                            ...row,
+                            cells: row.cells.map((c, j) =>
+                              j === ci ? { ...c, text: e.target.value } : c,
+                            ),
+                          })
+                        }
+                      />
+                      <TextInput
+                        label="Link (optional)"
+                        value={cell.href}
+                        placeholder="https://… or documents/…"
+                        onChange={(e) =>
+                          oc({
+                            ...row,
+                            cells: row.cells.map((c, j) =>
+                              j === ci ? { ...c, href: e.target.value } : c,
+                            ),
+                          })
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
                 <div className="flex gap-2 pt-1">
                   <button
                     type="button"
                     className="admin-btn admin-btn-outline admin-btn-sm"
                     onClick={() =>
-                      oc({ ...row, cells: [...row.cells, { text: "", href: "" }] })
+                      oc({
+                        ...row,
+                        cells: [...row.cells, { text: "", href: "" }],
+                      })
                     }
                   >
                     <Plus size={13} /> Cell
@@ -346,28 +380,31 @@ function BlockEditor({
                     </button>
                   )}
                 </div>
-              </div>
+              </>
             )}
           />
-        </>
+        </FormGrid>
       );
 
     case "gallery":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading (optional)"
+            span={4}
             value={block.title}
             onChange={(e) => onChange({ ...block, title: e.target.value })}
           />
           <TextArea
             label="Description (optional)"
+            span={5}
             rows={2}
             value={block.description}
             onChange={(e) => onChange({ ...block, description: e.target.value })}
           />
           <Select
             label="Columns"
+            span={3}
             value={String(block.columns)}
             options={[
               { value: "2", label: "2 per row" },
@@ -383,13 +420,15 @@ function BlockEditor({
           />
           <Repeater<ContentImageGroupValue>
             label="Albums"
+            span="full"
             items={block.groups}
             onChange={(groups) => onChange({ ...block, groups })}
             newItem={emptyImageGroup}
             renderItem={(group, _i, oc) => (
-              <div className="space-y-1">
+              <FormGrid tight>
                 <TextInput
                   label="Album Title (optional)"
+                  span={4}
                   value={group.title}
                   onChange={(e) => oc({ ...group, title: e.target.value })}
                 />
@@ -398,67 +437,76 @@ function BlockEditor({
                   images={group.images}
                   onChange={(images) => oc({ ...group, images })}
                 />
-              </div>
+              </FormGrid>
             )}
           />
-        </>
+        </FormGrid>
       );
 
     case "timeline":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading (optional)"
+            span={4}
             value={block.title}
             onChange={(e) => onChange({ ...block, title: e.target.value })}
           />
           <TextArea
             label="Description (optional)"
+            span={8}
             rows={2}
             value={block.description}
             onChange={(e) => onChange({ ...block, description: e.target.value })}
           />
           <Repeater<ContentTimelineEntryValue>
             label="Entries"
+            span="full"
+            itemSpan={6}
             items={block.entries}
             onChange={(entries) => onChange({ ...block, entries })}
             newItem={() => ({ label: "", items: [] })}
             renderItem={(entry, _i, oc) => (
-              <div className="space-y-1">
+              <FormGrid tight>
                 <TextInput
                   label="Year / Label"
+                  span={4}
                   value={entry.label}
                   placeholder="2016"
                   onChange={(e) => oc({ ...entry, label: e.target.value })}
                 />
                 <TextAreaList
                   label="Milestones"
+                  span="full"
                   rows={2}
                   values={entry.items}
                   onChange={(items) => oc({ ...entry, items })}
                 />
-              </div>
+              </FormGrid>
             )}
           />
-        </>
+        </FormGrid>
       );
 
     case "accordion":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading (optional)"
+            span={4}
             value={block.title}
             onChange={(e) => onChange({ ...block, title: e.target.value })}
           />
           <TextArea
             label="Description (optional)"
+            span={5}
             rows={2}
             value={block.description}
             onChange={(e) => onChange({ ...block, description: e.target.value })}
           />
           <Select
             label="First panel"
+            span={3}
             value={block.openFirst ? "open" : "closed"}
             options={[
               { value: "open", label: "Open on load" },
@@ -470,72 +518,82 @@ function BlockEditor({
           />
           <Repeater<ContentAccordionItemValue>
             label="Panels"
+            span="full"
             items={block.items}
             onChange={(items) => onChange({ ...block, items })}
             newItem={() => ({ title: "", paragraphs: [], bullets: [] })}
             renderItem={(item, _i, oc) => (
-              <div className="space-y-1">
+              <FormGrid tight>
                 <TextInput
                   label="Panel Title"
+                  span={5}
                   value={item.title}
                   placeholder="Computer Society of India"
                   onChange={(e) => oc({ ...item, title: e.target.value })}
                 />
                 <TextAreaList
                   label="Paragraphs"
+                  span="full"
                   values={item.paragraphs}
                   onChange={(paragraphs) => oc({ ...item, paragraphs })}
                 />
                 <TextAreaList
                   label="Bullet Points"
+                  span="full"
                   rows={2}
                   values={item.bullets}
                   onChange={(bullets) => oc({ ...item, bullets })}
                 />
-              </div>
+              </FormGrid>
             )}
           />
-        </>
+        </FormGrid>
       );
 
     case "contact":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Heading"
+            span={5}
             value={block.title}
             placeholder="For Feedback and Comments"
             onChange={(e) => onChange({ ...block, title: e.target.value })}
           />
           <TextArea
             label="Text"
-            rows={3}
+            span={7}
+            rows={2}
             value={block.text}
             onChange={(e) => onChange({ ...block, text: e.target.value })}
           />
           <TextInput
             label="Email"
+            span={6}
             value={block.email}
             placeholder="principal@jct.ac.in"
             onChange={(e) => onChange({ ...block, email: e.target.value })}
           />
           <TextInput
             label="Phone"
+            span={6}
             value={block.phone}
             onChange={(e) => onChange({ ...block, phone: e.target.value })}
           />
           <TextInput
             label="Button Label"
+            span={4}
             value={block.linkLabel}
             onChange={(e) => onChange({ ...block, linkLabel: e.target.value })}
           />
           <TextInput
             label="Button Link"
+            span={8}
             value={block.linkHref}
             placeholder="https://…"
             onChange={(e) => onChange({ ...block, linkHref: e.target.value })}
           />
-        </>
+        </FormGrid>
       );
   }
 }
@@ -588,11 +646,12 @@ function BlockList({
 
   return (
     <div className="space-y-3">
-      <div className="space-y-2">
+      {/* Two block rows at a time — the list is a jump menu, not a form. */}
+      <div className="admin-form-grid admin-form-grid--tight">
         {blocks.map((block, i) => (
           <div
             key={i}
-            className="flex items-start gap-2 rounded-lg border border-gray-200 p-3"
+            className="admin-col-6 flex items-start gap-2 rounded-lg border border-gray-200 p-3"
           >
             <button
               type="button"
@@ -638,7 +697,7 @@ function BlockList({
           </div>
         ))}
         {blocks.length === 0 && (
-          <p className="rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-400">
+          <p className="admin-col-full rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-400">
             No blocks yet — add one below.
           </p>
         )}
@@ -706,9 +765,10 @@ export function ContentPageInspector({
   switch (section) {
     case "hero":
       return (
-        <>
+        <FormGrid>
           <TextInput
             label="Hero Title"
+            span={5}
             value={data.hero.title}
             onChange={(e) =>
               patch({ hero: { ...data.hero, title: e.target.value } })
@@ -716,37 +776,42 @@ export function ContentPageInspector({
           />
           <TextArea
             label="Hero Subtitle"
+            span={7}
             rows={3}
             value={data.hero.subtitle}
             onChange={(e) =>
               patch({ hero: { ...data.hero, subtitle: e.target.value } })
             }
           />
-        </>
+        </FormGrid>
       );
 
     case "breadcrumb":
       return (
         <Repeater<ContentBreadcrumbValue>
           label="Breadcrumb Trail"
+          itemSpan={6}
           items={data.breadcrumb}
           onChange={(breadcrumb) => patch({ breadcrumb })}
           newItem={() => ({ label: "", href: "" })}
           renderItem={(crumb, _i, oc) => (
-            <div className="space-y-1">
+            <FormGrid tight>
               <TextInput
                 label="Label"
+                span={5}
                 value={crumb.label}
                 placeholder="Engineering"
                 onChange={(e) => oc({ ...crumb, label: e.target.value })}
               />
               <TextInput
-                label="Link (leave blank for the current page)"
+                label="Link"
+                span={7}
+                hint="Leave blank for the current page."
                 value={crumb.href}
                 placeholder="/institutions/engineering"
                 onChange={(e) => oc({ ...crumb, href: e.target.value })}
               />
-            </div>
+            </FormGrid>
           )}
         />
       );

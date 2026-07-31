@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronsUpDown,
+  Loader2,
   Search,
   X,
 } from "lucide-react";
@@ -69,6 +70,9 @@ export function DataTable<T>({
   onRowClick,
   initialSort,
   pageSize,
+  hasMore = false,
+  loadingMore = false,
+  onLoadMore,
 }: {
   rows: T[];
   columns: Column<T>[];
@@ -85,6 +89,13 @@ export function DataTable<T>({
   initialSort?: { key: string; dir: "asc" | "desc" };
   /** Rows per page. Omit to render every row, which is the default. */
   pageSize?: number;
+  /**
+   * Incremental loading: the caller holds only part of the data and can fetch
+   * the next chunk. Paging past the last loaded page asks for it.
+   */
+  hasMore?: boolean;
+  loadingMore?: boolean;
+  onLoadMore?: () => void;
 }) {
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState(initialSort ?? null);
@@ -140,10 +151,12 @@ export function DataTable<T>({
   );
 
   // A narrowed result set must not leave the reader stranded on a page that no
-  // longer exists — or worse, on page 4 of a 2-page result.
+  // longer exists — or worse, on page 4 of a 2-page result. `safePage` clamps
+  // the rest; only a new search jumps back to the top. Resetting on `rows`
+  // too would fight incremental loading, which appends to that same array.
   useEffect(() => {
     setPage(1);
-  }, [deferredQuery, rows]);
+  }, [deferredQuery]);
 
   const selectedRows = useMemo(
     () => sorted.filter((r) => selected.has(rowKey(r))),
@@ -385,7 +398,7 @@ export function DataTable<T>({
                 : `${sorted.length} of ${rows.length} items`}
           </span>
 
-          {pageSize && totalPages > 1 && (
+          {pageSize && (totalPages > 1 || hasMore) && (
             <nav aria-label="Pagination" className="admin-pagination-controls">
               <button
                 type="button"
@@ -398,15 +411,30 @@ export function DataTable<T>({
               </button>
               <span aria-live="polite">
                 Page {safePage} of {totalPages}
+                {hasMore ? "+" : ""}
               </span>
               <button
                 type="button"
-                onClick={() => setPage(safePage + 1)}
-                disabled={safePage >= totalPages}
+                // At the end of what is loaded, Next fetches the next chunk
+                // and steps onto the page it fills.
+                onClick={() => {
+                  if (safePage >= totalPages) {
+                    onLoadMore?.();
+                    setPage(safePage + 1);
+                  } else {
+                    setPage(safePage + 1);
+                  }
+                }}
+                disabled={
+                  loadingMore || (safePage >= totalPages && !(hasMore && onLoadMore))
+                }
                 className="admin-btn admin-btn-outline admin-btn-sm"
               >
-                Next
-                <ChevronRight size={13} />
+                {loadingMore ? (
+                  <Loader2 size={13} className="animate-spin" />
+                ) : null}
+                {loadingMore ? "Loading…" : "Next"}
+                {!loadingMore && <ChevronRight size={13} />}
               </button>
             </nav>
           )}

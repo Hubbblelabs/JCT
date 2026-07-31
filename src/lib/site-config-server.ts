@@ -37,7 +37,10 @@ export async function getPublishedConfigValue(
       status?: string;
       published_value?: unknown;
     }>();
-    if (!doc || doc.status !== "published" || !doc.published_value) {
+    // `published_value` alone is the gate: it is only ever written by a
+    // publish, while `status` flips to "draft" as soon as an editor saves
+    // without publishing — which must not blank the already-live section.
+    if (!doc || !doc.published_value) {
       return null;
     }
     if (key === "homeProspectus") {
@@ -76,8 +79,9 @@ export async function getPublishedConfigs(
   }>) {
     // Public pages must only ever render published values. Falling back to
     // the draft `value` would leak unpublished edits to anonymous visitors
-    // (the public API route enforces the same rule).
-    if (doc.status !== "published" || !doc.published_value) continue;
+    // (the public API route enforces the same rule). `status` is not part of
+    // the test — a pending draft must not hide the published version.
+    if (!doc.published_value) continue;
     let value: unknown = doc.published_value;
     if (doc.config_key === "homeProspectus")
       value = resolveProspectusUrl(value);

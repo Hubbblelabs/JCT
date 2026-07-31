@@ -51,8 +51,13 @@ export async function GET(req: Request) {
       const doc = await SiteConfig.findOne({ config_key: key });
       // Public endpoint must only ever return published values. Falling back
       // to `doc.value` leaks unpublished drafts to anonymous visitors.
+      //
+      // `published_value` alone is the gate, not `status`: it is written only
+      // by a publish, so it is never draft content — while `status` flips to
+      // "draft" the moment an editor saves without publishing, which would
+      // otherwise blank a live section that is perfectly published.
       let payload: Envelope;
-      if (!doc || doc.status !== "published" || !doc.published_value) {
+      if (!doc || !doc.published_value) {
         payload = { source: "empty", data: null };
       } else {
         let value: unknown = doc.published_value;
@@ -74,7 +79,7 @@ export async function GET(req: Request) {
 
     const data: Record<string, unknown> = {};
     for (const doc of docs) {
-      if (doc.status !== "published" || !doc.published_value) continue;
+      if (!doc.published_value) continue;
       let value: unknown = doc.published_value;
       if (doc.config_key === "homeProspectus") {
         value = resolveProspectusUrl(value);

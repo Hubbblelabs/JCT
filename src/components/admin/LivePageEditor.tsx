@@ -2,11 +2,16 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Check, Loader2, X, ExternalLink } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Save, X, ExternalLink } from "lucide-react";
 import {
   DeferredUploadsProvider,
   useDeferredUploads,
 } from "@/lib/deferred-uploads";
+import {
+  loadEditableConfig,
+  saveEditableConfig,
+  type SaveMode,
+} from "@/lib/admin-site-config";
 
 /**
  * Shared shell for the click-to-edit + inspector editors (the same pattern the
@@ -25,8 +30,12 @@ type Props<T> = {
   subtitle: string;
   /** Parsed schema defaults, used when the key has not been seeded yet. */
   emptyValue: () => T;
-  /** Section keys in the order the quick-jump buttons should appear. */
-  sectionOrder: readonly string[];
+  /**
+   * Kept on the type because callers pass it, but no longer rendered: the
+   * quick-jump button strip duplicated the preview itself, where clicking the
+   * section you want is both faster and unambiguous.
+   */
+  sectionOrder?: readonly string[];
   sectionLabels: Record<string, string>;
   /**
    * Inspector heading for the selected section. Needed when a page has
@@ -63,7 +72,6 @@ function LivePageEditorInner<T>({
   title,
   subtitle,
   emptyValue,
-  sectionOrder,
   sectionLabels,
   sectionTitle,
   initialSection,
@@ -75,7 +83,7 @@ function LivePageEditorInner<T>({
 
   const [draft, setDraft] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = useState<SaveMode | null>(null);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
   const [selected, setSelected] = useState<string>(initialSection);
   const [inspectorOpen, setInspectorOpen] = useState(false);
@@ -85,17 +93,12 @@ function LivePageEditorInner<T>({
     setLoading(true);
     setDraft(null);
     setMsg(null);
-    fetch(`/api/public/site-config?key=${configKey}`)
-      .then((r) => r.json())
+    loadEditableConfig<T>(configKey)
       .then((res) => {
         if (cancelled) return;
         // Key not yet seeded — open the editor with schema defaults so the
         // admin can fill in a brand-new page instead of hitting an error.
-        setDraft(
-          res?.data && typeof res.data === "object"
-            ? (res.data as T)
-            : emptyValue(),
-        );
+        setDraft(res.value ?? emptyValue());
       })
       .catch((err) => {
         if (!cancelled) {
@@ -119,32 +122,30 @@ function LivePageEditorInner<T>({
     setInspectorOpen(true);
   };
 
-  const save = async () => {
-    setSaving(true);
+  const save = async (mode: SaveMode) => {
+    setSaving(mode);
     setMsg(null);
     try {
       const flushedDraft = (await flush(draft)) as T;
       setDraft(flushedDraft);
-      const r = await fetch("/api/admin/site-config", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ config_key: configKey, value: flushedDraft }),
+      await saveEditableConfig(configKey, flushedDraft, mode);
+      setMsg({
+        text: mode === "publish" ? "Saved & published" : "Draft saved",
+        ok: true,
       });
-      if (r.ok) {
-        setMsg({ text: "Saved & published", ok: true });
-      } else {
-        const e = await r.json().catch(() => null);
-        setMsg({ text: e?.message ?? e?.error ?? "Save failed", ok: false });
-      }
     } catch (err) {
       setMsg({
         text: err instanceof Error ? err.message : "Save failed",
         ok: false,
       });
     } finally {
-      setSaving(false);
+      setSaving(null);
     }
   };
+
+  const saveButtons = (full?: boolean) => (
+    <SaveButtons saving={saving} disabled={loading} onSave={save} full={full} />
+  );
 
   return (
     <div className="admin-content">
@@ -163,19 +164,6 @@ function LivePageEditorInner<T>({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          {sectionOrder.map((s) => (
-            <button
-              key={s}
-              onClick={() => selectSection(s)}
-              className={`admin-btn admin-btn-sm ${
-                selected === s && inspectorOpen
-                  ? "admin-btn-primary"
-                  : "admin-btn-outline"
-              }`}
-            >
-              {sectionLabels[s] ?? s}
-            </button>
-          ))}
           <a
             href={publicPath}
             target="_blank"
@@ -193,18 +181,7 @@ function LivePageEditorInner<T>({
               {msg.text}
             </span>
           )}
-          <button
-            onClick={save}
-            disabled={saving || loading}
-            className="admin-btn admin-btn-primary"
-          >
-            {saving ? (
-              <Loader2 size={15} className="animate-spin" />
-            ) : (
-              <Check size={15} />
-            )}
-            {saving ? "Saving…" : "Save & Publish"}
-          </button>
+          {saveButtons()}
         </div>
       </div>
 
@@ -220,7 +197,8 @@ function LivePageEditorInner<T>({
 
       {inspectorOpen && draft && (
         <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 p-0 sm:p-4">
-          <aside className="flex h-full w-full flex-col overflow-y-auto bg-white shadow-2xl sm:max-w-md sm:rounded-xl">
+          {/* Wide enough for the two-column form grid the inspectors use. */}
+          <aside className="flex h-full w-full flex-col overflow-y-auto bg-white shadow-2xl sm:max-w-3xl sm:rounded-xl">
             <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
               <div>
                 <p className="text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">
@@ -249,22 +227,60 @@ function LivePageEditorInner<T>({
               })}
             </div>
             <div className="sticky bottom-0 mt-auto border-t border-gray-100 bg-white px-6 py-3">
-              <button
-                onClick={save}
-                disabled={saving}
-                className="admin-btn admin-btn-primary w-full justify-center"
-              >
-                {saving ? (
-                  <Loader2 size={15} className="animate-spin" />
-                ) : (
-                  <Check size={15} />
-                )}
-                {saving ? "Saving…" : "Save & Publish"}
-              </button>
+              {saveButtons(true)}
             </div>
           </aside>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * The editors' one save control: "Save" keeps the change as a draft, "Save &
+ * Publish" also makes it live. Shared so the header and the inspector footer
+ * cannot drift apart.
+ */
+export function SaveButtons({
+  saving,
+  disabled,
+  onSave,
+  full,
+}: {
+  saving: SaveMode | null;
+  disabled?: boolean;
+  onSave: (mode: SaveMode) => void;
+  /** Stretch to fill the row — used in the inspector footer. */
+  full?: boolean;
+}) {
+  const busy = saving !== null || disabled;
+  return (
+    <div className={`flex items-center gap-2 ${full ? "w-full" : ""}`}>
+      <button
+        onClick={() => onSave("draft")}
+        disabled={busy}
+        title="Save without publishing — the live page keeps its current content"
+        className={`admin-btn admin-btn-outline ${full ? "flex-1 justify-center" : ""}`}
+      >
+        {saving === "draft" ? (
+          <Loader2 size={15} className="animate-spin" />
+        ) : (
+          <Save size={15} />
+        )}
+        {saving === "draft" ? "Saving…" : "Save"}
+      </button>
+      <button
+        onClick={() => onSave("publish")}
+        disabled={busy}
+        className={`admin-btn admin-btn-primary ${full ? "flex-1 justify-center" : ""}`}
+      >
+        {saving === "publish" ? (
+          <Loader2 size={15} className="animate-spin" />
+        ) : (
+          <Check size={15} />
+        )}
+        {saving === "publish" ? "Publishing…" : "Save & Publish"}
+      </button>
     </div>
   );
 }

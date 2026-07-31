@@ -1,7 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { TextInput, Select } from "@/components/admin/inputs";
+import {
+  Field,
+  FormGrid,
+  TextInput,
+  Select,
+} from "@/components/admin/inputs";
 import {
   Check,
   Loader2,
@@ -397,75 +402,85 @@ export default function UsersPage() {
           />
         )}
 
-        <TextInput
-          label="Full name"
-          value={form.full_name}
-          onChange={(e) => set("full_name", e.target.value)}
-          required
-        />
-
-        {!editing && (
+        {/* Identity, then credentials, then what they are allowed to touch. */}
+        <FormGrid>
           <TextInput
-            label="Email"
-            type="email"
-            value={form.email}
-            onChange={(e) => set("email", e.target.value)}
+            label="Full name"
+            span={editing ? 6 : 4}
+            value={form.full_name}
+            onChange={(e) => set("full_name", e.target.value)}
             required
-            hint="This is also their sign-in name and cannot be changed later."
           />
-        )}
 
-        <TextInput
-          label={editing ? "New password" : "Password"}
-          type="password"
-          value={form.password}
-          onChange={(e) => set("password", e.target.value)}
-          required={!editing}
-          autoComplete="new-password"
-          hint={
-            editing
-              ? "Leave blank to keep their current password."
-              : "At least 8 characters."
-          }
-        />
-
-        <Select
-          label="Role"
-          value={form.role}
-          options={ROLES}
-          onChange={(e) => setRole(e.target.value)}
-          hint="Admins can also manage people, settings and the audit log."
-        />
-
-        {form.role === "editor" ? (
-          <Select
-            label="College they can edit"
-            value={form.institution}
-            options={EDITOR_INSTITUTIONS}
-            onChange={(e) => set("institution", e.target.value)}
-            hint="They will not be able to open or change any other college's content."
-          />
-        ) : (
-          <div className="mb-4">
-            <Banner tone="warning" title="Full access">
-              Admins can edit every college, manage accounts, and restore or
-              reset site configuration.
-            </Banner>
-          </div>
-        )}
-
-        {editing && (
-          <label className="flex items-center gap-2">
-            <input
-              type="checkbox"
-              checked={form.is_active}
-              onChange={(e) => set("is_active", e.target.checked)}
+          {!editing && (
+            <TextInput
+              label="Email"
+              span={4}
+              type="email"
+              value={form.email}
+              onChange={(e) => set("email", e.target.value)}
+              required
+              hint="This is also their sign-in name and cannot be changed later."
             />
-            <span className="text-[length:var(--admin-text-body)] text-[var(--admin-text-secondary)]">
-              Allow this person to sign in
-            </span>
-          </label>
-        )}
+          )}
+
+          <TextInput
+            label={editing ? "New password" : "Password"}
+            span={editing ? 6 : 4}
+            type="password"
+            value={form.password}
+            onChange={(e) => set("password", e.target.value)}
+            required={!editing}
+            autoComplete="new-password"
+            hint={
+              editing
+                ? "Leave blank to keep their current password."
+                : "At least 8 characters."
+            }
+          />
+
+          <Select
+            label="Role"
+            span={6}
+            value={form.role}
+            options={ROLES}
+            onChange={(e) => setRole(e.target.value)}
+            hint="Admins can also manage people, settings and the audit log."
+          />
+
+          {form.role === "editor" ? (
+            <Select
+              label="College they can edit"
+              span={6}
+              value={form.institution}
+              options={EDITOR_INSTITUTIONS}
+              onChange={(e) => set("institution", e.target.value)}
+              hint="They will not be able to open or change any other college's content."
+            />
+          ) : (
+            <Field label="Access" span={6}>
+              <Banner tone="warning" title="Full access">
+                Admins can edit every college, manage accounts, and restore or
+                reset site configuration.
+              </Banner>
+            </Field>
+          )}
+
+          {editing && (
+            <Field label="Sign-in" span="full">
+              <label className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  checked={form.is_active}
+                  onChange={(e) => set("is_active", e.target.checked)}
+                />
+                <span className="text-[length:var(--admin-text-body)] text-[var(--admin-text-secondary)]">
+                  Allow this person to sign in
+                </span>
+              </label>
+            </Field>
+          )}
+        </FormGrid>
       </Drawer>
     </PageShell>
   );
