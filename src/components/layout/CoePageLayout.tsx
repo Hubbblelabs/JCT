@@ -379,7 +379,10 @@ export function CoePageLayout({
 
         <div className="mt-8 lg:mt-12 lg:grid lg:grid-cols-[280px_1fr] lg:gap-12 xl:grid-cols-[300px_1fr]">
           <div className="hidden lg:block">
-            <div className="sticky top-32">
+            {/* Capped to the viewport (the `top-32` offset plus the bottom band
+                held by the floating Apply / WhatsApp buttons) and scrollable so
+                a long nav list stays fully reachable. */}
+            <div className="sticky top-32 max-h-[calc(100vh-14rem)] overflow-y-auto overscroll-contain">
               <CoeSideNav
                 data={data}
                 activeId={activeId}

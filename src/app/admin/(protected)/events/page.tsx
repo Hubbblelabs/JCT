@@ -6,8 +6,6 @@ import {
   FormGrid,
   TextInput,
   TextArea,
-  Select,
-  NumberInput,
   ImageUploadInput,
 } from "@/components/admin/inputs";
 import {
@@ -20,6 +18,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { DataTable, type Column } from "@/components/admin/kit/DataTable";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 import {
@@ -62,12 +61,6 @@ const EMPTY: Omit<EventItem, "_id"> = {
   is_active: true,
   sort_order: 0,
 };
-
-const INSTITUTIONS = [
-  { value: "engineering", label: "Engineering" },
-  { value: "arts-science", label: "Arts & Science" },
-  { value: "polytechnic", label: "Polytechnic" },
-];
 
 const INSTITUTION_LABELS: Record<string, string> = {
   engineering: "Engineering",
@@ -245,6 +238,100 @@ function EventsPageInner() {
     await load();
   };
 
+  const columns: Column<EventItem>[] = [
+    {
+      key: "title",
+      header: "Title",
+      sortable: true,
+      value: (e) => `${e.title} ${e.slug} ${e.location}`,
+      render: (e) => (
+        <span className="block">
+          <span className="block font-medium">{e.title}</span>
+          <span className="block text-xs text-gray-400">/events/{e.slug}</span>
+        </span>
+      ),
+    },
+    {
+      key: "event_date",
+      header: "Date",
+      sortable: true,
+      // Sort on the raw ISO string, not the display text — "02 Feb" ahead of
+      // "10 Jan" is what alphabetical ordering of the formatted date gives.
+      value: (e) => e.event_date ?? "",
+      render: (e) => (
+        <span className="text-sm text-gray-500">
+          {formatDate(e.event_date)}
+        </span>
+      ),
+    },
+    {
+      key: "category",
+      header: "Category",
+      sortable: true,
+      value: (e) => e.category,
+      render: (e) => (
+        <span className="admin-badge admin-badge-blue">{e.category}</span>
+      ),
+    },
+    {
+      key: "institution",
+      header: "College",
+      sortable: true,
+      hideOnMobile: true,
+      value: (e) => INSTITUTION_LABELS[e.institution] ?? e.institution,
+      render: (e) => (
+        <span className="admin-badge admin-badge-gray">
+          {INSTITUTION_LABELS[e.institution] ?? e.institution}
+        </span>
+      ),
+    },
+    {
+      key: "is_active",
+      header: "Status",
+      sortable: true,
+      value: (e) => (e.is_active ? "Active" : "Hidden"),
+      render: (e) => (
+        <span
+          className={`admin-badge ${e.is_active ? "admin-badge-green" : "admin-badge-red"}`}
+        >
+          {e.is_active ? "Active" : "Hidden"}
+        </span>
+      ),
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "right",
+      // The main aggregate is read-only — it names the source college instead
+      // of offering edits that belong on that college's page.
+      render: (e) =>
+        isMain ? null : (
+          <div className="flex justify-end gap-1">
+            <button
+              onClick={(ev) => {
+                ev.stopPropagation();
+                openEdit(e);
+              }}
+              aria-label={`Edit ${e.title}`}
+              className="admin-btn admin-btn-outline admin-btn-sm"
+            >
+              <Pencil size={13} />
+            </button>
+            <button
+              onClick={(ev) => {
+                ev.stopPropagation();
+                void del(e._id);
+              }}
+              aria-label={`Delete ${e.title}`}
+              className="admin-btn admin-btn-danger admin-btn-sm"
+            >
+              <Trash2 size={13} />
+            </button>
+          </div>
+        ),
+    },
+  ];
+
   return (
     <>
       <div className="admin-content">
@@ -281,85 +368,28 @@ function EventsPageInner() {
           )}
         </div>
 
-        <div className="admin-card overflow-x-auto p-0">
-          {loading ? (
-            <div className="flex justify-center py-12">
-              <Loader2 size={24} className="animate-spin text-gray-400" />
-            </div>
-          ) : (
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Date</th>
-                  <th>Category</th>
-                  <th>College</th>
-                  <th>Status</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {events.length === 0 && (
-                  <tr>
-                    <td colSpan={6} className="py-10 text-center text-gray-400">
-                      No events yet.
-                    </td>
-                  </tr>
-                )}
-                {events.map((e) => (
-                  <tr key={e._id}>
-                    <td className="font-medium">
-                      {e.title}
-                      <span className="block text-xs text-gray-400">
-                        /events/{e.slug}
-                      </span>
-                    </td>
-                    <td className="text-sm text-gray-500">
-                      {formatDate(e.event_date)}
-                    </td>
-                    <td>
-                      <span className="admin-badge admin-badge-blue">
-                        {e.category}
-                      </span>
-                    </td>
-                    <td className="text-sm text-gray-500">
-                      <span className="admin-badge admin-badge-gray">
-                        {INSTITUTION_LABELS[e.institution] ?? e.institution}
-                      </span>
-                    </td>
-                    <td>
-                      <span
-                        className={`admin-badge ${e.is_active ? "admin-badge-green" : "admin-badge-red"}`}
-                      >
-                        {e.is_active ? "Active" : "Hidden"}
-                      </span>
-                    </td>
-                    <td>
-                      {/* The main aggregate is read-only — it names the source
-                          college instead of linking away to it. */}
-                      {!isMain && (
-                        <div className="flex gap-1">
-                          <button
-                            onClick={() => openEdit(e)}
-                            className="admin-btn admin-btn-outline admin-btn-sm"
-                          >
-                            <Pencil size={13} />
-                          </button>
-                          <button
-                            onClick={() => del(e._id)}
-                            className="admin-btn admin-btn-danger admin-btn-sm"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+        <DataTable
+          rows={events}
+          columns={columns}
+          rowKey={(e) => e._id}
+          loading={loading}
+          searchPlaceholder="Search title, category or location…"
+          onRowClick={isMain ? undefined : openEdit}
+          initialSort={{ key: "event_date", dir: "desc" }}
+          // Colleges accumulate events every term, so this list is the one that
+          // outgrows a single screen — page it rather than rendering hundreds
+          // of rows at once.
+          pageSize={20}
+          empty={{
+            title: "No events yet",
+            body: "Announcements, events and news entries for this college.",
+            action: isMain ? undefined : (
+              <button onClick={openNew} className="admin-btn admin-btn-primary">
+                <Plus size={16} /> Add Event
+              </button>
+            ),
+          }}
+        />
       </div>
 
       {editing && (
@@ -425,27 +455,15 @@ function EventsPageInner() {
                     <option key={c} value={c} />
                   ))}
                 </datalist>
+                {/* No College or Sort order field: authoring only happens
+                    inside a college scope, so the college is fixed by the URL,
+                    and events are ordered by date. */}
                 <TextInput
                   label="Location"
-                  span={4}
+                  span={6}
                   value={form.location}
                   onChange={(e) => set("location", e.target.value)}
                   placeholder="Main Auditorium"
-                />
-                <Select
-                  label="College"
-                  span={3}
-                  value={form.institution}
-                  options={INSTITUTIONS}
-                  onChange={(e) => set("institution", e.target.value)}
-                  disabled={!!filterInst}
-                />
-                <NumberInput
-                  label="Sort order"
-                  span={2}
-                  value={form.sort_order}
-                  onChange={(e) => set("sort_order", Number(e.target.value))}
-                  min={0}
                 />
                 <ImageUploadInput
                   label="Cover image"

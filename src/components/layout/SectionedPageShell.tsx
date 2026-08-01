@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ExternalLink } from "lucide-react";
+import { EditableRegion } from "@/components/admin/EditableRegion";
 
 /**
  * Sidebar + panels shell for pages that absorbed what used to be separate
@@ -41,10 +42,21 @@ export function SectionedPageShell({
   items,
   navTitle = "On This Page",
   className = "",
+  editable = false,
+  navSection,
+  onEditSection,
 }: {
   items: PageSectionItem[];
   navTitle?: string;
   className?: string;
+  /**
+   * Admin preview: clicking the sidebar's chrome (not its entries — those keep
+   * switching panels) opens `navSection` in the inspector, which is where the
+   * tab order, labels and custom tabs are edited.
+   */
+  editable?: boolean;
+  navSection?: string;
+  onEditSection?: (section: string) => void;
 }) {
   const panelIds = useMemo(
     () => items.filter((i) => !i.href).map((i) => i.id),
@@ -92,12 +104,21 @@ export function SectionedPageShell({
 
   if (items.length === 0) return null;
 
+  const navEditable = editable && !!navSection;
+
   return (
     <div
       className={`lg:grid lg:grid-cols-[280px_1fr] lg:items-start lg:gap-10 xl:grid-cols-[300px_1fr] xl:gap-12 ${className}`}
     >
       {/* Mobile: horizontally scrollable pill bar */}
-      <div className="-mx-4 mb-6 w-full overflow-x-auto px-4 pb-2 lg:hidden">
+      <EditableRegion
+        as="div"
+        section={navSection ?? ""}
+        label={navTitle}
+        editable={navEditable}
+        onEditSection={onEditSection}
+        className="-mx-4 mb-6 w-full overflow-x-auto px-4 pb-2 lg:hidden"
+      >
         <div className="flex w-max gap-2">
           {items.map((item) => (
             <SectionNavEntry
@@ -109,11 +130,18 @@ export function SectionedPageShell({
             />
           ))}
         </div>
-      </div>
+      </EditableRegion>
 
       {/* Desktop: sticky card. `sticky` needs the grid item to be its own box,
           not stretched to the row height — hence `items-start` above. */}
-      <nav className="border-border sticky top-24 hidden rounded-2xl border bg-white p-5 shadow-sm lg:block">
+      <EditableRegion
+        as="nav"
+        section={navSection ?? ""}
+        label={navTitle}
+        editable={navEditable}
+        onEditSection={onEditSection}
+        className="border-border sticky top-24 hidden max-h-[calc(100vh-12rem)] overflow-y-auto overscroll-contain rounded-2xl border bg-white p-5 shadow-sm lg:block"
+      >
         <h2 className="text-navy border-border mb-4 border-b pb-3 text-xs font-bold tracking-[0.15em] uppercase">
           {navTitle}
         </h2>
@@ -128,7 +156,7 @@ export function SectionedPageShell({
             />
           ))}
         </div>
-      </nav>
+      </EditableRegion>
 
       <div ref={panelsRef} className="min-w-0">
         {items
@@ -211,6 +239,7 @@ function SectionNavEntry({
     return (
       <Link
         href={item.href}
+        onClick={(e) => e.stopPropagation()}
         target={isExternal ? "_blank" : undefined}
         rel={isExternal ? "noopener noreferrer" : undefined}
         className={cls}
@@ -227,7 +256,12 @@ function SectionNavEntry({
   return (
     <button
       type="button"
-      onClick={() => onSelect(item.id)}
+      // Stop the click short of the surrounding EditableRegion in the admin
+      // preview: picking a tab must switch panels, not open the inspector.
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect(item.id);
+      }}
       aria-current={active ? "true" : undefined}
       className={cls}
     >

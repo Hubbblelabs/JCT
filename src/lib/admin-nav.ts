@@ -96,37 +96,58 @@ const COLLEGE_NAV_LABELS: Record<College, string> = {
 /** Colleges that publish a committees & cells page — see /admin/committees. */
 const COMMITTEE_COLLEGES: College[] = ["engineering", "polytechnic"];
 
-/** Groups for one college. Engineering carries extra sub-pages. */
+/**
+ * Order of the standalone content-page editors inside "Other Pages". Anything
+ * the registry gains later that is not listed here lands at the end rather
+ * than disappearing.
+ */
+const CONTENT_PAGE_ORDER: string[] = [
+  "library",
+  "professional-bodies",
+  "cyber-safety",
+  "nss",
+  "feedback-system",
+  "mandatory-disclosures",
+  "hr-manual",
+  "fine-arts-club",
+];
+
+/**
+ * Groups for one college: what the landing page renders, then every other
+ * page. Engineering carries extra sub-pages.
+ */
 function collegeGroups(college: College): AdminNavGroup[] {
   const eng = college === "engineering";
   const q = `college=${college}`;
   const pc = (section: string) => `/admin/page-content?${q}&section=${section}`;
 
-  // Editors for the block-based content pages (Library, NIRF, Timeline, …).
-  // They all share one route — the registry decides which pages exist and
-  // which hub group each card belongs to.
-  const contentItems = (
-    group: (typeof CONTENT_PAGES)[number]["group"],
-  ): AdminNavItem[] =>
-    CONTENT_PAGES.filter(
-      (p) => p.institution === college && p.group === group,
-    ).map((p) => ({
-      label: p.label,
-      href: `/admin/content/${p.slug}`,
-      icon: p.icon,
-      description: p.description,
-    }));
+  // Editors for the block-based content pages (Library, NSS, HR Manual, …).
+  // They all share one route — the registry decides which pages exist.
+  //
+  // A page with a `host` is deliberately absent: it publishes as a panel of
+  // another page (Timeline inside About, NIRF inside Reports & Downloads, the
+  // NAAC sub-pages inside NAAC…), and its editor is reached from that page's
+  // own editor. Listing it here as well would offer two doors to one panel.
+  const contentItems = (): AdminNavItem[] =>
+    CONTENT_PAGES.filter((p) => p.institution === college && !p.host)
+      .slice()
+      .sort((a, b) => {
+        const ai = CONTENT_PAGE_ORDER.indexOf(a.slug);
+        const bi = CONTENT_PAGE_ORDER.indexOf(b.slug);
+        return (
+          (ai === -1 ? CONTENT_PAGE_ORDER.length : ai) -
+          (bi === -1 ? CONTENT_PAGE_ORDER.length : bi)
+        );
+      })
+      .map((p) => ({
+        label: p.label,
+        href: `/admin/content/${p.slug}`,
+        icon: p.icon,
+        description: p.description,
+      }));
 
-  // Ordered as every college landing page renders: hero, programs (in the
-  // Academics group), metrics, news & events, admissions, placements (own
-  // group), campus life, testimonials.
-  const homePage: AdminNavItem[] = [
-    {
-      label: "Navbar",
-      href: pc("navbar"),
-      icon: PanelTop,
-      description: "Header links, dropdowns and their order.",
-    },
+  // Ordered as every college landing page renders, top to bottom.
+  const landingPage: AdminNavItem[] = [
     ...(eng
       ? [
           {
@@ -137,6 +158,12 @@ function collegeGroups(college: College): AdminNavGroup[] {
           },
         ]
       : []),
+    {
+      label: "Navbar",
+      href: pc("navbar"),
+      icon: PanelTop,
+      description: "Header links, dropdowns and their order.",
+    },
     {
       label: "Hero",
       href: pc("hero"),
@@ -167,6 +194,12 @@ function collegeGroups(college: College): AdminNavGroup[] {
       description: "Admissions block — steps, dates and contact details.",
     },
     {
+      label: "Placement Highlights",
+      href: `/admin/recruiters?${q}`,
+      icon: Award,
+      description: "Recruiter logos and highlight stats.",
+    },
+    {
       label: "Life at JCT",
       href: pc("lifeAtJct"),
       icon: Camera,
@@ -180,12 +213,34 @@ function collegeGroups(college: College): AdminNavGroup[] {
     },
   ];
 
-  const academics: AdminNavItem[] = [
+  const otherPages: AdminNavItem[] = [
     {
       label: "Programs",
       href: `/admin/programs?${q}`,
       icon: GraduationCap,
       description: "Program cards and their full tabbed page content.",
+    },
+    {
+      label: "News & Events",
+      href: `/admin/events?${q}`,
+      icon: CalendarDays,
+      description: "Announcements, events and news entries.",
+    },
+    {
+      label: "About Us",
+      href: `/admin/about?${q}`,
+      icon: Info,
+      description:
+        "About page sections and the Timeline tab, live preview editor.",
+    },
+    {
+      // One door to everything placements: the page editor owns the layout and
+      // links across to the year-wise records and the gallery tab.
+      label: "Placements",
+      href: `/admin/placements-page?${q}`,
+      icon: Briefcase,
+      description:
+        "Placements page layout, the year-wise records and the gallery tab.",
     },
     ...(eng
       ? [
@@ -195,50 +250,33 @@ function collegeGroups(college: College): AdminNavGroup[] {
             icon: ScrollText,
             description: "CoE page sections, live preview editor.",
           },
+        ]
+      : []),
+    {
+      // Named as the public navbar names it, so the admin entry and the live
+      // link read the same.
+      label: "Affiliation & Accreditation",
+      href: `/admin/accreditations?${q}`,
+      icon: Award,
+      description: "Accreditation badges, bodies and certificates.",
+    },
+    ...(eng
+      ? [
+          {
+            label: "NAAC",
+            href: "/admin/naac",
+            icon: BadgeCheck,
+            description:
+              "NAAC appeal tables, documents and the best practices / distinctiveness / AQAR tabs.",
+          },
           {
             label: "Research",
             href: "/admin/research",
             icon: FlaskConical,
             description: "Research page sections and publications.",
           },
-        ]
-      : []),
-    ...contentItems("Academics"),
-  ];
-
-  const placements: AdminNavItem[] = [
-    {
-      label: "Placements",
-      href: `/admin/placements?${q}`,
-      icon: Briefcase,
-      description: "Placed-student records used across the site.",
-    },
-    {
-      label: "Placements Page",
-      href: `/admin/placements-page?${q}`,
-      icon: ScrollText,
-      description: "Layout and copy of the placements page.",
-    },
-    {
-      label: "Placement Highlights",
-      href: `/admin/recruiters?${q}`,
-      icon: Award,
-      description: "Recruiter logos and highlight stats.",
-    },
-    ...contentItems("Placements"),
-  ];
-
-  const campus: AdminNavItem[] = [
-    {
-      label: "News & Events",
-      href: `/admin/events?${q}`,
-      icon: CalendarDays,
-      description: "Announcements, events and news entries.",
-    },
-    ...(eng
-      ? [
           {
-            label: "Clubs & Cells",
+            label: "Clubs",
             href: "/admin/clubs",
             icon: Sparkles,
             description: "Student clubs and cells page.",
@@ -257,54 +295,25 @@ function collegeGroups(college: College): AdminNavGroup[] {
           },
         ]
       : []),
-    ...contentItems("Campus & Community"),
-  ];
-
-  const institution: AdminNavItem[] = [
-    {
-      label: "About Us",
-      href: `/admin/about?${q}`,
-      icon: Info,
-      description: "About page sections, live preview editor.",
-    },
-    {
-      label: "Accreditations",
-      href: `/admin/accreditations?${q}`,
-      icon: Award,
-      description: "Accreditation badges, bodies and certificates.",
-    },
     ...(eng
       ? [
           {
-            label: "NAAC",
-            href: "/admin/naac",
-            icon: BadgeCheck,
-            description:
-              "NAAC appeal tables, supporting documents and its sub-page tabs.",
-          },
-          // Sits here rather than under Campus & Community: the Documents page
-          // now also hosts the NIRF, financial statements and ICT content tabs,
-          // whose cards are in this group.
-          {
             // Public label is "Reports & Downloads" — kept in step here so the
-            // admin card and the navbar entry name the same page.
+            // admin entry and the navbar entry name the same page.
             label: "Reports & Downloads",
             href: "/admin/documents",
             icon: FolderOpen,
             description:
-              "Downloads and the NIRF / financial / ICT tabs. Mandatory disclosures and the HR manual have pages of their own.",
+              "Downloads and the NIRF / financial statements / ICT content tabs.",
           },
         ]
       : []),
-    ...contentItems("Institution"),
+    ...contentItems(),
   ];
 
   return [
-    { title: "Landing Page", items: homePage },
-    { title: "Academics", items: academics },
-    { title: "Placements", items: placements },
-    { title: "Campus & Community", items: campus },
-    { title: "Institution", items: institution },
+    { title: "Landing Page", items: landingPage },
+    { title: "Other Pages", items: otherPages },
   ];
 }
 

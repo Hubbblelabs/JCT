@@ -260,7 +260,7 @@ function ResearchTabsView({ tabs }: { tabs: ResearchTabValue[] }) {
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
       <aside className="shrink-0 lg:w-72">
-        <div className="sticky top-24 z-30 lg:rounded-2xl lg:border lg:border-white/10 lg:bg-white/5 lg:p-3">
+        <div className="sticky top-24 z-30 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto lg:overscroll-contain lg:rounded-2xl lg:border lg:border-white/10 lg:bg-white/5 lg:p-3">
           <nav className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:flex lg:flex-col lg:gap-1">
             {tabs.map((tab) => {
               const Icon = lookupSidebarIcon(tab.icon) ?? FlaskConical;

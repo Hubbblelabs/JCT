@@ -11,6 +11,10 @@ import {
   Repeater,
   type FieldSpan,
 } from "@/components/admin/inputs";
+import { SidebarNavEditor } from "@/components/admin/SidebarNavEditor";
+import { PageBodySectionsEditor } from "@/components/admin/PageBodySectionsEditor";
+import { NAAC_NAV_DEFAULTS } from "@/components/layout/NaacPageLayout";
+import type { SidebarNavItemRaw } from "@/lib/sidebar-nav";
 import type {
   NaacDocGroupValue,
   NaacDocSectionValue,
@@ -18,6 +22,7 @@ import type {
   NaacPageValue,
   NaacQualitativeRowValue,
   NaacQuantitativeRowValue,
+  PageBodySection,
 } from "@/lib/validation";
 
 const emptyDoc = (): NaacDocValue => ({ label: "", file: "" });
@@ -82,6 +87,46 @@ export function NaacSectionInspector({
   onChange: (next: NaacPageValue) => void;
 }) {
   const patch = (p: Partial<NaacPageValue>) => onChange({ ...data, ...p });
+
+  // A sidebar tab the admin added: its label and its content blocks.
+  if (section.startsWith("custom:")) {
+    const anchor = section.slice("custom:".length);
+    const items = data.sidebar?.navItems ?? [];
+    const idx = items.findIndex((it) => (it.id || "") === anchor);
+    if (idx === -1) {
+      return (
+        <p className="text-sm text-gray-500">
+          This tab no longer exists. Re-open the inspector.
+        </p>
+      );
+    }
+    const item = items[idx];
+    const updateItem = (next: Partial<typeof item>) =>
+      patch({
+        sidebar: {
+          ...data.sidebar,
+          navItems: items.map((it, j) => (j === idx ? { ...it, ...next } : it)),
+        },
+      });
+    return (
+      <FormGrid>
+        <TextInput
+          label="Tab Label"
+          span={5}
+          value={item.label ?? ""}
+          placeholder="Name shown in the NAAC sidebar"
+          onChange={(e) => updateItem({ label: e.target.value })}
+        />
+        <Field label="Content Blocks" span="full">
+          <PageBodySectionsEditor
+            value={(item.blocks ?? []) as PageBodySection[]}
+            onChange={(blocks) => updateItem({ blocks })}
+            allowedTypes={["heading", "text", "image", "list", "cards"]}
+          />
+        </Field>
+      </FormGrid>
+    );
+  }
 
   const patchDocSection = (index: number, next: NaacDocSectionValue) =>
     patch({
@@ -568,6 +613,30 @@ export function NaacSectionInspector({
             </FormGrid>
           )}
         />
+      );
+
+    case "sidebar":
+      return (
+        <>
+          <p className="mb-3 text-xs text-gray-500">
+            Rename, reorder or hide the NAAC page&rsquo;s tabs — its own appeal
+            panel and the Best Practices / Institutional Distinctiveness / AQAR
+            pages — and add custom link or content tabs. A hosted tab stays
+            hidden on the public page until that page has published content.
+          </p>
+          <SidebarNavEditor
+            defaults={NAAC_NAV_DEFAULTS}
+            value={data.sidebar?.navItems as SidebarNavItemRaw[] | undefined}
+            onChange={(navItems) =>
+              patch({
+                sidebar: {
+                  ...data.sidebar,
+                  navItems: navItems as typeof data.sidebar.navItems,
+                },
+              })
+            }
+          />
+        </>
       );
 
     default:

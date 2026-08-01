@@ -408,6 +408,10 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                   ? pathname === basePath
                   : pathname.startsWith(basePath) && basePath !== "/");
               const hasDropdown = !!link.children;
+              // Only a long menu splits into two columns — below that the
+              // single column is both narrower to scan and less likely to
+              // collide with the viewport edge.
+              const twoColumn = (link.children?.length ?? 0) > 6;
               const isExpanded = desktopExpanded === link.name;
               // Items past the midpoint sit close to the right edge, so their
               // panel is right-anchored; earlier ones open to the right. Without
@@ -495,86 +499,99 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 8, scale: 0.985 }}
                             transition={{ duration: 0.22, ease: "easeOut" }}
-                            className={`scrollbar-hide max-h-[min(70vh,32rem)] w-[min(18rem,calc(100vw-3rem))] overflow-y-auto rounded-2xl border p-2 whitespace-normal shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
+                            className={`scrollbar-hide max-h-[min(70vh,32rem)] overflow-y-auto rounded-2xl border p-2 whitespace-normal shadow-[0_24px_48px_-28px_rgba(0,0,0,0.65)] backdrop-blur-2xl ${
+                              twoColumn
+                                ? "w-[min(40rem,calc(100vw-3rem))]"
+                                : "w-[min(18rem,calc(100vw-3rem))]"
+                            } ${
                               isDropdownSolid
                                 ? "border-white/10 bg-[#0a1628]/96"
                                 : "border-white/20 bg-[#0a1628]/70"
                             }`}
                           >
-                            {link.children?.map((child: NavChild) => {
-                              const isChildHashLink = child.href.includes("#");
-                              const childPath = child.href.split("#")[0];
-                              const isChildActive =
-                                !child.isFile &&
-                                !isChildHashLink &&
-                                (childPath !== "/"
-                                  ? pathname === childPath ||
-                                    pathname.startsWith(`${childPath}/`)
-                                  : pathname === "/");
+                            <div
+                              className={
+                                twoColumn
+                                  ? "grid grid-cols-2 items-start gap-x-1"
+                                  : ""
+                              }
+                            >
+                              {link.children?.map((child: NavChild) => {
+                                const isChildHashLink =
+                                  child.href.includes("#");
+                                const childPath = child.href.split("#")[0];
+                                const isChildActive =
+                                  !child.isFile &&
+                                  !isChildHashLink &&
+                                  (childPath !== "/"
+                                    ? pathname === childPath ||
+                                      pathname.startsWith(`${childPath}/`)
+                                    : pathname === "/");
 
-                              return (
-                                <Link
-                                  key={child.name}
-                                  href={child.href}
-                                  onClick={(e) => {
-                                    setDesktopExpanded(null);
-                                    handleNavClick(e, child.href);
-                                  }}
-                                  target={child.isFile ? "_blank" : undefined}
-                                  rel={
-                                    child.isFile
-                                      ? "noopener noreferrer"
-                                      : undefined
-                                  }
-                                  className={`group block rounded-lg px-4 py-3 font-sans transition-colors ${
-                                    isDropdownSolid
-                                      ? "hover:bg-white/10"
-                                      : "hover:bg-white/15"
-                                  } ${isChildActive ? "bg-white/10" : ""} ${child.className || ""}`}
-                                >
-                                  <div className="flex items-center justify-between gap-3">
-                                    <div className="min-w-0">
-                                      <div
-                                        className={`flex items-center gap-1.5 text-[15px] font-medium break-words transition-colors ${highlightColor.replace("text-", "group-hover:text-")} ${
-                                          isChildActive
-                                            ? highlightColor
-                                            : isDropdownSolid
-                                              ? "text-white/90"
-                                              : "text-white"
-                                        }`}
-                                      >
-                                        {child.isFile && (
-                                          <FileText
-                                            size={13}
-                                            className="shrink-0"
-                                          />
-                                        )}
-                                        <span className="min-w-0">
-                                          {child.name}
-                                        </span>
-                                      </div>
-                                      {child.desc && (
+                                return (
+                                  <Link
+                                    key={child.name}
+                                    href={child.href}
+                                    onClick={(e) => {
+                                      setDesktopExpanded(null);
+                                      handleNavClick(e, child.href);
+                                    }}
+                                    target={child.isFile ? "_blank" : undefined}
+                                    rel={
+                                      child.isFile
+                                        ? "noopener noreferrer"
+                                        : undefined
+                                    }
+                                    className={`group block rounded-lg px-4 py-3 font-sans transition-colors ${
+                                      isDropdownSolid
+                                        ? "hover:bg-white/10"
+                                        : "hover:bg-white/15"
+                                    } ${isChildActive ? "bg-white/10" : ""} ${child.className || ""}`}
+                                  >
+                                    <div className="flex items-center justify-between gap-3">
+                                      <div className="min-w-0">
                                         <div
-                                          className={`mt-0.5 text-[13px] break-words transition-colors group-hover:text-white/80 ${
+                                          className={`flex items-center gap-1.5 text-[15px] font-medium break-words transition-colors ${highlightColor.replace("text-", "group-hover:text-")} ${
                                             isChildActive
-                                              ? "text-white/70"
+                                              ? highlightColor
                                               : isDropdownSolid
-                                                ? "text-white/50"
-                                                : "text-white/75"
+                                                ? "text-white/90"
+                                                : "text-white"
                                           }`}
                                         >
-                                          {child.desc}
+                                          {child.isFile && (
+                                            <FileText
+                                              size={13}
+                                              className="shrink-0"
+                                            />
+                                          )}
+                                          <span className="min-w-0">
+                                            {child.name}
+                                          </span>
                                         </div>
-                                      )}
+                                        {child.desc && (
+                                          <div
+                                            className={`mt-0.5 text-[13px] break-words transition-colors group-hover:text-white/80 ${
+                                              isChildActive
+                                                ? "text-white/70"
+                                                : isDropdownSolid
+                                                  ? "text-white/50"
+                                                  : "text-white/75"
+                                            }`}
+                                          >
+                                            {child.desc}
+                                          </div>
+                                        )}
+                                      </div>
+                                      <ArrowRight
+                                        size={14}
+                                        className={`shrink-0 -translate-x-1 ${highlightColor} transition-all duration-300 ${isChildActive ? "translate-x-0 opacity-100" : "opacity-0 group-hover:translate-x-0 group-hover:opacity-100"}`}
+                                      />
                                     </div>
-                                    <ArrowRight
-                                      size={14}
-                                      className={`shrink-0 -translate-x-1 ${highlightColor} transition-all duration-300 ${isChildActive ? "translate-x-0 opacity-100" : "opacity-0 group-hover:translate-x-0 group-hover:opacity-100"}`}
-                                    />
-                                  </div>
-                                </Link>
-                              );
-                            })}
+                                  </Link>
+                                );
+                              })}
+                            </div>
                           </motion.div>
                         </div>
                       )}

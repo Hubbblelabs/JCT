@@ -230,7 +230,7 @@ export function GroupDetailLayout({
           </div>
 
           {/* Sidebar */}
-          <aside className="space-y-6 lg:sticky lg:top-24 lg:self-start">
+          <aside className="space-y-6 lg:sticky lg:top-24 lg:max-h-[calc(100vh-12rem)] lg:self-start lg:overflow-y-auto lg:overscroll-contain">
             {hasSidebarInfo && (
               <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
                 {img && (

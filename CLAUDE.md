@@ -30,6 +30,7 @@ pnpm dev       # Dev server with Turbopack at http://localhost:3000
 pnpm build     # Production build (output: "standalone")
 pnpm start     # Run the production build
 pnpm lint      # ESLint — NOTE: this script always runs with --fix
+pnpm lint:ci   # ESLint without --fix — use when you must not rewrite files
 pnpm format    # Prettier (with Tailwind class sorting)
 pnpm typecheck # tsc --noEmit (run alongside build to verify changes)
 ```
@@ -39,8 +40,10 @@ Data seeding scripts (bootstrap a fresh DB; `:dry` variants preview without writ
 ```bash
 pnpm seed:admin                       # create initial admin user
 pnpm seed:deptcontent:eee[:dry]       # seed rich Program.content for EEE
-pnpm seed:placements[:dry]            # and ~15 more seed:* / migrate:* entries
+pnpm seed:placements[:dry]            # and ~30 more seed:* / migrate:* entries
 ```
+
+Notable subsystems bootstrapped this way (all SiteConfig-key based, see "SiteConfig & page content"): `seed:accreditations`, `seed:naac`, `seed:contentpages` + `seed:contentpagenav`, `seed:committeegroups`/`seed:committees`/`seed:clubs`, `seed:research`, `seed:lifeatjct`, `seed:seo`, `seed:aboutsections`, plus `migrate:disclosurepages` and `migrate:moremenu` (nav reorder).
 
 Run `pnpm run` for the full list. Every entry in `package.json` points at a file
 that exists — entries for deleted scripts (`seed:programs:engineering`,
@@ -55,9 +58,9 @@ There is **no test framework** configured — no test runner, no test files, no 
 
 `src/app/` is the App Router root. The app has two halves:
 
-- **`src/app/admin/`** — the CMS. `(protected)/` is a route group whose `layout.tsx` does a session check; `login/` is public. Key admin pages: `dashboard/`, `programs/`, `pages/`, `users/`, `testimonials/`, `recruiters/`, `about/`, `coe/`, `campus-life/`, `page-content/`, `main/page-content/`, `global/page-content/`, `settings/`, `audit/`.
+- **`src/app/admin/`** — the CMS. `(protected)/` is a route group whose `layout.tsx` does a session check; `login/` is public. Key admin pages: `dashboard/`, `programs/`, `pages/`, `users/`, `testimonials/`, `recruiters/`, `about/`, `coe/`, `campus-life/`, `page-content/`, `main/page-content/`, `global/page-content/`, `settings/`, `audit/`, `events/` (thin CRUD over the `Event` model), `research/`, `clubs/`, `committees/`, `documents/`, `naac/` (all `LivePageEditor` shells, see "Visual page editors"), `accreditations/`, `placements-page/` (bespoke SiteConfig editors, not the `LivePageEditor` shell), `placements/` (**a redirect only** — year-wise `Placement` records are now authored inside `placements-page/`; two screens writing the same docs is what that avoids), `content/[slug]/` (one dynamic editor for all block-based content pages — NIRF, timeline, library — driven by a registry in `src/lib/content-pages.ts`). The sidebar/breadcrumbs/Ctrl+K palette are all generated from a single source of truth, `src/lib/admin-nav.ts` — add a page there to get nav + search for free instead of wiring a hub page. Each college has just two groups: **Landing Page** (ordered as the public landing page renders, top to bottom) and **Other Pages**; standalone content-page editors are appended in `CONTENT_PAGE_ORDER`, and anything not listed there lands at the end rather than vanishing.
 - **`src/app/institutions/<inst>/`** — public pages for each of `engineering`, `arts-science`, `polytechnic`. Each has `page.tsx` (landing), `about/`, `courses/`, `programs/` + `programs/[slug]/` (DB-driven program detail pages), `p/[slug]/` (generic CMS Page renderer, see Page CMS below), and a legacy `[course]/` dynamic route. Engineering also has `coe/` (Centre of Excellence).
-- **Top-level public routes**: `src/app/page.tsx` (home), `campus-life/`, `about-us/`, and `p/[slug]/` (institution-agnostic `main` CMS pages).
+- **Top-level public routes**: `src/app/page.tsx` (home), `campus-life/`, `about-us/`, `accreditations/`, `events/` + `events/[slug]/`, `p/[slug]/` (institution-agnostic `main` CMS pages), plus `sitemap.ts` / `robots.ts` (fed by `src/lib/seo-pages.ts`).
 
 ### Authentication & authorization
 
@@ -71,9 +74,10 @@ There is **no test framework** configured — no test runner, no test files, no 
 ### API design
 
 - **Admin routes** (`src/app/api/admin/*`): gate with `requireRole`, parse with `validateBody(req, ZodSchema)` (or `validateFields` for multipart), record `logAudit(...)` (non-fatal), and call `revalidateTargets(...)` after writes. Response/error helpers in `src/lib/api-helpers.ts`: `json`, `badRequest`, `validationError`, `unauthorized`, `forbidden`, `notFound`, `serverError`.
-- **Audit logging**: `logAudit(entityType, action, userEmail, summary)` from `src/lib/audit.ts` records a write to the `AuditLog` collection (entries expire after 1 year via a TTL index). It never throws — if logging fails, it's caught and logged but the route response proceeds normally. Always call it even if later operations might fail; it's a best-effort record of intent, not a transactional guarantee.
+- **Audit logging**: `logAudit(entityType, action, userEmail, summary)` from `src/lib/audit.ts` records a write to the `AuditLog` collection (entries expire after 1 year via a TTL index). It never throws — if logging fails, it's caught and logged but the route response proceeds normally. Always call it even if later operations might fail; it's a best-effort record of intent, not a transactional guarantee. `GET /api/admin/audit` paginates by **keyset cursor**, not page number — `?limit=&before=<ISO timestamp>`, capped at `AUDIT_PAGE_SIZE`/200. `DELETE /api/admin/audit` purges entries older than a fixed retention window (15/30/90/180/365 days only).
 - **Public routes** (`src/app/api/public/*`): no auth. Responses use a `{ source, data }` envelope (`source` is `"db" | "empty" | "error"`). These handlers read query params, which makes them **dynamic** — route-level `export const revalidate` is inert on them. Instead they serve from the in-memory TTL cache in `src/lib/public-cache.ts` (1h TTL), which `revalidateTargets` / `revalidatePaths` / `revalidateForConfigKey` clear on every admin write. Same single-instance assumption as the rate limiter.
-- Some admin routes have `seed/` sub-routes for bootstrapping data (`recruiters`, `testimonials`, `site-config`).
+- Some admin routes have `seed/` sub-routes for bootstrapping data — `testimonials/seed` and `site-config/seed` (there is no `recruiters` route at all, see below).
+- **Documents upload in two shapes.** `POST /api/admin/documents/upload` takes the bytes through the function, which a host caps at ~4.5 MB. The client path used by the editors is instead **presign → direct PUT → confirm**: `POST /api/admin/documents/presign` returns `{presigned_url, storage_key, safe_name}`, the browser PUTs the file straight to R2, then `POST /api/admin/documents/confirm` records the `DocumentAsset`. Images still go through `POST /api/admin/images/upload` (a 413 there is surfaced as a size message, not "Upload failed").
 
 ### Database & connection
 
@@ -88,11 +92,28 @@ Several admin areas share a **click-to-edit + inspector** pattern:
 - **Program builder** (`/admin/programs/[id]`) — edit tabs/sections on the left, live-preview on the right (see below).
 - **About editor** (`/admin/about`) — renders the public `AboutPageLayout` with editable overlays; clicking a section opens `AboutSectionInspector` in a slide-over panel. Backed by SiteConfig keys like `engineeringAbout`.
 - **CoE editor** (`/admin/coe`) — same pattern with `CoePageLayout` / `CoeSectionInspector`, backed by the `engineeringCoe` SiteConfig key.
-- **Engineering sub-page editors** — `/admin/research`, `/admin/clubs`, `/admin/committees`, `/admin/documents`, backed by `engineeringResearch`, `engineeringClubs`, `engineeringCommittees`, `engineeringDocuments`. These four are built on the shared `LivePageEditor` shell (`src/components/admin/LivePageEditor.tsx`), which owns all the load/save/inspector boilerplate — a new page of this kind needs only a schema, a layout, and an inspector, not another copy of the editor. Clubs & Cells and Committees are the same data shape and share `GroupsPageLayout` / `GroupsSectionInspector`, distinguished by a `variant` prop.
+- **Engineering sub-page editors** — `/admin/research`, `/admin/clubs`, `/admin/committees`, `/admin/documents`, `/admin/naac`, backed by `engineeringResearch`, `engineeringClubs`, `engineeringCommittees`, `engineeringDocuments`, `engineeringNaac`. These are built on the shared `LivePageEditor` shell (`src/components/admin/LivePageEditor.tsx`), which owns all the load/save/inspector boilerplate — a new page of this kind needs only a schema, a layout, and an inspector, not another copy of the editor. Clubs & Cells and Committees are the same data shape and share `GroupsPageLayout` / `GroupsSectionInspector`, distinguished by a `variant` prop.
+- **`/admin/about`, `/admin/accreditations`, `/admin/placements-page`** — same "click a section, edit in a panel" spirit but **not** on the `LivePageEditor` shell; they load/save their SiteConfig keys directly via `loadEditableConfig`/`saveEditableConfig` (`src/lib/admin-site-config.ts`, which reads the **admin** endpoint so an unpublished draft survives a reload). Don't assume every editor in the CMS is a `LivePageEditor` instance.
+- **`/admin/placements-page` also owns `Placement` documents**, not just its config key: `src/lib/admin-placement-records.ts` loads every year for the college, the preview renders them through `toPreviewRecord`, and save PATCHes **only the records whose editable fields changed** (writing all of them would rewrite and audit-log untouched years). Records are collection docs, so they have **no draft/publish split** — "Save draft" still writes them through. New years must use `nextFreeYear()`; `(institution, year)` is unique.
 
 All of them save via `PUT /api/admin/site-config` and revalidate the relevant institution pages immediately.
 
 Public page layouts wrap each section in `EditableRegion`, which is inert unless `editable` is passed — so the admin preview and the live page render from exactly one component.
+
+### Hosted content pages (a page inside another page)
+
+A `ContentPageDef` in `src/lib/content-pages.ts` with a **`host`** has no route of its own — it publishes as one sidebar panel of `path` (Timeline inside About, NIRF / financial statements / ICT content inside Documents, the NAAC sub-pages inside NAAC, the placement gallery inside Placements). Consequences that are easy to get wrong:
+
+- The host route renders every panel into the HTML via `SectionedPageShell` and toggles them with `hidden` — panels are **not** mounted on demand, because the absorbed pages carry indexable tables. `#anchor` deep-links a panel.
+- Server side, the host loads them with `loadHostedContentPages(path)` (`src/lib/hosted-content.ts`), which drops a page that is missing, unpublished or empty rather than showing a dead tab.
+- Admin side, the host's editor edits them too: `useHostedDrafts` / `HostedInspector` (`src/components/admin/hosted-content.tsx`) keep a draft per slug, and inspector keys are namespaced `hosted:<slug>:<section>` (`hostedSectionKey` / `parseHostedSection`). `LivePageEditor` wires this in automatically; the bespoke editors call the same hooks.
+- Hosted pages are deliberately **absent from `admin-nav.ts`** — listing them would give two doors to one panel. `/admin/content/<slug>` for a hosted page redirects to its host editor via `hostAdminEditor()`.
+- `content-pages.ts` throws at import time on a duplicate `slug`, `configKey`, or host `anchor`. Slugs are global, not per-institution.
+
+### Admin UI building blocks
+
+- **`src/components/admin/kit/`** — the shared kit (`PageShell`, `DataTable`, `Drawer`, `SaveBar`, `SortableList`, `useUnsavedGuard`, plus `primitives.tsx` badges/banners/skeletons). List-style screens (dashboard, programs, events, users, testimonials, audit) build from it. If a screen needs markup the kit lacks, add it to the kit rather than inlining it.
+- **Deferred uploads** (`src/lib/deferred-uploads.tsx`) — inside a `DeferredUploadsProvider`, picking a file does **not** upload. It registers a `pending:<id>` placeholder key plus an object-URL preview, and the real upload happens in `flush(value)` at save time, which walks the value and swaps placeholders for storage keys. Two rules follow: a placeholder not found in the flushed value is dropped (so its file is never uploaded), and everything being saved must go through **one** `flush` call — `LivePageEditor` flushes `{host, hosted}` together for exactly this reason. `getPreview(key)` is what makes an unsaved image render in the live preview.
 
 ### Program CMS — the content builder (most important subsystem)
 
@@ -133,12 +154,14 @@ There is **no `Department` model** anymore. Rich page content that used to live 
 
 Separate from Program content, the **`Page`** model (`src/lib/models/Page.ts`) backs free-standing CMS pages (admin `/admin/pages`, API `/api/admin/pages`). Same draft/publish pair as Program (`content`/`published_content`, `status`, `version`). A page is scoped by `institution` (`main | engineering | arts-science | polytechnic`) and a `template` (`standard | hero-content | sidebar | gallery | contact`). The `(institution, slug)` index is unique — different institutions can reuse a slug. Public renderers: `/p/[slug]` (the `main` scope) and `/institutions/<inst>/p/[slug]` (per-institution), both reading published content only.
 
+`GET /api/admin/pages` also flags **orphan pages**: `src/lib/page-nav-links.ts` checks every published `Page` against the four navbars' draft and published values, and pages not linked from any of them get an orphan badge in the admin list — a way to catch pages that exist but nothing on the site links to.
+
 ### SiteConfig & page content
 
 - **`SiteConfig`** docs are keyed by a unique `config_key`, with a draft/publish pair `value` / `published_value` and `status: "draft" | "published"`.
-- Allowed config keys are a **fixed registry** in `src/lib/validation/siteConfig.ts` (`SITE_CONFIG_SCHEMAS`) — each key maps to a Zod schema, and unknown keys are rejected. Keys include `contact`, `social`, `address`, `stats`, `accreditations`, `home`, `homeStats`, `engineeringHero`, `engineeringMetrics`, `artsScienceHero`, `polytechnicAdmissions`, etc. Add a new site-wide setting by adding an entry here.
+- Allowed config keys are a **fixed registry** in `src/lib/validation/siteConfig.ts` (`SITE_CONFIG_SCHEMAS`) — each key maps to a Zod schema, and unknown keys are rejected. The registry has grown to ~90 keys; the individual schemas live in topic files under `src/lib/validation/` (`hero.ts`, `navbar.ts`, `floatingElements.ts`, `homeSections.ts`, `engineeringPages.ts`/`engineeringSections.ts`, `naacPage.ts`, `campusLifePage.ts`, `contentPage.ts`, `pamphlet.ts`, `upcomingEvents.ts`, `announcement.ts`, `admissions.ts`, `seo.ts`, etc.) and each contributes one or more keys to `SITE_CONFIG_SCHEMAS` — the topic file is not itself the key name. Add a new site-wide setting by adding a schema in the right topic file (or a new one) and registering it in `SITE_CONFIG_SCHEMAS`.
 - The admin "page content" pages (`(protected)/page-content/`, `(protected)/main/page-content/`, `(protected)/global/page-content/`) edit these config keys via `PageContentForms.tsx` / `PageContentShell.tsx`.
-- **Backup/restore/reset**: `POST /api/admin/site-config/backup` snapshots all configs, `POST /api/admin/site-config/restore` restores from a snapshot, `POST /api/admin/site-config/reset` reverts a key to its seed default. All are accessible from the admin Settings page.
+- **Backup/restore/reset**: `POST /api/admin/site-config/backup` snapshots all configs, `POST /api/admin/site-config/restore` restores from a snapshot, `POST /api/admin/site-config/reset` reverts a key to its seed default. Two more restore routes cover what the config snapshot doesn't: `restore-collections` (the model collections listed in `src/lib/backup-collections.ts`) and `restore-assets` (R2 objects + their `ImageAsset`/`DocumentAsset` rows). All are accessible from the admin Settings page.
 
 ### Images & documents
 
@@ -192,6 +215,7 @@ CI is `.github/workflows/build-deploy.yml`, two jobs on a single `push` trigger 
 Consequences to keep in mind:
 
 - Pushing to `v2-admin` publishes a new `:latest` image but does **not** deploy. Releasing is a separate, deliberate act: tag `vX.Y.Z` and push the tag.
+- **The branch trigger still names `v2-admin` while work happens on `v3-admin`** — pushes to `v3-admin` build nothing. Only a `v*` tag currently produces an image and a deploy. Fix the trigger before relying on branch builds.
 - Both compose files hardcode `kavinnandha/jct:latest`, so there is no immutable per-version image — a tag deploys whatever that tag's build produced, and rollback means rebuilding. Parameterizing the image tag would need matching changes in `docker-compose.build.yaml`, `docker-compose.prod.yaml`, and the SSH script.
 - **Pushing a `v*` tag deploys to production.** Never create or push tags on your own — see Git below.
 

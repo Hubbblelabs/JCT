@@ -130,9 +130,11 @@ export function DataTable<T>({
       const bv = col.value!(b);
       if (typeof av === "number" && typeof bv === "number")
         return (av - bv) * dir;
-      return String(av).localeCompare(String(bv), undefined, {
-        numeric: true,
-      }) * dir;
+      return (
+        String(av).localeCompare(String(bv), undefined, {
+          numeric: true,
+        }) * dir
+      );
     });
   }, [filtered, sort, columns]);
 
@@ -157,6 +159,22 @@ export function DataTable<T>({
   useEffect(() => {
     setPage(1);
   }, [deferredQuery]);
+
+  // Drop selections whose row is gone. A bulk action reloads `rows` with the
+  // deleted records missing, and without this the bar kept counting them —
+  // "1 selected" with nothing selected on screen, and the actions would re-run
+  // against rows that no longer exist.
+  useEffect(() => {
+    setSelected((prev) => {
+      if (prev.size === 0) return prev;
+      const live = new Set(rows.map(rowKey));
+      const next = new Set<string>();
+      for (const key of prev) if (live.has(key)) next.add(key);
+      // Same reference when nothing was pruned — this effect re-runs on every
+      // render, since callers pass `rowKey` as an inline arrow.
+      return next.size === prev.size ? prev : next;
+    });
+  }, [rows, rowKey]);
 
   const selectedRows = useMemo(
     () => sorted.filter((r) => selected.has(rowKey(r))),
@@ -237,9 +255,7 @@ export function DataTable<T>({
 
       {showBulk && selected.size > 0 && (
         <div className="admin-bulk-bar">
-          <span>
-            {selected.size} selected
-          </span>
+          <span>{selected.size} selected</span>
           <button
             type="button"
             onClick={() => setSelected(new Set())}
@@ -426,7 +442,8 @@ export function DataTable<T>({
                   }
                 }}
                 disabled={
-                  loadingMore || (safePage >= totalPages && !(hasMore && onLoadMore))
+                  loadingMore ||
+                  (safePage >= totalPages && !(hasMore && onLoadMore))
                 }
                 className="admin-btn admin-btn-outline admin-btn-sm"
               >

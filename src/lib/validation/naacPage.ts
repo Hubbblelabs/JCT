@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { SidebarNavItemSchema } from "./sidebarNav";
 
 // ──────────────────────────────────────────────────────────────────────────
 // The standalone NAAC page (/institutions/engineering/naac),
@@ -186,6 +187,17 @@ export const NaacPageSchema = z.object({
     .array(NaacDocSectionSchema)
     .max(NAAC_PAGE_LIMITS.sectionsMax)
     .default([]),
+  /**
+   * Overrides for the page's sidebar tabs — the appeal panel plus the hosted
+   * sub-pages (best practices, distinctiveness, AQAR). Admins reorder, rename
+   * or hide them, and can add link tabs and custom block tabs, exactly like the
+   * Programs and Placements pages.
+   */
+  sidebar: z
+    .object({
+      navItems: z.array(SidebarNavItemSchema).optional(),
+    })
+    .default({ navItems: [] }),
 });
 
 export type NaacPageValue = z.infer<typeof NaacPageSchema>;

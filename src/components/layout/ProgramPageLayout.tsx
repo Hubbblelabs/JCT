@@ -2418,7 +2418,7 @@ export function ProgramPageLayout({
               onEditSection={onEditSection}
               className="shrink-0 lg:w-72"
             >
-              <div className="sticky top-24 z-40 lg:rounded-2xl lg:border lg:border-slate-200/60 lg:bg-white lg:p-3 lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+              <div className="sticky top-24 z-40 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto lg:overscroll-contain lg:rounded-2xl lg:border lg:border-slate-200/60 lg:bg-white lg:p-3 lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
                 <nav className="grid grid-cols-2 gap-2 pb-4 sm:grid-cols-3 lg:flex lg:flex-col lg:items-stretch lg:gap-1 lg:pb-0">
                   {visibleTabs.map((tab) => {
                     const Icon =

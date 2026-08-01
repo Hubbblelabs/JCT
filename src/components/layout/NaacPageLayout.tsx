@@ -8,13 +8,18 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EditableRegion } from "@/components/admin/EditableRegion";
 import {
   SectionedPageShell,
+  SectionPanelHeading,
   type PageSectionItem,
 } from "@/components/layout/SectionedPageShell";
+import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
+import { hostedContentPages } from "@/lib/content-pages";
+import { resolveSidebarItems, type SidebarNavDefault } from "@/lib/sidebar-nav";
 import { getImageUrl } from "@/lib/utils";
 import type {
   NaacDocValue,
   NaacDocSectionValue,
   NaacPageValue,
+  PageBodySection,
 } from "@/lib/validation";
 
 export type NaacEditableSection =
@@ -25,8 +30,11 @@ export type NaacEditableSection =
   | "qualitative"
   | "quantitative"
   | "docSections"
+  | "sidebar"
   // Per-block sections, e.g. "docSection:2" — resolved in NAAC_SECTION_TITLE.
-  | `docSection:${number}`;
+  | `docSection:${number}`
+  // A sidebar tab the admin added, e.g. "custom:section-1730…".
+  | `custom:${string}`;
 
 export const NAAC_SECTION_LABELS: Record<string, string> = {
   hero: "Hero",
@@ -36,6 +44,7 @@ export const NAAC_SECTION_LABELS: Record<string, string> = {
   qualitative: "Qualitative Parameters",
   quantitative: "Quantitative Parameters",
   docSections: "Document Sections",
+  sidebar: "Sidebar Tabs",
 };
 
 export const NAAC_SECTION_ORDER: readonly string[] = [
@@ -46,6 +55,30 @@ export const NAAC_SECTION_ORDER: readonly string[] = [
   "qualitative",
   "quantitative",
   "docSections",
+  "sidebar",
+];
+
+/** Sidebar label for the NAAC page's own panel. */
+export const NAAC_OVERVIEW_SECTION_ID = "naac";
+
+const NAAC_PUBLIC_PATH = "/institutions/engineering/naac";
+
+/**
+ * The tabs this page ships with: its own appeal panel, then the content pages
+ * it hosts (best practices, institutional distinctiveness, AQAR reports).
+ * `data.sidebar.navItems` reorders, renames, hides or extends this list.
+ */
+export const NAAC_NAV_DEFAULTS: SidebarNavDefault[] = [
+  {
+    anchor: NAAC_OVERVIEW_SECTION_ID,
+    navLabel: "Accreditation & Appeal",
+    icon: BadgeCheck,
+  },
+  ...hostedContentPages(NAAC_PUBLIC_PATH).map((p) => ({
+    anchor: p.host!.anchor,
+    navLabel: p.host!.navLabel,
+    icon: p.icon,
+  })),
 ];
 
 /** Inspector heading for a section key, including the per-block ones. */
@@ -54,6 +87,13 @@ export function naacSectionTitle(section: string, data: NaacPageValue): string {
   if (m) {
     const block = data.docSections[Number(m[1])];
     return block?.title?.trim() || "Document Section";
+  }
+  if (section.startsWith("custom:")) {
+    const anchor = section.slice("custom:".length);
+    const item = (data.sidebar?.navItems ?? []).find(
+      (it) => (it.id || "") === anchor,
+    );
+    return item?.label?.trim() || "Custom Tab";
   }
   return NAAC_SECTION_LABELS[section] ?? "Section";
 }
@@ -582,9 +622,6 @@ export function NaacPageBody({
   );
 }
 
-/** Sidebar label for the NAAC page's own panel. */
-export const NAAC_OVERVIEW_SECTION_ID = "naac";
-
 export function NaacPageLayout({
   data,
   editable = false,
@@ -610,6 +647,67 @@ export function NaacPageLayout({
     />
   );
 
+  // The sidebar is whatever the admin configured: built-in tabs (this page's
+  // appeal panel and the hosted sub-pages) in their saved order, plus any link
+  // or block tabs they added. A hosted tab with nothing published never
+  // reaches `sections`, so it drops out here rather than dead-ending.
+  const hostedById = new Map(sections.map((s) => [s.id, s]));
+  const items: PageSectionItem[] = [];
+  for (const item of resolveSidebarItems(
+    NAAC_NAV_DEFAULTS,
+    data.sidebar?.navItems,
+  )) {
+    const Icon = item.icon;
+    if (item.customHref) {
+      items.push({
+        id: item.id,
+        label: item.navLabel,
+        icon: <Icon />,
+        href: item.customHref,
+      });
+    } else if (item.customSection) {
+      const blocks = (item.blocks ?? []) as unknown as PageBodySection[];
+      items.push({
+        id: item.anchor,
+        label: item.navLabel,
+        icon: <Icon />,
+        content: (
+          <EditableRegion
+            as="div"
+            section={`custom:${item.anchor}`}
+            label={item.navLabel}
+            editable={editable}
+            onEditSection={onEdit}
+          >
+            <SectionPanelHeading title={item.navLabel} />
+            {blocks.length > 0 ? (
+              <PageBlocksRenderer blocks={blocks} />
+            ) : (
+              <div className="text-muted-foreground/60 rounded-2xl border border-dashed border-white/15 py-16 text-center text-sm">
+                {editable
+                  ? "Click to add content blocks to this tab."
+                  : "Content will be published soon."}
+              </div>
+            )}
+          </EditableRegion>
+        ),
+      });
+    } else if (item.anchor === NAAC_OVERVIEW_SECTION_ID) {
+      items.push({
+        id: item.anchor,
+        label: item.navLabel,
+        icon: <Icon />,
+        content: body,
+      });
+    } else {
+      const hosted = hostedById.get(item.anchor);
+      if (hosted)
+        items.push({ ...hosted, label: item.navLabel, icon: <Icon /> });
+    }
+  }
+  // One tab is not a sidebar — render it as the page.
+  const single = items.length <= 1;
+
   return (
     <main className="bg-surface text-foreground min-h-screen">
       {!editable && <Navbar forceSolidOnTop />}
@@ -632,22 +730,17 @@ export function NaacPageLayout({
           ]}
         />
 
-        {sections.length > 0 ? (
+        {single ? (
+          <div className="mt-8">{items[0]?.content ?? body}</div>
+        ) : (
           <SectionedPageShell
             className="mt-8"
             navTitle="NAAC"
-            items={[
-              {
-                id: NAAC_OVERVIEW_SECTION_ID,
-                label: "Accreditation & Appeal",
-                icon: <BadgeCheck />,
-                content: body,
-              },
-              ...sections,
-            ]}
+            items={items}
+            editable={editable}
+            navSection="sidebar"
+            onEditSection={onEdit}
           />
-        ) : (
-          <div className="mt-8">{body}</div>
         )}
       </div>
 

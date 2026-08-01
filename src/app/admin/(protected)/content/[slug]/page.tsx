@@ -1,6 +1,8 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 import { LivePageEditor } from "@/components/admin/LivePageEditor";
 import {
   ContentPageLayout,
@@ -10,7 +12,11 @@ import {
   type ContentEditableSection,
 } from "@/components/layout/ContentPageLayout";
 import { ContentPageInspector } from "@/components/admin/ContentPageInspector";
-import { contentPageUrl, getContentPage } from "@/lib/content-pages";
+import {
+  contentPageUrl,
+  getContentPage,
+  hostAdminEditor,
+} from "@/lib/content-pages";
 import { ContentPageSchema } from "@/lib/validation";
 import type { ContentPageValue } from "@/lib/validation";
 
@@ -20,8 +26,27 @@ import type { ContentPageValue } from "@/lib/validation";
  */
 export default function ContentPageEditor() {
   const params = useParams<{ slug: string }>();
+  const router = useRouter();
   const slug = typeof params?.slug === "string" ? params.slug : "";
   const def = getContentPage(slug);
+
+  // A hosted page is authored inside its host's editor, which loads and saves
+  // it alongside the rest of that page. Old bookmarks land here, so send them
+  // on rather than opening a second editor for the same config key.
+  const hostEditor = def ? hostAdminEditor(def) : undefined;
+  useEffect(() => {
+    if (hostEditor) router.replace(hostEditor);
+  }, [hostEditor, router]);
+
+  if (hostEditor) {
+    return (
+      <div className="admin-content">
+        <div className="flex items-center justify-center py-28">
+          <Loader2 size={24} className="animate-spin text-gray-400" />
+        </div>
+      </div>
+    );
+  }
 
   if (!def) {
     return (

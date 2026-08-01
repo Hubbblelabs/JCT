@@ -16,7 +16,11 @@ import {
   type AboutHostedItem,
 } from "@/components/layout/AboutPageLayout";
 import { AboutSectionInspector } from "@/components/admin/AboutSectionInspector";
-import { hostedContentEditorLinks } from "@/lib/content-pages";
+import {
+  HostedInspector,
+  hostedInspectorTitle,
+  useHostedDrafts,
+} from "@/components/admin/hosted-content";
 import {
   EngineeringAboutSchema,
   ArtsScienceAboutSchema,
@@ -86,16 +90,29 @@ function AboutEditorInner() {
   const { institution, configKey, publicPath, label } = config;
 
   // Content pages hosted as panels of this college's About page (e.g.
-  // Timeline, engineering-only) — they keep their own editor, so the preview
-  // just links across to it rather than loading their content here too.
-  const hosted: AboutHostedItem[] = hostedContentEditorLinks(publicPath).map(
-    ({ id, label: navLabel, icon: Icon, href }) => ({
-      anchor: id,
-      navLabel,
-      icon: <Icon />,
-      href,
-    }),
-  );
+  // Timeline, engineering-only). They are edited here, in place — the panel
+  // renders its real content and one Save writes the whole merged page.
+  const {
+    defs: hostedDefs,
+    drafts: hostedDrafts,
+    setDrafts: setHostedDrafts,
+    setDraft: setHostedDraft,
+    loading: hostedLoading,
+    saveAll: saveHosted,
+  } = useHostedDrafts(publicPath);
+
+  const hosted: AboutHostedItem[] = hostedDefs
+    .filter((def) => hostedDrafts[def.slug])
+    .map((def) => {
+      const Icon = def.icon;
+      return {
+        anchor: def.host!.anchor,
+        navLabel: def.host!.navLabel,
+        icon: <Icon />,
+        data: hostedDrafts[def.slug],
+        slug: def.slug,
+      };
+    });
 
   const [draft, setDraft] = useState<AboutPageValue | null>(null);
   const [loading, setLoading] = useState(true);
@@ -134,6 +151,12 @@ function AboutEditorInner() {
   };
 
   const inspectorTitle = (() => {
+    const hostedTitle = hostedInspectorTitle(
+      selected,
+      hostedDefs,
+      hostedDrafts,
+    );
+    if (hostedTitle) return hostedTitle;
     if (selected.startsWith("custom:")) {
       const anchor = selected.slice("custom:".length);
       const item = (draft?.sidebar.navItems ?? []).find(
@@ -148,9 +171,16 @@ function AboutEditorInner() {
     setSaving(mode);
     setMsg(null);
     try {
-      const flushedDraft = await flush(draft);
-      setDraft(flushedDraft as AboutPageValue);
-      await saveEditableConfig(configKey, flushedDraft, mode);
+      // Host and hosted drafts flush together: `flush` drops any pending
+      // upload it cannot find in the value it is handed.
+      const flushed = (await flush({ host: draft, hosted: hostedDrafts })) as {
+        host: AboutPageValue;
+        hosted: typeof hostedDrafts;
+      };
+      setDraft(flushed.host);
+      setHostedDrafts(flushed.hosted);
+      await saveEditableConfig(configKey, flushed.host, mode);
+      await saveHosted(flushed.hosted, mode);
       setMsg({
         text: mode === "publish" ? "Saved & published" : "Draft saved",
         ok: true,
@@ -205,7 +235,7 @@ function AboutEditorInner() {
         </div>
       </div>
 
-      {loading || !draft ? (
+      {loading || hostedLoading || !draft ? (
         <div className="flex items-center justify-center py-28">
           <Loader2 size={24} className="animate-spin text-gray-400" />
         </div>
@@ -242,11 +272,21 @@ function AboutEditorInner() {
               </button>
             </div>
             <div className="p-6">
-              <AboutSectionInspector
-                section={selected}
-                data={draft!}
-                onChange={setDraft}
-              />
+              {selected.startsWith("hosted:") ? (
+                <HostedInspector
+                  sectionKey={selected}
+                  defs={hostedDefs}
+                  drafts={hostedDrafts}
+                  onChange={setHostedDraft}
+                  onSelectSection={setSelected}
+                />
+              ) : (
+                <AboutSectionInspector
+                  section={selected}
+                  data={draft!}
+                  onChange={setDraft}
+                />
+              )}
             </div>
             <div className="sticky bottom-0 mt-auto border-t border-gray-100 bg-white px-6 py-3">
               <SaveButtons saving={saving} onSave={save} full />

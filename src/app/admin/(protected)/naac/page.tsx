@@ -9,17 +9,17 @@ import {
   type NaacEditableSection,
 } from "@/components/layout/NaacPageLayout";
 import { NaacSectionInspector } from "@/components/admin/NaacSectionInspector";
-import { hostedContentEditorLinks } from "@/lib/content-pages";
+import { hostedPanelItems } from "@/components/admin/hosted-content";
+import { hostedContentPages } from "@/lib/content-pages";
 import { NaacPageSchema } from "@/lib/validation";
 import type { NaacPageValue } from "@/lib/validation";
 
 const PUBLIC_PATH = "/institutions/engineering/naac";
 
-// AQAR, best practices and distinctiveness are panels of the public NAAC page
-// but keep their own editors, so the preview's sidebar links across to them.
-const HOSTED_LINKS = hostedContentEditorLinks(PUBLIC_PATH).map(
-  ({ icon: Icon, ...rest }) => ({ ...rest, icon: <Icon /> }),
-);
+// Best practices, institutional distinctiveness and AQAR are panels of this
+// page and are edited right here — the preview renders their real content,
+// every block click-to-edit, and one Save writes the lot.
+const HOSTED_DEFS = hostedContentPages(PUBLIC_PATH);
 
 export default function NaacEditorPage() {
   return (
@@ -27,17 +27,17 @@ export default function NaacEditorPage() {
       configKey="engineeringNaac"
       publicPath={PUBLIC_PATH}
       title="NAAC Page Editor"
-      subtitle="Engineering — NAAC appeal tables, supporting documents and sub-page tabs"
+      subtitle="Engineering — appeal tables, documents, and the Best Practices / Distinctiveness / AQAR tabs"
       emptyValue={() => NaacPageSchema.parse({})}
       sectionOrder={NAAC_SECTION_ORDER}
       sectionLabels={NAAC_SECTION_LABELS}
       sectionTitle={naacSectionTitle}
       initialSection="primaryDocs"
-      renderPreview={({ data, onEditSection }) => (
+      renderPreview={({ data, hosted, onEditSection }) => (
         <NaacPageLayout
           data={data}
           editable
-          sections={HOSTED_LINKS}
+          sections={hostedPanelItems(HOSTED_DEFS, hosted, onEditSection)}
           onEditSection={onEditSection as (s: NaacEditableSection) => void}
         />
       )}

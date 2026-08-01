@@ -47,6 +47,7 @@ import type {
 } from "@/lib/validation";
 import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
 import { ContentPageBody } from "@/components/layout/ContentPageLayout";
+import { hostedSectionKey } from "@/lib/content-pages";
 import {
   resolveSidebarItems,
   type ResolvedSidebarItem,
@@ -57,10 +58,11 @@ type Institution = "main" | "engineering" | "arts-science" | "polytechnic";
 
 /**
  * A content page (see `content-pages.ts`) hosted as a panel of this page's
- * sidebar instead of a route of its own — e.g. Engineering's Timeline.
- * Exactly one of `data`/`href` is set: the public route resolves the
- * published content, while the admin preview only links across to the
- * page's own editor (it is edited at /admin/content/<slug>, not here).
+ * sidebar instead of a route of its own — e.g. Engineering's Timeline. Both
+ * the public route and the admin preview pass `data`; the admin also passes
+ * `slug`, which turns the panel into a click-to-edit region whose inspector
+ * keys are namespaced (`hosted:<slug>:<section>`). `href` remains for a
+ * link-only entry.
  *
  * `icon` arrives pre-rendered (`<Icon />`), not as a component reference: the
  * public route builds this on the server and a bare component reference
@@ -74,6 +76,8 @@ export type AboutHostedItem = {
   icon: ReactNode;
   data?: ContentPageValue;
   href?: string;
+  /** Set in the admin preview — makes this panel editable in place. */
+  slug?: string;
 };
 
 type PersonModalData = {
@@ -772,7 +776,12 @@ export function AboutPageLayout({
 
         <div className="mt-8 lg:mt-12 lg:grid lg:grid-cols-[280px_1fr] lg:gap-12 xl:grid-cols-[300px_1fr]">
           <div className="hidden lg:block">
-            <div className="sticky top-32">
+            {/* Capped to the viewport and scrollable so a long nav list stays
+                fully reachable — a pinned element can't be scrolled into view
+                by the page scroll. The cap subtracts the `top-32` offset plus
+                the bottom band held by the floating Apply / WhatsApp buttons,
+                so the rail never ends underneath them. */}
+            <div className="sticky top-32 max-h-[calc(100vh-14rem)] overflow-y-auto overscroll-contain">
               <AboutSideNav
                 data={data}
                 theme={theme}
@@ -1486,30 +1495,51 @@ export function AboutPageLayout({
               </EditableRegion>
             ))}
 
-            {/* Hosted content pages (e.g. Timeline) — edited at their own
-                /admin/content/<slug> editor, so they render inline here only
-                on the public route; the admin preview only links to it. */}
+            {/* Hosted content pages (e.g. Timeline). They render inline on the
+                public route and in the admin preview alike — in the admin the
+                `slug` makes every region click-to-edit, so the host editor is
+                the one place the whole merged page is authored. */}
             {hosted
               .filter((h): h is AboutHostedItem & { data: ContentPageValue } =>
                 Boolean(h.data),
               )
-              .map((h) => (
-                <section
-                  key={h.anchor}
-                  id={h.anchor}
-                  className={`scroll-mt-28 transition-all duration-300 ${mobileVis(h.anchor)}`}
-                >
-                  <h2 className="text-foreground mb-5 flex items-center gap-3 font-serif text-2xl font-bold md:text-3xl">
-                    <span
-                      className={`${theme.iconBg20} flex h-10 w-10 shrink-0 items-center justify-center rounded-xl [&>svg]:size-5`}
+              .map((h) => {
+                const hostedEditable = editable && !!h.slug;
+                const key = (s: string) => hostedSectionKey(h.slug!, s);
+                return (
+                  <section
+                    key={h.anchor}
+                    id={h.anchor}
+                    className={`scroll-mt-28 transition-all duration-300 ${mobileVis(h.anchor)}`}
+                  >
+                    <EditableRegion
+                      as="div"
+                      section={hostedEditable ? key("hero") : ""}
+                      label={`${h.navLabel} — Heading`}
+                      editable={hostedEditable}
+                      onEditSection={onEditSection}
                     >
-                      {h.icon}
-                    </span>
-                    {h.data.hero?.title?.trim() || h.navLabel}
-                  </h2>
-                  <ContentPageBody data={h.data} />
-                </section>
-              ))}
+                      <h2 className="text-foreground mb-5 flex items-center gap-3 font-serif text-2xl font-bold md:text-3xl">
+                        <span
+                          className={`${theme.iconBg20} flex h-10 w-10 shrink-0 items-center justify-center rounded-xl [&>svg]:size-5`}
+                        >
+                          {h.icon}
+                        </span>
+                        {h.data.hero?.title?.trim() || h.navLabel}
+                      </h2>
+                    </EditableRegion>
+                    <ContentPageBody
+                      data={h.data}
+                      editable={hostedEditable}
+                      onEditSection={
+                        hostedEditable
+                          ? (s) => onEditSection?.(key(s))
+                          : undefined
+                      }
+                    />
+                  </section>
+                );
+              })}
           </div>
         </div>
       </div>

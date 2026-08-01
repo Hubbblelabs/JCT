@@ -63,8 +63,6 @@ export type ContentPageDef = {
   seoTitle: string;
   seoDescription: string;
   icon: LucideIcon;
-  /** Which admin hub group the card belongs to. */
-  group: "Institution" | "Academics" | "Campus & Community" | "Placements";
 };
 
 const ENG = "/institutions/engineering";
@@ -85,7 +83,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "The JCT Learning Resource Centre — collections, subscribed e-journals, open sources, borrowing rules and library services for students and faculty.",
     icon: BookOpen,
-    group: "Academics",
   },
   {
     slug: "nirf",
@@ -101,7 +98,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "National Institutional Ranking Framework (NIRF) submissions of JCT College of Engineering & Technology — overall, engineering and innovation reports.",
     icon: FileBarChart,
-    group: "Institution",
   },
   {
     slug: "timeline",
@@ -117,7 +113,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "Milestones of JCT College of Engineering & Technology year by year — new programmes, accreditations, conferences and campus achievements.",
     icon: History,
-    group: "Institution",
   },
   {
     slug: "professional-bodies",
@@ -131,7 +126,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "Professional body memberships and student chapters at JCT — CSI, ISTE, ICT Academy, Oracle Academy, IEI, IChemE, IAENG and more.",
     icon: Users,
-    group: "Academics",
   },
   {
     slug: "cyber-safety",
@@ -145,7 +139,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "National Cyber Safety and Security Standards at JCT — cyber crime and cyber defence reference handbooks and online safety resources.",
     icon: ShieldCheck,
-    group: "Academics",
   },
   {
     slug: "naac-best-practices",
@@ -161,7 +154,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "NAAC institutional best practices at JCT — ERP-driven transparent governance and the student mentoring and counselling system.",
     icon: Sparkles,
-    group: "Institution",
   },
   {
     slug: "naac-distinctiveness",
@@ -180,7 +172,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "Institutional distinctiveness of JCT College of Engineering & Technology as submitted to NAAC — programmes, accreditation, scholarships and governance.",
     icon: BadgeCheck,
-    group: "Institution",
   },
   {
     slug: "naac-aqar",
@@ -196,7 +187,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "Annual Quality Assurance Reports (AQAR) of JCT College of Engineering & Technology with criterion-wise qualitative and quantitative metric evidence.",
     icon: Award,
-    group: "Institution",
   },
   {
     slug: "financial-statements",
@@ -212,7 +202,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "Audited financial statements and year-wise balance sheets of JCT College of Engineering & Technology.",
     icon: FileSpreadsheet,
-    group: "Institution",
   },
   {
     slug: "ict-content",
@@ -228,9 +217,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "ICT-enabled teaching material authored by JCT faculty — subject-wise presentations and e-content across every department.",
     icon: MonitorPlay,
-    // Hosted by the Documents page, so its card sits with Documents rather
-    // than in Academics where the standalone page used to live.
-    group: "Institution",
   },
   {
     slug: "mandatory-disclosures",
@@ -245,7 +231,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "Mandatory disclosure filings of JCT College of Engineering & Technology, Coimbatore.",
     icon: ScrollText,
-    group: "Institution",
   },
   {
     slug: "hr-manual",
@@ -260,7 +245,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "The human resources manual of JCT College of Engineering & Technology, Coimbatore.",
     icon: BookUser,
-    group: "Institution",
   },
   {
     slug: "nss",
@@ -274,7 +258,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "The National Service Scheme unit at JCT along with the Red Ribbon Club and Youth Red Cross — objectives, activities and faculty in charge.",
     icon: HeartHandshake,
-    group: "Campus & Community",
   },
   {
     slug: "feedback-system",
@@ -288,7 +271,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "Student and staff feedback portals of JCT College of Engineering & Technology, accessed through the institution's ERP.",
     icon: MessageSquare,
-    group: "Institution",
   },
   {
     slug: "placement-gallery",
@@ -304,7 +286,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "Photographs from campus recruitment drives and placement events at JCT College of Engineering & Technology, year by year.",
     icon: Camera,
-    group: "Placements",
   },
   {
     slug: "fine-arts-club",
@@ -319,7 +300,6 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     seoDescription:
       "The Fine Arts Club at JCT Polytechnic College — its movie, cultural, arts and photography wings, objectives and event gallery.",
     icon: Palette,
-    group: "Campus & Community",
   },
 ];
 
@@ -372,20 +352,36 @@ export function hostedContentPages(path: string): ContentPageDef[] {
 }
 
 /**
- * The same sidebar entries a host renders publicly, but pointing at each
- * hosted page's own editor. The admin preview shows the real sidebar this way
- * without having to load four site-config keys into one editor.
+ * A hosted page is edited inside its host's editor, not at a route of its own,
+ * so its inspector keys are namespaced by slug. Kept here rather than in an
+ * admin component so the public layouts can build the same keys without
+ * pulling the inspector into their bundle.
  */
-export function hostedContentEditorLinks(path: string): {
-  id: string;
-  label: string;
-  icon: LucideIcon;
-  href: string;
-}[] {
-  return hostedContentPages(path).map((p) => ({
-    id: p.host!.anchor,
-    label: p.host!.navLabel,
-    icon: p.icon,
-    href: `/admin/content/${p.slug}`,
-  }));
+export function hostedSectionKey(slug: string, section: string): string {
+  return `hosted:${slug}:${section}`;
+}
+
+export function parseHostedSection(
+  key: string,
+): { slug: string; section: string } | null {
+  if (!key.startsWith("hosted:")) return null;
+  const rest = key.slice("hosted:".length);
+  const i = rest.indexOf(":");
+  if (i === -1) return { slug: rest, section: "blocks" };
+  return { slug: rest.slice(0, i), section: rest.slice(i + 1) };
+}
+
+/**
+ * The admin editor that owns a host route. A hosted page has no editor of its
+ * own any more, so `/admin/content/<slug>` sends the reader here instead.
+ */
+const HOST_ADMIN_EDITORS: Record<string, string> = {
+  [`${ENG}/about`]: "/admin/about?college=engineering",
+  [`${ENG}/documents`]: "/admin/documents",
+  [`${ENG}/naac`]: "/admin/naac",
+  [`${ENG}/placements`]: "/admin/placements-page?college=engineering",
+};
+
+export function hostAdminEditor(def: ContentPageDef): string | undefined {
+  return def.host ? HOST_ADMIN_EDITORS[def.path] : undefined;
 }

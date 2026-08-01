@@ -45,6 +45,7 @@ import { EditableRegion } from "@/components/admin/EditableRegion";
 import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
 import { getImageUrl } from "@/lib/utils";
 import { PLACEMENT_GALLERY_ANCHOR } from "@/lib/page-anchors";
+import { hostedSectionKey } from "@/lib/content-pages";
 import {
   resolveSidebarItems,
   type ResolvedSidebarItem,
@@ -84,6 +85,49 @@ export const PLACEMENT_SECTION_LABELS: Record<
   "why-recruit": "Why Recruit at JCT",
   sidebar: "Sidebar Navigation",
 };
+
+/**
+ * The year-wise data on this page comes from `Placement` documents, not from
+ * the page's site-config key, but it is authored here all the same — these are
+ * the inspector keys for it.
+ *
+ * `PLACEMENT_RECORDS_SECTION` opens the year list (add / delete / pick the
+ * current year); `placementRecordSection(id, key)` opens one year's data at
+ * whichever block was clicked.
+ */
+export const PLACEMENT_RECORDS_SECTION = "records";
+
+export type PlacementRecordSectionKey =
+  "overview" | "recruiters" | "achievers" | "company-wise";
+
+export const PLACEMENT_RECORD_SECTION_LABELS: Record<
+  PlacementRecordSectionKey,
+  string
+> = {
+  overview: "Year Summary & Stats",
+  recruiters: "Top Recruiters",
+  achievers: "Placed Students",
+  "company-wise": "Placements by Company",
+};
+
+export function placementRecordSection(
+  recordId: string,
+  key: PlacementRecordSectionKey,
+): string {
+  return `record:${recordId}:${key}`;
+}
+
+export function parsePlacementRecordSection(
+  section: string,
+): { recordId: string; key: PlacementRecordSectionKey } | null {
+  if (!section.startsWith("record:")) return null;
+  const rest = section.slice("record:".length);
+  const i = rest.lastIndexOf(":");
+  if (i === -1) return null;
+  const key = rest.slice(i + 1) as PlacementRecordSectionKey;
+  if (!(key in PLACEMENT_RECORD_SECTION_LABELS)) return null;
+  return { recordId: rest.slice(0, i), key };
+}
 
 type EditProps = {
   editable?: boolean;
@@ -384,31 +428,50 @@ function PlacementSideNav({
           })}
         </div>
 
-        {records.length > 0 && (
-          <div className="border-border mt-5 border-t pt-5">
+        {/* Nested region: the year list is the door to the year-wise records,
+            which are their own documents rather than page copy. Clicking a
+            year still switches years — only the surrounding chrome opens the
+            record inspector. */}
+        {(records.length > 0 || editable) && (
+          <EditableRegion
+            as="div"
+            section={PLACEMENT_RECORDS_SECTION}
+            label="Placement Years"
+            editable={editable}
+            onEditSection={onEditSection}
+            className="border-border mt-5 border-t pt-5"
+          >
             <h3 className="text-navy mb-3 text-xs font-bold tracking-[0.15em] uppercase">
               Placement Data
             </h3>
-            <div className="space-y-1">
-              {currentYears.map((r) => (
-                <YearButton
-                  key={r._id}
-                  record={r}
-                  active={r._id === selectedId}
-                  onSelect={onSelectYear}
-                />
-              ))}
-            </div>
-            {pastYears.length > 0 && (
-              <div className="mt-3">
-                <PastYearSelect
-                  records={pastYears}
-                  selectedId={selectedId}
-                  onSelect={onSelectYear}
-                />
-              </div>
+            {records.length === 0 ? (
+              <p className="text-sm text-stone-400 italic">
+                No years yet. Click to add the first one.
+              </p>
+            ) : (
+              <>
+                <div className="space-y-1">
+                  {currentYears.map((r) => (
+                    <YearButton
+                      key={r._id}
+                      record={r}
+                      active={r._id === selectedId}
+                      onSelect={onSelectYear}
+                    />
+                  ))}
+                </div>
+                {pastYears.length > 0 && (
+                  <div className="mt-3">
+                    <PastYearSelect
+                      records={pastYears}
+                      selectedId={selectedId}
+                      onSelect={onSelectYear}
+                    />
+                  </div>
+                )}
+              </>
             )}
-          </div>
+          </EditableRegion>
         )}
       </EditableRegion>
     </>
@@ -429,7 +492,12 @@ function YearButton({
   return (
     <button
       type="button"
-      onClick={() => onSelect(record._id)}
+      // Stop short of the surrounding EditableRegion in the admin preview:
+      // picking a year must switch years, not open the inspector.
+      onClick={(e) => {
+        e.stopPropagation();
+        onSelect(record._id);
+      }}
       aria-pressed={active}
       className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors ${className} ${
         active
@@ -548,7 +616,14 @@ function PastYearSelect({
   };
 
   return (
-    <div ref={rootRef} className="relative" onKeyDown={onKeyDown}>
+    <div
+      ref={rootRef}
+      className="relative"
+      onKeyDown={onKeyDown}
+      // Everything in this dropdown is year-switching, never page editing —
+      // keep its clicks away from the surrounding EditableRegion.
+      onClick={(e) => e.stopPropagation()}
+    >
       <button
         ref={triggerRef}
         type="button"
@@ -1258,12 +1333,22 @@ function ProcessSection({
 
 // ─── Year-wise placement data ────────────────────────────────────────────────
 
-function CurrentYear({ record }: { record: PublicPlacement }) {
+function CurrentYear({
+  record,
+  editable,
+  onEditSection,
+}: { record: PublicPlacement } & EditProps) {
   const headline = HEADLINE_STATS.filter((s) => Number(record[s.key]) > 0);
   const packages = PACKAGE_STATS.filter((s) => String(record[s.key]).trim());
 
   return (
-    <div>
+    <EditableRegion
+      as="div"
+      section={placementRecordSection(record._id, "overview")}
+      label={`${record.year} — ${PLACEMENT_RECORD_SECTION_LABELS.overview}`}
+      editable={editable}
+      onEditSection={onEditSection}
+    >
       <div className="mb-8 flex flex-wrap items-end justify-between gap-3">
         <div>
           <span className="text-accent text-sm font-bold tracking-[0.2em] uppercase">
@@ -1344,7 +1429,11 @@ function CurrentYear({ record }: { record: PublicPlacement }) {
           })}
         </div>
       )}
-    </div>
+
+      {editable && headline.length === 0 && packages.length === 0 && (
+        <EmptyHint>Click to add this year&apos;s figures</EmptyHint>
+      )}
+    </EditableRegion>
   );
 }
 
@@ -1430,47 +1519,79 @@ function StudentCard({ student }: { student: PublicNotablePlacement }) {
   );
 }
 
-function PlacedStudents({ record }: { record: PublicPlacement }) {
+function PlacedStudents({
+  record,
+  editable,
+  onEditSection,
+}: { record: PublicPlacement } & EditProps) {
   return (
-    <section id="achievers" className="scroll-mt-28">
+    <EditableRegion
+      as="section"
+      id="achievers"
+      section={placementRecordSection(record._id, "achievers")}
+      label={`${record.year} — ${PLACEMENT_RECORD_SECTION_LABELS.achievers}`}
+      editable={editable}
+      onEditSection={onEditSection}
+      className="scroll-mt-28"
+    >
       <SectionHeading
         icon={GraduationCap}
         eyebrow="Our Achievers"
         title="Placed Students"
         meta={`${record.notable_placements.length} students`}
       />
-      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:gap-4 lg:grid-cols-6">
-        {record.notable_placements.map((s, i) => (
-          <motion.div
-            key={`${s.name}-${i}`}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: (i % 6) * 0.05 }}
-          >
-            <StudentCard student={s} />
-          </motion.div>
-        ))}
-      </div>
-    </section>
+      {record.notable_placements.length === 0 ? (
+        <EmptyHint>Click to add this year&apos;s placed students</EmptyHint>
+      ) : (
+        <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 md:gap-4 lg:grid-cols-6">
+          {record.notable_placements.map((s, i) => (
+            <motion.div
+              key={`${s.name}-${i}`}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: (i % 6) * 0.05 }}
+            >
+              <StudentCard student={s} />
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </EditableRegion>
   );
 }
 
-function TopRecruiters({ record }: { record: PublicPlacement }) {
+function TopRecruiters({
+  record,
+  editable,
+  onEditSection,
+}: { record: PublicPlacement } & EditProps) {
   return (
-    <section id="recruiters" className="scroll-mt-28">
+    <EditableRegion
+      as="section"
+      id="recruiters"
+      section={placementRecordSection(record._id, "recruiters")}
+      label={`${record.year} — ${PLACEMENT_RECORD_SECTION_LABELS.recruiters}`}
+      editable={editable}
+      onEditSection={onEditSection}
+      className="scroll-mt-28"
+    >
       <SectionHeading
         icon={Building2}
         eyebrow="Hiring Partners"
         title="Our Recruiters"
         meta={`${record.top_recruiters.length} companies`}
       />
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-        {record.top_recruiters.map((r, i) => (
-          <RecruiterTile key={`${r.name}-${i}`} name={r.name} logo={r.logo} />
-        ))}
-      </div>
-    </section>
+      {record.top_recruiters.length === 0 ? (
+        <EmptyHint>Click to add this year&apos;s recruiters</EmptyHint>
+      ) : (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+          {record.top_recruiters.map((r, i) => (
+            <RecruiterTile key={`${r.name}-${i}`} name={r.name} logo={r.logo} />
+          ))}
+        </div>
+      )}
+    </EditableRegion>
   );
 }
 
@@ -1500,19 +1621,36 @@ function CompanyLogo({ company }: { company: PublicCompanyPlacement }) {
 // Company-wise placed students: one card per recruiter, listing every student
 // it hired with their program and package. Sits alongside the recruiter grid so
 // visitors can see who was placed where.
-function CompanyPlacements({ record }: { record: PublicPlacement }) {
+function CompanyPlacements({
+  record,
+  editable,
+  onEditSection,
+}: { record: PublicPlacement } & EditProps) {
   const totalStudents = record.company_placements.reduce(
     (sum, c) => sum + c.students.length,
     0,
   );
   return (
-    <section id="company-wise" className="scroll-mt-28">
+    <EditableRegion
+      as="section"
+      id="company-wise"
+      section={placementRecordSection(record._id, "company-wise")}
+      label={`${record.year} — ${PLACEMENT_RECORD_SECTION_LABELS["company-wise"]}`}
+      editable={editable}
+      onEditSection={onEditSection}
+      className="scroll-mt-28"
+    >
       <SectionHeading
         icon={Briefcase}
         eyebrow="Company-wise"
         title="Placements by Company"
         meta={`${totalStudents} students · ${record.company_placements.length} companies`}
       />
+      {record.company_placements.length === 0 && (
+        <EmptyHint>
+          Click to group this year&apos;s students by company
+        </EmptyHint>
+      )}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         {record.company_placements.map((c, i) => (
           <div
@@ -1558,7 +1696,7 @@ function CompanyPlacements({ record }: { record: PublicPlacement }) {
           </div>
         ))}
       </div>
-    </section>
+    </EditableRegion>
   );
 }
 
@@ -1569,6 +1707,9 @@ export function PlacementsPageLayout({
   records,
   info,
   gallery = null,
+  gallerySlug,
+  selectedRecordId,
+  onSelectRecord,
   editable = false,
   onEditSection,
 }: {
@@ -1577,17 +1718,33 @@ export function PlacementsPageLayout({
   info: PlacementInfoValue;
   /**
    * The placement-gallery content page, which used to live at
-   * `/placements/gallery` and now renders as a section of this page. Edited
-   * separately at /admin/content/placement-gallery, so the admin preview
-   * passes null and the section is absent there.
+   * `/placements/gallery` and now renders as a section of this page. The admin
+   * preview passes its draft too, so it is edited here rather than anywhere
+   * else.
    */
   gallery?: ContentPageValue | null;
+  /**
+   * Set in the admin preview alongside `gallery` — makes the gallery section
+   * click-to-edit, keyed `hosted:<slug>:<section>`.
+   */
+  gallerySlug?: string;
+  /**
+   * Controlled year selection. The admin preview owns it, so the year showing
+   * on the page and the year open in the inspector cannot drift apart; the
+   * public route leaves both unset and the switcher keeps its own state.
+   */
+  selectedRecordId?: string;
+  onSelectRecord?: (id: string) => void;
 } & EditProps) {
   const label = INSTITUTION_LABELS[institution] ?? "JCT";
   // The current record is the one flagged is_current, else the newest (records
   // arrive sorted is_current desc, then year desc).
   const current = records.find((r) => r.is_current) ?? records[0] ?? null;
-  const [selectedId, setSelectedId] = useState<string>(current?._id ?? "");
+  const [ownSelectedId, setOwnSelectedId] = useState<string>(
+    current?._id ?? "",
+  );
+  const selectedId = selectedRecordId ?? ownSelectedId;
+  const setSelectedId = onSelectRecord ?? setOwnSelectedId;
   const active = records.find((r) => r._id === selectedId) ?? current ?? null;
 
   // A built-in nav entry only appears once its section actually has content —
@@ -1610,14 +1767,19 @@ export function PlacementsPageLayout({
     )
       set.add("tpo");
     if (editable || info.process.steps.length > 0) set.add("process");
-    // The gallery is edited on its own page, so it appears only once it has
-    // published content — there is nothing here to click to create it.
-    if ((gallery?.blocks?.length ?? 0) > 0) set.add(PLACEMENT_GALLERY_ANCHOR);
+    // Publicly the gallery appears only once it has content; in the editor it
+    // is always shown, empty or not, so there is something to click to fill in.
+    if (editable ? !!gallery : (gallery?.blocks?.length ?? 0) > 0)
+      set.add(PLACEMENT_GALLERY_ANCHOR);
     if (active) {
       set.add("overview");
-      if (active.top_recruiters.length > 0) set.add("recruiters");
-      if (active.notable_placements.length > 0) set.add("achievers");
-      if (active.company_placements.length > 0) set.add("company-wise");
+      // Empty year-wise blocks are hidden publicly but always shown in the
+      // editor — otherwise there is nothing to click to add the first entry.
+      if (editable || active.top_recruiters.length > 0) set.add("recruiters");
+      if (editable || active.notable_placements.length > 0)
+        set.add("achievers");
+      if (editable || active.company_placements.length > 0)
+        set.add("company-wise");
     }
     return set;
   }, [info, active, editable, gallery]);
@@ -1706,7 +1868,9 @@ export function PlacementsPageLayout({
     if (window.innerWidth < 1024) handleNavigate("overview");
   };
 
-  const hasSections = records.length > 0 || present.size > 0;
+  // The editor always renders the shell, even for a college with nothing yet:
+  // the sidebar is where a first year — and every other section — is added.
+  const hasSections = editable || records.length > 0 || present.size > 0;
   const isEmpty = !hasSections;
 
   // No `overflow-x-hidden` here: `overflow-x: hidden` computes overflow-y to
@@ -1755,7 +1919,7 @@ export function PlacementsPageLayout({
               <div className="lg:grid lg:grid-cols-[280px_1fr] lg:items-start lg:gap-10 xl:grid-cols-[300px_1fr] xl:gap-12">
                 {/* `sticky` needs the grid item to be its own box, not stretched
                     to the row height — hence `items-start` above. */}
-                <div className="sticky top-24 hidden lg:block">
+                <div className="sticky top-24 hidden max-h-[calc(100vh-12rem)] overflow-y-auto overscroll-contain lg:block">
                   <PlacementSideNav
                     items={navItems}
                     activeId={activeId}
@@ -1809,16 +1973,32 @@ export function PlacementsPageLayout({
                   {active && (
                     <>
                       <section id="overview" className="scroll-mt-28">
-                        <CurrentYear record={active} />
+                        <CurrentYear
+                          record={active}
+                          editable={editable}
+                          onEditSection={onEditSection}
+                        />
                       </section>
                       {present.has("recruiters") && (
-                        <TopRecruiters record={active} />
+                        <TopRecruiters
+                          record={active}
+                          editable={editable}
+                          onEditSection={onEditSection}
+                        />
                       )}
                       {present.has("achievers") && (
-                        <PlacedStudents record={active} />
+                        <PlacedStudents
+                          record={active}
+                          editable={editable}
+                          onEditSection={onEditSection}
+                        />
                       )}
                       {present.has("company-wise") && (
-                        <CompanyPlacements record={active} />
+                        <CompanyPlacements
+                          record={active}
+                          editable={editable}
+                          onEditSection={onEditSection}
+                        />
                       )}
                     </>
                   )}
@@ -1828,14 +2008,37 @@ export function PlacementsPageLayout({
                       id={PLACEMENT_GALLERY_ANCHOR}
                       className="scroll-mt-28"
                     >
-                      <SectionHeading
-                        icon={Camera}
-                        eyebrow="Gallery"
-                        title={
-                          gallery.hero?.title?.trim() || "Placement Gallery"
+                      <EditableRegion
+                        as="div"
+                        section={
+                          gallerySlug
+                            ? hostedSectionKey(gallerySlug, "hero")
+                            : ""
+                        }
+                        label="Placement Gallery — Heading"
+                        editable={editable && !!gallerySlug}
+                        onEditSection={onEditSection}
+                      >
+                        <SectionHeading
+                          icon={Camera}
+                          eyebrow="Gallery"
+                          title={
+                            gallery.hero?.title?.trim() || "Placement Gallery"
+                          }
+                        />
+                      </EditableRegion>
+                      <ContentPageBody
+                        data={gallery}
+                        editable={editable && !!gallerySlug}
+                        onEditSection={
+                          gallerySlug
+                            ? (s) =>
+                                onEditSection?.(
+                                  hostedSectionKey(gallerySlug, s),
+                                )
+                            : undefined
                         }
                       />
-                      <ContentPageBody data={gallery} />
                     </section>
                   )}
 

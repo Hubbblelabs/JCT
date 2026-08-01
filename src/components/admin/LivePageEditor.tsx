@@ -12,6 +12,12 @@ import {
   saveEditableConfig,
   type SaveMode,
 } from "@/lib/admin-site-config";
+import {
+  HostedInspector,
+  hostedInspectorTitle,
+  useHostedDrafts,
+  type HostedDrafts,
+} from "@/components/admin/hosted-content";
 
 /**
  * Shared shell for the click-to-edit + inspector editors (the same pattern the
@@ -46,6 +52,11 @@ type Props<T> = {
   initialSection: string;
   renderPreview: (args: {
     data: T;
+    /**
+     * Drafts of the content pages this route absorbs, keyed by slug. Empty
+     * until they load, and always empty for a route that hosts none.
+     */
+    hosted: HostedDrafts;
     onEditSection: (section: string) => void;
   }) => ReactNode;
   renderInspector: (args: {
@@ -80,6 +91,16 @@ function LivePageEditorInner<T>({
 }: Props<T>) {
   const router = useRouter();
   const { flush } = useDeferredUploads();
+  // The pages this route absorbs are edited here too, so the whole merged page
+  // is one preview, one inspector and one Save.
+  const {
+    defs: hostedDefs,
+    drafts: hosted,
+    setDrafts: setHosted,
+    setDraft: setHostedDraft,
+    loading: hostedLoading,
+    saveAll: saveHosted,
+  } = useHostedDrafts(publicPath);
 
   const [draft, setDraft] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
@@ -126,9 +147,17 @@ function LivePageEditorInner<T>({
     setSaving(mode);
     setMsg(null);
     try {
-      const flushedDraft = (await flush(draft)) as T;
-      setDraft(flushedDraft);
-      await saveEditableConfig(configKey, flushedDraft, mode);
+      // Flush host and hosted drafts in one call: `flush` drops any pending
+      // upload it cannot find in the value it is handed, so flushing them
+      // separately would discard the other half's images.
+      const flushed = (await flush({ host: draft, hosted })) as {
+        host: T;
+        hosted: HostedDrafts;
+      };
+      setDraft(flushed.host);
+      setHosted(flushed.hosted);
+      await saveEditableConfig(configKey, flushed.host, mode);
+      await saveHosted(flushed.hosted, mode);
       setMsg({
         text: mode === "publish" ? "Saved & published" : "Draft saved",
         ok: true,
@@ -185,13 +214,17 @@ function LivePageEditorInner<T>({
         </div>
       </div>
 
-      {loading || !draft ? (
+      {loading || hostedLoading || !draft ? (
         <div className="flex items-center justify-center py-28">
           <Loader2 size={24} className="animate-spin text-gray-400" />
         </div>
       ) : (
         <div className="-mx-6 -mb-6 overflow-hidden border-t border-gray-200 bg-white xl:mx-0 xl:rounded-xl xl:border">
-          {renderPreview({ data: draft, onEditSection: selectSection })}
+          {renderPreview({
+            data: draft,
+            hosted,
+            onEditSection: selectSection,
+          })}
         </div>
       )}
 
@@ -205,7 +238,8 @@ function LivePageEditorInner<T>({
                   Inspector
                 </p>
                 <h2 className="mt-0.5 font-semibold text-gray-900">
-                  {sectionTitle?.(selected, draft) ??
+                  {hostedInspectorTitle(selected, hostedDefs, hosted) ??
+                    sectionTitle?.(selected, draft) ??
                     sectionLabels[selected] ??
                     "Section"}
                 </h2>
@@ -219,12 +253,22 @@ function LivePageEditorInner<T>({
               </button>
             </div>
             <div className="p-6">
-              {renderInspector({
-                section: selected,
-                data: draft,
-                onChange: setDraft,
-                onSelectSection: setSelected,
-              })}
+              {selected.startsWith("hosted:") ? (
+                <HostedInspector
+                  sectionKey={selected}
+                  defs={hostedDefs}
+                  drafts={hosted}
+                  onChange={setHostedDraft}
+                  onSelectSection={setSelected}
+                />
+              ) : (
+                renderInspector({
+                  section: selected,
+                  data: draft,
+                  onChange: setDraft,
+                  onSelectSection: setSelected,
+                })
+              )}
             </div>
             <div className="sticky bottom-0 mt-auto border-t border-gray-100 bg-white px-6 py-3">
               {saveButtons(true)}

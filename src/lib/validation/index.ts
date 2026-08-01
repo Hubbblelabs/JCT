@@ -101,6 +101,8 @@ export type {
   PlacementUpdateValue,
   TopRecruiterValue,
   NotablePlacementValue,
+  CompanyPlacementValue,
+  CompanyStudentValue,
 } from "./placements";
 
 export { PlacementInfoSchema, PLACEMENT_INFO_LIMITS } from "./placementInfo";
