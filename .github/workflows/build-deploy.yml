@@ -3,7 +3,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - v2-admin
+      - v3-admin
     tags:
       - "v*"
 jobs:
