@@ -224,7 +224,9 @@ function BlockEditor({
             span={8}
             rows={2}
             value={block.description}
-            onChange={(e) => onChange({ ...block, description: e.target.value })}
+            onChange={(e) =>
+              onChange({ ...block, description: e.target.value })
+            }
           />
           <Select
             label="Layout"
@@ -289,7 +291,9 @@ function BlockEditor({
             span={8}
             rows={2}
             value={block.description}
-            onChange={(e) => onChange({ ...block, description: e.target.value })}
+            onChange={(e) =>
+              onChange({ ...block, description: e.target.value })
+            }
           />
           <StringList
             label="Column Headings"
@@ -400,7 +404,9 @@ function BlockEditor({
             span={5}
             rows={2}
             value={block.description}
-            onChange={(e) => onChange({ ...block, description: e.target.value })}
+            onChange={(e) =>
+              onChange({ ...block, description: e.target.value })
+            }
           />
           <Select
             label="Columns"
@@ -457,7 +463,9 @@ function BlockEditor({
             span={8}
             rows={2}
             value={block.description}
-            onChange={(e) => onChange({ ...block, description: e.target.value })}
+            onChange={(e) =>
+              onChange({ ...block, description: e.target.value })
+            }
           />
           <Repeater<ContentTimelineEntryValue>
             label="Entries"
@@ -502,7 +510,9 @@ function BlockEditor({
             span={5}
             rows={2}
             value={block.description}
-            onChange={(e) => onChange({ ...block, description: e.target.value })}
+            onChange={(e) =>
+              onChange({ ...block, description: e.target.value })
+            }
           />
           <Select
             label="First panel"
@@ -716,7 +726,8 @@ function BlockList({
               }}
               className="admin-btn admin-btn-outline admin-btn-sm"
             >
-              <Plus size={13} /> {CONTENT_BLOCK_LABELS[type as ContentBlockType]}
+              <Plus size={13} />{" "}
+              {CONTENT_BLOCK_LABELS[type as ContentBlockType]}
             </button>
           ))}
         </div>

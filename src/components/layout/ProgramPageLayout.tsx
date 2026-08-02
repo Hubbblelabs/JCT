@@ -2289,7 +2289,6 @@ export function ProgramPageLayout({
     ? ""
     : rawDegreePrefix;
 
-
   const heroPills =
     dept.heroMeta && dept.heroMeta.length > 0
       ? dept.heroMeta

@@ -59,7 +59,10 @@ const STATIC_NAV_BY_KEY: Record<string, StaticNavItem[]> = {
  */
 function siteHosts(): Set<string> {
   const hosts = new Set<string>();
-  for (const raw of [process.env.NEXTAUTH_URL, process.env.NEXT_PUBLIC_SITE_URL]) {
+  for (const raw of [
+    process.env.NEXTAUTH_URL,
+    process.env.NEXT_PUBLIC_SITE_URL,
+  ]) {
     if (!raw) continue;
     try {
       hosts.add(new URL(raw).host.toLowerCase());
@@ -109,7 +112,11 @@ type NavEntry = { href?: unknown; children?: unknown; visible?: unknown };
  * children array, and hidden children are dropped individually. `visible` is
  * optional, so only an explicit `false` hides (undefined means visible).
  */
-function collectItems(items: unknown, into: Set<string>, hosts: Set<string>): number {
+function collectItems(
+  items: unknown,
+  into: Set<string>,
+  hosts: Set<string>,
+): number {
   if (!Array.isArray(items)) return 0;
   let seen = 0;
   for (const raw of items) {

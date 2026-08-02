@@ -119,10 +119,7 @@ const TableBlock = z.object({
   type: z.literal("table"),
   title: s(300),
   description: s(1000),
-  columns: z
-    .array(s(200))
-    .max(CONTENT_PAGE_LIMITS.columnsMax)
-    .default([]),
+  columns: z.array(s(200)).max(CONTENT_PAGE_LIMITS.columnsMax).default([]),
   rows: z.array(TableRowSchema).max(CONTENT_PAGE_LIMITS.rowsMax).default([]),
 });
 

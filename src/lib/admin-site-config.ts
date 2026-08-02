@@ -28,7 +28,9 @@ type ConfigDoc = {
 export async function loadEditableConfig<T>(
   key: string,
 ): Promise<EditableConfig<T>> {
-  const r = await fetch(`/api/admin/site-config?key=${encodeURIComponent(key)}`);
+  const r = await fetch(
+    `/api/admin/site-config?key=${encodeURIComponent(key)}`,
+  );
   if (!r.ok) {
     const body = await r.json().catch(() => null);
     throw new Error(body?.message ?? body?.error ?? "Failed to load content");
@@ -44,9 +46,8 @@ export async function loadEditableConfig<T>(
   const raw = doc.value ?? doc.published_value ?? null;
   return {
     value: raw && typeof raw === "object" ? (raw as T) : null,
-    status: doc.status === "draft" || doc.status === "published"
-      ? doc.status
-      : null,
+    status:
+      doc.status === "draft" || doc.status === "published" ? doc.status : null,
   };
 }
 

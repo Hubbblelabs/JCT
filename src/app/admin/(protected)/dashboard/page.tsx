@@ -18,10 +18,7 @@ async function getDashboardData() {
   try {
     await connectDB();
 
-    const logs = await AuditLog.find()
-      .sort({ created_at: -1 })
-      .limit(8)
-      .lean();
+    const logs = await AuditLog.find().sort({ created_at: -1 }).limit(8).lean();
 
     return { logs: logs as Record<string, unknown>[], ok: true };
   } catch (err) {

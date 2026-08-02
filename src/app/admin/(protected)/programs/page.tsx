@@ -2,7 +2,15 @@
 
 import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Eye, EyeOff, GraduationCap, Loader2, Plus, Send, Trash2 } from "lucide-react";
+import {
+  Eye,
+  EyeOff,
+  GraduationCap,
+  Loader2,
+  Plus,
+  Send,
+  Trash2,
+} from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { COLLEGE_LABELS, type College } from "@/lib/admin-nav";
@@ -27,8 +35,7 @@ interface Program {
   status: "draft" | "published" | "archived";
 }
 
-const collegeLabel = (id: string) =>
-  COLLEGE_LABELS[id as College] ?? id ?? "—";
+const collegeLabel = (id: string) => COLLEGE_LABELS[id as College] ?? id ?? "—";
 
 function ProgramsPageInner() {
   const searchParams = useSearchParams();
@@ -129,12 +136,15 @@ function ProgramsPageInner() {
   };
 
   const setActive = (selected: Program[], is_active: boolean) =>
-    runBulk(is_active ? "Published to site:" : "Hidden from site:", selected, (p) =>
-      fetch(`/api/admin/programs/${p._id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ is_active }),
-      }),
+    runBulk(
+      is_active ? "Published to site:" : "Hidden from site:",
+      selected,
+      (p) =>
+        fetch(`/api/admin/programs/${p._id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ is_active }),
+        }),
     );
 
   const publish = (selected: Program[]) =>
@@ -145,7 +155,9 @@ function ProgramsPageInner() {
   const remove = async (selected: Program[]) => {
     const ok = await confirm({
       title:
-        selected.length === 1 ? "Delete program" : `Delete ${selected.length} programs`,
+        selected.length === 1
+          ? "Delete program"
+          : `Delete ${selected.length} programs`,
       message:
         selected.length === 1
           ? `Permanently delete “${selected[0].name}”? Its page content and uploaded images go with it. This cannot be undone.`

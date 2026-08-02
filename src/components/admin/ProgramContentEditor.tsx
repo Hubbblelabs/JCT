@@ -834,10 +834,8 @@ export function ProgramSectionInspector({
             <Field label="Student Highlights" span={6}>
               <ItemsEditor
                 items={
-                  (flatObj(content, "studentParticipation").highlights as Record<
-                    string,
-                    unknown
-                  >[]) ?? []
+                  (flatObj(content, "studentParticipation")
+                    .highlights as Record<string, unknown>[]) ?? []
                 }
                 onChange={(v) =>
                   setObj("studentParticipation", "highlights", v)

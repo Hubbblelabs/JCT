@@ -226,8 +226,8 @@ export function AdminCommandPalette({
 
         <div className="admin-palette-footer">
           <span>
-            <kbd className="admin-kbd">↑</kbd> <kbd className="admin-kbd">↓</kbd>{" "}
-            navigate
+            <kbd className="admin-kbd">↑</kbd>{" "}
+            <kbd className="admin-kbd">↓</kbd> navigate
           </span>
           <span>
             <kbd className="admin-kbd">↵</kbd> open

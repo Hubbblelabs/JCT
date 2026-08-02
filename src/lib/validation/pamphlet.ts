@@ -132,7 +132,11 @@ export const PamphletSchema = z.object({
     .optional()
     .default([]),
   /** Which popup is live. Falls back to the first one when unset or stale. */
-  activePopupId: zClampedString(0, LIMITS.popupIdMax, "Active popup").optional(),
+  activePopupId: zClampedString(
+    0,
+    LIMITS.popupIdMax,
+    "Active popup",
+  ).optional(),
 
   delayMs: z
     .number()

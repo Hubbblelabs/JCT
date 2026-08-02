@@ -191,8 +191,7 @@ export function NumberInput({
   );
 }
 
-interface TextAreaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   hint?: string;
   span?: FieldSpan;

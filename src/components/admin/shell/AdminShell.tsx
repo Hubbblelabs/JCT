@@ -3,11 +3,7 @@
 import { Suspense, useEffect, useMemo, useState, type ReactNode } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
-import {
-  findNavTrail,
-  isImmersiveRoute,
-  type NavScope,
-} from "@/lib/admin-nav";
+import { findNavTrail, isImmersiveRoute, type NavScope } from "@/lib/admin-nav";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminTopbar } from "./AdminTopbar";
 import { AdminCommandPalette } from "./AdminCommandPalette";

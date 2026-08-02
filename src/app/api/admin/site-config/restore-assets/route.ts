@@ -145,7 +145,9 @@ export async function POST(req: NextRequest) {
     return badRequest("Invalid metadata JSON");
   }
 
-  const entries = form.getAll("files").filter((f): f is File => f instanceof File);
+  const entries = form
+    .getAll("files")
+    .filter((f): f is File => f instanceof File);
   if (entries.length === 0) return badRequest("No files in batch");
 
   // The browser cannot put a path in a FormData filename reliably, so keys
@@ -213,7 +215,10 @@ export async function POST(req: NextRequest) {
                   ...(typeof meta.aspect_ratio === "string"
                     ? { aspect_ratio: meta.aspect_ratio }
                     : {}),
-                  uploaded_by: str(meta.uploaded_by, session!.user?.email ?? ""),
+                  uploaded_by: str(
+                    meta.uploaded_by,
+                    session!.user?.email ?? "",
+                  ),
                 },
               },
               { upsert: true },
@@ -228,7 +233,10 @@ export async function POST(req: NextRequest) {
                   url,
                   mime_type: mime,
                   file_size: num(meta.file_size, buffer.length),
-                  uploaded_by: str(meta.uploaded_by, session!.user?.email ?? ""),
+                  uploaded_by: str(
+                    meta.uploaded_by,
+                    session!.user?.email ?? "",
+                  ),
                 },
               },
               { upsert: true },

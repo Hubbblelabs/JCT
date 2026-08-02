@@ -76,9 +76,10 @@ function readSlot(raw: unknown): Slot {
  */
 function selectPopup(r: Record<string, unknown>): Record<string, unknown> {
   const popups = Array.isArray(r.popups)
-    ? (r.popups.filter(
-        (p) => p && typeof p === "object",
-      ) as Record<string, unknown>[])
+    ? (r.popups.filter((p) => p && typeof p === "object") as Record<
+        string,
+        unknown
+      >[])
     : [];
   if (popups.length === 0) return r;
 
@@ -467,51 +468,51 @@ export function Pamphlet() {
                 )}
 
                 <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end sm:gap-3">
-                {showVirtualTour && tourEmbeds && (
-                  <button
-                    onClick={() => setIsVideoOpen(true)}
-                    className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
-                  >
-                    <Play size={18} className="fill-current sm:size-5" />{" "}
-                    {virtualTour.label}
-                  </button>
-                )}
-                {showVirtualTour && !tourEmbeds && (
-                  <a
-                    href={virtualTour.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
-                  >
-                    <Play size={18} className="fill-current sm:size-5" />{" "}
-                    {virtualTour.label}
-                  </a>
-                )}
-                {showCallNow && (
-                  <a
-                    href={`tel:${callNow.phone.replace(/[^0-9+]/g, "")}`}
-                    onClick={handleClose}
-                    className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
-                  >
-                    <Phone size={18} className="sm:size-5" />
-                    {callNow.label}
-                  </a>
-                )}
-                {showApply && (
-                  <Link
-                    href={applyHref}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={handleClose}
-                    className="group bg-gold flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-black shadow-[0_20px_40px_-10px_rgba(212,160,36,0.6)] transition-all hover:scale-105 hover:bg-white active:scale-95 sm:gap-3 sm:px-10 sm:py-4 sm:text-base md:px-12 md:text-lg"
-                  >
-                    {applyLabel}{" "}
-                    <ArrowRight
-                      size={18}
-                      className="transition-transform group-hover:translate-x-1 sm:size-[22px]"
-                    />
-                  </Link>
-                )}
+                  {showVirtualTour && tourEmbeds && (
+                    <button
+                      onClick={() => setIsVideoOpen(true)}
+                      className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
+                    >
+                      <Play size={18} className="fill-current sm:size-5" />{" "}
+                      {virtualTour.label}
+                    </button>
+                  )}
+                  {showVirtualTour && !tourEmbeds && (
+                    <a
+                      href={virtualTour.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
+                    >
+                      <Play size={18} className="fill-current sm:size-5" />{" "}
+                      {virtualTour.label}
+                    </a>
+                  )}
+                  {showCallNow && (
+                    <a
+                      href={`tel:${callNow.phone.replace(/[^0-9+]/g, "")}`}
+                      onClick={handleClose}
+                      className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
+                    >
+                      <Phone size={18} className="sm:size-5" />
+                      {callNow.label}
+                    </a>
+                  )}
+                  {showApply && (
+                    <Link
+                      href={applyHref}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={handleClose}
+                      className="group bg-gold flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-black shadow-[0_20px_40px_-10px_rgba(212,160,36,0.6)] transition-all hover:scale-105 hover:bg-white active:scale-95 sm:gap-3 sm:px-10 sm:py-4 sm:text-base md:px-12 md:text-lg"
+                    >
+                      {applyLabel}{" "}
+                      <ArrowRight
+                        size={18}
+                        className="transition-transform group-hover:translate-x-1 sm:size-[22px]"
+                      />
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>

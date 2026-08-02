@@ -76,7 +76,9 @@ export function AuditLogTable({
   const [range, setRange] = useState("");
 
   const [purgeOpen, setPurgeOpen] = useState(false);
-  const [purgeWindow, setPurgeWindow] = useState(String(PURGE_WINDOWS[0].value));
+  const [purgeWindow, setPurgeWindow] = useState(
+    String(PURGE_WINDOWS[0].value),
+  );
   const [purging, setPurging] = useState(false);
 
   const loadMore = useCallback(async () => {
@@ -84,7 +86,9 @@ export function AuditLogTable({
     const oldest = rows[rows.length - 1];
     setLoadingMore(true);
     try {
-      const qs = oldest ? `?before=${encodeURIComponent(oldest.createdAt)}` : "";
+      const qs = oldest
+        ? `?before=${encodeURIComponent(oldest.createdAt)}`
+        : "";
       const res = await fetch(`/api/admin/audit${qs}`);
       if (!res.ok) throw new Error();
       const data = (await res.json()) as {
@@ -210,7 +214,7 @@ export function AuditLogTable({
       align: "right",
       value: (r) => +new Date(r.createdAt),
       render: (r) => (
-        <span className="whitespace-nowrap text-[length:var(--admin-text-sm)] text-[var(--admin-text-faint)]">
+        <span className="text-[length:var(--admin-text-sm)] whitespace-nowrap text-[var(--admin-text-faint)]">
           {new Date(r.createdAt).toLocaleString("en-IN")}
         </span>
       ),

@@ -29,7 +29,12 @@ export function useLightbox(images: LightboxImage[], enabled = true) {
   );
   const close = useCallback(() => setIndex(null), []);
   const overlay = (
-    <Lightbox images={images} index={index} onIndexChange={setIndex} onClose={close} />
+    <Lightbox
+      images={images}
+      index={index}
+      onIndexChange={setIndex}
+      onClose={close}
+    />
   );
   return { open, close, index, overlay, enabled };
 }
@@ -60,7 +65,8 @@ export function Lightbox({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
       else if (e.key === "ArrowRight") onIndexChange((index! + 1) % count);
-      else if (e.key === "ArrowLeft") onIndexChange((index! - 1 + count) % count);
+      else if (e.key === "ArrowLeft")
+        onIndexChange((index! - 1 + count) % count);
     };
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);

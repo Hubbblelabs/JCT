@@ -7,10 +7,7 @@ import { AuditLog } from "@/lib/models";
 import { hasMinRole } from "@/lib/permissions";
 import { PageShell } from "@/components/admin/kit/PageShell";
 import { Banner } from "@/components/admin/kit/primitives";
-import {
-  AuditLogTable,
-  type AuditRow,
-} from "@/components/admin/AuditLogTable";
+import { AuditLogTable, type AuditRow } from "@/components/admin/AuditLogTable";
 import { AUDIT_PAGE_SIZE } from "@/lib/audit";
 
 /**
@@ -53,8 +50,7 @@ async function getLogs(): Promise<{
 export default async function AuditPage() {
   const session = await auth();
   const role = (session?.user as Record<string, unknown> | undefined)?.role as
-    | string
-    | undefined;
+    string | undefined;
   // Checked here, before the query, rather than relying on the layout's
   // redirect — layout and page render in parallel, so a layout-only guard
   // still lets this segment read the audit trail and stream it.

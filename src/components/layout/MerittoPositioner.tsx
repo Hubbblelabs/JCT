@@ -20,7 +20,5 @@
  * launcher down with it.
  */
 export function MerittoPositioner() {
-  return (
-    <style>{`#eeChatIndicator { display: none !important; }`}</style>
-  );
+  return <style>{`#eeChatIndicator { display: none !important; }`}</style>;
 }

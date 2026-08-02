@@ -10,7 +10,16 @@ import {
   Select,
   ImageUploadInput,
 } from "@/components/admin/inputs";
-import { Check, Eye, EyeOff, Loader2, MessageSquare, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  Check,
+  Eye,
+  EyeOff,
+  Loader2,
+  MessageSquare,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 import {
@@ -170,7 +179,9 @@ function TestimonialsPageInner() {
     rows: Testimonial[],
     run: (t: Testimonial) => Promise<Response>,
   ) => {
-    const results = await Promise.all(rows.map((t) => run(t).catch(() => null)));
+    const results = await Promise.all(
+      rows.map((t) => run(t).catch(() => null)),
+    );
     const failed = results.filter((r) => !r || !r.ok).length;
     if (failed === 0) toast.success(`${label} ${rows.length} testimonial(s).`);
     else

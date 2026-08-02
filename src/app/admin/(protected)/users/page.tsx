@@ -1,12 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import {
-  Field,
-  FormGrid,
-  TextInput,
-  Select,
-} from "@/components/admin/inputs";
+import { Field, FormGrid, TextInput, Select } from "@/components/admin/inputs";
 import {
   Check,
   Loader2,
@@ -98,7 +93,9 @@ export default function UsersPage() {
       setUsers(Array.isArray(data) ? data : []);
     } catch (err) {
       setUsers([]);
-      setLoadError(err instanceof Error ? err.message : "Could not load users.");
+      setLoadError(
+        err instanceof Error ? err.message : "Could not load users.",
+      );
     } finally {
       setLoading(false);
     }

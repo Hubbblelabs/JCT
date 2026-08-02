@@ -332,7 +332,9 @@ function AccreditationList({
               ratio="square"
               value={item.logo}
               onChange={(url) =>
-                onChange(safe.map((a, j) => (j === i ? { ...a, logo: url } : a)))
+                onChange(
+                  safe.map((a, j) => (j === i ? { ...a, logo: url } : a)),
+                )
               }
               hideUrlField
             />

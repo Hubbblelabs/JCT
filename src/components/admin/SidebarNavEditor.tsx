@@ -2,12 +2,7 @@
 
 import { useMemo } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
-import {
-  Field,
-  FormGrid,
-  Select,
-  TextInput,
-} from "@/components/admin/inputs";
+import { Field, FormGrid, Select, TextInput } from "@/components/admin/inputs";
 import {
   defaultsAsOverrides,
   SIDEBAR_ICON_OPTIONS,

@@ -22,15 +22,14 @@ export function EventsPageLayout({ events }: { events: PublicEventCard[] }) {
   // Publishing or unpublishing an event can shrink the list under the current
   // page while this component stays mounted.
   const current = Math.min(page, pageCount);
-  const visible = events.slice(
-    (current - 1) * PAGE_SIZE,
-    current * PAGE_SIZE,
-  );
+  const visible = events.slice((current - 1) * PAGE_SIZE, current * PAGE_SIZE);
 
   useEffect(() => {
     if (!paged.current) return;
     const top =
-      (gridRef.current?.getBoundingClientRect().top ?? 0) + window.scrollY - 120;
+      (gridRef.current?.getBoundingClientRect().top ?? 0) +
+      window.scrollY -
+      120;
     window.scrollTo({ top, behavior: "smooth" });
   }, [current]);
 

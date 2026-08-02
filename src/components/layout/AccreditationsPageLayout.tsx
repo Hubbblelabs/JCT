@@ -91,9 +91,7 @@ const INSTITUTION_META: Record<
  * NAAC used to be mapped implicitly here; it now lives under "More" in the
  * navbar at /institutions/engineering/naac, so this page no longer links to it.
  */
-function detailPageFor(
-  item: AccreditationsPageValue["items"][number],
-): string {
+function detailPageFor(item: AccreditationsPageValue["items"][number]): string {
   return item.detailHref?.trim() ?? "";
 }
 

@@ -58,9 +58,7 @@ async function readCollection(
   if (!file) return null;
   try {
     const parsed = JSON.parse(await file.async("string")) as unknown;
-    return Array.isArray(parsed)
-      ? (parsed as Record<string, unknown>[])
-      : null;
+    return Array.isArray(parsed) ? (parsed as Record<string, unknown>[]) : null;
   } catch {
     return null;
   }
@@ -129,7 +127,12 @@ async function restoreCollections(
   zip: JSZip,
   mode: RestoreMode,
   onProgress: (label: string) => void,
-): Promise<{ restored: number; rejected: number; pruned: number; errors: string[] }> {
+): Promise<{
+  restored: number;
+  rejected: number;
+  pruned: number;
+  errors: string[];
+}> {
   let restored = 0;
   let rejected = 0;
   let pruned = 0;
@@ -144,7 +147,9 @@ async function restoreCollections(
     });
     const data = (await res.json()) as Record<string, unknown>;
     if (!res.ok) {
-      errors.push(`${label}: ${(data.error as string) ?? `HTTP ${res.status}`}`);
+      errors.push(
+        `${label}: ${(data.error as string) ?? `HTTP ${res.status}`}`,
+      );
       return null;
     }
     restored += (data.restored as number) ?? 0;
@@ -739,10 +744,10 @@ export default function SettingsPage() {
               </p>
             ) : (
               <p className="pt-1 text-xs text-red-600">
-                Without assets this archive is <strong>not restorable</strong> on
-                its own — it carries no image or document files, and no list of
-                which ones are missing. Only uncheck these if the storage bucket
-                is being backed up separately.
+                Without assets this archive is <strong>not restorable</strong>{" "}
+                on its own — it carries no image or document files, and no list
+                of which ones are missing. Only uncheck these if the storage
+                bucket is being backed up separately.
               </p>
             )}
           </div>
@@ -905,8 +910,8 @@ export default function SettingsPage() {
                 </div>
                 {preview.collectionCounts.length === 0 && (
                   <p className="pt-1 text-xs text-amber-600">
-                    This archive predates content backups — programs,
-                    placements and testimonials will not be restored.
+                    This archive predates content backups — programs, placements
+                    and testimonials will not be restored.
                   </p>
                 )}
                 {preview.assetFileCount === 0 && (
