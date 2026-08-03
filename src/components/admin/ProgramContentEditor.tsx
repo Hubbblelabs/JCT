@@ -115,6 +115,19 @@ const HERO_META_FIELDS: FieldDef[] = [
 ];
 const E_HERO_META: HeroMetaItem = { icon: "", label: "", value: "" };
 
+// Badge logos overlaid on the public program cards. Uploads land in R2 like
+// every other image — they are no longer static files under /public.
+const ACCREDITATION_FIELDS: FieldDef[] = [
+  {
+    key: "name",
+    label: "Label (alt text)",
+    placeholder: "AICTE",
+    span: "full",
+  },
+  { key: "logo", label: "Logo", type: "image", span: "full" },
+];
+const E_ACCREDITATION = { name: "", logo: "" };
+
 const TAB_CONFIG_FIELDS: FieldDef[] = [
   { key: "id", label: "Tab id", placeholder: "overview", span: 4 },
   { key: "label", label: "Label", placeholder: "Overview", span: 4 },
@@ -281,6 +294,7 @@ export interface ProgramCardExtras {
   seats: number;
   highlight: string;
   description: string;
+  accreditations: { name: string; logo: string }[];
 }
 
 export function ProgramSectionInspector({
@@ -422,7 +436,7 @@ export function ProgramSectionInspector({
                     onProgramCardChange({ degree: e.target.value })
                   }
                   placeholder="e.g., B.E, B.Sc, M.Tech, Diploma"
-                  hint="Shown on program cards; also splits UG/PG listings."
+                  hint="Prefixes the hero title and shows on program cards; also splits UG/PG listings."
                 />
                 <TextInput
                   label="Duration"
@@ -432,6 +446,7 @@ export function ProgramSectionInspector({
                     onProgramCardChange({ duration: e.target.value })
                   }
                   placeholder="e.g., 4 Years"
+                  hint="Fills the hero's Duration pill unless a custom pill overrides it."
                 />
                 <NumberInput
                   label="Seats"
@@ -444,6 +459,7 @@ export function ProgramSectionInspector({
                     })
                   }
                   placeholder="e.g., 60"
+                  hint="Also drives the Annual Intake stat and hero pill."
                 />
                 <TextInput
                   label="Card Highlight"
@@ -464,6 +480,30 @@ export function ProgramSectionInspector({
                   }
                   placeholder="Short summary shown on the program card"
                 />
+                <Field
+                  label="Accreditation Badges"
+                  span="full"
+                  hint="Logos shown over the program card image on the listing pages."
+                >
+                  <ItemsEditor
+                    items={
+                      (programCard.accreditations ?? []) as unknown as Record<
+                        string,
+                        unknown
+                      >[]
+                    }
+                    onChange={(v) =>
+                      onProgramCardChange({
+                        accreditations:
+                          v as unknown as ProgramCardExtras["accreditations"],
+                      })
+                    }
+                    fields={ACCREDITATION_FIELDS}
+                    emptyItem={E_ACCREDITATION}
+                    addLabel="Add Badge"
+                    cardSpan={6}
+                  />
+                </Field>
               </>
             )}
             <ImageUploadInput
@@ -474,7 +514,27 @@ export function ProgramSectionInspector({
               onChange={(url) => set("heroImage", url)}
               hideUrlField
             />
-            <Field label="Hero Meta Pills" span="full">
+            {/* Both fall back to a per-college default in the renderer when
+                left blank — until now there was no way to set them at all. */}
+            <TextInput
+              label="Hero Background Colour"
+              span={6}
+              value={String(content.bgColor ?? "")}
+              onChange={(e) => set("bgColor", e.target.value)}
+              placeholder="#0F172A — blank uses the college default"
+            />
+            <TextInput
+              label="Accent Colour"
+              span={6}
+              value={String(content.accentColor ?? "")}
+              onChange={(e) => set("accentColor", e.target.value)}
+              placeholder="#FFC917 — blank uses the college default"
+            />
+            <Field
+              label="Extra Hero Pills"
+              span="full"
+              hint="Degree, Duration, Intake, Affiliation and Accreditation are added automatically from the fields above and the Quick stats section — list only additional pills here."
+            >
               <ItemsEditor
                 items={flatArr<Record<string, unknown>>(content, "heroMeta")}
                 onChange={(v) => set("heroMeta", v)}
@@ -487,29 +547,26 @@ export function ProgramSectionInspector({
           </FormGrid>
         );
       case "stats":
+        // Annual Intake is deliberately absent: it reads the card's "Seats",
+        // edited in the Hero section. Two fields writing one stat meant the
+        // one you happened to edit was often the one being ignored.
         return (
           <FormGrid>
             <TextInput
               label="Established"
-              span={3}
+              span={4}
               value={flatStr(content, "established", "about.established")}
               onChange={(e) => set("established", e.target.value)}
             />
             <TextInput
-              label="Intake"
-              span={3}
-              value={flatStr(content, "intake", "about.intake")}
-              onChange={(e) => set("intake", e.target.value)}
-            />
-            <TextInput
               label="Accreditation"
-              span={3}
+              span={4}
               value={flatStr(content, "accreditation", "about.accreditation")}
               onChange={(e) => set("accreditation", e.target.value)}
             />
             <TextInput
               label="Affiliation"
-              span={3}
+              span={4}
               value={flatStr(content, "affiliation", "about.affiliation")}
               onChange={(e) => set("affiliation", e.target.value)}
             />

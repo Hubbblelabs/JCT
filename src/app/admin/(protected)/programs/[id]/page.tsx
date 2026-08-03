@@ -13,7 +13,10 @@ import {
   type ProgramContentSection,
 } from "@/components/admin/ProgramContentEditor";
 import { ProgramPageLayout } from "@/components/layout/ProgramPageLayout";
-import { normalizeProgramData } from "@/lib/normalize-program-data";
+import {
+  normalizeProgramData,
+  withProgramCardFields,
+} from "@/lib/normalize-program-data";
 import {
   Send,
   Save,
@@ -47,6 +50,7 @@ interface ProgramFields {
   description: string;
   image: string;
   outcomes: string[];
+  accreditations: { name: string; logo: string }[];
   is_active: boolean;
   sort_order: number;
 }
@@ -63,6 +67,7 @@ const EMPTY_PROG: ProgramFields = {
   description: "",
   image: "",
   outcomes: [],
+  accreditations: [],
   is_active: true,
   sort_order: 0,
 };
@@ -118,12 +123,15 @@ function ProgramDetailInner() {
 
   // ── Live-preview data (raw content → normalized ProgramData) ───────────────
   const previewData = useMemo(() => {
-    const merged = {
-      ...content,
-      name: prog.name || (content.name as string) || "",
-      shortName: prog.abbr || "",
-      college: prog.institution || "",
-    };
+    const merged = withProgramCardFields(
+      {
+        ...content,
+        name: prog.name || (content.name as string) || "",
+        shortName: prog.abbr || "",
+        college: prog.institution || "",
+      },
+      { degree: prog.degree, duration: prog.duration, seats: prog.seats },
+    );
     return normalizeProgramData(merged, prog.slug || "preview");
   }, [content, prog]);
 
@@ -568,6 +576,7 @@ function ProgramDetailInner() {
                     seats: prog.seats,
                     highlight: prog.highlight,
                     description: prog.description,
+                    accreditations: prog.accreditations ?? [],
                   }}
                   onProgramCardChange={(patch) =>
                     setProg((f) => ({ ...f, ...patch }))

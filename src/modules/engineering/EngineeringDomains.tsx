@@ -7,7 +7,11 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { DragScroll } from "@/components/ui/DragScroll";
-import { getImageUrl } from "@/lib/utils";
+import {
+  getImageUrl,
+  parseCourseAccreditations,
+  type CourseAccreditation,
+} from "@/lib/utils";
 
 type EngineeringCourse = {
   name: string;
@@ -15,7 +19,8 @@ type EngineeringCourse = {
   slug: string;
   image: string;
   highlight: string;
-  nbaAccredited?: boolean;
+  /** Badge logos authored per program in the admin (R2-backed). */
+  accreditations: CourseAccreditation[];
 };
 
 function CourseCard({
@@ -55,26 +60,19 @@ function CourseCard({
           />
         )}
         <div className="absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent" />
-        {showAccreditationBadges && (
+        {showAccreditationBadges && course.accreditations.length > 0 && (
           <div className="absolute top-3 right-3 flex items-center gap-2 rounded-full bg-white/92 px-2.5 py-1 shadow-sm backdrop-blur-sm">
-            <Image
-              src="/accreditations/aicte.webp"
-              alt="AICTE"
-              width={56}
-              height={22}
-              style={{ width: "auto" }}
-              className="h-4 object-contain"
-            />
-            {course.nbaAccredited && (
+            {course.accreditations.map((accreditation, i) => (
               <Image
-                src="/accreditations/nba.webp"
-                alt="NBA Accredited"
+                key={`${accreditation.logo}-${i}`}
+                src={getImageUrl(accreditation.logo) ?? accreditation.logo}
+                alt={accreditation.name || "Accreditation"}
                 width={56}
                 height={22}
                 style={{ width: "auto" }}
                 className="h-4 object-contain"
               />
-            )}
+            ))}
           </div>
         )}
       </div>
@@ -362,6 +360,7 @@ function normalizeDbCourses(raw: unknown): EngineeringCourse[] {
       slug,
       image: typeof r.image === "string" ? r.image : "",
       highlight: typeof r.highlight === "string" ? r.highlight : "",
+      accreditations: parseCourseAccreditations(r.accreditations),
     });
   }
   return out;

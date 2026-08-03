@@ -2289,14 +2289,39 @@ export function ProgramPageLayout({
     ? ""
     : rawDegreePrefix;
 
-  const heroPills =
-    dept.heroMeta && dept.heroMeta.length > 0
-      ? dept.heroMeta
-      : [
-          { label: "Duration", value: dept.about.duration },
-          { label: "Affiliation", value: dept.about.affiliation },
-          { label: "Accreditation", value: dept.about.accreditation },
-        ];
+  // Built-in pills read the fields the admin actually edits (card degree /
+  // duration / seats, plus the Quick-stats values). `heroMeta` used to replace
+  // this list wholesale, which is how a program could show "4 Years" forever
+  // while the inspector said something else. It is now additive: a custom row
+  // is kept only when it isn't a stale copy of a built-in that has a value, so
+  // pre-existing pills survive where nothing else supplies them.
+  const builtInPills = [
+    { icon: "GraduationCap", label: "Degree", value: rawDegreePrefix },
+    { icon: "Clock", label: "Duration", value: dept.about.duration },
+    {
+      icon: "Users",
+      label: labels?.overview?.stats?.intake || "Intake",
+      value: dept.about.intake ? String(dept.about.intake) : "",
+    },
+    {
+      icon: "BookOpen",
+      label: labels?.overview?.stats?.affiliation || "Affiliation",
+      value: dept.about.affiliation,
+    },
+    {
+      icon: "Award",
+      label: labels?.overview?.stats?.accreditation || "Accreditation",
+      value: dept.about.accreditation,
+    },
+  ].filter((pill) => pill.value);
+
+  const builtInLabels = new Set(
+    builtInPills.map((pill) => pill.label.trim().toLowerCase()),
+  );
+  const customPills = (dept.heroMeta ?? []).filter(
+    (pill) => !builtInLabels.has((pill.label ?? "").trim().toLowerCase()),
+  );
+  const heroPills = [...builtInPills, ...customPills];
 
   return (
     <>

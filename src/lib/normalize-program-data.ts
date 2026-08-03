@@ -138,6 +138,48 @@ function obj<T>(v: unknown, fallback: T): T {
   return v && typeof v === "object" && !Array.isArray(v) ? (v as T) : fallback;
 }
 
+/**
+ * Card-level row fields that also feed the program detail page. Degree,
+ * duration and seats are authored on the program card (the Hero inspector) —
+ * that is the only editor for them — so they have to reach the renderer from
+ * here rather than being invented by it.
+ */
+export type ProgramCardFields = {
+  degree?: string;
+  duration?: string;
+  seats?: number;
+};
+
+/**
+ * Folds the card fields into raw `content` before normalization.
+ *
+ * The card wins over the stored `content` value: these fields have an editor
+ * on the card and (for degree/duration) none inside `content`, so a legacy
+ * `content.duration` shadowing them is exactly the bug this prevents — an
+ * edit in the inspector has to be what the page renders. `content` still
+ * fills in when the card field is blank, so nothing regresses on documents
+ * that were only ever authored the old way.
+ *
+ * Card fields have no draft/publish split, so an edit here shows on the public
+ * page as soon as it is saved — same as the program cards themselves.
+ */
+export function withProgramCardFields(
+  content: unknown,
+  card: ProgramCardFields,
+): Record<string, unknown> {
+  const base =
+    content && typeof content === "object" && !Array.isArray(content)
+      ? { ...(content as Record<string, unknown>) }
+      : {};
+  const degreePrefix = str(card.degree) || str(base.degreePrefix);
+  const duration = str(card.duration) || str(base.duration);
+  const intake = card.seats && card.seats > 0 ? card.seats : num(base.intake);
+  if (degreePrefix) base.degreePrefix = degreePrefix;
+  if (duration) base.duration = duration;
+  if (intake) base.intake = intake;
+  return base;
+}
+
 export function normalizeProgramData(
   content: unknown,
   slug: string,
@@ -175,8 +217,10 @@ export function normalizeProgramData(
     name,
     shortName: str(c.shortName),
     college,
-    bgColor: str(c.bgColor, defaultBg),
-    accentColor: str(c.accentColor, "#FFC917"),
+    // `||`, not a str() fallback: clearing the field in the admin stores "",
+    // which is a string and would otherwise stick as the colour.
+    bgColor: str(c.bgColor) || defaultBg,
+    accentColor: str(c.accentColor) || "#FFC917",
     heroImage: str(c.heroImage, defaultHero),
 
     about: {
@@ -185,7 +229,9 @@ export function normalizeProgramData(
       accreditation: str(c.accreditation),
       intake: num(c.intake),
       affiliation: str(c.affiliation),
-      duration: str(c.duration, "4 Years"),
+      // No hardcoded fallback: an unset duration renders no hero pill at all,
+      // which beats every program claiming "4 Years".
+      duration: str(c.duration),
     },
 
     hod: {

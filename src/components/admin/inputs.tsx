@@ -549,6 +549,10 @@ export function ImageUploadInput({
   };
 
   const isPending = deferred && value.startsWith("pending:");
+  // A pending key whose object URL is already gone (flushed, or cancelled from
+  // elsewhere) resolves to "". Passing that to `src` makes the browser
+  // re-request the current page, so it counts as "no preview".
+  const previewUrl = getPreviewUrl(value);
   // The preview frame mirrors how the public site renders this ratio, so what
   // the editor sees here is what ships.
   const previewFrame = rule.aspectClass
@@ -570,13 +574,13 @@ export function ImageUploadInput({
             <div
               className={`relative overflow-hidden rounded-lg border border-gray-200 bg-gray-50 ${previewFrame}`}
             >
-              {imgError ? (
+              {imgError || !previewUrl ? (
                 <span className="flex h-full w-full items-center justify-center text-xs text-gray-400">
                   No preview
                 </span>
               ) : (
                 <img
-                  src={getPreviewUrl(value)}
+                  src={previewUrl}
                   alt=""
                   className={`h-full w-full ${previewFit}`}
                   onError={() => setImgError(true)}
@@ -938,7 +942,8 @@ export function DocumentUploadInput({
 export type FieldDef = {
   key: string;
   label: string;
-  type?: "text" | "textarea" | "number";
+  /** "image" swaps the plain input for an ImageUploadInput (R2-backed). */
+  type?: "text" | "textarea" | "number" | "image";
   /** @deprecated use `span` — kept so existing call sites keep compiling. */
   span2?: boolean;
   /** Columns of the 12-column row this field takes. Defaults to half a row. */
@@ -978,6 +983,21 @@ export function ItemsEditor({
             {fields.map((f) => {
               const fieldId = `${baseId}-${i}-${f.key}`;
               const span = f.span ?? (f.span2 ? "full" : undefined);
+              // ImageUploadInput brings its own label + preview, so it replaces
+              // the row entirely rather than sitting under a bare <label>.
+              if (f.type === "image") {
+                return (
+                  <div key={f.key} className={colClass(span)}>
+                    <ImageUploadInput
+                      label={f.label}
+                      value={String(item[f.key] ?? "")}
+                      onChange={(v) => upd(i, f.key, v)}
+                      hint={f.placeholder}
+                      hideUrlField
+                    />
+                  </div>
+                );
+              }
               return (
                 <div key={f.key} className={colClass(span)}>
                   <label className="admin-label" htmlFor={fieldId}>

@@ -26,6 +26,9 @@ export const LIMITS = {
   cardDescriptionTextMax: 600,
   outcomesMax: 12,
   outcomeItemMax: 240,
+  accreditationsMax: 6,
+  accreditationNameMax: 60,
+  accreditationLogoMax: 500,
 
   // Rich content limits
   tabsMax: 8,
@@ -59,6 +62,15 @@ export const LIMITS = {
 
 // ── Card-level Program (top-level row fields) ───────────────────────────────
 
+/**
+ * One accreditation badge on a program card. `logo` holds an R2 storage key
+ * (or an absolute URL) — never a path into /public.
+ */
+const ProgramAccreditationItemSchema = z.object({
+  name: zOptionalString(LIMITS.accreditationNameMax).default(""),
+  logo: zOptionalString(LIMITS.accreditationLogoMax).default(""),
+});
+
 // Base shape WITHOUT defaults. In Zod 4, `.partial()` of a defaulted field
 // still injects the default when the key is omitted, so a partial PATCH like
 // `{ is_active: false }` would silently reset `outcomes` / `sort_order` on
@@ -78,6 +90,9 @@ const ProgramBaseSchema = z.object({
   outcomes: z
     .array(zClampedString(0, LIMITS.outcomeItemMax, "Outcome"))
     .max(LIMITS.outcomesMax),
+  accreditations: z
+    .array(ProgramAccreditationItemSchema)
+    .max(LIMITS.accreditationsMax),
   is_active: z.boolean(),
   sort_order: zNonNegativeInt,
 });
@@ -91,6 +106,11 @@ export const ProgramSchema = ProgramBaseSchema.extend({
   outcomes: z
     .array(zClampedString(0, LIMITS.outcomeItemMax, "Outcome"))
     .max(LIMITS.outcomesMax)
+    .optional()
+    .default([]),
+  accreditations: z
+    .array(ProgramAccreditationItemSchema)
+    .max(LIMITS.accreditationsMax)
     .optional()
     .default([]),
   is_active: z.boolean().optional().default(true),

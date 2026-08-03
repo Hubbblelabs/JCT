@@ -9,6 +9,11 @@ import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
+import {
+  getImageUrl,
+  parseCourseAccreditations,
+  type CourseAccreditation,
+} from "@/lib/utils";
 
 type Course = {
   name: string;
@@ -16,7 +21,8 @@ type Course = {
   slug: string;
   image: string;
   highlight: string;
-  nbaAccredited?: boolean;
+  /** Badge logos authored per program in the admin (R2-backed). */
+  accreditations: CourseAccreditation[];
 };
 
 function CourseCard({
@@ -47,26 +53,19 @@ function CourseCard({
           className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
-        {showBadges && (
+        {showBadges && course.accreditations.length > 0 && (
           <div className="absolute top-3 right-3 flex items-center gap-2 rounded-full bg-white/92 px-2.5 py-1 shadow-sm backdrop-blur-sm">
-            <Image
-              src="/accreditations/aicte.webp"
-              alt="AICTE"
-              width={56}
-              height={22}
-              style={{ width: "auto" }}
-              className="h-4 object-contain"
-            />
-            {course.nbaAccredited && (
+            {course.accreditations.map((accreditation, i) => (
               <Image
-                src="/accreditations/nba.webp"
-                alt="NBA"
+                key={`${accreditation.logo}-${i}`}
+                src={getImageUrl(accreditation.logo) ?? accreditation.logo}
+                alt={accreditation.name || "Accreditation"}
                 width={56}
                 height={22}
                 style={{ width: "auto" }}
                 className="h-4 object-contain"
               />
-            )}
+            ))}
           </div>
         )}
         {badge && (
@@ -139,6 +138,7 @@ function normalizeCourse(r: Record<string, unknown>): Course | null {
     abbr: typeof r.abbr === "string" ? r.abbr : "",
     image: typeof r.image === "string" ? r.image : "",
     highlight: typeof r.highlight === "string" ? r.highlight : "",
+    accreditations: parseCourseAccreditations(r.accreditations),
   };
 }
 

@@ -13,6 +13,10 @@ export interface IProgram extends Document {
   description: string;
   image: string;
   outcomes: string[];
+  // Accreditation badges overlaid on the public program cards. `logo` is an R2
+  // storage key picked from the shared media library — these logos used to be
+  // hardcoded files under /public.
+  accreditations: { name: string; logo: string }[];
   is_active: boolean;
   sort_order: number;
 
@@ -27,6 +31,16 @@ export interface IProgram extends Document {
   updated_at: Date;
   updated_by?: string;
 }
+
+// Sub-document for the card accreditation badges. `_id: false` keeps the
+// stored array free of per-item ObjectIds — these are plain display values.
+const ProgramAccreditationSchema = new Schema(
+  {
+    name: { type: String, default: "" },
+    logo: { type: String, default: "" },
+  },
+  { _id: false },
+);
 
 const ProgramSchema = new Schema<IProgram>(
   {
@@ -51,6 +65,7 @@ const ProgramSchema = new Schema<IProgram>(
     description: { type: String, default: "" },
     image: { type: String, default: "" },
     outcomes: { type: [String], default: [] },
+    accreditations: { type: [ProgramAccreditationSchema], default: [] },
     is_active: { type: Boolean, default: true },
     sort_order: { type: Number, default: 0 },
 

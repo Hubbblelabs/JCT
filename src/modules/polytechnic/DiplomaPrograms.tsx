@@ -6,7 +6,11 @@ import Image from "next/image";
 import { ArrowLeft, ArrowRight, LucideIcon } from "lucide-react";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { getImageUrl } from "@/lib/utils";
+import {
+  getImageUrl,
+  parseCourseAccreditations,
+  type CourseAccreditation,
+} from "@/lib/utils";
 import { DragScroll } from "@/components/ui/DragScroll";
 import { PolySection, PolySectionHeader } from "@/modules/polytechnic/PolyUI";
 
@@ -15,6 +19,8 @@ type PolytechnicCourse = {
   slug: string;
   image?: string;
   icon?: LucideIcon;
+  /** Badge logos authored per program in the admin (R2-backed). */
+  accreditations: CourseAccreditation[];
 };
 
 function CourseCard({ course }: { course: PolytechnicCourse }) {
@@ -50,17 +56,22 @@ function CourseCard({ course }: { course: PolytechnicCourse }) {
         )}
         <div className="absolute inset-0 bg-linear-to-t from-black/35 via-transparent to-transparent" />
 
-        {/* AICTE Badge */}
-        <div className="absolute top-3 right-3 flex items-center gap-2 rounded-full bg-white/92 px-2.5 py-1 shadow-sm backdrop-blur-sm">
-          <Image
-            src="/accreditations/aicte.webp"
-            alt="AICTE"
-            width={56}
-            height={22}
-            style={{ width: "auto" }}
-            className="h-4 object-contain"
-          />
-        </div>
+        {/* Accreditation badges — per-program, edited in the admin */}
+        {course.accreditations.length > 0 && (
+          <div className="absolute top-3 right-3 flex items-center gap-2 rounded-full bg-white/92 px-2.5 py-1 shadow-sm backdrop-blur-sm">
+            {course.accreditations.map((accreditation, i) => (
+              <Image
+                key={`${accreditation.logo}-${i}`}
+                src={getImageUrl(accreditation.logo) ?? accreditation.logo}
+                alt={accreditation.name || "Accreditation"}
+                width={56}
+                height={22}
+                style={{ width: "auto" }}
+                className="h-4 object-contain"
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col justify-between px-5 pt-3.5 pb-2">
@@ -254,6 +265,7 @@ function normalizeDbPrograms(raw: unknown): PolytechnicCourse[] {
       name,
       slug,
       image: typeof r.image === "string" ? r.image : undefined,
+      accreditations: parseCourseAccreditations(r.accreditations),
     });
   }
   return out;

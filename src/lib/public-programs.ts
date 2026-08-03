@@ -1,6 +1,9 @@
 import { connectDB } from "@/lib/mongodb";
 import { Program } from "@/lib/models";
-import { normalizeProgramData } from "@/lib/normalize-program-data";
+import {
+  normalizeProgramData,
+  withProgramCardFields,
+} from "@/lib/normalize-program-data";
 import type { ProgramData } from "@/types/program";
 
 export type ProgramInstitution = "engineering" | "arts-science" | "polytechnic";
@@ -18,6 +21,7 @@ type ProgramLean = {
   highlight?: string;
   description?: string;
   outcomes?: string[];
+  accreditations?: { name?: string; logo?: string }[];
   is_active?: boolean;
   sort_order?: number;
   status?: string;
@@ -25,6 +29,12 @@ type ProgramLean = {
   published_at?: Date | string;
   published_content?: unknown;
   content?: unknown;
+};
+
+export type PublicProgramAccreditation = {
+  name: string;
+  /** Absolute (or proxy) URL — already resolved out of its R2 storage key. */
+  logo: string;
 };
 
 export type PublicProgramCard = {
@@ -40,6 +50,7 @@ export type PublicProgramCard = {
   highlight: string;
   description: string;
   outcomes: string[];
+  accreditations: PublicProgramAccreditation[];
   sort_order: number;
 };
 
@@ -76,6 +87,23 @@ function heroImageFrom(content: unknown): string | null {
   return null;
 }
 
+/**
+ * Badge logos are stored as R2 keys; resolve them here so every consumer gets
+ * a ready-to-render URL. Entries without a logo are dropped — an empty badge
+ * slot would render as a broken image.
+ */
+function accreditationsFrom(
+  raw: ProgramLean["accreditations"],
+): PublicProgramAccreditation[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((item) => ({
+      name: item?.name ?? "",
+      logo: publicImageUrl(item?.logo) ?? "",
+    }))
+    .filter((item) => item.logo !== "");
+}
+
 function asCard(doc: ProgramLean): PublicProgramCard {
   // Card image mirrors the program-detail hero image; fall back to the
   // card-level `image` when no hero image is set.
@@ -94,6 +122,7 @@ function asCard(doc: ProgramLean): PublicProgramCard {
     highlight: doc.highlight ?? "",
     description: doc.description ?? "",
     outcomes: Array.isArray(doc.outcomes) ? doc.outcomes : [],
+    accreditations: accreditationsFrom(doc.accreditations),
     sort_order: doc.sort_order ?? 0,
   };
 }
@@ -127,7 +156,7 @@ export async function listPublicPrograms({
 
   const docs = await Program.find(query)
     .select(
-      "name abbr slug institution degree duration seats image highlight description outcomes sort_order published_content.heroImage content.heroImage",
+      "name abbr slug institution degree duration seats image highlight description outcomes accreditations sort_order published_content.heroImage content.heroImage",
     )
     .sort({ sort_order: 1, name: 1 })
     .lean<ProgramLean[]>();
@@ -184,7 +213,7 @@ export async function getPublishedProgramBySlug({
     ...publishedQuery(true),
   })
     .select(
-      "name abbr slug institution degree duration seats image highlight description outcomes sort_order status version published_at published_content",
+      "name abbr slug institution degree duration seats image highlight description outcomes accreditations sort_order status version published_at published_content",
     )
     .lean<ProgramLean | null>();
 
@@ -210,7 +239,14 @@ export async function getPublishedProgramBySlug({
         }
       : doc.published_content;
 
-  const normalized = normalizeProgramData(content, slug);
+  const normalized = normalizeProgramData(
+    withProgramCardFields(content, {
+      degree: doc.degree,
+      duration: doc.duration,
+      seats: doc.seats,
+    }),
+    slug,
+  );
   if (!normalized) return null;
 
   return {
