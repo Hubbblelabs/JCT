@@ -1,0 +1,49 @@
+# Reverse-proxy settings required by the admin backup/restore routes.
+#
+# These are NOT optional if backups are used with images/documents included.
+# The prod host's nginx config lives outside this repo (docker-compose.prod.yaml
+# publishes the app on :3000 and nothing else), so this file is the reference —
+# copy the relevant directives into the server block that fronts jct.
+#
+# Why each one matters:
+#
+#   client_max_body_size
+#     POST /api/admin/site-config/restore takes the whole ZIP as its request
+#     body. nginx defaults to 1 MB and answers 413 before the handler ever
+#     runs. The current bucket is ~7.5 GB, so this must be unlimited (0) or set
+#     well above the largest expected archive.
+#
+#   proxy_request_buffering off
+#     Left on (the default), nginx spools the entire upload to its own disk
+#     before forwarding a single byte. That doubles the disk cost of a restore
+#     and delays the NDJSON progress stream until after the upload completes.
+#
+#   proxy_buffering off / X-Accel-Buffering
+#     The backup response is a chunked ZIP built as it is sent, and the restore
+#     response is an NDJSON progress stream. Both routes already send
+#     `X-Accel-Buffering: no`; this is the belt-and-braces equivalent.
+#
+#   timeouts
+#     A multi-gigabyte transfer runs for minutes. The 60s defaults will cut it.
+
+location /api/admin/site-config/ {
+    proxy_pass http://127.0.0.1:3000;
+
+    proxy_http_version 1.1;
+    proxy_set_header Host              $host;
+    proxy_set_header X-Real-IP         $remote_addr;
+    proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+
+    # Restore: accept an arbitrarily large archive, and stream it through.
+    client_max_body_size       0;
+    proxy_request_buffering    off;
+
+    # Backup: stream the archive out as it is produced.
+    proxy_buffering            off;
+
+    # Both directions run for minutes on a large archive.
+    proxy_read_timeout         3600s;
+    proxy_send_timeout         3600s;
+    send_timeout               3600s;
+}

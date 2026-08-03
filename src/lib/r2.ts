@@ -7,6 +7,8 @@ import {
   ListObjectsV2Command,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { Upload } from "@aws-sdk/lib-storage";
+import type { Readable } from "stream";
 
 function getR2Client() {
   const accountId = process.env.R2_ACCOUNT_ID;
@@ -50,6 +52,12 @@ export async function getPresignedPutUrl(
   );
 }
 
+/** The public URL an object is served from once it exists in the bucket. */
+export function r2PublicUrl(key: string): string {
+  const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+  return publicUrl ? `${publicUrl}/${key}` : `/api/public/images/${key}`;
+}
+
 export async function uploadToR2(
   key: string,
   body: Buffer,
@@ -68,8 +76,39 @@ export async function uploadToR2(
     }),
   );
 
-  const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
-  return publicUrl ? `${publicUrl}/${key}` : `/api/public/images/${key}`;
+  return r2PublicUrl(key);
+}
+
+/** Multipart part size. Below R2's 5 MB floor, parts are rejected. */
+const UPLOAD_PART_BYTES = 8 * 1024 * 1024;
+
+/**
+ * Upload from a stream without ever holding the object in memory.
+ *
+ * A plain `PutObjectCommand` cannot be used here: it needs the length up front,
+ * and a retry would replay a stream that has already been consumed. `Upload`
+ * splits the stream into parts and retries per part, which is what makes a
+ * half-gigabyte PDF survivable — the restore path has several.
+ */
+export async function uploadStreamToR2(
+  key: string,
+  body: Readable,
+  contentType: string,
+): Promise<string> {
+  const client = getR2Client();
+  const bucket = process.env.R2_BUCKET_NAME;
+  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+
+  await new Upload({
+    client,
+    params: { Bucket: bucket, Key: key, Body: body, ContentType: contentType },
+    partSize: UPLOAD_PART_BYTES,
+    // One part in flight: the source is a single sequential read off the
+    // spooled archive, so concurrency would only buffer parts in memory.
+    queueSize: 1,
+  }).done();
+
+  return r2PublicUrl(key);
 }
 
 /**
@@ -171,23 +210,26 @@ export async function getFromR2(
   };
 }
 
-export async function getR2AsBuffer(
+/**
+ * An object's bytes as a Node stream, never materialised in memory. This is
+ * what makes a whole-bucket backup possible: the archive pulls each object
+ * through at whatever rate the client drains it, so RAM stays flat regardless
+ * of how large the object — or the bucket — is.
+ */
+export async function getR2Stream(
   key: string,
-): Promise<{ buffer: Buffer; contentType: string }> {
+  signal?: AbortSignal,
+): Promise<Readable> {
   const client = getR2Client();
   const bucket = process.env.R2_BUCKET_NAME;
   if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
 
   const res = await client.send(
     new GetObjectCommand({ Bucket: bucket, Key: key }),
+    { abortSignal: signal },
   );
   if (!res.Body) throw new Error(`No body returned for R2 key: ${key}`);
-
-  const bytes = await res.Body.transformToByteArray();
-  return {
-    buffer: Buffer.from(bytes),
-    contentType: res.ContentType ?? "application/octet-stream",
-  };
+  return res.Body as Readable;
 }
 
 /**
