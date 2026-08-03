@@ -43,5 +43,24 @@ export default auth((req) => {
 });
 
 export const config = {
-  matcher: ["/admin/:path*", "/api/admin/:path*"],
+  matcher: [
+    "/admin/:path*",
+    /**
+     * Every path under /api/admin EXCEPT the restore route.
+     *
+     * Next clones the request body for any request the proxy matches, and caps
+     * that clone at `experimental.proxyClientMaxBodySize` (10 MB by default).
+     * Past the cap it does not reject the request — it ends the stream early
+     * and logs a warning, so the handler receives a truncated archive and the
+     * ZIP parse dies with FILE_ENDED. Raising the cap is not the fix either:
+     * the clone handed to the proxy is never drained, so a multi-gigabyte body
+     * would simply accumulate in memory instead.
+     *
+     * This proxy never reads a request body — it only inspects the pathname and
+     * the session — so skipping it here costs nothing. Access is still enforced:
+     * the route calls `requireRole(req, "admin")` before it touches the body,
+     * exactly as every other admin API route does.
+     */
+    "/api/admin/((?!site-config/restore(?:/|$)).*)",
+  ],
 };

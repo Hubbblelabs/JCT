@@ -185,6 +185,7 @@ Consequences to keep in mind:
 - Pushing to `v2-admin` publishes a new `:latest` image but does **not** deploy. Releasing is a separate, deliberate act: tag `vX.Y.Z` and push the tag.
 - Both compose files hardcode `kavinnandha/jct:latest`, so there is no immutable per-version image — a tag deploys whatever that tag's build produced, and rollback means rebuilding. Parameterizing the image tag would need matching changes in `docker-compose.build.yaml`, `docker-compose.prod.yaml`, and the SSH script.
 - **Pushing a `v*` tag deploys to production.** Never create or push tags on your own — see Git below.
+- The reverse proxy in front of the app is **not** in this repo, but the admin backup/restore routes depend on its settings. Restore POSTs the whole ZIP as one body (currently ~7.5 GB) and backup streams a chunked ZIP out; nginx defaults (`client_max_body_size 1m`, request/response buffering on, 60s timeouts) break both. See `deploy/nginx-jct.conf.example` for the required directives.
 
 ## Validation
 
@@ -247,6 +248,7 @@ The codebase is indexed using ccc. Use ccc for codebase knowledge.
 
 - Use proxy.ts instead of middleware.ts
 - useSearchParams requires Suspense boundary
+- **Any route matched by `proxy.ts` has its request body capped.** Next clones the body for the proxy and truncates the clone at `experimental.proxyClientMaxBodySize` (10 MB default) — it does not reject the request, it silently ends the stream early, so the handler sees a partial body. Raising the limit is not a fix: the proxy never drains its clone, so a large body accumulates in memory instead. A route that accepts a large upload must be excluded from the matcher and enforce auth itself via `requireRole` (see the `site-config/restore` exclusion in `src/proxy.ts`).
 
 ## Zod 4
 

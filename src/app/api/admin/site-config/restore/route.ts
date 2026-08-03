@@ -1,264 +1,307 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { Readable, Transform } from "stream";
+import { pipeline } from "stream/promises";
+import { createWriteStream } from "fs";
+import { mkdtemp, rm } from "fs/promises";
+import { tmpdir } from "os";
+import path from "path";
+import unzipper from "unzipper";
 import { connectDB } from "@/lib/mongodb";
-import { SiteConfig, ImageAsset, DocumentAsset } from "@/lib/models";
-import { requireRole, json, badRequest, serverError } from "@/lib/api-helpers";
+import { requireRole, badRequest } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
+import { isBackupCollection } from "@/lib/backup-collections";
+import { revalidateTargets } from "@/lib/revalidate";
+import { isR2Configured } from "@/lib/r2";
 import {
-  isKnownSiteConfigKey,
-  SITE_CONFIG_SCHEMAS,
-  type SiteConfigKey,
-} from "@/lib/validation/siteConfig";
-import { revalidateTargets, revalidateForConfigKey } from "@/lib/revalidate";
+  restoreConfigs,
+  restoreCollectionDocs,
+  restoreAsset,
+  indexMetaByKey,
+  isSafeStorageKey,
+  MAX_JSON_BYTES,
+} from "@/lib/restore";
 
-interface ImageMeta {
-  filename: string;
-  storage_key: string;
-  alt_text: string;
-  category: string;
-  institution: string;
-  file_size: number;
-  mime_type: string;
-  width?: number;
-  height?: number;
-  uploaded_by: string;
+/**
+ * Restore from a single backup archive.
+ *
+ * The archive is spooled to a temp file and then read through its **central
+ * directory**, not parsed as it arrives. That detail is load-bearing.
+ *
+ * A streaming parse looked cheaper, but every asset the backup writes is a
+ * streamed ZIP entry, and a streamed entry carries a data descriptor: its local
+ * header stores zero for the CRC and both sizes. A streaming reader therefore
+ * cannot know where an entry ends and falls back to scanning the raw bytes for
+ * the `PK\x07\x08` descriptor signature. Asset bytes are high-entropy, so that
+ * sequence occurs by chance roughly once per 4 GiB — at which point the file is
+ * silently truncated, the parser desynchronises, and every entry after it is
+ * lost. On a bucket the size of this one that is the expected outcome, not an
+ * edge case. The central directory holds the real sizes, so reading from it
+ * removes the guesswork entirely.
+ *
+ * Memory stays flat regardless: the spool streams to disk, JSON manifests are
+ * the only things parsed whole (see `MAX_JSON_BYTES`), and each asset is piped
+ * from the archive straight into a multipart upload. The cost is disk — roughly
+ * the archive's own size, released in `finally`.
+ *
+ * The response is NDJSON rather than a single JSON object: a multi-gigabyte
+ * restore runs for minutes, and a silent connection is one a reverse proxy will
+ * eventually close. Emitting a progress line keeps bytes moving and gives the
+ * admin UI something real to show. The final line carries `done`.
+ */
+
+/**
+ * Sanity backstop on the spooled archive. Not a real limit — it exists so a
+ * malformed or hostile upload cannot fill the disk indefinitely.
+ */
+const MAX_ARCHIVE_BYTES = 64 * 1024 * 1024 * 1024;
+
+/** Emit progress every N assets, and every N bytes while spooling. */
+const ASSET_PROGRESS_EVERY = 10;
+const SPOOL_PROGRESS_BYTES = 32 * 1024 * 1024;
+
+/** Entry surface used here; the shipped types predate the installed version. */
+interface CentralEntry {
+  path: string;
+  type: "File" | "Directory";
+  uncompressedSize: number;
+  stream(): Readable;
+  buffer(): Promise<Buffer>;
 }
 
-interface DocMeta {
-  filename: string;
-  storage_key: string;
-  mime_type: string;
-  file_size: number;
-  uploaded_by: string;
+async function readJson(entry: CentralEntry): Promise<unknown> {
+  if (entry.uncompressedSize > MAX_JSON_BYTES) return null;
+  try {
+    return JSON.parse((await entry.buffer()).toString("utf8"));
+  } catch {
+    return null;
+  }
 }
 
-/** Guards the legacy-key passthrough against junk or injection-shaped keys. */
-const SAFE_LEGACY_KEY = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/;
+/**
+ * Write the request body to a temp file, reporting progress as it lands.
+ * Counting happens in a Transform so `pipeline` keeps ownership of
+ * backpressure and teardown — the upload is gigabytes and a hand-rolled
+ * pause/resume here would be the easiest place to lose bytes.
+ */
+async function spool(
+  body: ReadableStream<Uint8Array>,
+  dest: string,
+  onProgress: (bytes: number) => void,
+): Promise<number> {
+  let received = 0;
+  let lastReported = 0;
 
-interface RestorePayload {
-  configs?: unknown[];
-  imageMeta?: unknown[];
-  docMeta?: unknown[];
+  const count = new Transform({
+    transform(chunk: Buffer, _enc, cb) {
+      received += chunk.length;
+      if (received > MAX_ARCHIVE_BYTES) {
+        cb(new Error("Archive exceeds the maximum accepted size"));
+        return;
+      }
+      if (received - lastReported >= SPOOL_PROGRESS_BYTES) {
+        lastReported = received;
+        onProgress(received);
+      }
+      cb(null, chunk);
+    },
+  });
+
+  await pipeline(
+    Readable.fromWeb(body as unknown as Parameters<typeof Readable.fromWeb>[0]),
+    count,
+    createWriteStream(dest),
+  );
+  return received;
 }
 
 export async function POST(req: NextRequest) {
   const { session, error } = await requireRole(req, "admin");
   if (error) return error;
+  if (!req.body)
+    return badRequest("Expected a ZIP archive as the request body");
 
-  let payload: RestorePayload;
-  try {
-    payload = (await req.json()) as RestorePayload;
-  } catch {
-    return badRequest("Invalid request body");
-  }
+  await connectDB();
 
-  if (!Array.isArray(payload.configs)) {
-    return badRequest("Invalid backup payload — missing configs array");
-  }
+  const userEmail = session!.user?.email ?? "";
+  const encoder = new TextEncoder();
+  const reqBody = req.body;
 
-  const rawConfigs = payload.configs;
+  const body = new ReadableStream<Uint8Array>({
+    async start(controller) {
+      const emit = (event: Record<string, unknown>) =>
+        controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
 
-  const errs: string[] = [];
-  const validConfigs: Array<{
-    config_key: string;
-    value: unknown;
-    published_value: unknown;
-    status: string;
-  }> = [];
-  let legacyRestored = 0;
+      const warnings: string[] = [];
+      let configsRestored = 0;
+      let collectionDocs = 0;
+      let assetsRestored = 0;
 
-  for (const item of rawConfigs) {
-    if (typeof item !== "object" || item === null) {
-      errs.push("Each config entry must be an object");
-      continue;
-    }
-    const entry = item as Record<string, unknown>;
-    const key = entry.config_key as string;
-    if (!isKnownSiteConfigKey(key)) {
-      // Keys outside the registry are still real stored settings — e.g.
-      // `recruitersSection`, which the seed route reads as a migration source.
-      // Dropping them made a restore lossy, so carry them across verbatim and
-      // report them instead. Nothing renders them: public reads resolve keys
-      // through the registry, and the normal write path still rejects unknowns.
-      if (!SAFE_LEGACY_KEY.test(key ?? "")) {
-        errs.push(`Malformed config_key: "${String(key)}" — skipped`);
-        continue;
-      }
-      validConfigs.push({
-        config_key: key,
-        value: entry.value,
-        published_value: entry.published_value ?? entry.value,
-        status: entry.status === "published" ? "published" : "draft",
-      });
-      legacyRestored++;
-      errs.push(
-        `"${key}" is not in the config registry — restored as-is (legacy key)`,
-      );
-      continue;
-    }
-    const schema = SITE_CONFIG_SCHEMAS[key];
-    const parsedValue = schema.safeParse(entry.value);
-    if (!parsedValue.success) {
-      errs.push(
-        `${key}: ${parsedValue.error.issues.map((i: { message: string }) => i.message).join(", ")}`,
-      );
-      continue;
-    }
-    // Store the ORIGINAL value, not `parsedValue.data`. Zod strips keys the
-    // schema doesn't declare and injects `.default()`s, so writing the parsed
-    // output makes restore lossy: a backup→restore round-trip silently dropped
-    // fields like `mainNavbar.items[].inMore`. The parse is a safety gate only.
-    let publishedValue: unknown = entry.value;
-    // A draft-only config exports `published_value: null`; that is expected,
-    // not a schema failure, so don't warn about it.
-    if (entry.published_value !== undefined && entry.published_value !== null) {
-      const parsedPublished = schema.safeParse(entry.published_value);
-      if (parsedPublished.success) {
-        publishedValue = entry.published_value;
-      } else {
-        errs.push(
-          `${key}.published_value: rejected by schema, reverting to draft value`,
-        );
-      }
-    }
-    validConfigs.push({
-      config_key: key,
-      value: entry.value,
-      published_value: publishedValue,
-      status: entry.status === "published" ? "published" : "draft",
-    });
-  }
-
-  if (errs.length > 0 && validConfigs.length === 0) {
-    return json({ error: "Validation errors", details: errs }, 422);
-  }
-
-  try {
-    await connectDB();
-
-    for (const cfg of validConfigs) {
-      await SiteConfig.findOneAndUpdate(
-        { config_key: cfg.config_key },
-        {
-          $set: {
-            value: cfg.value,
-            published_value: cfg.published_value,
-            status: cfg.status,
-            updated_by: session!.user?.email,
-          },
-          $inc: { version: 1 },
-        },
-        { upsert: true },
-      );
-      // Only registry keys have revalidation targets mapped; legacy keys are
-      // covered by the blanket revalidate below.
-      if (isKnownSiteConfigKey(cfg.config_key)) {
-        revalidateForConfigKey(cfg.config_key as SiteConfigKey);
-      }
-    }
-    revalidateTargets("all-institutions");
-
-    // Restore image metadata (DB records only — binaries assumed still in R2)
-    let imagesRestored = 0;
-    const warnings: string[] = [...errs];
-
-    const imageMeta = Array.isArray(payload.imageMeta)
-      ? (payload.imageMeta as unknown[])
-      : [];
-    for (const raw of imageMeta) {
-      const meta = raw as ImageMeta;
+      let dir: string | null = null;
       try {
-        if (
-          typeof meta.storage_key !== "string" ||
-          !meta.storage_key.startsWith("images/")
-        ) {
-          warnings.push(
-            `Rejected image with invalid storage_key: ${String(meta.storage_key)}`,
-          );
-          continue;
+        dir = await mkdtemp(path.join(tmpdir(), "jct-restore-"));
+        const archivePath = path.join(dir, "backup.zip");
+
+        emit({ stage: "upload", bytes: 0 });
+        const received = await spool(reqBody, archivePath, (bytes) =>
+          emit({ stage: "upload", bytes }),
+        );
+        emit({ stage: "upload", bytes: received, complete: true });
+
+        const central = (await unzipper.Open.file(archivePath)) as unknown as {
+          files: CentralEntry[];
+        };
+        const files = central.files.filter((f) => f.type !== "Directory");
+
+        // Entries are dispatched by name rather than in archive order, so a
+        // reordered or hand-built archive still restores correctly — asset
+        // metadata in particular must be in hand before the binaries it
+        // describes.
+        const byPath = new Map(files.map((f) => [f.path, f]));
+
+        const configEntry = byPath.get("site-config.json");
+        if (!configEntry) {
+          emit({
+            done: true,
+            error: "Invalid backup — the archive has no site-config.json",
+          });
+          return;
         }
-        await ImageAsset.findOneAndUpdate(
-          { storage_key: meta.storage_key },
-          {
-            $set: {
-              filename: meta.filename,
-              storage_key: meta.storage_key,
-              url: meta.storage_key,
-              alt_text: meta.alt_text || "",
-              category: meta.category || "other",
-              institution: meta.institution || "all",
-              file_size: meta.file_size || 0,
-              mime_type: meta.mime_type || "image/webp",
-              width: meta.width,
-              height: meta.height,
-              uploaded_by: meta.uploaded_by || session!.user?.email || "",
-            },
-          },
-          { upsert: true },
-        );
-        imagesRestored++;
-      } catch (err) {
-        warnings.push(
-          `Failed to restore image ${meta.storage_key}: ${String(err)}`,
-        );
-      }
-    }
-
-    // Restore document metadata (DB records only)
-    let docsRestored = 0;
-
-    const docMeta = Array.isArray(payload.docMeta)
-      ? (payload.docMeta as unknown[])
-      : [];
-    for (const raw of docMeta) {
-      const meta = raw as DocMeta;
-      try {
-        if (
-          typeof meta.storage_key !== "string" ||
-          !meta.storage_key.startsWith("documents/")
-        ) {
-          warnings.push(
-            `Rejected document with invalid storage_key: ${String(meta.storage_key)}`,
-          );
-          continue;
+        const parsedConfig = (await readJson(configEntry)) as {
+          configs?: unknown[];
+        } | null;
+        if (!Array.isArray(parsedConfig?.configs)) {
+          emit({
+            done: true,
+            error: "Invalid backup — site-config.json has no configs array",
+          });
+          return;
         }
-        await DocumentAsset.findOneAndUpdate(
-          { storage_key: meta.storage_key },
-          {
-            $set: {
-              filename: meta.filename,
-              storage_key: meta.storage_key,
-              mime_type: meta.mime_type || "application/pdf",
-              file_size: meta.file_size || 0,
-              uploaded_by: meta.uploaded_by || session!.user?.email || "",
+        const configResult = await restoreConfigs(
+          parsedConfig.configs,
+          userEmail,
+        );
+        configsRestored = configResult.restored;
+        warnings.push(...configResult.warnings);
+        emit({ stage: "config", restored: configsRestored });
+
+        for (const entry of files) {
+          if (
+            !entry.path.startsWith("collections/") ||
+            !entry.path.endsWith(".json")
+          ) {
+            continue;
+          }
+          const name = entry.path.slice("collections/".length, -".json".length);
+          if (!isBackupCollection(name)) continue;
+          const docs = await readJson(entry);
+          if (!Array.isArray(docs) || docs.length === 0) continue;
+          const result = await restoreCollectionDocs(name, docs);
+          collectionDocs += result.restored;
+          warnings.push(...result.errors);
+          emit({ stage: "collection", name, restored: result.restored });
+        }
+
+        const imageMetaEntry = byPath.get("images/_metadata.json");
+        const docMetaEntry = byPath.get("documents/_metadata.json");
+        const imageMeta = imageMetaEntry
+          ? indexMetaByKey(await readJson(imageMetaEntry))
+          : {};
+        const docMeta = docMetaEntry
+          ? indexMetaByKey(await readJson(docMetaEntry))
+          : {};
+
+        const assets = files.filter((f) => isSafeStorageKey(f.path));
+        // R2 is checked lazily: an archive with no assets restores fine
+        // without storage configured.
+        if (assets.length > 0 && !isR2Configured()) {
+          warnings.push(
+            `${assets.length} asset file(s) skipped — R2 storage is not configured`,
+          );
+        } else {
+          for (const entry of assets) {
+            const meta = entry.path.startsWith("images/")
+              ? imageMeta[entry.path]
+              : docMeta[entry.path];
+            const err = await restoreAsset(
+              entry.path,
+              () => entry.stream(),
+              entry.uncompressedSize,
+              meta,
+              userEmail,
+            );
+            if (err) {
+              warnings.push(err);
+              continue;
+            }
+            assetsRestored++;
+            if (assetsRestored % ASSET_PROGRESS_EVERY === 0) {
+              emit({
+                stage: "assets",
+                restored: assetsRestored,
+                total: assets.length,
+              });
+            }
+          }
+        }
+
+        revalidateTargets("home", "all-institutions");
+        await logAudit(
+          "site-config",
+          "restored",
+          userEmail,
+          `Restored backup: ${configsRestored} configs, ${collectionDocs} content documents, ${assetsRestored} asset files`,
+        );
+
+        emit({
+          done: true,
+          configs: configsRestored,
+          skipped: configResult.skipped,
+          collections: collectionDocs,
+          assets: assetsRestored,
+          warnings,
+        });
+      } catch (e) {
+        console.error("[site-config/restore]", e);
+        // The common failure is the client hanging up mid-upload, which also
+        // tears down this response — enqueueing onto it would throw a second,
+        // less useful error over the first.
+        try {
+          emit({
+            done: true,
+            error: "Restore failed while reading the archive",
+            // Whatever landed before the failure stays applied; say so rather
+            // than letting the operator assume nothing changed.
+            partial: {
+              configs: configsRestored,
+              collections: collectionDocs,
+              assets: assetsRestored,
             },
-          },
-          { upsert: true },
-        );
-        docsRestored++;
-      } catch (err) {
-        warnings.push(
-          `Failed to restore document ${meta.storage_key}: ${String(err)}`,
-        );
+            warnings,
+          });
+        } catch {
+          // Response already gone; the console.error above is the record.
+        }
+      } finally {
+        if (dir) {
+          await rm(dir, { recursive: true, force: true }).catch((err) =>
+            console.error("[site-config/restore] temp cleanup:", err),
+          );
+        }
+        try {
+          controller.close();
+        } catch {
+          // Already closed by the client disconnecting.
+        }
       }
-    }
+    },
+  });
 
-    await logAudit(
-      "site-config",
-      "restored",
-      session!.user?.email ?? "",
-      `Restored backup: ${validConfigs.length} configs, ${imagesRestored} images, ${docsRestored} documents`,
-    );
-
-    return json({
-      restored: validConfigs.length,
-      restored_legacy: legacyRestored,
-      skipped: rawConfigs.length - validConfigs.length,
-      images_restored: imagesRestored,
-      documents_restored: docsRestored,
-      warnings: warnings.length > 0 ? warnings : undefined,
-    });
-  } catch (e) {
-    console.error("[site-config/restore]", e);
-    return serverError();
-  }
+  return new NextResponse(body, {
+    status: 200,
+    headers: {
+      "Content-Type": "application/x-ndjson",
+      "Cache-Control": "no-store",
+      "X-Accel-Buffering": "no",
+    },
+  });
 }

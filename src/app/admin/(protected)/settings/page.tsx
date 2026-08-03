@@ -3,8 +3,6 @@
 import { useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import JSZip from "jszip";
-import { BACKUP_COLLECTIONS } from "@/lib/backup-collections";
 import {
   Download,
   Upload,
@@ -18,226 +16,57 @@ import {
   FileText,
 } from "lucide-react";
 
-interface BackupPreview {
-  exportedAt: string;
-  exportedBy: string;
-  configCount: number;
-  imageCount: number;
-  docCount: number;
-  /** Binaries actually present in the archive, incl. files with no DB row. */
-  assetFileCount: number;
-  /** Per-collection document counts found under `collections/`. */
-  collectionCounts: Array<{ label: string; count: number }>;
+/** Shape of `GET /api/admin/site-config/backup?probe=1`. */
+interface ExportProbe {
+  config_entries: number;
+  asset_files: number;
+  asset_bytes: number;
+}
+
+/** One NDJSON line from the restore stream. */
+interface RestoreEvent {
+  stage?: "upload" | "config" | "collection" | "assets";
+  name?: string;
+  restored?: number;
+  total?: number;
+  bytes?: number;
+  complete?: boolean;
+  done?: boolean;
+  error?: string;
+  configs?: number;
+  skipped?: number;
+  collections?: number;
+  assets?: number;
+  /** What a failed restore had already written before it gave up. */
+  partial?: { configs: number; collections: number; assets: number };
+  warnings?: string[];
 }
 
 type Status = { type: "success" | "error" | "warning"; message: string };
 
-/**
- * Asset binaries go up in small batches: a full archive is tens of megabytes
- * and a single request would hit the reverse proxy's body limit. Batches are
- * capped by BOTH byte size and file count so a few large PDFs can't build an
- * oversized request on their own.
- */
-const ASSET_BATCH_BYTES = 6 * 1024 * 1024;
-const ASSET_BATCH_FILES = 25;
-
-/** Same reasoning for content documents — programs alone run to ~750 KB. */
-const DOC_BATCH_BYTES = 512 * 1024;
-
-/**
- * Read `collections/<name>.json` out of the archive. Returns null when the
- * archive predates collection support, so an older backup still restores its
- * configs and assets instead of erroring.
- */
-async function readCollection(
-  zip: JSZip,
-  name: string,
-): Promise<Record<string, unknown>[] | null> {
-  const file = zip.file(`collections/${name}.json`);
-  if (!file) return null;
-  try {
-    const parsed = JSON.parse(await file.async("string")) as unknown;
-    return Array.isArray(parsed)
-      ? (parsed as Record<string, unknown>[])
-      : null;
-  } catch {
-    return null;
-  }
-}
-
-/** Split documents so each request stays under the body limit. */
-function chunkBySize(
-  docs: Record<string, unknown>[],
-  maxBytes: number,
-): Record<string, unknown>[][] {
-  const chunks: Record<string, unknown>[][] = [];
-  let current: Record<string, unknown>[] = [];
-  let bytes = 0;
-  for (const doc of docs) {
-    const size = JSON.stringify(doc).length;
-    if (current.length > 0 && bytes + size > maxBytes) {
-      chunks.push(current);
-      current = [];
-      bytes = 0;
-    }
-    current.push(doc);
-    bytes += size;
-  }
-  if (current.length > 0) chunks.push(current);
-  return chunks;
-}
-
-/**
- * Push every content collection back, chunk by chunk. Failures are collected
- * rather than thrown so one bad collection can't strand the rest of a restore.
- */
-async function restoreCollections(
-  zip: JSZip,
-  onProgress: (label: string) => void,
-): Promise<{ restored: number; errors: string[] }> {
-  let restored = 0;
-  const errors: string[] = [];
-
-  for (const col of BACKUP_COLLECTIONS) {
-    const docs = await readCollection(zip, col.name);
-    if (docs === null || docs.length === 0) continue;
-    onProgress(col.label);
-    for (const chunk of chunkBySize(docs, DOC_BATCH_BYTES)) {
-      try {
-        const res = await fetch(
-          "/api/admin/site-config/restore-collections",
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ collection: col.name, docs: chunk }),
-          },
-        );
-        const data = (await res.json()) as Record<string, unknown>;
-        if (!res.ok) {
-          errors.push(
-            `${col.label}: ${(data.error as string) ?? `HTTP ${res.status}`}`,
-          );
-          continue;
-        }
-        restored += (data.restored as number) ?? 0;
-        const chunkErrors = data.errors as string[] | undefined;
-        if (chunkErrors?.length) errors.push(...chunkErrors);
-      } catch (err) {
-        errors.push(`${col.label}: ${String(err)}`);
-      }
-    }
-  }
-  return { restored, errors };
-}
-
 function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(0)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-/** Every binary in the archive, i.e. everything except the JSON manifests. */
-function collectAssetEntries(zip: JSZip): JSZip.JSZipObject[] {
-  const out: JSZip.JSZipObject[] = [];
-  zip.forEach((relPath, entry) => {
-    if (entry.dir) return;
-    if (!relPath.startsWith("images/") && !relPath.startsWith("documents/")) {
-      return;
-    }
-    if (relPath.endsWith("/_metadata.json")) return;
-    out.push(entry);
-  });
-  return out;
-}
-
-function indexMetaByKey(
-  meta: unknown[] | undefined,
-): Record<string, Record<string, unknown>> {
-  const map: Record<string, Record<string, unknown>> = {};
-  for (const raw of meta ?? []) {
-    const m = raw as Record<string, unknown>;
-    if (typeof m?.storage_key === "string") map[m.storage_key] = m;
-  }
-  return map;
+  if (bytes < 1024 * 1024 * 1024)
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }
 
 /**
- * Send the archive's binaries to the restore-assets route in size-bounded
- * batches. Batch failures are collected rather than thrown so one bad file
- * can't abandon the rest of the restore midway.
+ * Hand the URL to the browser's own download manager rather than fetching it.
+ * `fetch` + `response.blob()` would buffer the entire archive in the tab's
+ * heap — the exact failure the streamed export exists to avoid. A plain
+ * navigation streams straight to disk, so a multi-gigabyte backup costs the
+ * page almost no memory.
  */
-async function uploadAssetBatches(
-  entries: JSZip.JSZipObject[],
-  meta: {
-    images: Record<string, Record<string, unknown>>;
-    docs: Record<string, Record<string, unknown>>;
-  },
-  onProgress: (done: number) => void,
-): Promise<{ uploaded: number; errors: string[] }> {
-  let uploaded = 0;
-  let done = 0;
-  const errors: string[] = [];
-
-  let batch: Array<{ key: string; blob: Blob }> = [];
-  let batchBytes = 0;
-
-  const flush = async () => {
-    if (batch.length === 0) return;
-    const form = new FormData();
-    const imageMeta: Record<string, unknown> = {};
-    const docMeta: Record<string, unknown> = {};
-    for (const item of batch) {
-      form.append("keys", item.key);
-      form.append("files", item.blob, item.key.split("/").pop() ?? "asset");
-      const m = item.key.startsWith("images/")
-        ? meta.images[item.key]
-        : meta.docs[item.key];
-      if (m) {
-        if (item.key.startsWith("images/")) imageMeta[item.key] = m;
-        else docMeta[item.key] = m;
-      }
-    }
-    form.append("imageMeta", JSON.stringify(imageMeta));
-    form.append("docMeta", JSON.stringify(docMeta));
-
-    try {
-      const res = await fetch("/api/admin/site-config/restore-assets", {
-        method: "POST",
-        body: form,
-      });
-      const data = (await res.json()) as Record<string, unknown>;
-      if (!res.ok) {
-        errors.push(
-          `Asset batch failed: ${(data.error as string) ?? res.status}`,
-        );
-      } else {
-        uploaded += (data.uploaded as number) ?? 0;
-        const batchErrors = data.errors as string[] | undefined;
-        if (batchErrors?.length) errors.push(...batchErrors);
-      }
-    } catch (err) {
-      errors.push(`Asset batch failed: ${String(err)}`);
-    }
-    done += batch.length;
-    onProgress(done);
-    batch = [];
-    batchBytes = 0;
-  };
-
-  for (const entry of entries) {
-    const blob = await entry.async("blob");
-    if (
-      batch.length >= ASSET_BATCH_FILES ||
-      (batchBytes > 0 && batchBytes + blob.size > ASSET_BATCH_BYTES)
-    ) {
-      await flush();
-    }
-    batch.push({ key: entry.name, blob });
-    batchBytes += blob.size;
-  }
-  await flush();
-
-  return { uploaded, errors };
+function startDownload(url: string) {
+  const a = document.createElement("a");
+  a.href = url;
+  a.rel = "noopener";
+  a.style.display = "none";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
 }
 
 export default function SettingsPage() {
@@ -257,17 +86,12 @@ export default function SettingsPage() {
   const [exportStatus, setExportStatus] = useState<Status | null>(null);
 
   // Restore state
-  const [preview, setPreview] = useState<BackupPreview | null>(null);
   const [restoreFile, setRestoreFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState("");
   const [restoring, setRestoring] = useState(false);
   const [restoreStatus, setRestoreStatus] = useState<Status | null>(null);
   const [restoreWarnings, setRestoreWarnings] = useState<string[]>([]);
-  const [assetProgress, setAssetProgress] = useState<{
-    done: number;
-    total: number;
-    label?: string;
-  } | null>(null);
+  const [progress, setProgress] = useState("");
 
   // Reset state
   const [resetting, setResetting] = useState(false);
@@ -282,45 +106,37 @@ export default function SettingsPage() {
     );
   }
 
+  const backupUrl = (extra?: Record<string, string>) => {
+    const params = new URLSearchParams(extra);
+    if (includeImages) params.set("includeImages", "1");
+    if (includeDocs) params.set("includeDocs", "1");
+    return `/api/admin/site-config/backup?${params}`;
+  };
+
   const handleExport = async () => {
     setExporting(true);
     setExportStatus(null);
     try {
-      const params = new URLSearchParams();
-      if (includeImages) params.set("includeImages", "1");
-      if (includeDocs) params.set("includeDocs", "1");
-      const qs = params.toString();
-      const res = await fetch(
-        `/api/admin/site-config/backup${qs ? `?${qs}` : ""}`,
-      );
+      const res = await fetch(backupUrl({ probe: "1" }));
+      const data = (await res.json()) as Record<string, unknown>;
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
         setExportStatus({
           type: "error",
-          message: (err as Record<string, string>).error ?? "Export failed",
+          message: (data.error as string) ?? "Export failed",
         });
         return;
       }
-      const blob = await res.blob();
-      const disposition = res.headers.get("Content-Disposition") ?? "";
-      const match = disposition.match(/filename="([^"]+)"/);
-      const filename = match?.[1] ?? "jct-backup.zip";
-      // The anchor must be in the document and the object URL must outlive the
-      // click: revoking synchronously after click() races the browser's own
-      // fetch of the blob and lands a 0-byte file in Downloads.
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.rel = "noopener";
-      a.style.display = "none";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      const probe = data as unknown as ExportProbe;
+      startDownload(backupUrl());
+      // Deliberately not reported as success: the status is already 200 by the
+      // time the first byte ships, so a failure mid-archive cannot come back as
+      // an error here. The archive's own _report.json is the real receipt.
       setExportStatus({
-        type: "success",
-        message: `Backup downloaded (${formatBytes(blob.size)}).`,
+        type: "warning",
+        message:
+          probe.asset_files > 0
+            ? `Download started — ${probe.config_entries} config entries plus ${probe.asset_files} asset files (${formatBytes(probe.asset_bytes)}). The archive is built as it downloads, so the size shows as unknown until it finishes. Check _report.json inside the ZIP to confirm every file made it.`
+            : `Download started — ${probe.config_entries} config entries and all content collections. Check _report.json inside the ZIP to confirm the archive completed.`,
       });
     } catch {
       setExportStatus({ type: "error", message: "Export failed. Try again." });
@@ -329,9 +145,8 @@ export default function SettingsPage() {
     }
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    setPreview(null);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
     setRestoreFile(null);
     setFileError("");
     setRestoreStatus(null);
@@ -340,164 +155,110 @@ export default function SettingsPage() {
       setFileError("Invalid file — expected a .zip backup archive.");
       return;
     }
-    try {
-      const buffer = await file.arrayBuffer();
-      const zip = await JSZip.loadAsync(buffer);
-
-      const configFile = zip.file("site-config.json");
-      if (!configFile) {
-        setFileError("Invalid backup — ZIP does not contain site-config.json.");
-        return;
-      }
-      const configData = JSON.parse(await configFile.async("string")) as {
-        exported_at?: string;
-        exported_by?: string;
-        configs?: unknown[];
-      };
-      const configCount = Array.isArray(configData.configs)
-        ? configData.configs.length
-        : 0;
-
-      let imageCount = 0;
-      const imageMetaFile = zip.file("images/_metadata.json");
-      if (imageMetaFile) {
-        const meta = JSON.parse(
-          await imageMetaFile.async("string"),
-        ) as unknown[];
-        imageCount = Array.isArray(meta) ? meta.length : 0;
-      }
-
-      let docCount = 0;
-      const docMetaFile = zip.file("documents/_metadata.json");
-      if (docMetaFile) {
-        const meta = JSON.parse(await docMetaFile.async("string")) as unknown[];
-        docCount = Array.isArray(meta) ? meta.length : 0;
-      }
-
-      const collectionCounts: Array<{ label: string; count: number }> = [];
-      for (const col of BACKUP_COLLECTIONS) {
-        const docs = await readCollection(zip, col.name);
-        if (docs && docs.length > 0) {
-          collectionCounts.push({ label: col.label, count: docs.length });
-        }
-      }
-
-      setPreview({
-        exportedAt: configData.exported_at ?? "",
-        exportedBy: configData.exported_by ?? "",
-        configCount,
-        imageCount,
-        docCount,
-        assetFileCount: collectAssetEntries(zip).length,
-        collectionCounts,
-      });
-      setRestoreFile(file);
-    } catch {
-      setFileError("Could not read ZIP file — the archive may be corrupted.");
-    }
+    setRestoreFile(file);
   };
 
+  /**
+   * The archive is uploaded as a raw body, not parsed here: the server spools
+   * it to disk and reads its central directory. The response is NDJSON so a
+   * long restore keeps reporting instead of going silent behind a proxy
+   * timeout.
+   */
   const handleRestore = async () => {
     if (!restoreFile) return;
     setRestoring(true);
     setRestoreStatus(null);
     setRestoreWarnings([]);
-    setAssetProgress(null);
+    setProgress("Uploading archive…");
     try {
-      // Parse the ZIP client-side — send only structured JSON to avoid
-      // nginx body size limits that break large multipart/binary uploads.
-      const buffer = await restoreFile.arrayBuffer();
-      const zip = await JSZip.loadAsync(buffer);
-
-      const configFile = zip.file("site-config.json");
-      if (!configFile) {
-        setRestoreStatus({
-          type: "error",
-          message: "Invalid backup — missing site-config.json",
-        });
-        return;
-      }
-      const configData = JSON.parse(await configFile.async("string")) as {
-        configs?: unknown[];
-      };
-
-      let imageMeta: unknown[] | undefined;
-      const imageMetaFile = zip.file("images/_metadata.json");
-      if (imageMetaFile) {
-        try {
-          imageMeta = JSON.parse(
-            await imageMetaFile.async("string"),
-          ) as unknown[];
-        } catch {
-          // non-fatal: image metadata missing or malformed
-        }
-      }
-
-      let docMeta: unknown[] | undefined;
-      const docMetaFile = zip.file("documents/_metadata.json");
-      if (docMetaFile) {
-        try {
-          docMeta = JSON.parse(await docMetaFile.async("string")) as unknown[];
-        } catch {
-          // non-fatal: document metadata missing or malformed
-        }
-      }
-
       const res = await fetch("/api/admin/site-config/restore", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          configs: configData.configs ?? [],
-          imageMeta,
-          docMeta,
-        }),
+        headers: { "Content-Type": "application/zip" },
+        body: restoreFile,
       });
-      const data = (await res.json()) as Record<string, unknown>;
-      if (!res.ok) {
-        const details = data.details as string[] | undefined;
-        setRestoreWarnings(details ?? []);
+      if (!res.ok || !res.body) {
+        const err = (await res.json().catch(() => ({}))) as Record<
+          string,
+          string
+        >;
         setRestoreStatus({
           type: "error",
-          message: `Restore failed: ${(data.error as string) ?? "Unknown error"}`,
+          message: `Restore failed: ${err.error ?? `HTTP ${res.status}`}`,
         });
         return;
       }
-      const parts = [`${data.restored as number} config entries`];
-      const warnings = [...((data.warnings as string[] | undefined) ?? [])];
-      const skipped = (data.skipped as number) ?? 0;
 
-      // Content collections (programs, placements, testimonials, …). Without
-      // this a "full" restore rebuilt the settings but left the site empty.
-      const content = await restoreCollections(zip, (label) =>
-        setAssetProgress({ label, done: 0, total: 0 }),
-      );
-      if (content.restored > 0) {
-        parts.push(`${content.restored} content documents`);
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffered = "";
+      let final: RestoreEvent | null = null;
+
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffered += decoder.decode(value, { stream: true });
+        const lines = buffered.split("\n");
+        buffered = lines.pop() ?? "";
+        for (const line of lines) {
+          if (!line.trim()) continue;
+          const event = JSON.parse(line) as RestoreEvent;
+          if (event.done) {
+            final = event;
+            continue;
+          }
+          if (event.stage === "upload") {
+            setProgress(
+              event.complete
+                ? `Uploaded ${formatBytes(event.bytes ?? 0)} — reading archive…`
+                : `Uploading… ${formatBytes(event.bytes ?? 0)} of ${formatBytes(restoreFile.size)}`,
+            );
+          } else if (event.stage === "config") {
+            setProgress("Restored site config");
+          } else if (event.stage === "collection") {
+            setProgress(`Restored ${event.restored} ${event.name}`);
+          } else if (event.stage === "assets") {
+            setProgress(
+              `Restored ${event.restored}/${event.total ?? "?"} asset files…`,
+            );
+          }
+        }
       }
-      warnings.push(...content.errors);
 
-      // Push the binaries back into R2. Restoring only the metadata rows leaves
-      // the media library pointing at objects that don't exist.
-      const assets = collectAssetEntries(zip);
-      if (assets.length > 0) {
-        const metaByKey = {
-          images: indexMetaByKey(imageMeta),
-          docs: indexMetaByKey(docMeta),
-        };
-        const result = await uploadAssetBatches(assets, metaByKey, (done) =>
-          setAssetProgress({ done, total: assets.length }),
-        );
-        if (result.uploaded > 0) parts.push(`${result.uploaded} asset files`);
-        warnings.push(...result.errors);
+      if (!final) {
+        setRestoreStatus({
+          type: "error",
+          message: "Restore ended unexpectedly — the connection was cut.",
+        });
+        return;
+      }
+      if (final.error) {
+        setRestoreWarnings(final.warnings ?? []);
+        // A failed restore is not a no-op — whatever was written stays written.
+        const p = final.partial;
+        const applied =
+          p && (p.configs > 0 || p.collections > 0 || p.assets > 0)
+            ? ` ${p.configs} config entries, ${p.collections} content documents and ${p.assets} asset files had already been applied and remain in place.`
+            : "";
+        setRestoreStatus({
+          type: "error",
+          message: `${final.error}.${applied}`,
+        });
+        return;
       }
 
-      const msg = `Restored: ${parts.join(", ")}.${skipped > 0 ? ` ${skipped} entry(s) skipped.` : ""}`;
+      const parts = [`${final.configs} config entries`];
+      if ((final.collections ?? 0) > 0) {
+        parts.push(`${final.collections} content documents`);
+      }
+      if ((final.assets ?? 0) > 0) parts.push(`${final.assets} asset files`);
+      const warnings = final.warnings ?? [];
       setRestoreWarnings(warnings);
       setRestoreStatus({
         type: warnings.length ? "warning" : "success",
-        message: msg,
+        message: `Restored: ${parts.join(", ")}.${
+          (final.skipped ?? 0) > 0 ? ` ${final.skipped} entry(s) skipped.` : ""
+        }`,
       });
-      setPreview(null);
       setRestoreFile(null);
       if (fileRef.current) fileRef.current.value = "";
     } catch {
@@ -507,6 +268,7 @@ export default function SettingsPage() {
       });
     } finally {
       setRestoring(false);
+      setProgress("");
     }
   };
 
@@ -568,13 +330,13 @@ export default function SettingsPage() {
             <div>
               <h2 className="font-semibold text-gray-900">Export Backup</h2>
               <p className="mt-0.5 text-sm text-gray-500">
-                Download a ZIP archive containing all site config entries plus
-                any selected assets.
+                Downloads one ZIP containing all site config, content, and — if
+                selected — every uploaded file. The archive is streamed as it
+                downloads, so size is unlimited.
               </p>
             </div>
           </div>
 
-          {/* Asset options */}
           <div className="mb-4 space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-3">
             <p className="text-xs font-medium tracking-wide text-gray-500 uppercase">
               Include in backup
@@ -601,8 +363,8 @@ export default function SettingsPage() {
             </label>
             {(includeImages || includeDocs) && (
               <p className="pt-1 text-xs text-amber-600">
-                Including assets may take longer and produce a large ZIP file.
-                Requires R2 storage to be configured.
+                Keep the browser tab open until the download finishes — closing
+                it cancels the archive. Requires R2 storage to be configured.
               </p>
             )}
           </div>
@@ -618,7 +380,7 @@ export default function SettingsPage() {
             ) : (
               <Download size={15} />
             )}
-            {exporting ? "Creating backup…" : "Download Backup"}
+            {exporting ? "Preparing…" : "Download Backup"}
           </button>
         </div>
 
@@ -633,8 +395,10 @@ export default function SettingsPage() {
                 Restore from Backup
               </h2>
               <p className="mt-0.5 text-sm text-gray-500">
-                Upload a previously exported ZIP archive. Site configs, images,
-                and documents are restored. Existing entries are overwritten.
+                Select a backup archive. Site configs, content, images, and
+                documents in the archive overwrite what is stored now. Anything
+                created since the backup is left untouched, not deleted — this
+                merges the archive in, it does not roll the site back.
               </p>
             </div>
           </div>
@@ -670,62 +434,18 @@ export default function SettingsPage() {
 
             {fileError && <p className="text-sm text-red-600">{fileError}</p>}
 
-            {preview && (
-              <div className="space-y-1 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm">
-                <div className="flex items-center gap-1.5 font-medium text-gray-700">
-                  <FileArchive size={14} />
-                  Backup preview
-                </div>
-                {preview.exportedAt && (
-                  <p className="text-gray-500">
-                    Exported:{" "}
-                    {new Date(preview.exportedAt).toLocaleString("en-IN")}
-                  </p>
-                )}
-                {preview.exportedBy && (
-                  <p className="text-gray-500">By: {preview.exportedBy}</p>
-                )}
-                <div className="flex flex-wrap gap-2 pt-1">
-                  <span className="admin-badge admin-badge-gray text-[11px]">
-                    {preview.configCount} config entries
-                  </span>
-                  {preview.imageCount > 0 && (
-                    <span className="admin-badge admin-badge-blue text-[11px]">
-                      {preview.imageCount} images
-                    </span>
-                  )}
-                  {preview.docCount > 0 && (
-                    <span className="admin-badge admin-badge-blue text-[11px]">
-                      {preview.docCount} documents
-                    </span>
-                  )}
-                  {preview.collectionCounts.map((c) => (
-                    <span
-                      key={c.label}
-                      className="admin-badge admin-badge-yellow text-[11px]"
-                    >
-                      {c.count} {c.label.toLowerCase()}
-                    </span>
-                  ))}
-                  {preview.assetFileCount > 0 && (
-                    <span className="admin-badge admin-badge-green text-[11px]">
-                      {preview.assetFileCount} asset files
-                    </span>
-                  )}
-                </div>
-                {preview.collectionCounts.length === 0 && (
-                  <p className="pt-1 text-xs text-amber-600">
-                    This archive predates content backups — programs,
-                    placements and testimonials will not be restored.
-                  </p>
-                )}
-                {preview.assetFileCount === 0 && (
-                  <p className="pt-1 text-xs text-amber-600">
-                    This archive has no asset files — images and documents will
-                    not be restored to storage.
-                  </p>
-                )}
+            {restoreFile && (
+              <div className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
+                <FileArchive size={14} />
+                {restoreFile.name}
+                <span className="text-gray-500">
+                  ({formatBytes(restoreFile.size)})
+                </span>
               </div>
+            )}
+
+            {restoring && progress && (
+              <p className="text-xs text-gray-500">{progress}</p>
             )}
 
             <button
@@ -738,13 +458,7 @@ export default function SettingsPage() {
               ) : (
                 <Upload size={15} />
               )}
-              {restoring
-                ? assetProgress
-                  ? assetProgress.total > 0
-                    ? `Uploading assets ${assetProgress.done}/${assetProgress.total}…`
-                    : `Restoring ${assetProgress.label}…`
-                  : "Restoring…"
-                : "Restore Backup"}
+              {restoring ? "Restoring…" : "Restore Backup"}
             </button>
           </div>
         </div>
