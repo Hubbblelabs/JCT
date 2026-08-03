@@ -491,11 +491,20 @@ const GALLERY_COLS: Record<number, string> = {
  * A gallery is revealed in two steps, because the placement gallery alone runs
  * to thirty albums and ~300 photographs — rendering it whole pushed every
  * section below it off the page and downloaded hundreds of images nobody
- * scrolled to. Albums past the first few are hidden behind one button, and a
- * long album is itself capped until its own button is pressed.
+ * scrolled to. Albums past the first are hidden behind one button, and a long
+ * album is itself capped until its own button is pressed.
+ *
+ * The collapsed state is deliberately short: one album heading plus three grid
+ * rows of photographs, so the gallery costs about four rows of page length
+ * until a visitor asks for more.
  */
-const GALLERY_PAGE_SIZE = 12;
-const GALLERY_GROUP_PAGE_SIZE = 2;
+const GALLERY_INITIAL_ROWS = 3;
+const GALLERY_GROUP_PAGE_SIZE = 1;
+
+/** Photos shown before the album's own "show more" — three grid rows of them. */
+function galleryPageSize(columns: number): number {
+  return Math.max(1, columns) * GALLERY_INITIAL_ROWS;
+}
 
 /** "1 photo" / "5 photos" — the counts are user-facing. */
 function plural(count: number, noun: string): string {
@@ -519,13 +528,10 @@ function GalleryGroup({
   // In the editor every photo stays on screen — a hidden one can't be clicked
   // to edit, and the inspector's list has to match what the preview shows.
   const [expanded, setExpanded] = useState(false);
+  const pageSize = galleryPageSize(columns);
   const collapsed = !editable && !expanded;
-  const hidden = collapsed
-    ? Math.max(0, group.images.length - GALLERY_PAGE_SIZE)
-    : 0;
-  const images = collapsed
-    ? group.images.slice(0, GALLERY_PAGE_SIZE)
-    : group.images;
+  const hidden = collapsed ? Math.max(0, group.images.length - pageSize) : 0;
+  const images = collapsed ? group.images.slice(0, pageSize) : group.images;
 
   return (
     <div>
@@ -565,7 +571,7 @@ function GalleryGroup({
         })}
       </div>
 
-      {!editable && group.images.length > GALLERY_PAGE_SIZE && (
+      {!editable && group.images.length > pageSize && (
         <div className="mt-5 flex justify-center">
           <button
             type="button"

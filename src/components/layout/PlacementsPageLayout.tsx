@@ -32,6 +32,7 @@ import {
   Camera,
   ChevronDown,
   ExternalLink,
+  History,
   Images,
   type LucideIcon,
 } from "lucide-react";
@@ -154,6 +155,7 @@ export const PLACEMENT_NAV_DEFAULTS: SidebarNavDefault[] = [
   { anchor: "mou", navLabel: "MoUs & Collaborations", icon: FileText },
   { anchor: "why-recruit", navLabel: "Why Recruit at JCT", icon: Star },
   { anchor: "overview", navLabel: "Placement Highlights", icon: TrendingUp },
+  { anchor: "history", navLabel: "Year-wise History", icon: History },
   { anchor: "recruiters", navLabel: "Our Recruiters", icon: Building2 },
   { anchor: "achievers", navLabel: "Placed Students", icon: GraduationCap },
   {
@@ -1700,6 +1702,271 @@ function CompanyPlacements({
   );
 }
 
+// ─── Year-wise history ───────────────────────────────────────────────────────
+
+/**
+ * Columns of the history table. A column is dropped entirely when no year on
+ * record carries it — a college that never tracked "offers made" shouldn't get
+ * a column of dashes.
+ */
+type HistoryColumn = {
+  id: string;
+  label: string;
+  has: (r: PublicPlacement) => boolean;
+  format: (r: PublicPlacement) => string;
+};
+
+const HISTORY_COLUMNS: HistoryColumn[] = [
+  {
+    id: "placement_percentage",
+    label: "Placement Rate",
+    has: (r) => r.placement_percentage > 0,
+    format: (r) => `${r.placement_percentage}%`,
+  },
+  {
+    id: "students_placed",
+    label: "Students Placed",
+    has: (r) => r.students_placed > 0,
+    format: (r) => String(r.students_placed),
+  },
+  {
+    id: "total_students",
+    label: "Eligible",
+    has: (r) => r.total_students > 0,
+    format: (r) => String(r.total_students),
+  },
+  {
+    id: "offers_made",
+    label: "Offers",
+    has: (r) => r.offers_made > 0,
+    format: (r) => String(r.offers_made),
+  },
+  {
+    id: "companies_visited",
+    label: "Companies",
+    has: (r) => r.companies_visited > 0,
+    format: (r) => String(r.companies_visited),
+  },
+  {
+    id: "recruiters",
+    label: "Recruiters Listed",
+    has: (r) => r.top_recruiters.length > 0,
+    format: (r) => String(r.top_recruiters.length),
+  },
+  {
+    id: "highest_package",
+    label: "Highest",
+    has: (r) => !!r.highest_package.trim(),
+    format: (r) => r.highest_package,
+  },
+  {
+    id: "average_package",
+    label: "Average",
+    has: (r) => !!r.average_package.trim(),
+    format: (r) => r.average_package,
+  },
+  {
+    id: "median_package",
+    label: "Median",
+    has: (r) => !!r.median_package.trim(),
+    format: (r) => r.median_package,
+  },
+];
+
+// Year labels are free text ("2024-2025", "2024-25", "2024"); order by the
+// first four-digit number in them rather than by string, so "2009-2010" doesn't
+// sort above "2024-2025" on a stray prefix.
+function yearSortKey(year: string): number {
+  const m = year.match(/\d{4}/);
+  return m ? Number(m[0]) : -1;
+}
+
+/**
+ * The gallery is authored as one block per academic year ("2024-2025"), so the
+ * photographs follow the year selected on the page instead of stacking every
+ * year's albums into one very long section. A block whose title carries no year
+ * (an intro, say) always shows.
+ *
+ * In the editor nothing is filtered: block inspector keys are indexes into this
+ * list, and a block hidden from the preview could not be clicked to edit.
+ */
+function galleryForYear(
+  gallery: ContentPageValue | null,
+  year: string,
+): ContentPageValue | null {
+  if (!gallery) return null;
+  const target = yearSortKey(year);
+  if (target < 0) return gallery;
+  const blocks = gallery.blocks.filter((b) => {
+    // Compare the *first* year in the label, not any of them: "2023-2024" and
+    // "2024-2025" both contain 2024, and matching on either would publish two
+    // years' albums at once.
+    const blockYear = yearSortKey(b.title ?? "");
+    return blockYear < 0 || blockYear === target;
+  });
+  return { ...gallery, blocks };
+}
+
+/**
+ * Every academic year on record in one table — the page otherwise shows a
+ * single selected year at a time, which hides the older batches behind the
+ * sidebar's "Past Years" dropdown. No cap: as many years as the college has
+ * published are listed here, newest first.
+ */
+function PlacementHistory({
+  records,
+  selectedId,
+  onSelectYear,
+  editable,
+  onEditSection,
+}: {
+  records: PublicPlacement[];
+  selectedId: string;
+  onSelectYear: (id: string) => void;
+} & EditProps) {
+  const rows = useMemo(
+    () =>
+      [...records].sort((a, b) => yearSortKey(b.year) - yearSortKey(a.year)),
+    [records],
+  );
+  const columns = useMemo(() => {
+    const present = HISTORY_COLUMNS.filter((c) => rows.some((r) => c.has(r)));
+    // The recruiter count is derived from the listed logos and only stands in
+    // for "companies visited" when that figure was never entered — showing both
+    // gives two near-identical columns.
+    return present.some((c) => c.id === "companies_visited")
+      ? present.filter((c) => c.id !== "recruiters")
+      : present;
+  }, [rows]);
+  const peakRate = rows.reduce(
+    (max, r) => Math.max(max, r.placement_percentage),
+    0,
+  );
+
+  return (
+    <EditableRegion
+      as="section"
+      id="history"
+      section={PLACEMENT_RECORDS_SECTION}
+      label="Placement Years"
+      editable={editable}
+      onEditSection={onEditSection}
+      className="scroll-mt-28"
+    >
+      <SectionHeading
+        icon={History}
+        eyebrow="Track Record"
+        title="Year-wise Placement History"
+        meta={`${rows.length} academic ${rows.length === 1 ? "year" : "years"}`}
+      />
+      {/* Tables of this width can't wrap on a phone; it scrolls inside its own
+          box so the page body never scrolls sideways. */}
+      <div className="border-border overflow-x-auto rounded-2xl border bg-white shadow-sm">
+        <table className="w-full min-w-[640px] border-collapse text-sm">
+          <thead>
+            <tr className="bg-stone-50 text-left">
+              <th
+                scope="col"
+                className="text-navy px-4 py-3 text-xs font-bold tracking-wider whitespace-nowrap uppercase"
+              >
+                Academic Year
+              </th>
+              {columns.map((c) => (
+                <th
+                  key={c.id}
+                  scope="col"
+                  className="text-navy px-4 py-3 text-right text-xs font-bold tracking-wider whitespace-nowrap uppercase"
+                >
+                  {c.label}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((r) => {
+              const isSelected = r._id === selectedId;
+              return (
+                <tr
+                  key={r._id}
+                  // Picking a year here drives the detailed sections above; the
+                  // click must not bubble into the surrounding EditableRegion,
+                  // which would open the inspector in the admin preview.
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSelectYear(r._id);
+                  }}
+                  className={`cursor-pointer border-t border-stone-100 transition-colors ${
+                    isSelected ? "bg-accent/5" : "hover:bg-stone-50"
+                  }`}
+                >
+                  <th scope="row" className="px-4 py-3 text-left font-semibold">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSelectYear(r._id);
+                      }}
+                      aria-pressed={isSelected}
+                      className={`flex items-center gap-2 text-left text-sm font-bold ${
+                        isSelected ? "text-accent" : "text-navy"
+                      }`}
+                    >
+                      <CalendarDays
+                        size={14}
+                        className={`shrink-0 ${
+                          isSelected ? "text-accent" : "text-stone-400"
+                        }`}
+                      />
+                      {r.year}
+                      {r.is_current && (
+                        <span className="bg-accent/10 text-accent rounded-full px-1.5 py-0.5 text-[10px] font-bold tracking-wide uppercase">
+                          Latest
+                        </span>
+                      )}
+                    </button>
+                    {r.placement_percentage > 0 && peakRate > 0 && (
+                      <span
+                        aria-hidden="true"
+                        className="mt-2 block h-1.5 w-full max-w-[140px] overflow-hidden rounded-full bg-stone-100"
+                      >
+                        <span
+                          className="bg-accent/70 block h-full rounded-full"
+                          style={{
+                            width: `${Math.max(
+                              6,
+                              (r.placement_percentage / peakRate) * 100,
+                            )}%`,
+                          }}
+                        />
+                      </span>
+                    )}
+                  </th>
+                  {columns.map((c) => (
+                    <td
+                      key={c.id}
+                      className={`px-4 py-3 text-right whitespace-nowrap ${
+                        c.has(r)
+                          ? "text-navy font-semibold"
+                          : "text-stone-300 font-normal"
+                      }`}
+                    >
+                      {c.has(r) ? c.format(r) : "—"}
+                    </td>
+                  ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <p className="mt-3 text-xs text-stone-500">
+        Select a year to load its figures, recruiters, placed students and
+        company-wise breakdown on this page.
+      </p>
+    </EditableRegion>
+  );
+}
+
 // ─── Page ────────────────────────────────────────────────────────────────────
 
 export function PlacementsPageLayout({
@@ -1747,6 +2014,14 @@ export function PlacementsPageLayout({
   const setSelectedId = onSelectRecord ?? setOwnSelectedId;
   const active = records.find((r) => r._id === selectedId) ?? current ?? null;
 
+  // Only the selected year's photographs are published; the editor keeps every
+  // block so each one stays clickable.
+  const visibleGallery = useMemo(
+    () =>
+      editable ? gallery : galleryForYear(gallery ?? null, active?.year ?? ""),
+    [gallery, editable, active],
+  );
+
   // A built-in nav entry only appears once its section actually has content —
   // an empty MoU list or a college with no placement records must not leave a
   // dead anchor in the sidebar.
@@ -1769,10 +2044,13 @@ export function PlacementsPageLayout({
     if (editable || info.process.steps.length > 0) set.add("process");
     // Publicly the gallery appears only once it has content; in the editor it
     // is always shown, empty or not, so there is something to click to fill in.
-    if (editable ? !!gallery : (gallery?.blocks?.length ?? 0) > 0)
+    if (editable ? !!gallery : (visibleGallery?.blocks?.length ?? 0) > 0)
       set.add(PLACEMENT_GALLERY_ANCHOR);
     if (active) {
       set.add("overview");
+      // The history table only earns its place once there is more than one year
+      // to compare — with a single record it would just restate the overview.
+      if (records.length > 1) set.add("history");
       // Empty year-wise blocks are hidden publicly but always shown in the
       // editor — otherwise there is nothing to click to add the first entry.
       if (editable || active.top_recruiters.length > 0) set.add("recruiters");
@@ -1782,7 +2060,7 @@ export function PlacementsPageLayout({
         set.add("company-wise");
     }
     return set;
-  }, [info, active, editable, gallery]);
+  }, [info, active, editable, gallery, visibleGallery, records.length]);
 
   const navItems = useMemo(
     () =>
@@ -1979,6 +2257,15 @@ export function PlacementsPageLayout({
                           onEditSection={onEditSection}
                         />
                       </section>
+                      {present.has("history") && (
+                        <PlacementHistory
+                          records={records}
+                          selectedId={active._id}
+                          onSelectYear={handleSelectYear}
+                          editable={editable}
+                          onEditSection={onEditSection}
+                        />
+                      )}
                       {present.has("recruiters") && (
                         <TopRecruiters
                           record={active}
@@ -2003,7 +2290,7 @@ export function PlacementsPageLayout({
                     </>
                   )}
 
-                  {present.has(PLACEMENT_GALLERY_ANCHOR) && gallery && (
+                  {present.has(PLACEMENT_GALLERY_ANCHOR) && visibleGallery && (
                     <section
                       id={PLACEMENT_GALLERY_ANCHOR}
                       className="scroll-mt-28"
@@ -2023,12 +2310,16 @@ export function PlacementsPageLayout({
                           icon={Camera}
                           eyebrow="Gallery"
                           title={
-                            gallery.hero?.title?.trim() || "Placement Gallery"
+                            visibleGallery.hero?.title?.trim() ||
+                            "Placement Gallery"
+                          }
+                          meta={
+                            !editable && active ? `${active.year} photos` : undefined
                           }
                         />
                       </EditableRegion>
                       <ContentPageBody
-                        data={gallery}
+                        data={visibleGallery}
                         editable={editable && !!gallerySlug}
                         onEditSection={
                           gallerySlug
