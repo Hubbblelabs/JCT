@@ -374,7 +374,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
             >
               <div className="relative h-7 w-7 lg:h-10 lg:w-10">
                 <Image
-                  src="/logo/jct_logo.webp"
+                  src="/jct_logo.webp"
                   alt="JCT Logo"
                   fill
                   sizes="(min-width: 1024px) 40px, 28px"
@@ -675,7 +675,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
                 <div className="flex items-center gap-3">
                   <div className="relative h-9 w-9">
                     <Image
-                      src="/logo/jct_logo.webp"
+                      src="/jct_logo.webp"
                       alt="JCT"
                       fill
                       sizes="36px"

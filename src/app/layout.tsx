@@ -61,7 +61,7 @@ const jsonLd = {
   "@type": "EducationalOrganization",
   name: "JCT Institutions",
   url: SITE_URL,
-  logo: `${SITE_URL}/logo/jct_logo.webp`,
+  logo: `${SITE_URL}/jct_logo.webp`,
   description:
     "JCT Institutions is a premier group of three colleges in Coimbatore offering Engineering, Arts & Science, and Polytechnic programs.",
   foundingDate: "2009",
@@ -83,7 +83,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" type="image/x-icon" href="/logo/favicon.ico"></link>
+        <link rel="icon" type="image/x-icon" href="/favicon.ico"></link>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
