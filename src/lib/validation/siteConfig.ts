@@ -165,7 +165,19 @@ export const SiteConfigPutSchema = z
      */
     publish: z.boolean().optional(),
   })
-  .superRefine((payload, ctx) => {
+  /**
+   * Validates AND normalizes `value` against the key's schema.
+   *
+   * A `.superRefine` can only report issues, never replace the payload, so the
+   * route wrote the caller's RAW object straight into `value`/`published_value`.
+   * Every schema in the registry declares its fields with `.default(...)`,
+   * which makes them optional on input but non-optional in the inferred type —
+   * so a payload omitting them validated, stored partial, and then 500'd the
+   * public page that dereferenced e.g. `data.breadcrumb.filter(...)`. Returning
+   * the parsed output means the stored document always matches the type the
+   * readers cast to.
+   */
+  .transform((payload, ctx) => {
     const schema = SITE_CONFIG_SCHEMAS[payload.config_key as SiteConfigKey];
     const parsed = schema.safeParse(payload.value);
     if (!parsed.success) {
@@ -175,7 +187,9 @@ export const SiteConfigPutSchema = z
           path: ["value", ...issue.path],
         });
       }
+      return z.NEVER;
     }
+    return { ...payload, value: parsed.data as unknown };
   });
 
 export function isKnownSiteConfigKey(key: string): key is SiteConfigKey {

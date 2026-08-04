@@ -3,7 +3,11 @@ import { Types } from "mongoose";
 import type { ZodIssue, ZodType } from "zod";
 import { auth } from "@/auth";
 import { hasMinRole, canAccessInstitution, type Role } from "@/lib/permissions";
-import { clientIpFromHeaders, consumeUploadAttempt } from "@/lib/rate-limit";
+import {
+  clientIpFromHeaders,
+  consumeUploadAttempt,
+  consumeUploadAttemptByUser,
+} from "@/lib/rate-limit";
 
 export function json(data: unknown, status = 200) {
   return NextResponse.json(data, { status });
@@ -122,16 +126,25 @@ export function tooManyRequests(retryAfterSec: number) {
 }
 
 /**
- * Apply the upload rate limiter keyed by user email + client IP.
- * Returns a 429 response when over the limit, or null when allowed.
+ * Apply the upload rate limiter.
+ *
+ * Two buckets, both must allow: a per-(user|ip) one for granularity, and an
+ * IP-independent per-user one. The IP component is only as trustworthy as the
+ * proxy headers, so the per-user bucket is the guard that actually holds when
+ * a client rotates X-Forwarded-For — mirroring `consumeLoginAttemptByEmail`.
  */
 export function enforceUploadRateLimit(
   req: NextRequest,
   userKey: string,
 ): NextResponse | null {
   const ip = clientIpFromHeaders(req.headers);
-  const result = consumeUploadAttempt(`${userKey}|${ip}`);
-  if (!result.allowed) return tooManyRequests(result.retryAfterSec);
+  const perIp = consumeUploadAttempt(`${userKey}|${ip}`);
+  const perUser = consumeUploadAttemptByUser(userKey);
+  if (!perIp.allowed || !perUser.allowed) {
+    return tooManyRequests(
+      Math.max(perIp.retryAfterSec, perUser.retryAfterSec),
+    );
+  }
   return null;
 }
 

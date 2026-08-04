@@ -48,8 +48,16 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files — Next.js loads .env, .env.local, .env.production and
+# .env.*.local automatically, so all of them are real-credential files.
+# Ignoring only `.env` left the rest committable.
 .env
+.env.local
+.env.production
+.env.development
+.env.test
+.env*.local
+!.env.example
 
 # vercel
 .vercel

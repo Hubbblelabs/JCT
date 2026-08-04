@@ -14,6 +14,8 @@ import {
   revalidatePaths,
   type RevalidateTarget,
 } from "@/lib/revalidate";
+import { extractR2Keys } from "@/lib/r2";
+import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 
 function institutionTarget(inst: string): RevalidateTarget | null {
   if (inst === "main") return "home";
@@ -46,12 +48,25 @@ export async function POST(
     const doc = await Page.findById(id);
     if (!doc) return notFound();
 
+    // Assets held only by the outgoing published snapshot are orphaned once it
+    // is overwritten below.
+    const oldPublishedKeys = extractR2Keys(doc.published_content);
+
     doc.published_content = doc.content;
     doc.status = "published";
     doc.version = (doc.version ?? 1) + 1;
     doc.published_at = new Date();
     doc.updated_by = session!.user?.email ?? doc.updated_by;
     await doc.save();
+
+    if (oldPublishedKeys.size > 0) {
+      const kept = extractR2Keys({
+        content: doc.content,
+        published_content: doc.published_content,
+      });
+      const orphaned = [...oldPublishedKeys].filter((k) => !kept.has(k));
+      if (orphaned.length > 0) cleanupStorageKeys(orphaned, "pages/publish");
+    }
 
     const target = institutionTarget(doc.institution);
     if (target) {

@@ -21,8 +21,19 @@ export async function ContentPage({ slug }: { slug: string }) {
   if (!def) notFound();
 
   const value = await getPublishedConfigValue(def.configKey);
-  const data =
-    value && typeof value === "object" ? (value as ContentPageValue) : EMPTY;
+  // Validate rather than cast. `getPublishedConfigValue` hands back the raw
+  // Mongo document, and an `as` on a partial or hand-edited value (or one that
+  // arrived through site-config/restore, which stores entries verbatim) turns
+  // a missing `blocks`/`breadcrumb` array into an uncaught TypeError and a 500
+  // — instead of the empty page EMPTY exists to render.
+  const parsed = ContentPageSchema.safeParse(value);
+  if (!parsed.success && value && typeof value === "object") {
+    console.error(
+      `[ContentPage:${def.configKey}] stored value failed validation:`,
+      parsed.error.issues.slice(0, 5),
+    );
+  }
+  const data: ContentPageValue = parsed.success ? parsed.data : EMPTY;
 
   // Nothing seeded yet: fall back to the registry label so the page still has
   // a heading instead of rendering a blank hero.

@@ -86,6 +86,7 @@ export default function GlobalError({
             >
               Try again
             </button>
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages -- global-error replaces the root layout after a render crash; a hard navigation is deliberate, since the client router is what just failed. */}
             <a
               href="/"
               style={{

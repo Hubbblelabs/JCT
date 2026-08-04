@@ -28,8 +28,11 @@ export async function GET(req: NextRequest) {
 /**
  * DELETE /api/admin/documents?storage_key=<key>
  *
- * Deletes a document asset by its R2 storage key. Used when a PDF is removed
- * or replaced in the admin UI without going through the [id] route.
+ * Deletes a document asset by its R2 storage key.
+ *
+ * NOT called from the admin UI — see the matching note on the images route.
+ * Replacing a PDF in an editor is reclaimed server-side by the save route's
+ * orphan diff; this endpoint is for manual/administrative use.
  */
 export async function DELETE(req: NextRequest) {
   const { session, error } = await requireRole(req, "editor");

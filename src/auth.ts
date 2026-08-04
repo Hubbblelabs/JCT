@@ -1,6 +1,7 @@
 import NextAuth, { type DefaultSession } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
+import { Types } from "mongoose";
 import { connectDB } from "@/lib/mongodb";
 import { validateServerEnv } from "@/lib/env";
 import { User } from "@/lib/models";
@@ -22,6 +23,11 @@ const DUMMY_BCRYPT_HASH =
 validateServerEnv();
 
 const authSecret = process.env.NEXTAUTH_SECRET;
+
+// How often a live JWT is checked back against its User document. Short enough
+// that an offboarding takes effect within a minute, long enough that a busy
+// admin session costs roughly one indexed lookup per minute.
+const SESSION_REVALIDATE_MS = 60 * 1000;
 
 declare module "next-auth" {
   interface User {
@@ -129,14 +135,57 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }),
   ],
   callbacks: {
-    jwt({ token, user }) {
+    /**
+     * Re-hydrate the token from the database instead of trusting the claims
+     * frozen at sign-in.
+     *
+     * With `strategy: "jwt"` there is no server-side session store, so without
+     * this a deactivated, deleted or demoted user keeps whatever `role` and
+     * `institution` they held for the full 24h `maxAge` — defeating the
+     * is_active flag, the DELETE handler and every guard in
+     * `src/app/api/admin/users/[id]/route.ts`. Returning `null` invalidates
+     * the session outright.
+     *
+     * The lookup is throttled to one per SESSION_REVALIDATE_MS per token, so
+     * this costs at most one indexed findById per minute per active admin.
+     */
+    async jwt({ token, user }) {
       if (user) {
         token.uid = (user as { id?: string }).id;
         token.role = user.role;
         token.institution = user.institution;
         token.programs = user.programs;
+        token.checkedAt = Date.now();
+        return token;
       }
-      return token;
+
+      const uid = typeof token.uid === "string" ? token.uid : null;
+      if (!uid || !Types.ObjectId.isValid(uid)) return null;
+
+      const checkedAt =
+        typeof token.checkedAt === "number" ? token.checkedAt : 0;
+      if (Date.now() - checkedAt < SESSION_REVALIDATE_MS) return token;
+
+      try {
+        await connectDB();
+        const fresh = await User.findById(uid)
+          .select("role institution programs is_active")
+          .lean();
+        if (!fresh || fresh.is_active === false) return null;
+        token.role = String(fresh.role || "");
+        token.institution = String(fresh.institution || "");
+        token.programs = Array.isArray(fresh.programs)
+          ? fresh.programs.map(String)
+          : [];
+        token.checkedAt = Date.now();
+        return token;
+      } catch (error) {
+        // A transient database outage must not sign every admin out. Keep the
+        // existing claims but leave `checkedAt` untouched so the very next
+        // request retries rather than waiting out the throttle window.
+        console.error("[auth] session revalidation failed:", error);
+        return token;
+      }
     },
     session({ session, token }) {
       if (session.user) {
@@ -169,7 +218,20 @@ function getClientIp(request: unknown): string {
       (h as Record<string, string>)[k.toLowerCase()];
     return typeof v === "string" ? v : null;
   };
+  // X-Real-IP first: our reverse proxy sets it from $remote_addr, while
+  // X-Forwarded-For is built with $proxy_add_x_forwarded_for and therefore
+  // starts with whatever the client sent. See clientIpFromHeaders.
+  const real = get("x-real-ip");
+  if (real) return real.trim();
+  const cf = get("cf-connecting-ip");
+  if (cf) return cf.trim();
   const fwd = get("x-forwarded-for");
-  if (fwd) return fwd.split(",")[0]!.trim();
-  return get("x-real-ip") ?? get("cf-connecting-ip") ?? "unknown";
+  if (fwd) {
+    const parts = fwd
+      .split(",")
+      .map((p) => p.trim())
+      .filter(Boolean);
+    if (parts.length > 0) return parts[parts.length - 1]!;
+  }
+  return "unknown";
 }

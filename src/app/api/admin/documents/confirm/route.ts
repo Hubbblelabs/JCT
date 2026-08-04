@@ -8,7 +8,9 @@ import {
   json,
   badRequest,
   serverError,
+  validateBody,
 } from "@/lib/api-helpers";
+import { DocumentConfirmSchema } from "@/lib/validation";
 import { logAudit } from "@/lib/audit";
 
 export const maxDuration = 30;
@@ -20,24 +22,14 @@ export async function POST(req: NextRequest) {
   const limited = enforceUploadRateLimit(req, session!.user?.email ?? "");
   if (limited) return limited;
 
+  // Schema-validated, like every other admin write route. The `documents/`
+  // prefix check lives in the schema: without it an editor could register a
+  // DocumentAsset pointing at any object in the bucket.
+  const parsed = await validateBody(req, DocumentConfirmSchema);
+  if (!parsed.ok) return parsed.response;
+  const { storage_key, filename, mime_type } = parsed.data;
+
   try {
-    const body = (await req.json()) as {
-      storage_key?: string;
-      filename?: string;
-      size?: number;
-      mime_type?: string;
-    };
-    const { storage_key, filename, mime_type } = body;
-
-    if (!storage_key || !filename)
-      return badRequest("storage_key and filename required");
-
-    // Only accept keys minted by the presign route. Without this an editor
-    // could register a DocumentAsset pointing at any object in the bucket.
-    if (!storage_key.startsWith("documents/")) {
-      return badRequest("Invalid storage_key");
-    }
-
     // The client-supplied size/mime are advisory — confirm against the
     // actual uploaded object. This also rejects confirms for keys that were
     // presigned but never uploaded.

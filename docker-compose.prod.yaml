@@ -5,8 +5,12 @@ services:
 
     restart: unless-stopped
 
+    # Bound to loopback so only the host's nginx can reach the app. Published
+    # on 0.0.0.0 it was reachable directly at <host>:3000, bypassing the
+    # reverse proxy's TLS, rate limiting and body-size settings that the
+    # backup/restore routes depend on (see deploy/nginx-jct.conf.example).
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
 
     env_file:
       - .env

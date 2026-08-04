@@ -189,6 +189,7 @@ function ContentImg({ image }: { image: ContentImageValue }) {
   const alt = image.alt.trim() || image.caption.trim() || "";
 
   if (pendingPreview) {
+    // eslint-disable-next-line @next/next/no-img-element -- a deferred upload's preview is a local blob: URL, which /_next/image cannot fetch or optimize.
     return <img src={pendingPreview} alt={alt} className="h-auto w-full" />;
   }
   if (!url || failed) {
@@ -641,7 +642,10 @@ function GalleryBlockView({
         <div className="space-y-10">
           {visibleGroups.map((group, gi) => (
             <GalleryGroup
-              key={gi}
+              // Keyed by identity for the same reason the blocks above are:
+              // a positional key lets one album's expanded state survive onto
+              // a different album.
+              key={`${group.title}:${gi}`}
               group={group}
               columns={block.columns}
               viewerIndexes={indexOf[gi]}
@@ -898,7 +902,11 @@ export function ContentPageBody({
   onEditSection?: (section: ContentEditableSection) => void;
 }) {
   const onEdit = onEditSection as ((s: string) => void) | undefined;
-  const intro = data.intro.filter((p) => p.trim() !== "");
+  // `intro`/`blocks` are optional-in-practice: a stored value that fails schema
+  // validation still reaches here through the loaders' raw fallbacks, and
+  // dereferencing a missing array 500s the whole hosting page.
+  const intro = (data.intro ?? []).filter((p) => p.trim() !== "");
+  const blocks = data.blocks ?? [];
 
   return (
     <>
@@ -930,10 +938,17 @@ export function ContentPageBody({
         </EditableRegion>
       )}
 
-      {data.blocks.length > 0
-        ? data.blocks.map((block, i) => (
+      {blocks.length > 0
+        ? blocks.map((block, i) => (
             <EditableRegion
-              key={i}
+              // Keyed by identity, not position. The placements page hands this
+              // component a *filtered* block array that changes when the visitor
+              // picks another academic year; with a bare index key React kept
+              // the same GalleryBlockView mounted and handed it a different
+              // block, so one year's "show all albums/photos" state carried
+              // over to the next — defeating the lazy-expansion the caps exist
+              // for and firing every image request at once.
+              key={`${block.type}:${block.title}:${i}`}
               as="section"
               section={`block:${i}`}
               label={blockLabel(block, i)}

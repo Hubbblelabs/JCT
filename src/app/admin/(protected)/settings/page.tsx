@@ -308,7 +308,7 @@ export default function SettingsPage() {
     const ok = await confirm({
       title: "Delete all site data",
       message:
-        "Every site config entry, uploaded image and uploaded document will be deleted from the database and from storage. Public pages will fall back to hard-coded defaults. This cannot be undone.",
+        "Every site config entry will be deleted, along with every uploaded image and document that no site content still references — from the database and from storage. Programs, pages, events, placements and testimonials are NOT deleted, and any asset they still use is kept. Public pages driven by site config will fall back to hard-coded defaults. This cannot be undone.",
       confirmLabel: "Delete everything",
       destructive: true,
     });
@@ -336,9 +336,13 @@ export default function SettingsPage() {
         (data.r2_failures as number) > 0
           ? ` ${data.r2_failures as number} R2 file(s) could not be deleted — remove them manually.`
           : "";
+      const kept =
+        (data.assets_kept as number) > 0
+          ? ` ${data.assets_kept as number} asset(s) kept — still referenced by programs, pages, events, placements or testimonials.`
+          : "";
       setResetStatus({
         type: (data.r2_failures as number) > 0 ? "warning" : "success",
-        message: `Deleted: ${parts.join(", ")}.${r2Warn} Pages will serve defaults until reconfigured.`,
+        message: `Deleted: ${parts.join(", ")}.${kept}${r2Warn} Pages will serve defaults until reconfigured.`,
       });
       setResetConfirm("");
     } catch {

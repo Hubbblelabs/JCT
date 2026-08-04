@@ -13,9 +13,16 @@ import { publicCacheGet, publicCacheSet } from "@/lib/public-cache";
 // the admin-gated /api/admin/images/serve route that anonymous visitors
 // cannot load.
 
+const SCOPES = ["all", "engineering", "arts-science", "polytechnic"] as const;
+
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const institution = searchParams.get("institution") ?? "all";
+  // Allowlist before the value reaches either the Mongo filter or a cache key,
+  // mirroring the placements route.
+  if (!(SCOPES as readonly string[]).includes(institution)) {
+    return NextResponse.json({ source: "empty", data: [] });
+  }
 
   const cacheKey = `testimonials:${institution}`;
   const cached = publicCacheGet<{ source: string; data: unknown }>(cacheKey);

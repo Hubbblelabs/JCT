@@ -2,8 +2,9 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Loader2, X, ExternalLink } from "lucide-react";
+import { ArrowLeft, Loader2, ExternalLink } from "lucide-react";
 import { SaveButtons } from "@/components/admin/LivePageEditor";
+import { InspectorOverlay } from "@/components/admin/InspectorOverlay";
 import {
   loadEditableConfig,
   saveEditableConfig,
@@ -340,71 +341,51 @@ function PlacementsPageEditorInner() {
       )}
 
       {inspectorOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 p-0 sm:p-4">
-          <aside className="flex h-full w-full flex-col overflow-y-auto bg-white shadow-2xl sm:max-w-3xl sm:rounded-xl">
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
-              <div>
-                <p className="text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">
-                  Inspector
-                </p>
-                <h2 className="mt-0.5 font-semibold text-gray-900">
-                  {inspectorTitle}
-                </h2>
-              </div>
-              <button
-                onClick={() => setInspectorOpen(false)}
-                className="admin-btn admin-btn-outline admin-btn-sm shrink-0"
-              >
-                <X size={14} />
-                <span className="sr-only">Close inspector</span>
-              </button>
-            </div>
-            <div className="p-6">
-              {selected === PLACEMENT_RECORDS_SECTION ? (
-                <PlacementYearsInspector
-                  records={records}
-                  selectedId={resolvedRecordId}
-                  busy={recordBusy}
-                  onSelect={(id) => {
-                    setActiveRecordId(id);
-                    setSelected(placementRecordSection(id, "overview"));
-                  }}
-                  onAdd={() => void addYear()}
-                  onDelete={(r) => void removeYear(r)}
-                />
-              ) : recordSection ? (
-                activeRecord ? (
-                  <PlacementRecordInspector
-                    record={activeRecord}
-                    sectionKey={recordSection.key}
-                    onChange={patchRecord}
-                  />
-                ) : (
-                  <p className="text-sm text-gray-500">
-                    This year is no longer part of the page.
-                  </p>
-                )
-              ) : selected.startsWith("hosted:") ? (
-                <HostedInspector
-                  sectionKey={selected}
-                  defs={hostedDefs}
-                  drafts={hostedDrafts}
-                  onChange={setHostedDraft}
-                  onSelectSection={setSelected}
-                />
-              ) : (
-                <PlacementSectionInspector
-                  section={selected}
-                  data={draft!}
-                  onChange={setDraft}
-                />
-              )}
-            </div>
-            <div className="sticky bottom-0 mt-auto border-t border-gray-100 bg-white px-6 py-3">
-              <SaveButtons saving={saving} onSave={save} full />
-            </div>
-          </aside>
-        </div>
+        <InspectorOverlay
+          title={inspectorTitle}
+          onClose={() => setInspectorOpen(false)}
+          footer={<SaveButtons saving={saving} onSave={save} full />}
+        >
+          {selected === PLACEMENT_RECORDS_SECTION ? (
+            <PlacementYearsInspector
+              records={records}
+              selectedId={resolvedRecordId}
+              busy={recordBusy}
+              onSelect={(id) => {
+                setActiveRecordId(id);
+                setSelected(placementRecordSection(id, "overview"));
+              }}
+              onAdd={() => void addYear()}
+              onDelete={(r) => void removeYear(r)}
+            />
+          ) : recordSection ? (
+            activeRecord ? (
+              <PlacementRecordInspector
+                record={activeRecord}
+                sectionKey={recordSection.key}
+                onChange={patchRecord}
+              />
+            ) : (
+              <p className="text-sm text-gray-500">
+                This year is no longer part of the page.
+              </p>
+            )
+          ) : selected.startsWith("hosted:") ? (
+            <HostedInspector
+              sectionKey={selected}
+              defs={hostedDefs}
+              drafts={hostedDrafts}
+              onChange={setHostedDraft}
+              onSelectSection={setSelected}
+            />
+          ) : (
+            <PlacementSectionInspector
+              section={selected}
+              data={draft!}
+              onChange={setDraft}
+            />
+          )}
+        </InspectorOverlay>
       )}
     </div>
   );

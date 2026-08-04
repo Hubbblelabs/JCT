@@ -4,7 +4,16 @@ node_modules
 Dockerfile
 dist
 coverage
-node_modules
 .vscode
 README.md
+
+# env files — the builder does `COPY . .` and `next build` inlines every
+# NEXT_PUBLIC_* value it finds into .next/static, which ships in the runner
+# image. Keep all of them out of the build context, not just `.env`.
 .env
+.env.local
+.env.production
+.env.development
+.env.test
+.env*.local
+!.env.example

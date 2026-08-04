@@ -57,6 +57,15 @@ export function EditableRegion<S extends string>({
       onKeyDown={
         editable
           ? (event: KeyboardEvent) => {
+              // Only act when the region itself has focus. Keydown bubbles, so
+              // without this an Enter pressed on any descendant button, link or
+              // listbox reaches here, gets preventDefault()'d — which for a
+              // <button> cancels the click that Enter would otherwise fire —
+              // and opens the inspector instead of running the control. That
+              // made every keyboard-only interaction inside a preview
+              // impossible. Descendants stopPropagation on click only, which
+              // does nothing for keydown.
+              if (event.target !== event.currentTarget) return;
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
                 handleSelect(event);

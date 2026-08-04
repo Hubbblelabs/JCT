@@ -3475,8 +3475,20 @@ export function NavbarAdminSection({
     setSaving(true);
     setMsg(null);
     try {
-      const flushedNav = deferred ? await deferred.flush(navbarVal) : navbarVal;
-      if (deferred) setNavbarVal(flushedNav);
+      // Both values go through ONE flush. `flush` drops any pending upload it
+      // cannot find in the value it is handed, so flushing the navbar alone
+      // would discard a file picked in the header form — and this component
+      // shares its provider with the whole PageContentShell.
+      const flushed = deferred
+        ? ((await deferred.flush({
+            header: headerVal,
+            navbar: navbarVal,
+          })) as { header: HeaderVal; navbar: NavbarVal })
+        : { header: headerVal, navbar: navbarVal };
+      if (deferred) {
+        setHeaderVal(flushed.header);
+        setNavbarVal(flushed.navbar);
+      }
       const put = (config_key: string, value: unknown) =>
         fetch("/api/admin/site-config", {
           method: "PUT",
@@ -3484,8 +3496,8 @@ export function NavbarAdminSection({
           body: JSON.stringify({ config_key, value }),
         });
       const [hr, nr] = await Promise.all([
-        put(headerConfigKey, headerVal),
-        put(navbarConfigKey, flushedNav),
+        put(headerConfigKey, flushed.header),
+        put(navbarConfigKey, flushed.navbar),
       ]);
       const ok = hr.ok && nr.ok;
       setMsg({ ok, text: ok ? "Saved!" : "Save failed." });

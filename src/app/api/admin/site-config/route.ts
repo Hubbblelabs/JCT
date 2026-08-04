@@ -82,8 +82,19 @@ export async function PUT(req: NextRequest) {
     await connectDB();
 
     // Fetch the existing doc BEFORE overwriting so we can detect orphaned R2 keys.
+    //
+    // The union of BOTH sides matters. Draft saves deliberately skip cleanup
+    // (see below), so by the time a publish arrives `existing.value` is already
+    // the draft that dropped the old key — diffing against the draft alone
+    // finds nothing and every asset replaced via "Save draft" then "Save &
+    // publish" (the normal authoring path) leaks forever. `published_value`
+    // still holds it, so seed from both.
     const existing = await SiteConfig.findOne({ config_key }).lean();
-    const oldKeys = existing?.value ? [...extractR2Keys(existing.value)] : [];
+    const oldKeySet = new Set<string>();
+    if (existing?.value) extractR2Keys(existing.value, oldKeySet);
+    if (existing?.published_value)
+      extractR2Keys(existing.published_value, oldKeySet);
+    const oldKeys = [...oldKeySet];
 
     const doc = await SiteConfig.findOneAndUpdate(
       { config_key },

@@ -2,14 +2,12 @@ import { NextRequest } from "next/server";
 import {
   requireRole,
   json,
-  badRequest,
   serverError,
+  validateBody,
   enforceUploadRateLimit,
 } from "@/lib/api-helpers";
+import { DocumentPresignSchema } from "@/lib/validation";
 import { getPresignedPutUrl } from "@/lib/r2";
-
-const ALLOWED_MIME = ["application/pdf"] as const;
-const MAX_SIZE = 25 * 1024 * 1024;
 
 export const maxDuration = 30;
 
@@ -20,27 +18,13 @@ export async function POST(req: NextRequest) {
   const limited = enforceUploadRateLimit(req, session!.user?.email ?? "");
   if (limited) return limited;
 
+  // Structured 422 on a bad body, like every other admin write route — the
+  // previous `as` cast turned a non-string filename into a 500.
+  const parsed = await validateBody(req, DocumentPresignSchema);
+  if (!parsed.ok) return parsed.response;
+  const { filename, size } = parsed.data;
+
   try {
-    const body = (await req.json()) as {
-      filename?: string;
-      size?: number;
-      mime_type?: string;
-    };
-    const { filename, size, mime_type } = body;
-
-    if (!filename) return badRequest("filename required");
-    if (
-      !mime_type ||
-      !ALLOWED_MIME.includes(mime_type as (typeof ALLOWED_MIME)[number])
-    ) {
-      return badRequest(
-        `Invalid file type "${mime_type}". Only PDF files are accepted.`,
-      );
-    }
-    if (!size || size > MAX_SIZE) {
-      return badRequest("File too large. Max is 25 MB.");
-    }
-
     const safeName = filename
       .replace(/\s+/g, "-")
       .replace(/[^a-zA-Z0-9._-]/g, "_");

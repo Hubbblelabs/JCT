@@ -210,6 +210,17 @@ export {
 export type { NavbarValue, NavbarItem, NavbarChild } from "./navbar";
 
 export {
+  DocumentPresignSchema,
+  DocumentConfirmSchema,
+  DOCUMENT_UPLOAD_LIMITS,
+  DOCUMENT_UPLOAD_MIME,
+} from "./documentUploads";
+export type {
+  DocumentPresignValue,
+  DocumentConfirmValue,
+} from "./documentUploads";
+
+export {
   SidebarNavItemSchema,
   SidebarNavOverrideSchema,
   SIDEBAR_NAV_LIMITS,

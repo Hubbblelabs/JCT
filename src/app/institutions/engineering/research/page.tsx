@@ -1,4 +1,4 @@
-import { getPublishedConfigValue } from "@/lib/site-config-server";
+import { getPublishedConfig } from "@/lib/site-config-server";
 import { ResearchPageLayout } from "@/components/layout/ResearchPageLayout";
 import { ResearchPageSchema } from "@/lib/validation";
 import type { ResearchPageValue } from "@/lib/validation";
@@ -21,8 +21,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function EngineeringResearchPage() {
-  const value = await getPublishedConfigValue("engineeringResearch");
-  const data =
-    value && typeof value === "object" ? (value as ResearchPageValue) : DEFAULT;
+  const data = await getPublishedConfig(
+    "engineeringResearch",
+    ResearchPageSchema,
+    DEFAULT,
+  );
   return <ResearchPageLayout data={data} />;
 }

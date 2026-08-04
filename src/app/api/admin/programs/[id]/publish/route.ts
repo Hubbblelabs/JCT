@@ -10,6 +10,8 @@ import {
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { revalidatePaths } from "@/lib/revalidate";
+import { extractR2Keys } from "@/lib/r2";
+import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 
 export async function POST(
   req: NextRequest,
@@ -26,6 +28,10 @@ export async function POST(
     const current = await Program.findById(id);
     if (!current) return notFound("Program not found");
 
+    // Assets the outgoing published snapshot held. Publishing overwrites it,
+    // so anything the new draft doesn't carry is orphaned from here on.
+    const oldPublishedKeys = extractR2Keys(current.published_content);
+
     const doc = await Program.findByIdAndUpdate(
       id,
       {
@@ -39,9 +45,21 @@ export async function POST(
     );
     if (!doc) return notFound("Program not found");
 
+    if (oldPublishedKeys.size > 0) {
+      const kept = extractR2Keys({
+        image: doc.image,
+        content: doc.content,
+        published_content: doc.published_content,
+      });
+      const orphaned = [...oldPublishedKeys].filter((k) => !kept.has(k));
+      if (orphaned.length > 0) cleanupStorageKeys(orphaned, "programs/publish");
+    }
+
     revalidatePaths(
       `/institutions/${doc.institution}`,
-      `/institutions/${doc.institution}/programs`,
+      // The listing page is /courses — `/programs` has no page.tsx, so
+      // revalidating it was a silent no-op.
+      `/institutions/${doc.institution}/courses`,
       `/institutions/${doc.institution}/programs/${doc.slug}`,
     );
 

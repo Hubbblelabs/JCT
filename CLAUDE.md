@@ -35,20 +35,25 @@ pnpm format    # Prettier (with Tailwind class sorting)
 pnpm typecheck # tsc --noEmit (run alongside build to verify changes)
 ```
 
-Data seeding scripts (bootstrap a fresh DB; `:dry` variants preview without writing):
+There is exactly **one** script, and it only creates the first admin user:
 
 ```bash
-pnpm seed:admin                       # create initial admin user
-pnpm seed:deptcontent:eee[:dry]       # seed rich Program.content for EEE
-pnpm seed:placements[:dry]            # and ~30 more seed:* / migrate:* entries
+pnpm seed:admin   # scripts/seed-admin.js — creates the initial admin user
 ```
 
-Notable subsystems bootstrapped this way (all SiteConfig-key based, see "SiteConfig & page content"): `seed:accreditations`, `seed:naac`, `seed:contentpages` + `seed:contentpagenav`, `seed:committeegroups`/`seed:committees`/`seed:clubs`, `seed:research`, `seed:lifeatjct`, `seed:seo`, `seed:aboutsections`, plus `migrate:disclosurepages` and `migrate:moremenu` (nav reorder).
+`scripts/` contains that one file. The seed/migrate catalogue this section used
+to document (`seed:deptcontent:*`, `seed:placements`, `seed:accreditations`,
+`seed:naac`, `seed:contentpages`, `seed:committees`, `seed:clubs`,
+`seed:research`, `seed:lifeatjct`, `seed:seo`, `seed:aboutsections`,
+`migrate:disclosurepages`, `migrate:moremenu`, …) **no longer exists** — the
+scripts themselves were deleted, not merely their package.json entries. Do not
+reintroduce references to them.
 
-Run `pnpm run` for the full list. Every entry in `package.json` points at a file
-that exists — entries for deleted scripts (`seed:programs:engineering`,
-`seed:deptcontent:{engineering,polytechnic,arts-science}`) were removed, so
-following these instructions no longer fails on a missing file.
+Everything else is bootstrapped one of two ways on a fresh database:
+
+- through the admin CMS, which writes each SiteConfig key on first save, or
+- by restoring a backup archive: `POST /api/admin/site-config/restore` (the
+  Settings page has the UI for it).
 
 There is **no test framework** configured — no test runner, no test files, no `test` script. Verify changes with `pnpm build` + `pnpm lint` and by exercising the feature in the browser.
 
@@ -148,7 +153,7 @@ There is **no `Department` model** anymore. Rich page content that used to live 
 - **The editor** (`src/app/admin/(protected)/programs/[id]/page.tsx` with `ProgramContentEditor`, `CurriculumEditor`, `ProgramLabelsEditor` in `src/components/admin/`) is a **live-preview builder**: edit content on one side, see the rendered public page on the other.
 - **Publish flow**: `POST /api/admin/programs/[id]/publish` copies `content` → `published_content`, sets `status: "published"`, bumps `version`.
 - **Slug uniqueness is per-institution.** `Program` indexes `{institution, slug}` unique, matching `Page` — three colleges can each have `computer-science`. Databases created before this change still carry the old global `slug_1` index and must drop it once: `db.programs.dropIndex("slug_1")`.
-- **Public reads** go through `src/lib/public-programs.ts` (`listPublicPrograms`, `getPublishedProgramBySlug`, `listPublishedProgramSlugs`). `listPublicPrograms` defaults `publishedOnly` to **true** — drafts are opt-out (`?published=false`), not opt-in. It was the other way round, which made every unpublished program publicly enumerable on `/api/public/programs`. These only return docs with `status: "published"` and non-null `published_content`, then run the content through `src/lib/normalize-program-data.ts` to produce the typed `ProgramData` the public pages render.
+- **Public reads** go through `src/lib/public-programs.ts` (`listPublicPrograms`, `getPublishedProgramBySlug`, `listPublishedProgramSlugs`). `listPublicPrograms` has **no** draft escape hatch — not a parameter, not a query string. Its one caller is the unauthenticated `/api/public/programs`, where any opt-out (it used to accept `?published=false`) hands anyone the full card payload for every draft and archived program: embargoed course names, slugs, seat counts, hero images. Admin previews read the `requireRole`-gated `/api/admin/programs` instead. These only return docs with `status: "published"` and non-null `published_content`, then run the content through `src/lib/normalize-program-data.ts` to produce the typed `ProgramData` the public pages render.
 
 ### Page CMS — generic standalone pages
 
@@ -161,14 +166,14 @@ Separate from Program content, the **`Page`** model (`src/lib/models/Page.ts`) b
 - **`SiteConfig`** docs are keyed by a unique `config_key`, with a draft/publish pair `value` / `published_value` and `status: "draft" | "published"`.
 - Allowed config keys are a **fixed registry** in `src/lib/validation/siteConfig.ts` (`SITE_CONFIG_SCHEMAS`) — each key maps to a Zod schema, and unknown keys are rejected. The registry has grown to ~90 keys; the individual schemas live in topic files under `src/lib/validation/` (`hero.ts`, `navbar.ts`, `floatingElements.ts`, `homeSections.ts`, `engineeringPages.ts`/`engineeringSections.ts`, `naacPage.ts`, `campusLifePage.ts`, `contentPage.ts`, `pamphlet.ts`, `upcomingEvents.ts`, `announcement.ts`, `admissions.ts`, `seo.ts`, etc.) and each contributes one or more keys to `SITE_CONFIG_SCHEMAS` — the topic file is not itself the key name. Add a new site-wide setting by adding a schema in the right topic file (or a new one) and registering it in `SITE_CONFIG_SCHEMAS`.
 - The admin "page content" pages (`(protected)/page-content/`, `(protected)/main/page-content/`, `(protected)/global/page-content/`) edit these config keys via `PageContentForms.tsx` / `PageContentShell.tsx`.
-- **Backup/restore/reset**: `GET /api/admin/site-config/backup` streams a single ZIP (site config, every `BACKUP_COLLECTIONS` collection, and — if requested — every R2 asset) straight to the response socket via `archiver`, so memory stays flat regardless of archive size (see `src/lib/backup-assets.ts`). `POST /api/admin/site-config/restore` takes the ZIP as a raw request body, spools it to a temp file, and restores everything from its central directory via `unzipper` (`src/lib/restore.ts`), reporting progress as NDJSON; pass `?mode=replace` to delete, per collection, anything not present in the archive (default `?mode=merge` only upserts). `POST /api/admin/site-config/reset` reverts a key to its seed default. This route is excluded from the `proxy.ts` matcher and enforces auth itself — see the Next.js 16 body-size note below. All are accessible from the admin Settings page.
+- **Backup/restore/reset**: `GET /api/admin/site-config/backup` streams a single ZIP (site config, every `BACKUP_COLLECTIONS` collection, and — if requested — every R2 asset) straight to the response socket via `archiver`, so memory stays flat regardless of archive size (see `src/lib/backup-assets.ts`). `POST /api/admin/site-config/restore` takes the ZIP as a raw request body, spools it to a temp file, and restores everything from its central directory via `unzipper` (`src/lib/restore.ts`), reporting progress as NDJSON; pass `?mode=replace` to delete, per collection, anything not present in the archive (default `?mode=merge` only upserts). `POST /api/admin/site-config/reset` is **not** a per-key revert: it takes no body and no key, and performs a full wipe — every `SiteConfig` document, plus every `ImageAsset`/`DocumentAsset` row and R2 object that no surviving content document still references. Content collections (Program, Page, Event, Placement, Testimonial) are left alone, which is why the asset wipe is reference-checked. Audit-logged as "Full reset"; there is no undo short of restoring a backup. The restore route is excluded from the `proxy.ts` matcher and enforces auth itself — see the Next.js 16 body-size note below. All are accessible from the admin Settings page.
 
 ### Images & documents
 
 - **Images**: uploaded via `POST /api/admin/images/upload` (FormData) → validated for mime/size → stored in R2 via `src/lib/r2.ts` → an `ImageAsset` doc records metadata (url, alt text, category, institution). If R2 env vars are absent, images fall back to local serving via `/api/public/images/[...path]` or `/api/admin/images/serve/[...key]`.
 - **Documents**: `POST /api/admin/documents/upload` handles non-image assets (e.g. prospectus/pamphlet PDFs).
-- **R2 key tracking**: `extractR2Keys(value)` in `src/lib/r2.ts` recursively walks any JSON value and collects strings that look like R2 storage keys (`images/…` or `documents/…`). Pass the collected keys to `cleanupStorageKeys(keys, context)` from `src/lib/asset-cleanup.ts` when content is deleted or replaced — it removes **both** the R2 object and its `ImageAsset`/`DocumentAsset` tracking row (deleting only the blob leaves the media library full of broken entries). It's fire-and-forget and never blocks the route response.
-- `next.config.ts` `images.remotePatterns` allowlists external hosts (unsplash, pravatar, wikimedia, companieslogo, the R2 public domain) and applies a strict CSP that sandboxes SVGs.
+- **R2 key tracking**: `extractR2Keys(value)` in `src/lib/r2.ts` recursively walks any JSON value and collects strings that look like R2 storage keys (`images/…` or `documents/…`). Pass the collected keys to `cleanupStorageKeys(keys, context)` from `src/lib/asset-cleanup.ts` when content is deleted or replaced — it removes **both** the R2 object and its `ImageAsset`/`DocumentAsset` tracking row (deleting only the blob leaves the media library full of broken entries). It's fire-and-forget and never blocks the route response. **Call it AFTER the write that dropped the reference**: before deleting anything it scans SiteConfig, Program, Page, Event, Placement and Testimonial for the key and keeps any that is still referenced, so a pre-write call would find its own document and skip. That scan is not optional — storage keys are not one-to-one with documents (the "Also apply to" control in the Life at JCT editor writes the same keys under four config entries, and any editor can reuse an asset by pasting its key).
+- `next.config.ts` `images.remotePatterns` allowlists external hosts (unsplash, wikimedia, companieslogo, the R2 public domain from `NEXT_PUBLIC_R2_PUBLIC_URL`, and `i.pravatar.cc` outside production) and applies a strict CSP that sandboxes SVGs. Do not re-add a `*.r2.dev` wildcard — that is Cloudflare's shared public-bucket domain, so it trusts every R2 bucket on the platform and turns `/_next/image` into an open image proxy.
 
 ### Caching & revalidation
 
@@ -205,17 +210,30 @@ R2_BUCKET_NAME
 NEXT_PUBLIC_R2_PUBLIC_URL
 ```
 
+Also read by this repo's code:
+
+```
+NEXT_PUBLIC_SITE_URL   # public origin; src/lib/page-nav-links.ts uses it plus
+                       # NEXTAUTH_URL to decide which absolute navbar URLs are
+                       # same-origin. Unset on a deployment where NEXTAUTH_URL
+                       # is not the public domain, and the admin page list
+                       # badges linked pages as orphans. NEXT_PUBLIC_*, so it
+                       # must be present at BUILD time, not just at runtime.
+MONGODB_MAX_POOL_SIZE  # per-instance Mongo pool (default 10)
+```
+
 ## Deployment
 
-CI is `.github/workflows/build-deploy.yml`, two jobs on a single `push` trigger (branch `v2-admin` + tags matching `v*`):
+CI is `.github/workflows/build-deploy.yml`, three jobs over `push` (branch `v3-admin` + tags matching `v*`) and `pull_request`:
 
-- **`build-and-push`** — runs on **both** branch pushes and tag pushes. Builds `docker-compose.build.yaml` (image `kavinnandha/jct:latest`) and pushes to Docker Hub. `MONGODB_URI` is injected as a BuildKit secret, build-time only.
-- **`deploy`** — gated by `if: startsWith(github.ref, 'refs/tags/v')`, so **the server is only touched when a version tag is pushed**. SSHes to the prod host as root and runs `docker compose pull && docker compose up -d --remove-orphans` against the server's copy of `docker-compose.prod.yaml`.
+- **`verify`** — runs on every trigger. `pnpm install --frozen-lockfile`, `pnpm lint:ci`, `pnpm typecheck`, `prettier --check .`. Nothing else in the pipeline lints: `next build` type-checks but Next 16 no longer runs ESLint as part of it.
+- **`build-and-push`** — `needs: verify`, and `if: github.event_name == 'push'` so pull requests verify without publishing. Builds `docker-compose.build.yaml` (image `kavinnandha/jct:latest`) and pushes to Docker Hub. `MONGODB_URI` is injected as a BuildKit secret, build-time only.
+- **`deploy`** — gated by `if: startsWith(github.ref, 'refs/tags/v')`, so **the server is only touched when a version tag is pushed**. SSHes to the prod host and runs `docker compose pull && docker compose up -d --remove-orphans` against the server's copy of `docker-compose.prod.yaml`.
 
 Consequences to keep in mind:
 
-- Pushing to `v2-admin` publishes a new `:latest` image but does **not** deploy. Releasing is a separate, deliberate act: tag `vX.Y.Z` and push the tag.
-- **The branch trigger still names `v2-admin` while work happens on `v3-admin`** — pushes to `v3-admin` build nothing. Only a `v*` tag currently produces an image and a deploy. Fix the trigger before relying on branch builds.
+- Pushing to `v3-admin` publishes a new `:latest` image but does **not** deploy. Releasing is a separate, deliberate act: tag `vX.Y.Z` and push the tag.
+- The deploy step reads `DEPLOY_HOST` (required), `DEPLOY_USER` (defaults to `root`) and `SSH_KEY` from repo secrets, falling back to `SSH_PASSWORD` while `SSH_KEY` is unset. The host address is deliberately not committed.
 - Both compose files hardcode `kavinnandha/jct:latest`, so there is no immutable per-version image — a tag deploys whatever that tag's build produced, and rollback means rebuilding. Parameterizing the image tag would need matching changes in `docker-compose.build.yaml`, `docker-compose.prod.yaml`, and the SSH script.
 - **Pushing a `v*` tag deploys to production.** Never create or push tags on your own — see Git below.
 - The reverse proxy in front of the app is **not** in this repo, but the admin backup/restore routes depend on its settings. Restore POSTs the whole ZIP as one body (currently ~7.5 GB) and backup streams a chunked ZIP out; nginx defaults (`client_max_body_size 1m`, request/response buffering on, 60s timeouts) break both. See `deploy/nginx-jct.conf.example` for the required directives.

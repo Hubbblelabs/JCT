@@ -79,10 +79,35 @@ export function consumeUploadAttempt(key: string): RateLimitResult {
   return rateLimit(`upload:${key}`, 30, 60 * 1000);
 }
 
+// Per-user upload cap that ignores client IP entirely. The (user|ip) bucket
+// above is bypassable by rotating a spoofed X-Forwarded-For, so this is the
+// real guard: 60 uploads per minute per account regardless of source.
+export function consumeUploadAttemptByUser(userKey: string): RateLimitResult {
+  return rateLimit(`upload-user:${userKey}`, 60, 60 * 1000);
+}
+
+/**
+ * Resolve the client IP from proxy headers.
+ *
+ * X-Real-IP is read FIRST because it is the only header our own reverse proxy
+ * sets from `$remote_addr` (deploy/nginx-jct.conf.example). X-Forwarded-For is
+ * set with `$proxy_add_x_forwarded_for`, which *appends* the real peer to
+ * whatever the client sent — so its left-most element is always attacker
+ * chosen. When falling back to XFF we therefore take the LAST element, which
+ * is the hop our proxy appended.
+ */
 export function clientIpFromHeaders(headers: Headers): string {
+  const real = headers.get("x-real-ip");
+  if (real) return real.trim();
+  const cf = headers.get("cf-connecting-ip");
+  if (cf) return cf.trim();
   const fwd = headers.get("x-forwarded-for");
-  if (fwd) return fwd.split(",")[0]!.trim();
-  return (
-    headers.get("x-real-ip") ?? headers.get("cf-connecting-ip") ?? "unknown"
-  );
+  if (fwd) {
+    const parts = fwd
+      .split(",")
+      .map((p) => p.trim())
+      .filter(Boolean);
+    if (parts.length > 0) return parts[parts.length - 1]!;
+  }
+  return "unknown";
 }

@@ -5,6 +5,7 @@ import { deleteFromR2 } from "@/lib/r2";
 import {
   requireRole,
   enforceAssetScope,
+  institutionReadFilter,
   json,
   badRequest,
   notFound,
@@ -13,7 +14,7 @@ import {
 import { logAudit } from "@/lib/audit";
 
 export async function GET(req: NextRequest) {
-  const { error } = await requireRole(req, "editor");
+  const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
   try {
@@ -26,7 +27,16 @@ export async function GET(req: NextRequest) {
     if (category) filter.category = category;
     if (institution) filter.institution = institution;
 
-    const docs = await ImageAsset.find(filter)
+    // Scope AFTER the client filter so it always wins, matching every other
+    // admin list GET. Without it, `?institution=engineering` handed an editor
+    // scoped to another college the full metadata — filenames, alt text,
+    // uploader emails and storage_keys, all directly fetchable — for assets
+    // the write paths on this same collection already refuse to touch.
+    // `includeShared` mirrors enforceAssetScope: the "all" pool is shared.
+    const docs = await ImageAsset.find({
+      ...filter,
+      ...institutionReadFilter(session, { includeShared: true }),
+    })
       .sort({ created_at: -1 })
       .limit(500);
     return json(docs);
@@ -39,9 +49,14 @@ export async function GET(req: NextRequest) {
 /**
  * DELETE /api/admin/images?storage_key=<key>
  *
- * Deletes an image asset by its R2 storage key. Used by the admin UI when an
- * uploaded image is removed or replaced without going through the [id] route
- * (e.g. image removed from a photo gallery slot or replaced via file picker).
+ * Deletes an image asset by its R2 storage key.
+ *
+ * NOT called from the admin UI. `ImageUploadInput.handleRemove` only cancels a
+ * `pending:` placeholder and clears local state; reclamation for an
+ * already-uploaded key happens server-side in the save route's orphan diff.
+ * This endpoint exists for manual/administrative use — the comment here used
+ * to claim the gallery-removal flow called it, which sent an auditor looking
+ * for a client-side cleanup path that has never existed.
  */
 export async function DELETE(req: NextRequest) {
   const { session, error } = await requireRole(req, "editor");

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getPublishedConfigValue } from "@/lib/site-config-server";
+import { getPublishedConfig } from "@/lib/site-config-server";
 import { GroupDetailLayout } from "@/components/layout/GroupDetailLayout";
 import { GroupsPageSchema } from "@/lib/validation";
 import type { GroupsPageValue } from "@/lib/validation";
@@ -12,10 +12,7 @@ export const revalidate = 86400;
 const EMPTY: GroupsPageValue = GroupsPageSchema.parse({});
 
 async function getData(): Promise<GroupsPageValue> {
-  const value = await getPublishedConfigValue("polytechnicCommittees");
-  return value && typeof value === "object"
-    ? (value as GroupsPageValue)
-    : EMPTY;
+  return getPublishedConfig("polytechnicCommittees", GroupsPageSchema, EMPTY);
 }
 
 export async function generateStaticParams() {

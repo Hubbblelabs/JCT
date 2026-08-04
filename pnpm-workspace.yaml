@@ -8,11 +8,17 @@ allowBuilds:
 # fixes GHSA-qx2v-qp2m-jg93. Overrides live here in pnpm 11+, not package.json.
 overrides:
   postcss@<8.5.10: ">=8.5.10"
-  # Pin sharp to the version Next 16 bundles for its image optimizer so the
-  # whole tree resolves ONE sharp + ONE libvips. Two copies (Next's 0.34.5 +
-  # a direct 0.35.x) made the /api/admin/images/upload binding dlopen a
-  # libvips .so that Vercel's Next file-tracing never bundled:
+  # Pin sharp so the whole tree resolves ONE sharp + ONE libvips. Two copies
+  # (Next's own + a different direct one) made the
+  # /api/admin/images/upload binding dlopen a libvips .so that Next's file
+  # tracing never bundled:
   # "ERR_DLOPEN_FAILED: libvips-cpp.so.8.18.3: cannot open shared object file".
-  sharp: 0.34.5
+  #
+  # 0.35.x rather than the 0.34.5 Next declares (`sharp: ^0.34.5`, an optional
+  # dep): everything below 0.35.0 ships a libvips with CVE-2026-33327/33328/
+  # 35590/35591. The override is what keeps it single-copy despite the range
+  # mismatch. If the image optimizer ever fails to load its binding again,
+  # this pin is the first thing to look at.
+  sharp: 0.35.3
 minimumReleaseAgeExclude:
   - postcss@8.5.21

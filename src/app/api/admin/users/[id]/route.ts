@@ -58,10 +58,28 @@ export async function PATCH(
     const target = await User.findById(id).lean<{
       _id: unknown;
       role: string;
+      institution?: string;
       is_active: boolean;
       email: string;
     } | null>();
     if (!target) return notFound("User not found");
+
+    // The schema's editor+"all" rule can only see the payload, so a role-only
+    // demotion slipped past it: admins are stored with institution "all", and
+    // `update.institution` below is skipped when the body omits one — leaving
+    // `{role: "editor", institution: "all"}`, exactly the state the rule
+    // forbids. Such an account is 403'd on every scoped write and reads back
+    // an empty CMS with no explanation. Decide on the RESULTING document.
+    const nextRole = body.role ?? target.role;
+    const nextInstitution =
+      nextRole === "admin"
+        ? "all"
+        : (body.institution ?? target.institution ?? "");
+    if (nextRole === "editor" && nextInstitution === "all") {
+      return badRequest(
+        "Editors must be assigned to a specific college — send `institution` alongside `role`",
+      );
+    }
 
     // Self-modification guards: an admin cannot demote themselves or
     // deactivate themselves — those changes must come from another admin

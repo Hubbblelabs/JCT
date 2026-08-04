@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getPublishedConfigValue } from "@/lib/site-config-server";
 import { CampusLifePageLayout } from "@/components/layout/CampusLifePageLayout";
-import type { CampusLifePageValue } from "@/lib/validation";
+import { CampusLifePageSchema } from "@/lib/validation";
 import type { Metadata } from "next";
 import { seoMetadata } from "@/lib/seo";
 
@@ -24,5 +24,16 @@ export default async function CampusLifePage() {
 
   if (!value || typeof value !== "object") return notFound();
 
-  return <CampusLifePageLayout data={value as CampusLifePageValue} />;
+  // Validate rather than cast: the layout dereferences nested arrays, so a
+  // partial or hand-edited document would 500 the page instead of 404ing.
+  const parsed = CampusLifePageSchema.safeParse(value);
+  if (!parsed.success) {
+    console.error(
+      "[campus-life] stored value failed validation:",
+      parsed.error.issues.slice(0, 5),
+    );
+    return notFound();
+  }
+
+  return <CampusLifePageLayout data={parsed.data} />;
 }

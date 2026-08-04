@@ -20,6 +20,28 @@ const store = new Map<string, Entry>();
 
 const DEFAULT_TTL_MS = 60 * 60 * 1000; // 1h, mirrors the intended ISR window
 
+// Hard cap on retained entries. Cache keys are built from query params on
+// unauthenticated routes, so without a bound an anonymous client can mint an
+// unbounded number of never-read-again entries and exhaust the container's
+// heap. Insertion order in a Map is stable, so the first key is the oldest.
+const MAX_ENTRIES = 2000;
+
+// Sweep expired entries every minute, mirroring src/lib/rate-limit.ts — lazy
+// expiry alone only reclaims a key when that exact key is read again, which
+// never happens for one-shot attacker-generated keys.
+let sweepHandle: ReturnType<typeof setInterval> | null = null;
+function ensureSweeper() {
+  if (sweepHandle) return;
+  sweepHandle = setInterval(() => {
+    const now = Date.now();
+    for (const [k, e] of store) {
+      if (e.expiresAt <= now) store.delete(k);
+    }
+  }, 60_000);
+  // Don't keep the event loop alive just for the sweeper.
+  if (typeof sweepHandle.unref === "function") sweepHandle.unref();
+}
+
 export function publicCacheGet<T>(key: string): T | undefined {
   const entry = store.get(key);
   if (!entry) return undefined;
@@ -27,6 +49,9 @@ export function publicCacheGet<T>(key: string): T | undefined {
     store.delete(key);
     return undefined;
   }
+  // Re-insert so hot keys move to the back and survive eviction.
+  store.delete(key);
+  store.set(key, entry);
   return entry.value as T;
 }
 
@@ -35,7 +60,14 @@ export function publicCacheSet(
   value: unknown,
   ttlMs = DEFAULT_TTL_MS,
 ): void {
+  ensureSweeper();
+  store.delete(key);
   store.set(key, { value, expiresAt: Date.now() + ttlMs });
+  while (store.size > MAX_ENTRIES) {
+    const oldest = store.keys().next();
+    if (oldest.done) break;
+    store.delete(oldest.value);
+  }
 }
 
 /**

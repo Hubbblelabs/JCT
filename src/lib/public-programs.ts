@@ -127,29 +127,32 @@ function asCard(doc: ProgramLean): PublicProgramCard {
   };
 }
 
-function publishedQuery(publishedOnly: boolean): Record<string, unknown> {
-  if (!publishedOnly) return {};
-  return {
-    status: "published",
-    published_content: { $exists: true, $ne: null },
-  };
-}
+/** The published-content gate every public read shares. */
+const PUBLISHED_QUERY = {
+  status: "published",
+  published_content: { $exists: true, $ne: null },
+} as const;
 
+/**
+ * Published rows only, with no opt-out parameter.
+ *
+ * The one caller is the unauthenticated /api/public/programs route, so a
+ * caller-controlled "include drafts" flag is an enumeration hole for embargoed
+ * course names, seat counts and hero images — which is exactly what it was
+ * before. Admin previews read the requireRole-gated /api/admin/programs.
+ */
 export async function listPublicPrograms({
   institution,
   degree,
-  // Safe-by-default: a caller that forgets this flag gets published rows only.
-  publishedOnly = true,
 }: {
   institution?: string | null;
   degree?: string | null;
-  publishedOnly?: boolean;
 }): Promise<PublicProgramCard[]> {
   await connectDB();
 
   const query: Record<string, unknown> = {
     is_active: true,
-    ...publishedQuery(publishedOnly),
+    ...PUBLISHED_QUERY,
   };
   if (institution) query.institution = institution;
   if (degree) query.degree = degree;
@@ -177,7 +180,7 @@ export async function listPublishedProgramSlugs(
     const docs = await Program.find({
       institution,
       is_active: true,
-      ...publishedQuery(true),
+      ...PUBLISHED_QUERY,
     })
       .select("slug")
       .sort({ sort_order: 1, name: 1 })
@@ -210,7 +213,7 @@ export async function getPublishedProgramBySlug({
     slug,
     institution,
     is_active: true,
-    ...publishedQuery(true),
+    ...PUBLISHED_QUERY,
   })
     .select(
       "name abbr slug institution degree duration seats image highlight description outcomes accreditations sort_order status version published_at published_content",

@@ -105,25 +105,50 @@ function PageContentShellInner({ pageTitle, pageSubtitle, sections }: Props) {
   const { flush } = useDeferredUploads();
   const section = sections.find((s) => s.id === selected);
 
+  /** Re-read one config key without discarding the other sections' drafts. */
+  const reloadKey = async (configKey: string) => {
+    const r = await fetch(
+      `/api/admin/site-config?key=${encodeURIComponent(configKey)}`,
+    );
+    if (!r.ok) return;
+    const data: { config_key: string; value: unknown }[] = await r.json();
+    const found = data.find((d) => d.config_key === configKey);
+    if (!found) return;
+    setValues((prev) => ({ ...prev, [configKey]: found.value }));
+  };
+
   const save = async () => {
     if (!section || section.kind !== "form" || !section.configKey) return;
     setSaving(true);
     setMsg(null);
     setApiError(null);
     try {
-      const flushedValue = await flush(values[section.configKey] ?? null);
-      setValues((prev) => ({ ...prev, [section.configKey!]: flushedValue }));
+      // Flush the WHOLE values map, not just the active section.
+      //
+      // One DeferredUploadsProvider spans every section and `values` keeps
+      // every section's draft across switches, but `flush` drops any pending
+      // placeholder it cannot find in the value it is handed — so flushing one
+      // section destroyed files picked in another and left that draft holding a
+      // dead `pending:` string. A file picked elsewhere now uploads here and
+      // its draft keeps a real key; it is referenced by nothing until that
+      // section is saved, which is the same state any not-yet-saved upload is
+      // in.
+      const flushedAll = (await flush(values)) as Record<string, unknown>;
+      setValues(flushedAll);
       const r = await fetch("/api/admin/site-config", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           config_key: section.configKey,
-          value: flushedValue,
+          value: flushedAll[section.configKey] ?? null,
         }),
       });
       if (r.ok) {
         setMsg({ kind: "ok", text: "Saved!" });
-        await load();
+        // Refresh only the key that was written — a full `load()` here
+        // overwrote `values` wholesale and silently wiped every other
+        // section's unsaved edits.
+        await reloadKey(section.configKey);
       } else {
         const parsed = await parseApiError(r);
         setApiError(parsed);
@@ -208,13 +233,18 @@ function PageContentShellInner({ pageTitle, pageSubtitle, sections }: Props) {
               </div>
             )}
 
+            {/* Custom sections own their save button and flush only their own
+                value, so they get their own pending-upload map. Sharing the
+                shell's provider meant their save revoked and dropped files
+                picked in any other section — `flush` discards every
+                placeholder it can't find in the value it is handed. */}
             {!loading && section?.kind === "custom" && section.customRender && (
-              <>
+              <DeferredUploadsProvider key={section.id}>
                 <h2 className="mb-4 font-semibold text-gray-800">
                   {section.label}
                 </h2>
                 {section.customRender()}
-              </>
+              </DeferredUploadsProvider>
             )}
 
             {!loading &&

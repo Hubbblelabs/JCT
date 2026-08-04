@@ -132,7 +132,8 @@ export async function POST(req: NextRequest) {
 
   await connectDB();
 
-  const mode = req.nextUrl.searchParams.get("mode") === "replace" ? "replace" : "merge";
+  const mode =
+    req.nextUrl.searchParams.get("mode") === "replace" ? "replace" : "merge";
   const userEmail = session!.user?.email ?? "";
   const encoder = new TextEncoder();
   const reqBody = req.body;
@@ -199,7 +200,9 @@ export async function POST(req: NextRequest) {
         const manifest = manifestEntry
           ? ((await readJson(manifestEntry)) as { version?: unknown } | null)
           : null;
-        const archiveVersion = Number.parseFloat(String(manifest?.version ?? ""));
+        const archiveVersion = Number.parseFloat(
+          String(manifest?.version ?? ""),
+        );
         const canPruneEmpty =
           Number.isFinite(archiveVersion) &&
           archiveVersion >= EMPTY_PRUNE_MIN_VERSION;

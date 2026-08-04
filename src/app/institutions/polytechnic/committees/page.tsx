@@ -1,4 +1,4 @@
-import { getPublishedConfigValue } from "@/lib/site-config-server";
+import { getPublishedConfig } from "@/lib/site-config-server";
 import { GroupsPageLayout } from "@/components/layout/GroupsPageLayout";
 import { GroupsPageSchema } from "@/lib/validation";
 import type { GroupsPageValue } from "@/lib/validation";
@@ -20,9 +20,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PolytechnicCommitteesPage() {
-  const value = await getPublishedConfigValue("polytechnicCommittees");
-  const data =
-    value && typeof value === "object" ? (value as GroupsPageValue) : DEFAULT;
+  const data = await getPublishedConfig(
+    "polytechnicCommittees",
+    GroupsPageSchema,
+    DEFAULT,
+  );
   return (
     <GroupsPageLayout
       data={data}

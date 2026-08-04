@@ -1,4 +1,4 @@
-import { getPublishedConfigValue } from "@/lib/site-config-server";
+import { getPublishedConfig } from "@/lib/site-config-server";
 import { AboutPageLayout } from "@/components/layout/AboutPageLayout";
 import { ArtsScienceAboutSchema } from "@/lib/validation";
 import type { AboutPageValue } from "@/lib/validation";
@@ -10,8 +10,10 @@ const DEFAULT: AboutPageValue = ArtsScienceAboutSchema.parse(
 ) as AboutPageValue;
 
 export default async function ArtsScienceAboutPage() {
-  const value = await getPublishedConfigValue("artsScienceAbout");
-  const data =
-    value && typeof value === "object" ? (value as AboutPageValue) : DEFAULT;
+  const data = await getPublishedConfig(
+    "artsScienceAbout",
+    ArtsScienceAboutSchema,
+    DEFAULT,
+  );
   return <AboutPageLayout data={data} institution="arts-science" />;
 }

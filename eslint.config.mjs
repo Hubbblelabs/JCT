@@ -2,6 +2,36 @@ import js from "@eslint/js";
 import prettier from "eslint-config-prettier/flat";
 import tseslint from "typescript-eslint";
 import reactHooks from "eslint-plugin-react-hooks";
+import nextConfig from "eslint-config-next";
+
+/**
+ * The `@next/next` rules out of eslint-config-next — no-html-link-for-pages,
+ * no-sync-scripts, no-img-element, no-head-import-in-document, and the rest.
+ * They were never wired in, so `eslint-config-next` sat in package.json
+ * version-pinned to Next itself while none of its rules ran and `pnpm lint:ci`
+ * exited clean on coverage it did not have.
+ *
+ * Only the plugin and its own rules are lifted out. The shipped entry also
+ * carries a `languageOptions.parser` that ESLint 10 rejects with
+ * "scopeManager.addGlobals is not a function", plus typescript-eslint / react /
+ * import / jsx-a11y presets that would duplicate the ones configured below.
+ */
+const nextEntry = nextConfig.find(
+  (entry) => entry?.plugins && "@next/next" in entry.plugins,
+);
+const nextPluginConfigs = nextEntry
+  ? [
+      {
+        files: ["**/*.{js,jsx,mjs,cjs,ts,tsx}"],
+        plugins: { "@next/next": nextEntry.plugins["@next/next"] },
+        rules: Object.fromEntries(
+          Object.entries(nextEntry.rules ?? {}).filter(([rule]) =>
+            rule.startsWith("@next/next/"),
+          ),
+        ),
+      },
+    ]
+  : [];
 
 export default [
   { ignores: ["dist", ".next", "node_modules", "out", "build"] },
@@ -42,6 +72,9 @@ export default [
 
   // TypeScript ESLint rules
   ...tseslint.configs.recommended,
+
+  // Next.js rules (@next/next/*)
+  ...nextPluginConfigs,
 
   // React Hooks plugin
   {

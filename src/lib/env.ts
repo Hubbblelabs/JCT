@@ -14,7 +14,20 @@ import { z } from "zod";
  * running server (`next start` / `next dev`) still refuses to boot.
  */
 
-const SECRET_PLACEHOLDER = "replace-with-32-byte-random-string";
+/**
+ * Values that must never be accepted as a real secret.
+ *
+ * A single constant drifted out of sync with `.env.example` once already: the
+ * guard checked a string the repo never shipped, and the shipped placeholder
+ * was caught only by accident (it is 31 characters, one short of the `.min(32)`
+ * check). A set survives edits to either file — add to it, never replace it.
+ */
+const SECRET_PLACEHOLDERS = new Set([
+  "your-random-32-char-secret-here",
+  "replace-with-32-byte-random-string",
+  "changeme",
+  "secret",
+]);
 
 const EnvSchema = z.object({
   MONGODB_URI: z
@@ -28,7 +41,7 @@ const EnvSchema = z.object({
     .string()
     .min(32, "NEXTAUTH_SECRET must be at least 32 characters")
     .refine(
-      (v) => v !== SECRET_PLACEHOLDER,
+      (v) => !SECRET_PLACEHOLDERS.has(v.trim()),
       "NEXTAUTH_SECRET is still the placeholder value — generate one with: openssl rand -base64 32",
     ),
   NEXTAUTH_URL: z.url("NEXTAUTH_URL must be an absolute URL").optional(),

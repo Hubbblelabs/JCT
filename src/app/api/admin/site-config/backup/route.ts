@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Readable } from "stream";
 import { ZipArchive, type Archiver } from "archiver";
+import type { mongo } from "mongoose";
 import { connectDB } from "@/lib/mongodb";
 import { SiteConfig, ImageAsset, DocumentAsset } from "@/lib/models";
 import { requireRole, serverError } from "@/lib/api-helpers";
@@ -73,6 +74,37 @@ function appendEntry(
 
 const appendJson = (archive: Archiver, name: string, value: unknown) =>
   appendEntry(archive, JSON.stringify(value, null, 2), name, false);
+
+/**
+ * Append a collection as a JSON array WITHOUT buffering it.
+ *
+ * `find({}).toArray()` plus `JSON.stringify(rows, null, 2)` held the whole
+ * collection twice — once as documents, once as an indented string — which
+ * contradicts this route's flat-memory guarantee and, past V8's ~512 MB string
+ * cap, throws `RangeError: Invalid string length` and ships a truncated ZIP
+ * under HTTP 200. `programs` and `pages` carry two Mixed rich-content blobs
+ * each, so they are exactly the collections that get there first.
+ *
+ * Returns the document count, so the manifest (written after this loop) still
+ * records it.
+ */
+async function appendCollection(
+  archive: Archiver,
+  name: string,
+  cursor: mongo.FindCursor<Record<string, unknown>>,
+): Promise<number> {
+  let count = 0;
+  async function* chunks(): AsyncGenerator<string> {
+    yield "[";
+    for await (const doc of cursor) {
+      yield (count === 0 ? "\n" : ",\n") + JSON.stringify(serializeDoc(doc));
+      count += 1;
+    }
+    yield "\n]\n";
+  }
+  await appendEntry(archive, Readable.from(chunks()), name, false);
+  return count;
+}
 
 type OpenedAsset =
   { key: string; stream: Readable } | { key: string; stream: null };
@@ -261,9 +293,13 @@ export async function GET(req: NextRequest) {
       const db = mongoose.connection.db;
       if (!db) throw new Error("No database connection");
       for (const col of BACKUP_COLLECTIONS) {
-        let rows: Record<string, unknown>[];
         try {
-          rows = await db.collection(col.name).find({}).toArray();
+          // Streamed from a cursor, not buffered — see appendCollection.
+          collectionCounts[col.name] = await appendCollection(
+            archive,
+            `collections/${col.name}.json`,
+            db.collection(col.name).find({}),
+          );
         } catch (err) {
           // MUST NOT fall back to an empty array. An archive cannot
           // distinguish "this collection was empty" from "we failed to read
@@ -275,12 +311,6 @@ export async function GET(req: NextRequest) {
           console.error(`[backup] Could not read collection ${col.name}:`, err);
           throw err;
         }
-        collectionCounts[col.name] = rows.length;
-        await appendJson(
-          archive,
-          `collections/${col.name}.json`,
-          rows.map(serializeDoc),
-        );
       }
 
       // Asset metadata precedes the binaries on purpose: a streaming restore

@@ -2,6 +2,7 @@
 
 import {
   useEffect,
+  useId,
   useMemo,
   useRef,
   useState,
@@ -417,7 +418,13 @@ function PlacementSideNav({
               <button
                 key={it.id}
                 type="button"
-                onClick={() => onNavigate(it.anchor)}
+                // Picking a section must scroll the preview, not open the
+                // sidebar inspector this nav sits inside — matching
+                // SectionNavEntry in SectionedPageShell.
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onNavigate(it.anchor);
+                }}
                 className={cls}
               >
                 <Icon size={16} className={iconCls} />
@@ -546,6 +553,12 @@ function PastYearSelect({
   const [dropUp, setDropUp] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  // Focus never leaves the trigger, so the highlighted option has to be
+  // announced through aria-activedescendant — otherwise arrowing through the
+  // list is silent to a screen reader and Enter commits a year the user was
+  // never told about.
+  const listId = useId();
+  const optionId = (recordId: string) => `${listId}-opt-${recordId}`;
 
   const selectedIdx = records.findIndex((r) => r._id === selectedId);
   const selected = selectedIdx >= 0 ? records[selectedIdx] : null;
@@ -632,6 +645,12 @@ function PastYearSelect({
         onClick={() => (open ? setOpen(false) : openPanel())}
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-controls={listId}
+        aria-activedescendant={
+          open && records[activeIndex]
+            ? optionId(records[activeIndex]._id)
+            : undefined
+        }
         className={`group flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all ${
           selected
             ? "border-accent/40 bg-accent/10 text-accent"
@@ -661,6 +680,7 @@ function PastYearSelect({
       <AnimatePresence>
         {open && (
           <motion.ul
+            id={listId}
             role="listbox"
             aria-label="Past years"
             initial={{ opacity: 0, y: dropUp ? 6 : -6, scale: 0.98 }}
@@ -676,35 +696,40 @@ function PastYearSelect({
               const isSelected = r._id === selectedId;
               const isActive = i === activeIndex;
               return (
-                <li key={r._id} role="option" aria-selected={isSelected}>
-                  <button
-                    type="button"
-                    onClick={() => commit(i)}
-                    onMouseEnter={() => setActiveIndex(i)}
-                    className={`flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
-                      isSelected
-                        ? "bg-accent/10 text-accent"
-                        : isActive
-                          ? "text-navy bg-stone-100"
-                          : "text-navy"
-                    }`}
-                  >
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-sm font-semibold">
-                        {r.year}
-                      </span>
-                      {r.placement_percentage > 0 && (
-                        <span className="block text-[11px] text-stone-400">
-                          {r.placement_percentage}% placed
-                          {r.students_placed > 0 &&
-                            ` · ${r.students_placed} students`}
-                        </span>
-                      )}
+                // The option IS the interactive element. It used to wrap a
+                // <button>, which both gave role="option" an interactive
+                // descendant (forbidden) and put every year in the tab order
+                // of a widget driven entirely from the trigger.
+                <li
+                  key={r._id}
+                  id={optionId(r._id)}
+                  role="option"
+                  aria-selected={isSelected}
+                  onClick={() => commit(i)}
+                  onMouseEnter={() => setActiveIndex(i)}
+                  className={`flex w-full cursor-pointer items-center gap-2.5 rounded-lg px-2.5 py-2 text-left transition-colors ${
+                    isSelected
+                      ? "bg-accent/10 text-accent"
+                      : isActive
+                        ? "text-navy bg-stone-100"
+                        : "text-navy"
+                  }`}
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-semibold">
+                      {r.year}
                     </span>
-                    {isSelected && (
-                      <Check size={15} className="text-accent shrink-0" />
+                    {r.placement_percentage > 0 && (
+                      <span className="block text-[11px] text-stone-400">
+                        {r.placement_percentage}% placed
+                        {r.students_placed > 0 &&
+                          ` · ${r.students_placed} students`}
+                      </span>
                     )}
-                  </button>
+                  </span>
+                  {isSelected && (
+                    <Check size={15} className="text-accent shrink-0" />
+                  )}
                 </li>
               );
             })}
@@ -742,6 +767,7 @@ function BannerImage({
   const url = isPending ? null : getImageUrl(src);
 
   if (pendingPreview) {
+    // eslint-disable-next-line @next/next/no-img-element -- a deferred upload's preview is a local blob: URL, which /_next/image cannot fetch or optimize.
     return <img src={pendingPreview} alt={alt} className="h-auto w-full" />;
   }
 
@@ -803,6 +829,17 @@ function BannerSection({
 }: { data: PlacementInfoValue["banner"] } & EditProps) {
   const images = data.images.filter((img) => img.image);
   const [activeIndex, setActiveIndex] = useState(0);
+  // WCAG 2.2.2 (Level A): auto-updating content needs a way to pause, stop or
+  // hide it.
+  //
+  // Two separate states on purpose. `hovering` is transient (pointer or
+  // keyboard focus inside the carousel) and must not be what the toggle
+  // writes — sharing one flag means clicking Pause while the pointer is over
+  // the button flips the hover-set `true` back to `false` and the slideshow
+  // resumes under the cursor. `userPaused` is the explicit, sticky choice.
+  const [hovering, setHovering] = useState(false);
+  const [userPaused, setUserPaused] = useState(false);
+  const [reducedMotion, setReducedMotion] = useState(false);
   const activeImage = images[activeIndex] ?? images[0];
   const hasMultipleImages = images.length > 1;
 
@@ -813,14 +850,25 @@ function BannerSection({
   }, [images.length]);
 
   useEffect(() => {
-    if (!hasMultipleImages) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const sync = () => setReducedMotion(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const autoplayRunning =
+    hasMultipleImages && !hovering && !userPaused && !reducedMotion;
+
+  useEffect(() => {
+    if (!autoplayRunning) return;
 
     const timer = window.setInterval(() => {
       setActiveIndex((index) => (index + 1) % images.length);
     }, BANNER_CAROUSEL_INTERVAL_MS);
 
     return () => window.clearInterval(timer);
-  }, [hasMultipleImages, images.length]);
+  }, [autoplayRunning, images.length]);
 
   const stepSlide = (
     direction: "previous" | "next",
@@ -868,9 +916,38 @@ function BannerSection({
         <EmptyHint>Click to upload a banner image</EmptyHint>
       )}
       {activeImage && (
-        <div className="relative">
+        <div
+          className="relative"
+          // Reading a caption must not be cut short at 4s. Hover and focus
+          // both suspend the timer; it resumes when the pointer/focus leaves,
+          // unless the visitor pressed Pause.
+          onMouseEnter={() => setHovering(true)}
+          onMouseLeave={() => setHovering(false)}
+          onFocusCapture={() => setHovering(true)}
+          onBlurCapture={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget as Node)) {
+              setHovering(false);
+            }
+          }}
+        >
           {hasMultipleImages && (
             <div className="mb-4 flex justify-end gap-2">
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setUserPaused((p) => !p);
+                }}
+                aria-label={
+                  userPaused
+                    ? "Play placement highlight slideshow"
+                    : "Pause placement highlight slideshow"
+                }
+                aria-pressed={userPaused}
+                className="border-border text-navy hover:border-gold/30 hover:text-gold inline-flex h-10 items-center justify-center gap-1.5 rounded-full border bg-white px-3.5 text-xs font-semibold shadow-sm transition-colors"
+              >
+                {userPaused ? "Play" : "Pause"}
+              </button>
               <button
                 type="button"
                 onClick={(event) => stepSlide("previous", event)}
@@ -932,7 +1009,10 @@ function BannerSection({
           </div>
 
           {hasMultipleImages && (
+            // A bare <div> maps to `generic`, and ARIA forbids naming generic
+            // elements — the label was being dropped, not announced.
             <div
+              role="group"
               className="mt-4 flex justify-center gap-2"
               aria-label="Placement highlight slides"
             >
@@ -1788,7 +1868,15 @@ function yearSortKey(year: string): number {
  * (an intro, say) always shows.
  *
  * In the editor nothing is filtered: block inspector keys are indexes into this
- * list, and a block hidden from the preview could not be clicked to edit.
+ * list, and a block hidden from the preview could not be clicked to edit. The
+ * editor shows a badge instead when the public page would show fewer.
+ *
+ * Fails OPEN. Album titles and Placement record years are authored on two
+ * different admin screens with no shared convention — records read "2024-2025"
+ * while an album may read "Class of 2025" — so a mismatch is entirely possible.
+ * Failing closed made the whole gallery section, its sidebar entry and the
+ * `/placements/gallery` redirect target disappear with no warning anywhere; an
+ * unfiltered gallery is a far better wrong answer than a missing one.
  */
 function galleryForYear(
   gallery: ContentPageValue | null,
@@ -1796,15 +1884,17 @@ function galleryForYear(
 ): ContentPageValue | null {
   if (!gallery) return null;
   const target = yearSortKey(year);
+  // `blocks` can be absent on a value that failed schema validation upstream.
+  const all = gallery.blocks ?? [];
   if (target < 0) return gallery;
-  const blocks = gallery.blocks.filter((b) => {
+  const blocks = all.filter((b) => {
     // Compare the *first* year in the label, not any of them: "2023-2024" and
     // "2024-2025" both contain 2024, and matching on either would publish two
     // years' albums at once.
     const blockYear = yearSortKey(b.title ?? "");
     return blockYear < 0 || blockYear === target;
   });
-  return { ...gallery, blocks };
+  return blocks.length > 0 ? { ...gallery, blocks } : gallery;
 }
 
 /**
@@ -1947,10 +2037,20 @@ function PlacementHistory({
                       className={`px-4 py-3 text-right whitespace-nowrap ${
                         c.has(r)
                           ? "text-navy font-semibold"
-                          : "text-stone-300 font-normal"
+                          : // stone-300 on white is ~1.5:1, far under the
+                            // 4.5:1 WCAG 1.4.3 minimum — and the dash is the
+                            // only thing saying "no figure for this year".
+                            "font-normal text-stone-500"
                       }`}
                     >
-                      {c.has(r) ? c.format(r) : "—"}
+                      {c.has(r) ? (
+                        c.format(r)
+                      ) : (
+                        <>
+                          <span aria-hidden="true">—</span>
+                          <span className="sr-only">Not recorded</span>
+                        </>
+                      )}
                     </td>
                   ))}
                 </tr>
@@ -2016,11 +2116,23 @@ export function PlacementsPageLayout({
 
   // Only the selected year's photographs are published; the editor keeps every
   // block so each one stays clickable.
-  const visibleGallery = useMemo(
-    () =>
-      editable ? gallery : galleryForYear(gallery ?? null, active?.year ?? ""),
-    [gallery, editable, active],
+  const filteredGallery = useMemo(
+    () => galleryForYear(gallery ?? null, active?.year ?? ""),
+    [gallery, active],
   );
+  const visibleGallery = editable ? (gallery ?? null) : filteredGallery;
+
+  // What the public page would show for the selected year, surfaced in the
+  // editor — otherwise an admin sees every album in the preview and has no way
+  // to tell that visitors see a subset (or, when titles don't carry the year,
+  // all of them regardless of the year picker).
+  const galleryFilterNote = useMemo(() => {
+    if (!editable || !gallery) return null;
+    const total = gallery.blocks?.length ?? 0;
+    const shown = filteredGallery?.blocks?.length ?? 0;
+    if (total === 0 || shown === total) return null;
+    return { shown, total, year: active?.year ?? "" };
+  }, [editable, gallery, filteredGallery, active]);
 
   // A built-in nav entry only appears once its section actually has content —
   // an empty MoU list or a college with no placement records must not leave a
@@ -2314,10 +2426,21 @@ export function PlacementsPageLayout({
                             "Placement Gallery"
                           }
                           meta={
-                            !editable && active ? `${active.year} photos` : undefined
+                            !editable && active
+                              ? `${active.year} photos`
+                              : undefined
                           }
                         />
                       </EditableRegion>
+                      {galleryFilterNote && (
+                        <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
+                          Editing view shows all {galleryFilterNote.total}{" "}
+                          albums. Visitors who select{" "}
+                          {galleryFilterNote.year || "this year"} see{" "}
+                          {galleryFilterNote.shown} — an album is matched to a
+                          year by the first four-digit number in its title.
+                        </p>
+                      )}
                       <ContentPageBody
                         data={visibleGallery}
                         editable={editable && !!gallerySlug}

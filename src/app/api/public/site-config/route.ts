@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { SiteConfig } from "@/lib/models";
 import { publicCacheGet, publicCacheSet } from "@/lib/public-cache";
+import { isKnownSiteConfigKey } from "@/lib/validation/siteConfig";
 
 // Reading query params makes this handler dynamic, so route-level ISR
 // (`export const revalidate`) does not apply — responses are instead served
@@ -40,7 +41,19 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const key = searchParams.get("key");
 
-  const cacheKey = `site-config:${key ?? "*"}`;
+  // Unknown keys are answered without a database read and without a cache
+  // entry: the key is arbitrary caller text, so caching it would let anyone
+  // grow the in-memory store one permanent entry per request.
+  if (key !== null && !isKnownSiteConfigKey(key)) {
+    return NextResponse.json({
+      source: "empty",
+      data: null,
+    } satisfies Envelope);
+  }
+
+  // JSON-encoded so a key literally named "*" can't collide with the
+  // whole-config-map response served when no key is supplied.
+  const cacheKey = JSON.stringify(["site-config", key]);
   const cached = publicCacheGet<Envelope>(cacheKey);
   if (cached) return NextResponse.json(cached);
 

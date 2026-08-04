@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getPublishedConfigValue } from "@/lib/site-config-server";
+import { getPublishedConfig } from "@/lib/site-config-server";
 import { seoMetadata } from "@/lib/seo";
 import { AboutPageLayout } from "@/components/layout/AboutPageLayout";
 import type { AboutPageValue } from "@/lib/validation";
@@ -57,12 +57,11 @@ const DEFAULT_MAIN_ABOUT: AboutPageValue = MainAboutSchema.parse({
 }) as AboutPageValue;
 
 export default async function MainAboutPage() {
-  const value = await getPublishedConfigValue("mainAbout");
-
-  const data =
-    value && typeof value === "object"
-      ? (value as AboutPageValue)
-      : DEFAULT_MAIN_ABOUT;
+  const data = await getPublishedConfig(
+    "mainAbout",
+    MainAboutSchema,
+    DEFAULT_MAIN_ABOUT,
+  );
 
   return <AboutPageLayout data={data} institution="main" />;
 }

@@ -2,7 +2,8 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Check, Loader2, Save, X, ExternalLink } from "lucide-react";
+import { ArrowLeft, Check, Loader2, Save, ExternalLink } from "lucide-react";
+import { InspectorOverlay } from "@/components/admin/InspectorOverlay";
 import {
   DeferredUploadsProvider,
   useDeferredUploads,
@@ -229,52 +230,33 @@ function LivePageEditorInner<T>({
       )}
 
       {inspectorOpen && draft && (
-        <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 p-0 sm:p-4">
-          {/* Wide enough for the two-column form grid the inspectors use. */}
-          <aside className="flex h-full w-full flex-col overflow-y-auto bg-white shadow-2xl sm:max-w-3xl sm:rounded-xl">
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
-              <div>
-                <p className="text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">
-                  Inspector
-                </p>
-                <h2 className="mt-0.5 font-semibold text-gray-900">
-                  {hostedInspectorTitle(selected, hostedDefs, hosted) ??
-                    sectionTitle?.(selected, draft) ??
-                    sectionLabels[selected] ??
-                    "Section"}
-                </h2>
-              </div>
-              <button
-                onClick={() => setInspectorOpen(false)}
-                className="admin-btn admin-btn-outline admin-btn-sm shrink-0"
-              >
-                <X size={14} />
-                <span className="sr-only">Close inspector</span>
-              </button>
-            </div>
-            <div className="p-6">
-              {selected.startsWith("hosted:") ? (
-                <HostedInspector
-                  sectionKey={selected}
-                  defs={hostedDefs}
-                  drafts={hosted}
-                  onChange={setHostedDraft}
-                  onSelectSection={setSelected}
-                />
-              ) : (
-                renderInspector({
-                  section: selected,
-                  data: draft,
-                  onChange: setDraft,
-                  onSelectSection: setSelected,
-                })
-              )}
-            </div>
-            <div className="sticky bottom-0 mt-auto border-t border-gray-100 bg-white px-6 py-3">
-              {saveButtons(true)}
-            </div>
-          </aside>
-        </div>
+        <InspectorOverlay
+          title={
+            hostedInspectorTitle(selected, hostedDefs, hosted) ??
+            sectionTitle?.(selected, draft) ??
+            sectionLabels[selected] ??
+            "Section"
+          }
+          onClose={() => setInspectorOpen(false)}
+          footer={saveButtons(true)}
+        >
+          {selected.startsWith("hosted:") ? (
+            <HostedInspector
+              sectionKey={selected}
+              defs={hostedDefs}
+              drafts={hosted}
+              onChange={setHostedDraft}
+              onSelectSection={setSelected}
+            />
+          ) : (
+            renderInspector({
+              section: selected,
+              data: draft,
+              onChange: setDraft,
+              onSelectSection: setSelected,
+            })
+          )}
+        </InspectorOverlay>
       )}
     </div>
   );

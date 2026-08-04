@@ -7,9 +7,14 @@ export type RevalidateTarget =
 
 // Per-institution page lists, composed into "all-institutions" below so a page
 // added to one institution can't drift out of the site-wide target.
+// NOTE: `/institutions/<inst>/programs` is NOT a route — only
+// `programs/[slug]/` exists under it, and `revalidatePath` on a path with no
+// page is a silent no-op. The page that actually lists programs is
+// `/courses`, which is what these lists carry.
 const ENGINEERING_PATHS = [
   "/institutions/engineering",
-  "/institutions/engineering/programs",
+  "/institutions/engineering/courses",
+  "/institutions/engineering/events",
   "/institutions/engineering/about",
   "/institutions/engineering/coe",
   "/institutions/engineering/placements",
@@ -28,7 +33,8 @@ const ENGINEERING_PATHS = [
 
 const ARTS_SCIENCE_PATHS = [
   "/institutions/arts-science",
-  "/institutions/arts-science/programs",
+  "/institutions/arts-science/courses",
+  "/institutions/arts-science/events",
   "/institutions/arts-science/about",
   "/institutions/arts-science/placements",
   "/institutions/arts-science/accreditations",
@@ -36,7 +42,8 @@ const ARTS_SCIENCE_PATHS = [
 
 const POLYTECHNIC_PATHS = [
   "/institutions/polytechnic",
-  "/institutions/polytechnic/programs",
+  "/institutions/polytechnic/courses",
+  "/institutions/polytechnic/events",
   "/institutions/polytechnic/about",
   "/institutions/polytechnic/placements",
   "/institutions/polytechnic/accreditations",
@@ -46,8 +53,15 @@ const POLYTECHNIC_PATHS = [
   ),
 ];
 
+// /sitemap.xml reads live data (published program/page/event slugs), so every
+// content write refreshes it — otherwise it stays frozen at whatever
+// `next build` captured until the next image rebuild, and new URLs go
+// unindexed for however long that is. (/robots.txt is static, so it isn't
+// listed here.)
+const FEED_PATHS = ["/sitemap.xml"];
+
 const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
-  home: ["/", "/campus-life", "/about-us", "/accreditations"],
+  home: ["/", "/campus-life", "/about-us", "/accreditations", "/events"],
   engineering: ENGINEERING_PATHS,
   "arts-science": ARTS_SCIENCE_PATHS,
   polytechnic: POLYTECHNIC_PATHS,
@@ -165,6 +179,7 @@ export function revalidateTargets(...targets: RevalidateTarget[]): void {
     for (const p of TARGET_PATHS[t] ?? []) paths.add(p);
     for (const p of DYNAMIC_PAGE_PATTERNS[t] ?? []) patterns.add(p);
   }
+  for (const p of FEED_PATHS) paths.add(p);
   for (const path of paths) {
     try {
       revalidatePath(path);
@@ -183,7 +198,7 @@ export function revalidateTargets(...targets: RevalidateTarget[]): void {
 
 export function revalidatePaths(...paths: string[]): void {
   publicCacheClear();
-  for (const path of paths) {
+  for (const path of [...paths, ...FEED_PATHS]) {
     try {
       revalidatePath(path);
     } catch {

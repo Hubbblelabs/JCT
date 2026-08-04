@@ -24,12 +24,19 @@ const nextConfig: NextConfig = {
   },
 
   images: {
+    // Every host here can be fetched and re-encoded by /_next/image on our
+    // server, so the list is the image-proxy surface. `*.r2.dev` used to be
+    // allowlisted: that is Cloudflare's *shared* public-bucket domain, so it
+    // trusted every public R2 bucket in existence rather than ours. The bucket
+    // this app actually writes to comes from NEXT_PUBLIC_R2_PUBLIC_URL below.
     remotePatterns: [
       { protocol: "https", hostname: "companieslogo.com" },
       { protocol: "https", hostname: "upload.wikimedia.org" },
       { protocol: "https", hostname: "images.unsplash.com" },
-      { protocol: "https", hostname: "i.pravatar.cc" },
-      { protocol: "https" as const, hostname: "*.r2.dev" },
+      // Placeholder-avatar service — development seeds only, never production.
+      ...(process.env.NODE_ENV !== "production"
+        ? [{ protocol: "https" as const, hostname: "i.pravatar.cc" }]
+        : []),
       ...(r2Host ? [{ protocol: "https" as const, hostname: r2Host }] : []),
     ],
     formats: ["image/avif", "image/webp"],

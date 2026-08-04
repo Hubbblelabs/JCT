@@ -6,6 +6,13 @@ import { CONTENT_PAGES } from "@/lib/content-pages";
 
 const BASE_URL = "https://jct.ac.in";
 
+// This route reads live slugs from Mongo. Without an ISR window it is
+// prerendered once at build and never regenerated, so every program, page and
+// event published after the last image build would be missing from the
+// sitemap. Admin writes also revalidate it explicitly (see FEED_PATHS in
+// src/lib/revalidate.ts); this is the backstop.
+export const revalidate = 3600;
+
 const INSTITUTIONS = ["engineering", "arts-science", "polytechnic"] as const;
 
 function toEntry(

@@ -1,7 +1,8 @@
 import mongoose from "mongoose";
 import type { Readable } from "stream";
 import { SiteConfig, ImageAsset, DocumentAsset } from "@/lib/models";
-import { uploadStreamToR2 } from "@/lib/r2";
+import { uploadStreamToR2, extractR2Keys } from "@/lib/r2";
+import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 import {
   backupCollection,
   reviveDoc,
@@ -214,7 +215,12 @@ export async function restoreCollectionDocs(
 }> {
   const spec = backupCollection(name);
   if (!spec) {
-    return { restored: 0, rejected: 0, pruned: 0, errors: [`Unknown collection: ${name}`] };
+    return {
+      restored: 0,
+      rejected: 0,
+      pruned: 0,
+      errors: [`Unknown collection: ${name}`],
+    };
   }
   const schema = RESTORE_SCHEMAS[name];
   if (!schema) {
@@ -230,7 +236,12 @@ export async function restoreCollectionDocs(
 
   const db = mongoose.connection.db;
   if (!db) {
-    return { restored: 0, rejected: 0, pruned: 0, errors: ["No database connection"] };
+    return {
+      restored: 0,
+      rejected: 0,
+      pruned: 0,
+      errors: ["No database connection"],
+    };
   }
   const col = db.collection(name);
 
@@ -255,7 +266,9 @@ export async function restoreCollectionDocs(
     const parsed = schema.safeParse(body);
     if (!parsed.success) {
       rejected++;
-      errors.push(`${name} ${String(doc._id)}: rejected — ${describeIssues(parsed.error)}`);
+      errors.push(
+        `${name} ${String(doc._id)}: rejected — ${describeIssues(parsed.error)}`,
+      );
       continue;
     }
 
@@ -293,12 +306,36 @@ export async function restoreCollectionDocs(
 
   let pruned = 0;
   if (mode === "replace" && rejected === 0 && errors.length === 0) {
+    // Collect the doomed documents' storage keys BEFORE deleting them.
+    // `deleteMany` on the raw driver bypasses every model hook, so without
+    // this the pruned documents' images/PDFs (Program.content, Page.content,
+    // Event.image + gallery, Placement recruiter logos, Testimonial avatars)
+    // stayed in R2 and in the media library with nothing referencing them and
+    // no UI able to reach them. Note the asymmetry this fixes: `restoreAsset`
+    // happily pushes archive bytes back in, so a restore could only ever grow
+    // the bucket.
+    const doomed = await col
+      .find({ _id: { $nin: writtenIds } })
+      .toArray()
+      .catch((err) => {
+        console.warn(`[restore] ${name}: could not read docs to prune:`, err);
+        return [] as PlainDoc[];
+      });
+    const doomedKeys = new Set<string>();
+    for (const doc of doomed) extractR2Keys(doc, doomedKeys);
+
     const res = await col.deleteMany({ _id: { $nin: writtenIds } });
     pruned = res.deletedCount ?? 0;
     if (pruned > 0) {
       console.warn(
         `[restore] ${name}: replace mode removed ${pruned} document(s) absent from the archive`,
       );
+    }
+    // cleanupStorageKeys re-checks every key against the surviving documents
+    // (this collection included, since the delete has already happened), so a
+    // key the restored rows still use is kept.
+    if (doomedKeys.size > 0) {
+      cleanupStorageKeys(doomedKeys, `restore/${name}`);
     }
   }
 

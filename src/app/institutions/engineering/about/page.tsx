@@ -1,4 +1,4 @@
-import { getPublishedConfigValue } from "@/lib/site-config-server";
+import { getPublishedConfig } from "@/lib/site-config-server";
 import {
   AboutPageLayout,
   type AboutHostedItem,
@@ -18,12 +18,10 @@ const DEFAULT: AboutPageValue = EngineeringAboutSchema.parse(
 export default async function EngineeringAboutPage() {
   // Timeline used to be a route of its own; it is now a panel of this page's
   // sidebar (see the `host` entry in content-pages.ts).
-  const [value, hostedPages] = await Promise.all([
-    getPublishedConfigValue("engineeringAbout"),
+  const [data, hostedPages] = await Promise.all([
+    getPublishedConfig("engineeringAbout", EngineeringAboutSchema, DEFAULT),
     loadHostedContentPages(PUBLIC_PATH),
   ]);
-  const data =
-    value && typeof value === "object" ? (value as AboutPageValue) : DEFAULT;
   const hosted: AboutHostedItem[] = hostedPages.map(({ def, data: page }) => {
     const Icon = def.icon;
     return {

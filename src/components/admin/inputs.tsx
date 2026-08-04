@@ -579,6 +579,7 @@ export function ImageUploadInput({
                   No preview
                 </span>
               ) : (
+                // eslint-disable-next-line @next/next/no-img-element -- a deferred upload's preview is a local blob: URL, which /_next/image cannot fetch or optimize.
                 <img
                   src={previewUrl}
                   alt=""

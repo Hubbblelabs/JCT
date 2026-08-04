@@ -976,9 +976,16 @@ function AcademicsTab({
     regulations[0] || "",
   );
 
-  const currentRegulationData = dept.curriculum.find(
-    (c) => c.regulationName === activeRegulation,
-  );
+  // Fall back to the first regulation when the state no longer names one that
+  // exists, mirroring ResearchTabsView. `activeRegulation` is seeded once at
+  // mount, and this tab stays mounted while an admin edits — so adding the
+  // first regulation (state is still "") or renaming one made `find()` return
+  // undefined and the curriculum the admin had just typed vanish from the live
+  // preview with no semester tabs and no course table.
+  const currentRegulationData =
+    dept.curriculum.find((c) => c.regulationName === activeRegulation) ??
+    dept.curriculum[0];
+  const activeRegulationName = currentRegulationData?.regulationName ?? "";
   const semesters = currentRegulationData?.semesters || [];
 
   const showCurriculum =
@@ -1025,12 +1032,14 @@ function AcademicsTab({
                       setActiveSemester(0); // Reset to Semester 1 on regulation change
                     }}
                     className={`shrink-0 rounded-lg px-3 py-1.5 text-[11px] font-bold transition-all sm:text-xs ${
-                      activeRegulation === reg
+                      activeRegulationName === reg
                         ? "text-white shadow-sm"
                         : "bg-transparent text-gray-500 hover:bg-gray-50 hover:text-gray-900"
                     }`}
                     style={
-                      activeRegulation === reg ? { backgroundColor: ac } : {}
+                      activeRegulationName === reg
+                        ? { backgroundColor: ac }
+                        : {}
                     }
                   >
                     {reg}
@@ -1066,7 +1075,7 @@ function AcademicsTab({
           <AnimatePresence mode="wait">
             {semesters[activeSemester] && (
               <motion.div
-                key={`${activeRegulation}-${activeSemester}`}
+                key={`${activeRegulationName}-${activeSemester}`}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}

@@ -1,4 +1,5 @@
 import "server-only";
+import type { ZodType } from "zod";
 import { connectDB } from "./mongodb";
 import { SiteConfig } from "./models";
 
@@ -54,6 +55,35 @@ export async function getPublishedConfigValue(
     );
     return null;
   }
+}
+
+/**
+ * Read a published config value and VALIDATE it, falling back to the schema
+ * defaults when it doesn't hold up.
+ *
+ * Public page readers used to write
+ * `value && typeof value === "object" ? (value as XValue) : DEFAULT`, which
+ * only guards against a missing or non-object value — never a partial or
+ * malformed one. Layouts then dereference `data.blocks`, `data.breadcrumb`,
+ * `data.intro` with no optional chaining, so a document that predates a schema
+ * field, was hand-edited, or came back through site-config/restore (which
+ * stores entries verbatim) rendered as an uncaught TypeError and a 500 instead
+ * of the empty page the fallback exists for.
+ */
+export async function getPublishedConfig<T>(
+  key: string,
+  schema: ZodType<T>,
+  fallback: T,
+): Promise<T> {
+  const value = await getPublishedConfigValue(key);
+  if (value === null || value === undefined) return fallback;
+  const parsed = schema.safeParse(value);
+  if (parsed.success) return parsed.data;
+  console.error(
+    `[site-config-server] published value for "${key}" failed validation; serving defaults:`,
+    parsed.error.issues.slice(0, 5),
+  );
+  return fallback;
 }
 
 export async function getPublishedConfigs(

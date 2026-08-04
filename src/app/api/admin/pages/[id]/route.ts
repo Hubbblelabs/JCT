@@ -106,12 +106,32 @@ export async function PATCH(
       }
     }
 
+    // Page.content is the Mixed block payload and carries image/document keys.
+    // PATCH replaces it wholesale, so without this diff editing a block out of
+    // a page leaks its assets — the DELETE handler below already reclaims the
+    // exact same field.
+    const oldKeys =
+      body.content !== undefined
+        ? extractR2Keys(current.content)
+        : new Set<string>();
+
     const doc = await Page.findByIdAndUpdate(
       id,
       { $set: { ...body, updated_by: session!.user?.email } },
       { returnDocument: "after" },
     );
     if (!doc) return notFound();
+
+    if (oldKeys.size > 0) {
+      // published_content stays on the keep side: a draft edit must not delete
+      // an asset the live page still renders.
+      const kept = extractR2Keys({
+        content: doc.content,
+        published_content: doc.published_content,
+      });
+      const orphaned = [...oldKeys].filter((k) => !kept.has(k));
+      if (orphaned.length > 0) cleanupStorageKeys(orphaned, "pages/patch");
+    }
 
     const target = institutionTarget(doc.institution);
     if (target) {

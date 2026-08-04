@@ -1,4 +1,4 @@
-import { getPublishedConfigValue } from "@/lib/site-config-server";
+import { getPublishedConfig } from "@/lib/site-config-server";
 import { NaacPageLayout } from "@/components/layout/NaacPageLayout";
 import { loadHostedSections } from "@/components/layout/HostedContentSections";
 import { NaacPageSchema } from "@/lib/validation";
@@ -13,11 +13,9 @@ const DEFAULT: NaacPageValue = NaacPageSchema.parse({});
 export default async function EngineeringNaacPage() {
   // The AQAR / best-practices / distinctiveness pages used to be routes of
   // their own; they are now panels of this page's sidebar.
-  const [value, sections] = await Promise.all([
-    getPublishedConfigValue("engineeringNaac"),
+  const [data, sections] = await Promise.all([
+    getPublishedConfig("engineeringNaac", NaacPageSchema, DEFAULT),
     loadHostedSections(PATH),
   ]);
-  const data =
-    value && typeof value === "object" ? (value as NaacPageValue) : DEFAULT;
   return <NaacPageLayout data={data} sections={sections} />;
 }
