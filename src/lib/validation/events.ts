@@ -36,7 +36,10 @@ export const LIMITS = {
   descriptionMax: 20000,
   categoryMax: 40,
   locationMax: 120,
-  galleryMax: 4,
+  // Event albums are imported whole from the college news posts, which run to
+  // a couple of dozen photographs per event — a 4-photo cap silently threw
+  // most of an album away.
+  galleryMax: 24,
 } as const;
 
 // Extra photos beyond the cover image, rendered as a grid on the detail page.

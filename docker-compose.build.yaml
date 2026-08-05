@@ -12,7 +12,9 @@
 #   docker login
 #
 # MONGODB_URI is taken from .env using a BuildKit secret and is
-# available only during build.
+# available only during build. NEXT_PUBLIC_R2_PUBLIC_URL is also taken from
+# .env, as a plain build arg (it's a public value, baked into the client
+# bundle either way).
 
 services:
   jct:
@@ -21,6 +23,8 @@ services:
     build:
       context: .
       dockerfile: dockerfile
+      args:
+        NEXT_PUBLIC_R2_PUBLIC_URL: ${NEXT_PUBLIC_R2_PUBLIC_URL}
       secrets:
         - mongodb_uri
 

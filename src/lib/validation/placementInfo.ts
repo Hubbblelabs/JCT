@@ -9,9 +9,10 @@ import { SidebarNavItemSchema } from "./sidebarNav";
 const s = (max: number) => z.string().max(max).default("");
 
 export const PLACEMENT_INFO_LIMITS = {
-  // Posters are published per batch/department, so a college accumulates a
-  // handful of them rather than a single banner.
-  bannerImagesMax: 12,
+  // Posters are published per drive/department, so a college accumulates a
+  // wall of them rather than a single banner — the Polytechnic's placed-student
+  // sheets alone run to twenty.
+  bannerImagesMax: 24,
   mouItemsMax: 80,
   whyPointsMax: 12,
   processStepsMax: 15,

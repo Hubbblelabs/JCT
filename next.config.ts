@@ -13,7 +13,10 @@ function r2Hostname(): string | null {
 const r2Host = r2Hostname();
 
 const nextConfig: NextConfig = {
-  output: "standalone",
+  // Vercel does its own function bundling/tracing; "standalone" output is
+  // for the Docker deploy path (see .github/workflows/build-deploy.yml) and
+  // breaks Vercel's build (missing .next/next-server.js.nft.json) if left on.
+  ...(process.env.VERCEL ? {} : { output: "standalone" as const }),
   compress: true,
   poweredByHeader: false,
 

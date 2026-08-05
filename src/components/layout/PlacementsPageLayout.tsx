@@ -1871,12 +1871,14 @@ function yearSortKey(year: string): number {
  * list, and a block hidden from the preview could not be clicked to edit. The
  * editor shows a badge instead when the public page would show fewer.
  *
- * Fails OPEN. Album titles and Placement record years are authored on two
- * different admin screens with no shared convention — records read "2024-2025"
- * while an album may read "Class of 2025" — so a mismatch is entirely possible.
- * Failing closed made the whole gallery section, its sidebar entry and the
- * `/placements/gallery` redirect target disappear with no warning anywhere; an
- * unfiltered gallery is a far better wrong answer than a missing one.
+ * Fails CLOSED: a year that matches no album publishes no album, rather than
+ * falling back to every year at once. Album titles and Placement record years
+ * are authored on two different admin screens with no shared convention —
+ * records read "2024-2025" while an album may read "Class of 2025" — so a
+ * mismatch stays possible, and the cost of one is the gallery section (and its
+ * sidebar entry) disappearing for that year. That is the intended behaviour:
+ * showing another year's photographs under the selected year is worse than
+ * showing none, and the editor badge names the mismatch for the admin.
  */
 function galleryForYear(
   gallery: ContentPageValue | null,
@@ -1894,7 +1896,7 @@ function galleryForYear(
     const blockYear = yearSortKey(b.title ?? "");
     return blockYear < 0 || blockYear === target;
   });
-  return blocks.length > 0 ? { ...gallery, blocks } : gallery;
+  return { ...gallery, blocks };
 }
 
 /**

@@ -14,6 +14,17 @@ RUN corepack enable pnpm
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/pnpm-lock.yaml ./pnpm-lock.yaml
 COPY . .
+# NEXT_PUBLIC_* vars are inlined by `next build`, so they must be present here,
+# not just at container runtime — this is what next.config.ts reads to build
+# images.remotePatterns for R2, and what src/lib/utils.ts#getImageUrl reads to
+# turn a stored R2 storage key into a full URL. Missing it silently degrades
+# to the local image-proxy route, but any image already stored as a full R2
+# URL then fails at request time with '"url" parameter is not allowed'
+# because the R2 host was never allowlisted in this build. It's a public
+# value (just the bucket's public domain), so a plain build ARG is fine —
+# unlike MONGODB_URI it doesn't need the BuildKit secret mechanism.
+ARG NEXT_PUBLIC_R2_PUBLIC_URL
+ENV NEXT_PUBLIC_R2_PUBLIC_URL=${NEXT_PUBLIC_R2_PUBLIC_URL}
 # MONGODB_URI is injected as a BuildKit secret (never persisted in the image
 # layers) so `next build` can reach MongoDB and prerender the public ISR pages
 # with real content. Without it, DB-backed pages (campus-life, coe, about,

@@ -1,12 +1,58 @@
 name: Build and Deploy
 
+# Three triggers, three different outcomes:
+#   - pull_request      → verify only
+#   - push to a branch  → verify, then rebuild and push :latest (NO deploy)
+#   - push of a v* tag  → verify, build, and deploy to production
+#
+# The branch trigger is what makes the `if:` on the deploy job load-bearing:
+# without it, every image build was also a production deploy and there was no
+# way to refresh :latest without restarting prod.
 on:
   push:
+    branches:
+      - v3-admin
     tags:
       - "v*"
+  pull_request:
+
 jobs:
+  verify:
+    name: Lint, Typecheck and Format
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # `next build` type-checks, but Next 16 no longer runs ESLint as part of
+      # it — so without these steps nothing lints or format-checks this repo at
+      # any point before it reaches production.
+      - name: Lint
+        run: pnpm lint:ci
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Format check
+        run: pnpm exec prettier --check .
+
   build-and-push:
     name: Build Docker Images and Push
+    needs: verify
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
@@ -22,6 +68,7 @@ jobs:
       - name: Build and Push Images
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          NEXT_PUBLIC_R2_PUBLIC_URL: ${{ secrets.NEXT_PUBLIC_R2_PUBLIC_URL }}
 
         run: |
           docker compose -f docker-compose.build.yaml build --push
@@ -34,11 +81,20 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
-      - name: Deploy using SSH password
+      # The host is a repo secret rather than a committed literal, and the
+      # login prefers a key over a password. Set DEPLOY_HOST (required),
+      # DEPLOY_USER (a non-root account in the `docker` group) and SSH_KEY;
+      # appleboy/ssh-action uses the key when present and falls back to
+      # SSH_PASSWORD only while the key secret is empty, so this can be
+      # tightened without a broken deploy in between. Once SSH_KEY works,
+      # delete SSH_PASSWORD and disable PermitRootLogin /
+      # PasswordAuthentication on the server.
+      - name: Deploy over SSH
         uses: appleboy/ssh-action@v1.2.0
         with:
-          host: 182.74.148.66
-          username: root
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER || 'root' }}
+          key: ${{ secrets.SSH_KEY }}
           password: ${{ secrets.SSH_PASSWORD }}
 
           script: |
