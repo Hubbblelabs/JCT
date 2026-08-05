@@ -2,9 +2,9 @@
  * Seed content for registry pages that must not publish blank.
  *
  * Most block-based content pages start empty and are filled in from the admin
- * editor. The statutory pages (`/privacy`, `/terms`, `/support`) can't: the
- * copy is legally required to be on the site from the moment the route exists,
- * and there is no seed script left in this repo to load it (see CLAUDE.md).
+ * editor. The footer pages (`/disclaimer`, `/privacy`, `/terms`, `/faq`) can't:
+ * the copy has to be on the site from the moment the route exists, and there is
+ * no seed script left in this repo to load it (see CLAUDE.md).
  *
  * So the copy lives here as a plain `ContentPageSchema` input, used two ways:
  *
@@ -21,6 +21,29 @@ import { TRUST_NAME, TRUST_ADDRESS, SUPPORT_EMAIL, SITE_DOMAIN } from "./legal";
 
 /** Raw `ContentPageSchema` input — parsed by the caller, never cast. */
 export type ContentPageDefault = Record<string, unknown>;
+
+const DISCLAIMER: ContentPageDefault = {
+  hero: {
+    title: "Disclaimer",
+    subtitle:
+      "The basis on which the information on this website is published.",
+  },
+  breadcrumb: [{ label: "Disclaimer", href: "" }],
+  intro: [
+    `The information contained in this website is for general information purposes only. The information is provided by ${TRUST_NAME} and while we endeavour to keep the information up to date and correct, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability or availability with respect to the website or the information, products, services, or related graphics contained on the website for any purpose. Visitors should confirm the accuracy, completeness and currency of information and/or availability of service/offer with the respective authorized officials concerned, particularly before taking any step based upon such information at that particular point of time.`,
+  ],
+  blocks: [
+    {
+      type: "text",
+      title: "",
+      paragraphs: [
+        "Any reliance you place on such information is therefore strictly at your own risk. In no event will we be liable for any loss or damage including without limitation, indirect or consequential loss or damage, or any loss or damage whatsoever arising from loss of data or profits are arising out of, or in connection with, the use of this website.",
+        `Through this website, you are able to link to other websites, which are not under the control of ${TRUST_NAME}. We have no control over the nature, content and availability of those sites. The inclusion of any links does not necessarily imply a recommendation or endorse the views expressed within them.`,
+        `Every effort is made to keep the website up and running smoothly. However, ${TRUST_NAME} takes no responsibility for, and will not be liable for, the website being temporarily unavailable due to technical issues beyond our control.`,
+      ],
+    },
+  ],
+};
 
 const PRIVACY: ContentPageDefault = {
   hero: {
@@ -137,61 +160,112 @@ const TERMS: ContentPageDefault = {
         `Company and its suppliers and licencors expressly reserve all intellectual property rights in all text, processes, programs, products, technology, content and other materials, which appear on this Site. Access to this Site does not confer and shall not be considered as conferring upon anyone any license under any of Company or any third party’s intellectual property rights. All rights, including copyright, in this Site are owned by or licensed to Trust. Any use of this Site or its Contents, including copying or storing it or them in whole or part, other than for your own personal, non-commercial use is prohibited without the permission of the Trust. You may not modify, distribute or re-post anything on this Site for any purpose. Trust names and logos and all related product and service names, design marks and slogans are the trademarks or service marks of ${TRUST_NAME}.`,
       ],
     },
-    {
-      type: "text",
-      title: "Disclaimer",
-      paragraphs: [
-        `The information contained in this website is for general information purposes only. The information is provided by ${TRUST_NAME} and while we endeavour to keep the information up to date and correct, we make no representations or warranties of any kind, express or implied, about the completeness, accuracy, reliability, suitability or availability with respect to the website or the information, products, services, or related graphics contained on the website for any purpose. Visitors should confirm the accuracy, completeness and currency of information and/or availability of service/offer with the respective authorized officials concerned, particularly before taking any step based upon such information at that particular point of time.`,
-        "Any reliance you place on such information is therefore strictly at your own risk. In no event will we be liable for any loss or damage including without limitation, indirect or consequential loss or damage, or any loss or damage whatsoever arising from loss of data or profits are arising out of, or in connection with, the use of this website.",
-        `Through this website, you are able to link to other websites, which are not under the control of ${TRUST_NAME}. We have no control over the nature, content and availability of those sites. The inclusion of any links does not necessarily imply a recommendation or endorse the views expressed within them.`,
-        `Every effort is made to keep the website up and running smoothly. However, ${TRUST_NAME} takes no responsibility for, and will not be liable for, the website being temporarily unavailable due to technical issues beyond our control.`,
-      ],
-    },
   ],
 };
 
-const SUPPORT: ContentPageDefault = {
+const FAQ: ContentPageDefault = {
   hero: {
-    title: "Contact Support",
-    subtitle: "Get in touch with the JCT Institutions support desk.",
+    title: "Frequently Asked Questions",
+    subtitle:
+      "Courses, approvals, admission, scholarships, placements and campus — answered.",
   },
-  breadcrumb: [{ label: "Contact Support", href: "" }],
+  breadcrumb: [{ label: "FAQ", href: "" }],
   intro: [
-    "For any question about this website, our programmes, an admission enquiry, or a matter relating to our Privacy Policy or Terms & Conditions, please write to us. We respond to support requests on working days.",
+    "The questions prospective students and parents ask us most often. If yours is not answered here, write to us and the admissions team will help.",
   ],
   blocks: [
     {
+      type: "accordion",
+      title: "",
+      description: "",
+      openFirst: true,
+      items: [
+        {
+          title: "What courses are offered at JCT Institutions?",
+          paragraphs: [
+            "JCT Institutions offers a wide range of programs through its Engineering, Arts & Science, and Polytechnic colleges. Students can choose from B.E., B.Tech., B.Sc., BCA, BBA, B.Com., Diploma programs, and more, depending on their academic goals.",
+          ],
+          bullets: [],
+        },
+        {
+          title:
+            "Is JCT Institutions approved by AICTE and affiliated with a university?",
+          paragraphs: [
+            "Yes. JCT College of Engineering and Technology is AICTE approved and affiliated with Anna University. JCT College of Arts & Science is affiliated with Bharathiar University. The institution also holds NAAC accreditation, and selected engineering programs are NBA accredited.",
+          ],
+          bullets: [],
+        },
+        {
+          title: "What is the admission process for JCT Institutions?",
+          paragraphs: [
+            "Students can apply online through the JCT admission portal or contact the admission office directly. Admissions are available through government counselling (where applicable) and management quota based on eligibility criteria.",
+          ],
+          bullets: [],
+        },
+        {
+          title: "Are scholarships available at JCT Institutions?",
+          paragraphs: [
+            "Yes. Eligible students can benefit from government scholarships and institutional scholarship opportunities based on academic performance and eligibility criteria. Students can contact the admission office for complete details.",
+          ],
+          bullets: [],
+        },
+        {
+          title: "Does JCT Institutions offer industry-oriented learning?",
+          paragraphs: [
+            "Yes. JCT’s curriculum is designed with industry input and emphasizes practical learning through laboratory sessions, workshops, internships, industrial visits, and project-based education.",
+          ],
+          bullets: [],
+        },
+        {
+          title: "How can I apply for admission to JCT Institutions?",
+          paragraphs: [
+            "Students can submit their application online through the official website, download the prospectus, or contact the admissions team for counselling and application guidance.",
+          ],
+          bullets: [],
+        },
+        {
+          title:
+            "Can students from other states apply for admission at JCT Institutions?",
+          paragraphs: [
+            "Yes. JCT Institutions welcomes applications from students across India. Candidates from other states can apply for admission to Engineering, Arts & Science, and Polytechnic programs, provided they meet the eligibility criteria for their chosen course.",
+            "The admission team assists out-of-state students throughout the application process, including eligibility verification, document submission, counselling, and enrolment. JCT also offers hostel facilities, transportation support, and a student-friendly campus environment, making it a convenient choice for students relocating from other states.",
+            `For detailed admission guidance, eligibility requirements, and application procedures, students can contact the JCT Admissions Office or apply through the official website (${SITE_DOMAIN}).`,
+          ],
+          bullets: [],
+        },
+        {
+          title: "Does JCT Institutions provide placement assistance?",
+          paragraphs: [
+            "Yes. JCT Institutions provides placement training, career guidance, aptitude coaching, mock interviews, and campus recruitment opportunities with leading companies across various industries.",
+          ],
+          bullets: [],
+        },
+        {
+          title: "Where is JCT Institutions located?",
+          paragraphs: [
+            "JCT Institutions is located on Velandhavalam Main Road, Pichanur, Coimbatore, Tamil Nadu, offering a peaceful and well-connected campus environment.",
+          ],
+          bullets: [],
+        },
+      ],
+    },
+    {
       type: "contact",
-      title: "Support Desk",
-      text: `Email us and we will get back to you. You can also write to us at ${TRUST_NAME}, ${TRUST_ADDRESS}.`,
+      title: "Still have a question?",
+      text: `Write to us and we will get back to you. You can also reach us at ${TRUST_NAME}, ${TRUST_ADDRESS}.`,
       email: SUPPORT_EMAIL,
       phone: "",
       linkLabel: "",
       linkHref: "",
     },
-    {
-      type: "text",
-      title: "Postal Address",
-      paragraphs: [`${TRUST_NAME}\n${TRUST_ADDRESS}`],
-    },
-    {
-      type: "list",
-      title: "Before You Write",
-      intro:
-        "These pages answer the questions the support desk is asked most often.",
-      ordered: false,
-      items: [
-        "Privacy Policy — what personal data this website collects and how it is used: /privacy",
-        "Terms & Conditions — the terms, disclaimer and copyright notice governing this website: /terms",
-      ],
-    },
   ],
 };
 
 const CONTENT_PAGE_DEFAULTS: Record<string, ContentPageDefault> = {
+  disclaimer: DISCLAIMER,
   privacy: PRIVACY,
   terms: TERMS,
-  support: SUPPORT,
+  faq: FAQ,
 };
 
 /** Seed content for `slug`, or undefined when the page starts blank. */

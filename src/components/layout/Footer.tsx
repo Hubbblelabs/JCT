@@ -36,13 +36,17 @@ const SOCIAL_DEFS = [
 ] as const;
 
 // Fixed footer chrome — not part of the editable Footer CMS.
-// Site-root routes, not per-institution ones: the footer renders on every
-// site, and these three pages are institution-agnostic. (They used to point at
-// /mandatory-disclosure/* and /contact, none of which are routes.)
+// Site-root routes, not per-institution ones: the footer renders on every site
+// and every one of these pages is institution-agnostic. The first four are
+// block-based content pages (see `src/lib/content-pages.ts`, edited under
+// Global CMS → Pages); "Blogs" points at the Event-model listing, which is
+// where JCT publishes its posts.
 const LEGAL_LINKS = [
+  { name: "Disclaimer", href: "/disclaimer" },
   { name: "Privacy Policy", href: "/privacy" },
-  { name: "Terms of Service", href: "/terms" },
-  { name: "Contact Support", href: "/support" },
+  { name: "Terms and Conditions", href: "/terms" },
+  { name: "Blogs", href: "/events" },
+  { name: "FAQ", href: "/faq" },
 ];
 
 const MAP_EMBED_URL =

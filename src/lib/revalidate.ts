@@ -61,7 +61,7 @@ const POLYTECHNIC_PATHS = [
 const FEED_PATHS = ["/sitemap.xml"];
 
 // Institution-agnostic routes served from the site root. Sourced from the
-// registry for the same reason the college lists are: a statutory page added
+// registry for the same reason the college lists are: a footer page added
 // there can't drift out of the "home" target.
 const MAIN_CONTENT_PATHS = CONTENT_PAGES.filter(
   (p) => p.institution === "main" && !p.host,
@@ -89,8 +89,8 @@ const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
 
 const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   // Every block-based content page revalidates its own institution. The
-  // institution-agnostic ones ("main" — the statutory pages under /privacy,
-  // /terms, /support) are not a RevalidateTarget of their own; their routes
+  // institution-agnostic ones ("main" — the footer pages under /disclaimer,
+  // /privacy, /terms, /faq) are not a RevalidateTarget of their own; their routes
   // are carried by "home" via MAIN_CONTENT_PATHS above.
   ...Object.fromEntries(
     CONTENT_PAGES.map(

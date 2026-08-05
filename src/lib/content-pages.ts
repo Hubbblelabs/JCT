@@ -17,6 +17,7 @@
  * (src/lib/validation/siteConfig.ts) — the API rejects unknown keys.
  */
 import {
+  AlertTriangle,
   Award,
   BadgeCheck,
   BookOpen,
@@ -25,8 +26,8 @@ import {
   FileBarChart,
   FileSpreadsheet,
   HeartHandshake,
+  HelpCircle,
   History,
-  LifeBuoy,
   Lock,
   MessageSquare,
   MonitorPlay,
@@ -43,8 +44,8 @@ import { TRUST_NAME } from "@/lib/legal";
 
 /**
  * Which site a page belongs to. "main" covers the institution-agnostic pages
- * served from the site root (the statutory pages under /privacy, /terms,
- * /support) — they have no college, so they are edited from the Global CMS
+ * served from the site root (the footer pages under /disclaimer, /privacy,
+ * /terms, /faq) — they have no college, so they are edited from the Global CMS
  * section rather than a college's "Other Pages" group.
  */
 export type ContentPageScope = College | "main";
@@ -313,9 +314,26 @@ export const CONTENT_PAGES: ContentPageDef[] = [
       "The Fine Arts Club at JCT Polytechnic College — its movie, cultural, arts and photography wings, objectives and event gallery.",
     icon: Palette,
   },
-  // Statutory pages linked from the footer of every page on every site. They
-  // ship with their copy already written (see `content-page-defaults.ts`)
-  // because the text has to be live from the moment the route exists.
+  // Pages linked from the footer of every page on every site. They ship with
+  // their copy already written (see `content-page-defaults.ts`) because the
+  // text has to be live from the moment the route exists.
+  //
+  // Registry order is footer order: Disclaimer, Privacy Policy, Terms &
+  // Conditions, FAQ. (The footer's fifth link, Blogs, points at /events — the
+  // Event-model listing — so it is not a content page.)
+  {
+    slug: "disclaimer",
+    configKey: "disclaimerPage",
+    institution: "main",
+    path: "/disclaimer",
+    label: "Disclaimer",
+    description:
+      "Site-wide disclaimer — accuracy of information, liability and third-party links.",
+    seoLabel: "Disclaimer",
+    seoTitle: `Disclaimer | ${MAIN_SUFFIX}`,
+    seoDescription: `The disclaimer governing the information published on jct.ac.in by ${TRUST_NAME} — accuracy, liability and links to external websites.`,
+    icon: AlertTriangle,
+  },
   {
     slug: "privacy",
     configKey: "privacyPolicyPage",
@@ -335,25 +353,25 @@ export const CONTENT_PAGES: ContentPageDef[] = [
     institution: "main",
     path: "/terms",
     label: "Terms & Conditions",
-    description:
-      "Site-wide terms of use, disclaimer, jurisdiction and copyright notice.",
+    description: "Site-wide terms of use, jurisdiction and copyright notice.",
     seoLabel: "Terms & Conditions",
     seoTitle: `Terms & Conditions | ${MAIN_SUFFIX}`,
-    seoDescription: `The terms of use, disclaimer, jurisdiction and copyright notice governing your use of jct.ac.in, operated by ${TRUST_NAME}.`,
+    seoDescription: `The terms of use, jurisdiction and copyright notice governing your use of jct.ac.in, operated by ${TRUST_NAME}.`,
     icon: ScrollText,
   },
   {
-    slug: "support",
-    configKey: "supportPage",
+    slug: "faq",
+    configKey: "faqPage",
     institution: "main",
-    path: "/support",
-    label: "Contact Support",
-    description: "Site-wide support desk contact details.",
-    seoLabel: "Contact Support",
-    seoTitle: `Contact Support | ${MAIN_SUFFIX}`,
+    path: "/faq",
+    label: "FAQ",
+    description:
+      "Frequently asked questions about courses, approvals, admission and placements.",
+    seoLabel: "FAQ",
+    seoTitle: `Frequently Asked Questions | ${MAIN_SUFFIX}`,
     seoDescription:
-      "Reach the JCT Institutions support desk — email, admissions helpline and postal address.",
-    icon: LifeBuoy,
+      "Answers to the questions asked most often about JCT Institutions — courses offered, AICTE approval and affiliation, admission process, scholarships, placements and location.",
+    icon: HelpCircle,
   },
 ];
 

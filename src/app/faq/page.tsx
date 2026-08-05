@@ -7,9 +7,9 @@ import {
 export const revalidate = 3600;
 
 export default async function Page() {
-  return <ContentPage slug="support" />;
+  return <ContentPage slug="faq" />;
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  return contentPageMetadata("support");
+  return contentPageMetadata("faq");
 }

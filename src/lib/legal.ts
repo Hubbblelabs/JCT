@@ -1,7 +1,7 @@
 /**
- * Fixed identifiers used by the statutory pages (`/privacy`, `/terms`,
- * `/support`). They are the legal entity's own details, not editable site
- * content — keeping them here stops the three pages from drifting apart.
+ * Fixed identifiers used by the footer pages (`/disclaimer`, `/privacy`,
+ * `/terms`, `/faq`). They are the legal entity's own details, not editable site
+ * content — keeping them here stops the four pages from drifting apart.
  */
 
 export const TRUST_NAME =

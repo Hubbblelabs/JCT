@@ -445,10 +445,9 @@ const GLOBAL_GROUPS: AdminNavGroup[] = [
     ],
   },
   {
-    // The statutory pages the footer links to from every site. They are
-    // block-based content pages like the college ones, but belong to no
-    // college — so they are listed here rather than under a college's
-    // "Other Pages" group.
+    // The pages the footer links to from every site. They are block-based
+    // content pages like the college ones, but belong to no college — so they
+    // are listed here rather than under a college's "Other Pages" group.
     title: "Pages",
     items: mainContentPages()
       .filter((p) => !p.host)
