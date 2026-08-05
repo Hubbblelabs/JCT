@@ -224,7 +224,7 @@ function TextBlockView({
     <>
       <BlockHeading title={block.title} />
       {paragraphs.length > 0 && (
-        <div className="max-w-4xl space-y-4">
+        <div className="space-y-4">
           {paragraphs.map((p, i) => (
             <p
               key={i}
@@ -251,7 +251,7 @@ function ListBlockView({
       <BlockHeading title={block.title} description={block.intro} />
       {items.length > 0 ? (
         <ListTag
-          className={`text-muted-foreground max-w-4xl space-y-3 ${
+          className={`text-muted-foreground space-y-3 ${
             block.ordered ? "list-decimal" : "list-disc"
           } marker:text-gold pl-5`}
         >
@@ -928,7 +928,6 @@ export function ContentPageBody({
           label={CONTENT_SECTION_LABELS.intro}
           editable={editable}
           onEditSection={onEdit}
-          className="max-w-4xl"
         >
           {intro.length > 0 ? (
             <div className="space-y-4">
@@ -1026,7 +1025,14 @@ export function ContentPageLayout({
         <PageHero title={data.hero.title} subtitle={data.hero.subtitle} />
       </EditableRegion>
 
-      <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
+      {/*
+       * One centred column, not a full-width container: the blocks below no
+       * longer carry their own `max-w-4xl`, so without a cap a paragraph would
+       * run the whole 1536px container — and with the old cap the text sat
+       * against the left edge with the right half of the page empty. The same
+       * column serves the public route and the admin live preview.
+       */}
+      <div className="mx-auto w-full max-w-5xl px-4 py-8 md:px-6 md:py-12">
         {showBreadcrumb && (crumbs.length > 0 || editable) && (
           <EditableRegion
             as="div"
