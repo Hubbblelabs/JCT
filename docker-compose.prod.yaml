@@ -15,4 +15,15 @@ services:
     env_file:
       - .env
 
+    environment:
+      # Where backup archives are built before they are downloaded. Bind-mounted
+      # rather than left in the container: an archive is currently ~7.5 GB, which
+      # would otherwise land on the Docker overlay filesystem and be thrown away
+      # on every `docker compose pull`. The host path also lets nginx serve the
+      # file directly — see BACKUP_ACCEL_PREFIX in deploy/nginx-jct.conf.example.
+      BACKUP_DIR: /var/backups/jct
+
+    volumes:
+      - /srv/jct/backups:/var/backups/jct
+
     pull_policy: always

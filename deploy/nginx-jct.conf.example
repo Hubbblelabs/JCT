@@ -19,8 +19,9 @@
 #     and delays the NDJSON progress stream until after the upload completes.
 #
 #   proxy_buffering off / X-Accel-Buffering
-#     The backup response is a chunked ZIP built as it is sent, and the restore
-#     response is an NDJSON progress stream. Both routes already send
+#     The restore response is an NDJSON progress stream, and the backup download
+#     is a multi-gigabyte file. Buffering either through nginx's own disk adds a
+#     full extra copy before the client sees anything. Both routes already send
 #     `X-Accel-Buffering: no`; this is the belt-and-braces equivalent.
 #
 #   timeouts
@@ -39,11 +40,43 @@ location /api/admin/site-config/ {
     client_max_body_size       0;
     proxy_request_buffering    off;
 
-    # Backup: stream the archive out as it is produced.
+    # Backup download and restore progress: pass bytes through as they arrive.
     proxy_buffering            off;
 
     # Both directions run for minutes on a large archive.
     proxy_read_timeout         3600s;
     proxy_send_timeout         3600s;
     send_timeout               3600s;
+}
+
+# ── Optional: let nginx serve the finished backup archive itself ──────────────
+#
+# A backup is built to disk first (BACKUP_DIR) and only then downloaded, so the
+# download is an ordinary static file. Without the block below, Node reads that
+# file and pipes it through the proxy — which works, and supports resume, but
+# copies every byte through the application process.
+#
+# Set BACKUP_ACCEL_PREFIX=/internal-backups on the app and add this location,
+# and the download route instead answers with an `X-Accel-Redirect`. nginx then
+# serves the file with sendfile(), handles Range requests natively, and Node
+# leaves the data path entirely. On a multi-gigabyte archive this is the
+# difference between one process copy per byte and none.
+#
+# `internal` is what makes this safe: the location cannot be requested directly
+# from outside, only reached via the redirect the app issues after it has run
+# `requireRole(req, "admin")`. Do NOT drop that keyword — the archive contains
+# every site config value and every uploaded file.
+#
+# The alias must be the HOST path that docker-compose.prod.yaml bind-mounts to
+# the container's BACKUP_DIR.
+
+location /internal-backups/ {
+    internal;
+    alias /srv/jct/backups/;
+
+    sendfile   on;
+    tcp_nopush on;
+    # The archive is already deflated; re-compressing it wastes CPU and defeats
+    # sendfile().
+    gzip       off;
 }

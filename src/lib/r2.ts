@@ -10,6 +10,24 @@ import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Upload } from "@aws-sdk/lib-storage";
 import type { Readable } from "stream";
 
+/**
+ * One client per process, not one per call.
+ *
+ * An `S3Client` owns an HTTPS agent and its socket pool. Constructing a fresh
+ * one for every operation threw that pool away each time, so no connection was
+ * ever reused and every single object fetch paid a full TCP + TLS handshake to
+ * Cloudflare — on the order of 100 ms each. A whole-bucket backup walks ~1,700
+ * objects, which made handshakes alone the dominant cost of an export.
+ *
+ * The SDK's default Node handler already keeps its agent alive with 50 max
+ * sockets, which is above the backup builder's fetch concurrency — so reusing
+ * the client is the whole fix; no custom `requestHandler` is needed.
+ *
+ * Cached against the credential triple so a changed env var still rebuilds it,
+ * even though these never change at runtime in practice.
+ */
+let cachedClient: { fingerprint: string; client: S3Client } | null = null;
+
 function getR2Client() {
   const accountId = process.env.R2_ACCOUNT_ID;
   const accessKeyId = process.env.R2_ACCESS_KEY_ID;
@@ -19,11 +37,16 @@ function getR2Client() {
     throw new Error("R2 credentials are not configured");
   }
 
-  return new S3Client({
+  const fingerprint = `${accountId}:${accessKeyId}:${secretAccessKey}`;
+  if (cachedClient?.fingerprint === fingerprint) return cachedClient.client;
+
+  const client = new S3Client({
     region: "auto",
     endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
     credentials: { accessKeyId, secretAccessKey },
   });
+  cachedClient = { fingerprint, client };
+  return client;
 }
 
 export async function getPresignedPutUrl(
@@ -230,6 +253,33 @@ export async function getR2Stream(
   );
   if (!res.Body) throw new Error(`No body returned for R2 key: ${key}`);
   return res.Body as Readable;
+}
+
+/**
+ * An object's bytes as a single Buffer.
+ *
+ * The streaming reader above is the right tool when the consumer drains at an
+ * unknown rate, because it holds nothing. It is the wrong tool when many small
+ * objects must be fetched *concurrently*: an open, unread response body is a
+ * socket held idle, so concurrency there means idle sockets that can time out.
+ * Reading small objects to completion frees the socket immediately, which is
+ * what lets the backup builder run many fetches at once. Only call this for
+ * objects known to be small — the caller owns the memory bound.
+ */
+export async function getR2Bytes(
+  key: string,
+  signal?: AbortSignal,
+): Promise<Buffer> {
+  const client = getR2Client();
+  const bucket = process.env.R2_BUCKET_NAME;
+  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+
+  const res = await client.send(
+    new GetObjectCommand({ Bucket: bucket, Key: key }),
+    { abortSignal: signal },
+  );
+  if (!res.Body) throw new Error(`No body returned for R2 key: ${key}`);
+  return Buffer.from(await res.Body.transformToByteArray());
 }
 
 /**

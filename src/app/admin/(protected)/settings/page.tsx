@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
@@ -17,12 +17,25 @@ import {
   FileText,
 } from "lucide-react";
 
-/** Shape of `GET /api/admin/site-config/backup?probe=1`. */
-interface ExportProbe {
+/** A backup build, as reported by `/api/admin/site-config/backup`. */
+interface BackupJob {
+  id: string;
+  state: "building" | "ready" | "failed";
+  filename: string;
+  bytes: number;
+  size?: number;
+  expected_bytes: number;
+  entries_done: number;
+  entries_total: number;
   config_entries: number;
   asset_files: number;
-  asset_bytes: number;
   assets_unavailable?: boolean;
+  error?: string;
+  report?: {
+    assets_expected: number;
+    assets_archived: number;
+    unreadable: string[];
+  };
 }
 
 /** One NDJSON line from the restore stream. */
@@ -62,9 +75,10 @@ function formatBytes(bytes: number): string {
 /**
  * Hand the URL to the browser's own download manager rather than fetching it.
  * `fetch` + `response.blob()` would buffer the entire archive in the tab's
- * heap — the exact failure the streamed export exists to avoid. A plain
- * navigation streams straight to disk, so a multi-gigabyte backup costs the
- * page almost no memory.
+ * heap. A plain navigation writes straight to disk, so a multi-gigabyte backup
+ * costs the page almost no memory — and because the server serves a finished
+ * file with a known length, the browser can show real progress and resume a
+ * failed transfer instead of starting over.
  */
 function startDownload(url: string) {
   const a = document.createElement("a");
@@ -96,6 +110,10 @@ export default function SettingsPage() {
   const [includeDocs, setIncludeDocs] = useState(true);
   const [exporting, setExporting] = useState(false);
   const [exportStatus, setExportStatus] = useState<Status | null>(null);
+  const [job, setJob] = useState<BackupJob | null>(null);
+  /** Guards the auto-download so a poll that re-reports "ready" can't fire it
+   * a second time. */
+  const downloaded = useRef<string | null>(null);
 
   // Restore state. Merge is the default because it is the non-destructive
   // option; replace is what actually undoes a bad import, so it is offered
@@ -113,6 +131,54 @@ export default function SettingsPage() {
   const [resetConfirm, setResetConfirm] = useState("");
   const [resetStatus, setResetStatus] = useState<Status | null>(null);
 
+  // Poll a running build. Keyed on id+state rather than the whole job so the
+  // interval isn't torn down and rebuilt on every progress tick.
+  const jobId = job?.id;
+  const jobState = job?.state;
+  useEffect(() => {
+    if (!jobId || jobState !== "building") return;
+    let cancelled = false;
+    const tick = async () => {
+      try {
+        const res = await fetch(`/api/admin/site-config/backup?jobId=${jobId}`);
+        if (!res.ok) return;
+        const next = (await res.json()) as BackupJob;
+        if (!cancelled) setJob(next);
+      } catch {
+        // Transient — the next tick retries. A build outlives a blip.
+      }
+    };
+    const timer = setInterval(tick, 1500);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [jobId, jobState]);
+
+  // Hand a finished archive to the browser exactly once.
+  useEffect(() => {
+    if (!job) return;
+    if (job.state === "failed") {
+      setExportStatus({
+        type: "error",
+        message: `Backup failed: ${job.error ?? "unknown error"}`,
+      });
+      return;
+    }
+    if (job.state !== "ready" || downloaded.current === job.id) return;
+    downloaded.current = job.id;
+    startDownload(`/api/admin/site-config/backup/file?jobId=${job.id}`);
+    const missing = job.report?.unreadable.length ?? 0;
+    setExportStatus({
+      type: missing > 0 || job.assets_unavailable ? "warning" : "success",
+      message: job.assets_unavailable
+        ? `Archive built (${formatBytes(job.size ?? 0)}) and downloading — but WITHOUT images or documents, because R2 storage is not configured on this deployment. This archive cannot restore media on its own.`
+        : missing > 0
+          ? `Archive built (${formatBytes(job.size ?? 0)}) and downloading — but ${missing} asset file(s) could not be read from storage. See _report.json inside the ZIP for the list.`
+          : `Archive built (${formatBytes(job.size ?? 0)}) and downloading — ${job.config_entries} config entries and ${job.report?.assets_archived ?? 0} asset files. The download resumes on its own if it is interrupted.`,
+    });
+  }, [job]);
+
   if (status === "loading") {
     return (
       <div className="admin-content flex items-center justify-center py-24">
@@ -128,12 +194,24 @@ export default function SettingsPage() {
     return `/api/admin/site-config/backup?${params}`;
   };
 
+  /**
+   * Start a build and let the polling effect take it from there. The response
+   * is a job, not an archive — the bytes are fetched separately once the file
+   * exists on the server.
+   */
   const handleExport = async () => {
     setExporting(true);
     setExportStatus(null);
+    downloaded.current = null;
     try {
-      const res = await fetch(backupUrl({ probe: "1" }));
+      const res = await fetch(backupUrl(), { method: "POST" });
       const data = (await res.json()) as Record<string, unknown>;
+      if (res.status === 409 && data.job) {
+        // Another tab (or an earlier click) already has one running — adopt it
+        // rather than reporting a conflict the operator can do nothing about.
+        setJob(data.job as unknown as BackupJob);
+        return;
+      }
       if (!res.ok) {
         setExportStatus({
           type: "error",
@@ -141,19 +219,7 @@ export default function SettingsPage() {
         });
         return;
       }
-      const probe = data as unknown as ExportProbe;
-      startDownload(backupUrl());
-      // Deliberately not reported as success: the status is already 200 by the
-      // time the first byte ships, so a failure mid-archive cannot come back as
-      // an error here. The archive's own _report.json is the real receipt.
-      setExportStatus({
-        type: "warning",
-        message: probe.assets_unavailable
-          ? `Download started — ${probe.config_entries} config entries, but WITHOUT images or documents — R2 storage is not configured on this deployment. This archive cannot restore media on its own.`
-          : probe.asset_files > 0
-            ? `Download started — ${probe.config_entries} config entries plus ${probe.asset_files} asset files (${formatBytes(probe.asset_bytes)}). The archive is built as it downloads, so the size shows as unknown until it finishes. Check _report.json inside the ZIP to confirm every file made it.`
-            : `Download started — ${probe.config_entries} config entries and all content collections. Check _report.json inside the ZIP to confirm the archive completed.`,
-      });
+      setJob(data as unknown as BackupJob);
     } catch {
       setExportStatus({ type: "error", message: "Export failed. Try again." });
     } finally {
@@ -374,9 +440,10 @@ export default function SettingsPage() {
             <div>
               <h2 className="font-semibold text-gray-900">Export Backup</h2>
               <p className="mt-0.5 text-sm text-gray-500">
-                Downloads one ZIP containing all site config, content, and — if
-                selected — every uploaded file. The archive is streamed as it
-                downloads, so size is unlimited.
+                Builds one ZIP containing all site config, content, and — if
+                selected — every uploaded file, then downloads it. The archive
+                is assembled on the server first, so the download runs at full
+                speed and resumes if it is interrupted.
               </p>
             </div>
           </div>
@@ -407,8 +474,9 @@ export default function SettingsPage() {
             </label>
             {includeImages || includeDocs ? (
               <p className="pt-1 text-xs text-amber-600">
-                Keep the browser tab open until the download finishes — closing
-                it cancels the archive. Requires R2 storage to be configured.
+                Keep this tab open while the archive builds. Once it is ready
+                the download is a normal file transfer — closing the tab then
+                will not lose it. Requires R2 storage to be configured.
               </p>
             ) : (
               <p className="pt-1 text-xs text-red-600">
@@ -421,17 +489,36 @@ export default function SettingsPage() {
           </div>
 
           <StatusBanner status={exportStatus} />
+
+          {job?.state === "building" && <BuildProgress job={job} />}
+
+          {job?.state === "ready" && (
+            <p className="mb-3 text-xs text-gray-500">
+              Download didn&apos;t start?{" "}
+              <a
+                className="font-medium text-blue-600 underline"
+                href={`/api/admin/site-config/backup/file?jobId=${job.id}`}
+              >
+                Get {job.filename} ({formatBytes(job.size ?? 0)})
+              </a>
+            </p>
+          )}
+
           <button
             onClick={handleExport}
-            disabled={exporting}
+            disabled={exporting || job?.state === "building"}
             className="admin-btn admin-btn-primary"
           >
-            {exporting ? (
+            {exporting || job?.state === "building" ? (
               <Loader2 size={15} className="animate-spin" />
             ) : (
               <Download size={15} />
             )}
-            {exporting ? "Preparing…" : "Download Backup"}
+            {job?.state === "building"
+              ? "Building archive…"
+              : exporting
+                ? "Starting…"
+                : "Download Backup"}
           </button>
         </div>
 
@@ -611,6 +698,40 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+    </div>
+  );
+}
+
+/**
+ * Live build progress. The denominator is the planned asset total, which is
+ * close to the finished size but not exact — assets are stored uncompressed,
+ * while the JSON entries are deflated and not counted at all. Clamped so a
+ * slightly-off estimate can never show a bar past 100%.
+ */
+function BuildProgress({ job }: { job: BackupJob }) {
+  const pct = job.expected_bytes
+    ? Math.min(100, Math.round((job.bytes / job.expected_bytes) * 100))
+    : 0;
+  return (
+    <div className="mb-3 rounded-lg border border-blue-200 bg-blue-50 p-3">
+      <div className="mb-1.5 flex items-center justify-between text-xs text-blue-800">
+        <span>
+          Building archive — {job.entries_done}/{job.entries_total} files
+        </span>
+        <span>
+          {formatBytes(job.bytes)}
+          {job.expected_bytes > 0 && ` of ~${formatBytes(job.expected_bytes)}`}
+        </span>
+      </div>
+      <div className="h-1.5 overflow-hidden rounded-full bg-blue-200">
+        <div
+          className="h-full rounded-full bg-blue-600 transition-[width] duration-500"
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+      <p className="mt-1.5 text-xs text-blue-700/80">
+        The download starts on its own when this finishes.
+      </p>
     </div>
   );
 }

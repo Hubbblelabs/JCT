@@ -1,413 +1,187 @@
-import { NextRequest, NextResponse } from "next/server";
-import { Readable } from "stream";
-import { ZipArchive, type Archiver } from "archiver";
-import type { mongo } from "mongoose";
-import { connectDB } from "@/lib/mongodb";
-import { SiteConfig, ImageAsset, DocumentAsset } from "@/lib/models";
-import { requireRole, serverError } from "@/lib/api-helpers";
-import { logAudit } from "@/lib/audit";
-import mongoose from "mongoose";
-import { getR2Stream, isR2Configured } from "@/lib/r2";
-import { BACKUP_COLLECTIONS, serializeDoc } from "@/lib/backup-collections";
+import { NextRequest } from "next/server";
 import {
-  listBackupObjects,
-  type AssetObject,
-  type AssetSource,
-  IMAGE_PREFIX,
-  DOCUMENT_PREFIX,
-} from "@/lib/backup-assets";
+  requireRole,
+  json,
+  badRequest,
+  notFound,
+  serverError,
+} from "@/lib/api-helpers";
+import { logAudit } from "@/lib/audit";
+import { planBackup, writeBackupArchive } from "@/lib/backup-archive";
+import {
+  activeBuild,
+  createJob,
+  deleteJob,
+  ensureSpace,
+  finishJob,
+  getJob,
+  listJobs,
+  openArchive,
+  partialPath,
+  pruneJobs,
+  sealArchive,
+  updateProgress,
+} from "@/lib/backup-jobs";
+import { rm } from "fs/promises";
 
 /**
- * A whole backup — site config, content collections, and every asset byte — as
- * one streamed ZIP.
+ * Backup export, staged: build to disk, then download the file.
  *
- * Nothing is buffered. Entries are appended to a live archive that is already
- * being written to the response socket, and each R2 object is piped straight
- * through as the client drains it. Server memory stays flat at a few MB no
- * matter how large the bucket is, which is what makes a multi-gigabyte archive
- * possible at all: the earlier implementation built the entire ZIP as a Buffer
- * first and died on memory long before it ever produced a file.
+ * - `GET  ?probe=1`      — what an export would contain, without building it.
+ * - `POST`               — start a build; returns a job id immediately.
+ * - `GET  ?jobId=<id>`   — that job's state and progress.
+ * - `GET`                — every job the server still holds.
+ * - `DELETE ?jobId=<id>` — drop an archive and free its disk.
  *
- * The response has no Content-Length — the size is unknowable until the last
- * byte — so it travels chunked. The browser's own download manager writes it to
- * disk incrementally; the client must NOT read it via `response.blob()`, which
- * would re-create the same problem in the tab's heap.
+ * The bytes themselves come from `backup/file`, which serves the finished
+ * archive as an ordinary ranged file download. See `src/lib/backup-jobs.ts`
+ * for why the build and the download are separated at all.
  */
 
-/**
- * How many R2 objects to open ahead of the one being archived. Prefetching
- * hides per-object request latency, which otherwise dominates a bucket of many
- * small files — but a prefetched stream is an *open socket waiting to be read*,
- * and the archive only advances as fast as the client drains it. Queue a large
- * object and its socket can sit idle for minutes on a slow link and time out
- * mid-append, which destroys the archive.
- *
- * So the queue is bounded by bytes as well as count: only small objects are
- * opened ahead, and anything large is fetched strictly when its turn comes.
- */
-const ASSET_PREFETCH = 4;
-const ASSET_PREFETCH_BYTES = 8 * 1024 * 1024;
-
-/** Attach the listener BEFORE appending: archiver processes entries serially,
- * so with one append outstanding the next `entry` event is necessarily ours. */
-function appendEntry(
-  archive: Archiver,
-  source: Readable | string,
-  name: string,
-  store: boolean,
-): Promise<void> {
-  const done = new Promise<void>((resolve, reject) => {
-    const onEntry = () => {
-      archive.off("error", onError);
-      resolve();
-    };
-    const onError = (err: Error) => {
-      archive.off("entry", onEntry);
-      reject(err);
-    };
-    archive.once("entry", onEntry);
-    archive.once("error", onError);
-  });
-  archive.append(source, { name, store });
-  return done;
-}
-
-const appendJson = (archive: Archiver, name: string, value: unknown) =>
-  appendEntry(archive, JSON.stringify(value, null, 2), name, false);
-
-/**
- * Append a collection as a JSON array WITHOUT buffering it.
- *
- * `find({}).toArray()` plus `JSON.stringify(rows, null, 2)` held the whole
- * collection twice — once as documents, once as an indented string — which
- * contradicts this route's flat-memory guarantee and, past V8's ~512 MB string
- * cap, throws `RangeError: Invalid string length` and ships a truncated ZIP
- * under HTTP 200. `programs` and `pages` carry two Mixed rich-content blobs
- * each, so they are exactly the collections that get there first.
- *
- * Returns the document count, so the manifest (written after this loop) still
- * records it.
- */
-async function appendCollection(
-  archive: Archiver,
-  name: string,
-  cursor: mongo.FindCursor<Record<string, unknown>>,
-): Promise<number> {
-  let count = 0;
-  async function* chunks(): AsyncGenerator<string> {
-    yield "[";
-    for await (const doc of cursor) {
-      yield (count === 0 ? "\n" : ",\n") + JSON.stringify(serializeDoc(doc));
-      count += 1;
-    }
-    yield "\n]\n";
-  }
-  await appendEntry(archive, Readable.from(chunks()), name, false);
-  return count;
-}
-
-type OpenedAsset =
-  { key: string; stream: Readable } | { key: string; stream: null };
-
-async function openAsset(
-  key: string,
-  signal?: AbortSignal,
-): Promise<OpenedAsset> {
-  try {
-    return { key, stream: await getR2Stream(key, signal) };
-  } catch (err) {
-    // A dead storage key must not abort the archive — it is reported instead.
-    console.warn(`[backup] Skipping ${key}:`, err);
-    return { key, stream: null };
-  }
-}
-
-/** Pipe every object into the archive, at most one in flight, a few queued. */
-async function streamAssets(
-  archive: Archiver,
-  objects: AssetObject[],
-  signal?: AbortSignal,
-): Promise<string[]> {
-  const unreadable: string[] = [];
-  const queue: Array<Promise<OpenedAsset>> = [];
-  let next = 0;
-  let queuedBytes = 0;
-
-  const fill = () => {
-    while (queue.length < ASSET_PREFETCH && next < objects.length) {
-      const obj = objects[next]!;
-      // Never open a large object early — see ASSET_PREFETCH_BYTES. The first
-      // slot is exempt so the loop always has something to work on.
-      if (queue.length > 0 && queuedBytes + obj.size > ASSET_PREFETCH_BYTES) {
-        break;
-      }
-      next++;
-      queuedBytes += obj.size;
-      queue.push(openAsset(obj.key, signal));
-    }
-  };
-  const sizeOf = new Map(objects.map((o) => [o.key, o.size]));
-
-  fill();
-  while (queue.length > 0) {
-    const asset = await queue.shift()!;
-    queuedBytes -= sizeOf.get(asset.key) ?? 0;
-    fill();
-    if (!asset.stream) {
-      unreadable.push(asset.key);
-      continue;
-    }
-    // Stored under the full storage key so restore can rebuild it verbatim.
-    // Already-compressed bytes — re-deflating burns CPU for nothing.
-    await appendEntry(archive, asset.stream, asset.key, true);
-  }
-  return unreadable;
-}
-
-/**
- * The client probes before navigating, so the object listing would otherwise be
- * walked twice per export — 1,700+ objects across paginated LIST calls. The
- * probe's result is parked here for the download that immediately follows.
- * Single-instance assumption, same as the public API cache.
- */
-const listingCache = new Map<string, { at: number; objects: AssetObject[] }>();
-const LISTING_TTL_MS = 60_000;
-
-async function listWithCache(
-  cacheKey: string,
-  sources: AssetSource[],
-): Promise<AssetObject[]> {
-  const hit = listingCache.get(cacheKey);
-  if (hit && Date.now() - hit.at < LISTING_TTL_MS) return hit.objects;
-
-  const objects = await listBackupObjects(sources);
-  listingCache.clear();
-  listingCache.set(cacheKey, { at: Date.now(), objects });
-  return objects;
-}
+/** Headroom over the asset total for config, collections and ZIP overhead. */
+const DISK_SLACK_BYTES = 512 * 1024 * 1024;
 
 export async function GET(req: NextRequest) {
+  const { error } = await requireRole(req, "admin");
+  if (error) return error;
+
+  const url = new URL(req.url);
+  const jobId = url.searchParams.get("jobId");
+
+  if (jobId) {
+    const job = await getJob(jobId);
+    return job ? json(job) : notFound("No such backup job");
+  }
+
+  if (url.searchParams.get("probe") === "1") {
+    try {
+      const plan = await planBackup({
+        wantImages: url.searchParams.get("includeImages") === "1",
+        wantDocs: url.searchParams.get("includeDocs") === "1",
+      });
+      return json({
+        config_entries: plan.configs.length,
+        asset_files: plan.objects.length,
+        asset_bytes: plan.assetBytes,
+        assets_unavailable: plan.assetsUnavailable || undefined,
+      });
+    } catch (e) {
+      console.error("[site-config/backup] probe:", e);
+      return serverError();
+    }
+  }
+
+  return json({ jobs: await listJobs() });
+}
+
+export async function POST(req: NextRequest) {
   const { session, error } = await requireRole(req, "admin");
   if (error) return error;
+
+  const busy = activeBuild();
+  if (busy) {
+    // Two concurrent builds would compete for the same bandwidth and disk and
+    // neither would finish sooner, so the caller is pointed at the live one.
+    return json({ error: "A backup is already being built", job: busy }, 409);
+  }
 
   const url = new URL(req.url);
   const wantImages = url.searchParams.get("includeImages") === "1";
   const wantDocs = url.searchParams.get("includeDocs") === "1";
 
-  // Asset inclusion is now ON by default, so an unconfigured-R2 deployment
-  // would hit this on the primary "Download Backup" action. Failing the whole
-  // request there would leave the operator with no backup at all, which is
-  // strictly worse than a database-only one — so degrade and report instead.
-  const r2 = isR2Configured();
-  const assetsUnavailable = (wantImages || wantDocs) && !r2;
-  const includeImages = wantImages && r2;
-  const includeDocs = wantDocs && r2;
-
-  // Everything that can fail with a real status code happens before the first
-  // byte ships. Once the archive is streaming, the status is already 200 and a
-  // later failure can only be reported inside the archive itself.
-  let configs: Awaited<ReturnType<typeof SiteConfig.find>>;
-  let objects: AssetObject[] = [];
-  let images: Array<Record<string, unknown>> = [];
-  let docs: Array<Record<string, unknown>> = [];
+  // Everything that can fail with a real status code happens before the job
+  // exists — once it does, failures can only be reported through its state.
+  let plan;
   try {
-    await connectDB();
-    configs = await SiteConfig.find().sort({ config_key: 1 }).lean();
-
-    const sources: AssetSource[] = [];
-    if (includeImages) {
-      images = (await ImageAsset.find().lean()) as Array<
-        Record<string, unknown>
-      >;
-      sources.push({
-        prefix: IMAGE_PREFIX,
-        dbKeys: images.map((img) => img.storage_key as string),
-      });
-    }
-    if (includeDocs) {
-      docs = (await DocumentAsset.find().lean()) as Array<
-        Record<string, unknown>
-      >;
-      sources.push({
-        prefix: DOCUMENT_PREFIX,
-        dbKeys: docs.map((doc) => doc.storage_key as string),
-      });
-    }
-    if (sources.length > 0) {
-      objects = await listWithCache(
-        `${includeImages ? "i" : ""}${includeDocs ? "d" : ""}`,
-        sources,
-      );
-    }
+    await pruneJobs();
+    plan = await planBackup({ wantImages, wantDocs });
   } catch (e) {
-    console.error("[site-config/backup]", e);
-    return serverError();
+    console.error("[site-config/backup] plan:", e);
+    return serverError("Could not read the data to back up");
   }
 
-  // The download itself is a plain browser navigation, which cannot surface an
-  // error banner — a failed request would just replace the page with JSON. So
-  // the client asks for the same work up front and only navigates once it knows
-  // the export will succeed.
-  if (url.searchParams.get("probe") === "1") {
-    return NextResponse.json({
-      config_entries: configs.length,
-      asset_files: objects.length,
-      asset_bytes: objects.reduce((sum, o) => sum + o.size, 0),
-      assets_unavailable: assetsUnavailable || undefined,
-    });
+  // Filling the volume mid-build is far worse than refusing now: on a shared
+  // disk it can take the app down with it. Old archives are given up first.
+  const needed = plan.assetBytes + DISK_SLACK_BYTES;
+  const space = await ensureSpace(needed);
+  if (!space.ok) {
+    return badRequest(
+      `Not enough disk space to build this backup — it needs about ${Math.ceil(needed / 1e9)} GB and only ${Math.floor(space.free / 1e9)} GB is free, even after removing older archives. Free space on the server, or point BACKUP_DIR at a larger volume.`,
+    );
   }
 
   const exportedAt = new Date().toISOString();
   const exportedBy = session!.user?.email ?? "";
-  const archive = new ZipArchive({ zlib: { level: 6 } });
-
-  // Without a listener an archiver error is an unhandled 'error' event, which
-  // takes the process down rather than just the response.
-  archive.on("error", (err: Error) => {
-    console.error("[site-config/backup] archive stream:", err);
-    archive.destroy();
+  const job = await createJob({
+    filename: `jct-backup-${exportedAt.slice(0, 10)}.zip`,
+    expected_bytes: plan.assetBytes,
+    entries_total: plan.objects.length,
+    config_entries: plan.configs.length,
+    asset_files: plan.objects.length,
+    assets_unavailable: plan.assetsUnavailable || undefined,
   });
-  // A cancelled download must stop the R2 reads behind it.
-  req.signal.addEventListener("abort", () => archive.destroy());
-
-  void (async () => {
-    try {
-      await appendJson(archive, "site-config.json", {
-        version: "2.0",
-        exported_at: exportedAt,
-        exported_by: exportedBy,
-        configs: configs.map((doc) => ({
-          config_key: doc.config_key,
-          value: doc.value,
-          published_value: doc.published_value ?? null,
-          status: doc.status,
-          version: doc.version,
-          published_at: doc.published_at ?? null,
-        })),
-      });
-
-      // Read content collections through the native driver rather than the
-      // Mongoose models: `recruiters` still exists as a collection after its
-      // model was removed, and a backup must not silently skip it.
-      const collectionCounts: Record<string, number> = {};
-      const db = mongoose.connection.db;
-      if (!db) throw new Error("No database connection");
-      for (const col of BACKUP_COLLECTIONS) {
-        try {
-          // Streamed from a cursor, not buffered — see appendCollection.
-          collectionCounts[col.name] = await appendCollection(
-            archive,
-            `collections/${col.name}.json`,
-            db.collection(col.name).find({}),
-          );
-        } catch (err) {
-          // MUST NOT fall back to an empty array. An archive cannot
-          // distinguish "this collection was empty" from "we failed to read
-          // it", and a replace-mode restore treats an empty collection file
-          // as an instruction to delete every document in that collection.
-          // Writing `[]` here would turn a transient read error into silent,
-          // total data loss the next time this archive is restored — so the
-          // whole archive is aborted instead of shipping a partial one.
-          console.error(`[backup] Could not read collection ${col.name}:`, err);
-          throw err;
-        }
-      }
-
-      // Asset metadata precedes the binaries on purpose: a streaming restore
-      // reads entries in order, and needs the media-library rows in hand before
-      // the files they describe arrive.
-      if (includeImages) {
-        await appendJson(
-          archive,
-          "images/_metadata.json",
-          images.map((img) => ({
-            filename: img.filename,
-            storage_key: img.storage_key,
-            alt_text: img.alt_text,
-            category: img.category,
-            institution: img.institution,
-            file_size: img.file_size,
-            mime_type: img.mime_type,
-            width: img.width,
-            height: img.height,
-            ratio_type: img.ratio_type,
-            aspect_ratio: img.aspect_ratio,
-            uploaded_by: img.uploaded_by,
-          })),
-        );
-      }
-      if (includeDocs) {
-        await appendJson(
-          archive,
-          "documents/_metadata.json",
-          docs.map((doc) => ({
-            filename: doc.filename,
-            storage_key: doc.storage_key,
-            mime_type: doc.mime_type,
-            file_size: doc.file_size,
-            uploaded_by: doc.uploaded_by,
-          })),
-        );
-      }
-
-      await appendJson(archive, "manifest.json", {
-        // 4.1 is the first version in which an empty `collections/<name>.json`
-        // reliably means "this collection was empty" rather than possibly
-        // "the read failed" — earlier versions wrote `[]` on a read error.
-        // Restore uses this to decide whether an empty file may prune a
-        // collection in replace mode.
-        version: "4.1",
-        exported_at: exportedAt,
-        exported_by: exportedBy,
-        config_entries: configs.length,
-        collections: collectionCounts,
-        assets: {
-          files: objects.length,
-          bytes: objects.reduce((sum, o) => sum + o.size, 0),
-        },
-        // Recorded so a restore operator can tell "this archive has no
-        // assets because none were requested" from "because R2 was down".
-        assets_unavailable: assetsUnavailable || undefined,
-      });
-
-      const unreadable = await streamAssets(archive, objects, req.signal);
-
-      // Written last because it can only be known last. An operator holding the
-      // archive can still tell exactly what did not make it in.
-      await appendJson(archive, "_report.json", {
-        exported_at: exportedAt,
-        assets_expected: objects.length,
-        assets_archived: objects.length - unreadable.length,
-        unreadable,
-      });
-
-      await archive.finalize();
-    } catch (err) {
-      console.error("[site-config/backup] while streaming:", err);
-      archive.destroy();
-    }
-  })();
 
   await logAudit(
     "site-config",
     "exported",
     exportedBy,
-    `Started backup export: ${configs.length} config entries, ${objects.length} asset files`,
+    `Started backup build: ${plan.configs.length} config entries, ${plan.objects.length} asset files`,
   );
 
-  const filename = `jct-backup-${exportedAt.slice(0, 10)}.zip`;
-  return new NextResponse(
-    Readable.toWeb(archive) as unknown as ReadableStream<Uint8Array>,
-    {
-      status: 200,
-      headers: {
-        "Content-Type": "application/zip",
-        "Content-Disposition": `attachment; filename="${filename}"`,
-        "Cache-Control": "no-store",
-        // Tell nginx not to buffer the response; buffering would reintroduce
-        // the whole-archive-in-memory problem one hop further out.
-        "X-Accel-Buffering": "no",
-      },
-    },
+  // Deliberately not awaited: the build runs for minutes and the caller polls
+  // for its state. Nothing downstream depends on the response, so a rejection
+  // here is recorded on the job rather than thrown into the request.
+  void (async () => {
+    const out = openArchive(job.id);
+    try {
+      const report = await writeBackupArchive(
+        plan,
+        out,
+        { exportedAt, exportedBy },
+        (p) =>
+          updateProgress(job.id, {
+            bytes: p.bytes,
+            entries_done: p.entriesDone,
+            entries_total: p.entriesTotal,
+          }),
+      );
+      const size = await sealArchive(job.id);
+      await finishJob(job.id, { state: "ready", size, report });
+      console.log(`[backup] ${job.id} ready — ${size} bytes`);
+    } catch (err) {
+      console.error(`[backup] ${job.id} failed:`, err);
+      out.destroy();
+      // The partial file must not survive: only the sealed name is servable,
+      // but a stray .part would still occupy the disk indefinitely.
+      await rm(partialPath(job.id), { force: true }).catch(() => {});
+      await finishJob(job.id, {
+        state: "failed",
+        error: err instanceof Error ? err.message : "Backup build failed",
+      });
+    }
+  })();
+
+  return json(job, 202);
+}
+
+export async function DELETE(req: NextRequest) {
+  const { session, error } = await requireRole(req, "admin");
+  if (error) return error;
+
+  const jobId = new URL(req.url).searchParams.get("jobId");
+  if (!jobId) return badRequest("jobId is required");
+  const job = await getJob(jobId);
+  if (!job) return notFound("No such backup job");
+  if (job.state === "building" && activeBuild()?.id === jobId) {
+    return badRequest("That backup is still being built");
+  }
+
+  await deleteJob(jobId);
+  await logAudit(
+    "site-config",
+    "deleted",
+    session!.user?.email ?? "",
+    `Deleted backup archive ${jobId}`,
   );
+  return json({ deleted: true });
 }
