@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { getPublishedConfigValue } from "@/lib/site-config-server";
 import { seoMetadata } from "@/lib/seo";
 import { getContentPage } from "@/lib/content-pages";
+import { contentPageDefault } from "@/lib/content-page-defaults";
 import { ContentPageLayout } from "@/components/layout/ContentPageLayout";
 import { ContentPageSchema } from "@/lib/validation";
 import type { ContentPageValue } from "@/lib/validation";
@@ -33,7 +34,19 @@ export async function ContentPage({ slug }: { slug: string }) {
       parsed.error.issues.slice(0, 5),
     );
   }
-  const data: ContentPageValue = parsed.success ? parsed.data : EMPTY;
+  const stored: ContentPageValue = parsed.success ? parsed.data : EMPTY;
+
+  // A statutory page ships with its copy written (see `content-page-defaults`)
+  // — there is no seed script left to load it, and /privacy must not publish
+  // blank. The default only stands in until the key is saved from the admin;
+  // an intentionally-emptied page has a hero title, so it keeps its own value.
+  const seed = contentPageDefault(def.slug);
+  const isUnsaved =
+    !stored.hero?.title?.trim() &&
+    (stored.intro?.length ?? 0) === 0 &&
+    (stored.blocks?.length ?? 0) === 0;
+  const data: ContentPageValue =
+    isUnsaved && seed ? ContentPageSchema.parse(seed) : stored;
 
   // Nothing seeded yet: fall back to the registry label so the page still has
   // a heading instead of rendering a blank hero.

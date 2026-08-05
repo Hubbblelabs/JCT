@@ -41,7 +41,7 @@ import {
 } from "lucide-react";
 import type { ComponentType } from "react";
 import { hasMinRole } from "@/lib/permissions";
-import { CONTENT_PAGES } from "@/lib/content-pages";
+import { CONTENT_PAGES, mainContentPages } from "@/lib/content-pages";
 
 export type AdminRole = "editor" | "admin";
 
@@ -443,6 +443,21 @@ const GLOBAL_GROUPS: AdminNavGroup[] = [
         description: "Floating buttons and widgets shown on every page.",
       },
     ],
+  },
+  {
+    // The statutory pages the footer links to from every site. They are
+    // block-based content pages like the college ones, but belong to no
+    // college — so they are listed here rather than under a college's
+    // "Other Pages" group.
+    title: "Pages",
+    items: mainContentPages()
+      .filter((p) => !p.host)
+      .map((p) => ({
+        label: p.label,
+        href: `/admin/content/${p.slug}`,
+        icon: p.icon,
+        description: p.description,
+      })),
   },
 ];
 

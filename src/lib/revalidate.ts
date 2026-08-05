@@ -60,8 +60,22 @@ const POLYTECHNIC_PATHS = [
 // listed here.)
 const FEED_PATHS = ["/sitemap.xml"];
 
+// Institution-agnostic routes served from the site root. Sourced from the
+// registry for the same reason the college lists are: a statutory page added
+// there can't drift out of the "home" target.
+const MAIN_CONTENT_PATHS = CONTENT_PAGES.filter(
+  (p) => p.institution === "main" && !p.host,
+).map((p) => p.path);
+
 const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
-  home: ["/", "/campus-life", "/about-us", "/accreditations", "/events"],
+  home: [
+    "/",
+    "/campus-life",
+    "/about-us",
+    "/accreditations",
+    "/events",
+    ...MAIN_CONTENT_PATHS,
+  ],
   engineering: ENGINEERING_PATHS,
   "arts-science": ARTS_SCIENCE_PATHS,
   polytechnic: POLYTECHNIC_PATHS,
@@ -74,10 +88,17 @@ const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
 };
 
 const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
-  // Every block-based content page revalidates its own institution.
+  // Every block-based content page revalidates its own institution. The
+  // institution-agnostic ones ("main" — the statutory pages under /privacy,
+  // /terms, /support) are not a RevalidateTarget of their own; their routes
+  // are carried by "home" via MAIN_CONTENT_PATHS above.
   ...Object.fromEntries(
     CONTENT_PAGES.map(
-      (p) => [p.configKey, [p.institution]] as [string, RevalidateTarget[]],
+      (p) =>
+        [p.configKey, [p.institution === "main" ? "home" : p.institution]] as [
+          string,
+          RevalidateTarget[],
+        ],
     ),
   ),
   contact: ["all-institutions"],

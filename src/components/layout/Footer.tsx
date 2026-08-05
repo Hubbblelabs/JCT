@@ -36,10 +36,13 @@ const SOCIAL_DEFS = [
 ] as const;
 
 // Fixed footer chrome — not part of the editable Footer CMS.
+// Site-root routes, not per-institution ones: the footer renders on every
+// site, and these three pages are institution-agnostic. (They used to point at
+// /mandatory-disclosure/* and /contact, none of which are routes.)
 const LEGAL_LINKS = [
-  { name: "Privacy Policy", href: "/mandatory-disclosure/privacy" },
-  { name: "Terms of Service", href: "/mandatory-disclosure/terms" },
-  { name: "Contact Support", href: "/contact" },
+  { name: "Privacy Policy", href: "/privacy" },
+  { name: "Terms of Service", href: "/terms" },
+  { name: "Contact Support", href: "/support" },
 ];
 
 const MAP_EMBED_URL =

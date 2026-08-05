@@ -17,6 +17,7 @@ import {
   getContentPage,
   hostAdminEditor,
 } from "@/lib/content-pages";
+import { contentPageDefault } from "@/lib/content-page-defaults";
 import { ContentPageSchema } from "@/lib/validation";
 import type { ContentPageValue } from "@/lib/validation";
 
@@ -77,7 +78,12 @@ export default function ContentPageEditor() {
       publicPath={contentPageUrl(def)}
       title={`${def.label} Editor`}
       subtitle={def.description}
-      emptyValue={() => ContentPageSchema.parse({})}
+      // An unsaved statutory page opens on the copy the public route is
+      // already serving, not a blank canvas — otherwise the first save would
+      // wipe the live text.
+      emptyValue={() =>
+        ContentPageSchema.parse(contentPageDefault(def.slug) ?? {})
+      }
       sectionOrder={sectionOrder}
       sectionLabels={CONTENT_SECTION_LABELS}
       sectionTitle={contentSectionTitle}

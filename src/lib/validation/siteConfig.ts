@@ -138,6 +138,10 @@ export const SITE_CONFIG_SCHEMAS = {
   engineeringFeedbackSystem: ContentPageSchema,
   polytechnicFineArtsClub: ContentPageSchema,
   engineeringPlacementGallery: ContentPageSchema,
+  // Statutory pages linked from the footer of every site.
+  privacyPolicyPage: ContentPageSchema,
+  termsPage: ContentPageSchema,
+  supportPage: ContentPageSchema,
   // Per-page meta title/description, keyed by public route path.
   mainSeo: SeoPagesSchema,
   engineeringSeo: SeoPagesSchema,

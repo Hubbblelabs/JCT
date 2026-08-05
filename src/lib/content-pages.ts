@@ -26,6 +26,8 @@ import {
   FileSpreadsheet,
   HeartHandshake,
   History,
+  LifeBuoy,
+  Lock,
   MessageSquare,
   MonitorPlay,
   Palette,
@@ -37,12 +39,21 @@ import {
 } from "lucide-react";
 import type { College } from "@/lib/admin-nav";
 import { PLACEMENT_GALLERY_ANCHOR } from "@/lib/page-anchors";
+import { TRUST_NAME } from "@/lib/legal";
+
+/**
+ * Which site a page belongs to. "main" covers the institution-agnostic pages
+ * served from the site root (the statutory pages under /privacy, /terms,
+ * /support) — they have no college, so they are edited from the Global CMS
+ * section rather than a college's "Other Pages" group.
+ */
+export type ContentPageScope = College | "main";
 
 export type ContentPageDef = {
   /** URL segment for the admin editor: /admin/content/<slug> */
   slug: string;
   configKey: string;
-  institution: College;
+  institution: ContentPageScope;
   /**
    * Public route this page is published at. For a hosted page (see `host`)
    * this is the host's route — several entries then share one `path`.
@@ -69,6 +80,7 @@ const ENG = "/institutions/engineering";
 const POLY = "/institutions/polytechnic";
 const SUFFIX = "JCT College of Engineering & Technology, Coimbatore";
 const POLY_SUFFIX = "JCT Polytechnic College, Coimbatore";
+const MAIN_SUFFIX = "JCT Institutions";
 
 export const CONTENT_PAGES: ContentPageDef[] = [
   {
@@ -301,7 +313,54 @@ export const CONTENT_PAGES: ContentPageDef[] = [
       "The Fine Arts Club at JCT Polytechnic College — its movie, cultural, arts and photography wings, objectives and event gallery.",
     icon: Palette,
   },
+  // Statutory pages linked from the footer of every page on every site. They
+  // ship with their copy already written (see `content-page-defaults.ts`)
+  // because the text has to be live from the moment the route exists.
+  {
+    slug: "privacy",
+    configKey: "privacyPolicyPage",
+    institution: "main",
+    path: "/privacy",
+    label: "Privacy Policy",
+    description:
+      "Site-wide privacy policy — data collected, cookies, storage and contact.",
+    seoLabel: "Privacy Policy",
+    seoTitle: `Privacy Policy | ${MAIN_SUFFIX}`,
+    seoDescription: `How ${TRUST_NAME} collects, uses, stores and protects the personal information of visitors to jct.ac.in.`,
+    icon: Lock,
+  },
+  {
+    slug: "terms",
+    configKey: "termsPage",
+    institution: "main",
+    path: "/terms",
+    label: "Terms & Conditions",
+    description:
+      "Site-wide terms of use, disclaimer, jurisdiction and copyright notice.",
+    seoLabel: "Terms & Conditions",
+    seoTitle: `Terms & Conditions | ${MAIN_SUFFIX}`,
+    seoDescription: `The terms of use, disclaimer, jurisdiction and copyright notice governing your use of jct.ac.in, operated by ${TRUST_NAME}.`,
+    icon: ScrollText,
+  },
+  {
+    slug: "support",
+    configKey: "supportPage",
+    institution: "main",
+    path: "/support",
+    label: "Contact Support",
+    description: "Site-wide support desk contact details.",
+    seoLabel: "Contact Support",
+    seoTitle: `Contact Support | ${MAIN_SUFFIX}`,
+    seoDescription:
+      "Reach the JCT Institutions support desk — email, admissions helpline and postal address.",
+    icon: LifeBuoy,
+  },
 ];
+
+/** Pages served from the site root rather than under an institution. */
+export function mainContentPages(): ContentPageDef[] {
+  return CONTENT_PAGES.filter((p) => p.institution === "main");
+}
 
 export const CONTENT_PAGE_CONFIG_KEYS = CONTENT_PAGES.map((p) => p.configKey);
 
