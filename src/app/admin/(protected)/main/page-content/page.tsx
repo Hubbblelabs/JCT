@@ -27,7 +27,7 @@ import {
   type NavbarVal,
 } from "@/components/admin/PageContentForms";
 import { mainNavigation } from "@/data/all-navigations";
-import { seoPagesDefaultValue } from "@/lib/seo-pages";
+import { reconcileSeoPages, seoPagesDefaultValue } from "@/lib/seo-pages";
 import {
   Field,
   FormGrid,
@@ -1096,6 +1096,7 @@ function Inner() {
       kind: "form",
       configKey: "mainSeo",
       defaultValue: seoPagesDefaultValue("main") as SeoPagesVal,
+      reconcile: (v) => reconcileSeoPages("main", v),
       render: (v, onChange) => (
         <SeoPagesForm value={(v as SeoPagesVal) ?? {}} onChange={onChange} />
       ),

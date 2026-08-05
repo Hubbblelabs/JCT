@@ -51,7 +51,7 @@ import {
   polytechnicNavigation,
   type NavItem as StaticNavItem,
 } from "@/data/all-navigations";
-import { seoPagesDefaultValue } from "@/lib/seo-pages";
+import { reconcileSeoPages, seoPagesDefaultValue } from "@/lib/seo-pages";
 
 type College = "engineering" | "arts-science" | "polytechnic";
 
@@ -69,6 +69,7 @@ function seoSection(college: College): SectionDef {
     kind: "form",
     configKey: SEO_CONFIG_KEY[college],
     defaultValue: seoPagesDefaultValue(college) as SeoPagesVal,
+    reconcile: (v) => reconcileSeoPages(college, v),
     render: (v, onChange) => (
       <SeoPagesForm value={(v as SeoPagesVal) ?? {}} onChange={onChange} />
     ),

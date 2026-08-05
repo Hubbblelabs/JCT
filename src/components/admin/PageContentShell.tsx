@@ -28,6 +28,14 @@ export type SectionDef = {
   customRender?: () => ReactNode;
   /** Default value when no SiteConfig exists yet */
   defaultValue?: unknown;
+  /**
+   * Reshape the loaded value before it reaches the editor. Used where the
+   * stored value can fall behind a code-side registry — the SEO sections run
+   * `reconcileSeoPages` so rows for pages added or removed since the key was
+   * last saved show up correctly. Must be pure and idempotent: it runs on the
+   * default value too, and again after every save.
+   */
+  reconcile?: (value: unknown) => unknown;
 };
 
 type Props = {
@@ -85,8 +93,8 @@ function PageContentShellInner({ pageTitle, pageSubtitle, sections }: Props) {
       for (const s of sections) {
         if (s.kind !== "form" || !s.configKey) continue;
         const found = data.find((d) => d.config_key === s.configKey);
-        next[s.configKey] =
-          found?.value ?? s.defaultValue ?? defaultValueFor(s);
+        const raw = found?.value ?? s.defaultValue ?? defaultValueFor(s);
+        next[s.configKey] = s.reconcile ? s.reconcile(raw) : raw;
       }
       setValues(next);
     } catch {
@@ -114,7 +122,11 @@ function PageContentShellInner({ pageTitle, pageSubtitle, sections }: Props) {
     const data: { config_key: string; value: unknown }[] = await r.json();
     const found = data.find((d) => d.config_key === configKey);
     if (!found) return;
-    setValues((prev) => ({ ...prev, [configKey]: found.value }));
+    const reconcile = sections.find(
+      (s) => s.configKey === configKey,
+    )?.reconcile;
+    const value = reconcile ? reconcile(found.value) : found.value;
+    setValues((prev) => ({ ...prev, [configKey]: value }));
   };
 
   const save = async () => {

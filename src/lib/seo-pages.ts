@@ -8,6 +8,7 @@
  * a row here without wiring the route does nothing.
  */
 import { CONTENT_PAGES } from "@/lib/content-pages";
+import { LIMITS as SEO_LIMITS } from "@/lib/validation/seo";
 
 export type SeoPageDefault = {
   path: string;
@@ -86,15 +87,97 @@ export const SEO_PAGE_DEFAULTS: Record<string, SeoPageDefault[]> = {
   polytechnic: POLYTECHNIC_SEO_PAGES,
 };
 
+export type SeoPageRow = {
+  path: string;
+  label: string;
+  title: string;
+  description: string;
+};
+
+/**
+ * "/institutions/engineering/" and "/Institutions/Engineering" both address the
+ * stored "/institutions/engineering" row. Shared with `getPageSeo` so the
+ * editor and the lookup agree on when two rows are the same page.
+ */
+export function normalizeSeoPath(path: string): string {
+  const trimmed = path.trim().toLowerCase();
+  if (!trimmed) return "/";
+  return trimmed.replace(/\/+$/, "") || "/";
+}
+
 /** Blank rows for a scope, in the shape the `<scope>Seo` config stores. */
-export function seoPagesDefaultValue(scope: string): {
-  pages: { path: string; label: string; title: string; description: string }[];
-} {
-  return {
-    pages: (SEO_PAGE_DEFAULTS[scope] ?? []).map((p) => ({
-      ...p,
-      title: "",
-      description: "",
-    })),
-  };
+export function seoPagesDefaultValue(scope: string): { pages: SeoPageRow[] } {
+  return reconcileSeoPages(scope, null);
+}
+
+function str(v: unknown): string {
+  return typeof v === "string" ? v : "";
+}
+
+/**
+ * Bring a stored `<scope>Seo` value back in step with the page registry.
+ *
+ * `seoPagesDefaultValue` only ever seeded a key that had never been saved, so
+ * a scope saved once was frozen: pages added to the registry afterwards never
+ * got a row, and rows for deleted routes lingered forever (the CMS shipped
+ * with a `/support` row long after that page was removed). The editors run
+ * this on load instead, which self-heals every existing database.
+ *
+ * Admin-entered text is never discarded — a row for a path the registry does
+ * not know about is kept as long as it carries a title or description, since
+ * that is a page someone deliberately added by hand. Only blank unknown rows,
+ * which are pure noise, are dropped.
+ */
+export function reconcileSeoPages(
+  scope: string,
+  stored: unknown,
+): { pages: SeoPageRow[] } {
+  const defaults = SEO_PAGE_DEFAULTS[scope] ?? [];
+
+  const rawRows = (stored as { pages?: unknown } | null)?.pages;
+  const rows: Record<string, unknown>[] = Array.isArray(rawRows)
+    ? rawRows.filter(
+        (r): r is Record<string, unknown> =>
+          !!r && typeof r === "object" && typeof r.path === "string",
+      )
+    : [];
+
+  const storedByPath = new Map<string, Record<string, unknown>>();
+  for (const row of rows) {
+    const key = normalizeSeoPath(row.path as string);
+    // First row wins, so a duplicated path collapses to one entry.
+    if (!storedByPath.has(key)) storedByPath.set(key, row);
+  }
+
+  // Registry order, registry path and registry label all win — a renamed page
+  // shows its new name — while the admin's own title/description carry over.
+  const merged: SeoPageRow[] = defaults.map((d) => {
+    const found = storedByPath.get(normalizeSeoPath(d.path));
+    return {
+      path: d.path,
+      label: d.label,
+      title: str(found?.title),
+      description: str(found?.description),
+    };
+  });
+
+  const known = new Set(defaults.map((d) => normalizeSeoPath(d.path)));
+  const extras: SeoPageRow[] = [];
+  const seenExtras = new Set<string>();
+  for (const row of rows) {
+    const key = normalizeSeoPath(row.path as string);
+    if (known.has(key) || seenExtras.has(key)) continue;
+    const title = str(row.title).trim();
+    const description = str(row.description).trim();
+    if (!title && !description) continue;
+    seenExtras.add(key);
+    extras.push({
+      path: row.path as string,
+      label: str(row.label),
+      title: str(row.title),
+      description: str(row.description),
+    });
+  }
+
+  return { pages: [...merged, ...extras].slice(0, SEO_LIMITS.pagesMax) };
 }

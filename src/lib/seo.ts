@@ -2,6 +2,7 @@ import "server-only";
 import type { Metadata } from "next";
 import type { ProgramData } from "@/types/program";
 import { getPublishedConfigValue } from "./site-config-server";
+import { normalizeSeoPath } from "./seo-pages";
 
 export type SeoScope = "main" | "engineering" | "arts-science" | "polytechnic";
 
@@ -14,15 +15,6 @@ export const SEO_CONFIG_KEY: Record<SeoScope, string> = {
 };
 
 export type PageSeo = { title: string; description: string };
-
-/** "/institutions/engineering/" and "/Institutions/Engineering" both match
- * the stored "/institutions/engineering" entry. */
-function normalizePath(path: string): string {
-  const trimmed = path.trim().toLowerCase();
-  if (!trimmed) return "/";
-  const withoutTrailing = trimmed.replace(/\/+$/, "");
-  return withoutTrailing || "/";
-}
 
 /**
  * Look up the admin-managed meta tags for one public page. Returns null when
@@ -38,12 +30,12 @@ export async function getPageSeo(
   const pages = (value as { pages?: unknown }).pages;
   if (!Array.isArray(pages)) return null;
 
-  const wanted = normalizePath(path);
+  const wanted = normalizeSeoPath(path);
   for (const raw of pages) {
     if (!raw || typeof raw !== "object") continue;
     const entry = raw as Record<string, unknown>;
     if (typeof entry.path !== "string") continue;
-    if (normalizePath(entry.path) !== wanted) continue;
+    if (normalizeSeoPath(entry.path) !== wanted) continue;
     const title = typeof entry.title === "string" ? entry.title.trim() : "";
     const description =
       typeof entry.description === "string" ? entry.description.trim() : "";
