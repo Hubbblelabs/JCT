@@ -113,6 +113,11 @@ function ImageRepeater({
   return (
     <Repeater<ContentImageValue>
       label={label}
+      // Full width so the repeater's own grid is wide enough for its container
+      // query to keep two photos per row — at the default half-width it fell
+      // under the 620px breakpoint and stacked every photo in one long column,
+      // which is unusable for an album of twenty.
+      span="full"
       itemSpan={6}
       items={images}
       onChange={onChange}

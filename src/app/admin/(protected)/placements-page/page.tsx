@@ -38,7 +38,8 @@ import {
   toPreviewRecord,
   type AdminPlacementRecord,
 } from "@/lib/admin-placement-records";
-import { PlacementInfoSchema } from "@/lib/validation";
+import { hostedSectionKey } from "@/lib/content-pages";
+import { emptyContentBlock, PlacementInfoSchema } from "@/lib/validation";
 import type { PlacementInfoValue } from "@/lib/validation";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
@@ -159,6 +160,25 @@ function PlacementsPageEditorInner() {
     // are what change as the editor types.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [records],
+  );
+
+  // The gallery is one image block per academic year, and the preview shows
+  // only the selected year's — so the block is created from the page rather
+  // than hunted for in the inspector's block list, pre-titled with the year so
+  // it matches on the public page (which pairs album to year by that title).
+  const addGalleryBlock = useCallback(
+    (year: string) => {
+      if (!gallerySlug) return;
+      const current = hostedDrafts[gallerySlug];
+      if (!current) return;
+      const blocks = current.blocks ?? [];
+      const block = emptyContentBlock("gallery");
+      const next = [...blocks, { ...block, title: year }];
+      setHostedDraft(gallerySlug, { ...current, blocks: next });
+      setSelected(hostedSectionKey(gallerySlug, `block:${next.length - 1}`));
+      setInspectorOpen(true);
+    },
+    [gallerySlug, hostedDrafts, setHostedDraft],
   );
 
   const patchRecord = useCallback((next: AdminPlacementRecord) => {
@@ -332,6 +352,7 @@ function PlacementsPageEditorInner() {
             info={draft}
             gallery={gallerySlug ? hostedDrafts[gallerySlug] : null}
             gallerySlug={gallerySlug}
+            onAddGalleryBlock={addGalleryBlock}
             selectedRecordId={resolvedRecordId}
             onSelectRecord={setActiveRecordId}
             editable

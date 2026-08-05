@@ -896,10 +896,21 @@ export function ContentPageBody({
   data,
   editable = false,
   onEditSection,
+  blockIndices,
+  emptyBlocksHint = "No blocks yet. Click to add the first one.",
 }: {
   data: ContentPageValue;
   editable?: boolean;
   onEditSection?: (section: ContentEditableSection) => void;
+  /**
+   * Original index of each block in `data`, for callers that hand over a
+   * *filtered* list (the placements page shows one academic year at a time).
+   * Inspector keys are indexes into the full stored array, so without this the
+   * editor would open — and overwrite — the wrong block.
+   */
+  blockIndices?: number[];
+  /** Placeholder copy when there is nothing to render but the editor is on. */
+  emptyBlocksHint?: string;
 }) {
   const onEdit = onEditSection as ((s: string) => void) | undefined;
   // `intro`/`blocks` are optional-in-practice: a stored value that fails schema
@@ -939,26 +950,31 @@ export function ContentPageBody({
       )}
 
       {blocks.length > 0
-        ? blocks.map((block, i) => (
-            <EditableRegion
-              // Keyed by identity, not position. The placements page hands this
-              // component a *filtered* block array that changes when the visitor
-              // picks another academic year; with a bare index key React kept
-              // the same GalleryBlockView mounted and handed it a different
-              // block, so one year's "show all albums/photos" state carried
-              // over to the next — defeating the lazy-expansion the caps exist
-              // for and firing every image request at once.
-              key={`${block.type}:${block.title}:${i}`}
-              as="section"
-              section={`block:${i}`}
-              label={blockLabel(block, i)}
-              editable={editable}
-              onEditSection={onEdit}
-              className="mt-14 first:mt-10"
-            >
-              <BlockView block={block} editable={editable} />
-            </EditableRegion>
-          ))
+        ? blocks.map((block, i) => {
+            // Where this block sits in the stored array — the same as `i`
+            // unless the caller filtered the list (see `blockIndices`).
+            const index = blockIndices?.[i] ?? i;
+            return (
+              <EditableRegion
+                // Keyed by identity, not position. The placements page hands
+                // this component a *filtered* block array that changes when the
+                // visitor picks another academic year; with a bare index key
+                // React kept the same GalleryBlockView mounted and handed it a
+                // different block, so one year's "show all albums/photos" state
+                // carried over to the next — defeating the lazy-expansion the
+                // caps exist for and firing every image request at once.
+                key={`${block.type}:${block.title}:${index}`}
+                as="section"
+                section={`block:${index}`}
+                label={blockLabel(block, index)}
+                editable={editable}
+                onEditSection={onEdit}
+                className="mt-14 first:mt-10"
+              >
+                <BlockView block={block} editable={editable} />
+              </EditableRegion>
+            );
+          })
         : editable && (
             <EditableRegion
               as="section"
@@ -969,7 +985,7 @@ export function ContentPageBody({
               className="mt-14"
             >
               <div className="text-muted-foreground/60 rounded-2xl border border-dashed border-white/15 py-16 text-center text-sm">
-                No blocks yet. Click to add the first one.
+                {emptyBlocksHint}
               </div>
             </EditableRegion>
           )}

@@ -34,6 +34,7 @@ import {
   ChevronDown,
   ExternalLink,
   History,
+  ImagePlus,
   Images,
   type LucideIcon,
 } from "lucide-react";
@@ -1867,9 +1868,11 @@ function yearSortKey(year: string): number {
  * year's albums into one very long section. A block whose title carries no year
  * (an intro, say) always shows.
  *
- * In the editor nothing is filtered: block inspector keys are indexes into this
- * list, and a block hidden from the preview could not be clicked to edit. The
- * editor shows a badge instead when the public page would show fewer.
+ * The editor filters too, so an admin edits the year they are looking at rather
+ * than scrolling past every other year's albums. Block inspector keys are
+ * indexes into the *stored* list, so the surviving indexes are returned
+ * alongside the filtered value and handed to `ContentPageBody`; a badge names
+ * how many albums the year picker is hiding.
  *
  * Fails CLOSED: a year that matches no album publishes no album, rather than
  * falling back to every year at once. Album titles and Placement record years
@@ -1883,20 +1886,23 @@ function yearSortKey(year: string): number {
 function galleryForYear(
   gallery: ContentPageValue | null,
   year: string,
-): ContentPageValue | null {
-  if (!gallery) return null;
+): { value: ContentPageValue | null; indices: number[] } {
+  if (!gallery) return { value: null, indices: [] };
   const target = yearSortKey(year);
   // `blocks` can be absent on a value that failed schema validation upstream.
   const all = gallery.blocks ?? [];
-  if (target < 0) return gallery;
-  const blocks = all.filter((b) => {
+  if (target < 0) return { value: gallery, indices: all.map((_, i) => i) };
+  const indices: number[] = [];
+  const blocks = all.filter((b, i) => {
     // Compare the *first* year in the label, not any of them: "2023-2024" and
     // "2024-2025" both contain 2024, and matching on either would publish two
     // years' albums at once.
     const blockYear = yearSortKey(b.title ?? "");
-    return blockYear < 0 || blockYear === target;
+    const keep = blockYear < 0 || blockYear === target;
+    if (keep) indices.push(i);
+    return keep;
   });
-  return { ...gallery, blocks };
+  return { value: { ...gallery, blocks }, indices };
 }
 
 /**
@@ -2077,6 +2083,7 @@ export function PlacementsPageLayout({
   info,
   gallery = null,
   gallerySlug,
+  onAddGalleryBlock,
   selectedRecordId,
   onSelectRecord,
   editable = false,
@@ -2098,6 +2105,13 @@ export function PlacementsPageLayout({
    */
   gallerySlug?: string;
   /**
+   * Admin preview only — appends an image block to the gallery draft, titled
+   * with the year passed in, and opens it in the inspector. The preview shows
+   * only the selected year's albums, so a year with none would otherwise offer
+   * no obvious way to start one.
+   */
+  onAddGalleryBlock?: (year: string) => void;
+  /**
    * Controlled year selection. The admin preview owns it, so the year showing
    * on the page and the year open in the inspector cannot drift apart; the
    * public route leaves both unset and the switcher keeps its own state.
@@ -2116,24 +2130,23 @@ export function PlacementsPageLayout({
   const setSelectedId = onSelectRecord ?? setOwnSelectedId;
   const active = records.find((r) => r._id === selectedId) ?? current ?? null;
 
-  // Only the selected year's photographs are published; the editor keeps every
-  // block so each one stays clickable.
+  // Only the selected year's photographs are published — and the editor shows
+  // the same subset, so an admin edits the year on screen instead of every
+  // year's albums stacked together.
   const filteredGallery = useMemo(
     () => galleryForYear(gallery ?? null, active?.year ?? ""),
     [gallery, active],
   );
-  const visibleGallery = editable ? (gallery ?? null) : filteredGallery;
+  const visibleGallery = filteredGallery.value;
 
-  // What the public page would show for the selected year, surfaced in the
-  // editor — otherwise an admin sees every album in the preview and has no way
-  // to tell that visitors see a subset (or, when titles don't carry the year,
-  // all of them regardless of the year picker).
+  // Names what the year picker is hiding, so an admin who cannot find an album
+  // knows it belongs to another year rather than assuming it was lost.
   const galleryFilterNote = useMemo(() => {
     if (!editable || !gallery) return null;
     const total = gallery.blocks?.length ?? 0;
-    const shown = filteredGallery?.blocks?.length ?? 0;
+    const shown = filteredGallery.indices.length;
     if (total === 0 || shown === total) return null;
-    return { shown, total, year: active?.year ?? "" };
+    return { hidden: total - shown, shown, year: active?.year ?? "" };
   }, [editable, gallery, filteredGallery, active]);
 
   // A built-in nav entry only appears once its section actually has content —
@@ -2427,24 +2440,49 @@ export function PlacementsPageLayout({
                             visibleGallery.hero?.title?.trim() ||
                             "Placement Gallery"
                           }
-                          meta={
-                            !editable && active
-                              ? `${active.year} photos`
-                              : undefined
-                          }
+                          meta={active ? `${active.year} photos` : undefined}
                         />
                       </EditableRegion>
+                      {/* The gallery is authored one image block per year, so
+                          the control that creates one sits at the top of the
+                          section — the block list inside the inspector is two
+                          clicks away and does not pre-fill the year. */}
+                      {editable && gallerySlug && onAddGalleryBlock && (
+                        <div className="mb-4 flex flex-wrap items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              onAddGalleryBlock(active?.year ?? "")
+                            }
+                            className="border-gold/40 text-gold hover:bg-gold/10 inline-flex items-center gap-1.5 rounded-lg border border-dashed px-3 py-2 text-xs font-semibold"
+                          >
+                            <ImagePlus size={14} />
+                            Add image block
+                            {active?.year ? ` for ${active.year}` : ""}
+                          </button>
+                          <span className="text-muted-foreground/70 text-xs">
+                            Creates a photo album titled with the selected year.
+                          </span>
+                        </div>
+                      )}
                       {galleryFilterNote && (
                         <p className="mb-4 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
-                          Editing view shows all {galleryFilterNote.total}{" "}
-                          albums. Visitors who select{" "}
-                          {galleryFilterNote.year || "this year"} see{" "}
-                          {galleryFilterNote.shown} — an album is matched to a
-                          year by the first four-digit number in its title.
+                          Showing the {galleryFilterNote.shown} album(s) for{" "}
+                          {galleryFilterNote.year || "this year"} —{" "}
+                          {galleryFilterNote.hidden} belonging to other years
+                          are hidden. Switch years above to edit them; an album
+                          is matched to a year by the first four-digit number in
+                          its title.
                         </p>
                       )}
                       <ContentPageBody
                         data={visibleGallery}
+                        blockIndices={filteredGallery.indices}
+                        emptyBlocksHint={
+                          active?.year
+                            ? `No image block for ${active.year} yet — use “Add image block” above.`
+                            : "No blocks yet. Click to add the first one."
+                        }
                         editable={editable && !!gallerySlug}
                         onEditSection={
                           gallerySlug
