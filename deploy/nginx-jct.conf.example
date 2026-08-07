@@ -80,3 +80,84 @@ location /internal-backups/ {
     # sendfile().
     gzip       off;
 }
+
+# ── Object storage vhost (on-prem Garage) ────────────────────────────────────
+#
+# Only needed when assets are served from this server rather than Cloudflare
+# R2. docker-compose.prod.yaml publishes Garage's S3 API on 127.0.0.1:3900 and
+# nothing else; this block is what puts TLS in front of it.
+#
+# It carries BOTH kinds of traffic, which is why it needs the upload
+# directives as well as the caching ones:
+#
+#   - The browser's presigned PUT when an admin uploads a document. That path
+#     is not optional and has no server-side fallback — proxy.ts truncates any
+#     request body it matches at 10 MB, so large PDFs can only reach storage
+#     by going browser-to-Garage directly.
+#   - Public GETs of every image and document on the site.
+#
+# TLS is mandatory, not a nicety: next.config.ts allowlists the asset host for
+# /_next/image with `protocol: "https"` only. Served over plain HTTP, every
+# optimised image fails with '"url" parameter is not allowed'.
+#
+# The app is then configured with:
+#   STORAGE_ENDPOINT=https://s3.jct.ac.in
+#   NEXT_PUBLIC_STORAGE_PUBLIC_URL=https://s3.jct.ac.in/jct-assets
+#
+# CORS is configured on the bucket itself, not here — see
+# deploy/garage.toml.example. Adding `add_header Access-Control-Allow-*` in
+# nginx instead looks like it works for GETs and then fails the preflight on
+# PUT, because nginx's add_header does not apply to the 4xx Garage returns for
+# an unconfigured OPTIONS.
+
+server {
+    listen 443 ssl http2;
+    server_name s3.jct.ac.in;
+
+    # ssl_certificate / ssl_certificate_key — issue with certbot as usual.
+
+    location / {
+        proxy_pass http://127.0.0.1:3900;
+
+        proxy_http_version 1.1;
+        # Garage signs against the Host header it receives. Rewriting it breaks
+        # every SigV4 signature, so pass the original through untouched.
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Presigned PUT of a prospectus PDF. The 1 MB default 413s the upload
+        # before Garage ever sees it, and buffering spools the whole file to
+        # nginx's disk first for no benefit.
+        client_max_body_size    0;
+        proxy_request_buffering off;
+        proxy_buffering         off;
+
+        proxy_read_timeout      3600s;
+        proxy_send_timeout      3600s;
+        send_timeout            3600s;
+    }
+
+    # Uploaded assets are immutable — the key contains a timestamp and a
+    # replacement gets a new key, so nothing under these prefixes is ever
+    # rewritten in place. Garage does not set Cache-Control itself, and
+    # without one every image is re-fetched from origin on each page view.
+    location ~ ^/[^/]+/(images|documents)/ {
+        proxy_pass http://127.0.0.1:3900;
+
+        proxy_http_version 1.1;
+        proxy_set_header Host              $host;
+        proxy_set_header X-Real-IP         $remote_addr;
+        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # No `always`: nginx then applies this to 2xx/3xx only, so a 404 for an
+        # object that has not finished uploading is not cached for a month.
+        add_header Cache-Control "public, max-age=2592000, immutable";
+
+        client_max_body_size    0;
+        proxy_request_buffering off;
+        proxy_read_timeout      3600s;
+    }
+}

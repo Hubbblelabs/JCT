@@ -4,6 +4,7 @@ import {
   normalizeProgramData,
   withProgramCardFields,
 } from "@/lib/normalize-program-data";
+import { publicAssetBaseUrl } from "@/lib/storage-public";
 import type { ProgramData } from "@/types/program";
 
 export type ProgramInstitution = "engineering" | "arts-science" | "polytechnic";
@@ -70,9 +71,9 @@ function publicImageUrl(imageUrl: string | null | undefined): string | null {
     return imageUrl;
   }
   if (imageUrl.includes("/") || imageUrl.startsWith("uploads/")) {
-    const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+    const publicUrl = publicAssetBaseUrl();
     if (publicUrl) {
-      return `${publicUrl.replace(/\/$/, "")}/${imageUrl.replace(/^\//, "")}`;
+      return `${publicUrl}/${imageUrl.replace(/^\//, "")}`;
     }
     return `/api/public/images/${imageUrl.replace(/^\//, "")}`;
   }

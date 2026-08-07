@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { storageEnvPresence } from "./storage-config";
 
 /**
  * Boot-time validation of server environment configuration.
@@ -55,22 +56,19 @@ const EnvSchema = z.object({
 });
 
 /**
- * R2 is optional as a whole — images fall back to local serving. But a
- * *partial* set is always a mistake: uploads fail at request time with an SDK
- * error rather than falling back cleanly.
+ * Object storage is optional as a whole — images fall back to local serving
+ * through `/api/public/images/<key>`. But a *partial* set is always a mistake:
+ * uploads fail at request time with an SDK error rather than falling back
+ * cleanly.
+ *
+ * The check runs against the resolved configuration rather than a fixed list
+ * of variable names, so it stays correct whichever naming a deployment uses —
+ * canonical `STORAGE_*`, legacy `R2_*`, or a mix during a migration.
  */
-const R2_KEYS = [
-  "R2_ACCOUNT_ID",
-  "R2_ACCESS_KEY_ID",
-  "R2_SECRET_ACCESS_KEY",
-  "R2_BUCKET_NAME",
-] as const;
-
-function checkR2(): string | null {
-  const present = R2_KEYS.filter((k) => (process.env[k] ?? "").trim() !== "");
-  if (present.length === 0 || present.length === R2_KEYS.length) return null;
-  const missing = R2_KEYS.filter((k) => !present.includes(k));
-  return `R2 storage is partially configured — missing: ${missing.join(", ")}. Set all four or none.`;
+function checkStorage(): string | null {
+  const { present, missing } = storageEnvPresence();
+  if (present.length === 0 || missing.length === 0) return null;
+  return `Object storage is partially configured — missing: ${missing.join(", ")}. Set all four or none. See .env.example.`;
 }
 
 export function validateServerEnv(): void {
@@ -83,8 +81,8 @@ export function validateServerEnv(): void {
     }
   }
 
-  const r2 = checkR2();
-  if (r2) problems.push(r2);
+  const storage = checkStorage();
+  if (storage) problems.push(storage);
 
   if (problems.length === 0) return;
 

@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { SiteConfig } from "@/lib/models";
 import { publicCacheGet, publicCacheSet } from "@/lib/public-cache";
 import { isKnownSiteConfigKey } from "@/lib/validation/siteConfig";
+import { publicAssetBaseUrl } from "@/lib/storage-public";
 
 // Reading query params makes this handler dynamic, so route-level ISR
 // (`export const revalidate`) does not apply — responses are instead served
@@ -23,8 +24,8 @@ function resolveProspectusUrl(value: unknown): unknown {
     ) {
       return v;
     }
-    // Otherwise, it's a path in R2 storage - construct full URL
-    const baseUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+    // Otherwise, it's an object storage key - construct full URL
+    const baseUrl = publicAssetBaseUrl();
     if (baseUrl) {
       return {
         ...v,

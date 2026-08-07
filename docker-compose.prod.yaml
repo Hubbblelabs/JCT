@@ -1,9 +1,29 @@
+# Production host.
+#
+# Three services: the app, MongoDB, and Garage (S3-compatible object storage).
+# The database and storage were previously MongoDB Atlas and Cloudflare R2;
+# both are now optional — delete a service here and point the matching env vars
+# at the managed equivalent and nothing else changes, because the app resolves
+# its provider entirely from the environment (see src/lib/storage-config.ts).
+#
+# Garage rather than MinIO: MinIO's community Docker images were withdrawn in
+# October 2025 and the repository is archived, so it receives no security
+# patches. Garage is a single binary that covers everything this app asks of
+# S3 — presigned PUT, multipart, ListObjectsV2, CORS.
+#
+# Nothing here is published beyond loopback. The host's nginx terminates TLS
+# and is the only thing that reaches these ports; see deploy/nginx-jct.conf.example.
+
 services:
   jct:
     image: kavinnandha/jct:latest
     container_name: jct
 
     restart: unless-stopped
+
+    depends_on:
+      - mongo
+      - garage
 
     # Bound to loopback so only the host's nginx can reach the app. Published
     # on 0.0.0.0 it was reachable directly at <host>:3000, bypassing the
@@ -26,4 +46,63 @@ services:
     volumes:
       - /srv/jct/backups:/var/backups/jct
 
+    networks:
+      - jct
+
     pull_policy: always
+
+  mongo:
+    image: mongo:8
+    container_name: jct-mongo
+
+    restart: unless-stopped
+
+    # A standalone mongod is enough: nothing in this app uses transactions,
+    # change streams or Atlas Search, all of which would require a replica set.
+    command: ["--auth", "--bind_ip_all"]
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:?set MONGO_ROOT_USER in .env}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?set MONGO_ROOT_PASSWORD in .env}
+
+    # Loopback only. This port exists for one reason: the CI build runs on a
+    # self-hosted runner ON THIS HOST, and `next build` has to reach the
+    # database to prerender the public ISR pages with real content. Without it
+    # those pages bake empty and stay wrong until the next revalidation.
+    # See `network: host` in docker-compose.build.yaml.
+    ports:
+      - "127.0.0.1:27017:27017"
+
+    volumes:
+      - /srv/jct/mongo:/data/db
+
+    networks:
+      - jct
+
+  garage:
+    # Pin a concrete version. `:latest` on a storage engine means an unattended
+    # `docker compose pull` can change the on-disk metadata format under you.
+    image: dxflrs/garage:v2.0.0
+    container_name: jct-garage
+
+    restart: unless-stopped
+
+    # 3900 is the S3 API — nginx fronts it with TLS as s3.jct.ac.in, which is
+    # what both the server-side SDK and the browser's presigned PUT talk to.
+    ports:
+      - "127.0.0.1:3900:3900"
+
+    volumes:
+      - ./deploy/garage.toml:/etc/garage.toml:ro
+      # Metadata and data are separate on purpose: metadata is small and
+      # latency-sensitive (put it on SSD), data is bulk. Losing meta loses the
+      # bucket even if data survives, so both belong in the backup plan.
+      - /srv/jct/garage/meta:/var/lib/garage/meta
+      - /srv/jct/garage/data:/var/lib/garage/data
+
+    networks:
+      - jct
+
+networks:
+  jct:
+    driver: bridge

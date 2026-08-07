@@ -36,11 +36,11 @@ import type { BackupJobReport } from "@/lib/backup-jobs";
  * is safe to do in parallel; a large object is worth a dedicated turn anyway,
  * since its transfer time dwarfs the request latency being hidden.
  */
-const SMALL_ASSET_BYTES = 4 * 1024 * 1024;
+const SMALL_ASSET_BYTES = 32 * 1024 * 1024;
 /** Concurrent small-object fetches. Below the SDK agent's 50-socket pool. */
-const FETCH_CONCURRENCY = 12;
+const FETCH_CONCURRENCY = 64;
 /** Ceiling on buffered-but-not-yet-archived bytes, so memory stays bounded. */
-const FETCH_BUDGET_BYTES = 192 * 1024 * 1024;
+const FETCH_BUDGET_BYTES = 512 * 1024 * 1024;
 
 export interface BackupPlan {
   configs: Array<Record<string, unknown>>;

@@ -1,7 +1,20 @@
 import type { NextConfig } from "next";
 
-function r2Hostname(): string | null {
-  const raw = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+/**
+ * The host uploaded assets are served from. Canonical name first, legacy R2
+ * name as a fallback — the same resolution order src/lib/storage-public.ts
+ * uses, duplicated here because this file runs in plain Node (no `@/*` alias,
+ * no bundler) before the app exists.
+ *
+ * Note the `protocol: "https"` on the pattern below: the asset origin must be
+ * TLS. A self-hosted S3 server reached over plain HTTP will not be allowlisted
+ * and every image through /_next/image fails with '"url" parameter is not
+ * allowed'.
+ */
+function assetHostname(): string | null {
+  const raw =
+    process.env.NEXT_PUBLIC_STORAGE_PUBLIC_URL ||
+    process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
   if (!raw) return null;
   try {
     return new URL(raw).hostname;
@@ -10,7 +23,7 @@ function r2Hostname(): string | null {
   }
 }
 
-const r2Host = r2Hostname();
+const assetHost = assetHostname();
 
 const nextConfig: NextConfig = {
   // Vercel does its own function bundling/tracing; "standalone" output is
@@ -31,7 +44,7 @@ const nextConfig: NextConfig = {
     // server, so the list is the image-proxy surface. `*.r2.dev` used to be
     // allowlisted: that is Cloudflare's *shared* public-bucket domain, so it
     // trusted every public R2 bucket in existence rather than ours. The bucket
-    // this app actually writes to comes from NEXT_PUBLIC_R2_PUBLIC_URL below.
+    // this app actually writes to comes from the asset origin resolved above.
     remotePatterns: [
       { protocol: "https", hostname: "companieslogo.com" },
       { protocol: "https", hostname: "upload.wikimedia.org" },
@@ -40,7 +53,9 @@ const nextConfig: NextConfig = {
       ...(process.env.NODE_ENV !== "production"
         ? [{ protocol: "https" as const, hostname: "i.pravatar.cc" }]
         : []),
-      ...(r2Host ? [{ protocol: "https" as const, hostname: r2Host }] : []),
+      ...(assetHost
+        ? [{ protocol: "https" as const, hostname: assetHost }]
+        : []),
     ],
     formats: ["image/avif", "image/webp"],
     minimumCacheTTL: 2592000,

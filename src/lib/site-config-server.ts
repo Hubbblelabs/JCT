@@ -2,8 +2,7 @@ import "server-only";
 import type { ZodType } from "zod";
 import { connectDB } from "./mongodb";
 import { SiteConfig } from "./models";
-
-const R2_PUBLIC_URL = process.env.NEXT_PUBLIC_R2_PUBLIC_URL ?? "";
+import { publicAssetBaseUrl } from "./storage-public";
 
 function resolveProspectusUrl(value: unknown): unknown {
   if (!value || typeof value !== "object") return value;
@@ -16,7 +15,8 @@ function resolveProspectusUrl(value: unknown): unknown {
       !url.startsWith("https://") &&
       !url.startsWith("/")
     ) {
-      if (R2_PUBLIC_URL) return { ...v, url: `${R2_PUBLIC_URL}/${url}` };
+      const base = publicAssetBaseUrl();
+      if (base) return { ...v, url: `${base}/${url}` };
     }
   }
   return v;

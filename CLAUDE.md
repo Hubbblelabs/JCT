@@ -9,7 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Public site** (`/`, `/institutions/*`, `/campus-life`): institution landing pages, program listings, dynamic per-program detail pages, campus life. Server-rendered with ISR caching.
 - **Admin CMS** (`/admin/*`): manage programs (via a live-preview content builder), users, images, documents, testimonials, recruiters, page content, and site-wide config.
 
-Persistence is **MongoDB Atlas** (Mongoose), auth is **NextAuth.js**, image/document storage is **Cloudflare R2** (S3-compatible).
+Persistence is **MongoDB** (Mongoose), auth is **NextAuth.js**, image/document storage is **any S3-compatible object store**. Both are provider-agnostic: MongoDB Atlas or a self-hosted `mongod`, Cloudflare R2 or a self-hosted Garage, chosen entirely by environment (see "Images & documents" and `src/lib/storage-config.ts`).
 
 ## Tech Stack
 
@@ -19,11 +19,21 @@ Persistence is **MongoDB Atlas** (Mongoose), auth is **NextAuth.js**, image/docu
 - **Auth**: NextAuth.js 5 (beta) — Credentials provider, bcryptjs hashing
 - **Validation**: Zod 4
 - **UI/Styling**: Tailwind CSS 4, Framer Motion, Lucide React, React Icons
-- **Storage**: AWS S3 SDK against Cloudflare R2
+- **Storage**: AWS S3 SDK against any S3-compatible store (Cloudflare R2 or self-hosted Garage)
 - **Forms**: React Hook Form + Zod resolver
 - **Package Manager**: pnpm
 
 ## Development Commands
+
+**pnpm only, Node 22+.** `pnpm-workspace.yaml` carries load-bearing
+`overrides` that npm and yarn both ignore: a `postcss@<8.5.10` security bump,
+and `sharp: 0.35.3` pinned so the tree resolves **one** sharp and one libvips.
+Install with anything else and two copies resolve — `/api/admin/images/upload`
+then dlopens a `.so` Next's file tracing never bundled and the build dies with
+`ERR_DLOPEN_FAILED: libvips-cpp.so.8.18.3: cannot open shared object file`. The
+pin is deliberately above the `^0.34.5` Next declares (below 0.35.0 ships a
+libvips with CVE-2026-33327/33328/35590/35591), so a range mismatch is expected —
+don't "fix" it. `engines.node` still says `>=18.18.0` and is stale.
 
 ```bash
 pnpm dev       # Dev server with Turbopack at http://localhost:3000
@@ -75,6 +85,18 @@ There is **no test framework** configured — no test runner, no test files, no 
 - **Roles** (`src/lib/permissions.ts`): only two — `editor` (0) < `admin` (1). Helpers: `hasMinRole`, `canManageUsers` (admin), `canAccessInstitution`. Editors are scoped to their `institution`; admins act on everything (and are stored with `institution: "all"`). **Scope is institution-level only.** `User.programs[]` still exists on the model and rides in the JWT, but nothing reads it and the admin UI does not collect it; the `canAccessProgram` helper that pretended otherwise has been removed. For shared media assets, use `enforceAssetScope` (allows own-institution + the shared `"all"` pool).
 - In API routes, call `requireRole(req, minRole)` from `src/lib/api-helpers.ts`. It returns `{ session, error }`; if `error` is truthy, return it directly.
 - **Editor scope enforcement**: editors with a restricted `institution` must call `enforceInstitutionScope(session, targetInstitution)` in write routes. This prevents an editor scoped to Engineering from writing to Arts & Science data. Call it early after `requireRole` to fail fast. **Reads are scoped too**: list GETs merge `institutionReadFilter(session)` into the Mongo query and detail GETs re-check `enforceInstitutionScope` — admin list/detail responses include draft content, which must not leak across colleges.
+- **Boot-time env validation**: `validateServerEnv()` (`src/lib/env.ts`) runs at **module scope in `src/auth.ts`** — there is no `instrumentation.ts`. It throws on a bad `MONGODB_URI`/`NEXTAUTH_SECRET` (min 32 chars, and rejected against a `SECRET_PLACEHOLDERS` set — add to that set, never replace it) or a *partial* storage config, but only **warns** when `NEXT_PHASE === "phase-production-build"`, so `next build` still runs on a machine with an incomplete `.env`.
+
+### Rate limiting & client IP
+
+`src/lib/rate-limit.ts` is an in-memory fixed-window limiter (single-instance assumption, same as `public-cache.ts`; swap the store for Redis to scale out). Two things about it are load-bearing:
+
+- **Every limit is two buckets, not one.** `consumeLoginAttempt` keys on `ip|email` (10 / 5 min) *and* `consumeLoginAttemptByEmail` keys on the account alone (20 / 15 min); uploads mirror this via `consumeUploadAttempt` + `consumeUploadAttemptByUser` (`enforceUploadRateLimit` in `src/lib/api-helpers.ts` calls both). The IP-keyed bucket is bypassable by rotating a spoofed `X-Forwarded-For`, so the account-keyed one is the real guard. Adding a new limited route means adding both.
+- **`clientIpFromHeaders` reads `X-Real-IP` first and, falling back to `X-Forwarded-For`, takes the LAST element** — nginx sets XFF with `$proxy_add_x_forwarded_for`, which *appends* the real peer to whatever the client sent, so the left-most element is attacker-chosen. Changing this to `parts[0]` reopens the bypass.
+
+### HTML sanitization
+
+CMS `richText` is authored by `editor`-role users, i.e. **authenticated but untrusted**. Anything reaching `dangerouslySetInnerHTML` must go through `sanitizeHtml()` (`src/lib/sanitize-html.ts`, isomorphic-dompurify with a tag/attr allowlist). Currently three call sites exist and all are covered: events are sanitized **server-side** in `getPublicEventBySlug` (`descriptionHtml` is already clean by the time `EventDetailLayout` renders it), `ResearchPageLayout` sanitizes at render, and `src/app/layout.tsx` injects only `JSON.stringify`'d JSON-LD. To support a new tag, extend the allowlist — never bypass the call.
 
 ### API design
 
@@ -170,10 +192,12 @@ Separate from Program content, the **`Page`** model (`src/lib/models/Page.ts`) b
 
 ### Images & documents
 
-- **Images**: uploaded via `POST /api/admin/images/upload` (FormData) → validated for mime/size → stored in R2 via `src/lib/r2.ts` → an `ImageAsset` doc records metadata (url, alt text, category, institution). If R2 env vars are absent, images fall back to local serving via `/api/public/images/[...path]` or `/api/admin/images/serve/[...key]`.
+- **Provider is env-only.** `src/lib/storage-config.ts` resolves the endpoint, bucket, credentials, signing region and addressing style from `STORAGE_*`, falling back to the legacy `R2_*` names, falling back to deriving R2's endpoint from `R2_ACCOUNT_ID`. `src/lib/r2.ts` keeps its R2-flavoured export names (they are called from ~28 files) but is provider-neutral underneath. Two things bite when pointing it at a self-hosted server: the signing region must match the server's configured region exactly or every call fails `SignatureDoesNotMatch`, and browser-direct presigned PUTs need a **bucket CORS rule** — without one, document uploads fail in the browser and the server logs nothing. There is no server-side fallback for that, because `proxy.ts` truncates any matched request body at 10 MB.
+- **Public asset URLs** come from `publicAssetBaseUrl()` in `src/lib/storage-public.ts` (`NEXT_PUBLIC_STORAGE_PUBLIC_URL` → `NEXT_PUBLIC_R2_PUBLIC_URL`). It is a **separate, client-safe module** because both literals must appear verbatim for Next's build-time inlining to reach the browser bundle. Never read those env vars directly — a computed lookup is never substituted and reads as `undefined` client-side. Changing the value needs a **rebuild**, not a restart.
+- **Images**: uploaded via `POST /api/admin/images/upload` (FormData) → validated for mime/size → stored via `src/lib/r2.ts` → an `ImageAsset` doc records metadata (url, alt text, category, institution). If storage env vars are absent, images fall back to local serving via `/api/public/images/[...path]` or `/api/admin/images/serve/[...key]`. A _partial_ configuration is refused at boot by `validateServerEnv`.
 - **Documents**: `POST /api/admin/documents/upload` handles non-image assets (e.g. prospectus/pamphlet PDFs).
 - **R2 key tracking**: `extractR2Keys(value)` in `src/lib/r2.ts` recursively walks any JSON value and collects strings that look like R2 storage keys (`images/…` or `documents/…`). Pass the collected keys to `cleanupStorageKeys(keys, context)` from `src/lib/asset-cleanup.ts` when content is deleted or replaced — it removes **both** the R2 object and its `ImageAsset`/`DocumentAsset` tracking row (deleting only the blob leaves the media library full of broken entries). It's fire-and-forget and never blocks the route response. **Call it AFTER the write that dropped the reference**: before deleting anything it scans SiteConfig, Program, Page, Event, Placement and Testimonial for the key and keeps any that is still referenced, so a pre-write call would find its own document and skip. That scan is not optional — storage keys are not one-to-one with documents (the "Also apply to" control in the Life at JCT editor writes the same keys under four config entries, and any editor can reuse an asset by pasting its key).
-- `next.config.ts` `images.remotePatterns` allowlists external hosts (unsplash, wikimedia, companieslogo, the R2 public domain from `NEXT_PUBLIC_R2_PUBLIC_URL`, and `i.pravatar.cc` outside production) and applies a strict CSP that sandboxes SVGs. Do not re-add a `*.r2.dev` wildcard — that is Cloudflare's shared public-bucket domain, so it trusts every R2 bucket on the platform and turns `/_next/image` into an open image proxy.
+- `next.config.ts` `images.remotePatterns` allowlists external hosts (unsplash, wikimedia, companieslogo, the asset host derived from `NEXT_PUBLIC_STORAGE_PUBLIC_URL`/`NEXT_PUBLIC_R2_PUBLIC_URL`, and `i.pravatar.cc` outside production) and applies a strict CSP that sandboxes SVGs. The pattern is `protocol: "https"` only, so **a self-hosted asset host must be behind TLS** — over plain HTTP every optimised image fails with `"url" parameter is not allowed`. Do not re-add a `*.r2.dev` wildcard — that is Cloudflare's shared public-bucket domain, so it trusts every R2 bucket on the platform and turns `/_next/image` into an open image proxy.
 
 ### Caching & revalidation
 
@@ -195,20 +219,30 @@ Separate from Program content, the **`Page`** model (`src/lib/models/Page.ts`) b
 See `.env.example`. Required:
 
 ```
-MONGODB_URI       # MongoDB Atlas connection string
+MONGODB_URI       # mongodb+srv:// (Atlas) or mongodb:// (self-hosted). Nothing
+                  # here uses transactions, change streams or Atlas Search, so
+                  # a standalone mongod is sufficient — no replica set needed.
 NEXTAUTH_SECRET   # 32-char random secret (openssl rand -base64 32)
 NEXTAUTH_URL      # http://localhost:3000 (dev) / https://jct.ac.in (prod)
 ```
 
-Optional — images/documents fall back to local serving if unset:
+Optional — images/documents fall back to local serving if unset. Set all four
+or none; a partial set fails at boot. Canonical names, for any S3-compatible
+store:
 
 ```
-R2_ACCOUNT_ID
-R2_ACCESS_KEY_ID
-R2_SECRET_ACCESS_KEY
-R2_BUCKET_NAME
-NEXT_PUBLIC_R2_PUBLIC_URL
+STORAGE_ENDPOINT            # omit for R2 — derived from R2_ACCOUNT_ID
+STORAGE_BUCKET
+STORAGE_ACCESS_KEY_ID
+STORAGE_SECRET_ACCESS_KEY
+STORAGE_REGION              # default "auto"; MUST match the server's region
+STORAGE_FORCE_PATH_STYLE    # defaults true whenever STORAGE_ENDPOINT is set
+NEXT_PUBLIC_STORAGE_PUBLIC_URL   # must be https; inlined at BUILD time
 ```
+
+The legacy `R2_ACCOUNT_ID` / `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` /
+`R2_BUCKET_NAME` / `NEXT_PUBLIC_R2_PUBLIC_URL` are still read as fallbacks, so
+an existing deployment keeps working untouched.
 
 Also read by this repo's code:
 
@@ -235,7 +269,7 @@ BACKUP_ACCEL_PREFIX    # optional; when set, the download route answers with an
 CI is `.github/workflows/build-deploy.yml`, three jobs over `push` (branch `v3-admin` + tags matching `v*`) and `pull_request`:
 
 - **`verify`** — runs on every trigger. `pnpm install --frozen-lockfile`, `pnpm lint:ci`, `pnpm typecheck`, `prettier --check .`. Nothing else in the pipeline lints: `next build` type-checks but Next 16 no longer runs ESLint as part of it.
-- **`build-and-push`** — `needs: verify`, and `if: github.event_name == 'push'` so pull requests verify without publishing. Builds `docker-compose.build.yaml` (image `kavinnandha/jct:latest`) and pushes to Docker Hub. `MONGODB_URI` is injected as a BuildKit secret, build-time only.
+- **`build-and-push`** — `needs: verify`, and `if: github.event_name == 'push'` so pull requests verify without publishing. Builds `docker-compose.build.yaml` (image `kavinnandha/jct:latest`) and pushes to Docker Hub. `MONGODB_URI` is injected as a BuildKit secret, build-time only. **`runs-on: self-hosted`** — `next build` must reach MongoDB to prerender the public ISR pages with real content, and an on-prem database is published on loopback only, unreachable from GitHub's runners. `network: host` on the build in `docker-compose.build.yaml` is what lets the build container see `127.0.0.1`. Build there without a DB and every DB-backed page bakes empty and stays wrong until the next revalidation. `verify` stays on `ubuntu-latest` — it needs no database.
 - **`deploy`** — gated by `if: startsWith(github.ref, 'refs/tags/v')`, so **the server is only touched when a version tag is pushed**. SSHes to the prod host and runs `docker compose pull && docker compose up -d --remove-orphans` against the server's copy of `docker-compose.prod.yaml`.
 
 Consequences to keep in mind:
@@ -244,8 +278,9 @@ Consequences to keep in mind:
 - The deploy step reads `DEPLOY_HOST` (required), `DEPLOY_USER` (defaults to `root`) and `SSH_KEY` from repo secrets, falling back to `SSH_PASSWORD` while `SSH_KEY` is unset. The host address is deliberately not committed.
 - Both compose files hardcode `kavinnandha/jct:latest`, so there is no immutable per-version image — a tag deploys whatever that tag's build produced, and rollback means rebuilding. Parameterizing the image tag would need matching changes in `docker-compose.build.yaml`, `docker-compose.prod.yaml`, and the SSH script.
 - **Pushing a `v*` tag deploys to production.** Never create or push tags on your own — see Git below.
-- The reverse proxy in front of the app is **not** in this repo, but the admin backup/restore routes depend on its settings. Restore POSTs the whole ZIP as one body (currently ~7.5 GB) and backup downloads one out; nginx defaults (`client_max_body_size 1m`, request/response buffering on, 60s timeouts) break both. See `deploy/nginx-jct.conf.example` for the required directives, including the optional `internal` location that lets nginx serve the built archive with `sendfile()` (enabled by setting `BACKUP_ACCEL_PREFIX`).
-- **Backups need disk.** `docker-compose.prod.yaml` bind-mounts `/srv/jct/backups` to the container's `BACKUP_DIR`. Without a mount the archive lands on the container's overlay filesystem and is discarded on every `docker compose pull`. Retention is the newest 2 archives, 24h max — see `pruneJobs` in `src/lib/backup-jobs.ts`.
+- The reverse proxy in front of the app is **not** in this repo, but the admin backup/restore routes depend on its settings. Restore POSTs the whole ZIP as one body (currently ~7.5 GB) and backup downloads one out; nginx defaults (`client_max_body_size 1m`, request/response buffering on, 60s timeouts) break both. See `deploy/nginx-jct.conf.example` for the required directives, including the optional `internal` location that lets nginx serve the built archive with `sendfile()` (enabled by setting `BACKUP_ACCEL_PREFIX`), and the object-storage vhost used when assets are served from this server rather than R2.
+- **On-prem stack.** `docker-compose.prod.yaml` also defines `mongo` (MongoDB 8, standalone, `--auth`) and `garage` (S3-compatible object storage, config in `deploy/garage.toml.example`). Both are published on loopback only; nginx terminates TLS. Garage rather than MinIO: MinIO's community Docker images were withdrawn in October 2025 and the repo is archived, so it gets no security patches. Delete either service and point the matching env vars at Atlas / R2 — nothing else changes.
+- **Backups need disk.** `docker-compose.prod.yaml` bind-mounts `/srv/jct/backups` to the container's `BACKUP_DIR`. Without a mount the archive lands on the container's overlay filesystem and is discarded on every `docker compose pull`. Retention (`pruneJobs` in `src/lib/backup-jobs.ts`) keeps **only the newest** archive, but will not delete a superseded one until it is **3 hours old** — that grace protects a multi-gigabyte download still in flight, and it outranks disk pressure (`ensureSpace` refuses the new build rather than reclaiming a young archive, and the 400 says so). Nothing outlives 24h. `pruneJobs` is called before a build, after one seals, and on the job-list GET; archives spared by the grace also arm an `unref`'d timer so they are swept without waiting for the next admin action. Settings has a manual delete, which is deliberately exempt from the grace.
 
 ## Validation
 
@@ -343,3 +378,13 @@ The codebase is indexed using ccc. Use ccc for codebase knowledge.
 2. Grep all affected code paths
 3. Analyse every component/API/hook touching this feature
 4. Then implement
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

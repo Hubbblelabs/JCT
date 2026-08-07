@@ -53,7 +53,24 @@ jobs:
     name: Build Docker Images and Push
     needs: verify
     if: github.event_name == 'push'
-    runs-on: ubuntu-latest
+
+    # Runs on the production host, not a GitHub-hosted runner.
+    #
+    # `next build` reaches MongoDB to prerender the public ISR pages with real
+    # content (see the BuildKit secret in `dockerfile`). Since the database
+    # moved on-prem it is published on loopback only and is not reachable from
+    # GitHub's runners — building there would bake every DB-backed page empty,
+    # and they would stay wrong until the next revalidation. Building on the
+    # host that owns the database is the fix; `network: host` in
+    # docker-compose.build.yaml is what lets the build container see 127.0.0.1.
+    #
+    # `verify` deliberately stays on ubuntu-latest: lint, typecheck and format
+    # need no database, and keeping them off the campus box keeps PR feedback
+    # fast and independent of the server being up.
+    #
+    # Run the runner service as a dedicated non-root user in the `docker`
+    # group. It executes repository code by design.
+    runs-on: self-hosted
 
     steps:
       - name: Checkout repository
@@ -65,9 +82,14 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
+      # Both asset-origin secrets are passed; whichever is unset resolves to an
+      # empty build arg and is ignored. NEXT_PUBLIC_* is inlined at build time,
+      # so a change here needs a rebuild — restarting the container will not
+      # pick it up.
       - name: Build and Push Images
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          NEXT_PUBLIC_STORAGE_PUBLIC_URL: ${{ secrets.NEXT_PUBLIC_STORAGE_PUBLIC_URL }}
           NEXT_PUBLIC_R2_PUBLIC_URL: ${{ secrets.NEXT_PUBLIC_R2_PUBLIC_URL }}
 
         run: |

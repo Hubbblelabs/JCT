@@ -109,6 +109,7 @@ export default function SettingsPage() {
   const [includeImages, setIncludeImages] = useState(true);
   const [includeDocs, setIncludeDocs] = useState(true);
   const [exporting, setExporting] = useState(false);
+  const [discarding, setDiscarding] = useState(false);
   const [exportStatus, setExportStatus] = useState<Status | null>(null);
   const [job, setJob] = useState<BackupJob | null>(null);
   /** Guards the auto-download so a poll that re-reports "ready" can't fire it
@@ -224,6 +225,55 @@ export default function SettingsPage() {
       setExportStatus({ type: "error", message: "Export failed. Try again." });
     } finally {
       setExporting(false);
+    }
+  };
+
+  /**
+   * Drop a finished archive from the server's disk.
+   *
+   * Deliberately exempt from the 3-hour retention grace: that window exists to
+   * stop *automatic* deletion racing a download, and an operator saying "I
+   * have it, take it back" is not a race. Confirmed first because the bytes
+   * are gone for good — rebuilding a 7.5 GB export is not a quick undo.
+   */
+  const handleDiscardArchive = async () => {
+    if (!job || job.state !== "ready") return;
+    const ok = await confirm({
+      title: "Delete this backup archive?",
+      message: `${job.filename} (${formatBytes(job.size ?? 0)}) will be removed from the server. Make sure your download finished — this cannot be undone, and rebuilding takes another full export.`,
+      confirmLabel: "Delete archive",
+      destructive: true,
+    });
+    if (!ok) return;
+
+    setDiscarding(true);
+    try {
+      const res = await fetch(`/api/admin/site-config/backup?jobId=${job.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = (await res.json().catch(() => ({}))) as {
+          error?: string;
+        };
+        setExportStatus({
+          type: "error",
+          message: data.error ?? "Could not delete the archive.",
+        });
+        return;
+      }
+      setJob(null);
+      downloaded.current = null;
+      setExportStatus({
+        type: "success",
+        message: "Archive deleted — the disk space is free again.",
+      });
+    } catch {
+      setExportStatus({
+        type: "error",
+        message: "Could not delete the archive. Try again.",
+      });
+    } finally {
+      setDiscarding(false);
     }
   };
 
@@ -493,15 +543,37 @@ export default function SettingsPage() {
           {job?.state === "building" && <BuildProgress job={job} />}
 
           {job?.state === "ready" && (
-            <p className="mb-3 text-xs text-gray-500">
-              Download didn&apos;t start?{" "}
-              <a
-                className="font-medium text-blue-600 underline"
-                href={`/api/admin/site-config/backup/file?jobId=${job.id}`}
-              >
-                Get {job.filename} ({formatBytes(job.size ?? 0)})
-              </a>
-            </p>
+            <div className="mb-3 space-y-1.5">
+              <p className="text-xs text-gray-500">
+                Download didn&apos;t start?{" "}
+                <a
+                  className="font-medium text-blue-600 underline"
+                  href={`/api/admin/site-config/backup/file?jobId=${job.id}`}
+                >
+                  Get {job.filename} ({formatBytes(job.size ?? 0)})
+                </a>
+              </p>
+              {/* The server keeps an archive for 3 hours before it will delete
+                  it automatically, in case it is still being downloaded. That
+                  also means it occupies the volume for 3 hours and can block
+                  the next export on a tight disk — so once the download is
+                  safely finished there has to be a way to give the space back
+                  sooner. This is it. */}
+              <p className="text-xs text-gray-500">
+                Saved it already?{" "}
+                <button
+                  type="button"
+                  onClick={handleDiscardArchive}
+                  disabled={discarding}
+                  className="font-medium text-blue-600 underline disabled:opacity-50"
+                >
+                  {discarding
+                    ? "Deleting…"
+                    : "Delete this archive from the server"}
+                </button>{" "}
+                to free {formatBytes(job.size ?? 0)} now.
+              </p>
+            </div>
           )}
 
           <button

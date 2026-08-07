@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { DocumentAsset } from "@/lib/models";
-import { deleteFromR2, headR2Object } from "@/lib/r2";
+import { deleteFromR2, headR2Object, r2PublicUrl } from "@/lib/r2";
 import {
   requireRole,
   enforceUploadRateLimit,
@@ -38,9 +38,7 @@ export async function POST(req: NextRequest) {
       return badRequest("Upload not found in storage — upload the file first");
     }
 
-    const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL
-      ? `${process.env.NEXT_PUBLIC_R2_PUBLIC_URL}/${storage_key}`
-      : `/api/public/images/${storage_key}`;
+    const publicUrl = r2PublicUrl(storage_key);
 
     try {
       await connectDB();

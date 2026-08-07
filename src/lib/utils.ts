@@ -1,5 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { publicAssetBaseUrl } from "@/lib/storage-public";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -35,19 +36,20 @@ export function getImageUrl(
   }
 
   // Site-relative paths (e.g. "/campus-life-assets/x.webp") point at files in
-  // /public — serve them as-is. Rewriting them to R2 (or the R2 proxy route,
-  // which only serves "images/"/"documents/" keys) breaks the image.
+  // /public — serve them as-is. Rewriting them to object storage (or the proxy
+  // route, which only serves "images/"/"documents/" keys) breaks the image.
   if (imageUrl.startsWith("/")) {
     return imageUrl;
   }
 
   // If it's a storage key, construct the full URL
   if (imageUrl.includes("/")) {
-    const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+    const publicUrl = publicAssetBaseUrl();
     if (publicUrl) {
       return `${publicUrl}/${imageUrl}`;
     }
-    // Fallback: public proxy route that fetches from R2 server-side (no auth required)
+    // Fallback: public proxy route that streams from storage server-side (no
+    // auth required)
     return `/api/public/images/${imageUrl}`;
   }
 

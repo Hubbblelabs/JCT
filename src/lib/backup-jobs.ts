@@ -230,6 +230,14 @@ export async function listJobs(): Promise<BackupJob[]> {
 
 async function removeJob(id: string): Promise<void> {
   live.delete(id);
+  // A sweep armed for this archive has nothing left to do — and would run a
+  // full prune for no reason. `sweeps` is declared below; this only reads it
+  // at call time, long after module evaluation.
+  const pending = sweeps.get(id);
+  if (pending) {
+    clearTimeout(pending);
+    sweeps.delete(id);
+  }
   await Promise.all([
     rm(archivePath(id), { force: true }),
     rm(partialPath(id), { force: true }),
@@ -237,10 +245,53 @@ async function removeJob(id: string): Promise<void> {
   await writeIndex((await readIndex()).filter((j) => j.id !== id));
 }
 
-/** Keep the newest few archives so a failed download can be retried, but never
- * let old ones silently fill the disk. */
-const KEEP_ARCHIVES = 2;
+/**
+ * Retention. Three rules, in the order they matter:
+ *
+ *   1. Only the newest archive is kept. A backup is an explicit admin action,
+ *      and the one they just built is the one they want.
+ *   2. A superseded archive is not removed until it is at least MIN_AGE old.
+ *      Downloading 7.5 GB over a campus link takes a while, and the operator
+ *      may well kick off a second export while the first is still coming down
+ *      — deleting it out from under them would fail the transfer with no
+ *      explanation. This grace window is the whole reason a second archive can
+ *      exist at all.
+ *   3. Nothing survives MAX_AGE, superseded or not. Without this backstop a
+ *      single archive would sit on the volume forever, because rule 1 only
+ *      fires when a *replacement* exists.
+ */
+const KEEP_ARCHIVES = 1;
 const MAX_AGE_MS = 24 * 60 * 60 * 1000;
+const MIN_AGE_MS = 3 * 60 * 60 * 1000;
+
+/**
+ * Pending re-sweeps for archives that rule 2 spared, keyed by job id.
+ *
+ * Without these an archive superseded at 20 minutes old would linger until
+ * something else happened to call `pruneJobs` — and since backups are
+ * admin-triggered, "something else" might be next month. The timer closes that
+ * gap without introducing a cron.
+ *
+ * `unref()` so a pending sweep can never hold the process open, and one timer
+ * per id so repeated prunes don't stack. A restart drops them, which is why
+ * the route also prunes on the job-list GET.
+ */
+const sweeps = new Map<string, NodeJS.Timeout>();
+
+function scheduleSweep(id: string, delay: number): void {
+  if (sweeps.has(id)) return;
+  const timer = setTimeout(
+    () => {
+      sweeps.delete(id);
+      void pruneJobs().catch((err) =>
+        console.error("[backup-jobs] Scheduled prune failed:", err),
+      );
+    },
+    Math.max(delay, 1_000),
+  );
+  timer.unref?.();
+  sweeps.set(id, timer);
+}
 
 export async function pruneJobs(): Promise<void> {
   const jobs = await listJobs();
@@ -254,8 +305,18 @@ export async function pruneJobs(): Promise<void> {
     // archive worth space, and its index entry is the only record of why the
     // export failed — so it survives until it ages out rather than being swept
     // away the moment the operator retries.
-    const surplus = job.state === "ready" && ++kept > KEEP_ARCHIVES;
-    if (stale || surplus) await removeJob(job.id);
+    //
+    // The age test comes last so `++kept` still runs for every ready job:
+    // an archive spared by the grace window has still been counted, and the
+    // one after it is correctly seen as surplus too.
+    const superseded = job.state === "ready" && ++kept > KEEP_ARCHIVES;
+    const surplus = superseded && age >= MIN_AGE_MS;
+
+    if (stale || surplus) {
+      await removeJob(job.id);
+    } else if (superseded) {
+      scheduleSweep(job.id, MIN_AGE_MS - age);
+    }
   }
 }
 
@@ -282,10 +343,16 @@ export async function freeBytes(): Promise<number | null> {
  * archives oldest-first if there isn't any.
  *
  * Counting retained archives as "available" without deleting them would be a
- * lie — `pruneJobs` deliberately keeps the newest few so a failed download can
+ * lie — `pruneJobs` deliberately keeps the newest one so a failed download can
  * be retried, so that space is not free unless something actually gives it up.
- * Here the newest archive is the one worth keeping, so older ones are dropped
- * only as far as the new build actually requires.
+ *
+ * The MIN_AGE grace outranks disk pressure. An archive younger than that may
+ * still be downloading, and silently deleting it to make room for the next
+ * export trades a transfer the operator is watching for one they have not
+ * started yet — a strictly worse outcome, and the exact failure the grace
+ * window exists to prevent. `withheldYoung` reports that this happened so the
+ * caller can say *why* the export was refused; "not enough disk space" alone
+ * is baffling on a server that visibly holds an archive it could delete.
  *
  * A volume whose free space can't be read (`statfs` unsupported) is allowed
  * through: refusing every export on a platform that simply won't answer the
@@ -293,21 +360,27 @@ export async function freeBytes(): Promise<number | null> {
  */
 export async function ensureSpace(
   needed: number,
-): Promise<{ ok: boolean; free: number }> {
+): Promise<{ ok: boolean; free: number; withheldYoung: boolean }> {
   let free = await freeBytes();
-  if (free === null) return { ok: true, free: 0 };
-  if (free >= needed) return { ok: true, free };
+  if (free === null) return { ok: true, free: 0, withheldYoung: false };
+  if (free >= needed) return { ok: true, free, withheldYoung: false };
 
-  const reclaimable = (await listJobs())
+  const now = Date.now();
+  const ready = (await listJobs())
     .filter((j) => j.state === "ready")
     .sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
+
+  const reclaimable = ready.filter(
+    (j) => now - new Date(j.created_at).getTime() >= MIN_AGE_MS,
+  );
+  const withheldYoung = reclaimable.length < ready.length;
 
   for (const job of reclaimable) {
     await removeJob(job.id);
     free = (await freeBytes()) ?? free;
-    if (free >= needed) return { ok: true, free };
+    if (free >= needed) return { ok: true, free, withheldYoung };
   }
-  return { ok: false, free };
+  return { ok: false, free, withheldYoung };
 }
 
 export const openArchive = (id: string) => createWriteStream(partialPath(id));

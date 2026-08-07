@@ -35,7 +35,12 @@ import { rm } from "fs/promises";
  *
  * The bytes themselves come from `backup/file`, which serves the finished
  * archive as an ordinary ranged file download. See `src/lib/backup-jobs.ts`
- * for why the build and the download are separated at all.
+ * for why the build and the download are separated at all, and for the
+ * retention rules — only the newest archive is kept, a superseded one is not
+ * removed until it is 3 hours old, and nothing outlives 24 hours. `pruneJobs`
+ * is called from three places here: before a build (clear what has aged out
+ * before checking disk), after one seals (retire what it replaces), and on the
+ * job list (recover the sweep after a restart).
  */
 
 /** Headroom over the asset total for config, collections and ZIP overhead. */
@@ -71,6 +76,13 @@ export async function GET(req: NextRequest) {
     }
   }
 
+  // Retention normally advances when a new backup is built or when a timer
+  // armed by `pruneJobs` fires. A restart drops those timers, so the job list
+  // — which the Settings page reaches — doubles as a recovery trigger. Not on
+  // the `?jobId=` branch above: that one is polled every 1.5s during a build.
+  await pruneJobs().catch((e) =>
+    console.error("[site-config/backup] prune on list:", e),
+  );
   return json({ jobs: await listJobs() });
 }
 
@@ -105,8 +117,14 @@ export async function POST(req: NextRequest) {
   const needed = plan.assetBytes + DISK_SLACK_BYTES;
   const space = await ensureSpace(needed);
   if (!space.ok) {
+    // Naming the protected archive matters: without it the operator reads
+    // "not enough disk" while looking at a server that plainly holds one it
+    // could delete, and goes looking for a bug that isn't there.
+    const protectedNote = space.withheldYoung
+      ? " An existing archive was built less than 3 hours ago and is protected from automatic deletion, in case it is still being downloaded — wait for it to age out, or delete it yourself from Settings."
+      : "";
     return badRequest(
-      `Not enough disk space to build this backup — it needs about ${Math.ceil(needed / 1e9)} GB and only ${Math.floor(space.free / 1e9)} GB is free, even after removing older archives. Free space on the server, or point BACKUP_DIR at a larger volume.`,
+      `Not enough disk space to build this backup — it needs about ${Math.ceil(needed / 1e9)} GB and only ${Math.floor(space.free / 1e9)} GB is free, even after removing older archives.${protectedNote} Free space on the server, or point BACKUP_DIR at a larger volume.`,
     );
   }
 
@@ -148,6 +166,14 @@ export async function POST(req: NextRequest) {
       const size = await sealArchive(job.id);
       await finishJob(job.id, { state: "ready", size, report });
       console.log(`[backup] ${job.id} ready — ${size} bytes`);
+      // Retire the archive this one replaces, now that a replacement actually
+      // exists. Pruning before the build (above) cannot do this: at that point
+      // the old archive is still the newest one and rightly survives its own
+      // prune. Doing it here also means a build that fails leaves the previous
+      // backup intact rather than trading a good archive for nothing.
+      await pruneJobs().catch((e) =>
+        console.error("[site-config/backup] prune after seal:", e),
+      );
     } catch (err) {
       console.error(`[backup] ${job.id} failed:`, err);
       out.destroy();

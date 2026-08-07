@@ -11,6 +11,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
+import { publicAssetBaseUrl } from "@/lib/storage-public";
 import {
   ALLOWED_MIME_TYPES,
   MAX_DIRECT_UPLOAD_SIZE,
@@ -543,7 +544,7 @@ export function ImageUploadInput({
     if (deferred && key.startsWith("pending:"))
       return deferred.getPreview(key) ?? "";
     if (key.startsWith("http://") || key.startsWith("https://")) return key;
-    const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+    const publicUrl = publicAssetBaseUrl();
     if (publicUrl) return `${publicUrl}/${key}`;
     return `/api/admin/images/serve/${key}`;
   };

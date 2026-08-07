@@ -9,8 +9,16 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Upload } from "@aws-sdk/lib-storage";
 import type { Readable } from "stream";
+import { isStorageConfigured, storageConfig } from "@/lib/storage-config";
+import { publicAssetBaseUrl } from "@/lib/storage-public";
 
 /**
+ * The S3 layer. Named for R2 because that is what it was written against, but
+ * the endpoint, addressing style and signing region all come from
+ * `storage-config.ts` — so the same code drives a self-hosted S3 server with
+ * no change beyond the environment. The exported names are load-bearing across
+ * ~28 call sites and the project docs; they stay as they are.
+ *
  * One client per process, not one per call.
  *
  * An `S3Client` owns an HTTPS agent and its socket pool. Constructing a fresh
@@ -23,30 +31,46 @@ import type { Readable } from "stream";
  * sockets, which is above the backup builder's fetch concurrency — so reusing
  * the client is the whole fix; no custom `requestHandler` is needed.
  *
- * Cached against the credential triple so a changed env var still rebuilds it,
- * even though these never change at runtime in practice.
+ * Cached against every value that shapes the client, so pointing the app at a
+ * different provider rebuilds it instead of silently reusing a client aimed at
+ * the old endpoint.
  */
 let cachedClient: { fingerprint: string; client: S3Client } | null = null;
 
 function getR2Client() {
-  const accountId = process.env.R2_ACCOUNT_ID;
-  const accessKeyId = process.env.R2_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.R2_SECRET_ACCESS_KEY;
+  const cfg = storageConfig();
+  if (!cfg) throw new Error("Object storage is not configured");
 
-  if (!accountId || !accessKeyId || !secretAccessKey) {
-    throw new Error("R2 credentials are not configured");
-  }
-
-  const fingerprint = `${accountId}:${accessKeyId}:${secretAccessKey}`;
+  const fingerprint = [
+    cfg.endpoint,
+    cfg.region,
+    String(cfg.forcePathStyle),
+    cfg.accessKeyId,
+    cfg.secretAccessKey,
+  ].join("|");
   if (cachedClient?.fingerprint === fingerprint) return cachedClient.client;
 
   const client = new S3Client({
-    region: "auto",
-    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
-    credentials: { accessKeyId, secretAccessKey },
+    region: cfg.region,
+    endpoint: cfg.endpoint,
+    forcePathStyle: cfg.forcePathStyle,
+    credentials: {
+      accessKeyId: cfg.accessKeyId,
+      secretAccessKey: cfg.secretAccessKey,
+    },
   });
   cachedClient = { fingerprint, client };
   return client;
+}
+
+/**
+ * The configured bucket, or a throw. Every operation below needs it, and a
+ * missing bucket is a configuration error rather than something to handle.
+ */
+function bucketName(): string {
+  const bucket = storageConfig()?.bucket;
+  if (!bucket) throw new Error("Object storage bucket is not configured");
+  return bucket;
 }
 
 export async function getPresignedPutUrl(
@@ -56,8 +80,7 @@ export async function getPresignedPutUrl(
   contentLength?: number,
 ): Promise<string> {
   const client = getR2Client();
-  const bucket = process.env.R2_BUCKET_NAME;
-  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+  const bucket = bucketName();
   // When contentLength is provided it becomes a *signed* header, so the client
   // must upload exactly that many bytes — the presign route's size check is
   // otherwise advisory (a presigned PUT has no inherent size cap).
@@ -77,7 +100,7 @@ export async function getPresignedPutUrl(
 
 /** The public URL an object is served from once it exists in the bucket. */
 export function r2PublicUrl(key: string): string {
-  const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+  const publicUrl = publicAssetBaseUrl();
   return publicUrl ? `${publicUrl}/${key}` : `/api/public/images/${key}`;
 }
 
@@ -87,8 +110,7 @@ export async function uploadToR2(
   contentType: string,
 ): Promise<string> {
   const client = getR2Client();
-  const bucket = process.env.R2_BUCKET_NAME;
-  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+  const bucket = bucketName();
 
   await client.send(
     new PutObjectCommand({
@@ -119,8 +141,7 @@ export async function uploadStreamToR2(
   contentType: string,
 ): Promise<string> {
   const client = getR2Client();
-  const bucket = process.env.R2_BUCKET_NAME;
-  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+  const bucket = bucketName();
 
   await new Upload({
     client,
@@ -142,8 +163,7 @@ export async function headR2Object(
   key: string,
 ): Promise<{ size: number; contentType: string } | null> {
   const client = getR2Client();
-  const bucket = process.env.R2_BUCKET_NAME;
-  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+  const bucket = bucketName();
 
   try {
     const res = await client.send(
@@ -160,8 +180,7 @@ export async function headR2Object(
 
 export async function deleteFromR2(key: string): Promise<void> {
   const client = getR2Client();
-  const bucket = process.env.R2_BUCKET_NAME;
-  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+  const bucket = bucketName();
 
   await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
 }
@@ -221,8 +240,7 @@ export async function getFromR2(
   key: string,
 ): Promise<{ body: ReadableStream; contentType: string }> {
   const client = getR2Client();
-  const bucket = process.env.R2_BUCKET_NAME;
-  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+  const bucket = bucketName();
 
   const res = await client.send(
     new GetObjectCommand({ Bucket: bucket, Key: key }),
@@ -244,8 +262,7 @@ export async function getR2Stream(
   signal?: AbortSignal,
 ): Promise<Readable> {
   const client = getR2Client();
-  const bucket = process.env.R2_BUCKET_NAME;
-  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+  const bucket = bucketName();
 
   const res = await client.send(
     new GetObjectCommand({ Bucket: bucket, Key: key }),
@@ -271,8 +288,7 @@ export async function getR2Bytes(
   signal?: AbortSignal,
 ): Promise<Buffer> {
   const client = getR2Client();
-  const bucket = process.env.R2_BUCKET_NAME;
-  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+  const bucket = bucketName();
 
   const res = await client.send(
     new GetObjectCommand({ Bucket: bucket, Key: key }),
@@ -294,8 +310,7 @@ export async function listR2Objects(
   prefix: string,
 ): Promise<Array<{ key: string; size: number }>> {
   const client = getR2Client();
-  const bucket = process.env.R2_BUCKET_NAME;
-  if (!bucket) throw new Error("R2_BUCKET_NAME is not configured");
+  const bucket = bucketName();
 
   const out: Array<{ key: string; size: number }> = [];
   let token: string | undefined;
@@ -317,11 +332,11 @@ export async function listR2Objects(
   return out;
 }
 
+/**
+ * Whether object storage is usable at all. Kept under the old name because
+ * every caller reads as "is remote storage available" rather than "is
+ * Cloudflare available" — the provider is now a configuration detail.
+ */
 export function isR2Configured(): boolean {
-  return !!(
-    process.env.R2_ACCOUNT_ID &&
-    process.env.R2_ACCESS_KEY_ID &&
-    process.env.R2_SECRET_ACCESS_KEY &&
-    process.env.R2_BUCKET_NAME
-  );
+  return isStorageConfigured();
 }
