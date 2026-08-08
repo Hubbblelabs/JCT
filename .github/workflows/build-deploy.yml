@@ -1,13 +1,14 @@
 name: Build and Deploy
 
-# Three triggers, three different outcomes:
-#   - pull_request      → verify only
-#   - push to a branch  → verify, then rebuild and push :latest (NO deploy)
-#   - push of a v* tag  → verify, build, and deploy to production
+# Two triggers:
+#   - pull_request      → lint, typecheck, format check
+#   - push of a v* tag  → verify, then SSH to server to build and deploy
 #
-# The branch trigger is what makes the `if:` on the deploy job load-bearing:
-# without it, every image build was also a production deploy and there was no
-# way to refresh :latest without restarting prod.
+# Builds happen on the deployment server, not on GitHub runners, because the
+# build needs to reach MongoDB on 127.0.0.1. docker-compose.prod.yaml's jct
+# service has `build: network: host`, which lets next build see the loopback
+# database and prerender ISR pages with real content. No registry involved —
+# the image is built and run on the same host.
 on:
   push:
     branches:
@@ -31,7 +32,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
 
       - name: Install dependencies
@@ -49,52 +50,9 @@ jobs:
       - name: Format check
         run: pnpm exec prettier --check .
 
-  build-and-push:
-    name: Build Docker Images and Push
-    needs: verify
-    if: github.event_name == 'push'
-
-    # Runs on the production host, not a GitHub-hosted runner.
-    #
-    # `next build` reaches MongoDB to prerender the public ISR pages with real
-    # content (see the BuildKit secret in `dockerfile`). Since the database
-    # moved on-prem it is published on loopback only and is not reachable from
-    # GitHub's runners — building there would bake every DB-backed page empty,
-    # and they would stay wrong until the next revalidation. Building on the
-    # host that owns the database is the fix; `network: host` in
-    # docker-compose.build.yaml is what lets the build container see 127.0.0.1.
-    #
-    # `verify` deliberately stays on ubuntu-latest: lint, typecheck and format
-    # need no database, and keeping them off the campus box keeps PR feedback
-    # fast and independent of the server being up.
-    #
-    # Run the runner service as a dedicated non-root user in the `docker`
-    # group. It executes repository code by design.
-    runs-on: self-hosted
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
-
-      # NEXT_PUBLIC_* is inlined at build time, so a change to the asset origin
-      # needs a rebuild — restarting the container will not pick it up.
-      - name: Build and Push Images
-        env:
-          MONGODB_URI: ${{ secrets.MONGODB_URI }}
-          NEXT_PUBLIC_STORAGE_PUBLIC_URL: ${{ secrets.NEXT_PUBLIC_STORAGE_PUBLIC_URL }}
-
-        run: |
-          docker compose -f docker-compose.build.yaml build --push
-
   deploy:
     name: Deploy to Server
-    needs: build-and-push
+    needs: verify
     runs-on: ubuntu-latest
 
     if: startsWith(github.ref, 'refs/tags/v')
@@ -112,11 +70,13 @@ jobs:
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER || 'root' }}
+          username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.SSH_KEY }}
           password: ${{ secrets.SSH_PASSWORD }}
 
           script: |
-            cd jct
-            docker compose pull
-            docker compose up -d --remove-orphans
+            cd jctSite
+            git fetch --all --tags
+            git reset --hard origin/v3-admin
+            docker compose -f docker-compose.prod.yaml build jct
+            docker compose -f docker-compose.prod.yaml up -d --remove-orphans

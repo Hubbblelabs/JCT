@@ -3,10 +3,29 @@
 
 services:
   jct:
-    image: kavinnandha/jct:latest
     container_name: jct
 
     restart: unless-stopped
+
+    # `next build` reaches MongoDB to prerender the public ISR pages with real
+    # content. Mongo is published on loopback only, so the build container
+    # needs the host's network stack (`network: host`) to see 127.0.0.1 — its
+    # own loopback wouldn't reach it otherwise, and every DB-backed page would
+    # bake empty and stay wrong until the next revalidation.
+    #
+    # MONGODB_URI is passed as a BuildKit secret so it never lands in an image
+    # layer. NEXT_PUBLIC_STORAGE_PUBLIC_URL is a plain build arg — it's a
+    # public value, inlined into the client bundle either way, and NEXT_PUBLIC_*
+    # vars must be present at build time; setting them only at runtime has no
+    # effect.
+    build:
+      context: .
+      dockerfile: dockerfile
+      network: host
+      args:
+        NEXT_PUBLIC_STORAGE_PUBLIC_URL: ${NEXT_PUBLIC_STORAGE_PUBLIC_URL}
+      secrets:
+        - mongodb_uri
 
     depends_on:
       - mongo
@@ -24,9 +43,9 @@ services:
 
     environment:
       # Where backup archives are built before they are downloaded. Bind-mounted
-      # rather than left in the container: an archive is currently ~7.5 GB, which
-      # would otherwise land on the Docker overlay filesystem and be thrown away
-      # on every `docker compose pull`. The host path also lets nginx serve the
+      # rather than left in the container: an archive is currently several GB,
+      # which would otherwise land on the Docker overlay filesystem and be
+      # thrown away on every rebuild. The host path also lets nginx serve the
       # file directly — see BACKUP_ACCEL_PREFIX in deploy/nginx-jct.conf.example.
       BACKUP_DIR: /var/backups/jct
 
@@ -35,8 +54,6 @@ services:
 
     networks:
       - jct
-
-    pull_policy: always
 
   mongo:
     image: mongo:8
@@ -49,11 +66,7 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:?set MONGO_ROOT_USER in .env}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:?set MONGO_ROOT_PASSWORD in .env}
 
-    # Loopback only. This port exists for one reason: the CI build runs on a
-    # self-hosted runner ON THIS HOST, and `next build` has to reach the
-    # database to prerender the public ISR pages with real content. Without it
-    # those pages bake empty and stay wrong until the next revalidation.
-    # See `network: host` in docker-compose.build.yaml.
+    # Loopback only — see the `network: host` note on the jct build above.
     ports:
       - "127.0.0.1:27017:27017"
 
@@ -86,6 +99,10 @@ services:
 
     networks:
       - jct
+
+secrets:
+  mongodb_uri:
+    environment: MONGODB_URI
 
 networks:
   jct:
