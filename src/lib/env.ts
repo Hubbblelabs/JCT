@@ -60,10 +60,6 @@ const EnvSchema = z.object({
  * through `/api/public/images/<key>`. But a *partial* set is always a mistake:
  * uploads fail at request time with an SDK error rather than falling back
  * cleanly.
- *
- * The check runs against the resolved configuration rather than a fixed list
- * of variable names, so it stays correct whichever naming a deployment uses —
- * canonical `STORAGE_*`, legacy `R2_*`, or a mix during a migration.
  */
 function checkStorage(): string | null {
   const { present, missing } = storageEnvPresence();

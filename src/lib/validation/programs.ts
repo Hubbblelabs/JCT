@@ -63,7 +63,7 @@ export const LIMITS = {
 // ── Card-level Program (top-level row fields) ───────────────────────────────
 
 /**
- * One accreditation badge on a program card. `logo` holds an R2 storage key
+ * One accreditation badge on a program card. `logo` holds an storage key
  * (or an absolute URL) — never a path into /public.
  */
 const ProgramAccreditationItemSchema = z.object({

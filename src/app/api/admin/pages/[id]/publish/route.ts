@@ -14,7 +14,7 @@ import {
   revalidatePaths,
   type RevalidateTarget,
 } from "@/lib/revalidate";
-import { extractR2Keys } from "@/lib/r2";
+import { extractStorageKeys } from "@/lib/storage";
 import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 
 function institutionTarget(inst: string): RevalidateTarget | null {
@@ -50,7 +50,7 @@ export async function POST(
 
     // Assets held only by the outgoing published snapshot are orphaned once it
     // is overwritten below.
-    const oldPublishedKeys = extractR2Keys(doc.published_content);
+    const oldPublishedKeys = extractStorageKeys(doc.published_content);
 
     doc.published_content = doc.content;
     doc.status = "published";
@@ -60,7 +60,7 @@ export async function POST(
     await doc.save();
 
     if (oldPublishedKeys.size > 0) {
-      const kept = extractR2Keys({
+      const kept = extractStorageKeys({
         content: doc.content,
         published_content: doc.published_content,
       });

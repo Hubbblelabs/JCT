@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { ImageAsset } from "@/lib/models";
-import { deleteFromR2 } from "@/lib/r2";
+import { deleteObject } from "@/lib/storage";
 import {
   requireRole,
   enforceAssetScope,
@@ -33,7 +33,7 @@ export async function DELETE(
     if (scope) return scope;
 
     try {
-      await deleteFromR2(doc.storage_key);
+      await deleteObject(doc.storage_key);
     } catch {
       /* non-fatal */
     }

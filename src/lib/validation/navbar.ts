@@ -16,7 +16,7 @@ export const NavbarChildSchema = z.object({
   id: zClampedString(0, 40, "Item ID").optional(),
   label: zClampedString(1, NAVBAR_LIMITS.labelMax, "Label"),
   href: zUrl,
-  /** R2 storage key of an uploaded PDF. When set it wins over `href`. */
+  /** storage key of an uploaded PDF. When set it wins over `href`. */
   file: zUrl.optional(),
   desc: zClampedString(0, NAVBAR_LIMITS.descMax).optional(),
   visible: z.boolean().optional(),
@@ -27,7 +27,7 @@ export const NavbarItemSchema = z.object({
   id: zClampedString(0, 40, "Item ID").optional(),
   label: zClampedString(1, NAVBAR_LIMITS.labelMax, "Label"),
   href: zUrl,
-  /** R2 storage key of an uploaded PDF. When set it wins over `href`. */
+  /** storage key of an uploaded PDF. When set it wins over `href`. */
   file: zUrl.optional(),
   desc: zClampedString(0, NAVBAR_LIMITS.descMax).optional(),
   visible: z.boolean().optional(),

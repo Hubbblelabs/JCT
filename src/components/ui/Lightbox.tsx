@@ -6,7 +6,7 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 
 export type LightboxImage = {
-  /** Already-resolved public URL — R2 keys must be run through getImageUrl first. */
+  /** Already-resolved public URL — storage keys must be run through getImageUrl first. */
   src: string;
   alt?: string;
   caption?: string;

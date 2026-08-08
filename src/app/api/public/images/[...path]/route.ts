@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getFromR2 } from "@/lib/r2";
+import { getObject } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -17,7 +17,7 @@ export async function GET(
   }
 
   try {
-    const { body, contentType } = await getFromR2(key);
+    const { body, contentType } = await getObject(key);
     return new NextResponse(body as ReadableStream, {
       headers: {
         "Content-Type": contentType,

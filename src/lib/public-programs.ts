@@ -34,7 +34,7 @@ type ProgramLean = {
 
 export type PublicProgramAccreditation = {
   name: string;
-  /** Absolute (or proxy) URL — already resolved out of its R2 storage key. */
+  /** Absolute (or proxy) URL — already resolved out of its storage key. */
   logo: string;
 };
 
@@ -89,7 +89,7 @@ function heroImageFrom(content: unknown): string | null {
 }
 
 /**
- * Badge logos are stored as R2 keys; resolve them here so every consumer gets
+ * Badge logos are stored as storage keys; resolve them here so every consumer gets
  * a ready-to-render URL. Entries without a logo are dropped — an empty badge
  * slot would render as a broken image.
  */

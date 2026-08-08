@@ -4,7 +4,11 @@ import mongoose from "mongoose";
 import type { mongo } from "mongoose";
 import { connectDB } from "@/lib/mongodb";
 import { SiteConfig, ImageAsset, DocumentAsset } from "@/lib/models";
-import { getR2Bytes, getR2Stream, isR2Configured } from "@/lib/r2";
+import {
+  getObjectBytes,
+  getObjectStream,
+  isStorageConfigured,
+} from "@/lib/storage";
 import { BACKUP_COLLECTIONS, serializeDoc } from "@/lib/backup-collections";
 import {
   listBackupObjects,
@@ -20,7 +24,7 @@ import type { BackupJobReport } from "@/lib/backup-jobs";
  *
  * Nothing here streams to a client — the archive is written to a `Writable`
  * (a file, in practice) with no backpressure from the network. That is the
- * whole point: with no client gating the pace, assets can be fetched from R2
+ * whole point: with no client gating the pace, assets can be fetched from storage
  * many at a time instead of strictly one after another.
  */
 
@@ -57,21 +61,21 @@ export interface BackupPlan {
  * Everything the archive needs, gathered before a single byte is written.
  *
  * Kept separate from the write so the caller can reject an export it cannot
- * complete — no disk space, R2 unreachable — while a real HTTP status code can
+ * complete — no disk space, storage unreachable — while a real HTTP status code can
  * still be returned.
  */
 export async function planBackup(opts: {
   wantImages: boolean;
   wantDocs: boolean;
 }): Promise<BackupPlan> {
-  const r2 = isR2Configured();
-  // Asset inclusion is on by default, so an unconfigured-R2 deployment would
+  const hasStorage = isStorageConfigured();
+  // Asset inclusion is on by default, so an unconfigured-storage deployment would
   // hit this on the primary "Download Backup" action. Failing the whole export
   // there leaves the operator with no backup at all, which is strictly worse
   // than a database-only one — so degrade and report instead.
-  const assetsUnavailable = (opts.wantImages || opts.wantDocs) && !r2;
-  const includeImages = opts.wantImages && r2;
-  const includeDocs = opts.wantDocs && r2;
+  const assetsUnavailable = (opts.wantImages || opts.wantDocs) && !hasStorage;
+  const includeImages = opts.wantImages && hasStorage;
+  const includeDocs = opts.wantDocs && hasStorage;
 
   await connectDB();
   const configs = (await SiteConfig.find()
@@ -184,7 +188,7 @@ async function fetchSmall(
     return {
       key: obj.key,
       kind: "buffer",
-      body: await getR2Bytes(obj.key, signal),
+      body: await getObjectBytes(obj.key, signal),
     };
   } catch (err) {
     // A dead storage key must not abort the archive — it is reported instead.
@@ -228,7 +232,7 @@ async function archiveAssets(
         queuedBytes += obj.size;
         queue.push(fetchSmall(obj, signal));
       } else {
-        // Large, or a DB-only key R2 never listed (size 0) whose real size is
+        // Large, or a DB-only key storage never listed (size 0) whose real size is
         // unknown — either way, handled when the write cursor reaches it.
         queue.push(Promise.resolve({ key: obj.key, kind: "deferred" }));
       }
@@ -254,7 +258,7 @@ async function archiveAssets(
     }
     let stream: Readable;
     try {
-      stream = await getR2Stream(item.key, signal);
+      stream = await getObjectStream(item.key, signal);
     } catch (err) {
       console.warn(`[backup] Skipping ${item.key}:`, err);
       unreadable.push(item.key);
@@ -415,7 +419,7 @@ export async function writeBackupArchive(
     collections: collectionCounts,
     assets: { files: plan.objects.length, bytes: plan.assetBytes },
     // Recorded so a restore operator can tell "this archive has no assets
-    // because none were requested" from "because R2 was down".
+    // because none were requested" from "because storage was down".
     assets_unavailable: plan.assetsUnavailable || undefined,
   });
 

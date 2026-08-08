@@ -80,7 +80,7 @@ function staticNavFor(institution: string): NavItem[] {
 
 /**
  * A nav entry can point at an uploaded PDF instead of a route. The CMS stores
- * that as an R2 storage key, so resolve it to a public URL and flag it — file
+ * that as an storage key, so resolve it to a public URL and flag it — file
  * links open in a new tab and get a document icon.
  */
 function resolveNavTarget(raw: { href?: string; file?: string }): {

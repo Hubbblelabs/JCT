@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { ImageAsset } from "@/lib/models";
 import { requireRole, enforceAssetScope } from "@/lib/api-helpers";
-import { getFromR2 } from "@/lib/r2";
+import { getObject } from "@/lib/storage";
 
 export async function GET(
   req: NextRequest,
@@ -44,7 +44,7 @@ export async function GET(
       }
     }
 
-    const { body, contentType } = await getFromR2(storageKey);
+    const { body, contentType } = await getObject(storageKey);
     return new NextResponse(body, {
       headers: {
         "Content-Type": contentType,

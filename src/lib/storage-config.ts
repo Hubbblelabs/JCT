@@ -3,16 +3,9 @@
  * choice rather than a code change.
  *
  * The app talks plain S3 — PutObject, GetObject, HeadObject, DeleteObject,
- * ListObjectsV2, multipart uploads and presigned PUTs. Cloudflare R2 and a
- * self-hosted server (Garage) both answer that API, so the only things that
- * actually differ are the endpoint, the addressing style and the signing
- * region.
- *
- * Three-step resolution per field: canonical `STORAGE_*`, then the legacy
- * `R2_*` name, then a derived default. Keeping the old names as aliases is
- * what lets a deployment switch providers without a coordinated rename across
- * `.env`, the Docker build args and the CI secrets — and lets an existing
- * deployment keep booting untouched.
+ * ListObjectsV2, multipart uploads and presigned PUTs — so any S3-compatible
+ * server works. Only the endpoint, the addressing style and the signing region
+ * differ between them.
  */
 
 export interface StorageConfig {
@@ -26,21 +19,20 @@ export interface StorageConfig {
    * Path-style addressing (`https://host/bucket/key`) instead of virtual-host
    * style (`https://bucket.host/key`). Self-hosted servers are normally
    * reached by a single hostname with no wildcard DNS, so virtual-host style
-   * resolves to nothing; R2 handles either.
+   * resolves to nothing.
    */
   forcePathStyle: boolean;
 }
 
 const env = (name: string): string => (process.env[name] ?? "").trim();
 
-/** First non-empty value among the given env var names. */
-const pick = (...names: string[]): string => {
-  for (const name of names) {
-    const value = env(name);
-    if (value) return value;
-  }
-  return "";
-};
+/** The four variables that must be set together, in report order. */
+const REQUIRED = [
+  "STORAGE_ENDPOINT",
+  "STORAGE_BUCKET",
+  "STORAGE_ACCESS_KEY_ID",
+  "STORAGE_SECRET_ACCESS_KEY",
+] as const;
 
 /**
  * The complete storage configuration, or null when storage is not configured
@@ -52,41 +44,28 @@ const pick = (...names: string[]): string => {
  * error on the first upload.
  */
 export function storageConfig(): StorageConfig | null {
-  const accountId = env("R2_ACCOUNT_ID");
-  const explicitEndpoint = pick("STORAGE_ENDPOINT", "R2_ENDPOINT");
-
-  // R2's endpoint is derived from the account id; every other provider states
-  // it outright.
-  const endpoint =
-    explicitEndpoint ||
-    (accountId ? `https://${accountId}.r2.cloudflarestorage.com` : "");
-
-  const bucket = pick("STORAGE_BUCKET", "R2_BUCKET_NAME");
-  const accessKeyId = pick("STORAGE_ACCESS_KEY_ID", "R2_ACCESS_KEY_ID");
-  const secretAccessKey = pick(
-    "STORAGE_SECRET_ACCESS_KEY",
-    "R2_SECRET_ACCESS_KEY",
-  );
+  const endpoint = env("STORAGE_ENDPOINT");
+  const bucket = env("STORAGE_BUCKET");
+  const accessKeyId = env("STORAGE_ACCESS_KEY_ID");
+  const secretAccessKey = env("STORAGE_SECRET_ACCESS_KEY");
 
   if (!endpoint || !bucket || !accessKeyId || !secretAccessKey) return null;
 
   /**
    * The signing region is hashed into every SigV4 signature, so it must match
-   * what the server expects exactly. R2 accepts "auto". A self-hosted server
-   * declares its own (Garage's `s3_region` in garage.toml) and rejects
-   * anything else with `SignatureDoesNotMatch` — an error that reads like bad
-   * credentials and sends you looking in the wrong place. Set STORAGE_REGION
-   * to the same string the server is configured with.
+   * what the server expects exactly. Garage declares its own (`s3_region` in
+   * garage.toml) and rejects anything else with `SignatureDoesNotMatch` — an
+   * error that reads like bad credentials and sends you looking in the wrong
+   * place. Set STORAGE_REGION to the same string the server is configured with.
    */
-  const region = pick("STORAGE_REGION") || "auto";
+  const region = env("STORAGE_REGION") || "auto";
 
-  // Default by provider shape rather than forcing every deployment to set it:
-  // an explicit endpoint means a self-hosted server, which almost always needs
-  // path style. `STORAGE_FORCE_PATH_STYLE=false` overrides for the exceptions.
+  // Self-hosted servers rarely have the wildcard DNS virtual-host style needs,
+  // so path style is the default. `STORAGE_FORCE_PATH_STYLE=false` overrides.
   const pathStyleRaw = env("STORAGE_FORCE_PATH_STYLE").toLowerCase();
   const forcePathStyle = pathStyleRaw
     ? pathStyleRaw === "true" || pathStyleRaw === "1"
-    : Boolean(explicitEndpoint);
+    : true;
 
   return {
     endpoint,
@@ -103,39 +82,18 @@ export function isStorageConfigured(): boolean {
 }
 
 /**
- * Which storage env vars carry a value, canonical or legacy. Used by the boot
- * check to tell "nothing configured" (fine) apart from "half configured"
- * (always a mistake) without re-implementing the resolution order.
+ * Which storage env vars carry a value. Used by the boot check to tell
+ * "nothing configured" (fine) apart from "half configured" (always a mistake).
  */
 export function storageEnvPresence(): {
   present: string[];
   missing: string[];
 } {
-  const groups = [
-    {
-      label: "endpoint (STORAGE_ENDPOINT or R2_ACCOUNT_ID)",
-      names: ["STORAGE_ENDPOINT", "R2_ENDPOINT", "R2_ACCOUNT_ID"],
-    },
-    {
-      label: "bucket (STORAGE_BUCKET or R2_BUCKET_NAME)",
-      names: ["STORAGE_BUCKET", "R2_BUCKET_NAME"],
-    },
-    {
-      label: "access key id (STORAGE_ACCESS_KEY_ID or R2_ACCESS_KEY_ID)",
-      names: ["STORAGE_ACCESS_KEY_ID", "R2_ACCESS_KEY_ID"],
-    },
-    {
-      label:
-        "secret access key (STORAGE_SECRET_ACCESS_KEY or R2_SECRET_ACCESS_KEY)",
-      names: ["STORAGE_SECRET_ACCESS_KEY", "R2_SECRET_ACCESS_KEY"],
-    },
-  ];
-
   const present: string[] = [];
   const missing: string[] = [];
-  for (const group of groups) {
-    if (group.names.some((name) => env(name))) present.push(group.label);
-    else missing.push(group.label);
+  for (const name of REQUIRED) {
+    if (env(name)) present.push(name);
+    else missing.push(name);
   }
   return { present, missing };
 }

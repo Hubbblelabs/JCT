@@ -7,7 +7,7 @@ import { zClampedString } from "./_primitives";
  * Both routes used to parse with `(await req.json()) as {...}` — an `as` that
  * lies about untrusted input. A non-string `filename` reached `.replace()` and
  * came back as a 500 "Internal server error" instead of a 400, and an
- * unbounded one produced an arbitrarily long R2 storage key and
+ * unbounded one produced an arbitrarily long storage key and
  * `DocumentAsset.filename`.
  */
 
@@ -42,7 +42,7 @@ export const DocumentConfirmSchema = z.object({
     "Invalid storage_key — only keys minted by the presign route are accepted",
   ),
   filename: zClampedString(1, DOCUMENT_UPLOAD_LIMITS.filenameMax, "Filename"),
-  // Advisory only: the route confirms both against the object actually in R2.
+  // Advisory only: the route confirms both against the object actually in storage.
   size: z.number().int().positive().optional(),
   mime_type: z.enum(DOCUMENT_UPLOAD_MIME).optional(),
 });

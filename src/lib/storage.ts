@@ -9,35 +9,25 @@ import {
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { Upload } from "@aws-sdk/lib-storage";
 import type { Readable } from "stream";
-import { isStorageConfigured, storageConfig } from "@/lib/storage-config";
+import { storageConfig } from "@/lib/storage-config";
 import { publicAssetBaseUrl } from "@/lib/storage-public";
 
 /**
- * The S3 layer. Named for R2 because that is what it was written against, but
- * the endpoint, addressing style and signing region all come from
- * `storage-config.ts` — so the same code drives a self-hosted S3 server with
- * no change beyond the environment. The exported names are load-bearing across
- * ~28 call sites and the project docs; they stay as they are.
+ * The S3 layer. Endpoint, addressing style and signing region all come from
+ * `storage-config.ts`, so the same code drives any S3-compatible server.
  *
- * One client per process, not one per call.
- *
- * An `S3Client` owns an HTTPS agent and its socket pool. Constructing a fresh
- * one for every operation threw that pool away each time, so no connection was
- * ever reused and every single object fetch paid a full TCP + TLS handshake to
- * Cloudflare — on the order of 100 ms each. A whole-bucket backup walks ~1,700
- * objects, which made handshakes alone the dominant cost of an export.
- *
- * The SDK's default Node handler already keeps its agent alive with 50 max
- * sockets, which is above the backup builder's fetch concurrency — so reusing
- * the client is the whole fix; no custom `requestHandler` is needed.
+ * One client per process, not one per call: an `S3Client` owns an HTTPS agent
+ * and its socket pool, so constructing one per operation makes every object
+ * fetch pay a full TCP + TLS handshake. A whole-bucket backup walks ~1,700
+ * objects, which made handshakes the dominant cost of an export.
  *
  * Cached against every value that shapes the client, so pointing the app at a
- * different provider rebuilds it instead of silently reusing a client aimed at
- * the old endpoint.
+ * different provider rebuilds it instead of reusing one aimed at the old
+ * endpoint.
  */
 let cachedClient: { fingerprint: string; client: S3Client } | null = null;
 
-function getR2Client() {
+function getS3Client() {
   const cfg = storageConfig();
   if (!cfg) throw new Error("Object storage is not configured");
 
@@ -63,10 +53,6 @@ function getR2Client() {
   return client;
 }
 
-/**
- * The configured bucket, or a throw. Every operation below needs it, and a
- * missing bucket is a configuration error rather than something to handle.
- */
 function bucketName(): string {
   const bucket = storageConfig()?.bucket;
   if (!bucket) throw new Error("Object storage bucket is not configured");
@@ -79,7 +65,7 @@ export async function getPresignedPutUrl(
   expiresIn = 300,
   contentLength?: number,
 ): Promise<string> {
-  const client = getR2Client();
+  const client = getS3Client();
   const bucket = bucketName();
   // When contentLength is provided it becomes a *signed* header, so the client
   // must upload exactly that many bytes — the presign route's size check is
@@ -99,17 +85,17 @@ export async function getPresignedPutUrl(
 }
 
 /** The public URL an object is served from once it exists in the bucket. */
-export function r2PublicUrl(key: string): string {
+export function publicAssetUrl(key: string): string {
   const publicUrl = publicAssetBaseUrl();
   return publicUrl ? `${publicUrl}/${key}` : `/api/public/images/${key}`;
 }
 
-export async function uploadToR2(
+export async function uploadObject(
   key: string,
   body: Buffer,
   contentType: string,
 ): Promise<string> {
-  const client = getR2Client();
+  const client = getS3Client();
   const bucket = bucketName();
 
   await client.send(
@@ -121,10 +107,10 @@ export async function uploadToR2(
     }),
   );
 
-  return r2PublicUrl(key);
+  return publicAssetUrl(key);
 }
 
-/** Multipart part size. Below R2's 5 MB floor, parts are rejected. */
+/** Multipart part size. Below the S3 5 MB floor, parts are rejected. */
 const UPLOAD_PART_BYTES = 8 * 1024 * 1024;
 
 /**
@@ -135,12 +121,12 @@ const UPLOAD_PART_BYTES = 8 * 1024 * 1024;
  * splits the stream into parts and retries per part, which is what makes a
  * half-gigabyte PDF survivable — the restore path has several.
  */
-export async function uploadStreamToR2(
+export async function uploadObjectStream(
   key: string,
   body: Readable,
   contentType: string,
 ): Promise<string> {
-  const client = getR2Client();
+  const client = getS3Client();
   const bucket = bucketName();
 
   await new Upload({
@@ -152,17 +138,17 @@ export async function uploadStreamToR2(
     queueSize: 1,
   }).done();
 
-  return r2PublicUrl(key);
+  return publicAssetUrl(key);
 }
 
 /**
  * HEAD an object to confirm it exists and read its true size/type without
  * downloading the body. Returns null when the object doesn't exist.
  */
-export async function headR2Object(
+export async function headObject(
   key: string,
 ): Promise<{ size: number; contentType: string } | null> {
-  const client = getR2Client();
+  const client = getS3Client();
   const bucket = bucketName();
 
   try {
@@ -178,8 +164,8 @@ export async function headR2Object(
   }
 }
 
-export async function deleteFromR2(key: string): Promise<void> {
-  const client = getR2Client();
+export async function deleteObject(key: string): Promise<void> {
+  const client = getS3Client();
   const bucket = bucketName();
 
   await client.send(new DeleteObjectCommand({ Bucket: bucket, Key: key }));
@@ -187,11 +173,11 @@ export async function deleteFromR2(key: string): Promise<void> {
 
 /**
  * Recursively walk any JSON-serialisable value and collect every string that
- * looks like a tracked R2 storage key. Only keys we generate ourselves are
+ * looks like a tracked storage key. Only keys we generate ourselves are
  * matched: images are under "images/…" and documents under "documents/…".
  * External URLs (http/https) and local proxy paths are intentionally excluded.
  */
-export function extractR2Keys(
+export function extractStorageKeys(
   value: unknown,
   out = new Set<string>(),
   visited = new WeakSet<object>(),
@@ -216,7 +202,7 @@ export function extractR2Keys(
     ) {
       try {
         const plain = (value as { toObject: () => unknown }).toObject();
-        extractR2Keys(plain, out, visited);
+        extractStorageKeys(plain, out, visited);
         return out;
       } catch {
         // Fall back to traversing directly if toObject fails
@@ -225,21 +211,21 @@ export function extractR2Keys(
 
     if (Array.isArray(value)) {
       for (const item of value) {
-        extractR2Keys(item, out, visited);
+        extractStorageKeys(item, out, visited);
       }
     } else {
       for (const v of Object.values(value as Record<string, unknown>)) {
-        extractR2Keys(v, out, visited);
+        extractStorageKeys(v, out, visited);
       }
     }
   }
   return out;
 }
 
-export async function getFromR2(
+export async function getObject(
   key: string,
 ): Promise<{ body: ReadableStream; contentType: string }> {
-  const client = getR2Client();
+  const client = getS3Client();
   const bucket = bucketName();
 
   const res = await client.send(
@@ -257,18 +243,18 @@ export async function getFromR2(
  * through at whatever rate the client drains it, so RAM stays flat regardless
  * of how large the object — or the bucket — is.
  */
-export async function getR2Stream(
+export async function getObjectStream(
   key: string,
   signal?: AbortSignal,
 ): Promise<Readable> {
-  const client = getR2Client();
+  const client = getS3Client();
   const bucket = bucketName();
 
   const res = await client.send(
     new GetObjectCommand({ Bucket: bucket, Key: key }),
     { abortSignal: signal },
   );
-  if (!res.Body) throw new Error(`No body returned for R2 key: ${key}`);
+  if (!res.Body) throw new Error(`No body returned for storage key: ${key}`);
   return res.Body as Readable;
 }
 
@@ -283,18 +269,18 @@ export async function getR2Stream(
  * what lets the backup builder run many fetches at once. Only call this for
  * objects known to be small — the caller owns the memory bound.
  */
-export async function getR2Bytes(
+export async function getObjectBytes(
   key: string,
   signal?: AbortSignal,
 ): Promise<Buffer> {
-  const client = getR2Client();
+  const client = getS3Client();
   const bucket = bucketName();
 
   const res = await client.send(
     new GetObjectCommand({ Bucket: bucket, Key: key }),
     { abortSignal: signal },
   );
-  if (!res.Body) throw new Error(`No body returned for R2 key: ${key}`);
+  if (!res.Body) throw new Error(`No body returned for storage key: ${key}`);
   return Buffer.from(await res.Body.transformToByteArray());
 }
 
@@ -303,13 +289,13 @@ export async function getR2Bytes(
  *
  * The bucket — not the `ImageAsset`/`DocumentAsset` collections — is the source
  * of truth for what actually exists in storage. Seeded and hand-uploaded files
- * live in R2 without a tracking row, so anything that walks only the DB (a
- * backup, an audit) silently misses them.
+ * live in the bucket without a tracking row, so anything that walks only the DB
+ * (a backup, an audit) silently misses them.
  */
-export async function listR2Objects(
+export async function listObjects(
   prefix: string,
 ): Promise<Array<{ key: string; size: number }>> {
-  const client = getR2Client();
+  const client = getS3Client();
   const bucket = bucketName();
 
   const out: Array<{ key: string; size: number }> = [];
@@ -332,11 +318,4 @@ export async function listR2Objects(
   return out;
 }
 
-/**
- * Whether object storage is usable at all. Kept under the old name because
- * every caller reads as "is remote storage available" rather than "is
- * Cloudflare available" — the provider is now a configuration detail.
- */
-export function isR2Configured(): boolean {
-  return isStorageConfigured();
-}
+export { isStorageConfigured } from "@/lib/storage-config";

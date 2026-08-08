@@ -1,7 +1,7 @@
 /**
  * Which Mongo collections a site backup carries, beyond `siteconfigs`.
  *
- * Backups used to cover site config and R2 assets only, which silently left out
+ * Backups used to cover site config and storage assets only, which silently left out
  * every content collection — placements, programs, testimonials and the rest —
  * so a "full" archive could not actually rebuild the site.
  */

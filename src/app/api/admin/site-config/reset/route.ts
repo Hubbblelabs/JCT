@@ -4,7 +4,7 @@ import { SiteConfig, ImageAsset, DocumentAsset } from "@/lib/models";
 import { requireRole, json, serverError } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { revalidateTargets } from "@/lib/revalidate";
-import { deleteFromR2, isR2Configured } from "@/lib/r2";
+import { deleteObject, isStorageConfigured } from "@/lib/storage";
 import { stillReferencedKeys } from "@/lib/asset-cleanup";
 
 export async function POST(req: NextRequest) {
@@ -36,30 +36,36 @@ export async function POST(req: NextRequest) {
 
     let imagesDeleted = 0;
     let docsDeleted = 0;
-    let r2Failures = 0;
+    let storageFailures = 0;
 
     const removable = (key: string) => !referenced.has(key);
 
-    if (isR2Configured()) {
+    if (isStorageConfigured()) {
       for (const img of images) {
         if (!removable(img.storage_key)) continue;
         try {
-          await deleteFromR2(img.storage_key);
+          await deleteObject(img.storage_key);
           imagesDeleted++;
         } catch (err) {
-          console.warn(`[reset] R2 delete failed for ${img.storage_key}:`, err);
-          r2Failures++;
+          console.warn(
+            `[reset] storage delete failed for ${img.storage_key}:`,
+            err,
+          );
+          storageFailures++;
         }
       }
 
       for (const doc of docs) {
         if (!removable(doc.storage_key)) continue;
         try {
-          await deleteFromR2(doc.storage_key);
+          await deleteObject(doc.storage_key);
           docsDeleted++;
         } catch (err) {
-          console.warn(`[reset] R2 delete failed for ${doc.storage_key}:`, err);
-          r2Failures++;
+          console.warn(
+            `[reset] storage delete failed for ${doc.storage_key}:`,
+            err,
+          );
+          storageFailures++;
         }
       }
     }
@@ -79,7 +85,7 @@ export async function POST(req: NextRequest) {
       "site-config",
       "reset",
       session!.user?.email ?? "",
-      `Full reset — ${result.deletedCount} configs, ${imagesDeleted} images, ${docsDeleted} documents deleted from R2, ${keptKeys.length} assets kept (still referenced by content)${r2Failures > 0 ? ` (${r2Failures} R2 failures)` : ""}`,
+      `Full reset — ${result.deletedCount} configs, ${imagesDeleted} images, ${docsDeleted} documents deleted from storage, ${keptKeys.length} assets kept (still referenced by content)${storageFailures > 0 ? ` (${storageFailures} storage failures)` : ""}`,
     );
 
     return json({
@@ -87,7 +93,7 @@ export async function POST(req: NextRequest) {
       images_deleted: imagesDeleted,
       documents_deleted: docsDeleted,
       assets_kept: keptKeys.length,
-      r2_failures: r2Failures,
+      storage_failures: storageFailures,
     });
   } catch (e) {
     console.error("[site-config/reset]", e);

@@ -1,9 +1,7 @@
 # Garage configuration for the JCT on-prem object store.
 #
 # Copy to deploy/garage.toml (which docker-compose.prod.yaml mounts read-only
-# at /etc/garage.toml) and fill in the two secrets below. Garage replaces the
-# Cloudflare R2 bucket; MinIO is not an option, its community Docker images
-# were withdrawn in October 2025 and the repository is archived.
+# at /etc/garage.toml) and fill in the two secrets below.
 #
 # ─────────────────────────────────────────────────────────────────────────────
 # First-time setup, once the container is running

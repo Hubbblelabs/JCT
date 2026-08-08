@@ -1,18 +1,5 @@
 # Production host.
-#
 # Three services: the app, MongoDB, and Garage (S3-compatible object storage).
-# The database and storage were previously MongoDB Atlas and Cloudflare R2;
-# both are now optional — delete a service here and point the matching env vars
-# at the managed equivalent and nothing else changes, because the app resolves
-# its provider entirely from the environment (see src/lib/storage-config.ts).
-#
-# Garage rather than MinIO: MinIO's community Docker images were withdrawn in
-# October 2025 and the repository is archived, so it receives no security
-# patches. Garage is a single binary that covers everything this app asks of
-# S3 — presigned PUT, multipart, ListObjectsV2, CORS.
-#
-# Nothing here is published beyond loopback. The host's nginx terminates TLS
-# and is the only thing that reaches these ports; see deploy/nginx-jct.conf.example.
 
 services:
   jct:
@@ -54,11 +41,8 @@ services:
   mongo:
     image: mongo:8
     container_name: jct-mongo
-
+    
     restart: unless-stopped
-
-    # A standalone mongod is enough: nothing in this app uses transactions,
-    # change streams or Atlas Search, all of which would require a replica set.
     command: ["--auth", "--bind_ip_all"]
 
     environment:

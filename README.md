@@ -1,66 +1,48 @@
 # JCT Institutions
 
-A Next.js 16 application that is both the **public marketing/admissions site**
-and the **admin CMS** for three colleges in Coimbatore — JCT College of
-Engineering & Technology, JCT College of Arts & Science, and JCT Polytechnic
-College.
+Public marketing/admissions site + admin CMS for three colleges in Coimbatore —
+JCT College of Engineering & Technology, JCT College of Arts & Science, and
+JCT Polytechnic College.
 
 - Public site: institution landing pages, program listings, CMS-driven content
   pages, campus life, events. Server-rendered with ISR.
 - Admin CMS (`/admin`): live-preview editors for programs, page content,
   placements, media, users, and site-wide configuration.
 
-Persistence is MongoDB Atlas (Mongoose), auth is NextAuth.js, and image/document
-storage is Cloudflare R2 (S3-compatible).
+Stack: Next.js 16, MongoDB (Mongoose), NextAuth.js, and an S3-compatible object
+store for images and documents. Everything runs on-prem by default — MongoDB
+and Garage ship in `docker-compose.prod.yaml`.
 
 ## Requirements
 
-- **Node.js 22+**
-- **pnpm** — this project is pnpm-only. `pnpm-workspace.yaml` carries
-  load-bearing `overrides` (a `postcss` security patch and a single-copy `sharp`
-  pin). npm and yarn ignore that file, resolve two copies of sharp, and the
-  build then dies in the image optimizer with
-  `ERR_DLOPEN_FAILED: libvips-cpp.so … cannot open shared object file`.
-- A MongoDB connection string (Atlas or local).
+- Node.js 22+
+- pnpm — npm and yarn ignore `pnpm-workspace.yaml`, whose `overrides` pin a
+  single copy of sharp; two copies break the build in the image optimizer.
+- A MongoDB connection string.
 
 ## Setup
 
 ```bash
-corepack enable pnpm
+corepack enable pnpm && pnpm install && cp .env.example .env
 ```
 
-```bash
-pnpm install
-```
-
-```bash
-cp .env.example .env
-```
-
-Fill in at least `MONGODB_URI` and `NEXTAUTH_SECRET` in `.env` — the server
-refuses to boot without them. Generate a secret with:
+Fill in at least `MONGODB_URI` and `NEXTAUTH_SECRET` — the server refuses to
+boot without them. Generate a secret with:
 
 ```bash
 openssl rand -base64 32
 ```
 
-Create the first admin user:
+Create the first admin user, then start the dev server:
 
 ```bash
-pnpm seed:admin
+pnpm seed:admin && pnpm dev
 ```
 
-Then start the dev server:
+Site at http://localhost:3000, CMS at http://localhost:3000/admin.
 
-```bash
-pnpm dev
-```
-
-The site is at http://localhost:3000 and the CMS at http://localhost:3000/admin.
-
-`pnpm seed:admin` is the only seed script. Every other piece of content is
-authored through the admin CMS, or restored from a backup archive via the
-Settings page.
+`pnpm seed:admin` is the only seed script. Everything else is authored in the
+CMS or restored from a backup archive via the Settings page.
 
 ## Scripts
 
@@ -68,24 +50,37 @@ Settings page.
 pnpm dev        # dev server (Turbopack)
 pnpm build      # production build (output: "standalone")
 pnpm start      # run the production build
-pnpm lint       # ESLint — note: this one runs with --fix
+pnpm lint       # ESLint — runs with --fix
 pnpm lint:ci    # ESLint without --fix
-pnpm format     # Prettier (with Tailwind class sorting)
+pnpm format     # Prettier
 pnpm typecheck  # tsc --noEmit
 ```
 
-There is no test framework in this repo. Verify changes with `pnpm build`,
-`pnpm typecheck`, `pnpm lint:ci`, and by exercising the feature in a browser.
+No test framework. Verify with `pnpm build`, `pnpm typecheck`, `pnpm lint:ci`,
+and in a browser.
+
+## Storage
+
+Any S3-compatible server, configured entirely by `STORAGE_*` env vars (see
+`.env.example`). On-prem Garage is the default — `deploy/garage.toml.example`
+covers cluster setup, bucket creation and the CORS rule that browser-direct
+presigned uploads need; `deploy/nginx-jct.conf.example` terminates TLS in front
+of it.
+
+Two things bite: `STORAGE_REGION` must match the server's configured region
+exactly or every call fails `SignatureDoesNotMatch`, and
+`NEXT_PUBLIC_STORAGE_PUBLIC_URL` must be https and is inlined at build time —
+changing it needs a rebuild, not a restart.
 
 ## Deployment
 
-The app ships as a Docker image (`output: "standalone"`) to a self-hosted
-server, built and deployed by `.github/workflows/build-deploy.yml`. Pushing to
-`v3-admin` rebuilds and publishes the image; pushing a `vX.Y.Z` tag also deploys
-it to production. It is **not** deployed to Vercel.
+Docker image (`output: "standalone"`) to a self-hosted server, built and
+deployed by `.github/workflows/build-deploy.yml`. Pushing to `v3-admin`
+rebuilds and publishes the image; pushing a `vX.Y.Z` tag also deploys it.
+`docker-compose.prod.yaml` runs the app, MongoDB and Garage, all on loopback
+behind nginx.
 
 ## Further reading
 
-`CLAUDE.md` documents the architecture in depth — routing layout, the auth and
-authorization model, the Program/Page/SiteConfig CMS subsystems, caching and
-revalidation, and the storage-cleanup rules. Read it before making changes.
+`CLAUDE.md` documents the architecture in depth — routing, auth, the CMS
+subsystems, caching and revalidation, and the storage-cleanup rules.

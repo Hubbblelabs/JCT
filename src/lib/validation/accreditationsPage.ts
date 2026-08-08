@@ -35,13 +35,13 @@ const s = (max: number) => z.string().max(max).default("");
 const AccreditationItemSchema = z.object({
   name: s(ACCREDITATIONS_PAGE_LIMITS.nameMax), // "NAAC", "NBA"
   fullName: s(ACCREDITATIONS_PAGE_LIMITS.fullNameMax), // optional expansion
-  logo: s(ACCREDITATIONS_PAGE_LIMITS.logoMax), // R2 key / URL
+  logo: s(ACCREDITATIONS_PAGE_LIMITS.logoMax), // storage key / URL
   grade: s(ACCREDITATIONS_PAGE_LIMITS.gradeMax), // "A+", "CGPA 3.51"
   description: s(ACCREDITATIONS_PAGE_LIMITS.descriptionMax),
   accreditedBy: s(ACCREDITATIONS_PAGE_LIMITS.accreditedByMax), // issuing body
   validFrom: s(ACCREDITATIONS_PAGE_LIMITS.validMax), // "2022"
   validTo: s(ACCREDITATIONS_PAGE_LIMITS.validMax), // "2027"
-  certificate: s(ACCREDITATIONS_PAGE_LIMITS.certificateMax), // R2 doc key / URL
+  certificate: s(ACCREDITATIONS_PAGE_LIMITS.certificateMax), // storage doc key / URL
   certificateLabel: s(ACCREDITATIONS_PAGE_LIMITS.certificateLabelMax),
   // Optional dedicated page for this accreditation, e.g.
   // "/institutions/engineering/naac". Blank renders the card without a

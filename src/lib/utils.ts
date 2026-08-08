@@ -62,7 +62,7 @@ export type CourseAccreditation = { name: string; logo: string };
 /**
  * Reads the `accreditations` array off a `/api/public/programs` card. Entries
  * without a logo are dropped — an empty slot renders as a broken image. The
- * logo is whatever the admin picked from the media library (an R2 key, already
+ * logo is whatever the admin picked from the media library (an storage key, already
  * resolved to a URL by the API), never a path baked into /public.
  */
 export function parseCourseAccreditations(raw: unknown): CourseAccreditation[] {

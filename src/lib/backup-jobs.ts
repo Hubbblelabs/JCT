@@ -16,7 +16,7 @@ import path from "path";
  * Backups are built to disk first, then downloaded as an ordinary file.
  *
  * The previous design archived straight into the HTTP response, which coupled
- * two things that have no business being coupled: how fast R2 can be read, and
+ * two things that have no business being coupled: how fast storage can be read, and
  * how fast the operator's browser drains a socket. Every object was fetched,
  * zipped and pushed one at a time, gated by the slower of the two — so a 7.5 GB
  * export ran for hours on a link that could have carried it in minutes, could
@@ -24,7 +24,7 @@ import path from "path";
  * not be resumed if the tab was closed at 90%.
  *
  * Splitting it in two fixes all of that. The build phase has no client attached,
- * so it reads R2 with real concurrency at full server bandwidth. The serve phase
+ * so it reads storage with real concurrency at full server bandwidth. The serve phase
  * is a static file with a known `Content-Length` and byte-range support, so the
  * browser shows true progress, a dropped connection resumes instead of
  * restarting, and nginx can serve it with `sendfile()` and skip Node entirely.

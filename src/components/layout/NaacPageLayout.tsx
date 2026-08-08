@@ -98,7 +98,7 @@ export function naacSectionTitle(section: string, data: NaacPageValue): string {
   return NAAC_SECTION_LABELS[section] ?? "Section";
 }
 
-// Uploaded documents are stored as R2 keys ("documents/…"), which are not valid
+// Uploaded documents are stored as storage keys ("documents/…"), which are not valid
 // hrefs on their own — resolve them the same way the Documents page does.
 const docUrl = (v: string) => getImageUrl(v) || "";
 

@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import sharp from "sharp";
 import { connectDB } from "@/lib/mongodb";
 import { ImageAsset } from "@/lib/models";
-import { uploadToR2, deleteFromR2 } from "@/lib/r2";
+import { uploadObject, deleteObject } from "@/lib/storage";
 import {
   requireRole,
   enforceAssetScope,
@@ -199,12 +199,12 @@ export async function POST(req: NextRequest) {
       .replace(/[^a-zA-Z0-9._-]/g, "_")
       .slice(0, 80);
     // Random suffix so concurrent uploads of the same filename don't
-    // collide on the R2 key (Date.now() is not unique under load).
+    // collide on the storage key (Date.now() is not unique under load).
     const suffix = crypto.randomUUID().slice(0, 8);
     const filename = `${Date.now()}-${suffix}-${baseName}.webp`;
     const storageKey = `images/${filename}`;
 
-    await uploadToR2(storageKey, webpBuffer, "image/webp");
+    await uploadObject(storageKey, webpBuffer, "image/webp");
 
     try {
       await connectDB();
@@ -235,11 +235,11 @@ export async function POST(req: NextRequest) {
       );
       return json({ ...doc.toObject(), url: storageKey }, 201);
     } catch (dbErr) {
-      // R2 succeeded but DB failed — clean up the orphaned blob so we
+      // storage succeeded but DB failed — clean up the orphaned blob so we
       // don't accumulate untracked uploads.
       console.error(dbErr);
       try {
-        await deleteFromR2(storageKey);
+        await deleteObject(storageKey);
       } catch {
         /* non-fatal */
       }

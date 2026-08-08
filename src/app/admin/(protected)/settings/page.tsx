@@ -105,7 +105,7 @@ export default function SettingsPage() {
   // with no image bytes and no images/_metadata.json, so every image reference
   // dangles with nothing in the archive to even enumerate what's missing —
   // and "restore the backup" is exactly the recovery path after a bad delete,
-  // which cascades into R2 object removal.
+  // which cascades into stored object removal.
   const [includeImages, setIncludeImages] = useState(true);
   const [includeDocs, setIncludeDocs] = useState(true);
   const [exporting, setExporting] = useState(false);
@@ -173,7 +173,7 @@ export default function SettingsPage() {
     setExportStatus({
       type: missing > 0 || job.assets_unavailable ? "warning" : "success",
       message: job.assets_unavailable
-        ? `Archive built (${formatBytes(job.size ?? 0)}) and downloading — but WITHOUT images or documents, because R2 storage is not configured on this deployment. This archive cannot restore media on its own.`
+        ? `Archive built (${formatBytes(job.size ?? 0)}) and downloading — but WITHOUT images or documents, because object storage is not configured on this deployment. This archive cannot restore media on its own.`
         : missing > 0
           ? `Archive built (${formatBytes(job.size ?? 0)}) and downloading — but ${missing} asset file(s) could not be read from storage. See _report.json inside the ZIP for the list.`
           : `Archive built (${formatBytes(job.size ?? 0)}) and downloading — ${job.config_entries} config entries and ${job.report?.assets_archived ?? 0} asset files. The download resumes on its own if it is interrupted.`,
@@ -420,7 +420,7 @@ export default function SettingsPage() {
     // Typing RESET proves intent to fill the box; it does not prove intent to
     // press the button. This step names what is about to be destroyed, and it
     // is the last one — the request deletes config, images and documents from
-    // both Mongo and R2 with no undo.
+    // both Mongo and storage with no undo.
     const ok = await confirm({
       title: "Delete all site data",
       message:
@@ -449,15 +449,15 @@ export default function SettingsPage() {
       if ((data.documents_deleted as number) > 0)
         parts.push(`${data.documents_deleted as number} documents`);
       const r2Warn =
-        (data.r2_failures as number) > 0
-          ? ` ${data.r2_failures as number} R2 file(s) could not be deleted — remove them manually.`
+        (data.storage_failures as number) > 0
+          ? ` ${data.storage_failures as number} storage file(s) could not be deleted — remove them manually.`
           : "";
       const kept =
         (data.assets_kept as number) > 0
           ? ` ${data.assets_kept as number} asset(s) kept — still referenced by programs, pages, events, placements or testimonials.`
           : "";
       setResetStatus({
-        type: (data.r2_failures as number) > 0 ? "warning" : "success",
+        type: (data.storage_failures as number) > 0 ? "warning" : "success",
         message: `Deleted: ${parts.join(", ")}.${kept}${r2Warn} Pages will serve defaults until reconfigured.`,
       });
       setResetConfirm("");
@@ -526,7 +526,7 @@ export default function SettingsPage() {
               <p className="pt-1 text-xs text-amber-600">
                 Keep this tab open while the archive builds. Once it is ready
                 the download is a normal file transfer — closing the tab then
-                will not lose it. Requires R2 storage to be configured.
+                will not lose it. Requires object storage to be configured.
               </p>
             ) : (
               <p className="pt-1 text-xs text-red-600">
@@ -733,9 +733,9 @@ export default function SettingsPage() {
               <h2 className="font-semibold text-red-800">Reset All Data</h2>
               <p className="mt-0.5 text-sm text-red-700/80">
                 Permanently deletes all site config entries, uploaded images,
-                and uploaded documents — from both the database and R2 storage.
-                Public pages revert to hard-coded defaults. This cannot be
-                undone — export a backup first.
+                and uploaded documents — from both the database and object
+                storage. Public pages revert to hard-coded defaults. This cannot
+                be undone — export a backup first.
               </p>
             </div>
           </div>

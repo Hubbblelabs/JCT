@@ -1,6 +1,6 @@
 import "server-only";
 import type { Model } from "mongoose";
-import { deleteFromR2, extractR2Keys } from "@/lib/r2";
+import { deleteObject, extractStorageKeys } from "@/lib/storage";
 import {
   ImageAsset,
   DocumentAsset,
@@ -47,7 +47,7 @@ export async function stillReferencedKeys(
     const cursor = model.find({}).lean().cursor();
     try {
       for await (const doc of cursor) {
-        for (const key of extractR2Keys(doc)) {
+        for (const key of extractStorageKeys(doc)) {
           if (candidates.has(key)) found.add(key);
         }
         if (found.size === candidates.size) break;
@@ -61,7 +61,7 @@ export async function stillReferencedKeys(
 
 /**
  * Fire-and-forget cleanup of stored assets referenced by deleted/replaced
- * content. Removes BOTH the R2 object and its tracking row (ImageAsset /
+ * content. Removes BOTH the stored object and its tracking row (ImageAsset /
  * DocumentAsset) — deleting only the blob leaves the admin media library
  * full of entries pointing at objects that no longer exist.
  *
@@ -114,8 +114,8 @@ export function cleanupStorageKeys(
         continue;
       }
 
-      deleteFromR2(key).catch((err) =>
-        console.warn(`[${context}] R2 cleanup failed for "${key}":`, err),
+      deleteObject(key).catch((err) =>
+        console.warn(`[${context}] storage cleanup failed for "${key}":`, err),
       );
 
       const Model = key.startsWith("images/") ? ImageAsset : DocumentAsset;

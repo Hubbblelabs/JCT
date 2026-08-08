@@ -83,7 +83,7 @@ export function blockLabel(block: ContentBlockValue, index: number): string {
 
 // ─── Shared bits ────────────────────────────────────────────────────────────
 
-/** R2 keys are not valid hrefs on their own; absolute URLs pass straight through. */
+/** storage keys are not valid hrefs on their own; absolute URLs pass straight through. */
 const linkUrl = (v: string) => getImageUrl(v.trim()) || "";
 
 /**

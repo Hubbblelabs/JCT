@@ -14,7 +14,7 @@ import {
 import { logAudit } from "@/lib/audit";
 import { PlacementUpdateSchema } from "@/lib/validation";
 import { revalidateTargets, type RevalidateTarget } from "@/lib/revalidate";
-import { extractR2Keys } from "@/lib/r2";
+import { extractStorageKeys } from "@/lib/storage";
 import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 
 function isDuplicateKeyError(e: unknown): boolean {
@@ -81,14 +81,14 @@ export async function PATCH(
     }
 
     // Collect storage keys that are being replaced so we can clean up the
-    // orphaned R2 objects + ImageAsset rows after the update succeeds.
+    // orphaned stored objects + ImageAsset rows after the update succeeds.
     const oldKeys = new Set<string>();
     if (body.top_recruiters !== undefined)
-      extractR2Keys(existing.top_recruiters, oldKeys);
+      extractStorageKeys(existing.top_recruiters, oldKeys);
     if (body.notable_placements !== undefined)
-      extractR2Keys(existing.notable_placements, oldKeys);
+      extractStorageKeys(existing.notable_placements, oldKeys);
     if (body.company_placements !== undefined)
-      extractR2Keys(existing.company_placements, oldKeys);
+      extractStorageKeys(existing.company_placements, oldKeys);
 
     const updateFields: Record<string, unknown> = Object.fromEntries(
       Object.entries(body).filter(([, v]) => v !== undefined),
@@ -104,9 +104,9 @@ export async function PATCH(
     // Keys still referenced after the update must be kept.
     if (oldKeys.size > 0) {
       const stillUsed = new Set<string>();
-      extractR2Keys(doc.top_recruiters, stillUsed);
-      extractR2Keys(doc.notable_placements, stillUsed);
-      extractR2Keys(doc.company_placements, stillUsed);
+      extractStorageKeys(doc.top_recruiters, stillUsed);
+      extractStorageKeys(doc.notable_placements, stillUsed);
+      extractStorageKeys(doc.company_placements, stillUsed);
       const removed = [...oldKeys].filter((k) => !stillUsed.has(k));
       if (removed.length > 0) cleanupStorageKeys(removed, "placements/patch");
     }
@@ -154,9 +154,9 @@ export async function DELETE(
     if (!doc) return notFound();
 
     const keys = new Set<string>();
-    extractR2Keys(doc.top_recruiters, keys);
-    extractR2Keys(doc.notable_placements, keys);
-    extractR2Keys(doc.company_placements, keys);
+    extractStorageKeys(doc.top_recruiters, keys);
+    extractStorageKeys(doc.notable_placements, keys);
+    extractStorageKeys(doc.company_placements, keys);
     if (keys.size > 0) cleanupStorageKeys(keys, "placements/delete");
 
     revalidateTargets(doc.institution as RevalidateTarget);

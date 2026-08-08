@@ -16,7 +16,7 @@ import { z } from "zod";
 // admin editor, so a page is never locked into the shape it was imported with.
 //
 // Nothing here is hard-coded content: `scripts/seed-content-pages.mjs` performs
-// the one-time import of the legacy copy and files (into R2), and everything is
+// the one-time import of the legacy copy and files (into storage), and everything is
 // editable afterwards at /admin/content/<slug>.
 // ──────────────────────────────────────────────────────────────────────────
 
@@ -40,7 +40,7 @@ export const CONTENT_PAGE_LIMITS = {
 const s = (max: number) => z.string().max(max).default("");
 
 /**
- * A link target: either an R2 storage key ("documents/…", "images/…") or an
+ * A link target: either an storage key ("documents/…", "images/…") or an
  * absolute URL. Both are resolved through `getImageUrl()` at render time.
  */
 const zTarget = s(600);
@@ -68,7 +68,7 @@ const ListBlock = z.object({
     .default([]),
 });
 
-/** One downloadable file. `file` is an R2 key or an absolute URL. */
+/** One downloadable file. `file` is an storage key or an absolute URL. */
 export const ContentDocSchema = z.object({
   label: s(400),
   description: s(600),

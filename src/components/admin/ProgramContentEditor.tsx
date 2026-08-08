@@ -115,7 +115,7 @@ const HERO_META_FIELDS: FieldDef[] = [
 ];
 const E_HERO_META: HeroMetaItem = { icon: "", label: "", value: "" };
 
-// Badge logos overlaid on the public program cards. Uploads land in R2 like
+// Badge logos overlaid on the public program cards. Uploads land in storage like
 // every other image — they are no longer static files under /public.
 const ACCREDITATION_FIELDS: FieldDef[] = [
   {

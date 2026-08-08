@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { DocumentAsset } from "@/lib/models";
-import { deleteFromR2 } from "@/lib/r2";
+import { deleteObject } from "@/lib/storage";
 import {
   requireRole,
   json,
@@ -26,12 +26,15 @@ export async function DELETE(
     const doc = await DocumentAsset.findById(id);
     if (!doc) return notFound("Document not found");
 
-    // Delete from R2 first (non-fatal if it fails — DB record removal is the
-    // authoritative step; the R2 object will be unreachable anyway).
+    // Delete from storage first (non-fatal if it fails — DB record removal is the
+    // authoritative step; the stored object will be unreachable anyway).
     try {
-      await deleteFromR2(doc.storage_key);
-    } catch (r2Err) {
-      console.warn("[documents/delete] R2 deletion failed (non-fatal):", r2Err);
+      await deleteObject(doc.storage_key);
+    } catch (storageErr) {
+      console.warn(
+        "[documents/delete] storage deletion failed (non-fatal):",
+        storageErr,
+      );
     }
 
     await doc.deleteOne();

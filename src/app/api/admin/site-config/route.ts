@@ -14,7 +14,7 @@ import {
   SITE_CONFIG_KEY_INSTITUTION,
 } from "@/lib/validation";
 import { revalidateForConfigKey } from "@/lib/revalidate";
-import { extractR2Keys } from "@/lib/r2";
+import { extractStorageKeys } from "@/lib/storage";
 import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 import { hasMinRole } from "@/lib/permissions";
 
@@ -81,7 +81,7 @@ export async function PUT(req: NextRequest) {
   try {
     await connectDB();
 
-    // Fetch the existing doc BEFORE overwriting so we can detect orphaned R2 keys.
+    // Fetch the existing doc BEFORE overwriting so we can detect orphaned storage keys.
     //
     // The union of BOTH sides matters. Draft saves deliberately skip cleanup
     // (see below), so by the time a publish arrives `existing.value` is already
@@ -91,9 +91,9 @@ export async function PUT(req: NextRequest) {
     // still holds it, so seed from both.
     const existing = await SiteConfig.findOne({ config_key }).lean();
     const oldKeySet = new Set<string>();
-    if (existing?.value) extractR2Keys(existing.value, oldKeySet);
+    if (existing?.value) extractStorageKeys(existing.value, oldKeySet);
     if (existing?.published_value)
-      extractR2Keys(existing.published_value, oldKeySet);
+      extractStorageKeys(existing.published_value, oldKeySet);
     const oldKeys = [...oldKeySet];
 
     const doc = await SiteConfig.findOneAndUpdate(
@@ -118,7 +118,7 @@ export async function PUT(req: NextRequest) {
       { upsert: true, returnDocument: "after" },
     );
 
-    // Delete any stored assets (R2 object + tracking row) that were present
+    // Delete any stored assets (stored object + tracking row) that were present
     // in the old value but are no longer referenced by the new value.
     // Non-fatal — a failed cleanup never blocks the save.
     //
@@ -126,7 +126,7 @@ export async function PUT(req: NextRequest) {
     // referenced by `published_value`, and deleting it would break the live
     // page for a change that has not gone live.
     if (publish) {
-      const newKeys = new Set([...extractR2Keys(value)]);
+      const newKeys = new Set([...extractStorageKeys(value)]);
       cleanupStorageKeys(
         oldKeys.filter((k) => !newKeys.has(k)),
         "site-config",

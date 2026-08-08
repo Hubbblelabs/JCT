@@ -13,7 +13,7 @@ export interface IProgram extends Document {
   description: string;
   image: string;
   outcomes: string[];
-  // Accreditation badges overlaid on the public program cards. `logo` is an R2
+  // Accreditation badges overlaid on the public program cards. `logo` is an storage
   // storage key picked from the shared media library — these logos used to be
   // hardcoded files under /public.
   accreditations: { name: string; logo: string }[];

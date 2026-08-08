@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { DocumentAsset } from "@/lib/models";
-import { deleteFromR2, headR2Object, r2PublicUrl } from "@/lib/r2";
+import { deleteObject, headObject, publicAssetUrl } from "@/lib/storage";
 import {
   requireRole,
   enforceUploadRateLimit,
@@ -33,12 +33,12 @@ export async function POST(req: NextRequest) {
     // The client-supplied size/mime are advisory — confirm against the
     // actual uploaded object. This also rejects confirms for keys that were
     // presigned but never uploaded.
-    const head = await headR2Object(storage_key);
+    const head = await headObject(storage_key);
     if (!head || head.size === 0) {
       return badRequest("Upload not found in storage — upload the file first");
     }
 
-    const publicUrl = r2PublicUrl(storage_key);
+    const publicUrl = publicAssetUrl(storage_key);
 
     try {
       await connectDB();
@@ -61,11 +61,11 @@ export async function POST(req: NextRequest) {
       });
     } catch (dbErr) {
       console.error(
-        "[documents/confirm] DB write failed — rolling back R2",
+        "[documents/confirm] DB write failed — rolling back storage",
         dbErr,
       );
       try {
-        await deleteFromR2(storage_key);
+        await deleteObject(storage_key);
       } catch {
         /* non-fatal */
       }

@@ -14,7 +14,7 @@ export interface IDocumentAsset extends Document {
 const DocumentAssetSchema = new Schema<IDocumentAsset>(
   {
     filename: { type: String, required: true },
-    /** The R2 object key, e.g. "documents/1234567890-prospectus.pdf" */
+    /** The stored object key, e.g. "documents/1234567890-prospectus.pdf" */
     storage_key: { type: String, required: true, unique: true },
     /** Full public URL or server-proxy path */
     url: { type: String, required: true },

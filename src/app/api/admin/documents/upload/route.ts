@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { DocumentAsset } from "@/lib/models";
-import { uploadToR2, deleteFromR2 } from "@/lib/r2";
+import { uploadObject, deleteObject } from "@/lib/storage";
 import {
   requireRole,
   json,
@@ -55,10 +55,10 @@ export async function POST(req: NextRequest) {
       .replace(/[^a-zA-Z0-9._-]/g, "_");
     const storageKey = `documents/${Date.now()}-${safeName}`;
 
-    const publicUrl = await uploadToR2(storageKey, buffer, file.type);
+    const publicUrl = await uploadObject(storageKey, buffer, file.type);
 
-    // Track the document in MongoDB so it can be deleted later (and R2 cleaned up).
-    // If the DB write fails, roll back the R2 upload.
+    // Track the document in MongoDB so it can be deleted later (and storage cleaned up).
+    // If the DB write fails, roll back the storage upload.
     try {
       await connectDB();
       await DocumentAsset.create({
@@ -71,11 +71,11 @@ export async function POST(req: NextRequest) {
       });
     } catch (dbErr) {
       console.error(
-        "[documents/upload] DB write failed — rolling back R2",
+        "[documents/upload] DB write failed — rolling back storage",
         dbErr,
       );
       try {
-        await deleteFromR2(storageKey);
+        await deleteObject(storageKey);
       } catch {
         /* non-fatal */
       }

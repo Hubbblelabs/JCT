@@ -204,7 +204,7 @@ export function normalizeProgramData(
       : college === "polytechnic"
         ? "#1a3a2a"
         : "#800020";
-  // No local fallback hero — images come only from R2/CMS. Empty heroImage is
+  // No local fallback hero — images come only from storage/CMS. Empty heroImage is
   // guarded at the render site (ProgramPageLayout), so the banner is hidden.
   const defaultHero = "";
 

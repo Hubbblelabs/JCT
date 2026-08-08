@@ -176,7 +176,7 @@ async function doPresignedDocumentUpload(file: File): Promise<string> {
       safe_name: string;
     };
 
-  // Step 2: upload directly to R2 — bypasses Vercel's 4.5 MB payload limit
+  // Step 2: upload directly to storage — bypasses Vercel's 4.5 MB payload limit
   const uploadRes = await fetch(presigned_url, {
     method: "PUT",
     headers: { "Content-Type": "application/pdf" },

@@ -74,7 +74,7 @@ export function consumeLoginAttemptByEmail(email: string): RateLimitResult {
   return rateLimit(`login-email:${email}`, 20, 15 * 60 * 1000);
 }
 
-// 30 uploads per minute per user. Protects sharp / R2.
+// 30 uploads per minute per user. Protects sharp / storage.
 export function consumeUploadAttempt(key: string): RateLimitResult {
   return rateLimit(`upload:${key}`, 30, 60 * 1000);
 }

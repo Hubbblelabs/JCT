@@ -86,11 +86,11 @@ export const COE_NAV_DEFAULTS: SidebarNavDefault[] = [
   { anchor: "downloads", navLabel: "Circulars & Downloads", icon: Download },
 ];
 
-// Images come only from R2/CMS. Empty value -> "" so the call site skips the
+// Images come only from storage/CMS. Empty value -> "" so the call site skips the
 // <Image> and the neutral wrapper (bg-white/5) shows as the placeholder.
 const imgUrl = (v: string) => getImageUrl(v) || "";
 
-// Uploaded documents are stored as R2 keys ("documents/…"), which are not
+// Uploaded documents are stored as storage keys ("documents/…"), which are not
 // valid hrefs on their own — resolve them the same way images are.
 const docUrl = (v: string) => getImageUrl(v) || "";
 

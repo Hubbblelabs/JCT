@@ -18,7 +18,7 @@ import {
   revalidatePaths,
   type RevalidateTarget,
 } from "@/lib/revalidate";
-import { extractR2Keys } from "@/lib/r2";
+import { extractStorageKeys } from "@/lib/storage";
 import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 
 function institutionTarget(inst: string): RevalidateTarget | null {
@@ -112,7 +112,7 @@ export async function PATCH(
     // exact same field.
     const oldKeys =
       body.content !== undefined
-        ? extractR2Keys(current.content)
+        ? extractStorageKeys(current.content)
         : new Set<string>();
 
     const doc = await Page.findByIdAndUpdate(
@@ -125,7 +125,7 @@ export async function PATCH(
     if (oldKeys.size > 0) {
       // published_content stays on the keep side: a draft edit must not delete
       // an asset the live page still renders.
-      const kept = extractR2Keys({
+      const kept = extractStorageKeys({
         content: doc.content,
         published_content: doc.published_content,
       });
@@ -166,11 +166,11 @@ export async function DELETE(
     const doc = await Page.findByIdAndDelete(id);
     if (!doc) return notFound();
 
-    const r2Keys = extractR2Keys({
+    const storageKeys = extractStorageKeys({
       content: doc.content,
       published_content: doc.published_content,
     });
-    cleanupStorageKeys(r2Keys, "pages/delete");
+    cleanupStorageKeys(storageKeys, "pages/delete");
 
     const target = institutionTarget(doc.institution);
     if (target) {

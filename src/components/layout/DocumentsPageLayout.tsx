@@ -30,7 +30,7 @@ export const DOCUMENTS_SECTION_ORDER: DocumentsEditableSection[] = [
   "categories",
 ];
 
-// Uploaded documents are stored as R2 keys ("documents/…"), which are not valid
+// Uploaded documents are stored as storage keys ("documents/…"), which are not valid
 // hrefs on their own — resolve them the same way images are.
 const docUrl = (v: string) => getImageUrl(v) || "";
 

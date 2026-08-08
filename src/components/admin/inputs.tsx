@@ -944,7 +944,7 @@ export function DocumentUploadInput({
 export type FieldDef = {
   key: string;
   label: string;
-  /** "image" swaps the plain input for an ImageUploadInput (R2-backed). */
+  /** "image" swaps the plain input for an ImageUploadInput (storage-backed). */
   type?: "text" | "textarea" | "number" | "image";
   /** @deprecated use `span` — kept so existing call sites keep compiling. */
   span2?: boolean;

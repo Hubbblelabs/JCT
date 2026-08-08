@@ -17,7 +17,7 @@ import {
   revalidatePaths,
   type RevalidateTarget,
 } from "@/lib/revalidate";
-import { extractR2Keys } from "@/lib/r2";
+import { extractStorageKeys } from "@/lib/storage";
 import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 
 function institutionTarget(inst: string): RevalidateTarget | null {
@@ -100,10 +100,10 @@ export async function PATCH(
     // card-level `image` field.
     const oldKeys = new Set<string>();
     if (body.image !== undefined && existing.image) {
-      extractR2Keys(existing.image, oldKeys);
+      extractStorageKeys(existing.image, oldKeys);
     }
     if (body.content !== undefined) {
-      extractR2Keys(existing.content, oldKeys);
+      extractStorageKeys(existing.content, oldKeys);
     }
 
     const doc = await Program.findByIdAndUpdate(
@@ -116,7 +116,7 @@ export async function PATCH(
     if (oldKeys.size > 0) {
       // published_content is included on the keep side: a draft edit must not
       // delete an asset the live page is still serving.
-      const kept = extractR2Keys({
+      const kept = extractStorageKeys({
         image: doc.image,
         content: doc.content,
         published_content: doc.published_content,
@@ -158,12 +158,12 @@ export async function DELETE(
     const doc = await Program.findByIdAndDelete(id);
     if (!doc) return notFound();
 
-    const r2Keys = extractR2Keys({
+    const storageKeys = extractStorageKeys({
       image: doc.image,
       content: doc.content,
       published_content: doc.published_content,
     });
-    cleanupStorageKeys(r2Keys, "programs/delete");
+    cleanupStorageKeys(storageKeys, "programs/delete");
 
     const target = institutionTarget(doc.institution);
     if (target) {

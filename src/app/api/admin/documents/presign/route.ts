@@ -7,7 +7,7 @@ import {
   enforceUploadRateLimit,
 } from "@/lib/api-helpers";
 import { DocumentPresignSchema } from "@/lib/validation";
-import { getPresignedPutUrl } from "@/lib/r2";
+import { getPresignedPutUrl } from "@/lib/storage";
 
 export const maxDuration = 30;
 

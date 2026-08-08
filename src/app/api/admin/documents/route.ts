@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { DocumentAsset } from "@/lib/models";
-import { deleteFromR2 } from "@/lib/r2";
+import { deleteObject } from "@/lib/storage";
 import {
   requireRole,
   json,
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 /**
  * DELETE /api/admin/documents?storage_key=<key>
  *
- * Deletes a document asset by its R2 storage key.
+ * Deletes a document asset by its storage key.
  *
  * NOT called from the admin UI — see the matching note on the images route.
  * Replacing a PDF in an editor is reclaimed server-side by the save route's
@@ -47,9 +47,12 @@ export async function DELETE(req: NextRequest) {
     if (!doc) return notFound("Document asset not found");
 
     try {
-      await deleteFromR2(key);
-    } catch (r2Err) {
-      console.warn("[documents DELETE] R2 deletion failed (non-fatal):", r2Err);
+      await deleteObject(key);
+    } catch (storageErr) {
+      console.warn(
+        "[documents DELETE] storage deletion failed (non-fatal):",
+        storageErr,
+      );
     }
 
     await doc.deleteOne();

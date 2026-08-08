@@ -11,7 +11,7 @@ import { requireRole, badRequest } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { isBackupCollection } from "@/lib/backup-collections";
 import { revalidateTargets } from "@/lib/revalidate";
-import { isR2Configured } from "@/lib/r2";
+import { isStorageConfigured } from "@/lib/storage";
 import {
   restoreConfigs,
   restoreCollectionDocs,
@@ -254,11 +254,11 @@ export async function POST(req: NextRequest) {
           : {};
 
         const assets = files.filter((f) => isSafeStorageKey(f.path));
-        // R2 is checked lazily: an archive with no assets restores fine
+        // storage is checked lazily: an archive with no assets restores fine
         // without storage configured.
-        if (assets.length > 0 && !isR2Configured()) {
+        if (assets.length > 0 && !isStorageConfigured()) {
           warnings.push(
-            `${assets.length} asset file(s) skipped — R2 storage is not configured`,
+            `${assets.length} asset file(s) skipped — object storage is not configured`,
           );
         } else {
           for (const entry of assets) {

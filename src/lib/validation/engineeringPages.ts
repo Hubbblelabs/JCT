@@ -232,7 +232,7 @@ export const DOCUMENTS_PAGE_LIMITS = {
 const DocumentItemSchema = z.object({
   title: s(250),
   description: s(800),
-  /** R2 storage key from the document uploader, or an external URL. */
+  /** storage key from the document uploader, or an external URL. */
   file: s(500),
   updatedOn: s(60),
 });

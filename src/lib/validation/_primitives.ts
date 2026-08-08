@@ -39,7 +39,7 @@ export const zEmail = z
   .max(200);
 
 // URLs accept absolute http(s) URLs, root-relative paths, fragment-only
-// anchors (#section), or stored R2 storage keys. Empty strings are allowed
+// anchors (#section), or stored storage keys. Empty strings are allowed
 // because the admin UI uses "" as the unset sentinel.
 export const zUrl = z
   .string()

@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { ImageAsset } from "@/lib/models";
-import { deleteFromR2 } from "@/lib/r2";
+import { deleteObject } from "@/lib/storage";
 import {
   requireRole,
   enforceAssetScope,
@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
 /**
  * DELETE /api/admin/images?storage_key=<key>
  *
- * Deletes an image asset by its R2 storage key.
+ * Deletes an image asset by its storage key.
  *
  * NOT called from the admin UI. `ImageUploadInput.handleRemove` only cancels a
  * `pending:` placeholder and clears local state; reclamation for an
@@ -74,9 +74,12 @@ export async function DELETE(req: NextRequest) {
     if (scope) return scope;
 
     try {
-      await deleteFromR2(key);
-    } catch (r2Err) {
-      console.warn("[images DELETE] R2 deletion failed (non-fatal):", r2Err);
+      await deleteObject(key);
+    } catch (storageErr) {
+      console.warn(
+        "[images DELETE] storage deletion failed (non-fatal):",
+        storageErr,
+      );
     }
 
     await doc.deleteOne();

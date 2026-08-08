@@ -19,7 +19,7 @@ type PolytechnicCourse = {
   slug: string;
   image?: string;
   icon?: LucideIcon;
-  /** Badge logos authored per program in the admin (R2-backed). */
+  /** Badge logos authored per program in the admin (storage-backed). */
   accreditations: CourseAccreditation[];
 };
 

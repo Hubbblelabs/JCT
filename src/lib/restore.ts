@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import type { Readable } from "stream";
 import { SiteConfig, ImageAsset, DocumentAsset } from "@/lib/models";
-import { uploadStreamToR2, extractR2Keys } from "@/lib/r2";
+import { uploadObjectStream, extractStorageKeys } from "@/lib/storage";
 import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 import {
   backupCollection,
@@ -310,7 +310,7 @@ export async function restoreCollectionDocs(
     // `deleteMany` on the raw driver bypasses every model hook, so without
     // this the pruned documents' images/PDFs (Program.content, Page.content,
     // Event.image + gallery, Placement recruiter logos, Testimonial avatars)
-    // stayed in R2 and in the media library with nothing referencing them and
+    // stayed in storage and in the media library with nothing referencing them and
     // no UI able to reach them. Note the asymmetry this fixes: `restoreAsset`
     // happily pushes archive bytes back in, so a restore could only ever grow
     // the bucket.
@@ -322,7 +322,7 @@ export async function restoreCollectionDocs(
         return [] as PlainDoc[];
       });
     const doomedKeys = new Set<string>();
-    for (const doc of doomed) extractR2Keys(doc, doomedKeys);
+    for (const doc of doomed) extractStorageKeys(doc, doomedKeys);
 
     const res = await col.deleteMany({ _id: { $nin: writtenIds } });
     pruned = res.deletedCount ?? 0;
@@ -386,7 +386,7 @@ const MIME_BY_EXT: Record<string, string> = {
 /**
  * Content-Type has to come from the key's extension when the archive carries no
  * metadata for it. Defaulting by prefix alone would stamp `image/webp` onto
- * every untracked `.jpeg`/`.png`, and R2 serves that header straight to
+ * every untracked `.jpeg`/`.png`, and storage serves that header straight to
  * browsers.
  */
 function mimeForKey(key: string, metaMime: unknown): string {
@@ -422,7 +422,7 @@ function category(v: unknown): string {
 }
 
 /**
- * Push one asset's bytes back into R2 and re-create its tracking row. The bytes
+ * Push one asset's bytes back into storage and re-create its tracking row. The bytes
  * arrive as a stream and leave as a multipart upload, so nothing proportional
  * to the file size is ever held. Returns an error string on failure rather than
  * throwing — one bad file must not abandon the rest of the restore.
@@ -443,7 +443,7 @@ export async function restoreAsset(
   if (isRejectedType(key, mime)) return `${key}: SVG is not permitted`;
 
   try {
-    const url = await uploadStreamToR2(key, open(), mime);
+    const url = await uploadObjectStream(key, open(), mime);
 
     // No metadata means the archive held a file that never had a tracking row
     // (seeded assets under images/programs/…, images/hod/…). Put the bytes back

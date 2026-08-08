@@ -23,16 +23,10 @@ COPY . .
 # with '"url" parameter is not allowed' because the asset host was never
 # allowlisted in this build. It's a public value (just the bucket's public
 # domain), so a plain build ARG is fine — unlike MONGODB_URI it doesn't need
-# the BuildKit secret mechanism.
-#
-# Both names are passed because the inlining is textual: whichever one the
-# deployment sets, the other resolves to undefined in the bundle and the `||`
-# in publicAssetBaseUrl() picks the right one. Setting neither at build time
-# cannot be fixed by setting them at runtime.
+# the BuildKit secret mechanism. Not setting it at build time cannot be fixed
+# by setting it at runtime.
 ARG NEXT_PUBLIC_STORAGE_PUBLIC_URL
 ENV NEXT_PUBLIC_STORAGE_PUBLIC_URL=${NEXT_PUBLIC_STORAGE_PUBLIC_URL}
-ARG NEXT_PUBLIC_R2_PUBLIC_URL
-ENV NEXT_PUBLIC_R2_PUBLIC_URL=${NEXT_PUBLIC_R2_PUBLIC_URL}
 # MONGODB_URI is injected as a BuildKit secret (never persisted in the image
 # layers) so `next build` can reach MongoDB and prerender the public ISR pages
 # with real content. Without it, DB-backed pages (campus-life, coe, about,

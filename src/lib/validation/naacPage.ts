@@ -7,10 +7,10 @@ import { SidebarNavItemSchema } from "./sidebarNav";
 // headings, table column labels, rows and document links — lives here so the
 // admin editor can change all of it; nothing is hard-coded in the layout.
 //
-// Documents are R2 storage keys ("documents/…") produced by the document
+// Documents are storage keys ("documents/…") produced by the document
 // uploader, resolved through getImageUrl() at render time, exactly like the
 // Documents page. `scripts/seed-naac.mjs` performs the one-time import of the
-// legacy PDFs into R2 and writes this key.
+// legacy PDFs into storage and writes this key.
 // ──────────────────────────────────────────────────────────────────────────
 
 export const NAAC_PAGE_LIMITS = {
@@ -36,7 +36,7 @@ const HeroSchema = z
   })
   .default({ title: "", subtitle: "" });
 
-/** One downloadable file. `file` is an R2 key or an absolute URL. */
+/** One downloadable file. `file` is an storage key or an absolute URL. */
 const NaacDocSchema = z.object({
   label: s(400),
   file: s(500),

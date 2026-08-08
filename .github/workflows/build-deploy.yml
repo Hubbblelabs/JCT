@@ -82,15 +82,12 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      # Both asset-origin secrets are passed; whichever is unset resolves to an
-      # empty build arg and is ignored. NEXT_PUBLIC_* is inlined at build time,
-      # so a change here needs a rebuild — restarting the container will not
-      # pick it up.
+      # NEXT_PUBLIC_* is inlined at build time, so a change to the asset origin
+      # needs a rebuild — restarting the container will not pick it up.
       - name: Build and Push Images
         env:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           NEXT_PUBLIC_STORAGE_PUBLIC_URL: ${{ secrets.NEXT_PUBLIC_STORAGE_PUBLIC_URL }}
-          NEXT_PUBLIC_R2_PUBLIC_URL: ${{ secrets.NEXT_PUBLIC_R2_PUBLIC_URL }}
 
         run: |
           docker compose -f docker-compose.build.yaml build --push

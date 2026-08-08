@@ -12,10 +12,9 @@
 #   docker login
 #
 # MONGODB_URI is taken from .env using a BuildKit secret and is
-# available only during build. The asset-origin vars are also taken from .env,
-# as plain build args (they're public values, baked into the client bundle
-# either way). Pass whichever your deployment sets — the unset one resolves to
-# an empty arg and is ignored.
+# available only during build. NEXT_PUBLIC_STORAGE_PUBLIC_URL is also taken
+# from .env, as a plain build arg (it's a public value, baked into the client
+# bundle either way).
 #
 # `network: host` puts the build container on the host's network stack so
 # `next build` can reach a MongoDB published on 127.0.0.1 (see
@@ -34,7 +33,6 @@ services:
       network: host
       args:
         NEXT_PUBLIC_STORAGE_PUBLIC_URL: ${NEXT_PUBLIC_STORAGE_PUBLIC_URL}
-        NEXT_PUBLIC_R2_PUBLIC_URL: ${NEXT_PUBLIC_R2_PUBLIC_URL}
       secrets:
         - mongodb_uri
 

@@ -10,7 +10,7 @@ import {
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { revalidatePaths } from "@/lib/revalidate";
-import { extractR2Keys } from "@/lib/r2";
+import { extractStorageKeys } from "@/lib/storage";
 import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 
 export async function POST(
@@ -30,7 +30,7 @@ export async function POST(
 
     // Assets the outgoing published snapshot held. Publishing overwrites it,
     // so anything the new draft doesn't carry is orphaned from here on.
-    const oldPublishedKeys = extractR2Keys(current.published_content);
+    const oldPublishedKeys = extractStorageKeys(current.published_content);
 
     const doc = await Program.findByIdAndUpdate(
       id,
@@ -46,7 +46,7 @@ export async function POST(
     if (!doc) return notFound("Program not found");
 
     if (oldPublishedKeys.size > 0) {
-      const kept = extractR2Keys({
+      const kept = extractStorageKeys({
         image: doc.image,
         content: doc.content,
         published_content: doc.published_content,

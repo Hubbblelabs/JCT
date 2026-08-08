@@ -21,7 +21,7 @@ type Course = {
   slug: string;
   image: string;
   highlight: string;
-  /** Badge logos authored per program in the admin (R2-backed). */
+  /** Badge logos authored per program in the admin (storage-backed). */
   accreditations: CourseAccreditation[];
 };
 

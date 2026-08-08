@@ -295,7 +295,7 @@ export const ABOUT_NAV_DEFAULTS: SidebarNavDefault[] = [
   { anchor: "why-jct", navLabel: "Why JCT?", icon: Star },
 ];
 
-// Images come only from R2/CMS. Empty value -> "" so the call site skips the
+// Images come only from storage/CMS. Empty value -> "" so the call site skips the
 // <Image> and the neutral wrapper (bg-white/5 etc.) shows as the placeholder.
 const imgUrl = (v: string) => getImageUrl(v) || "";
 

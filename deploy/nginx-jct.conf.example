@@ -83,8 +83,7 @@ location /internal-backups/ {
 
 # ── Object storage vhost (on-prem Garage) ────────────────────────────────────
 #
-# Only needed when assets are served from this server rather than Cloudflare
-# R2. docker-compose.prod.yaml publishes Garage's S3 API on 127.0.0.1:3900 and
+# docker-compose.prod.yaml publishes Garage's S3 API on 127.0.0.1:3900 and
 # nothing else; this block is what puts TLS in front of it.
 #
 # It carries BOTH kinds of traffic, which is why it needs the upload

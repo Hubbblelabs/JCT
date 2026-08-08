@@ -1025,7 +1025,7 @@ function derivePopups(value: PamphletVal): PamphletPopupVal[] {
 /**
  * Writing the popup list clears the single-popup fields it superseded. Leaving
  * them behind would keep a replaced image referenced from two places, so the
- * old R2 object would never be cleaned up when the popup is re-pointed.
+ * old stored object would never be cleaned up when the popup is re-pointed.
  */
 function withPopups(
   value: PamphletVal,

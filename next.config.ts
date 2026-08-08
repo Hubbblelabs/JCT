@@ -1,10 +1,8 @@
 import type { NextConfig } from "next";
 
 /**
- * The host uploaded assets are served from. Canonical name first, legacy R2
- * name as a fallback — the same resolution order src/lib/storage-public.ts
- * uses, duplicated here because this file runs in plain Node (no `@/*` alias,
- * no bundler) before the app exists.
+ * The host uploaded assets are served from. Read here in plain Node (no `@/*`
+ * alias, no bundler), mirroring src/lib/storage-public.ts.
  *
  * Note the `protocol: "https"` on the pattern below: the asset origin must be
  * TLS. A self-hosted S3 server reached over plain HTTP will not be allowlisted
@@ -12,9 +10,7 @@ import type { NextConfig } from "next";
  * allowed'.
  */
 function assetHostname(): string | null {
-  const raw =
-    process.env.NEXT_PUBLIC_STORAGE_PUBLIC_URL ||
-    process.env.NEXT_PUBLIC_R2_PUBLIC_URL;
+  const raw = process.env.NEXT_PUBLIC_STORAGE_PUBLIC_URL;
   if (!raw) return null;
   try {
     return new URL(raw).hostname;
@@ -41,10 +37,9 @@ const nextConfig: NextConfig = {
 
   images: {
     // Every host here can be fetched and re-encoded by /_next/image on our
-    // server, so the list is the image-proxy surface. `*.r2.dev` used to be
-    // allowlisted: that is Cloudflare's *shared* public-bucket domain, so it
-    // trusted every public R2 bucket in existence rather than ours. The bucket
-    // this app actually writes to comes from the asset origin resolved above.
+    // server, so the list is the image-proxy surface. Never allowlist a shared
+    // multi-tenant asset domain — that turns /_next/image into an open image
+    // proxy. Our own bucket comes from the asset origin resolved above.
     remotePatterns: [
       { protocol: "https", hostname: "companieslogo.com" },
       { protocol: "https", hostname: "upload.wikimedia.org" },
