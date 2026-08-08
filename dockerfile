@@ -4,6 +4,8 @@ WORKDIR /app
 RUN npm install -g corepack
 RUN corepack enable pnpm
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+# Increase fetch timeout for slow networks (default 60s → 5 min)
+RUN pnpm config set fetch-timeout 300000
 RUN pnpm install --frozen-lockfile --store=/pnpm-store
 
 # ---------- Builder (build the app) ----------
