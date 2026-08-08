@@ -41,7 +41,7 @@ services:
   mongo:
     image: mongo:8
     container_name: jct-mongo
-    
+
     restart: unless-stopped
     command: ["--auth", "--bind_ip_all"]
 
