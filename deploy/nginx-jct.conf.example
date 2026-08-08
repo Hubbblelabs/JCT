@@ -103,17 +103,26 @@ location /internal-backups/ {
 #   STORAGE_ENDPOINT=https://s3.jct.ac.in
 #   NEXT_PUBLIC_STORAGE_PUBLIC_URL=https://s3.jct.ac.in/jct-assets
 #
-# CORS is configured on the bucket itself, not here — see
-# deploy/garage.toml.example. Adding `add_header Access-Control-Allow-*` in
-# nginx instead looks like it works for GETs and then fails the preflight on
-# PUT, because nginx's add_header does not apply to the 4xx Garage returns for
-# an unconfigured OPTIONS.
+# CORS must be configured here (nginx), not in Garage. Garage v2.0.0 does not
+# support CORS via the S3 API. nginx add_header alone doesn't work for OPTIONS
+# responses when Garage returns 4xx, so we intercept OPTIONS first.
 
 server {
     listen 443 ssl http2;
-    server_name s3.jct.ac.in;
+    server_name cdn.jct.ac.in;
 
     # ssl_certificate / ssl_certificate_key — issue with certbot as usual.
+
+    # Handle CORS preflight
+    if ($request_method = 'OPTIONS') {
+        add_header 'Access-Control-Allow-Origin' 'https://jct.ac.in' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, PUT, HEAD' always;
+        add_header 'Access-Control-Allow-Headers' '*' always;
+        add_header 'Access-Control-Expose-Headers' 'ETag' always;
+        add_header 'Access-Control-Max-Age' '3000' always;
+        add_header 'Content-Length' '0' always;
+        return 204;
+    }
 
     location / {
         proxy_pass http://127.0.0.1:3900;
@@ -125,6 +134,11 @@ server {
         proxy_set_header X-Real-IP         $remote_addr;
         proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Add CORS headers to all responses
+        add_header 'Access-Control-Allow-Origin' 'https://jct.ac.in' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, PUT, HEAD' always;
+        add_header 'Access-Control-Expose-Headers' 'ETag' always;
 
         # Presigned PUT of a prospectus PDF. The 1 MB default 413s the upload
         # before Garage ever sees it, and buffering spools the whole file to
