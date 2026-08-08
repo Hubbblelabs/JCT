@@ -74,6 +74,8 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           password: ${{ secrets.SSH_PASSWORD }}
 
+          command_timeout: "30m"
+
           script: |
             cd jctSite
             git fetch --all --tags
