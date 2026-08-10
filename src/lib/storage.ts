@@ -62,6 +62,33 @@ function getS3Client(opts?: { forBrowser?: boolean }) {
       accessKeyId: cfg.accessKeyId,
       secretAccessKey: cfg.secretAccessKey,
     },
+    /**
+     * Flexible checksums off. Both default to `WHEN_SUPPORTED`, which makes the
+     * SDK attach `x-amz-checksum-crc32` to uploads and *verify* it on every
+     * download — against whatever the server chooses to echo back.
+     *
+     * That verification is only meaningful when the server implements the same
+     * scheme AWS does, and Garage does not: a multipart upload (the restore
+     * path's `uploadObjectStream`, and anything over the part size) stores a
+     * checksum that is not the whole-object CRC32, and returns it without the
+     * `-N` composite suffix that tells the SDK to skip the check. The SDK then
+     * hashes the bytes it received, compares them to a number that never
+     * described those bytes, and throws
+     *   `Checksum mismatch: expected "…" but received "…" in response header
+     *    "x-amz-checksum-crc32"`
+     * on a GET of a perfectly intact object. In a backup that surfaces as files
+     * silently listed as unreadable in `_report.json` — an archive quietly
+     * missing documents, which is the worst possible way to learn about it.
+     *
+     * `WHEN_REQUIRED` leaves the header off requests and stops validating
+     * responses. Integrity on the wire is still covered by TLS (or, on the
+     * internal endpoint, by not leaving the host). This is also what keeps
+     * presigned PUTs usable: with `WHEN_SUPPORTED` the presigner folds
+     * checksum headers into the signature, and a plain browser PUT that cannot
+     * produce them is rejected.
+     */
+    requestChecksumCalculation: "WHEN_REQUIRED",
+    responseChecksumValidation: "WHEN_REQUIRED",
   });
   // Bounded by construction: at most one entry per (endpoint, credentials)
   // pair, and both come from the environment — so this holds two clients at

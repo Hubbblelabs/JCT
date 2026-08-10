@@ -12,6 +12,7 @@ import {
   activeBuild,
   createJob,
   deleteJob,
+  ensureBackupDirWritable,
   ensureSpace,
   finishJob,
   getJob,
@@ -116,6 +117,12 @@ export async function POST(req: NextRequest) {
     // neither would finish sooner, so the caller is pointed at the live one.
     return json({ error: "A backup is already being built", job: busy }, 409);
   }
+
+  // Before the plan: creating the directory and fixing its mode is cheap, while
+  // reading the whole asset list only to fail on the first write would waste
+  // minutes and tell the operator nothing useful.
+  const dirProblem = await ensureBackupDirWritable();
+  if (dirProblem) return badRequest(dirProblem);
 
   const url = new URL(req.url);
   const wantImages = url.searchParams.get("includeImages") === "1";

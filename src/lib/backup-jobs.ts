@@ -1,6 +1,7 @@
 import { randomUUID } from "crypto";
 import { createWriteStream } from "fs";
 import {
+  chmod,
   mkdir,
   readFile,
   rename,
@@ -321,6 +322,85 @@ export async function pruneJobs(): Promise<void> {
 }
 
 export const deleteJob = removeJob;
+
+/**
+ * Prove `BACKUP_DIR` is writable by creating and removing a file in it.
+ *
+ * `access(dir, W_OK)` is the obvious check and the wrong one: it answers from
+ * the permission bits, which is not the same question as "will a write
+ * succeed" on a read-only mount, a full filesystem, or an overlay with an
+ * upper layer that refuses. The archive is written with `createWriteStream`,
+ * so the probe writes too.
+ */
+async function probeWritable(dir: string): Promise<void> {
+  const probe = path.join(dir, ".write-probe");
+  await writeFile(probe, "");
+  await rm(probe, { force: true });
+}
+
+/**
+ * Make `BACKUP_DIR` usable, repairing what this process has the authority to
+ * repair. Returns null on success, or a message for the operator.
+ *
+ * Called at the start of an export because nothing downstream degrades
+ * gracefully: `mkdir -p` on an existing path succeeds whatever its mode, so an
+ * unwritable directory is not noticed until the first write — the index save
+ * logs `EACCES` and is swallowed as non-fatal, then the build dies partway
+ * through on the archive file itself, minutes in, with a raw errno the admin UI
+ * cannot explain.
+ *
+ * Three repairs, in order of how much authority they need:
+ *
+ *   1. Create the directory. Enough on any host where only the leaf is missing.
+ *   2. `chmod 0700`. Fixes a directory this user *owns* but cannot write —
+ *      a too-strict umask, or a mode tightened by hand.
+ *   3. Nothing. If the directory belongs to another user, `chmod` needs to be
+ *      that user (or root) and returns EPERM. In Docker that is the common
+ *      case: the container runs as `node` (uid 1000) and the bind mount carries
+ *      the *host's* ownership, so a directory created by root on the host stays
+ *      root's — and no amount of trying from inside the container changes it.
+ *
+ * There is deliberately no fallback to a writable directory elsewhere. An
+ * archive is several gigabytes; putting it on the container's own filesystem
+ * would fill the overlay and be discarded on the next rebuild, which looks like
+ * success and is worse than refusing.
+ */
+export async function ensureBackupDirWritable(): Promise<string | null> {
+  const dir = backupDir();
+
+  try {
+    await mkdir(dir, { recursive: true });
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code ?? "unknown error";
+    return `The backup directory ${dir} could not be created (${code}). Create it on the host and make it writable by the app, or point BACKUP_DIR somewhere the app can write.`;
+  }
+
+  try {
+    await probeWritable(dir);
+    return null;
+  } catch {
+    // Fall through to the repair attempt — the reason is only worth reporting
+    // if the repair also fails, and by then it is the *second* error that says
+    // what the operator has to do.
+  }
+
+  try {
+    // 0700, not 0777: the archive contains every credential-adjacent value in
+    // the site config, so widening it to other local users to dodge a
+    // permissions error would trade a visible failure for a quiet leak.
+    await chmod(dir, 0o700);
+    await probeWritable(dir);
+    console.warn(`[backup-jobs] Repaired permissions on ${dir}`);
+    return null;
+  } catch (err) {
+    const code = (err as NodeJS.ErrnoException).code ?? "unknown error";
+    const owner =
+      typeof process.getuid === "function"
+        ? ` The app runs as uid ${process.getuid()}.`
+        : "";
+    return `The backup directory ${dir} is not writable by the app and its permissions could not be repaired automatically (${code}) — it belongs to another user, so only that user or root can change it.${owner} In Docker this directory is a bind mount and keeps the host's ownership: run \`chown -R 1000:1000 /srv/jct/backups\` on the host (adjust the path if BACKUP_DIR was remapped), then try again.`;
+  }
+}
 
 /**
  * Free bytes on the backup volume, or null where the platform can't report it.
