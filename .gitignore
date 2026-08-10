@@ -59,6 +59,13 @@ yarn-error.log*
 .env*.local
 !.env.example
 
+# Deployment secrets that live only on the production host.
+#   .ssh              — host/user/password for the prod box
+#   deploy/garage.toml — the real config, carrying rpc_secret and admin_token
+#                        (deploy/garage.toml.example is the committed template)
+.ssh
+deploy/garage.toml
+
 # vercel
 .vercel
 

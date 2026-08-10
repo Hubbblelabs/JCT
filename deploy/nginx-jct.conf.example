@@ -1,176 +1,332 @@
-# Reverse-proxy settings required by the admin backup/restore routes.
+# Production nginx configuration for JCT.
 #
-# These are NOT optional if backups are used with images/documents included.
-# The prod host's nginx config lives outside this repo (docker-compose.prod.yaml
-# publishes the app on :3000 and nothing else), so this file is the reference —
-# copy the relevant directives into the server block that fronts jct.
+#   install:  cp deploy/nginx-jct.conf.example /etc/nginx/sites-available/jct
+#   enable:   ln -sf /etc/nginx/sites-available/jct /etc/nginx/sites-enabled/jct
+#             rm -f /etc/nginx/sites-enabled/default
+#   test:     nginx -t
+#   reload:   systemctl reload nginx
 #
-# Why each one matters:
+# Certificates (ECDSA, one cert per hostname group):
+#   certbot certonly --nginx -d jct.ac.in -d www.jct.ac.in
+#   certbot certonly --nginx -d cdn.jct.ac.in
 #
-#   client_max_body_size
-#     POST /api/admin/site-config/restore takes the whole ZIP as its request
-#     body. nginx defaults to 1 MB and answers 413 before the handler ever
-#     runs. The current bucket is ~7.5 GB, so this must be unlimited (0) or set
-#     well above the largest expected archive.
+# ─────────────────────────────────────────────────────────────────────────────
+# Do NOT add `set_real_ip_from` / `real_ip_header` here.
 #
-#   proxy_request_buffering off
-#     Left on (the default), nginx spools the entire upload to its own disk
-#     before forwarding a single byte. That doubles the disk cost of a restore
-#     and delays the NDJSON progress stream until after the upload completes.
-#
-#   proxy_buffering off / X-Accel-Buffering
-#     The restore response is an NDJSON progress stream, and the backup download
-#     is a multi-gigabyte file. Buffering either through nginx's own disk adds a
-#     full extra copy before the client sees anything. Both routes already send
-#     `X-Accel-Buffering: no`; this is the belt-and-braces equivalent.
-#
-#   timeouts
-#     A multi-gigabyte transfer runs for minutes. The 60s defaults will cut it.
+# This host sits behind a NAT port-forward, not another HTTP proxy, so
+# $remote_addr is already the true client address. src/lib/rate-limit.ts reads
+# X-Real-IP first and, failing that, takes the LAST element of
+# X-Forwarded-For — precisely because $proxy_add_x_forwarded_for *appends* the
+# real peer to whatever the client sent. Turning on real_ip here would let a
+# spoofed X-Forwarded-For rewrite $remote_addr and reopen the bypass that
+# ordering closes.
+# ─────────────────────────────────────────────────────────────────────────────
 
-location /api/admin/site-config/ {
-    proxy_pass http://127.0.0.1:3000;
-
-    proxy_http_version 1.1;
-    proxy_set_header Host              $host;
-    proxy_set_header X-Real-IP         $remote_addr;
-    proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
-    proxy_set_header X-Forwarded-Proto $scheme;
-
-    # Restore: accept an arbitrarily large archive, and stream it through.
-    client_max_body_size       0;
-    proxy_request_buffering    off;
-
-    # Backup download and restore progress: pass bytes through as they arrive.
-    proxy_buffering            off;
-
-    # Both directions run for minutes on a large archive.
-    proxy_read_timeout         3600s;
-    proxy_send_timeout         3600s;
-    send_timeout               3600s;
+# WebSocket/upgrade handling. Sending a bare `Connection: upgrade` on every
+# request (the previous config did) breaks keepalive to the upstream and
+# confuses HTTP/1.1 clients on ordinary responses; this maps it to "close"
+# unless the client actually asked to upgrade.
+map $http_upgrade $connection_upgrade {
+    default upgrade;
+    ''      close;
 }
 
-# ── Optional: let nginx serve the finished backup archive itself ──────────────
-#
-# A backup is built to disk first (BACKUP_DIR) and only then downloaded, so the
-# download is an ordinary static file. Without the block below, Node reads that
-# file and pipes it through the proxy — which works, and supports resume, but
-# copies every byte through the application process.
-#
-# Set BACKUP_ACCEL_PREFIX=/internal-backups on the app and add this location,
-# and the download route instead answers with an `X-Accel-Redirect`. nginx then
-# serves the file with sendfile(), handles Range requests natively, and Node
-# leaves the data path entirely. On a multi-gigabyte archive this is the
-# difference between one process copy per byte and none.
-#
-# `internal` is what makes this safe: the location cannot be requested directly
-# from outside, only reached via the redirect the app issues after it has run
-# `requireRole(req, "admin")`. Do NOT drop that keyword — the archive contains
-# every site config value and every uploaded file.
-#
-# The alias must be the HOST path that docker-compose.prod.yaml bind-mounts to
-# the container's BACKUP_DIR.
-
-location /internal-backups/ {
-    internal;
-    alias /srv/jct/backups/;
-
-    sendfile   on;
-    tcp_nopush on;
-    # The archive is already deflated; re-compressing it wastes CPU and defeats
-    # sendfile().
-    gzip       off;
+upstream jct_app {
+    server 127.0.0.1:3000;
+    keepalive 32;
 }
 
-# ── Object storage vhost (on-prem Garage) ────────────────────────────────────
-#
-# docker-compose.prod.yaml publishes Garage's S3 API on 127.0.0.1:3900 and
-# nothing else; this block is what puts TLS in front of it.
-#
-# It carries BOTH kinds of traffic, which is why it needs the upload
-# directives as well as the caching ones:
-#
-#   - The browser's presigned PUT when an admin uploads a document. That path
-#     is not optional and has no server-side fallback — proxy.ts truncates any
-#     request body it matches at 10 MB, so large PDFs can only reach storage
-#     by going browser-to-Garage directly.
-#   - Public GETs of every image and document on the site.
-#
-# TLS is mandatory, not a nicety: next.config.ts allowlists the asset host for
-# /_next/image with `protocol: "https"` only. Served over plain HTTP, every
-# optimised image fails with '"url" parameter is not allowed'.
-#
-# The app is then configured with:
-#   STORAGE_ENDPOINT=https://s3.jct.ac.in
-#   NEXT_PUBLIC_STORAGE_PUBLIC_URL=https://s3.jct.ac.in/jct-assets
-#
-# CORS must be configured here (nginx), not in Garage. Garage v2.0.0 does not
-# support CORS via the S3 API. nginx add_header alone doesn't work for OPTIONS
-# responses when Garage returns 4xx, so we intercept OPTIONS first.
+# Garage S3 API — signed requests only (server-side SDK, browser presigned PUT).
+upstream garage_s3 {
+    server 127.0.0.1:3900;
+    keepalive 16;
+}
+
+# Garage web endpoint — the ONLY way to serve an object without a signature.
+# The S3 API answers unsigned GETs with
+# "Forbidden: Garage does not support anonymous access yet".
+upstream garage_web {
+    server 127.0.0.1:3902;
+    keepalive 16;
+}
+
+# Shared TLS tuning. ssl_protocols/ssl_prefer_server_ciphers come from
+# /etc/nginx/nginx.conf; only the bits that are not already global live here.
+ssl_session_cache shared:SSL:10m;
+ssl_session_timeout 1d;
+ssl_session_tickets off;
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Catch-all: anything with a Host we do not serve (including bare-IP scans)
+# gets the connection dropped rather than silently falling through to the first
+# server block, which would otherwise answer as jct.ac.in.
+# ─────────────────────────────────────────────────────────────────────────────
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    server_name _;
+    return 444;
+}
 
 server {
-    listen 443 ssl http2;
-    server_name cdn.jct.ac.in;
+    listen 443 ssl default_server;
+    listen [::]:443 ssl default_server;
+    http2 on;
+    server_name _;
 
-    # ssl_certificate / ssl_certificate_key — issue with certbot as usual.
+    ssl_certificate     /etc/letsencrypt/live/jct.ac.in/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/jct.ac.in/privkey.pem;
 
-    # Handle CORS preflight
-    if ($request_method = 'OPTIONS') {
-        add_header 'Access-Control-Allow-Origin' 'https://jct.ac.in' always;
-        add_header 'Access-Control-Allow-Methods' 'GET, PUT, HEAD' always;
-        add_header 'Access-Control-Allow-Headers' '*' always;
-        add_header 'Access-Control-Expose-Headers' 'ETag' always;
-        add_header 'Access-Control-Max-Age' '3000' always;
-        add_header 'Content-Length' '0' always;
-        return 204;
+    return 444;
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# HTTP → HTTPS. The ACME webroot stays on :80 so renewals keep working without
+# nginx having to be stopped.
+# ─────────────────────────────────────────────────────────────────────────────
+server {
+    listen 80;
+    listen [::]:80;
+    server_name jct.ac.in www.jct.ac.in cdn.jct.ac.in;
+
+    location /.well-known/acme-challenge/ {
+        root /var/www/html;
     }
 
     location / {
-        proxy_pass http://127.0.0.1:3900;
+        return 301 https://$host$request_uri;
+    }
+}
 
+# ─────────────────────────────────────────────────────────────────────────────
+# www → apex. One canonical origin: NEXTAUTH_URL, NEXT_PUBLIC_SITE_URL and the
+# session cookie's domain all say https://jct.ac.in, and serving the app on
+# both hostnames would split the cookie and log admins out when they crossed.
+# ─────────────────────────────────────────────────────────────────────────────
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name www.jct.ac.in;
+
+    ssl_certificate     /etc/letsencrypt/live/jct.ac.in/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/jct.ac.in/privkey.pem;
+
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    return 301 https://jct.ac.in$request_uri;
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Main application
+# ─────────────────────────────────────────────────────────────────────────────
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name jct.ac.in;
+
+    ssl_certificate     /etc/letsencrypt/live/jct.ac.in/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/jct.ac.in/privkey.pem;
+
+    access_log /var/log/nginx/jct.access.log;
+    error_log  /var/log/nginx/jct.error.log;
+
+    # The app sets CSP, X-Frame-Options, Referrer-Policy and Permissions-Policy
+    # itself (next.config.ts#headers). HSTS is the one header it cannot set
+    # meaningfully, because TLS terminates out here.
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    # POST /api/admin/site-config/restore takes the whole backup ZIP as one raw
+    # body — currently ~7.5 GB. Any finite limit here truncates it.
+    client_max_body_size 0;
+    client_body_timeout 600s;
+
+    # Long, because both directions of the backup path are multi-gigabyte.
+    proxy_connect_timeout 60s;
+    proxy_send_timeout 600s;
+    proxy_read_timeout 600s;
+
+    gzip on;
+    gzip_proxied any;
+    gzip_comp_level 5;
+    gzip_min_length 1024;
+    gzip_vary on;
+    gzip_types
+        text/plain text/css text/xml text/javascript
+        application/javascript application/json application/xml
+        application/rss+xml image/svg+xml font/ttf font/otf;
+
+    location / {
+        proxy_pass http://jct_app;
         proxy_http_version 1.1;
-        # Garage signs against the Host header it receives. Rewriting it breaks
-        # every SigV4 signature, so pass the original through untouched.
-        proxy_set_header Host              $host;
-        proxy_set_header X-Real-IP         $remote_addr;
-        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection $connection_upgrade;
 
-        # Add CORS headers to all responses
-        add_header 'Access-Control-Allow-Origin' 'https://jct.ac.in' always;
-        add_header 'Access-Control-Allow-Methods' 'GET, PUT, HEAD' always;
-        add_header 'Access-Control-Expose-Headers' 'ETag' always;
-
-        # Presigned PUT of a prospectus PDF. The 1 MB default 413s the upload
-        # before Garage ever sees it, and buffering spools the whole file to
-        # nginx's disk first for no benefit.
-        client_max_body_size    0;
-        proxy_request_buffering off;
-        proxy_buffering         off;
-
-        proxy_read_timeout      3600s;
-        proxy_send_timeout      3600s;
-        send_timeout            3600s;
+        # Streaming responses (RSC payloads, the NDJSON restore progress feed)
+        # must not be held back waiting for a full buffer.
+        proxy_buffering off;
+        # A buffered response has no size cap, so a multi-GB backup download is
+        # never spooled to /var/lib/nginx before the client sees a byte.
+        proxy_max_temp_file_size 0;
     }
 
-    # Uploaded assets are immutable — the key contains a timestamp and a
-    # replacement gets a new key, so nothing under these prefixes is ever
-    # rewritten in place. Garage does not set Cache-Control itself, and
-    # without one every image is re-fetched from origin on each page view.
-    location ~ ^/[^/]+/(images|documents)/ {
-        proxy_pass http://127.0.0.1:3900;
-
+    # Restore streams a ~7.5 GB body. Buffering it would write the entire ZIP to
+    # nginx's temp dir before the handler is invoked: double the disk, double
+    # the wait, and no progress reporting.
+    location = /api/admin/site-config/restore {
+        proxy_pass http://jct_app;
         proxy_http_version 1.1;
-        proxy_set_header Host              $host;
-        proxy_set_header X-Real-IP         $remote_addr;
-        proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_set_header X-Forwarded-Proto $scheme;
 
-        # No `always`: nginx then applies this to 2xx/3xx only, so a 404 for an
-        # object that has not finished uploading is not cached for a month.
-        add_header Cache-Control "public, max-age=2592000, immutable";
-
-        client_max_body_size    0;
         proxy_request_buffering off;
-        proxy_read_timeout      3600s;
+        proxy_buffering off;
+        proxy_max_temp_file_size 0;
+        client_max_body_size 0;
+
+        # A restore can run for hours on a full archive.
+        proxy_send_timeout 24h;
+        proxy_read_timeout 24h;
+        client_body_timeout 24h;
+    }
+
+    # Build output is content-hashed and already carries immutable
+    # Cache-Control from next.config.ts; this just keeps nginx from
+    # re-negotiating with the upstream on every asset.
+    location /_next/static/ {
+        proxy_pass http://jct_app;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header Connection "";
+        proxy_cache_valid 200 30d;
+        expires 1y;
+        add_header Cache-Control "public, max-age=31536000, immutable";
+    }
+
+    # Set BACKUP_ACCEL_PREFIX=/internal-backups in .env to enable. The download
+    # route then answers with X-Accel-Redirect and nginx serves the archive with
+    # sendfile() instead of copying every byte through Node.
+    location /internal-backups/ {
+        internal;
+        alias /srv/jct/backups/;
+        sendfile on;
+        tcp_nopush on;
+        # The archive is a ZIP; re-compressing it wastes CPU for nothing.
+        gzip off;
+    }
+}
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CDN — Garage, on one hostname, split by path.
+#
+#   https://cdn.jct.ac.in/jct-assets/<key>   → 3900, S3 API, signature required
+#   https://cdn.jct.ac.in/<key>              → 3902, web endpoint, public read
+#
+# The split exists because the two doors have incompatible requirements and
+# only one hostname is delegated. The SDK builds path-style URLs
+# (STORAGE_FORCE_PATH_STYLE=true), so everything signed is already prefixed
+# with the bucket name; everything else is a public asset read.
+# NEXT_PUBLIC_STORAGE_PUBLIC_URL is therefore https://cdn.jct.ac.in with no
+# bucket segment, and STORAGE_ENDPOINT is the same origin *with* the bucket
+# supplied by the SDK.
+#
+# Stored keys all begin `images/` or `documents/` (see extractStorageKeys in
+# src/lib/storage.ts), so no real key can collide with the /jct-assets/ prefix.
+# ─────────────────────────────────────────────────────────────────────────────
+server {
+    listen 443 ssl;
+    listen [::]:443 ssl;
+    http2 on;
+    server_name cdn.jct.ac.in;
+
+    ssl_certificate     /etc/letsencrypt/live/cdn.jct.ac.in/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cdn.jct.ac.in/privkey.pem;
+
+    access_log /var/log/nginx/cdn.access.log;
+    error_log  /var/log/nginx/cdn.error.log;
+
+    add_header Strict-Transport-Security "max-age=31536000" always;
+
+    # Assets are webp/avif/pdf — already compressed. gzip would burn CPU to make
+    # them marginally larger.
+    gzip off;
+
+    # Presigned browser PUTs are whole documents; a prospectus PDF runs to
+    # hundreds of MB.
+    client_max_body_size 0;
+    client_body_timeout 600s;
+    proxy_connect_timeout 60s;
+    proxy_send_timeout 600s;
+    proxy_read_timeout 600s;
+
+    # ── Signed S3 API ────────────────────────────────────────────────────────
+    location /jct-assets/ {
+        # CORS lives here and only here. Uploads are presign → browser PUT, so
+        # the browser talks to Garage directly and without these headers the
+        # upload fails in the browser with nothing in the server log. Garage
+        # v2.0.0 does not implement PutBucketCors, so nginx is the only place
+        # this can be configured — and scoping it to this location keeps it off
+        # the public-read path, where a second set of headers from the web
+        # endpoint would be a duplicate the browser rejects.
+        #
+        # AllowedOrigin is where the upload comes FROM (the admin panel), not
+        # where assets are served TO.
+        add_header 'Access-Control-Allow-Origin'  'https://jct.ac.in' always;
+        add_header 'Access-Control-Allow-Methods' 'GET, PUT, HEAD, OPTIONS' always;
+        add_header 'Access-Control-Allow-Headers' '*' always;
+        add_header 'Access-Control-Expose-Headers' 'ETag' always;
+        add_header 'Access-Control-Max-Age'       '3000' always;
+
+        if ($request_method = 'OPTIONS') {
+            return 204;
+        }
+
+        proxy_pass http://garage_s3;
+        proxy_http_version 1.1;
+
+        # Garage signs against the Host header. Rewriting it here breaks every
+        # SigV4 signature — this is the one location where Host must pass
+        # through untouched.
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        # Stream the upload straight to Garage instead of spooling the whole
+        # object to disk first.
+        proxy_request_buffering off;
+        proxy_buffering off;
+        proxy_max_temp_file_size 0;
+    }
+
+    # ── Public read via the web endpoint ─────────────────────────────────────
+    location / {
+        proxy_pass http://garage_web;
+        proxy_http_version 1.1;
+
+        # The web endpoint resolves the bucket from Host. Safe to rewrite here
+        # because it performs no signature check; the S3 location above must
+        # never do this.
+        proxy_set_header Host "jct-assets";
+        proxy_set_header Connection "";
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_buffering off;
+        proxy_max_temp_file_size 0;
+
+        # Uploaded keys are content-addressed by a timestamp prefix
+        # (images/1781339322153-…webp) and never rewritten in place, so a long
+        # browser cache is safe. Deleting an asset removes the key entirely
+        # rather than replacing its bytes.
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000" always;
+        add_header X-Content-Type-Options "nosniff" always;
     }
 }

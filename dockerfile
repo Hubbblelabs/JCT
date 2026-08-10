@@ -29,6 +29,12 @@ COPY . .
 # by setting it at runtime.
 ARG NEXT_PUBLIC_STORAGE_PUBLIC_URL
 ENV NEXT_PUBLIC_STORAGE_PUBLIC_URL=${NEXT_PUBLIC_STORAGE_PUBLIC_URL}
+# Same build-time-only rule as the asset origin above. src/lib/page-nav-links.ts
+# compares navbar hrefs against this to decide which absolute URLs are
+# same-origin; unset at build time it reads as undefined in the bundle and the
+# admin page list badges live, linked pages as orphans.
+ARG NEXT_PUBLIC_SITE_URL
+ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
 # MONGODB_URI is injected as a BuildKit secret (never persisted in the image
 # layers) so `next build` can reach MongoDB and prerender the public ISR pages
 # with real content. Without it, DB-backed pages (campus-life, coe, about,

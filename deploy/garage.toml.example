@@ -1,90 +1,123 @@
-# Garage configuration for the JCT on-prem object store.
-#
-# Copy to deploy/garage.toml (which docker-compose.prod.yaml mounts read-only
-# at /etc/garage.toml) and fill in the two secrets below.
-#
-# ─────────────────────────────────────────────────────────────────────────────
-# First-time setup, once the container is running
-# ─────────────────────────────────────────────────────────────────────────────
-#
-#   alias garage='docker compose exec garage /garage'
-#
-# 1. Claim the single node into the cluster layout. `garage status` prints the
-#    node id; capacity is what the node advertises, so size it to the volume.
-#
-#      garage status
-#      garage layout assign -z jct -c 500G <node-id>
-#      garage layout apply --version 1
-#
-# 2. Create the bucket and a key for the app.
-#
-#      garage bucket create jct-assets
-#      garage key create jct-app
-#      garage bucket allow --read --write --owner jct-assets --key jct-app
-#
-#    The printed key id and secret go into .env as STORAGE_ACCESS_KEY_ID and
-#    STORAGE_SECRET_ACCESS_KEY. The secret is shown once.
-#
-# 3. Allow anonymous reads, so the public site can serve images directly
-#    instead of proxying every byte through Node.
-#
-#      garage bucket website --allow jct-assets
-#      garage bucket allow --read jct-assets --key <anonymous-or-public-key>
-#
-# 4. CORS. THIS IS NOT OPTIONAL and it is the step that gets forgotten.
-#    Document uploads go presign -> browser PUT -> confirm, so the browser
-#    talks to this server directly. Without a CORS rule allowing PUT from the
-#    site's origin, every document upload fails in the browser and the server
-#    logs nothing at all. There is no server-side fallback: proxy.ts truncates
-#    any request body it matches at 10 MB, so routing large PDFs through the
-#    app is not possible.
-#
-#      aws --endpoint-url https://s3.jct.ac.in s3api put-bucket-cors \
-#        --bucket jct-assets \
-#        --cors-configuration '{
-#          "CORSRules": [{
-#            "AllowedOrigins": ["https://jct.ac.in"],
-#            "AllowedMethods": ["GET", "PUT", "HEAD"],
-#            "AllowedHeaders": ["*"],
-#            "ExposeHeaders": ["ETag"],
-#            "MaxAgeSeconds": 3000
-#          }]
-#        }'
-#
-# 5. Verify before trusting it: upload a >10 MB PDF through an admin documents
-#    editor. That single test exercises presign, CORS, path-style addressing,
-#    the signing region and nginx's body-size limit at once.
+# Garage production configuration for JCT on-prem object storage
+# Copy this to deploy/garage.toml on the production server, then replace both
+# placeholder secrets below. deploy/garage.toml is gitignored — the file that
+# actually runs carries real secrets and must never be committed.
 
-# One node, so one copy. Raise this only alongside adding real nodes —
-# replication_factor 3 on a single node makes the cluster permanently
-# unhealthy rather than safer.
+# Single node, one replica (raise this only when adding real nodes)
 replication_factor = 1
 
 metadata_dir = "/var/lib/garage/meta"
 data_dir     = "/var/lib/garage/data"
 
-# Both generated with: openssl rand -hex 32
-# rpc_secret authenticates node-to-node traffic; admin_token guards the admin
-# API. Neither is optional, and neither belongs in git.
-rpc_secret   = "REPLACE_WITH_openssl_rand_hex_32"
+# Generate with: openssl rand -hex 32
+# MUST match between all cluster nodes. Never change after first start.
+rpc_secret   = "your-32-hex-random-string-here"
 rpc_bind_addr = "[::]:3901"
 rpc_public_addr = "127.0.0.1:3901"
 
 [s3_api]
 api_bind_addr = "[::]:3900"
 
-# The signing region is hashed into every SigV4 signature, so this string and
-# the app's STORAGE_REGION must match EXACTLY. A mismatch fails every request
-# with SignatureDoesNotMatch — an error that reads like bad credentials and
-# sends you auditing keys that were fine all along.
+# The signing region is hashed into every SigV4 signature and MUST match
+# STORAGE_REGION in .env EXACTLY. A mismatch fails every request with
+# SignatureDoesNotMatch — an error that reads like bad credentials and sends
+# you auditing keys that were fine all along.
+# Common values: "garage", "us-east-1", or your custom region name.
 s3_region = "garage"
 
-# Path-style addressing (https://s3.jct.ac.in/jct-assets/images/x.webp) needs
-# no wildcard DNS. Leave root_domain unset unless *.s3.jct.ac.in resolves; the
-# app defaults STORAGE_FORCE_PATH_STYLE to true whenever STORAGE_ENDPOINT is
-# set, which matches this.
-# root_domain = ".s3.jct.ac.in"
+# Path-style addressing (https://cdn.jct.ac.in/jct-assets/images/x.webp) needs
+# no wildcard DNS. Virtual-host style needs *.cdn.jct.ac.in to resolve.
+# Leave root_domain unset for path-style (default, app sets STORAGE_FORCE_PATH_STYLE=true).
+# root_domain = ".cdn.jct.ac.in"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Web endpoint — this is what serves public asset reads.
+#
+# It is NOT an optimisation. The S3 API on 3900 rejects every unsigned request
+# with "Forbidden: Garage does not support anonymous access yet", so a browser
+# fetching https://cdn.jct.ac.in/images/hero.webp cannot go through it at all.
+# Public reads have exactly one door in Garage and this is it.
+#
+# The endpoint picks the bucket from the Host header: if Host ends with
+# root_domain the suffix is stripped and the remainder is the bucket, otherwise
+# the whole Host is looked up as a bucket alias. nginx therefore forwards
+# `Host: jct-assets` on this location — see deploy/nginx-jct.conf.example.
+# Rewriting Host is safe here precisely because the web endpoint does no SigV4;
+# doing the same on the 3900 location would break every signature.
+#
+# root_domain is set to a name that resolves nowhere on purpose: it exists only
+# so the "strip the suffix" branch can never match a real request and the
+# bucket-alias branch is always the one taken.
+# ─────────────────────────────────────────────────────────────────────────────
+[s3_web]
+bind_addr = "[::]:3902"
+root_domain = ".web.jct.invalid"
+index = "index.html"
 
 [admin]
 api_bind_addr = "127.0.0.1:3903"
-admin_token   = "REPLACE_WITH_openssl_rand_hex_32"
+# Generate with: openssl rand -hex 32
+# Never shared; only used by admin commands (garage CLI).
+admin_token   = "your-32-hex-random-string-here"
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Setup after first start (run these ONCE, on first boot only)
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# When the container is first running:
+#
+#   alias garage='docker compose -f docker-compose.prod.yaml exec garage /garage'
+#
+# 1. Claim the node into the cluster layout. `garage status` prints node id.
+#    Capacity is a budget, not a reservation — set it below the free space on
+#    /srv/jct/garage/data, and raise it with a new `layout assign` + `apply`
+#    (bumping the version number) when the disk grows.
+#
+#      garage status
+#      garage layout assign -z jct -c 300G <node-id>
+#      garage layout apply --version 2
+#
+# 2. Create bucket and API key for the app:
+#
+#      garage bucket create jct-assets
+#      garage key create jct-app
+#      garage bucket allow --read --write --owner jct-assets --key jct-app
+#
+#    Copy the printed key id and secret into .env as:
+#      STORAGE_ACCESS_KEY_ID=...
+#      STORAGE_SECRET_ACCESS_KEY=...
+#    The secret is shown ONCE.
+#
+# 3. Enable the website flag on the bucket. Without it the web endpoint on 3902
+#    returns 404 for every key even though the object exists:
+#
+#      garage bucket website --allow jct-assets
+#
+#    There is no separate "anonymous key" to grant — the website flag IS the
+#    public-read switch, and it applies to the 3902 endpoint only. 3900 stays
+#    signed-only.
+#
+# 4. CORS is configured in nginx, NOT here. Garage v2.0.0 does not implement
+#    PutBucketCors, so `aws s3api put-bucket-cors` returns 501. Document
+#    uploads use presign → browser PUT, so the browser talks to Garage
+#    directly and CORS is mandatory: see deploy/nginx-jct.conf.example, which
+#    answers the preflight and adds the headers on the signed location.
+#
+# 5. Verify before trusting: upload a >10 MB PDF through an admin documents
+#    editor. That single test exercises presign, CORS, path-style addressing,
+#    the signing region, and nginx's body-size limit at once. Then load the
+#    resulting public URL in a logged-out browser to exercise the 3902 path.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# Monitoring
+# ─────────────────────────────────────────────────────────────────────────────
+#
+# Check cluster health:
+#   garage status
+#
+# Monitor storage usage:
+#   garage stats detailed
+#
+# List buckets and keys:
+#   garage bucket list
+#   garage key list

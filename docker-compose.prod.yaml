@@ -1,5 +1,11 @@
 # Production host.
 # Three services: the app, MongoDB, and Garage (S3-compatible object storage).
+#
+# Sized for the current on-prem box: 8 vCPU, 14 GiB RAM. The limits below are
+# deliberate, not decoration — MongoDB sizes its WiredTiger cache from the
+# memory it *sees*, and inside a container without a limit that is the whole
+# host. Left unbounded it reserves ~6.5 GiB and then competes with `next build`,
+# which is the memory-hungriest thing that runs here.
 
 services:
   jct:
@@ -24,12 +30,18 @@ services:
       network: host
       args:
         NEXT_PUBLIC_STORAGE_PUBLIC_URL: ${NEXT_PUBLIC_STORAGE_PUBLIC_URL}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
       secrets:
         - mongodb_uri
 
+    # `service_started` would let the app race Mongo's first-run user seeding on
+    # a fresh volume: the app connects, fails auth, and Mongoose caches the dead
+    # connection on the module global until the container is restarted by hand.
     depends_on:
-      - mongo
-      - garage
+      mongo:
+        condition: service_healthy
+      garage:
+        condition: service_started
 
     # Bound to loopback so only the host's nginx can reach the app. Published
     # on 0.0.0.0 it was reachable directly at <host>:3000, bypassing the
@@ -52,6 +64,25 @@ services:
     volumes:
       - /srv/jct/backups:/var/backups/jct
 
+    # node:26-slim carries no curl or wget. Node's global fetch is the only HTTP
+    # client in the image, so the check uses it rather than shipping a package
+    # for the sake of one probe.
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "fetch('http://127.0.0.1:3000/api/public/programs').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))",
+        ]
+      interval: 30s
+      timeout: 10s
+      start_period: 60s
+      retries: 3
+
+    mem_limit: 4g
+    cpus: 6.0
+
     networks:
       - jct
 
@@ -60,7 +91,12 @@ services:
     container_name: jct-mongodb
 
     restart: unless-stopped
-    command: ["--auth", "--bind_ip_all"]
+
+    # wiredTigerCacheSizeGB is set explicitly because the default is derived
+    # from host RAM, not the cgroup limit — a 2 GiB cache under a 4 GiB limit
+    # leaves room for connections, index builds and the restore path's bulk
+    # writes without the OOM killer taking the database down mid-write.
+    command: ["--auth", "--bind_ip_all", "--wiredTigerCacheSizeGB", "2"]
 
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:?set MONGO_ROOT_USER in .env}
@@ -73,6 +109,29 @@ services:
     volumes:
       - /srv/jct/mongo:/data/db
 
+    # `ping` is on mongod's short list of commands allowed before auth, so this
+    # needs no credentials and does not put the root password in `docker inspect`.
+    healthcheck:
+      test:
+        ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 15s
+      timeout: 5s
+      start_period: 40s
+      retries: 5
+
+    # SIGTERM makes mongod flush and close cleanly. The default 10s is not
+    # always enough for a checkpoint, and a killed mongod means recovery on the
+    # next boot.
+    stop_grace_period: 60s
+
+    mem_limit: 4g
+    cpus: 4.0
+
+    ulimits:
+      nofile:
+        soft: 64000
+        hard: 64000
+
     networks:
       - jct
 
@@ -84,10 +143,18 @@ services:
 
     restart: unless-stopped
 
-    # 3900 is the S3 API — nginx fronts it with TLS as s3.jct.ac.in, which is
-    # what both the server-side SDK and the browser's presigned PUT talk to.
     ports:
+      # 3900 is the S3 API — signed requests only. Both the server-side SDK and
+      # the browser's presigned PUT talk to this, fronted by nginx as
+      # https://cdn.jct.ac.in/<bucket>/<key>.
       - "127.0.0.1:3900:3900"
+      # 3902 is the web endpoint, and it is not optional. Garage's S3 API
+      # answers *every* unsigned request with
+      # "Forbidden: Garage does not support anonymous access yet", so public
+      # asset reads cannot go through 3900 at all. nginx maps
+      # https://cdn.jct.ac.in/<key> here with the bucket name in the Host
+      # header — see deploy/nginx-jct.conf.example.
+      - "127.0.0.1:3902:3902"
 
     volumes:
       - ./deploy/garage.toml:/etc/garage.toml:ro
@@ -96,6 +163,18 @@ services:
       # bucket even if data survives, so both belong in the backup plan.
       - /srv/jct/garage/meta:/var/lib/garage/meta
       - /srv/jct/garage/data:/var/lib/garage/data
+
+    # The image is FROM scratch — no shell, no curl. `/garage` is the only
+    # executable present, so the probe has to be the CLI itself in exec form.
+    healthcheck:
+      test: ["CMD", "/garage", "status"]
+      interval: 30s
+      timeout: 10s
+      start_period: 20s
+      retries: 3
+
+    mem_limit: 2g
+    cpus: 3.0
 
     networks:
       - jct
