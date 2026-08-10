@@ -1008,7 +1008,9 @@ export default function SettingsPage() {
                 file nothing references — from the database and from object
                 storage, including files the media library never tracked. Widen
                 the scope below to also clear content or every uploaded file.
-                Public pages revert to hard-coded defaults. This cannot be
+                Every page driven by site config — including the footer&apos;s
+                disclaimer, privacy, terms and FAQ pages — is left empty until
+                it is written again or a backup is restored. This cannot be
                 undone — export a backup first.
               </p>
             </div>
