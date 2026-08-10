@@ -35,9 +35,9 @@ export function getImageUrl(
     return imageUrl;
   }
 
-  // Site-relative paths (e.g. "/campus-life-assets/x.webp") point at files in
-  // /public — serve them as-is. Rewriting them to object storage (or the proxy
-  // route, which only serves "images/"/"documents/" keys) breaks the image.
+  // Site-relative paths (e.g. "/jct_logo.webp") point at files in /public —
+  // serve them as-is. Rewriting them to object storage (or the proxy route,
+  // which only serves "images/"/"documents/" keys) breaks the image.
   if (imageUrl.startsWith("/")) {
     return imageUrl;
   }

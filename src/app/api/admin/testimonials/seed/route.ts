@@ -4,6 +4,9 @@ import { Testimonial } from "@/lib/models";
 import { requireRole, json, serverError } from "@/lib/api-helpers";
 import { revalidateTargets } from "@/lib/revalidate";
 
+// Avatars are object-storage keys ("images/…"), not /public paths: the
+// /avatars directory these pointed at does not exist in the repo, so every
+// seeded testimonial rendered a broken portrait.
 const TESTIMONIALS = [
   {
     name: "Priya Krishnan",
@@ -12,7 +15,7 @@ const TESTIMONIALS = [
     company: "Infosys",
     quote:
       "The practical exposure at JCT gave me real confidence. From hackathons to internships, every experience prepared me for my career at Infosys.",
-    avatar: "/avatars/female_avatar.png",
+    avatar: "images/1779690427226-female_avatar.webp",
     category: "Alumni" as const,
     institution: "engineering" as const,
   },
@@ -23,7 +26,7 @@ const TESTIMONIALS = [
     company: "Caterpillar",
     quote:
       "JCT's engineering labs and faculty mentorship helped me develop real-world problem-solving skills. I landed my dream role straight from campus.",
-    avatar: "/avatars/male_avatar.png",
+    avatar: "images/1779690062590-male_avatar.webp",
     category: "Alumni" as const,
     institution: "engineering" as const,
   },
@@ -34,7 +37,7 @@ const TESTIMONIALS = [
     company: "TCS",
     quote:
       "The Arts & Science college provided a perfect blend of theory and practice. The coding bootcamps and placement training made all the difference.",
-    avatar: "/avatars/female_avatar.png",
+    avatar: "images/1779690427226-female_avatar.webp",
     category: "Alumni" as const,
     institution: "arts-science" as const,
   },
@@ -45,7 +48,7 @@ const TESTIMONIALS = [
     company: "TVS Motors",
     quote:
       "JCT Polytechnic's hands-on approach gave me skills employers value. I was offered a role before even completing my final semester.",
-    avatar: "/avatars/male_avatar.png",
+    avatar: "images/1779690062590-male_avatar.webp",
     category: "Alumni" as const,
     institution: "polytechnic" as const,
   },
@@ -56,7 +59,7 @@ const TESTIMONIALS = [
     company: "Zoho Corp",
     quote:
       "The faculty at JCT go beyond textbooks. They helped me prepare for competitive exams, interviews, and real-world business scenarios.",
-    avatar: "/avatars/female_avatar.png",
+    avatar: "images/1779690427226-female_avatar.webp",
     category: "Alumni" as const,
     institution: "arts-science" as const,
   },
@@ -67,7 +70,7 @@ const TESTIMONIALS = [
     company: "L&T",
     quote:
       "Hands-on lab sessions and workshop discipline gave me confidence from day one in my trainee role.",
-    avatar: "/avatars/male_avatar.png",
+    avatar: "images/1779690062590-male_avatar.webp",
     category: "Alumni" as const,
     institution: "polytechnic" as const,
   },
