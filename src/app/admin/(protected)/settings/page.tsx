@@ -60,6 +60,21 @@ interface RestoreEvent {
   warnings?: string[];
 }
 
+/** What `/api/admin/site-config/reset` reports back. Mirrors `@/lib/reset`. */
+interface ResetReport {
+  configs: number;
+  content: Record<string, number> | null;
+  assets: {
+    storage_configured: boolean;
+    storage_listed: boolean;
+    objects_deleted: number;
+    untracked_deleted: number;
+    objects_failed: number;
+    rows_deleted: number;
+    assets_kept: number;
+  };
+}
+
 type Status = { type: "success" | "error" | "warning"; message: string };
 
 /** How a restore treats documents that exist now but aren't in the archive. */
@@ -132,9 +147,13 @@ export default function SettingsPage() {
   const [clearingCache, setClearingCache] = useState(false);
   const [cacheStatus, setCacheStatus] = useState<Status | null>(null);
 
-  // Reset state
+  // Reset state. Both scope flags default OFF, so the button with nothing
+  // ticked does what it has always done: clear site config and reclaim assets
+  // nothing references.
   const [resetting, setResetting] = useState(false);
   const [resetConfirm, setResetConfirm] = useState("");
+  const [resetContent, setResetContent] = useState(false);
+  const [resetAssets, setResetAssets] = useState(false);
   const [resetStatus, setResetStatus] = useState<Status | null>(null);
 
   // Poll a running build. Keyed on id+state rather than the whole job so the
@@ -458,12 +477,27 @@ export default function SettingsPage() {
     if (resetConfirm !== "RESET") return;
     // Typing RESET proves intent to fill the box; it does not prove intent to
     // press the button. This step names what is about to be destroyed, and it
-    // is the last one — the request deletes config, images and documents from
-    // both Mongo and storage with no undo.
+    // is the last one — the request deletes from both Mongo and storage with
+    // no undo. The message is built from the ticked scope so it always
+    // describes the run about to happen, not a generic worst case.
+    const lines = [
+      "Every site config entry will be deleted.",
+      resetContent
+        ? "Every program, page, event, placement and testimonial will be deleted."
+        : "Programs, pages, events, placements and testimonials are NOT deleted.",
+      resetAssets
+        ? "Every uploaded image and document will be deleted from storage and the media library — including files that surviving content still uses."
+        : "Uploaded images and documents that no surviving content references will be deleted from storage and the media library; anything still in use is kept.",
+    ];
+    if (resetAssets && !resetContent) {
+      lines.push(
+        "WARNING: you are purging all files while keeping content, so surviving programs, events, placements and testimonials will be left with broken images.",
+      );
+    }
+    lines.push("This cannot be undone.");
     const ok = await confirm({
       title: "Delete all site data",
-      message:
-        "Every site config entry will be deleted, along with every uploaded image and document that no site content still references — from the database and from storage. Programs, pages, events, placements and testimonials are NOT deleted, and any asset they still use is kept. Public pages driven by site config will fall back to hard-coded defaults. This cannot be undone.",
+      message: lines.join(" "),
       confirmLabel: "Delete everything",
       destructive: true,
     });
@@ -473,33 +507,64 @@ export default function SettingsPage() {
     try {
       const res = await fetch("/api/admin/site-config/reset", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: resetContent, assets: resetAssets }),
       });
-      const data = (await res.json()) as Record<string, unknown>;
+      const data = (await res.json()) as ResetReport & { error?: string };
       if (!res.ok) {
         setResetStatus({
           type: "error",
-          message: (data.error as string) ?? "Reset failed",
+          message: data.error ?? "Reset failed",
         });
         return;
       }
-      const parts: string[] = [`${data.deleted as number} config entries`];
-      if ((data.images_deleted as number) > 0)
-        parts.push(`${data.images_deleted as number} images`);
-      if ((data.documents_deleted as number) > 0)
-        parts.push(`${data.documents_deleted as number} documents`);
-      const r2Warn =
-        (data.storage_failures as number) > 0
-          ? ` ${data.storage_failures as number} storage file(s) could not be deleted — remove them manually.`
-          : "";
+
+      const parts: string[] = [`${data.configs} config entries`];
+      for (const [name, n] of Object.entries(data.content ?? {})) {
+        if (n > 0) parts.push(`${n} ${name}`);
+      }
+      const a = data.assets;
+      if (a.objects_deleted > 0) {
+        parts.push(
+          `${a.objects_deleted} stored file(s)` +
+            (a.untracked_deleted > 0
+              ? ` (${a.untracked_deleted} untracked)`
+              : ""),
+        );
+      }
+
+      // Anything that stopped the sweep short is a warning, not a success:
+      // silence here is what let orphans build up unnoticed in the first place.
+      const warnings: string[] = [];
+      if (!a.storage_configured) {
+        warnings.push(
+          "Object storage is not configured, so no files were deleted and no media-library rows were removed.",
+        );
+      } else if (!a.storage_listed) {
+        warnings.push(
+          "The bucket could not be listed, so only files the database tracks were considered — untracked files remain.",
+        );
+      }
+      if (a.objects_failed > 0) {
+        warnings.push(
+          `${a.objects_failed} file(s) could not be deleted from storage; their media-library entries were kept so the next reset retries them.`,
+        );
+      }
       const kept =
-        (data.assets_kept as number) > 0
-          ? ` ${data.assets_kept as number} asset(s) kept — still referenced by programs, pages, events, placements or testimonials.`
+        a.assets_kept > 0
+          ? ` ${a.assets_kept} file(s) kept — still referenced by surviving content.`
           : "";
+
       setResetStatus({
-        type: (data.storage_failures as number) > 0 ? "warning" : "success",
-        message: `Deleted: ${parts.join(", ")}.${kept}${r2Warn} Pages will serve defaults until reconfigured.`,
+        type: warnings.length > 0 ? "warning" : "success",
+        message:
+          `Deleted: ${parts.join(", ")}.${kept}` +
+          (warnings.length > 0 ? ` ${warnings.join(" ")}` : "") +
+          " Pages will serve defaults until reconfigured.",
       });
       setResetConfirm("");
+      setResetContent(false);
+      setResetAssets(false);
     } catch {
       setResetStatus({ type: "error", message: "Reset failed. Try again." });
     } finally {
@@ -806,10 +871,12 @@ export default function SettingsPage() {
             <div>
               <h2 className="font-semibold text-red-800">Reset All Data</h2>
               <p className="mt-0.5 text-sm text-red-700/80">
-                Permanently deletes all site config entries, uploaded images,
-                and uploaded documents — from both the database and object
-                storage. Public pages revert to hard-coded defaults. This cannot
-                be undone — export a backup first.
+                Permanently deletes every site config entry, plus every uploaded
+                file nothing references — from the database and from object
+                storage, including files the media library never tracked. Widen
+                the scope below to also clear content or every uploaded file.
+                Public pages revert to hard-coded defaults. This cannot be
+                undone — export a backup first.
               </p>
             </div>
           </div>
@@ -817,6 +884,50 @@ export default function SettingsPage() {
           <StatusBanner status={resetStatus} />
 
           <div className="space-y-3">
+            <div className="space-y-2 rounded-lg border border-red-200 bg-white/60 p-3">
+              <p className="text-xs font-medium tracking-wide text-red-700/70 uppercase">
+                Also delete
+              </p>
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-red-900">
+                <input
+                  type="checkbox"
+                  checked={resetContent}
+                  onChange={(e) => setResetContent(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-red-300"
+                />
+                <span>
+                  <span className="font-medium">Content</span> — every program,
+                  page, event, placement and testimonial.
+                </span>
+              </label>
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-red-900">
+                <input
+                  type="checkbox"
+                  checked={resetAssets}
+                  onChange={(e) => setResetAssets(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-red-300"
+                />
+                <span>
+                  <span className="font-medium">Every uploaded file</span> — all
+                  images and documents, whether or not something still uses
+                  them.
+                </span>
+              </label>
+              {resetAssets && !resetContent && (
+                <p className="flex items-start gap-1.5 text-xs text-red-700">
+                  <AlertTriangle size={13} className="mt-0.5 shrink-0" />
+                  Purging every file while keeping content leaves surviving
+                  programs, events, placements and testimonials with broken
+                  images.
+                </p>
+              )}
+              {/* Users and the audit trail are never touched: wiping users
+                  would lock the admin out of the panel mid-reset. */}
+              <p className="text-xs text-red-700/60">
+                User accounts and the audit trail are never deleted.
+              </p>
+            </div>
+
             <label className="flex flex-col gap-1">
               <span className="text-sm font-medium text-red-700">
                 Type <strong>RESET</strong> to confirm
