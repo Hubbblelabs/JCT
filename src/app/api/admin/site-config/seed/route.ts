@@ -5,11 +5,16 @@ import { requireRole, json, serverError } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { revalidateForConfigKey } from "@/lib/revalidate";
 
-// Image values below are object-storage keys ("images/…"), resolved at render
-// time by getImageUrl() against NEXT_PUBLIC_STORAGE_PUBLIC_URL. They used to be
-// site-relative paths under /public/campus-life-assets, a directory that no
-// longer exists — so every seeded section rendered a broken image. Keys keep
-// working across a CDN change; absolute URLs would not.
+// Image values below are deliberately empty. They used to be hardcoded
+// /campus-life-assets/*.webp paths under a /public directory that no longer
+// exists in the repo, so every seeded section rendered a broken image.
+//
+// Seed data does not pin assets at all now. Pictures are chosen in the CMS,
+// which stores an object-storage key resolved at render time by getImageUrl()
+// against NEXT_PUBLIC_STORAGE_PUBLIC_URL. Every image field here is optional
+// (`zUrl.default("")`), so an unset one renders nothing rather than a broken
+// frame, and an editor filling it in is the normal path — not an override of a
+// baked-in default.
 type Seed = {
   config_key: string;
   value: Record<string, unknown>;
@@ -83,7 +88,7 @@ const SEEDS: Seed[] = [
     config_key: "campusLifePage",
     value: {
       hero: {
-        backgroundImage: "images/1779681845079-jct-life1.webp",
+        backgroundImage: "",
         title: "Life @ JCT",
         subtitle: "A vibrant ecosystem where heritage meets innovation.",
       },
@@ -92,7 +97,7 @@ const SEEDS: Seed[] = [
         title: "Experience the",
         titleHighlight: "Extraordinary",
         body: "At JCT Institutions, we believe that education extends far beyond the four walls of a classroom. Our campus is a living laboratory where students evolve into leaders.",
-        image: "images/1779681845424-building1.webp",
+        image: "",
         features: [
           {
             icon: "Users",
@@ -120,31 +125,31 @@ const SEEDS: Seed[] = [
         items: [
           {
             title: "Student Hub",
-            image: "images/1779690712543-jct-life2.webp",
+            image: "",
           },
           {
             title: "Central Library",
-            image: "images/1779702354155-library2.webp",
+            image: "",
           },
           {
             title: "Innovation Lab",
-            image: "images/1779690766578-computer-lab2.webp",
+            image: "",
           },
           {
             title: "Sports Complex",
-            image: "images/1779681521509-sports1.webp",
+            image: "",
           },
           {
             title: "Smart Classrooms",
-            image: "images/1779702353982-classroom2.webp",
+            image: "",
           },
           {
             title: "Research Excellence",
-            image: "images/1779680996501-electronics-lab.webp",
+            image: "",
           },
           {
             title: "Student Activities",
-            image: "images/1779702353753-arts-club3.webp",
+            image: "",
           },
         ],
       },
@@ -157,7 +162,7 @@ const SEEDS: Seed[] = [
           {
             title: "Hostel Facilities",
             desc: "A home away from home with multi-cuisine dining, Wi-Fi, and 24/7 care.",
-            image: "images/1779681522847-campus2.webp",
+            image: "",
             icon: "Home",
             points: [
               "Separate Boys/Girls Hostels",
@@ -168,7 +173,7 @@ const SEEDS: Seed[] = [
           {
             title: "Transport Network",
             desc: "Extensive fleet connecting Coimbatore and Palakkad with real-time GPS tracking.",
-            image: "images/1779702736524-transport.webp",
+            image: "",
             icon: "Bus",
             points: [
               "CCTV & GPS Enabled",
@@ -179,7 +184,7 @@ const SEEDS: Seed[] = [
           {
             title: "Industry-Ready Labs",
             desc: "Specialized research spaces equipped with the latest technology.",
-            image: "images/1779680996501-electronics-lab.webp",
+            image: "",
             icon: "Microscope",
             points: [
               "NABL Standards",
@@ -200,12 +205,7 @@ const SEEDS: Seed[] = [
           { label: "Annual Trophies", val: "150+" },
           { label: "Fitness Training", val: "NCA Certified" },
         ],
-        images: [
-          "images/1779681521509-sports1.webp",
-          "images/1779681524285-sports4.webp",
-          "images/1779681524381-sports3.webp",
-          "images/1779681520313-sports2.webp",
-        ],
+        images: [],
         highlightTitle: "Annual Sports Meet",
         highlightDesc:
           "A celebration of talent and grit with over 2000+ participants.",
@@ -213,7 +213,7 @@ const SEEDS: Seed[] = [
       clubs: {
         eyebrow: "Community & Arts",
         title: "Life in Full Color",
-        featuredImage: "images/1779703072113-arts-club1.webp",
+        featuredImage: "",
         featuredTitle: "The Arts & Music Club",
         featuredDesc:
           "Where creativity knows no bounds. Our members jam, perform, and collaborate across disciplines, making every day a performance.",
