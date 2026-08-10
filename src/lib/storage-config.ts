@@ -9,7 +9,17 @@
  */
 
 export interface StorageConfig {
+  /**
+   * The endpoint the *browser* must be able to reach. Presigned PUT URLs are
+   * signed against this one, so it has to stay publicly resolvable even when
+   * the server talks to the store some shorter way.
+   */
   endpoint: string;
+  /**
+   * The endpoint this process uses for its own S3 calls, when it differs.
+   * See `STORAGE_INTERNAL_ENDPOINT` below.
+   */
+  internalEndpoint: string | null;
   bucket: string;
   accessKeyId: string;
   secretAccessKey: string;
@@ -67,8 +77,29 @@ export function storageConfig(): StorageConfig | null {
     ? pathStyleRaw === "true" || pathStyleRaw === "1"
     : true;
 
+  /**
+   * Optional short path from this process to the storage server.
+   *
+   * `STORAGE_ENDPOINT` is a public hostname because the browser signs presigned
+   * PUTs against it. On a single-box deployment the storage server is a
+   * container on the same host, so every server-side call — and a backup makes
+   * one per object, thousands of them — leaves through the public address:
+   * public DNS, out to the WAN IP, hairpin back through the router, TLS at
+   * nginx, then finally loopback to the store. That path is bounded by the
+   * site's uplink and simply fails when the link is down, for bytes that never
+   * had to leave the machine.
+   *
+   * Set this to the direct address (`http://garage:3900` inside compose) and
+   * the SDK uses it for everything the server does itself. Presigning still
+   * uses the public endpoint — a URL the browser cannot resolve is useless.
+   * Only the host changes: bucket, keys, region and SigV4 are identical, and
+   * the signing region must still match the server's `s3_region`.
+   */
+  const internalEndpoint = env("STORAGE_INTERNAL_ENDPOINT") || null;
+
   return {
     endpoint,
+    internalEndpoint,
     bucket,
     accessKeyId,
     secretAccessKey,

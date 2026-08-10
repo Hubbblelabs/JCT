@@ -228,6 +228,27 @@ export function revalidatePaths(...paths: string[]): void {
   }
 }
 
+/**
+ * Drop every cache the app owns: the in-memory public API cache and the whole
+ * ISR/data cache tree.
+ *
+ * The targeted helpers above are the right tool after a write — they know which
+ * pages a change can possibly affect. This is the operator's escape hatch for
+ * when they don't match reality: a restore that wrote documents behind the
+ * routes' backs, a config key with no `SITE_CONFIG_KEY_TARGETS` entry, or a
+ * page that is simply still showing yesterday's content. `revalidatePath("/",
+ * "layout")` invalidates the root layout and therefore every page beneath it,
+ * which is every public route including the dynamic detail pages the path lists
+ * enumerate one by one.
+ *
+ * Nothing is re-rendered here. Route handlers only *mark* paths stale, so the
+ * cost lands on the next visitor to each page rather than on this request.
+ */
+export function revalidateEverything(): void {
+  publicCacheClear();
+  revalidatePath("/", "layout");
+}
+
 export function revalidateForConfigKey(key: string): void {
   // Clear the in-memory public API cache so client-side fetches get fresh
   // data (the /api/public/* routes are dynamic — revalidatePath can't

@@ -24,32 +24,49 @@ import { publicAssetBaseUrl } from "@/lib/storage-public";
  * Cached against every value that shapes the client, so pointing the app at a
  * different provider rebuilds it instead of reusing one aimed at the old
  * endpoint.
+ *
+ * Two clients, not one, because two different consumers reach the store from
+ * two different places. Everything this process does itself goes through
+ * `STORAGE_INTERNAL_ENDPOINT` when it is set — on a single-box deployment the
+ * store is a neighbouring container, and routing thousands of backup GETs out
+ * to the public hostname and back is both slow and pointlessly dependent on the
+ * site's internet link. Presigned URLs are handed to a browser, which can only
+ * use the public one. See `storage-config.ts` for the full note.
  */
-let cachedClient: { fingerprint: string; client: S3Client } | null = null;
+const clients = new Map<string, S3Client>();
 
-function getS3Client() {
+function getS3Client(opts?: { forBrowser?: boolean }) {
   const cfg = storageConfig();
   if (!cfg) throw new Error("Object storage is not configured");
 
+  const endpoint =
+    opts?.forBrowser || !cfg.internalEndpoint
+      ? cfg.endpoint
+      : cfg.internalEndpoint;
+
   const fingerprint = [
-    cfg.endpoint,
+    endpoint,
     cfg.region,
     String(cfg.forcePathStyle),
     cfg.accessKeyId,
     cfg.secretAccessKey,
   ].join("|");
-  if (cachedClient?.fingerprint === fingerprint) return cachedClient.client;
+  const cached = clients.get(fingerprint);
+  if (cached) return cached;
 
   const client = new S3Client({
     region: cfg.region,
-    endpoint: cfg.endpoint,
+    endpoint,
     forcePathStyle: cfg.forcePathStyle,
     credentials: {
       accessKeyId: cfg.accessKeyId,
       secretAccessKey: cfg.secretAccessKey,
     },
   });
-  cachedClient = { fingerprint, client };
+  // Bounded by construction: at most one entry per (endpoint, credentials)
+  // pair, and both come from the environment — so this holds two clients at
+  // the very most, not one per request.
+  clients.set(fingerprint, client);
   return client;
 }
 
@@ -65,7 +82,9 @@ export async function getPresignedPutUrl(
   expiresIn = 300,
   contentLength?: number,
 ): Promise<string> {
-  const client = getS3Client();
+  // Signed for the browser, so it must carry the public endpoint even when the
+  // server itself reaches storage by a shorter internal address.
+  const client = getS3Client({ forBrowser: true });
   const bucket = bucketName();
   // When contentLength is provided it becomes a *signed* header, so the client
   // must upload exactly that many bytes — the presign route's size check is

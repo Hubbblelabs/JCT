@@ -192,7 +192,7 @@ Separate from Program content, the **`Page`** model (`src/lib/models/Page.ts`) b
 
 ### Images & documents
 
-- **Provider is env-only.** `src/lib/storage-config.ts` resolves the endpoint, bucket, credentials, signing region and addressing style from `STORAGE_*` — those four are required together, and there are no legacy aliases. `src/lib/storage.ts` is the S3 layer on top (`uploadObject`, `uploadObjectStream`, `getObject`, `getObjectStream`, `getObjectBytes`, `headObject`, `deleteObject`, `listObjects`, `getPresignedPutUrl`, `publicAssetUrl`, `extractStorageKeys`). Two things bite on a self-hosted server: the signing region must match the server's configured region exactly or every call fails `SignatureDoesNotMatch`, and browser-direct presigned PUTs need a **CORS rule** — without one, document uploads fail in the browser and the server logs nothing. There is no server-side fallback for that, because `proxy.ts` truncates any matched request body at 10 MB. On Garage the rule cannot live on the bucket: v2.0.0 does not implement `PutBucketCors` (`aws s3api put-bucket-cors` returns 501), so nginx answers the preflight and adds the headers on the signed `/jct-assets/` location instead.
+- **Provider is env-only.** `src/lib/storage-config.ts` resolves the endpoint, bucket, credentials, signing region and addressing style from `STORAGE_*` — those four are required together, and there are no legacy aliases. `STORAGE_ENDPOINT` is the **public** address because presigned PUTs are signed against it and a browser has to resolve it; `STORAGE_INTERNAL_ENDPOINT` (optional) is the address this process uses for its own calls. `getS3Client({forBrowser: true})` in `src/lib/storage.ts` is what keeps presigning on the public one — everything else takes the internal endpoint when set. `src/lib/storage.ts` is the S3 layer on top (`uploadObject`, `uploadObjectStream`, `getObject`, `getObjectStream`, `getObjectBytes`, `headObject`, `deleteObject`, `listObjects`, `getPresignedPutUrl`, `publicAssetUrl`, `extractStorageKeys`). Two things bite on a self-hosted server: the signing region must match the server's configured region exactly or every call fails `SignatureDoesNotMatch`, and browser-direct presigned PUTs need a **CORS rule** — without one, document uploads fail in the browser and the server logs nothing. There is no server-side fallback for that, because `proxy.ts` truncates any matched request body at 10 MB. On Garage the rule cannot live on the bucket: v2.0.0 does not implement `PutBucketCors` (`aws s3api put-bucket-cors` returns 501), so nginx answers the preflight and adds the headers on the signed `/jct-assets/` location instead.
 - **Public asset URLs** come from `publicAssetBaseUrl()` in `src/lib/storage-public.ts` (`NEXT_PUBLIC_STORAGE_PUBLIC_URL`). It is a **separate, client-safe module** because the literal must appear verbatim for Next's build-time inlining to reach the browser bundle. Never read that env var through a computed lookup — it is never substituted and reads as `undefined` client-side. Changing the value needs a **rebuild**, not a restart.
 - **`NEXT_PUBLIC_STORAGE_PUBLIC_URL` is not `STORAGE_ENDPOINT` + bucket.** On Garage they are two different servers. The S3 API (3900) rejects every unsigned request with `Forbidden: Garage does not support anonymous access yet`, so a browser can never read `https://cdn.jct.ac.in/<bucket>/<key>`; public reads have exactly one door, Garage's **web endpoint** (3902), which picks the bucket from the `Host` header and needs `garage bucket website --allow <bucket>`. In production nginx puts both on `cdn.jct.ac.in` split by path — `/jct-assets/…` to 3900 with `Host` untouched (rewriting it breaks SigV4), everything else to 3902 with `Host: jct-assets`. So the public base URL carries **no bucket segment**. Setting it to the path-style S3 URL 403s every image on the site. See `deploy/nginx-jct.conf.example`.
 - **Images**: uploaded via `POST /api/admin/images/upload` (FormData) → validated for mime/size → stored via `src/lib/storage.ts` → an `ImageAsset` doc records metadata (url, alt text, category, institution). If storage env vars are absent, images fall back to local serving via `/api/public/images/[...path]` or `/api/admin/images/serve/[...key]`. A _partial_ configuration is refused at boot by `validateServerEnv`.
@@ -207,6 +207,7 @@ Separate from Program content, the **`Page`** model (`src/lib/models/Page.ts`) b
   - `revalidateTargets(...targets)` — targets are `"home" | "engineering" | "arts-science" | "polytechnic" | "all-institutions"`. Note `all-institutions` does **not** include `/campus-life`; only `home` does.
   - `revalidateForConfigKey(key)` — looks up the affected pages via the `SITE_CONFIG_KEY_TARGETS` map. When adding a new SiteConfig key in `src/lib/validation/siteConfig.ts`, add an entry to `SITE_CONFIG_KEY_TARGETS` in `src/lib/revalidate.ts` mapping that key to the targets it affects — without this mapping, the cache invalidation will be incomplete.
   - `revalidatePaths(...paths)` — revalidate explicit paths.
+  - `revalidateEverything()` — `publicCacheClear()` + `revalidatePath("/", "layout")`, i.e. every public route including the dynamic detail pages. Not for write routes (use the targeted helpers); it backs the **Clear Cache** button on the admin Settings page via `POST /api/admin/cache`, for when the targeted mapping was bypassed — a restore, a hand-edited document, a config key with no `SITE_CONFIG_KEY_TARGETS` entry.
 
 ### Frontend structure & state
 
@@ -237,6 +238,16 @@ STORAGE_ACCESS_KEY_ID
 STORAGE_SECRET_ACCESS_KEY
 STORAGE_REGION              # default "auto"; MUST match the server's region
 STORAGE_FORCE_PATH_STYLE    # defaults true
+STORAGE_INTERNAL_ENDPOINT   # optional; where THIS PROCESS reaches the S3 API
+                            # when that isn't the public address. Unset, every
+                            # server-side call (a backup makes one per object)
+                            # leaves through STORAGE_ENDPOINT's public hostname
+                            # and hairpins back — which is why an archive build
+                            # depends on the internet link on a box that holds
+                            # every byte locally. Presigning ignores it: those
+                            # URLs are for the browser. On compose that's
+                            # http://garage:3900, never 127.0.0.1 (the app
+                            # container's own loopback).
 NEXT_PUBLIC_STORAGE_PUBLIC_URL   # must be https; inlined at BUILD time
 ```
 

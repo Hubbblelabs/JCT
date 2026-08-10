@@ -46,6 +46,26 @@ import { rm } from "fs/promises";
 /** Headroom over the asset total for config, collections and ZIP overhead. */
 const DISK_SLACK_BYTES = 512 * 1024 * 1024;
 
+/**
+ * What the archive actually holds, for the filename.
+ *
+ * Several archives of the same site end up in one downloads folder, and until
+ * one is opened they are indistinguishable — a database-only export and a
+ * 7.5 GB full export differ only in size. Restoring the wrong one is silent:
+ * merge mode writes the config and leaves every image reference dangling.
+ *
+ * Read from the *plan*, not from the query string. `planBackup` turns asset
+ * inclusion off when object storage is unconfigured, so a request that asked
+ * for images can still produce an archive without them — and the name has to
+ * describe the file, not the intent.
+ */
+function archiveScope(plan: { includeImages: boolean; includeDocs: boolean }) {
+  if (plan.includeImages && plan.includeDocs) return "images-documents";
+  if (plan.includeImages) return "images";
+  if (plan.includeDocs) return "documents";
+  return "db-only";
+}
+
 export async function GET(req: NextRequest) {
   const { error } = await requireRole(req, "admin");
   if (error) return error;
@@ -131,7 +151,7 @@ export async function POST(req: NextRequest) {
   const exportedAt = new Date().toISOString();
   const exportedBy = session!.user?.email ?? "";
   const job = await createJob({
-    filename: `jct-backup-${exportedAt.slice(0, 10)}.zip`,
+    filename: `jct-backup-${exportedAt.slice(0, 10)}-${archiveScope(plan)}.zip`,
     expected_bytes: plan.assetBytes,
     entries_total: plan.objects.length,
     config_entries: plan.configs.length,

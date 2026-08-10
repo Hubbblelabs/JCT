@@ -15,6 +15,7 @@ import {
   FileArchive,
   Image,
   FileText,
+  RefreshCw,
 } from "lucide-react";
 
 /** A backup build, as reported by `/api/admin/site-config/backup`. */
@@ -126,6 +127,10 @@ export default function SettingsPage() {
   const [restoreStatus, setRestoreStatus] = useState<Status | null>(null);
   const [restoreWarnings, setRestoreWarnings] = useState<string[]>([]);
   const [progress, setProgress] = useState("");
+
+  // Cache state
+  const [clearingCache, setClearingCache] = useState(false);
+  const [cacheStatus, setCacheStatus] = useState<Status | null>(null);
 
   // Reset state
   const [resetting, setResetting] = useState(false);
@@ -415,6 +420,40 @@ export default function SettingsPage() {
     }
   };
 
+  /**
+   * Mark every public page stale. Not confirmed: nothing is deleted and the
+   * worst case is that the next visitor to each page waits for a re-render.
+   */
+  const handleClearCache = async () => {
+    setClearingCache(true);
+    setCacheStatus(null);
+    try {
+      const res = await fetch("/api/admin/cache", { method: "POST" });
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+      };
+      if (!res.ok) {
+        setCacheStatus({
+          type: "error",
+          message: data.error ?? "Could not clear the cache.",
+        });
+        return;
+      }
+      setCacheStatus({
+        type: "success",
+        message:
+          "Cache cleared. Every public page rebuilds the next time it is opened — the first visit to each one is slower than usual.",
+      });
+    } catch {
+      setCacheStatus({
+        type: "error",
+        message: "Could not clear the cache. Try again.",
+      });
+    } finally {
+      setClearingCache(false);
+    }
+  };
+
   const handleReset = async () => {
     if (resetConfirm !== "RESET") return;
     // Typing RESET proves intent to fill the box; it does not prove intent to
@@ -474,8 +513,8 @@ export default function SettingsPage() {
         <div>
           <h1 className="admin-page-title">Backup &amp; restore</h1>
           <p className="admin-page-subtitle">
-            Export an archive of everything on this site, restore one, or reset
-            the site back to its defaults.
+            Export an archive of everything on this site, restore one, clear the
+            page cache, or reset the site back to its defaults.
           </p>
         </div>
       </div>
@@ -721,6 +760,41 @@ export default function SettingsPage() {
               {restoring ? "Restoring…" : "Restore Backup"}
             </button>
           </div>
+        </div>
+
+        {/* ── Cache ── */}
+        <div className="admin-card lg:col-span-2">
+          <div className="mb-4 flex items-start gap-3">
+            <div className="rounded-lg bg-indigo-50 p-2">
+              <RefreshCw size={18} className="text-indigo-600" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-gray-900">Clear Site Cache</h2>
+              <p className="mt-0.5 text-sm text-gray-500">
+                Public pages are cached for an hour, and every edit made here
+                already refreshes the pages it affects. Use this when the live
+                site is still showing old content anyway — after restoring a
+                backup, or after data was changed outside the CMS. Nothing is
+                deleted: each page simply rebuilds from the database the next
+                time someone opens it.
+              </p>
+            </div>
+          </div>
+
+          <StatusBanner status={cacheStatus} />
+
+          <button
+            onClick={handleClearCache}
+            disabled={clearingCache}
+            className="admin-btn admin-btn-outline"
+          >
+            {clearingCache ? (
+              <Loader2 size={15} className="animate-spin" />
+            ) : (
+              <RefreshCw size={15} />
+            )}
+            {clearingCache ? "Clearing…" : "Clear Cache"}
+          </button>
         </div>
 
         {/* ── Reset ── */}
