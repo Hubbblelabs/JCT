@@ -17,7 +17,6 @@ import {
   getContentPage,
   hostAdminEditor,
 } from "@/lib/content-pages";
-import { contentPageDefault } from "@/lib/content-page-defaults";
 import { ContentPageSchema } from "@/lib/validation";
 import type { ContentPageValue } from "@/lib/validation";
 
@@ -78,12 +77,12 @@ export default function ContentPageEditor() {
       publicPath={contentPageUrl(def)}
       title={`${def.label} Editor`}
       subtitle={def.description}
-      // An unsaved statutory page opens on the copy the public route is
-      // already serving, not a blank canvas — otherwise the first save would
-      // wipe the live text.
-      emptyValue={() =>
-        ContentPageSchema.parse(contentPageDefault(def.slug) ?? {})
-      }
+      // Blank, like every other content page. The footer pages used to open on
+      // a module of hard-coded copy, which showed the editor text that did not
+      // exist in the database and made "what is stored" unanswerable from the
+      // screen. Their copy is seeded into SiteConfig instead, so an unsaved
+      // page here genuinely has nothing stored.
+      emptyValue={() => ContentPageSchema.parse({})}
       sectionOrder={sectionOrder}
       sectionLabels={CONTENT_SECTION_LABELS}
       sectionTitle={contentSectionTitle}

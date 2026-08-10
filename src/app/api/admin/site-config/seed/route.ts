@@ -4,6 +4,9 @@ import { SiteConfig } from "@/lib/models";
 import { requireRole, json, serverError } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { revalidateForConfigKey } from "@/lib/revalidate";
+import { CONTENT_PAGE_SEEDS } from "@/lib/content-page-seeds";
+import { getContentPage } from "@/lib/content-pages";
+import { ContentPageSchema } from "@/lib/validation";
 
 // Image values below are deliberately empty. They used to be hardcoded
 // /campus-life-assets/*.webp paths under a /public directory that no longer
@@ -20,6 +23,16 @@ type Seed = {
   value: Record<string, unknown>;
   /** When true, the seed is also published (value copied to published_value). */
   publish?: boolean;
+  /**
+   * Insert only — never overwrite an existing document, even when published.
+   *
+   * `publish` alone is not enough for the statutory footer pages: they must be
+   * live the moment the key exists (so `published_value` has to be set), and
+   * they must never be reverted by someone re-running the seed after an editor
+   * has rewritten them. Those two requirements are independent, so they are two
+   * flags.
+   */
+  insertOnly?: boolean;
 };
 
 const PLACEMENT_HIGHLIGHTS_DEFAULT = {
@@ -44,7 +57,31 @@ const PLACEMENT_HIGHLIGHTS_KEYS = [
   "polytechnicPlacementHighlights",
 ] as const;
 
+/**
+ * The four footer pages (`/disclaimer`, `/privacy`, `/terms`, `/faq`).
+ *
+ * Published on insert because a statutory page must not be live-but-blank, and
+ * `insertOnly` because re-running the seed must never revert edited legal copy.
+ * The slug → config key mapping comes from the page registry rather than being
+ * repeated here, so adding a footer page in one place cannot miss the other.
+ */
+const CONTENT_PAGE_SEED_ENTRIES: Seed[] = Object.entries(
+  CONTENT_PAGE_SEEDS,
+).flatMap(([slug, value]) => {
+  const def = getContentPage(slug);
+  if (!def) return [];
+  return [
+    {
+      config_key: def.configKey,
+      value: ContentPageSchema.parse(value) as Record<string, unknown>,
+      publish: true,
+      insertOnly: true,
+    },
+  ];
+});
+
 const SEEDS: Seed[] = [
+  ...CONTENT_PAGE_SEED_ENTRIES,
   // Placement Highlights section copy — one per scope. publish:false so an
   // existing (or migrated) value is never clobbered when re-seeding.
   ...PLACEMENT_HIGHLIGHTS_KEYS.map((config_key) => ({
@@ -287,17 +324,18 @@ export async function POST(req: NextRequest) {
       };
       if (seed.publish) fields.published_value = seed.value;
 
-      // publish:true  → always overwrite (admin is explicitly re-seeding live content)
-      // publish:false → only insert if the doc is missing; never clobber published content
-      const update = seed.publish
-        ? { $set: fields, $inc: { version: 1 } }
-        : {
-            $setOnInsert: {
-              config_key: seed.config_key,
-              version: 1,
-              ...fields,
-            },
-          };
+      // publish:true                   → always overwrite (admin is explicitly re-seeding live content)
+      // publish:false or insertOnly    → only insert if the doc is missing; never clobber stored content
+      const update =
+        seed.publish && !seed.insertOnly
+          ? { $set: fields, $inc: { version: 1 } }
+          : {
+              $setOnInsert: {
+                config_key: seed.config_key,
+                version: 1,
+                ...fields,
+              },
+            };
 
       await SiteConfig.findOneAndUpdate(
         { config_key: seed.config_key },
@@ -314,7 +352,7 @@ export async function POST(req: NextRequest) {
       "site-config",
       "seeded",
       session!.user?.email ?? "",
-      "Seeded site config keys (homeStats, About pages, COE page, Campus Life page)",
+      "Seeded site config keys (footer content pages, homeStats, About pages, COE page, Campus Life page)",
     );
 
     return json({ message: "Default content seeded successfully." });

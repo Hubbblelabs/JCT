@@ -314,9 +314,11 @@ export const CONTENT_PAGES: ContentPageDef[] = [
       "The Fine Arts Club at JCT Polytechnic College — its movie, cultural, arts and photography wings, objectives and event gallery.",
     icon: Palette,
   },
-  // Pages linked from the footer of every page on every site. They ship with
-  // their copy already written (see `content-page-defaults.ts`) because the
-  // text has to be live from the moment the route exists.
+  // Pages linked from the footer of every page on every site. Their copy is
+  // bootstrapped into SiteConfig by `POST /api/admin/site-config/seed` (see
+  // `content-page-seeds.ts`) because the text has to be live from the moment
+  // the route exists — but it is read from the database like every other page,
+  // never from the bundle.
   //
   // Registry order is footer order: Disclaimer, Privacy Policy, Terms &
   // Conditions, FAQ. (The footer's fifth link, Blogs, points at /events — the

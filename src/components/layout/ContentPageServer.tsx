@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { getPublishedConfigValue } from "@/lib/site-config-server";
 import { seoMetadata } from "@/lib/seo";
 import { getContentPage } from "@/lib/content-pages";
-import { contentPageDefault } from "@/lib/content-page-defaults";
 import { ContentPageLayout } from "@/components/layout/ContentPageLayout";
 import { ContentPageSchema } from "@/lib/validation";
 import type { ContentPageValue } from "@/lib/validation";
@@ -13,6 +12,14 @@ import type { ContentPageValue } from "@/lib/validation";
  * registry is a three-line `page.tsx` that renders `<ContentPage slug="…" />`
  * and re-exports `contentPageMetadata` — the shape of the page itself lives
  * entirely in the CMS.
+ *
+ * The published SiteConfig value is the only source of copy. The footer pages
+ * (`/disclaimer`, `/privacy`, `/terms`, `/faq`) used to fall back to a module
+ * of hard-coded text whenever their key looked unsaved, which meant the live
+ * page was rendered from the deployed bundle rather than the database, and an
+ * editor's first save silently changed where the text came from. Their copy is
+ * now bootstrapped into SiteConfig by `POST /api/admin/site-config/seed` (see
+ * `content-page-seeds.ts`) and read from there like every other page.
  */
 
 const EMPTY: ContentPageValue = ContentPageSchema.parse({});
@@ -34,22 +41,11 @@ export async function ContentPage({ slug }: { slug: string }) {
       parsed.error.issues.slice(0, 5),
     );
   }
-  const stored: ContentPageValue = parsed.success ? parsed.data : EMPTY;
+  const data: ContentPageValue = parsed.success ? parsed.data : EMPTY;
 
-  // A statutory page ships with its copy written (see `content-page-defaults`)
-  // — there is no seed script left to load it, and /privacy must not publish
-  // blank. The default only stands in until the key is saved from the admin;
-  // an intentionally-emptied page has a hero title, so it keeps its own value.
-  const seed = contentPageDefault(def.slug);
-  const isUnsaved =
-    !stored.hero?.title?.trim() &&
-    (stored.intro?.length ?? 0) === 0 &&
-    (stored.blocks?.length ?? 0) === 0;
-  const data: ContentPageValue =
-    isUnsaved && seed ? ContentPageSchema.parse(seed) : stored;
-
-  // Nothing seeded yet: fall back to the registry label so the page still has
-  // a heading instead of rendering a blank hero.
+  // The registry label is a heading of last resort, not content: a page whose
+  // key has not been seeded yet still renders with a title rather than an
+  // empty hero. Everything below the heading comes from the database.
   const withFallbackHero: ContentPageValue = data.hero?.title?.trim()
     ? data
     : { ...data, hero: { ...data.hero, title: def.label } };

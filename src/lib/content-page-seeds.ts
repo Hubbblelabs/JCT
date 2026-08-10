@@ -1,28 +1,26 @@
 /**
- * Seed content for registry pages that must not publish blank.
+ * Bootstrap copy for the footer pages (`/disclaimer`, `/privacy`, `/terms`,
+ * `/faq`), written into SiteConfig by `POST /api/admin/site-config/seed`.
  *
- * Most block-based content pages start empty and are filled in from the admin
- * editor. The footer pages (`/disclaimer`, `/privacy`, `/terms`, `/faq`) can't:
- * the copy has to be on the site from the moment the route exists, and there is
- * no seed script left in this repo to load it (see CLAUDE.md).
+ * **Nothing renders from this file.** These four pages used to fall back to it
+ * at render time whenever their SiteConfig key was missing or empty, which made
+ * the live text a property of the deployed bundle rather than of the database:
+ * the CMS could not be the source of truth for a page it was only sometimes
+ * consulted about, and the copy an editor saw depended on whether anyone had
+ * pressed Save yet. `ContentPage` now reads the database and only the database.
  *
- * So the copy lives here as a plain `ContentPageSchema` input, used two ways:
- *
- *  - `ContentPage` renders it when the SiteConfig doc is missing or empty, so
- *    the live page is correct on a fresh database;
- *  - `/admin/content/<slug>` starts a never-saved page from it, so an editor
- *    opens the real text instead of a blank canvas — the first save writes it
- *    to Mongo and the CMS owns it from then on.
- *
- * Everything here is editable afterwards; nothing reads these values once the
- * key has been saved.
+ * This is bootstrap data in the same sense as the rest of `site-config/seed`:
+ * a one-time write that creates the SiteConfig documents on a fresh database,
+ * inserted published so a statutory page is never live-but-blank, and
+ * insert-only so re-running it can never overwrite what an editor has since
+ * written. Once the key exists, this file is dead weight to the running site.
  */
 import { TRUST_NAME, TRUST_ADDRESS, SUPPORT_EMAIL, SITE_DOMAIN } from "./legal";
 
 /** Raw `ContentPageSchema` input — parsed by the caller, never cast. */
-export type ContentPageDefault = Record<string, unknown>;
+export type ContentPageSeed = Record<string, unknown>;
 
-const DISCLAIMER: ContentPageDefault = {
+const DISCLAIMER: ContentPageSeed = {
   hero: {
     title: "Disclaimer",
     subtitle:
@@ -45,7 +43,7 @@ const DISCLAIMER: ContentPageDefault = {
   ],
 };
 
-const PRIVACY: ContentPageDefault = {
+const PRIVACY: ContentPageSeed = {
   hero: {
     title: "Privacy Policy",
     subtitle:
@@ -122,7 +120,7 @@ const PRIVACY: ContentPageDefault = {
   ],
 };
 
-const TERMS: ContentPageDefault = {
+const TERMS: ContentPageSeed = {
   hero: {
     title: "Terms & Conditions",
     subtitle: "The terms that govern your use of this website.",
@@ -163,7 +161,7 @@ const TERMS: ContentPageDefault = {
   ],
 };
 
-const FAQ: ContentPageDefault = {
+const FAQ: ContentPageSeed = {
   hero: {
     title: "Frequently Asked Questions",
     subtitle:
@@ -261,16 +259,13 @@ const FAQ: ContentPageDefault = {
   ],
 };
 
-const CONTENT_PAGE_DEFAULTS: Record<string, ContentPageDefault> = {
+/**
+ * Keyed by registry slug, not by config key — `content-pages.ts` owns the
+ * slug → `configKey` mapping, and duplicating it here is how the two drift.
+ */
+export const CONTENT_PAGE_SEEDS: Record<string, ContentPageSeed> = {
   disclaimer: DISCLAIMER,
   privacy: PRIVACY,
   terms: TERMS,
   faq: FAQ,
 };
-
-/** Seed content for `slug`, or undefined when the page starts blank. */
-export function contentPageDefault(
-  slug: string,
-): ContentPageDefault | undefined {
-  return CONTENT_PAGE_DEFAULTS[slug];
-}
