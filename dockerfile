@@ -50,6 +50,13 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
+# The standalone server.js binds `process.env.HOSTNAME || "0.0.0.0"`, and Docker
+# sets HOSTNAME to the container id. Node resolves that through /etc/hosts, so
+# the app ends up listening on the bridge address alone — 127.0.0.1 inside the
+# container is refused, which breaks any in-container probe. Publishing stays
+# loopback-only via the port mapping in docker-compose.prod.yaml, so binding
+# every interface *inside* the container exposes nothing.
+ENV HOSTNAME=0.0.0.0
 
 USER node
 
