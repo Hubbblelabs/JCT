@@ -180,8 +180,12 @@ services:
       - jct
 
 secrets:
+  # MONGODB_BUILD_URI, not MONGODB_URI: the build runs with `network: host`, and
+  # in the host namespace the compose alias `mongo` in MONGODB_URI resolves to
+  # nothing. `next build` then prerenders every DB-backed page empty and the
+  # site stays wrong until each one revalidates. See .env.example.
   mongodb_uri:
-    environment: MONGODB_URI
+    environment: MONGODB_BUILD_URI
 
 networks:
   jct:
