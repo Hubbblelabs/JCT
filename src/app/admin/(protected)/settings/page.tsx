@@ -75,6 +75,14 @@ interface ResetReport {
   };
 }
 
+/** One step of a running restore, as shown by `RestoreProgressBar`. */
+interface RestoreProgressState {
+  /** Fraction 0–1, or null when the step has no measurable total. */
+  ratio: number | null;
+  label: string;
+  detail: string;
+}
+
 type Status = { type: "success" | "error" | "warning"; message: string };
 
 /** How a restore treats documents that exist now but aren't in the archive. */
@@ -86,6 +94,16 @@ function formatBytes(bytes: number): string {
   if (bytes < 1024 * 1024 * 1024)
     return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+}
+
+/** Coarse "time left" — a restore upload runs in tens of minutes, not seconds. */
+function formatDuration(seconds: number): string {
+  if (!Number.isFinite(seconds) || seconds < 0) return "";
+  if (seconds < 90) return `${Math.round(seconds)}s`;
+  const mins = Math.round(seconds / 60);
+  if (mins < 60) return `${mins} min`;
+  const hours = Math.floor(mins / 60);
+  return `${hours}h ${mins % 60}m`;
 }
 
 /**
@@ -104,6 +122,164 @@ function startDownload(url: string) {
   document.body.appendChild(a);
   a.click();
   a.remove();
+}
+
+/**
+ * POST the archive and drive the progress display from it.
+ *
+ * `XMLHttpRequest`, not `fetch`, and that is the whole point: **fetch cannot
+ * report upload progress.** It has no equivalent of `xhr.upload.onprogress`, so
+ * the browser gives no signal at all while the body goes out. A full archive is
+ * ~7.8 GB and a typical link pushes it in well over an hour, which the old code
+ * showed as one unchanging line of text — indistinguishable from a hang, right
+ * where an operator is most likely to reload the page and start over.
+ *
+ * The server does emit `stage:"upload"` lines as it spools, but those only
+ * reach the browser if the response can be read while the request body is still
+ * being sent — which depends on the proxy (`proxy_request_buffering off`, see
+ * `deploy/nginx-jct.conf.example`) and on the browser. `xhr.upload` is measured
+ * locally and always fires, so it drives the bar; the server's own count is
+ * used once the browser has finished sending, when it is the more truthful of
+ * the two.
+ *
+ * XHR also still streams the NDJSON reply: `responseText` grows as lines
+ * arrive, so the post-upload stages are read from a cursor into it rather than
+ * waiting for the request to finish.
+ */
+function uploadRestore(
+  file: File,
+  mode: RestoreMode,
+  total: number,
+  onProgress: (state: RestoreProgressState) => void,
+): Promise<RestoreEvent | null> {
+  return new Promise<RestoreEvent | null>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", `/api/admin/site-config/restore?mode=${mode}`);
+    xhr.setRequestHeader("Content-Type", "application/zip");
+    // Default ("") is what makes partial `responseText` readable as it arrives.
+    xhr.responseType = "";
+
+    let uploaded = false;
+    let lastLoaded = 0;
+    let lastAt = performance.now();
+    let bps = 0;
+
+    xhr.upload.onprogress = (e) => {
+      if (uploaded) return;
+      const now = performance.now();
+      const dt = (now - lastAt) / 1000;
+      // Sample over at least a few hundred ms. The socket drains in bursts, so
+      // per-event deltas swing wildly and a raw rate produces an ETA that
+      // jumps between two minutes and two hours.
+      if (dt >= 0.4) {
+        const instant = (e.loaded - lastLoaded) / dt;
+        bps = bps === 0 ? instant : bps * 0.7 + instant * 0.3;
+        lastLoaded = e.loaded;
+        lastAt = now;
+      }
+      const known = e.lengthComputable ? e.total : total;
+      const left = bps > 0 ? (known - e.loaded) / bps : NaN;
+      const rate = bps > 0 ? ` · ${formatBytes(bps)}/s` : "";
+      const eta = bps > 0 ? ` · ${formatDuration(left)} left` : "";
+      onProgress({
+        ratio: known > 0 ? e.loaded / known : null,
+        label: "Uploading archive",
+        detail: `${formatBytes(e.loaded)} of ${formatBytes(known)}${rate}${eta}`,
+      });
+    };
+
+    xhr.upload.onload = () => {
+      uploaded = true;
+      onProgress({
+        ratio: null,
+        label: "Upload complete — reading archive",
+        detail: formatBytes(total),
+      });
+    };
+
+    let cursor = 0;
+    let final: RestoreEvent | null = null;
+
+    /** Consume whole NDJSON lines that have arrived since the last call. */
+    const drain = () => {
+      const text = xhr.responseText;
+      for (;;) {
+        const nl = text.indexOf("\n", cursor);
+        if (nl === -1) break;
+        const line = text.slice(cursor, nl).trim();
+        cursor = nl + 1;
+        if (!line) continue;
+        let event: RestoreEvent;
+        try {
+          event = JSON.parse(line) as RestoreEvent;
+        } catch {
+          continue; // A partial line can't happen here, but never throw on the feed.
+        }
+        if (event.done) {
+          final = event;
+          continue;
+        }
+        if (event.stage === "upload") {
+          // Before the browser has finished sending, its own counter is ahead
+          // of the server's and smoother; afterwards this is the real figure.
+          if (uploaded) {
+            onProgress({
+              ratio: null,
+              label: event.complete
+                ? "Reading archive"
+                : "Waiting for the server to finish receiving",
+              detail: `Server received ${formatBytes(event.bytes ?? 0)}`,
+            });
+          }
+        } else if (event.stage === "config") {
+          onProgress({
+            ratio: null,
+            label: "Restored site config",
+            detail: `${event.restored ?? 0} entries`,
+          });
+        } else if (event.stage === "collection") {
+          onProgress({
+            ratio: null,
+            label: `Restored ${event.name ?? "collection"}`,
+            detail: `${event.restored ?? 0} documents`,
+          });
+        } else if (event.stage === "assets") {
+          onProgress({
+            ratio: event.total ? (event.restored ?? 0) / event.total : null,
+            label: "Restoring files",
+            detail: `${event.restored ?? 0} of ${event.total ?? "?"}`,
+          });
+        }
+      }
+    };
+
+    xhr.onprogress = drain;
+
+    xhr.onload = () => {
+      drain();
+      // A non-2xx never carries the NDJSON feed — it is a plain JSON error from
+      // `api-helpers`, so report that rather than "ended unexpectedly".
+      if (xhr.status < 200 || xhr.status >= 300) {
+        let message = `HTTP ${xhr.status}`;
+        try {
+          const body = JSON.parse(xhr.responseText) as { error?: string };
+          if (body.error) message = body.error;
+        } catch {
+          /* Not JSON; the status is all there is. */
+        }
+        reject(new Error(message));
+        return;
+      }
+      resolve(final);
+    };
+
+    xhr.onerror = () =>
+      reject(new Error("the connection dropped during upload"));
+    xhr.ontimeout = () => reject(new Error("the upload timed out"));
+    xhr.onabort = () => reject(new Error("the upload was cancelled"));
+
+    xhr.send(file);
+  });
 }
 
 export default function SettingsPage() {
@@ -141,7 +317,7 @@ export default function SettingsPage() {
   const [restoring, setRestoring] = useState(false);
   const [restoreStatus, setRestoreStatus] = useState<Status | null>(null);
   const [restoreWarnings, setRestoreWarnings] = useState<string[]>([]);
-  const [progress, setProgress] = useState("");
+  const [progress, setProgress] = useState<RestoreProgressState | null>(null);
 
   // Cache state
   const [clearingCache, setClearingCache] = useState(false);
@@ -325,63 +501,19 @@ export default function SettingsPage() {
     setRestoring(true);
     setRestoreStatus(null);
     setRestoreWarnings([]);
-    setProgress("Uploading archive…");
+    const total = restoreFile.size;
+    setProgress({
+      ratio: 0,
+      label: "Uploading archive",
+      detail: `0 of ${formatBytes(total)}`,
+    });
     try {
-      const res = await fetch(
-        `/api/admin/site-config/restore?mode=${restoreMode}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/zip" },
-          body: restoreFile,
-        },
+      const final = await uploadRestore(
+        restoreFile,
+        restoreMode,
+        total,
+        setProgress,
       );
-      if (!res.ok || !res.body) {
-        const err = (await res.json().catch(() => ({}))) as Record<
-          string,
-          string
-        >;
-        setRestoreStatus({
-          type: "error",
-          message: `Restore failed: ${err.error ?? `HTTP ${res.status}`}`,
-        });
-        return;
-      }
-
-      const reader = res.body.getReader();
-      const decoder = new TextDecoder();
-      let buffered = "";
-      let final: RestoreEvent | null = null;
-
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        buffered += decoder.decode(value, { stream: true });
-        const lines = buffered.split("\n");
-        buffered = lines.pop() ?? "";
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          const event = JSON.parse(line) as RestoreEvent;
-          if (event.done) {
-            final = event;
-            continue;
-          }
-          if (event.stage === "upload") {
-            setProgress(
-              event.complete
-                ? `Uploaded ${formatBytes(event.bytes ?? 0)} — reading archive…`
-                : `Uploading… ${formatBytes(event.bytes ?? 0)} of ${formatBytes(restoreFile.size)}`,
-            );
-          } else if (event.stage === "config") {
-            setProgress("Restored site config");
-          } else if (event.stage === "collection") {
-            setProgress(`Restored ${event.restored} ${event.name}`);
-          } else if (event.stage === "assets") {
-            setProgress(
-              `Restored ${event.restored}/${event.total ?? "?"} asset files…`,
-            );
-          }
-        }
-      }
 
       if (!final) {
         setRestoreStatus({
@@ -428,14 +560,17 @@ export default function SettingsPage() {
       });
       setRestoreFile(null);
       if (fileRef.current) fileRef.current.value = "";
-    } catch {
+    } catch (err) {
       setRestoreStatus({
         type: "error",
-        message: "Restore failed. Try again.",
+        message:
+          err instanceof Error && err.message
+            ? `Restore failed: ${err.message}`
+            : "Restore failed. Try again.",
       });
     } finally {
       setRestoring(false);
-      setProgress("");
+      setProgress(null);
     }
   };
 
@@ -808,9 +943,7 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {restoring && progress && (
-              <p className="text-xs text-gray-500">{progress}</p>
-            )}
+            {restoring && progress && <RestoreProgressBar state={progress} />}
 
             <button
               onClick={handleRestore}
@@ -965,6 +1098,42 @@ export default function SettingsPage() {
  * while the JSON entries are deflated and not counted at all. Clamped so a
  * slightly-off estimate can never show a bar past 100%.
  */
+/**
+ * Live restore progress. Two shapes, because a restore alternates between steps
+ * with a real denominator (bytes uploaded of the file size, files restored of
+ * the archive's count) and steps without one (spooling, reading the central
+ * directory of a multi-gigabyte ZIP, upserting a collection). A determinate bar
+ * frozen at 0% for the minutes those take reads as a stall, so they get a
+ * pulsing full-width bar instead — moving, but not claiming a position.
+ */
+function RestoreProgressBar({ state }: { state: RestoreProgressState }) {
+  const pct =
+    state.ratio === null
+      ? null
+      : Math.min(100, Math.max(0, Math.round(state.ratio * 100)));
+  return (
+    <div className="rounded-lg border border-green-200 bg-green-50 p-3">
+      <div className="mb-1.5 flex items-center justify-between gap-3 text-xs text-green-800">
+        <span className="truncate">
+          {state.label}
+          {pct !== null && ` — ${pct}%`}
+        </span>
+        <span className="shrink-0 tabular-nums">{state.detail}</span>
+      </div>
+      <div className="h-1.5 overflow-hidden rounded-full bg-green-200">
+        {pct === null ? (
+          <div className="h-full w-full animate-pulse rounded-full bg-green-600" />
+        ) : (
+          <div
+            className="h-full rounded-full bg-green-600 transition-[width] duration-300"
+            style={{ width: `${pct}%` }}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
 function BuildProgress({ job }: { job: BackupJob }) {
   const pct = job.expected_bytes
     ? Math.min(100, Math.round((job.bytes / job.expected_bytes) * 100))
