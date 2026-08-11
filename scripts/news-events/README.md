@@ -58,28 +58,50 @@ reconfigure the running `jct` container:
 cd /root/jctSite && git pull
 ```
 
+### Always pass `--source` with the old server's LAN address
+
+```
+--source=http://192.168.20.70
+```
+
+The manifest records the old site's public origin, `http://182.74.29.15`, and
+**that address does not work from the production host.** Both machines sit on
+`192.168.20.0/22` — old is `192.168.20.70`, new is `192.168.20.20`, 0.3 ms
+apart — but the new server routes the old server's _public_ IP out through the
+gateway, where it is dropped: ICMP, port 80 and port 22 all time out, while the
+rest of the internet is fine. Curiously the reverse works, so the two are not
+symmetrically firewalled.
+
+This is not a footnote. The first production run silently imported ten events
+with no photographs at all before anyone noticed, which is why the script now
+fetches one image before touching the database and refuses to start if it
+cannot. Over the LAN the same images come back at ~60 MB/s.
+
+### The run
+
 Dry run first — it writes nothing and reports exactly what the real run would
-do:
+do (it skips the source check, since it fetches nothing):
 
 ```bash
 docker compose -f docker-compose.prod.yaml run --rm --no-deps -T --entrypoint node -v /root/jctSite/scripts:/app/scripts jct scripts/news-events/seed-news-events.mjs --dry-run
 ```
 
-Then a single-college smoke test, so a mistake costs six events rather than a
+Then a single-college smoke test, so a mistake costs seven events rather than a
 thousand:
 
 ```bash
-docker compose -f docker-compose.prod.yaml run --rm --no-deps -T --entrypoint node -v /root/jctSite/scripts:/app/scripts jct scripts/news-events/seed-news-events.mjs --institution=arts-science
+docker compose -f docker-compose.prod.yaml run --rm --no-deps -T --entrypoint node -v /root/jctSite/scripts:/app/scripts jct scripts/news-events/seed-news-events.mjs --source=http://192.168.20.70 --institution=arts-science
 ```
 
 Check `/admin/events` and one public detail page, then run the rest:
 
 ```bash
-docker compose -f docker-compose.prod.yaml run --rm --no-deps -T --entrypoint node -v /root/jctSite/scripts:/app/scripts jct scripts/news-events/seed-news-events.mjs
+docker compose -f docker-compose.prod.yaml run --rm --no-deps -T --entrypoint node -v /root/jctSite/scripts:/app/scripts jct scripts/news-events/seed-news-events.mjs --source=http://192.168.20.70 --concurrency=8
 ```
 
-Budget roughly **40–60 minutes** on the current ~10 Mbps link: 1.72 GB of source
-images, fetched six at a time.
+Over the LAN the whole import takes **about four minutes** — 1.72 GB of source
+JPEGs in, 947 MB of WebP out. (Against the public address it would have been
+hours, if it worked at all.)
 
 Finally, clear the public cache with the **Clear Cache** button on
 `/admin/settings` — the script writes to Mongo directly, so nothing has called
@@ -87,13 +109,16 @@ Finally, clear the public cache with the **Clear Cache** button on
 
 ### Options
 
-| Flag                   | Effect                               |
-| ---------------------- | ------------------------------------ |
-| `--dry-run`            | Report only; writes nothing.         |
-| `--force`              | Overwrite events that already exist. |
-| `--institution=<slug>` | Limit to one college.                |
-| `--limit=<n>`          | Stop after n events.                 |
-| `--concurrency=<n>`    | Parallel image fetches (default 6).  |
+| Flag                   | Effect                                                   |
+| ---------------------- | -------------------------------------------------------- |
+| `--source=<origin>`    | Where to fetch images from. See above — always set this. |
+| `--dry-run`            | Report only; writes nothing.                             |
+| `--force`              | Overwrite events that already exist.                     |
+| `--institution=<slug>` | Limit to one college.                                    |
+| `--limit=<n>`          | Stop after n events.                                     |
+| `--concurrency=<n>`    | Parallel image fetches (default 6).                      |
+
+`SEED_SOURCE_ORIGIN` sets the source from the environment instead.
 
 ### If it stops halfway
 
