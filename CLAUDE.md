@@ -45,19 +45,30 @@ pnpm format    # Prettier (with Tailwind class sorting)
 pnpm typecheck # tsc --noEmit (run alongside build to verify changes)
 ```
 
-There is exactly **one** script, and it only creates the first admin user:
+There are exactly **two** scripts:
 
 ```bash
-pnpm seed:admin   # scripts/seed-admin.js — creates the initial admin user
+pnpm seed:admin        # scripts/seed-admin.js — creates the initial admin user
+pnpm seed:news-events  # one-time import of the legacy news & events archive
 ```
 
-`scripts/` contains that one file. The seed/migrate catalogue this section used
-to document (`seed:deptcontent:*`, `seed:placements`, `seed:accreditations`,
-`seed:naac`, `seed:contentpages`, `seed:committees`, `seed:clubs`,
-`seed:research`, `seed:lifeatjct`, `seed:seo`, `seed:aboutsections`,
-`migrate:disclosurepages`, `migrate:moremenu`, …) **no longer exists** — the
-scripts themselves were deleted, not merely their package.json entries. Do not
-reintroduce references to them.
+`seed:news-events` (`scripts/news-events/`) is a **one-time migration, not a
+bootstrap step**: it imports the 1001 published `news-event` posts and their
+10,313 photographs from the three legacy WordPress installs on the old server
+into the `Event` collection. It talks to MongoDB and object storage directly
+rather than going through `/api/admin/*` — the upload route's 60-per-minute
+account rate limit would make it a six-hour run — so it duplicates that route's
+WebP settings and `ImageAsset` fields instead of inheriting them. Change either
+there and it has to change here too. Read `scripts/news-events/README.md`
+before running it; do **not** treat it as part of setting up a fresh database.
+
+The rest of the seed/migrate catalogue this section used to document
+(`seed:deptcontent:*`, `seed:placements`, `seed:accreditations`, `seed:naac`,
+`seed:contentpages`, `seed:committees`, `seed:clubs`, `seed:research`,
+`seed:lifeatjct`, `seed:seo`, `seed:aboutsections`, `migrate:disclosurepages`,
+`migrate:moremenu`, …) **no longer exists** — the scripts themselves were
+deleted, not merely their package.json entries. Do not reintroduce references
+to them.
 
 Everything else is bootstrapped one of two ways on a fresh database:
 

@@ -31,15 +31,19 @@ export const EVENT_CATEGORY_SUGGESTIONS = [
 ] as const;
 
 export const LIMITS = {
-  titleMax: 160,
+  // The legacy news-event titles carry the whole announcement — conference
+  // names with their full expansion, department and date all in one line. The
+  // longest of the 1001 imported posts is 261 characters, so a 160 cap would
+  // have truncated 32 of them mid-sentence.
+  titleMax: 280,
   excerptMax: 300,
   descriptionMax: 20000,
   categoryMax: 40,
   locationMax: 120,
-  // Event albums are imported whole from the college news posts, which run to
-  // a couple of dozen photographs per event — a 4-photo cap silently threw
-  // most of an album away.
-  galleryMax: 24,
+  // Event albums are imported whole from the college news posts. A 4-photo cap
+  // silently threw most of an album away; 24 still cut 64 of the imported
+  // events short, the largest of which is a 172-photo graduation day.
+  galleryMax: 200,
 } as const;
 
 // Extra photos beyond the cover image, rendered as a grid on the detail page.
