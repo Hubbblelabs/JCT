@@ -28,6 +28,13 @@
  *
  *   --dry-run              Report what would happen; write nothing.
  *   --force                Overwrite events that already exist.
+ *   --source=<origin>      Where to fetch the images from, overriding the
+ *                          manifest. Use the old server's LAN address —
+ *                          http://192.168.20.70 — not its public one: both
+ *                          machines sit on 192.168.20.0/22, but this host
+ *                          routes the old server's *public* IP out through the
+ *                          gateway, where it is dropped. Over the LAN the same
+ *                          images come back at ~60 MB/s instead of not at all.
  *   --institution=<slug>   Limit to one college.
  *   --limit=<n>            Stop after n events (for a smoke test).
  *   --concurrency=<n>      Parallel image fetches (default 6).
@@ -57,11 +64,14 @@ function parseArgs(argv) {
     institution: null,
     limit: 0,
     concurrency: 6,
+    source: process.env.SEED_SOURCE_ORIGIN || null,
   };
   for (const arg of argv) {
     if (arg === "--dry-run") opts.dryRun = true;
     else if (arg === "--force") opts.force = true;
-    else if (arg.startsWith("--institution=")) {
+    else if (arg.startsWith("--source=")) {
+      opts.source = arg.slice("--source=".length).replace(/\/+$/, "");
+    } else if (arg.startsWith("--institution=")) {
       opts.institution = arg.slice("--institution=".length);
     } else if (arg.startsWith("--limit=")) {
       opts.limit = Number(arg.slice("--limit=".length)) || 0;
@@ -343,7 +353,10 @@ export function storageKeyFor(institution, file) {
     .replace(/[^a-zA-Z0-9._-]/g, "_")
     .slice(0, 60);
   const abbr = INSTITUTION_ABBR[institution] ?? institution;
-  return `images/legacy-${abbr}-${file.attachmentId}-${base}.webp`;
+  // "newsevents-", not "legacy-": an older import already put 358 objects in
+  // the bucket under `images/legacy-<n>-<hash>.png`, and a shared prefix would
+  // make the two impossible to tell apart when auditing what this script owns.
+  return `images/newsevents-${abbr}-${file.attachmentId}-${base}.webp`;
 }
 
 function aspectRatioOf(width, height) {
@@ -369,11 +382,29 @@ async function storedSize(key) {
   }
 }
 
+/**
+ * Consecutive image failures before the run gives up.
+ *
+ * Without this a source that goes away mid-run is silently catastrophic: every
+ * fetch fails, but the events are still written, so the archive lands as a
+ * thousand headlines with no photographs and the summary reports success. That
+ * is exactly what happened on the first attempt against the old server's public
+ * address. One dead photo should not stop an import of ten thousand; two dozen
+ * in a row is not bad photos, it is a broken source.
+ */
+const FAILURE_STREAK_LIMIT = 25;
+
+class SourceUnreachable extends Error {}
+
 async function fetchWithRetry(url, attempts = 3) {
   let lastError;
   for (let i = 0; i < attempts; i += 1) {
     try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(120_000) });
+      // 60 s, not 120: over the LAN a whole image arrives in milliseconds, so a
+      // long ceiling only buys a slower diagnosis. Three attempts at two
+      // minutes each meant a single unreachable host cost six minutes per
+      // photo.
+      const res = await fetch(url, { signal: AbortSignal.timeout(60_000) });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       return Buffer.from(await res.arrayBuffer());
     } catch (err) {
@@ -444,6 +475,15 @@ async function migrateImageOnce(key, file, ctx, stats) {
     meta = await sharp(webp).metadata();
   } catch (err) {
     stats.failed.push({ path: file.path, reason: String(err?.message ?? err) });
+    stats.failureStreak += 1;
+    if (stats.failureStreak >= FAILURE_STREAK_LIMIT) {
+      throw new SourceUnreachable(
+        `${stats.failureStreak} image fetches failed in a row against ` +
+          `${ctx.baseUrl} — treating the source as unreachable rather than ` +
+          `importing a thousand events with no photographs. ` +
+          `Last error: ${String(err?.message ?? err)}`,
+      );
+    }
     return null;
   }
 
@@ -458,6 +498,7 @@ async function migrateImageOnce(key, file, ctx, stats) {
   await ensureAssetRow(key, file, ctx, { size: webp.length, meta });
   stats.uploaded += 1;
   stats.bytes += webp.length;
+  stats.failureStreak = 0;
   return key;
 }
 
@@ -511,12 +552,46 @@ async function mapLimit(items, limit, worker) {
 
 // ── main ─────────────────────────────────────────────────────────────────────
 
+/**
+ * Fetch one real image before touching the database.
+ *
+ * The first run against production imported ten events with no photographs at
+ * all, because the source was unreachable and nothing checked until it was too
+ * late to matter. One request up front turns that into a message before any
+ * write happens.
+ */
+async function preflight(origin, manifest) {
+  const install = manifest.installs.find((i) =>
+    i.events.some((e) => e.cover || e.gallery.length),
+  );
+  const sample = install.events.find((e) => e.cover || e.gallery.length);
+  const file = sample.cover ?? sample.gallery[0];
+  const url = origin + install.uploads_base + file.path;
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(30_000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const bytes = (await res.arrayBuffer()).byteLength;
+    console.log(`[seed] source reachable: ${origin} (${bytes} bytes sampled)`);
+  } catch (err) {
+    throw new SourceUnreachable(
+      `Cannot fetch images from ${origin} — ${String(err?.message ?? err)}.\n` +
+        `  Tried: ${url}\n` +
+        `  From this host the old server's PUBLIC address is not routable; ` +
+        `use its LAN address instead:\n` +
+        `    --source=http://192.168.20.70`,
+    );
+  }
+}
+
 async function main() {
   configure();
   const manifestPath = resolve(HERE, "manifest.json.gz");
   const manifest = JSON.parse(
     gunzipSync(readFileSync(manifestPath)).toString("utf8"),
   );
+  const origin = opts.source || manifest.source;
+
+  if (!opts.dryRun) await preflight(origin, manifest);
 
   await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 15_000 });
   console.log(`[seed] connected to MongoDB${opts.dryRun ? " (dry run)" : ""}`);
@@ -535,6 +610,7 @@ async function main() {
     datesFromPostDate: 0,
     bytes: 0,
     failed: [],
+    failureStreak: 0,
   };
 
   // Assign every slug from the WHOLE manifest before any filtering, so
@@ -602,7 +678,7 @@ async function main() {
 
     const ctx = {
       institution,
-      baseUrl: manifest.source + install.uploads_base,
+      baseUrl: origin + install.uploads_base,
       inFlight: new Map(),
       altFallback: title,
     };

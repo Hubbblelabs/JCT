@@ -125,161 +125,246 @@ function startDownload(url: string) {
 }
 
 /**
- * POST the archive and drive the progress display from it.
+ * Chunk size for the staged upload.
  *
- * `XMLHttpRequest`, not `fetch`, and that is the whole point: **fetch cannot
- * report upload progress.** It has no equivalent of `xhr.upload.onprogress`, so
- * the browser gives no signal at all while the body goes out. A full archive is
- * ~7.8 GB and a typical link pushes it in well over an hour, which the old code
- * showed as one unchanging line of text — indistinguishable from a hang, right
- * where an operator is most likely to reload the page and start over.
- *
- * The server does emit `stage:"upload"` lines as it spools, but those only
- * reach the browser if the response can be read while the request body is still
- * being sent — which depends on the proxy (`proxy_request_buffering off`, see
- * `deploy/nginx-jct.conf.example`) and on the browser. `xhr.upload` is measured
- * locally and always fires, so it drives the bar; the server's own count is
- * used once the browser has finished sending, when it is the more truthful of
- * the two.
- *
- * XHR also still streams the NDJSON reply: `responseText` grows as lines
- * arrive, so the post-upload stages are read from a cursor into it rather than
- * waiting for the request to finish.
+ * Small enough that one lost chunk costs seconds rather than restarting an
+ * hour-long transfer, large enough that a 7.5 GB archive is ~470 requests
+ * instead of thousands. At a typical uplink this is on the order of ten
+ * seconds in flight at a time.
  */
-function uploadRestore(
+const RESTORE_CHUNK_BYTES = 16 * 1024 * 1024;
+
+/** Attempts per chunk before the upload gives up. */
+const CHUNK_ATTEMPTS = 5;
+
+const UPLOAD_URL = "/api/admin/site-config/restore/upload";
+
+/**
+ * Where a half-finished upload is remembered, so closing the tab or losing the
+ * link does not mean starting the archive again. Keyed by the file's identity
+ * rather than its name alone — resuming into a *different* archive would
+ * produce a ZIP that is two files spliced together.
+ */
+const resumeKey = (file: File) =>
+  `jct.restore.upload.${file.name}.${file.size}.${file.lastModified}`;
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Pull the server's error message out of a response, falling back to status. */
+async function errorFrom(res: Response, fallback: string): Promise<string> {
+  try {
+    const body = (await res.json()) as { error?: string };
+    if (body.error) return body.error;
+  } catch {
+    /* Not JSON; the status is all there is. */
+  }
+  return `${fallback} (HTTP ${res.status})`;
+}
+
+/** Bytes the server currently holds for this session, or null if it's gone. */
+async function stagedBytes(uploadId: string): Promise<number | null> {
+  const res = await fetch(`${UPLOAD_URL}?uploadId=${uploadId}`);
+  if (!res.ok) return null;
+  return ((await res.json()) as { received: number }).received;
+}
+
+/**
+ * Upload the archive to the server in chunks, resuming wherever it left off.
+ *
+ * The previous version sent the whole thing as one request body. That cannot
+ * work at this size: the archive is ~7.5 GB, a typical uplink takes well over
+ * an hour to push it, and nothing survives an hour on one connection reliably —
+ * a Wi-Fi roam, a sleeping laptop, a NAT table eviction or an ISP re-dial all
+ * end it. `XMLHttpRequest` has no resume, so every drop meant starting from
+ * zero, and the server had already accepted 7 GB when the last attempt died.
+ *
+ * Chunking turns that into a transfer that makes progress: each request is a
+ * few seconds long, a failed one is retried, and a mismatch is resynchronised
+ * against what the server actually holds rather than assumed. The session id is
+ * kept in `localStorage`, so a reload picks the same upload back up.
+ */
+async function stageArchive(
   file: File,
+  onProgress: (state: RestoreProgressState) => void,
+): Promise<string> {
+  const key = resumeKey(file);
+  let uploadId = localStorage.getItem(key);
+  let offset = 0;
+
+  if (uploadId) {
+    // The server sweeps abandoned sessions, and this may be a different one
+    // entirely. Trust its answer, not the browser's memory.
+    const held = await stagedBytes(uploadId);
+    if (held === null || held > file.size) uploadId = null;
+    else offset = held;
+  }
+
+  if (!uploadId) {
+    const res = await fetch(UPLOAD_URL, { method: "POST" });
+    if (!res.ok)
+      throw new Error(await errorFrom(res, "Could not start the upload"));
+    uploadId = ((await res.json()) as { uploadId: string }).uploadId;
+    offset = 0;
+    try {
+      localStorage.setItem(key, uploadId);
+    } catch {
+      // Private mode or a full quota. Resume is a convenience, not a
+      // requirement — the upload still works, it just can't be picked up again.
+    }
+  }
+
+  const resumedFrom = offset;
+  const startedAt = performance.now();
+  let bps = 0;
+
+  const report = () => {
+    const elapsed = (performance.now() - startedAt) / 1000;
+    const sent = offset - resumedFrom;
+    if (elapsed > 1 && sent > 0) {
+      const instant = sent / elapsed;
+      bps = bps === 0 ? instant : bps * 0.7 + instant * 0.3;
+    }
+    const left = bps > 0 ? (file.size - offset) / bps : NaN;
+    const rate = bps > 0 ? ` · ${formatBytes(bps)}/s` : "";
+    const eta = bps > 0 ? ` · ${formatDuration(left)} left` : "";
+    onProgress({
+      ratio: file.size > 0 ? offset / file.size : null,
+      label: resumedFrom > 0 ? "Resuming upload" : "Uploading archive",
+      detail: `${formatBytes(offset)} of ${formatBytes(file.size)}${rate}${eta}`,
+    });
+  };
+
+  report();
+
+  while (offset < file.size) {
+    const end = Math.min(offset + RESTORE_CHUNK_BYTES, file.size);
+    // A Blob slice is a lazy view: the bytes are read as the request is sent,
+    // so an archive far larger than memory never lands in a JS buffer.
+    const chunk = file.slice(offset, end);
+    const at = offset;
+
+    let attempt = 0;
+    for (;;) {
+      attempt += 1;
+      try {
+        const res = await fetch(
+          `${UPLOAD_URL}?uploadId=${uploadId}&offset=${at}`,
+          {
+            method: "PATCH",
+            body: chunk,
+          },
+        );
+
+        // 409 means the server and this loop disagree about how much landed —
+        // most often because a retried chunk had in fact been written. Take the
+        // server's number and carry on from there instead of failing.
+        if (res.status === 409) {
+          offset = ((await res.json()) as { received: number }).received;
+          break;
+        }
+        if (!res.ok)
+          throw new Error(await errorFrom(res, "Chunk upload failed"));
+        offset = ((await res.json()) as { received: number }).received;
+        break;
+      } catch (err) {
+        if (attempt >= CHUNK_ATTEMPTS) {
+          throw new Error(
+            `${err instanceof Error ? err.message : "the connection dropped"} — ` +
+              `${formatBytes(offset)} of ${formatBytes(file.size)} is staged on the ` +
+              `server, so starting the restore again resumes from there`,
+            { cause: err },
+          );
+        }
+        // Back off, then re-read the truth: the chunk may have landed even
+        // though the response never came back.
+        await sleep(Math.min(30_000, 1000 * 2 ** (attempt - 1)));
+        const held = await stagedBytes(uploadId).catch(() => null);
+        if (held !== null) offset = held;
+      }
+    }
+    report();
+  }
+
+  return uploadId;
+}
+
+/**
+ * Run the restore against an archive already staged on the server, reading the
+ * NDJSON progress feed as it arrives.
+ *
+ * `fetch` rather than `XMLHttpRequest` now that there is no body to send: the
+ * only reason for XHR here was `xhr.upload.onprogress`, and a streaming reader
+ * consumes the feed without accumulating the whole response in `responseText`.
+ */
+async function runRestore(
+  uploadId: string,
   mode: RestoreMode,
-  total: number,
   onProgress: (state: RestoreProgressState) => void,
 ): Promise<RestoreEvent | null> {
-  return new Promise<RestoreEvent | null>((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", `/api/admin/site-config/restore?mode=${mode}`);
-    xhr.setRequestHeader("Content-Type", "application/zip");
-    // Default ("") is what makes partial `responseText` readable as it arrives.
-    xhr.responseType = "";
+  const res = await fetch(
+    `/api/admin/site-config/restore?mode=${mode}&uploadId=${uploadId}`,
+    { method: "POST" },
+  );
+  if (!res.ok) throw new Error(await errorFrom(res, "Restore failed"));
+  if (!res.body)
+    throw new Error("Restore failed — the server sent no response");
 
-    let uploaded = false;
-    let lastLoaded = 0;
-    let lastAt = performance.now();
-    let bps = 0;
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let final: RestoreEvent | null = null;
 
-    xhr.upload.onprogress = (e) => {
-      if (uploaded) return;
-      const now = performance.now();
-      const dt = (now - lastAt) / 1000;
-      // Sample over at least a few hundred ms. The socket drains in bursts, so
-      // per-event deltas swing wildly and a raw rate produces an ETA that
-      // jumps between two minutes and two hours.
-      if (dt >= 0.4) {
-        const instant = (e.loaded - lastLoaded) / dt;
-        bps = bps === 0 ? instant : bps * 0.7 + instant * 0.3;
-        lastLoaded = e.loaded;
-        lastAt = now;
-      }
-      const known = e.lengthComputable ? e.total : total;
-      const left = bps > 0 ? (known - e.loaded) / bps : NaN;
-      const rate = bps > 0 ? ` · ${formatBytes(bps)}/s` : "";
-      const eta = bps > 0 ? ` · ${formatDuration(left)} left` : "";
-      onProgress({
-        ratio: known > 0 ? e.loaded / known : null,
-        label: "Uploading archive",
-        detail: `${formatBytes(e.loaded)} of ${formatBytes(known)}${rate}${eta}`,
-      });
-    };
-
-    xhr.upload.onload = () => {
-      uploaded = true;
+  const handle = (event: RestoreEvent) => {
+    if (event.done) {
+      final = event;
+      return;
+    }
+    if (event.stage === "upload") {
       onProgress({
         ratio: null,
-        label: "Upload complete — reading archive",
-        detail: formatBytes(total),
+        label: event.complete ? "Reading archive" : "Receiving archive",
+        detail: `Server received ${formatBytes(event.bytes ?? 0)}`,
       });
-    };
+    } else if (event.stage === "config") {
+      onProgress({
+        ratio: null,
+        label: "Restored site config",
+        detail: `${event.restored ?? 0} entries`,
+      });
+    } else if (event.stage === "collection") {
+      onProgress({
+        ratio: null,
+        label: `Restored ${event.name ?? "collection"}`,
+        detail: `${event.restored ?? 0} documents`,
+      });
+    } else if (event.stage === "assets") {
+      onProgress({
+        ratio: event.total ? (event.restored ?? 0) / event.total : null,
+        label: "Restoring files",
+        detail: `${event.restored ?? 0} of ${event.total ?? "?"}`,
+      });
+    }
+  };
 
-    let cursor = 0;
-    let final: RestoreEvent | null = null;
-
-    /** Consume whole NDJSON lines that have arrived since the last call. */
-    const drain = () => {
-      const text = xhr.responseText;
-      for (;;) {
-        const nl = text.indexOf("\n", cursor);
-        if (nl === -1) break;
-        const line = text.slice(cursor, nl).trim();
-        cursor = nl + 1;
-        if (!line) continue;
-        let event: RestoreEvent;
-        try {
-          event = JSON.parse(line) as RestoreEvent;
-        } catch {
-          continue; // A partial line can't happen here, but never throw on the feed.
-        }
-        if (event.done) {
-          final = event;
-          continue;
-        }
-        if (event.stage === "upload") {
-          // Before the browser has finished sending, its own counter is ahead
-          // of the server's and smoother; afterwards this is the real figure.
-          if (uploaded) {
-            onProgress({
-              ratio: null,
-              label: event.complete
-                ? "Reading archive"
-                : "Waiting for the server to finish receiving",
-              detail: `Server received ${formatBytes(event.bytes ?? 0)}`,
-            });
-          }
-        } else if (event.stage === "config") {
-          onProgress({
-            ratio: null,
-            label: "Restored site config",
-            detail: `${event.restored ?? 0} entries`,
-          });
-        } else if (event.stage === "collection") {
-          onProgress({
-            ratio: null,
-            label: `Restored ${event.name ?? "collection"}`,
-            detail: `${event.restored ?? 0} documents`,
-          });
-        } else if (event.stage === "assets") {
-          onProgress({
-            ratio: event.total ? (event.restored ?? 0) / event.total : null,
-            label: "Restoring files",
-            detail: `${event.restored ?? 0} of ${event.total ?? "?"}`,
-          });
-        }
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (value) buffer += decoder.decode(value, { stream: true });
+    for (;;) {
+      const nl = buffer.indexOf("\n");
+      if (nl === -1) break;
+      const line = buffer.slice(0, nl).trim();
+      buffer = buffer.slice(nl + 1);
+      if (!line) continue;
+      try {
+        handle(JSON.parse(line) as RestoreEvent);
+      } catch {
+        continue; // Never throw on the feed.
       }
-    };
+    }
+    if (done) break;
+  }
 
-    xhr.onprogress = drain;
-
-    xhr.onload = () => {
-      drain();
-      // A non-2xx never carries the NDJSON feed — it is a plain JSON error from
-      // `api-helpers`, so report that rather than "ended unexpectedly".
-      if (xhr.status < 200 || xhr.status >= 300) {
-        let message = `HTTP ${xhr.status}`;
-        try {
-          const body = JSON.parse(xhr.responseText) as { error?: string };
-          if (body.error) message = body.error;
-        } catch {
-          /* Not JSON; the status is all there is. */
-        }
-        reject(new Error(message));
-        return;
-      }
-      resolve(final);
-    };
-
-    xhr.onerror = () =>
-      reject(new Error("the connection dropped during upload"));
-    xhr.ontimeout = () => reject(new Error("the upload timed out"));
-    xhr.onabort = () => reject(new Error("the upload was cancelled"));
-
-    xhr.send(file);
-  });
+  return final;
 }
 
 export default function SettingsPage() {
@@ -491,10 +576,10 @@ export default function SettingsPage() {
   };
 
   /**
-   * The archive is uploaded as a raw body, not parsed here: the server spools
-   * it to disk and reads its central directory. The response is NDJSON so a
-   * long restore keeps reporting instead of going silent behind a proxy
-   * timeout.
+   * Two phases. The archive is staged on the server in chunks — resumable, so a
+   * dropped link costs one chunk rather than the whole transfer — and only then
+   * is the restore run against it. The restore's response is NDJSON so a long
+   * one keeps reporting instead of going silent behind a proxy timeout.
    */
   const handleRestore = async () => {
     if (!restoreFile) return;
@@ -508,12 +593,15 @@ export default function SettingsPage() {
       detail: `0 of ${formatBytes(total)}`,
     });
     try {
-      const final = await uploadRestore(
-        restoreFile,
-        restoreMode,
-        total,
-        setProgress,
-      );
+      const uploadId = await stageArchive(restoreFile, setProgress);
+      // The server consumes the staged archive whether the restore succeeds or
+      // not, so the resume pointer is spent the moment the restore starts.
+      try {
+        localStorage.removeItem(resumeKey(restoreFile));
+      } catch {
+        /* Nothing stored; nothing to clear. */
+      }
+      const final = await runRestore(uploadId, restoreMode, setProgress);
 
       if (!final) {
         setRestoreStatus({

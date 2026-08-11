@@ -3,7 +3,6 @@ import { Readable, Transform } from "stream";
 import { pipeline } from "stream/promises";
 import { createWriteStream } from "fs";
 import { mkdtemp, rm } from "fs/promises";
-import { tmpdir } from "os";
 import path from "path";
 import unzipper from "unzipper";
 import { connectDB } from "@/lib/mongodb";
@@ -12,6 +11,14 @@ import { logAudit } from "@/lib/audit";
 import { isBackupCollection } from "@/lib/backup-collections";
 import { revalidateTargets } from "@/lib/revalidate";
 import { isStorageConfigured } from "@/lib/storage";
+import { backupDir } from "@/lib/backup-jobs";
+import {
+  discardUpload,
+  isUploadId,
+  pruneUploads,
+  receivedBytes,
+  uploadPath,
+} from "@/lib/restore-uploads";
 import {
   restoreConfigs,
   restoreCollectionDocs,
@@ -127,8 +134,24 @@ async function spool(
 export async function POST(req: NextRequest) {
   const { session, error } = await requireRole(req, "admin");
   if (error) return error;
-  if (!req.body)
+
+  /**
+   * Two ways in. `?uploadId=` restores an archive already staged in chunks by
+   * `restore/upload` — the path the admin UI takes, because a single 7.5 GB
+   * body cannot survive an hour on a browser connection and cannot resume when
+   * it doesn't (see src/lib/restore-uploads.ts). A raw body still works for a
+   * caller that can hold one open, such as curl from the server itself.
+   */
+  const staged = req.nextUrl.searchParams.get("uploadId");
+  if (staged !== null && !isUploadId(staged)) {
+    return badRequest("Invalid uploadId");
+  }
+  if (!staged && !req.body) {
     return badRequest("Expected a ZIP archive as the request body");
+  }
+  if (staged && (await receivedBytes(staged)) === null) {
+    return badRequest("No such upload session");
+  }
 
   await connectDB();
 
@@ -150,14 +173,26 @@ export async function POST(req: NextRequest) {
 
       let dir: string | null = null;
       try {
-        dir = await mkdtemp(path.join(tmpdir(), "jct-restore-"));
-        const archivePath = path.join(dir, "backup.zip");
+        let archivePath: string;
+        if (staged) {
+          // Already on disk, whole. Nothing to spool.
+          archivePath = uploadPath(staged);
+          const received = (await receivedBytes(staged)) ?? 0;
+          emit({ stage: "upload", bytes: received, complete: true });
+        } else {
+          // Spool onto the backup volume, not os.tmpdir(): in production that
+          // is a bind-mounted host path, whereas the container's temp dir sits
+          // on the overlay filesystem, where several gigabytes have no business
+          // being.
+          dir = await mkdtemp(path.join(backupDir(), "jct-restore-"));
+          archivePath = path.join(dir, "backup.zip");
 
-        emit({ stage: "upload", bytes: 0 });
-        const received = await spool(reqBody, archivePath, (bytes) =>
-          emit({ stage: "upload", bytes }),
-        );
-        emit({ stage: "upload", bytes: received, complete: true });
+          emit({ stage: "upload", bytes: 0 });
+          const received = await spool(reqBody!, archivePath, (bytes) =>
+            emit({ stage: "upload", bytes }),
+          );
+          emit({ stage: "upload", bytes: received, complete: true });
+        }
 
         const central = (await unzipper.Open.file(archivePath)) as unknown as {
           files: CentralEntry[];
@@ -331,6 +366,16 @@ export async function POST(req: NextRequest) {
           await rm(dir, { recursive: true, force: true }).catch((err) =>
             console.error("[site-config/restore] temp cleanup:", err),
           );
+        }
+        if (staged) {
+          // The staged archive is consumed here whether the restore worked or
+          // not: it has been read end to end either way, and leaving several
+          // gigabytes behind for a retry that would re-upload anyway is how the
+          // backup volume fills up.
+          await discardUpload(staged).catch((err) =>
+            console.error("[site-config/restore] staged cleanup:", err),
+          );
+          await pruneUploads();
         }
         try {
           controller.close();
