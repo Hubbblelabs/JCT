@@ -63,7 +63,13 @@ USER node
 COPY --from=builder --chown=node:node /app/public ./public
 COPY --from=builder --chown=node:node /app/.next/standalone ./
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static
+# Not part of the standalone output — file tracing only follows what the build
+# imports, and this is loaded by the runtime flag below, not by any module.
+COPY --from=builder --chown=node:node /app/deploy/http-timeouts.cjs ./http-timeouts.cjs
 
 EXPOSE 3000
 
-CMD ["node", "server.js"]
+# --require runs before server.js and turns off Node's 300 s cap on receiving a
+# request body, which otherwise kills every backup restore mid-upload. The file
+# explains why this cannot be done from inside the app.
+CMD ["node", "--require", "./http-timeouts.cjs", "server.js"]

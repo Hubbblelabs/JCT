@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
-    "start": "next start",
+    "start": "node --require ./deploy/http-timeouts.cjs node_modules/next/dist/bin/next start",
     "lint": "eslint . --fix",
     "lint:ci": "eslint .",
     "format": "prettier --write .",

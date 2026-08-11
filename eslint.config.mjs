@@ -127,4 +127,15 @@ export default [
       "no-undef": "off", // Next.js handles these
     },
   },
+
+  // Node preload scripts. These are loaded by `node --require` before anything
+  // else runs, so they cannot be ESM — `require` is the only import form
+  // available to them.
+  {
+    files: ["deploy/**/*.cjs"],
+    languageOptions: { sourceType: "commonjs" },
+    rules: {
+      "@typescript-eslint/no-require-imports": "off",
+    },
+  },
 ];
