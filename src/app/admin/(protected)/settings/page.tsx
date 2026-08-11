@@ -169,6 +169,24 @@ async function stagedBytes(uploadId: string): Promise<number | null> {
 }
 
 /**
+ * SHA-256 of a chunk, so the server can reject one that did not survive the
+ * wire. Returns null where `crypto.subtle` is unavailable — it needs a secure
+ * context, which production has and a plain-HTTP dev host does not. The server
+ * treats a missing digest as "unverified" rather than failing the upload.
+ */
+async function chunkDigest(body: ArrayBuffer): Promise<string | null> {
+  if (!globalThis.crypto?.subtle) return null;
+  try {
+    const hash = await crypto.subtle.digest("SHA-256", body);
+    return Array.from(new Uint8Array(hash))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Upload the archive to the server in chunks, resuming wherever it left off.
  *
  * The previous version sent the whole thing as one request body. That cannot
@@ -237,22 +255,26 @@ async function stageArchive(
   report();
 
   while (offset < file.size) {
-    const end = Math.min(offset + RESTORE_CHUNK_BYTES, file.size);
-    // A Blob slice is a lazy view: the bytes are read as the request is sent,
-    // so an archive far larger than memory never lands in a JS buffer.
-    const chunk = file.slice(offset, end);
-    const at = offset;
-
     let attempt = 0;
     for (;;) {
       attempt += 1;
+      // Re-derived every attempt: a retry after a resync must send the chunk
+      // that starts where the server actually is, not the one this loop picked
+      // before it found out.
+      const at = offset;
+      const end = Math.min(at + RESTORE_CHUNK_BYTES, file.size);
+
       try {
+        // Read the slice rather than handing `fetch` the lazy Blob, so the
+        // exact bytes being sent are the bytes being hashed. One chunk at a
+        // time, so an archive far larger than memory still never lands in a
+        // JS buffer whole.
+        const body = await file.slice(at, end).arrayBuffer();
+        const sha256 = await chunkDigest(body);
         const res = await fetch(
-          `${UPLOAD_URL}?uploadId=${uploadId}&offset=${at}`,
-          {
-            method: "PATCH",
-            body: chunk,
-          },
+          `${UPLOAD_URL}?uploadId=${uploadId}&offset=${at}` +
+            (sha256 ? `&sha256=${sha256}` : ""),
+          { method: "PATCH", body },
         );
 
         // 409 means the server and this loop disagree about how much landed —
@@ -261,6 +283,18 @@ async function stageArchive(
         if (res.status === 409) {
           offset = ((await res.json()) as { received: number }).received;
           break;
+        }
+        // 423: an earlier append for this session is still draining on the
+        // server. 422: this chunk arrived corrupted and was rolled back.
+        // Both mean "wait, re-read, send this chunk again" — never "advance",
+        // which is how a hole gets into the middle of the archive.
+        if (res.status === 423 || res.status === 422) {
+          if (attempt >= CHUNK_ATTEMPTS)
+            throw new Error(await errorFrom(res, "Chunk upload failed"));
+          await sleep(Math.min(30_000, 1000 * 2 ** (attempt - 1)));
+          const held = await stagedBytes(uploadId).catch(() => null);
+          if (held !== null) offset = held;
+          continue;
         }
         if (!res.ok)
           throw new Error(await errorFrom(res, "Chunk upload failed"));

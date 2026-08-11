@@ -289,6 +289,16 @@ export async function POST(req: NextRequest) {
           : {};
 
         const assets = files.filter((f) => isSafeStorageKey(f.path));
+        // An asset-shaped entry the key guard refused is a file the archive
+        // carried and the restore silently dropped. Say so: the only way that
+        // was ever noticed was by counting objects in the bucket afterwards.
+        for (const f of files) {
+          if (!f.path.startsWith("images/") && !f.path.startsWith("documents/"))
+            continue;
+          if (f.path.endsWith("/_metadata.json")) continue;
+          if (isSafeStorageKey(f.path)) continue;
+          warnings.push(`${f.path}: rejected as an unsafe storage key`);
+        }
         // storage is checked lazily: an archive with no assets restores fine
         // without storage configured.
         if (assets.length > 0 && !isStorageConfigured()) {

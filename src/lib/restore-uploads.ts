@@ -1,6 +1,6 @@
 import { createWriteStream } from "fs";
-import { mkdir, readdir, rm, stat } from "fs/promises";
-import { randomUUID } from "crypto";
+import { mkdir, readdir, rm, stat, truncate } from "fs/promises";
+import { createHash, randomUUID } from "crypto";
 import path from "path";
 import { Readable } from "stream";
 import { pipeline } from "stream/promises";
@@ -83,9 +83,30 @@ export type AppendResult =
   | { ok: true; received: number }
   | {
       ok: false;
-      reason: "missing" | "offset" | "too-large" | "no-space";
+      reason: "missing" | "offset" | "too-large" | "no-space" | "busy";
       received: number;
-    };
+    }
+  | { ok: false; reason: "checksum"; received: number; got: string };
+
+/** A hex SHA-256, as the client sends it. */
+const SHA256_HEX = /^[0-9a-f]{64}$/;
+
+export const isChunkDigest = (v: unknown): v is string =>
+  typeof v === "string" && SHA256_HEX.test(v);
+
+/**
+ * Sessions with an append currently in flight.
+ *
+ * Without this, a chunk whose client gave up mid-request keeps writing on the
+ * server: the browser sees the abort, re-reads `received`, and fires the next
+ * chunk while the dead request's stream is still draining into the same file.
+ * Two appenders then interleave at write-buffer granularity, so the archive
+ * ends up the right *length* with a region of wrong bytes in the middle — a
+ * ZIP whose central directory reads perfectly while individual entries fail
+ * with `FILE_ENDED`. A second append is refused outright; the client waits and
+ * asks again rather than racing.
+ */
+const appending = new Set<string>();
 
 /**
  * Append one chunk at `offset`.
@@ -94,12 +115,31 @@ export type AppendResult =
  * safe: a chunk whose response was lost can be replayed, and the mismatch tells
  * the client to re-read `received` and resume from the truth rather than
  * writing a hole or a duplicate into the middle of a ZIP.
+ *
+ * Writes are positional (`r+` at `offset`) rather than `a`, and the file is
+ * truncated back to `offset` both before the write and on any failure. An
+ * append that dies mid-chunk therefore leaves the session exactly where it
+ * started instead of a ragged tail the client has to discover by polling.
+ *
+ * `digest`, when given, is the chunk's SHA-256. It is checked against what
+ * actually landed and a mismatch rolls the write back, so a corrupted chunk is
+ * caught here — at the point it can still be re-sent — rather than hours later
+ * when the restore cannot parse an entry.
  */
 export async function appendChunk(
   id: string,
   offset: number,
   body: ReadableStream<Uint8Array>,
+  digest?: string,
 ): Promise<AppendResult> {
+  if (appending.has(id)) {
+    return {
+      ok: false,
+      reason: "busy",
+      received: (await receivedBytes(id)) ?? 0,
+    };
+  }
+
   const current = await receivedBytes(id);
   if (current === null) return { ok: false, reason: "missing", received: 0 };
   if (offset !== current) {
@@ -111,39 +151,59 @@ export async function appendChunk(
     return { ok: false, reason: "no-space", received: current };
   }
 
-  let written = 0;
-  const source = Readable.fromWeb(
-    body as Parameters<typeof Readable.fromWeb>[0],
-  );
-  const sink = createWriteStream(uploadPath(id), { flags: "a" });
+  appending.add(id);
+  const file = uploadPath(id);
+  const rollback = () =>
+    truncate(file, offset).catch((err) =>
+      console.error("[restore/upload] rollback failed", err),
+    );
 
   try {
-    await pipeline(
-      source,
-      async function* (chunks: AsyncIterable<Buffer>) {
-        for await (const chunk of chunks) {
-          written += chunk.length;
-          if (current + written > MAX_UPLOAD_BYTES) {
-            throw new Error("too-large");
-          }
-          yield chunk;
-        }
-      },
-      sink,
-    );
-  } catch (err) {
-    // A chunk that died mid-write leaves the file longer than `offset` but
-    // shorter than intended. Truncating back would need another syscall and
-    // buys nothing: the client re-reads `received` on failure anyway, and the
-    // strict-offset check above rejects anything that doesn't line up.
-    const size = (await receivedBytes(id)) ?? current;
-    if (err instanceof Error && err.message === "too-large") {
-      return { ok: false, reason: "too-large", received: size };
-    }
-    throw err;
-  }
+    // Nothing should exist past `offset`, but an earlier crash between the
+    // write and its rollback would leave some; start from a known state.
+    await truncate(file, offset);
 
-  return { ok: true, received: current + written };
+    let written = 0;
+    const hash = digest ? createHash("sha256") : null;
+    const source = Readable.fromWeb(
+      body as Parameters<typeof Readable.fromWeb>[0],
+    );
+
+    try {
+      await pipeline(
+        source,
+        async function* (chunks: AsyncIterable<Buffer>) {
+          for await (const chunk of chunks) {
+            written += chunk.length;
+            if (offset + written > MAX_UPLOAD_BYTES) {
+              throw new Error("too-large");
+            }
+            hash?.update(chunk);
+            yield chunk;
+          }
+        },
+        createWriteStream(file, { flags: "r+", start: offset }),
+      );
+    } catch (err) {
+      await rollback();
+      if (err instanceof Error && err.message === "too-large") {
+        return { ok: false, reason: "too-large", received: offset };
+      }
+      throw err;
+    }
+
+    if (hash) {
+      const got = hash.digest("hex");
+      if (got !== digest) {
+        await rollback();
+        return { ok: false, reason: "checksum", received: offset, got };
+      }
+    }
+
+    return { ok: true, received: offset + written };
+  } finally {
+    appending.delete(id);
+  }
 }
 
 export async function discardUpload(id: string): Promise<void> {

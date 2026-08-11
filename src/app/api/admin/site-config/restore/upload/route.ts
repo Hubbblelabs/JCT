@@ -5,6 +5,7 @@ import {
   appendChunk,
   createUpload,
   discardUpload,
+  isChunkDigest,
   isUploadId,
   pruneUploads,
   receivedBytes,
@@ -74,8 +75,13 @@ export async function PATCH(req: NextRequest) {
   if (!req.body)
     return badRequest("Expected a chunk of the archive as the body");
 
+  // Optional, and validated rather than trusted: an unparseable digest must
+  // read as "no digest sent" and not as a mismatch that rejects a good chunk.
+  const sha256 = searchParams.get("sha256");
+  const digest = isChunkDigest(sha256) ? sha256 : undefined;
+
   try {
-    const result = await appendChunk(uploadId, offset, req.body);
+    const result = await appendChunk(uploadId, offset, req.body, digest);
     if (result.ok) return json({ uploadId, received: result.received });
 
     // 409 on a mismatch rather than 400: the client's job is to re-read
@@ -88,6 +94,29 @@ export async function PATCH(req: NextRequest) {
           received: result.received,
         },
         409,
+      );
+    }
+    // 423 rather than 409: the client must NOT take `received` and move on —
+    // an append for this session is still draining and the number is in
+    // motion. Wait, re-read, re-send the same chunk.
+    if (result.reason === "busy") {
+      return json(
+        {
+          error: "Another chunk of this upload is still being written",
+          received: result.received,
+        },
+        423,
+      );
+    }
+    // The bytes that arrived are not the bytes that were sent. The write has
+    // already been rolled back, so the same chunk can simply be re-sent.
+    if (result.reason === "checksum") {
+      return json(
+        {
+          error: "Chunk failed its checksum and was discarded",
+          received: result.received,
+        },
+        422,
       );
     }
     if (result.reason === "missing")
