@@ -175,9 +175,37 @@ server {
         proxy_max_temp_file_size 0;
     }
 
-    # Restore streams a ~7.5 GB body. Buffering it would write the entire ZIP to
-    # nginx's temp dir before the handler is invoked: double the disk, double
-    # the wait, and no progress reporting.
+    # The admin UI stages the archive here in 16 MB chunks before running the
+    # restore, so this is the location that actually carries the 7.5 GB — one
+    # short request at a time, each resumable. Buffering would spool every chunk
+    # to nginx's temp dir before the handler ever sees it, adding a disk round
+    # trip to all ~470 of them for no benefit.
+    #
+    # `location /` would otherwise catch this path: the restore block below is an
+    # exact (`=`) match and does not cover the sub-path.
+    location = /api/admin/site-config/restore/upload {
+        proxy_pass http://jct_app;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_request_buffering off;
+        proxy_buffering off;
+        proxy_max_temp_file_size 0;
+        client_max_body_size 0;
+
+        # One chunk, not the whole archive — minutes is generous.
+        proxy_send_timeout 300s;
+        proxy_read_timeout 300s;
+        client_body_timeout 300s;
+    }
+
+    # Kept for a caller that can hold one connection open for the whole archive
+    # (curl from the server itself, say). The admin UI no longer uses this path:
+    # a browser cannot reliably push 7.5 GB in a single request and has no way to
+    # resume when it fails, which is what the chunked staging above exists to fix.
     location = /api/admin/site-config/restore {
         proxy_pass http://jct_app;
         proxy_http_version 1.1;
