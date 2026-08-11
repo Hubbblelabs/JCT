@@ -293,28 +293,10 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
-    // Migration: the old single global `recruitersSection` copy is now split
-    // into 4 per-scope keys. Clone its value into any new key that doesn't yet
-    // exist so no edited copy is lost. Published so it shows immediately.
-    const legacy = await SiteConfig.findOne({
-      config_key: "recruitersSection",
-    }).lean<{ value?: unknown; published_value?: unknown } | null>();
-    const legacyValue = legacy?.published_value ?? legacy?.value;
-    if (legacyValue) {
-      for (const key of PLACEMENT_HIGHLIGHTS_KEYS) {
-        const exists = await SiteConfig.exists({ config_key: key });
-        if (exists) continue;
-        await SiteConfig.create({
-          config_key: key,
-          value: legacyValue,
-          published_value: legacyValue,
-          status: "published",
-          version: 1,
-          updated_by: session!.user?.email ?? "",
-        });
-        revalidateForConfigKey(key);
-      }
-    }
+    // The one-shot migration that cloned the old global `recruitersSection`
+    // into the four per-scope PlacementHighlights keys lived here. All four
+    // exist and are published, so it could only ever skip them, and the key it
+    // read has been retired (see RETIRED_CONFIG_KEYS in src/lib/restore.ts).
 
     for (const seed of SEEDS) {
       const fields: Record<string, unknown> = {

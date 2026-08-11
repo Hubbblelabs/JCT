@@ -25,6 +25,25 @@ import { revalidateForConfigKey } from "@/lib/revalidate";
 const SAFE_LEGACY_KEY = /^[A-Za-z][A-Za-z0-9_-]{0,63}$/;
 
 /**
+ * Keys that were real settings once, have been superseded, and must NOT come
+ * back.
+ *
+ * The passthrough below deliberately restores unknown keys verbatim rather than
+ * dropping them, because "not in the registry" usually means "written before
+ * the registry knew about it". These two are the other case: their successors
+ * exist and are published, nothing reads them, and every archive on disk still
+ * carries them — so without this they reappear on every restore, each time with
+ * a warning that reads like a fault. Dropping them here is the only place that
+ * sticks, since deleting the documents alone lasts until the next restore.
+ */
+const RETIRED_CONFIG_KEYS = new Set([
+  // Split into main/engineering/artsScience/polytechnicPlacementHighlights.
+  "recruitersSection",
+  // Folded into the global `campusLifePage`.
+  "artsScienceCampusLife",
+]);
+
+/**
  * Ceiling on a JSON manifest, which genuinely has to be parsed whole. Asset
  * binaries have no ceiling — they are piped from the spooled archive straight
  * into a multipart upload and never sit in memory. An earlier 100MB cap applied
@@ -76,11 +95,15 @@ export async function restoreConfigs(
     const key = entry.config_key as string;
 
     if (!isKnownSiteConfigKey(key)) {
-      // Keys outside the registry are still real stored settings — e.g.
-      // `recruitersSection`, which the seed route reads as a migration source.
-      // Dropping them made a restore lossy, so carry them across verbatim and
-      // report them. Nothing renders them: public reads resolve keys through
-      // the registry, and the normal write path still rejects unknowns.
+      if (RETIRED_CONFIG_KEYS.has(key)) {
+        warnings.push(`"${key}" is a retired key — dropped, not restored`);
+        continue;
+      }
+      // Other keys outside the registry are still real stored settings, written
+      // before the registry knew about them. Dropping them made a restore
+      // lossy, so carry them across verbatim and report them. Nothing renders
+      // them: public reads resolve keys through the registry, and the normal
+      // write path still rejects unknowns.
       if (!SAFE_LEGACY_KEY.test(key ?? "")) {
         warnings.push(`Malformed config_key: "${String(key)}" — skipped`);
         continue;
