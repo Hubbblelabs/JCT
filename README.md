@@ -9,16 +9,17 @@ JCT Polytechnic College.
 - Admin CMS (`/admin`): live-preview editors for programs, page content,
   placements, media, users, and site-wide configuration.
 
-Stack: Next.js 16, MongoDB (Mongoose), NextAuth.js, and an S3-compatible object
-store for images and documents. Everything runs on-prem by default — MongoDB
-and Garage ship in `docker-compose.prod.yaml`.
+Stack: Next.js 16 (App Router), React 19, MongoDB (Mongoose), NextAuth.js, and
+an S3-compatible object store for images and documents. Everything runs on-prem
+by default — MongoDB and Garage ship in `docker-compose.prod.yaml`.
 
 ## Requirements
 
 - Node.js 22+
 - pnpm — npm and yarn ignore `pnpm-workspace.yaml`, whose `overrides` pin a
   single copy of sharp; two copies break the build in the image optimizer.
-- A MongoDB connection string.
+- A MongoDB connection string. A standalone `mongod` is enough — nothing here
+  uses transactions, change streams or Atlas Search.
 
 ## Setup
 
@@ -41,8 +42,10 @@ pnpm seed:admin && pnpm dev
 
 Site at http://localhost:3000, CMS at http://localhost:3000/admin.
 
-`pnpm seed:admin` is the only seed script. Everything else is authored in the
-CMS or restored from a backup archive via the Settings page.
+`pnpm seed:admin` is the only working seed script — the `seed:news-events` and
+`dedupe:events` entries still in `package.json` point at a deleted
+`scripts/news-events/` directory. Everything else is authored in the CMS or
+restored from a backup archive via the Settings page.
 
 ## Scripts
 
@@ -59,6 +62,18 @@ pnpm typecheck  # tsc --noEmit
 No test framework. Verify with `pnpm build`, `pnpm typecheck`, `pnpm lint:ci`,
 and in a browser.
 
+## How the content model works
+
+- **Programs** carry the rich per-course pages (`Program.content` draft →
+  `published_content` live). The `/admin/programs/[id]` builder edits them with
+  a live preview of the real public layout.
+- **Pages** are free-standing CMS pages, scoped per institution, rendered at
+  `/p/<slug>` and `/institutions/<inst>/p/<slug>`.
+- **SiteConfig** holds every site-wide and section-level setting under a fixed
+  registry of keys, each with its own Zod schema and its own draft/publish pair.
+- The public site reads **published** content only; drafts exist only in the
+  admin.
+
 ## Storage
 
 Any S3-compatible server, configured entirely by `STORAGE_*` env vars (see
@@ -69,18 +84,21 @@ of it.
 
 Two things bite: `STORAGE_REGION` must match the server's configured region
 exactly or every call fails `SignatureDoesNotMatch`, and
-`NEXT_PUBLIC_STORAGE_PUBLIC_URL` must be https and is inlined at build time —
-changing it needs a rebuild, not a restart.
+`NEXT_PUBLIC_STORAGE_PUBLIC_URL` must be https, must not include the bucket
+segment, and is inlined at build time — changing it needs a rebuild, not a
+restart.
 
 ## Deployment
 
 Docker image (`output: "standalone"`) to a self-hosted server, built and
-deployed by `.github/workflows/build-deploy.yml`. Pushing to `v3-admin`
-rebuilds and publishes the image; pushing a `vX.Y.Z` tag also deploys it.
+deployed by `.github/workflows/build-deploy.yml`. Pushing to `v3-admin` runs
+lint, typecheck and format check only; **deployment happens only when a
+`vX.Y.Z` tag is pushed**, which SSHes to the prod host and rebuilds there.
 `docker-compose.prod.yaml` runs the app, MongoDB and Garage, all on loopback
 behind nginx.
 
 ## Further reading
 
 `CLAUDE.md` documents the architecture in depth — routing, auth, the CMS
-subsystems, caching and revalidation, and the storage-cleanup rules.
+subsystems, caching and revalidation, backup/restore, and the storage-cleanup
+rules.

@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **JCT Institutions** is a Next.js 16 app that combines a **public marketing/admissions website** and an **admin CMS** for three colleges (Engineering, Arts & Science, Polytechnic) in Coimbatore.
 
-- **Public site** (`/`, `/institutions/*`, `/campus-life`): institution landing pages, program listings, dynamic per-program detail pages, campus life. Server-rendered with ISR caching.
+- **Public site** (`/`, `/institutions/*`, `/campus-life`, `/events`): institution landing pages, program listings, dynamic per-program detail pages, CMS-driven content pages, campus life. Server-rendered with ISR caching.
 - **Admin CMS** (`/admin/*`): manage programs (via a live-preview content builder), users, images, documents, testimonials, recruiters, page content, and site-wide config.
 
 Persistence is **MongoDB** (Mongoose), auth is **NextAuth.js**, image/document storage is **any S3-compatible object store**. Both are provider-agnostic — MongoDB Atlas or a self-hosted `mongod`, on-prem Garage or a managed S3 — chosen entirely by environment (see "Images & documents" and `src/lib/storage-config.ts`).
@@ -45,54 +45,24 @@ pnpm format    # Prettier (with Tailwind class sorting)
 pnpm typecheck # tsc --noEmit (run alongside build to verify changes)
 ```
 
-There are exactly **three** scripts:
+`scripts/` contains exactly **one** file, `seed-admin.js`:
 
 ```bash
-pnpm seed:admin        # scripts/seed-admin.js — creates the initial admin user
-pnpm seed:news-events  # one-time import of the legacy news & events archive
-pnpm dedupe:events     # collapse duplicate Event docs that import left behind
+pnpm seed:admin  # creates the initial admin user
 ```
 
-`seed:news-events` (`scripts/news-events/`) is a **one-time migration, not a
-bootstrap step**: it imports the 1001 published `news-event` posts and their
-10,313 photographs from the three legacy WordPress installs on the old server
-into the `Event` collection. It talks to MongoDB and object storage directly
-rather than going through `/api/admin/*` — the upload route's 60-per-minute
-account rate limit would make it a six-hour run — so it duplicates that route's
-WebP settings and `ImageAsset` fields instead of inheriting them. Change either
-there and it has to change here too. Read `scripts/news-events/README.md`
-before running it; do **not** treat it as part of setting up a fresh database.
+`package.json` still declares `seed:news-events` and `dedupe:events`, but
+`scripts/news-events/` has been deleted — those entries point at files that no
+longer exist and will fail with `MODULE_NOT_FOUND`. They were a one-time
+migration of the legacy WordPress news archive, not a bootstrap step. Do not
+reintroduce references to them, and do not treat their absence as a bug.
 
-`dedupe:events` (`scripts/news-events/dedupe-events.mjs`) is the cleanup for
-what that import got wrong the first time. It recognised an already-imported
-event **by slug alone**, and of the 69 events already typed into the CMS, 46
-slugified to exactly the generated slug and were correctly skipped while 23 did
-not (`international-women-s-day-2026` against a generated
-`international-womens-day-2026`) and were imported a second time; the legacy
-sites also carry duplicates of their own. The identity rule that decides what
-counts as the same event now lives in `scripts/news-events/event-identity.mjs`
-and is **shared** with the importer, which applies it before creating anything
-— so the same run cannot recreate the mess the script just cleaned up. Two
-things about it are load-bearing: **the same calendar day is the only
-unconditional match**, and the four-week `CROSS_ORIGIN_WINDOW_DAYS` tolerance
-for a retyped date applies only when there is a single candidate to apply it to
-(three departments each held an Engineer's Navaratri Golu Fest in one week, and
-a transitive window collapses all six records into one); and **nothing is
-deleted before its photographs are merged into the survivor**, because the two
-copies are complementary — the CMS record has the long hand-written body and
-two or three images, the imported one has a thin body and the whole WordPress
-album. It defaults to a dry run; `--apply` writes. Same-title records it will
-not judge (annual fixtures, three departments' separate inaugurals) are printed
-as a review list instead. Run the Settings page's **Clear Cache** afterwards —
-it writes to Mongo directly and cannot reach Next's revalidation.
-
-The rest of the seed/migrate catalogue this section used to document
+The larger seed/migrate catalogue older branches document
 (`seed:deptcontent:*`, `seed:placements`, `seed:accreditations`, `seed:naac`,
 `seed:contentpages`, `seed:committees`, `seed:clubs`, `seed:research`,
 `seed:lifeatjct`, `seed:seo`, `seed:aboutsections`, `migrate:disclosurepages`,
 `migrate:moremenu`, …) **no longer exists** — the scripts themselves were
-deleted, not merely their package.json entries. Do not reintroduce references
-to them.
+deleted, not merely their package.json entries.
 
 Everything else is bootstrapped one of two ways on a fresh database:
 
@@ -100,7 +70,7 @@ Everything else is bootstrapped one of two ways on a fresh database:
 - by restoring a backup archive: `POST /api/admin/site-config/restore` (the
   Settings page has the UI for it).
 
-There is **no test framework** configured — no test runner, no test files, no `test` script. Verify changes with `pnpm build` + `pnpm lint` and by exercising the feature in the browser.
+There is **no test framework** configured — no test runner, no test files, no `test` script. Verify changes with `pnpm build` + `pnpm typecheck` + `pnpm lint:ci` and by exercising the feature in the browser.
 
 ## Architecture
 
@@ -110,14 +80,14 @@ There is **no test framework** configured — no test runner, no test files, no 
 
 - **`src/app/admin/`** — the CMS. `(protected)/` is a route group whose `layout.tsx` does a session check; `login/` is public. Key admin pages: `dashboard/`, `programs/`, `pages/`, `users/`, `testimonials/`, `recruiters/`, `about/`, `coe/`, `campus-life/`, `page-content/`, `main/page-content/`, `global/page-content/`, `settings/`, `audit/`, `events/` (thin CRUD over the `Event` model), `research/`, `clubs/`, `committees/`, `documents/`, `naac/` (all `LivePageEditor` shells, see "Visual page editors"), `accreditations/`, `placements-page/` (bespoke SiteConfig editors, not the `LivePageEditor` shell), `placements/` (**a redirect only** — year-wise `Placement` records are now authored inside `placements-page/`; two screens writing the same docs is what that avoids), `content/[slug]/` (one dynamic editor for all block-based content pages — NIRF, timeline, library — driven by a registry in `src/lib/content-pages.ts`). The sidebar/breadcrumbs/Ctrl+K palette are all generated from a single source of truth, `src/lib/admin-nav.ts` — add a page there to get nav + search for free instead of wiring a hub page. Each college has just two groups: **Landing Page** (ordered as the public landing page renders, top to bottom) and **Other Pages**; standalone content-page editors are appended in `CONTENT_PAGE_ORDER`, and anything not listed there lands at the end rather than vanishing.
 - **`src/app/institutions/<inst>/`** — public pages for each of `engineering`, `arts-science`, `polytechnic`. Each has `page.tsx` (landing), `about/`, `courses/`, `programs/` + `programs/[slug]/` (DB-driven program detail pages), `p/[slug]/` (generic CMS Page renderer, see Page CMS below), and a legacy `[course]/` dynamic route. Engineering also has `coe/` (Centre of Excellence).
-- **Top-level public routes**: `src/app/page.tsx` (home), `campus-life/`, `about-us/`, `accreditations/`, `events/` + `events/[slug]/`, `p/[slug]/` (institution-agnostic `main` CMS pages), plus `sitemap.ts` / `robots.ts` (fed by `src/lib/seo-pages.ts`).
+- **Top-level public routes**: `src/app/page.tsx` (home), `campus-life/`, `about-us/`, `accreditations/`, `events/` + `events/[slug]/`, `p/[slug]/` (institution-agnostic `main` CMS pages), the legal pages (`privacy/`, `terms/`, `disclaimer/`, `faq/`), plus `sitemap.ts` / `robots.ts` (fed by `src/lib/seo-pages.ts`).
 
 ### Authentication & authorization
 
 - **`src/proxy.ts` is the Next.js 16 middleware** (Next 16 renamed `middleware.ts` → `proxy.ts`). It wraps NextAuth `auth()` and gates `/admin/:path*` + `/api/admin/:path*`: unauthenticated page requests redirect to `/admin/login?callbackUrl=...`, unauthenticated `/api/admin/*` requests get a JSON 401 (a redirect would hand `fetch()` callers login-page HTML with status 200); an authenticated user hitting the login page is sent to `/admin/dashboard`. This proxy is the real route gate — admin layouts also check the session as defense-in-depth. It **fails closed**: the `auth()` call is wrapped so any throw during session resolution denies the request rather than falling through to `NextResponse.next()`.
 - **A `redirect()` in an admin `layout.tsx` does not stop the page segment.** App Router renders layout and page in parallel, so a layout-only guard still lets the page query Mongo and stream the result into a 200. Any admin page that reads the DB server-side must check the session itself before querying (see `dashboard/page.tsx`, `audit/page.tsx`).
 - **`src/auth.ts`** configures NextAuth: Credentials provider only (email + password, bcrypt compare), JWT session with 24h `maxAge`. The session/JWT carries `role`, `institution`, and `programs[]`.
-- **Roles** (`src/lib/permissions.ts`): only two — `editor` (0) < `admin` (1). Helpers: `hasMinRole`, `canManageUsers` (admin), `canAccessInstitution`. Editors are scoped to their `institution`; admins act on everything (and are stored with `institution: "all"`). **Scope is institution-level only.** `User.programs[]` still exists on the model and rides in the JWT, but nothing reads it and the admin UI does not collect it; the `canAccessProgram` helper that pretended otherwise has been removed. For shared media assets, use `enforceAssetScope` (allows own-institution + the shared `"all"` pool).
+- **Roles** (`src/lib/permissions.ts`): only two — `editor` (0) < `admin` (1). Helpers: `hasMinRole`, `canManageUsers` (admin), `canAccessInstitution`. Editors are scoped to their `institution`; admins act on everything (and are stored with `institution: "all"`). **Scope is institution-level only.** `User.programs[]` still exists on the model and rides in the JWT, but nothing reads it and the admin UI does not collect it. For shared media assets, use `enforceAssetScope` (allows own-institution + the shared `"all"` pool).
 - In API routes, call `requireRole(req, minRole)` from `src/lib/api-helpers.ts`. It returns `{ session, error }`; if `error` is truthy, return it directly.
 - **Editor scope enforcement**: editors with a restricted `institution` must call `enforceInstitutionScope(session, targetInstitution)` in write routes. This prevents an editor scoped to Engineering from writing to Arts & Science data. Call it early after `requireRole` to fail fast. **Reads are scoped too**: list GETs merge `institutionReadFilter(session)` into the Mongo query and detail GETs re-check `enforceInstitutionScope` — admin list/detail responses include draft content, which must not leak across colleges.
 - **Boot-time env validation**: `validateServerEnv()` (`src/lib/env.ts`) runs at **module scope in `src/auth.ts`** — there is no `instrumentation.ts`. It throws on a bad `MONGODB_URI`/`NEXTAUTH_SECRET` (min 32 chars, and rejected against a `SECRET_PLACEHOLDERS` set — add to that set, never replace it) or a _partial_ storage config, but only **warns** when `NEXT_PHASE === "phase-production-build"`, so `next build` still runs on a machine with an incomplete `.env`.
@@ -137,7 +107,7 @@ CMS `richText` is authored by `editor`-role users, i.e. **authenticated but untr
 
 - **Admin routes** (`src/app/api/admin/*`): gate with `requireRole`, parse with `validateBody(req, ZodSchema)` (or `validateFields` for multipart), record `logAudit(...)` (non-fatal), and call `revalidateTargets(...)` after writes. Response/error helpers in `src/lib/api-helpers.ts`: `json`, `badRequest`, `validationError`, `unauthorized`, `forbidden`, `notFound`, `serverError`.
 - **Audit logging**: `logAudit(entityType, action, userEmail, summary)` from `src/lib/audit.ts` records a write to the `AuditLog` collection (entries expire after 1 year via a TTL index). It never throws — if logging fails, it's caught and logged but the route response proceeds normally. Always call it even if later operations might fail; it's a best-effort record of intent, not a transactional guarantee. `GET /api/admin/audit` paginates by **keyset cursor**, not page number — `?limit=&before=<ISO timestamp>`, capped at `AUDIT_PAGE_SIZE`/200. `DELETE /api/admin/audit` purges entries older than a fixed retention window (15/30/90/180/365 days only).
-- **Public routes** (`src/app/api/public/*`): no auth. Responses use a `{ source, data }` envelope (`source` is `"db" | "empty" | "error"`). These handlers read query params, which makes them **dynamic** — route-level `export const revalidate` is inert on them. Instead they serve from the in-memory TTL cache in `src/lib/public-cache.ts` (1h TTL), which `revalidateTargets` / `revalidatePaths` / `revalidateForConfigKey` clear on every admin write. Same single-instance assumption as the rate limiter.
+- **Public routes** (`src/app/api/public/*` — `images`, `placements`, `programs`, `recruiters`, `site-config`, `testimonials`): no auth. Responses use a `{ source, data }` envelope (`source` is `"db" | "empty" | "error"`). These handlers read query params, which makes them **dynamic** — route-level `export const revalidate` is inert on them. Instead they serve from the in-memory TTL cache in `src/lib/public-cache.ts` (1h TTL), which `revalidateTargets` / `revalidatePaths` / `revalidateForConfigKey` clear on every admin write. Same single-instance assumption as the rate limiter. Public event/page/program reads that pages do directly go through `src/lib/public-events.ts`, `public-pages.ts`, `public-programs.ts` instead of an API route.
 - Some admin routes have `seed/` sub-routes for bootstrapping data — `testimonials/seed` and `site-config/seed` (there is no `recruiters` route at all, see below).
 - **Documents upload in two shapes.** `POST /api/admin/documents/upload` takes the bytes through the function, which a host caps at ~4.5 MB. The client path used by the editors is instead **presign → direct PUT → confirm**: `POST /api/admin/documents/presign` returns `{presigned_url, storage_key, safe_name}`, the browser PUTs the file straight to the bucket, then `POST /api/admin/documents/confirm` records the `DocumentAsset`. Images still go through `POST /api/admin/images/upload` (a 413 there is surfaced as a size message, not "Upload failed").
 
@@ -221,7 +191,7 @@ Separate from Program content, the **`Page`** model (`src/lib/models/Page.ts`) b
 ### SiteConfig & page content
 
 - **`SiteConfig`** docs are keyed by a unique `config_key`, with a draft/publish pair `value` / `published_value` and `status: "draft" | "published"`.
-- Allowed config keys are a **fixed registry** in `src/lib/validation/siteConfig.ts` (`SITE_CONFIG_SCHEMAS`) — each key maps to a Zod schema, and unknown keys are rejected. The registry has grown to ~90 keys; the individual schemas live in topic files under `src/lib/validation/` (`hero.ts`, `navbar.ts`, `floatingElements.ts`, `homeSections.ts`, `engineeringPages.ts`/`engineeringSections.ts`, `naacPage.ts`, `campusLifePage.ts`, `contentPage.ts`, `pamphlet.ts`, `upcomingEvents.ts`, `announcement.ts`, `admissions.ts`, `seo.ts`, etc.) and each contributes one or more keys to `SITE_CONFIG_SCHEMAS` — the topic file is not itself the key name. Add a new site-wide setting by adding a schema in the right topic file (or a new one) and registering it in `SITE_CONFIG_SCHEMAS`.
+- Allowed config keys are a **fixed registry** in `src/lib/validation/siteConfig.ts` (`SITE_CONFIG_SCHEMAS`) — each key maps to a Zod schema, and unknown keys are rejected. The registry has grown past 140 keys; the individual schemas live in topic files under `src/lib/validation/` (`hero.ts`, `navbar.ts`, `floatingElements.ts`, `homeSections.ts`, `engineeringPages.ts`/`engineeringSections.ts`, `naacPage.ts`, `campusLifePage.ts`, `contentPage.ts`, `pamphlet.ts`, `upcomingEvents.ts`, `announcement.ts`, `admissions.ts`, `seo.ts`, etc.) and each contributes one or more keys to `SITE_CONFIG_SCHEMAS` — the topic file is not itself the key name. Add a new site-wide setting by adding a schema in the right topic file (or a new one) and registering it in `SITE_CONFIG_SCHEMAS`.
 - The admin "page content" pages (`(protected)/page-content/`, `(protected)/main/page-content/`, `(protected)/global/page-content/`) edit these config keys via `PageContentForms.tsx` / `PageContentShell.tsx`.
 - **Backup/restore/reset**: backup is **staged — build to disk, then download**, and is not one request. `POST /api/admin/site-config/backup` starts a build and returns a job (202) immediately; `GET …/backup?jobId=` polls its progress; `GET …/backup/file?jobId=` downloads the finished archive; `DELETE …/backup?jobId=` frees it. `GET …/backup?probe=1` still reports what an export would contain without building it. The archive (site config, every `BACKUP_COLLECTIONS` collection, and — if requested — every stored asset) is assembled by `src/lib/backup-archive.ts` via `archiver` and written to `BACKUP_DIR`; `src/lib/backup-jobs.ts` owns job state, disk layout, retention and the free-space check. **Do not fold this back into a single streaming response.** Archiving into the response socket coupled storage read speed to the client's drain rate, which forced assets through strictly one at a time and made a 7.5 GB export take hours; it also ruled out `Content-Length`, so there was no real progress and no resume. Building first decouples the two: small objects are fetched from storage concurrently (see `SMALL_ASSET_BYTES`/`FETCH_CONCURRENCY`), and the download is a ranged static file. Memory is still flat — collections stream from a cursor and only bounded small-object buffers are held. `POST /api/admin/site-config/restore` takes the ZIP as a raw request body, spools it to a temp file, and restores everything from its central directory via `unzipper` (`src/lib/restore.ts`), reporting progress as NDJSON; pass `?mode=replace` to delete, per collection, anything not present in the archive (default `?mode=merge` only upserts). `POST /api/admin/site-config/reset` is **not** a per-key revert: it takes no key, and performs a full wipe — every `SiteConfig` document, plus every stored object and asset row nothing still references. Scope is widened by an optional JSON body (`ResetOptionsSchema`, `src/lib/validation/reset.ts`): `{"content":true}` also deletes Program, Page, Event, Placement and Testimonial, and `{"assets":true}` skips the reference scan and purges every uploaded file. An absent or empty body means the historical scope, so an old client that POSTs nothing still works. `User` and `AuditLog` are never touched. The destructive half lives in `src/lib/reset.ts`, and two invariants there are load-bearing: **the sweep enumerates the union of the bucket and the tracking rows**, because objects legitimately exist with no `ImageAsset`/`DocumentAsset` row (files seeded or uploaded by hand, `restoreAsset` putting bytes back for an archive entry that carried no metadata, a presigned PUT whose `documents/confirm` never landed) — walking only the DB left those in storage permanently, invisible to every later reset; and **a tracking row is deleted only once its object is provably gone**, so a failed `deleteObject` or an unconfigured store keeps the row rather than converting a tracked object into an unreachable one. Audit-logged as "Full reset" / "Full purge"; there is no undo short of restoring a backup. The restore route is excluded from the `proxy.ts` matcher and enforces auth itself — see the Next.js 16 body-size note below. All are accessible from the admin Settings page.
 
@@ -253,7 +223,7 @@ Separate from Program content, the **`Page`** model (`src/lib/models/Page.ts`) b
 
 ## Environment Configuration
 
-See `.env.example`. Required:
+See `.env.example` — it is annotated and is the authoritative list. Required:
 
 ```
 MONGODB_URI       # mongodb+srv:// (Atlas) or mongodb:// (self-hosted). Nothing
@@ -286,7 +256,7 @@ STORAGE_INTERNAL_ENDPOINT   # optional; where THIS PROCESS reaches the S3 API
 NEXT_PUBLIC_STORAGE_PUBLIC_URL   # must be https; inlined at BUILD time
 ```
 
-Also read by this repo's code:
+Also read by this repo's code or its compose file:
 
 ```
 NEXT_PUBLIC_SITE_URL   # public origin; src/lib/page-nav-links.ts uses it plus
@@ -295,6 +265,11 @@ NEXT_PUBLIC_SITE_URL   # public origin; src/lib/page-nav-links.ts uses it plus
                        # is not the public domain, and the admin page list
                        # badges linked pages as orphans. NEXT_PUBLIC_*, so it
                        # must be present at BUILD time, not just at runtime.
+MONGODB_BUILD_URI      # on-prem compose only. `next build` runs with
+                       # `network: host`, where the compose alias `mongo` does
+                       # not resolve — so the runtime URI is unusable at build
+                       # time and the prerender silently bakes empty pages.
+                       # Passed as a BuildKit secret; never lands in a layer.
 MONGODB_MAX_POOL_SIZE  # per-instance Mongo pool (default 10)
 BACKUP_DIR             # where the admin backup route builds archives before
                        # they are downloaded (default: <os tmp>/jct-backups).
@@ -304,6 +279,9 @@ BACKUP_ACCEL_PREFIX    # optional; when set, the download route answers with an
                        # X-Accel-Redirect under this prefix so nginx serves the
                        # archive via sendfile() instead of piping it through
                        # Node. Needs a matching `internal` nginx location.
+AUTH_TRUST_HOST        # read by next-auth itself, not by this repo's code.
+                       # `trustHost: true` is also set in src/auth.ts, so a
+                       # missing value cannot take the admin panel down.
 ```
 
 ## Deployment
@@ -346,13 +324,13 @@ Zod schemas define every entity shape. They live in `src/lib/validation/` and ar
 1. Mongoose schema in `src/lib/models/NewType.ts`; export it from `src/lib/models/index.ts`.
 2. Zod schemas (+ `LIMITS`) in `src/lib/validation/newtype.ts`; re-export from the validation barrel.
 3. Admin API: `src/app/api/admin/newtype/route.ts` (GET/POST) and `[id]/route.ts` (PATCH/DELETE) — gate with `requireRole`, validate, audit, revalidate.
-4. Admin UI: `src/app/admin/(protected)/newtype/page.tsx`.
+4. Admin UI: `src/app/admin/(protected)/newtype/page.tsx`, and register it in `src/lib/admin-nav.ts`.
 5. Public API (if needed): `src/app/api/public/newtype/route.ts` — serve through `publicCacheGet`/`publicCacheSet` from `src/lib/public-cache.ts` (route-level `revalidate` is inert once the handler reads query params).
 6. If it affects public pages, extend `src/lib/revalidate.ts`.
 
 ### Publish draft content
 
-`Program` and `SiteConfig` use a draft/publish split. Publishing copies the draft field into the published field, flips `status` to `"published"`, and bumps `version`. The public site reads **only** published content; drafts are visible only in the admin.
+`Program`, `Page` and `SiteConfig` use a draft/publish split. Publishing copies the draft field into the published field, flips `status` to `"published"`, and bumps `version`. The public site reads **only** published content; drafts are visible only in the admin.
 
 ### Cache invalidation after a write
 
