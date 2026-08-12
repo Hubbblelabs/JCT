@@ -120,6 +120,31 @@ export async function getPublishedConfigs(
   return result;
 }
 
+/**
+ * The config keys the site chrome renders — navbar, header strip and footer.
+ *
+ * Every public page shows these, so they are fetched once in a layout rather
+ * than per page (see `SiteChrome`). All four institutions' keys are loaded
+ * together on purpose: `Navbar` picks its key from `InstitutionContext`, which
+ * resolves on the client (pathname first, then the sessionStorage fallback for
+ * routes like /events that belong to no college). The server can't know which
+ * one it will land on, and a key missing from the context is what sends the
+ * navbar back to the hardcoded fallback in `src/data/all-navigations.ts` until
+ * a client fetch replaces it — the wrong-menu flash this list exists to stop.
+ */
+export const SITE_CHROME_CONFIG_KEYS = [
+  "header",
+  "mainHeader",
+  "engineeringHeader",
+  "artsScienceHeader",
+  "polytechnicHeader",
+  "mainNavbar",
+  "engineeringNavbar",
+  "artsScienceNavbar",
+  "polytechnicNavbar",
+  "footer",
+] as const;
+
 export const HOME_CONFIG_KEYS = [
   "home",
   "homeProspectus",

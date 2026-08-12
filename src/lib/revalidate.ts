@@ -249,11 +249,36 @@ export function revalidateEverything(): void {
   revalidatePath("/", "layout");
 }
 
+/**
+ * Keys rendered by the site chrome, which now comes from a layout above every
+ * public route (see `SiteChrome`). A menu edit therefore changes pages the
+ * per-institution path lists don't enumerate — program detail pages, `/p/[slug]`,
+ * `/events/[slug]`, the footer's content pages — so these invalidate the whole
+ * tree rather than a target list that would leave the old menu baked into every
+ * detail page until its own ISR window expired.
+ */
+const SITE_WIDE_CONFIG_KEYS = new Set([
+  "header",
+  "mainHeader",
+  "engineeringHeader",
+  "artsScienceHeader",
+  "polytechnicHeader",
+  "mainNavbar",
+  "engineeringNavbar",
+  "artsScienceNavbar",
+  "polytechnicNavbar",
+  "footer",
+]);
+
 export function revalidateForConfigKey(key: string): void {
   // Clear the in-memory public API cache so client-side fetches get fresh
   // data (the /api/public/* routes are dynamic — revalidatePath can't
   // invalidate them).
   publicCacheClear();
+  if (SITE_WIDE_CONFIG_KEYS.has(key)) {
+    revalidateEverything();
+    return;
+  }
   const targets = SITE_CONFIG_KEY_TARGETS[key];
   if (targets?.length) revalidateTargets(...targets);
 }

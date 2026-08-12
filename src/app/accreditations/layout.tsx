@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { seoMetadata } from "@/lib/seo";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 
 const SEO_FALLBACK: Metadata = {
   title: "Accreditations | JCT Institutions, Coimbatore",
@@ -12,7 +13,7 @@ export default function AccreditationsLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <SiteChrome>{children}</SiteChrome>;
 }
 
 // Admin-managed meta tags win; the fallback above stands when no
