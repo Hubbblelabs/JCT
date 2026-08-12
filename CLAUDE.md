@@ -45,11 +45,12 @@ pnpm format    # Prettier (with Tailwind class sorting)
 pnpm typecheck # tsc --noEmit (run alongside build to verify changes)
 ```
 
-There are exactly **two** scripts:
+There are exactly **three** scripts:
 
 ```bash
 pnpm seed:admin        # scripts/seed-admin.js — creates the initial admin user
 pnpm seed:news-events  # one-time import of the legacy news & events archive
+pnpm dedupe:events     # collapse duplicate Event docs that import left behind
 ```
 
 `seed:news-events` (`scripts/news-events/`) is a **one-time migration, not a
@@ -61,6 +62,29 @@ account rate limit would make it a six-hour run — so it duplicates that route'
 WebP settings and `ImageAsset` fields instead of inheriting them. Change either
 there and it has to change here too. Read `scripts/news-events/README.md`
 before running it; do **not** treat it as part of setting up a fresh database.
+
+`dedupe:events` (`scripts/news-events/dedupe-events.mjs`) is the cleanup for
+what that import got wrong the first time. It recognised an already-imported
+event **by slug alone**, and of the 69 events already typed into the CMS, 46
+slugified to exactly the generated slug and were correctly skipped while 23 did
+not (`international-women-s-day-2026` against a generated
+`international-womens-day-2026`) and were imported a second time; the legacy
+sites also carry duplicates of their own. The identity rule that decides what
+counts as the same event now lives in `scripts/news-events/event-identity.mjs`
+and is **shared** with the importer, which applies it before creating anything
+— so the same run cannot recreate the mess the script just cleaned up. Two
+things about it are load-bearing: **the same calendar day is the only
+unconditional match**, and the four-week `CROSS_ORIGIN_WINDOW_DAYS` tolerance
+for a retyped date applies only when there is a single candidate to apply it to
+(three departments each held an Engineer's Navaratri Golu Fest in one week, and
+a transitive window collapses all six records into one); and **nothing is
+deleted before its photographs are merged into the survivor**, because the two
+copies are complementary — the CMS record has the long hand-written body and
+two or three images, the imported one has a thin body and the whole WordPress
+album. It defaults to a dry run; `--apply` writes. Same-title records it will
+not judge (annual fixtures, three departments' separate inaugurals) are printed
+as a review list instead. Run the Settings page's **Clear Cache** afterwards —
+it writes to Mongo directly and cannot reach Next's revalidation.
 
 The rest of the seed/migrate catalogue this section used to document
 (`seed:deptcontent:*`, `seed:placements`, `seed:accreditations`, `seed:naac`,

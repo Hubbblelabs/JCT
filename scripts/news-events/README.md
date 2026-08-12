@@ -149,6 +149,18 @@ docker run --rm --network host -v /root/jctSite:/work -w /work --env-file /root/
   deriving them from the filtered set would re-import the smoke-tested college
   a second time under `-2`. Any target slug an admin-created event already owns
   is reported at the start of the run.
+- **Recognising an event that is already there.** The slug is not enough, and
+  the first production run proved it: of the 69 events already typed into the
+  admin, 46 slugified to exactly the generated slug and were skipped, but 23 did
+  not — `international-women-s-day-2026` against the generated
+  `international-womens-day-2026` — and were imported a second time. So a post
+  that matches an existing record on college + normalized title + date has its
+  photo album merged into that record instead, and no second row is created.
+  Newly created events join the same index as the run proceeds, which collapses
+  the duplicates the legacy sites carry themselves (the same event posted twice,
+  minutes apart, by two departments). The rule lives in `event-identity.mjs` and
+  is shared with `dedupe-events.mjs`; see that section below for why the date
+  window is as narrow as it is.
 - **Dates.** The 2021 migration into this WordPress stamped several hundred
   backlog posts with the import date, so `post_date` alone would file a 2010
   conference under 2021. The `wpcf-event-date` / `wpcf-date` custom field is
@@ -176,6 +188,56 @@ docker run --rm --network host -v /root/jctSite:/work -w /work --env-file /root/
 - **Non-images.** Eight MP4s and two DOCX files are attached to these posts as
   gallery entries. `Event.gallery` is images only, so they are skipped and
   counted in the summary.
+
+## `dedupe-events.mjs` — cleaning up what the first run duplicated
+
+The first production import ran on 11 August 2026 with slug-only matching and
+left 31 duplicate `Event` documents behind: 20 from CMS records it failed to
+recognise, 11 already duplicated on the legacy sites. This script finds them and
+collapses them.
+
+```bash
+# dry run — prints the plan and the review list, writes nothing
+docker compose -f docker-compose.prod.yaml run --rm --no-deps -T --entrypoint node -v /root/jctSite/scripts:/app/scripts jct scripts/news-events/dedupe-events.mjs
+
+# carry it out
+docker compose -f docker-compose.prod.yaml run --rm --no-deps -T --entrypoint node -v /root/jctSite/scripts:/app/scripts jct scripts/news-events/dedupe-events.mjs --apply
+```
+
+| Flag                   | Effect                                            |
+| ---------------------- | ------------------------------------------------- |
+| `--apply`              | Merge and delete. Without it, nothing is written. |
+| `--institution=<slug>` | Limit to one college.                             |
+| `--json=<path>`        | Write the plan and review list as JSON.           |
+| `--quiet`              | Suppress the per-group breakdown.                 |
+
+Two decisions in it are load-bearing.
+
+**Nothing is thrown away.** The two copies of an event are complementary: the
+CMS record has the long hand-written body and two or three photographs, the
+imported one has a thin body and the entire WordPress album — up to 29 images.
+So the longer body wins the row, every photograph from the other copies is
+merged into its gallery, and only then are they deleted. No storage key is
+orphaned, which is why this script needs no S3 credentials and no
+`cleanupStorageKeys` pass.
+
+**The date window does not run transitively.** The same calendar day is the only
+unconditional match. `CROSS_ORIGIN_WINDOW_DAYS` (four weeks) exists because an
+editor retyping an event into the CMS often enters a different day from the one
+the legacy post carries — the BTBCE industrial visit is filed 3 January by
+WordPress and 31 January by its twin — but it is applied only where a title's
+records come out as exactly one CMS group facing one legacy group. Three
+departments each held an _Engineer's Navaratri Golu Fest-2025_, on 22, 24 and 30
+September, each typed into the CMS and each posted to WordPress; a window
+allowed to chain across them turns six correct records into one event and five
+wrong deletions.
+
+Anything the rule will not judge — annual fixtures, three departments' separate
+association inaugurals in one fortnight, two posts a day apart with different
+photographs — is printed as a **review list** rather than guessed at. Nine
+titles came out that way on the production run.
+
+Clear the public cache from `/admin/settings` afterwards, same as the import.
 
 ## Schema headroom this needed
 

@@ -21,6 +21,13 @@
  * event whose slug already exists is left alone unless --force is passed. A
  * run that dies halfway can simply be started again.
  *
+ * The slug is not the only test for "already there". An event somebody typed
+ * into the admin has a slug of its own, and matching on slug alone imported 23
+ * of them a second time on the first production run. So a post that matches an
+ * existing record on college + normalized title + date (see event-identity.mjs)
+ * has its photo album merged into that record and no new row is created —
+ * which also collapses the duplicates the legacy sites carry themselves.
+ *
  * Usage (inside the app image, which already has mongoose, sharp and the AWS
  * SDK — see README.md for the exact docker command):
  *
@@ -52,6 +59,13 @@ import {
   PutObjectCommand,
   HeadObjectCommand,
 } from "@aws-sdk/client-s3";
+
+import {
+  findTwin,
+  LEGACY_PREFIX,
+  mergePhotoKeys,
+  normalizeTitle,
+} from "./event-identity.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -601,6 +615,8 @@ async function main() {
     created: 0,
     updated: 0,
     skippedExisting: 0,
+    mergedIntoExisting: 0,
+    photosMerged: 0,
     uploaded: 0,
     alreadyPresent: 0,
     wouldUpload: 0,
@@ -631,8 +647,8 @@ async function main() {
 
   // An event somebody created by hand in the admin could already own one of
   // those slugs. The import skips whatever already exists (or overwrites it
-  // under --force), so this can't produce a duplicate — but it can quietly
-  // leave a legacy post unimported, which is worth saying out loud.
+  // under --force), which leaves a legacy post unimported — worth saying out
+  // loud, because it also means that post's photo album never lands.
   const collisions = await Event.find({ slug: { $in: [...slugFor.values()] } })
     .select("slug")
     .lean();
@@ -646,6 +662,26 @@ async function main() {
           .join(", ") +
         (collisions.length > 10 ? ", …" : ""),
     );
+  }
+
+  // Matching on the slug alone is not enough, and the first production run
+  // proved it: of 69 events already typed into the CMS, 46 happened to
+  // slugify to exactly the generated slug and were skipped, but 23 did not
+  // ("international-women-s-day-2026" against the generated
+  // "international-womens-day-2026") and were imported a second time. So the
+  // college + normalized title + date identity from event-identity.mjs is
+  // checked too, and the whole collection is loaded once rather than queried
+  // per post — 1024 documents of metadata is nothing next to 10,313 images,
+  // and a normalized-title comparison cannot be expressed as an index lookup.
+  const priorEvents = await Event.find({})
+    .select("_id slug title institution event_date image gallery")
+    .lean();
+  const priorByTitle = new Map();
+  for (const doc of priorEvents) {
+    const key = `${doc.institution}|${normalizeTitle(doc.title)}`;
+    const bucket = priorByTitle.get(key);
+    if (bucket) bucket.push(doc);
+    else priorByTitle.set(key, [doc]);
   }
 
   const planned = [];
@@ -675,6 +711,21 @@ async function main() {
     if (source !== "event-date-field" && source !== "publication-date") {
       stats.datesFromPostDate += 1;
     }
+
+    // Same event under a different slug — either a record an editor typed into
+    // the CMS, or an earlier post from this same run (the legacy sites publish
+    // one event twice often enough: two departments, minutes apart). Never a
+    // second row: the album is merged into whatever is already there.
+    //
+    // The probe is marked legacy through its cover key, which is what it will
+    // be once the images below land; the identity rule reads the cover to tell
+    // a hand-authored record from an imported one.
+    const twin = existing
+      ? null
+      : findTwin(
+          { institution, title, event_date: date, image: LEGACY_PREFIX },
+          priorByTitle.get(`${institution}|${normalizeTitle(title)}`) ?? [],
+        );
 
     const ctx = {
       institution,
@@ -724,15 +775,52 @@ async function main() {
       updated_by: UPLOADED_BY,
     };
 
-    if (opts.dryRun) {
-      stats.created += 1;
-    } else if (existing) {
-      await Event.updateOne({ _id: existing._id }, { $set: doc });
-      stats.updated += 1;
+    if (twin) {
+      // Photographs only. The twin's body, category and date are left exactly
+      // as they are — a CMS record's hand-written prose is the one thing this
+      // import cannot reproduce. Overwriting a record wholesale is what
+      // --force means on a slug match, not something to do behind the
+      // operator's back on a title match.
+      const merged = mergePhotoKeys(
+        twin.image,
+        twin.gallery,
+        [doc.image, ...doc.gallery],
+        GALLERY_MAX,
+      );
+      stats.mergedIntoExisting += 1;
+      stats.photosMerged += merged.length - (twin.gallery?.length ?? 0);
+      const update = { gallery: merged };
+      // No cover of its own: promote the first merged photograph, same as the
+      // fallback below.
+      if (!twin.image && merged.length) update.image = merged.shift();
+      if (!opts.dryRun) {
+        await Event.updateOne(
+          { _id: twin._id },
+          { $set: { ...update, updated_at: new Date() } },
+        );
+      }
+      // Also in dry run, so a second legacy copy of the same event merges into
+      // this one rather than being counted as another merge target.
+      Object.assign(twin, update);
     } else {
-      const now = new Date();
-      await Event.create({ ...doc, created_at: now, updated_at: now });
-      stats.created += 1;
+      if (opts.dryRun) {
+        stats.created += 1;
+      } else if (existing) {
+        await Event.updateOne({ _id: existing._id }, { $set: doc });
+        stats.updated += 1;
+      } else {
+        const now = new Date();
+        await Event.create({ ...doc, created_at: now, updated_at: now });
+        stats.created += 1;
+      }
+      // Visible to the rest of this run, so the legacy side's own duplicates
+      // merge into it instead of arriving as "-2".
+      if (!existing) {
+        const key = `${institution}|${normalizeTitle(title)}`;
+        const bucket = priorByTitle.get(key);
+        if (bucket) bucket.push(doc);
+        else priorByTitle.set(key, [doc]);
+      }
     }
 
     if (stats.events % 25 === 0) {
@@ -744,14 +832,18 @@ async function main() {
     }
   }
 
-  if (!opts.dryRun && stats.created + stats.updated > 0) {
+  if (
+    !opts.dryRun &&
+    stats.created + stats.updated + stats.mergedIntoExisting > 0
+  ) {
     await AuditLog.create({
       entity_type: "event",
       action: "created",
       user_email: UPLOADED_BY,
       summary:
         `Imported ${stats.created + stats.updated} news & events from the ` +
-        `legacy site (${stats.uploaded} images)`,
+        `legacy site (${stats.uploaded} images), merging ` +
+        `${stats.mergedIntoExisting} into records that already existed`,
       // The lean schema declared above has no timestamps config, so the field
       // the AuditLog model would fill in automatically has to be set by hand.
       created_at: new Date(),
@@ -763,7 +855,9 @@ async function main() {
     "events processed": stats.events,
     "events created": stats.created,
     "events updated": stats.updated,
-    "events skipped (already present)": stats.skippedExisting,
+    "events skipped (same slug already present)": stats.skippedExisting,
+    "events merged into an existing record": stats.mergedIntoExisting,
+    "photos merged into existing records": stats.photosMerged,
     "images uploaded": stats.uploaded,
     "images already in storage": stats.alreadyPresent,
     "images that would upload (dry run)": stats.wouldUpload,

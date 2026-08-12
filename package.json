@@ -11,7 +11,8 @@
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "seed:admin": "node scripts/seed-admin.js",
-    "seed:news-events": "node scripts/news-events/seed-news-events.mjs"
+    "seed:news-events": "node scripts/news-events/seed-news-events.mjs",
+    "dedupe:events": "node scripts/news-events/dedupe-events.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1105.0",
