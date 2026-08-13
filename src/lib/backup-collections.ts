@@ -33,6 +33,7 @@ export const BACKUP_COLLECTIONS: BackupCollection[] = [
   { name: "testimonials", label: "Testimonials", naturalKey: [] },
   { name: "recruiters", label: "Recruiters", naturalKey: ["name"] },
   { name: "events", label: "Events", naturalKey: ["slug"] },
+  { name: "blogs", label: "Blogs", naturalKey: ["slug"] },
 ];
 
 /**

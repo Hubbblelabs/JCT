@@ -321,8 +321,8 @@ export const CONTENT_PAGES: ContentPageDef[] = [
   // never from the bundle.
   //
   // Registry order is footer order: Disclaimer, Privacy Policy, Terms &
-  // Conditions, FAQ. (The footer's fifth link, Blogs, points at /events — the
-  // Event-model listing — so it is not a content page.)
+  // Conditions, FAQ. (The footer's fifth link, Blogs, points at /blogs — the
+  // Blog-model listing — so it is not a content page.)
   {
     slug: "disclaimer",
     configKey: "disclaimerPage",

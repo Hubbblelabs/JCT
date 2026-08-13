@@ -74,6 +74,8 @@ const TARGET_PATHS: Record<RevalidateTarget, string[]> = {
     "/about-us",
     "/accreditations",
     "/events",
+    // Institution-agnostic like /events: every college's posts list here.
+    "/blogs",
     ...MAIN_CONTENT_PATHS,
   ],
   engineering: ENGINEERING_PATHS,

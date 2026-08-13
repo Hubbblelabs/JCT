@@ -91,6 +91,15 @@ export {
 export type { EventCreateValue, EventUpdateValue } from "./events";
 
 export {
+  BlogCreateSchema,
+  BlogUpdateSchema,
+  BLOG_CATEGORY_SUGGESTIONS,
+  INSTITUTIONS as BLOG_INSTITUTIONS,
+  LIMITS as LIMITS_blog,
+} from "./blogs";
+export type { BlogCreateValue, BlogUpdateValue } from "./blogs";
+
+export {
   PlacementCreateSchema,
   PlacementUpdateSchema,
   INSTITUTIONS as PLACEMENT_INSTITUTIONS,

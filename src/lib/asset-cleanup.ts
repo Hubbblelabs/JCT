@@ -8,6 +8,7 @@ import {
   Program,
   Page,
   Event,
+  Blog,
   Placement,
   Testimonial,
 } from "@/lib/models";
@@ -26,6 +27,7 @@ const REFERENCE_MODELS = [
   Program,
   Page,
   Event,
+  Blog,
   Placement,
   Testimonial,
 ] as unknown as Model<unknown>[];

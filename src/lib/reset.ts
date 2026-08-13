@@ -6,6 +6,7 @@ import {
   Program,
   Page,
   Event,
+  Blog,
   Placement,
   Testimonial,
 } from "@/lib/models";
@@ -32,6 +33,7 @@ const RESET_CONTENT_MODELS: Array<{ name: string; model: Model<unknown> }> = (
     ["programs", Program],
     ["pages", Page],
     ["events", Event],
+    ["blogs", Blog],
     ["placements", Placement],
     ["testimonials", Testimonial],
   ] as const

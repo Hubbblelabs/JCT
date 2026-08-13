@@ -31,6 +31,7 @@ import {
   LayoutGrid,
   MessageSquare,
   MousePointerClick,
+  Newspaper,
   PanelBottom,
   PanelTop,
   ScrollText,
@@ -227,6 +228,14 @@ function collegeGroups(college: College): AdminNavGroup[] {
       description: "Announcements, events and news entries.",
     },
     {
+      // Posts are owned by a college (that is what scopes who may edit them)
+      // but they all publish to the one site-wide /blogs listing.
+      label: "Blogs",
+      href: `/admin/blogs?${q}`,
+      icon: Newspaper,
+      description: "Blog posts published on the site-wide /blogs page.",
+    },
+    {
       label: "About Us",
       href: `/admin/about?${q}`,
       icon: Info,
@@ -415,6 +424,14 @@ const MAIN_GROUPS: AdminNavGroup[] = [
         href: "/admin/events?scope=main",
         icon: CalendarDays,
         description: "Site-wide news and event entries.",
+      },
+      {
+        // Read-only aggregate of every college's posts — the /blogs page they
+        // all publish to is institution-agnostic.
+        label: "Blogs",
+        href: "/admin/blogs?scope=main",
+        icon: Newspaper,
+        description: "Every blog post across all colleges.",
       },
       {
         label: "Campus Life",

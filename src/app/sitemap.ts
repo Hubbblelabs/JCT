@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { listPublishedProgramSlugs } from "@/lib/public-programs";
 import { listPublishedPageSlugs } from "@/lib/public-pages";
 import { listPublicEventSlugs } from "@/lib/public-events";
+import { listPublicBlogSlugs } from "@/lib/public-blogs";
 import { CONTENT_PAGES } from "@/lib/content-pages";
 
 const BASE_URL = "https://jct.ac.in";
@@ -39,6 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       "/about-us",
       "/campus-life",
       "/events",
+      "/blogs",
       "/accreditations",
       "/institutions/engineering",
       "/institutions/engineering/about",
@@ -72,20 +74,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   });
 
-  const [programSlugsByInstitution, pageSlugsByInstitution, eventSlugs] =
-    await Promise.all([
-      Promise.all(
-        INSTITUTIONS.map((institution) =>
-          listPublishedProgramSlugs(institution),
-        ),
+  const [
+    programSlugsByInstitution,
+    pageSlugsByInstitution,
+    eventSlugs,
+    blogSlugs,
+  ] = await Promise.all([
+    Promise.all(
+      INSTITUTIONS.map((institution) => listPublishedProgramSlugs(institution)),
+    ),
+    Promise.all(
+      (["main", ...INSTITUTIONS] as const).map((institution) =>
+        listPublishedPageSlugs(institution),
       ),
-      Promise.all(
-        (["main", ...INSTITUTIONS] as const).map((institution) =>
-          listPublishedPageSlugs(institution),
-        ),
-      ),
-      listPublicEventSlugs(),
-    ]);
+    ),
+    listPublicEventSlugs(),
+    listPublicBlogSlugs(),
+  ]);
 
   const programEntries = INSTITUTIONS.flatMap((institution, i) =>
     programSlugsByInstitution[i].map(({ slug }) =>
@@ -115,11 +120,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     toEntry(`/events/${slug}`, { changeFrequency: "monthly", priority: 0.5 }),
   );
 
+  const blogEntries = blogSlugs.map(({ slug }) =>
+    toEntry(`/blogs/${slug}`, { changeFrequency: "monthly", priority: 0.5 }),
+  );
+
   return [
     ...staticEntries,
     ...programEntries,
     ...mainPageEntries,
     ...institutionPageEntries,
     ...eventEntries,
+    ...blogEntries,
   ];
 }

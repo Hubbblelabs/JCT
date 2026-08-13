@@ -39,13 +39,14 @@ const SOCIAL_DEFS = [
 // Site-root routes, not per-institution ones: the footer renders on every site
 // and every one of these pages is institution-agnostic. The first four are
 // block-based content pages (see `src/lib/content-pages.ts`, edited under
-// Global CMS → Pages); "Blogs" points at the Event-model listing, which is
-// where JCT publishes its posts.
+// Global CMS → Pages); "Blogs" points at the Blog-model listing at /blogs.
+// It used to point at /events, which meant the footer's only blog link led to
+// the news archive and blogs had nowhere of their own to live.
 const LEGAL_LINKS = [
   { name: "Disclaimer", href: "/disclaimer" },
   { name: "Privacy Policy", href: "/privacy" },
   { name: "Terms and Conditions", href: "/terms" },
-  { name: "Blogs", href: "/events" },
+  { name: "Blogs", href: "/blogs" },
   { name: "FAQ", href: "/faq" },
 ];
 

@@ -31,6 +31,7 @@ export const MAIN_SEO_PAGES: SeoPageDefault[] = [
   { path: "/about-us", label: "About Us" },
   { path: "/campus-life", label: "Campus Life" },
   { path: "/events", label: "News & Events" },
+  { path: "/blogs", label: "Blogs" },
   { path: "/accreditations", label: "Accreditations" },
   ...contentPageSeoRows("main"),
 ];
