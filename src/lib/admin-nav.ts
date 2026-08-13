@@ -435,6 +435,41 @@ const MAIN_GROUPS: AdminNavGroup[] = [
   },
 ];
 
+/**
+ * The Global "Pages" group: the block-based content pages the footer links
+ * from every site, plus Blogs.
+ *
+ * Blogs is not a content page — it is the read-only aggregate over the Blog
+ * model — but it is a footer link like the rest, so it is spliced in at the
+ * position the footer puts it: after Terms & Conditions, before FAQ. Appending
+ * it instead would list the group in an order the footer does not use. If the
+ * FAQ page is ever removed from the registry, it lands at the end rather than
+ * disappearing.
+ */
+function globalPageItems(): AdminNavItem[] {
+  const items: AdminNavItem[] = mainContentPages()
+    .filter((p) => !p.host)
+    .map((p) => ({
+      label: p.label,
+      href: `/admin/content/${p.slug}`,
+      icon: p.icon,
+      description: p.description,
+    }));
+
+  const blogs: AdminNavItem = {
+    // Authoring happens in a college's own Blogs screen, which is what scopes
+    // who may edit a post; this entry is the cross-college view.
+    label: "Blogs",
+    href: "/admin/blogs?scope=main",
+    icon: Newspaper,
+    description: "Every blog post across all colleges (read-only).",
+  };
+
+  const faqIndex = items.findIndex((i) => i.href === "/admin/content/faq");
+  items.splice(faqIndex === -1 ? items.length : faqIndex, 0, blogs);
+  return items;
+}
+
 const GLOBAL_GROUPS: AdminNavGroup[] = [
   {
     title: "Site-wide Elements",
@@ -458,27 +493,7 @@ const GLOBAL_GROUPS: AdminNavGroup[] = [
     // content pages like the college ones, but belong to no college — so they
     // are listed here rather than under a college's "Other Pages" group.
     title: "Pages",
-    items: [
-      ...mainContentPages()
-        .filter((p) => !p.host)
-        .map((p) => ({
-          label: p.label,
-          href: `/admin/content/${p.slug}`,
-          icon: p.icon,
-          description: p.description,
-        })),
-      {
-        // /blogs is one institution-agnostic listing carrying every college's
-        // posts, and the footer links it from every site — so it belongs with
-        // the other footer pages here rather than under Main Website. This
-        // entry is the read-only aggregate; authoring happens in a college's
-        // own Blogs screen, which is what scopes who may edit a post.
-        label: "Blogs",
-        href: "/admin/blogs?scope=main",
-        icon: Newspaper,
-        description: "Every blog post across all colleges (read-only).",
-      },
-    ],
+    items: globalPageItems(),
   },
 ];
 

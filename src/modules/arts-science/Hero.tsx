@@ -97,7 +97,7 @@ function AnimatedNumber({ value }: { value: string }) {
 
   const numericString = value.replace(/[^0-9.]/g, "");
   const prefix = value.startsWith("+") ? "+" : "";
-  const suffix = value.replace(/^[+0-9.,]+/, "");
+  const suffix = value.slice(prefix.length).replace(/^[0-9.,]+/, "");
   const finalNum = parseFloat(numericString.replace(/,/g, "")) || 0;
   const isFormatted = value.includes(",");
 
