@@ -367,3 +367,10 @@ export type { SeoEntry, SeoPagesValue, ProgramSeoValue } from "./seo";
 
 export { ResetOptionsSchema } from "./reset";
 export type { ResetOptions } from "./reset";
+
+export {
+  BackupScheduleSchema,
+  BACKUP_FREQUENCIES,
+  MAX_BACKUP_KEEP,
+} from "./backupSchedule";
+export type { BackupScheduleInput } from "./backupSchedule";

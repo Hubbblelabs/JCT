@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
@@ -15,13 +15,18 @@ import {
   FileArchive,
   Image,
   FileText,
+  CalendarClock,
+  HardDrive,
 } from "lucide-react";
 
 /** A backup build, as reported by `/api/admin/site-config/backup`. */
 interface BackupJob {
   id: string;
   state: "building" | "ready" | "failed";
+  /** Absent on archives built before automatic backups existed. */
+  origin?: "manual" | "auto";
   filename: string;
+  created_at: string;
   bytes: number;
   size?: number;
   expected_bytes: number;
@@ -82,6 +87,56 @@ interface RestoreProgressState {
   detail: string;
 }
 
+/** The automatic-backup schedule, as `backup/schedule` reports and accepts it. */
+interface BackupScheduleState {
+  enabled: boolean;
+  frequency: "daily" | "weekly" | "monthly";
+  timezone: string;
+  hour: number;
+  minute: number;
+  weekday: number;
+  day_of_month: number;
+  include_images: boolean;
+  include_docs: boolean;
+  keep: number;
+  next_run_at: string | null;
+  last_run_at: string | null;
+  last_status: "ready" | "failed" | null;
+  last_job_id: string | null;
+  last_error: string | null;
+}
+
+const WEEKDAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+];
+
+/**
+ * Zones offered when the browser won't enumerate them. Deliberately short:
+ * this is a college in Coimbatore, and the point of the fallback is that the
+ * field is never an empty select, not that it covers the world.
+ */
+const FALLBACK_TIMEZONES = ["Asia/Kolkata", "UTC"];
+
+function timezoneOptions(current: string): string[] {
+  let all: string[];
+  try {
+    all = Intl.supportedValuesOf?.("timeZone") ?? [];
+  } catch {
+    all = [];
+  }
+  if (all.length === 0) all = FALLBACK_TIMEZONES;
+  // The stored zone always appears, even if this browser's ICU build has
+  // never heard of it — otherwise opening the form silently rewrites the
+  // schedule to whatever the select happened to land on.
+  return all.includes(current) ? all : [current, ...all];
+}
+
 type Status = { type: "success" | "error" | "warning"; message: string };
 
 /** How a restore treats documents that exist now but aren't in the archive. */
@@ -103,6 +158,26 @@ function formatDuration(seconds: number): string {
   if (mins < 60) return `${mins} min`;
   const hours = Math.floor(mins / 60);
   return `${hours}h ${mins % 60}m`;
+}
+
+/**
+ * An absolute instant, written out in a chosen zone. Backups are scheduled in
+ * the site's zone but read by whoever is logged in, so "next run" has to say
+ * which clock it means — a bare "02:00" is unreadable from anywhere else.
+ */
+function formatWhen(iso: string | null | undefined, timeZone?: string): string {
+  if (!iso) return "—";
+  const at = new Date(iso);
+  if (Number.isNaN(at.getTime())) return "—";
+  try {
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: "medium",
+      timeStyle: "short",
+      timeZone,
+    }).format(at);
+  } catch {
+    return at.toISOString();
+  }
 }
 
 /**
@@ -446,6 +521,19 @@ export default function SettingsPage() {
   const [resetAssets, setResetAssets] = useState(false);
   const [resetStatus, setResetStatus] = useState<Status | null>(null);
 
+  // Automatic backups. Null until the schedule has been fetched — rendering a
+  // form off defaults first would let a slow response overwrite a field the
+  // admin had already started editing.
+  const [schedule, setSchedule] = useState<BackupScheduleState | null>(null);
+  const [scheduleSaving, setScheduleSaving] = useState(false);
+  const [scheduleStatus, setScheduleStatus] = useState<Status | null>(null);
+
+  // Every archive still on the server's disk. Automatic backups are only
+  // reachable through this list: nobody is watching when they are built, so
+  // without it a scheduled archive exists and cannot be found.
+  const [archives, setArchives] = useState<BackupJob[]>([]);
+  const [archivesLoaded, setArchivesLoaded] = useState(false);
+
   // Poll a running build. Keyed on id+state rather than the whole job so the
   // interval isn't torn down and rebuilt on every progress tick.
   const jobId = job?.id;
@@ -493,6 +581,54 @@ export default function SettingsPage() {
           : `Archive built (${formatBytes(job.size ?? 0)}) and downloading — ${job.config_entries} config entries and ${job.report?.assets_archived ?? 0} asset files. The download resumes on its own if it is interrupted.`,
     });
   }, [job]);
+
+  const refreshArchives = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/site-config/backup");
+      if (!res.ok) return;
+      const data = (await res.json()) as { jobs?: BackupJob[] };
+      setArchives(data.jobs ?? []);
+    } catch {
+      // The list is informational; a blip leaves the previous one on screen.
+    } finally {
+      setArchivesLoaded(true);
+    }
+  }, []);
+
+  // Load the schedule and the archive list once the session is known.
+  const authed = status === "authenticated";
+  useEffect(() => {
+    if (!authed) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const res = await fetch("/api/admin/site-config/backup/schedule");
+        if (!res.ok) return;
+        const data = (await res.json()) as BackupScheduleState;
+        if (!cancelled) setSchedule(data);
+      } catch {
+        if (!cancelled) {
+          setScheduleStatus({
+            type: "error",
+            message: "Could not load the automatic backup schedule.",
+          });
+        }
+      }
+    })();
+    void refreshArchives();
+    return () => {
+      cancelled = true;
+    };
+  }, [authed, refreshArchives]);
+
+  // A finished build changes what is on disk, and retention may have retired
+  // an older archive at the same moment — so the list is re-read rather than
+  // patched with the job that just completed.
+  useEffect(() => {
+    if (job?.state === "ready" || job?.state === "failed") {
+      void refreshArchives();
+    }
+  }, [job?.state, job?.id, refreshArchives]);
 
   if (status === "loading") {
     return (
@@ -550,11 +686,15 @@ export default function SettingsPage() {
    * have it, take it back" is not a race. Confirmed first because the bytes
    * are gone for good — rebuilding a 7.5 GB export is not a quick undo.
    */
-  const handleDiscardArchive = async () => {
-    if (!job || job.state !== "ready") return;
+  const handleDeleteArchive = async (target: BackupJob) => {
     const ok = await confirm({
       title: "Delete this backup archive?",
-      message: `${job.filename} (${formatBytes(job.size ?? 0)}) will be removed from the server. Make sure your download finished — this cannot be undone, and rebuilding takes another full export.`,
+      message:
+        `${target.filename} (${formatBytes(target.size ?? 0)}) will be removed from the server. ` +
+        (target.origin === "auto"
+          ? "This is a scheduled backup — deleting it is the only copy gone unless a newer one exists."
+          : "Make sure your download finished.") +
+        " This cannot be undone, and rebuilding takes another full export.",
       confirmLabel: "Delete archive",
       destructive: true,
     });
@@ -562,9 +702,10 @@ export default function SettingsPage() {
 
     setDiscarding(true);
     try {
-      const res = await fetch(`/api/admin/site-config/backup?jobId=${job.id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `/api/admin/site-config/backup?jobId=${target.id}`,
+        { method: "DELETE" },
+      );
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as {
           error?: string;
@@ -575,12 +716,18 @@ export default function SettingsPage() {
         });
         return;
       }
-      setJob(null);
-      downloaded.current = null;
+      // Only clear the export card when it was *that* archive: deleting an old
+      // scheduled backup from the list must not wipe the download link for the
+      // export the admin just built.
+      if (job?.id === target.id) {
+        setJob(null);
+        downloaded.current = null;
+      }
       setExportStatus({
         type: "success",
         message: "Archive deleted — the disk space is free again.",
       });
+      await refreshArchives();
     } catch {
       setExportStatus({
         type: "error",
@@ -588,6 +735,62 @@ export default function SettingsPage() {
       });
     } finally {
       setDiscarding(false);
+    }
+  };
+
+  /**
+   * Save the automatic-backup schedule.
+   *
+   * The whole form goes up, not a patch: the server re-derives the next firing
+   * from what it receives, and a partial payload would leave it computing that
+   * from a mix of new and stored fields.
+   */
+  const handleSaveSchedule = async () => {
+    if (!schedule) return;
+    setScheduleSaving(true);
+    setScheduleStatus(null);
+    try {
+      const res = await fetch("/api/admin/site-config/backup/schedule", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          enabled: schedule.enabled,
+          frequency: schedule.frequency,
+          timezone: schedule.timezone,
+          hour: schedule.hour,
+          minute: schedule.minute,
+          weekday: schedule.weekday,
+          day_of_month: schedule.day_of_month,
+          include_images: schedule.include_images,
+          include_docs: schedule.include_docs,
+          keep: schedule.keep,
+        }),
+      });
+      const data = (await res.json()) as BackupScheduleState & {
+        error?: string;
+        message?: string;
+      };
+      if (!res.ok) {
+        setScheduleStatus({
+          type: "error",
+          message: data.message ?? data.error ?? "Could not save the schedule.",
+        });
+        return;
+      }
+      setSchedule(data);
+      setScheduleStatus({
+        type: "success",
+        message: data.enabled
+          ? `Saved. Next automatic backup: ${formatWhen(data.next_run_at)}.`
+          : "Saved. Automatic backups are off — nothing will run.",
+      });
+    } catch {
+      setScheduleStatus({
+        type: "error",
+        message: "Could not save the schedule. Try again.",
+      });
+    } finally {
+      setScheduleSaving(false);
     }
   };
 
@@ -796,9 +999,9 @@ export default function SettingsPage() {
         <div>
           <h1 className="admin-page-title">Backup &amp; restore</h1>
           <p className="admin-page-subtitle">
-            Export an archive of everything on this site, restore one, or reset
-            the site back to its defaults. Clearing the page cache now lives in
-            the top bar.
+            Export an archive of everything on this site, schedule that export
+            to run on its own, restore one, or reset the site back to its
+            defaults. Clearing the page cache now lives in the top bar.
           </p>
         </div>
       </div>
@@ -886,7 +1089,7 @@ export default function SettingsPage() {
                 Saved it already?{" "}
                 <button
                   type="button"
-                  onClick={handleDiscardArchive}
+                  onClick={() => void handleDeleteArchive(job)}
                   disabled={discarding}
                   className="font-medium text-blue-600 underline disabled:opacity-50"
                 >
@@ -1042,6 +1245,383 @@ export default function SettingsPage() {
               {restoring ? "Restoring…" : "Restore Backup"}
             </button>
           </div>
+        </div>
+
+        {/* ── Automatic backups ── */}
+        <div className="admin-card lg:col-span-2">
+          <div className="mb-4 flex items-start gap-3">
+            <div className="rounded-lg bg-indigo-50 p-2">
+              <CalendarClock size={18} className="text-indigo-600" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-gray-900">Automatic backups</h2>
+              <p className="mt-0.5 text-sm text-gray-500">
+                Builds the same archive as the button above, on a schedule, and
+                keeps it on the server. Nothing is emailed or uploaded elsewhere
+                — download a copy from the list below, or restore straight from
+                it. The server must be running at the scheduled time; a run
+                missed while it was down starts as soon as it is back.
+              </p>
+            </div>
+          </div>
+
+          <StatusBanner status={scheduleStatus} />
+
+          {!schedule ? (
+            <div className="flex items-center gap-2 py-4 text-sm text-gray-500">
+              <Loader2 size={15} className="animate-spin" />
+              Loading schedule…
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-gray-700">
+                <input
+                  type="checkbox"
+                  checked={schedule.enabled}
+                  onChange={(e) =>
+                    setSchedule({ ...schedule, enabled: e.target.checked })
+                  }
+                  className="mt-0.5 h-4 w-4 rounded border-gray-300"
+                />
+                <span>
+                  <span className="font-medium">Run backups automatically</span>
+                  <span className="block text-xs text-gray-500">
+                    Off by default. Nothing runs and no disk is used until this
+                    is ticked and saved.
+                  </span>
+                </span>
+              </label>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <label className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    How often
+                  </span>
+                  <select
+                    value={schedule.frequency}
+                    onChange={(e) =>
+                      setSchedule({
+                        ...schedule,
+                        frequency: e.target
+                          .value as BackupScheduleState["frequency"],
+                      })
+                    }
+                    className="admin-input"
+                  >
+                    <option value="daily">Every day</option>
+                    <option value="weekly">Every week</option>
+                    <option value="monthly">Every month</option>
+                  </select>
+                </label>
+
+                {schedule.frequency === "weekly" && (
+                  <label className="flex flex-col gap-1">
+                    <span className="text-sm font-medium text-gray-700">
+                      Day of week
+                    </span>
+                    <select
+                      value={schedule.weekday}
+                      onChange={(e) =>
+                        setSchedule({
+                          ...schedule,
+                          weekday: Number(e.target.value),
+                        })
+                      }
+                      className="admin-input"
+                    >
+                      {WEEKDAYS.map((day, i) => (
+                        <option key={day} value={i}>
+                          {day}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+
+                {schedule.frequency === "monthly" && (
+                  <label className="flex flex-col gap-1">
+                    <span className="text-sm font-medium text-gray-700">
+                      Day of month
+                    </span>
+                    <select
+                      value={schedule.day_of_month}
+                      onChange={(e) =>
+                        setSchedule({
+                          ...schedule,
+                          day_of_month: Number(e.target.value),
+                        })
+                      }
+                      className="admin-input"
+                    >
+                      {/* 1–28 only: a 29th–31st schedule would skip the months
+                          that have no such day and look broken. */}
+                      {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                )}
+
+                <label className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-gray-700">At</span>
+                  <input
+                    type="time"
+                    value={`${String(schedule.hour).padStart(2, "0")}:${String(
+                      schedule.minute,
+                    ).padStart(2, "0")}`}
+                    onChange={(e) => {
+                      const [h, m] = e.target.value.split(":").map(Number);
+                      if (Number.isNaN(h) || Number.isNaN(m)) return;
+                      setSchedule({ ...schedule, hour: h, minute: m });
+                    }}
+                    className="admin-input"
+                  />
+                </label>
+
+                <label className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    Time zone
+                  </span>
+                  <select
+                    value={schedule.timezone}
+                    onChange={(e) =>
+                      setSchedule({ ...schedule, timezone: e.target.value })
+                    }
+                    className="admin-input"
+                  >
+                    {timezoneOptions(schedule.timezone).map((tz) => (
+                      <option key={tz} value={tz}>
+                        {tz}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="flex flex-col gap-1">
+                  <span className="text-sm font-medium text-gray-700">
+                    Archives to keep
+                  </span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={10}
+                    value={schedule.keep}
+                    onChange={(e) =>
+                      setSchedule({
+                        ...schedule,
+                        keep: Math.min(
+                          10,
+                          Math.max(1, Number(e.target.value) || 1),
+                        ),
+                      })
+                    }
+                    className="admin-input"
+                  />
+                </label>
+              </div>
+
+              <div className="space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-3">
+                <p className="text-xs font-medium tracking-wide text-gray-500 uppercase">
+                  Include in each automatic backup
+                </p>
+                <label className="flex cursor-pointer items-center gap-2.5 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={schedule.include_images}
+                    onChange={(e) =>
+                      setSchedule({
+                        ...schedule,
+                        include_images: e.target.checked,
+                      })
+                    }
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <Image size={14} className="text-gray-400" />
+                  Uploaded images
+                </label>
+                <label className="flex cursor-pointer items-center gap-2.5 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={schedule.include_docs}
+                    onChange={(e) =>
+                      setSchedule({
+                        ...schedule,
+                        include_docs: e.target.checked,
+                      })
+                    }
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <FileText size={14} className="text-gray-400" />
+                  Uploaded documents / files
+                </label>
+                {/* Disk is the whole cost of this feature, and it is easy to
+                    tick "keep 10" without picturing 75 GB. */}
+                <p className="flex items-start gap-1.5 pt-1 text-xs text-amber-600">
+                  <AlertTriangle size={13} className="mt-0.5 shrink-0" />
+                  Each archive with images and documents is currently several
+                  gigabytes. Keeping {schedule.keep} means roughly{" "}
+                  {schedule.keep}× that on the server&apos;s backup volume.
+                  Automatic archives are only removed once there are more than{" "}
+                  {schedule.keep} of them — they never expire on age.
+                </p>
+              </div>
+
+              <dl className="grid grid-cols-1 gap-3 rounded-lg border border-gray-100 bg-white p-3 text-sm sm:grid-cols-3">
+                <div>
+                  <dt className="text-xs text-gray-500">Next run</dt>
+                  <dd className="font-medium text-gray-900">
+                    {schedule.enabled
+                      ? formatWhen(schedule.next_run_at)
+                      : "Not scheduled"}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-gray-500">Last run</dt>
+                  <dd className="font-medium text-gray-900">
+                    {formatWhen(schedule.last_run_at)}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-gray-500">Last result</dt>
+                  <dd
+                    className={
+                      schedule.last_status === "failed"
+                        ? "font-medium text-red-700"
+                        : "font-medium text-gray-900"
+                    }
+                  >
+                    {schedule.last_status === "ready"
+                      ? "Succeeded"
+                      : schedule.last_status === "failed"
+                        ? `Failed — ${schedule.last_error || "unknown error"}`
+                        : "Never run"}
+                  </dd>
+                </div>
+              </dl>
+
+              <button
+                onClick={handleSaveSchedule}
+                disabled={scheduleSaving}
+                className="admin-btn admin-btn-primary"
+              >
+                {scheduleSaving ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : (
+                  <CalendarClock size={15} />
+                )}
+                {scheduleSaving ? "Saving…" : "Save schedule"}
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* ── Archives held on the server ── */}
+        <div className="admin-card lg:col-span-2">
+          <div className="mb-4 flex items-start gap-3">
+            <div className="rounded-lg bg-slate-100 p-2">
+              <HardDrive size={18} className="text-slate-600" />
+            </div>
+            <div>
+              <h2 className="font-semibold text-gray-900">
+                Archives on the server
+              </h2>
+              <p className="mt-0.5 text-sm text-gray-500">
+                Every backup still held on disk, newest first. Download one to
+                keep a copy off the server, or delete it to reclaim the space.
+              </p>
+            </div>
+          </div>
+
+          {!archivesLoaded ? (
+            <div className="flex items-center gap-2 py-3 text-sm text-gray-500">
+              <Loader2 size={15} className="animate-spin" />
+              Loading…
+            </div>
+          ) : archives.length === 0 ? (
+            <p className="py-3 text-sm text-gray-500">
+              No archives on the server. Build one above, or turn on automatic
+              backups.
+            </p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-200 text-left text-xs tracking-wide text-gray-500 uppercase">
+                    <th className="py-2 pr-3 font-medium">Archive</th>
+                    <th className="py-2 pr-3 font-medium">Built</th>
+                    <th className="py-2 pr-3 font-medium">Size</th>
+                    <th className="py-2 pr-3 font-medium">Status</th>
+                    <th className="py-2 font-medium"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {archives.map((a) => (
+                    <tr
+                      key={a.id}
+                      className="border-b border-gray-100 last:border-0"
+                    >
+                      <td className="py-2 pr-3">
+                        <span className="flex items-center gap-1.5">
+                          <FileArchive
+                            size={14}
+                            className="shrink-0 text-gray-400"
+                          />
+                          <span className="break-all">{a.filename}</span>
+                          {a.origin === "auto" && (
+                            <span className="shrink-0 rounded bg-indigo-50 px-1.5 py-0.5 text-[11px] font-medium text-indigo-700">
+                              Scheduled
+                            </span>
+                          )}
+                        </span>
+                      </td>
+                      <td className="py-2 pr-3 whitespace-nowrap text-gray-600">
+                        {formatWhen(a.created_at)}
+                      </td>
+                      <td className="py-2 pr-3 whitespace-nowrap text-gray-600 tabular-nums">
+                        {a.state === "ready" ? formatBytes(a.size ?? 0) : "—"}
+                      </td>
+                      <td className="py-2 pr-3">
+                        {a.state === "ready" ? (
+                          <span className="text-green-700">Ready</span>
+                        ) : a.state === "building" ? (
+                          <span className="text-blue-700">Building…</span>
+                        ) : (
+                          <span
+                            className="text-red-700"
+                            title={a.error ?? undefined}
+                          >
+                            Failed
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-2 text-right whitespace-nowrap">
+                        {a.state === "ready" && (
+                          <a
+                            className="mr-3 font-medium text-blue-600 underline"
+                            href={`/api/admin/site-config/backup/file?jobId=${a.id}`}
+                          >
+                            Download
+                          </a>
+                        )}
+                        {a.state !== "building" && (
+                          <button
+                            type="button"
+                            onClick={() => void handleDeleteArchive(a)}
+                            disabled={discarding}
+                            className="font-medium text-red-600 underline disabled:opacity-50"
+                          >
+                            Delete
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* ── Reset ── */}

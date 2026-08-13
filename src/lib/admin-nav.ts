@@ -494,7 +494,8 @@ const ADMIN_GROUPS: AdminNavGroup[] = [
         label: "Backup & restore",
         href: "/admin/settings",
         icon: DatabaseBackup,
-        description: "Export an archive, restore one, or reset everything.",
+        description:
+          "Export or schedule an archive, restore one, or reset everything.",
         minRole: "admin",
       },
     ],

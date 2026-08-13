@@ -12,6 +12,7 @@ import {
 } from "fs/promises";
 import os from "os";
 import path from "path";
+import { autoKeepCount } from "@/lib/backup-schedule";
 
 /**
  * Backups are built to disk first, then downloaded as an ordinary file.
@@ -50,6 +51,13 @@ export function accelPrefix(): string | null {
 
 export type BackupJobState = "building" | "ready" | "failed";
 
+/**
+ * Who asked for the archive. Retention treats the two differently — see
+ * `pruneJobs` — because a manual export is downloaded within the hour and an
+ * automatic one exists precisely so it is still there weeks later.
+ */
+export type BackupOrigin = "manual" | "auto";
+
 export interface BackupJobReport {
   assets_expected: number;
   assets_archived: number;
@@ -59,6 +67,7 @@ export interface BackupJobReport {
 export interface BackupJob {
   id: string;
   state: BackupJobState;
+  origin: BackupOrigin;
   /** Name the browser saves it as. */
   filename: string;
   created_at: string;
@@ -206,9 +215,13 @@ export async function finishJob(
  * so it is reported as failed rather than left polling forever.
  */
 function reconcile(job: BackupJob): BackupJob {
-  if (job.state !== "building" || live.has(job.id)) return job;
+  // Archives written before automatic backups existed carry no `origin`. They
+  // were all admin-triggered, so reading a missing one as "manual" keeps them
+  // under the retention rules they were created under.
+  const hydrated: BackupJob = { ...job, origin: job.origin ?? "manual" };
+  if (hydrated.state !== "building" || live.has(hydrated.id)) return hydrated;
   return {
-    ...job,
+    ...hydrated,
     state: "failed",
     error: "The server restarted while this backup was being built.",
   };
@@ -260,6 +273,15 @@ async function removeJob(id: string): Promise<void> {
  *   3. Nothing survives MAX_AGE, superseded or not. Without this backstop a
  *      single archive would sit on the volume forever, because rule 1 only
  *      fires when a *replacement* exists.
+ *
+ * Automatic archives are the exception to rules 1 and 3, and for the same
+ * reason: nobody is watching when they are built. Keeping one would mean a
+ * scheduled backup that silently overwrites the only copy of last night's
+ * good data with tonight's copy of a database somebody just broke, and
+ * expiring them at 24 hours would leave a weekly schedule with nothing to
+ * restore for six days out of seven. So they are bounded by *count* only —
+ * the admin-set `keep` — and never by age. A failed one still ages out at
+ * MAX_AGE: it holds no archive, only the record of why it failed.
  */
 const KEEP_ARCHIVES = 1;
 const MAX_AGE_MS = 24 * 60 * 60 * 1000;
@@ -297,20 +319,28 @@ function scheduleSweep(id: string, delay: number): void {
 export async function pruneJobs(): Promise<void> {
   const jobs = await listJobs();
   const now = Date.now();
-  let kept = 0;
+  const keepAuto = await autoKeepCount();
+  // Counted separately: an admin export must not push a scheduled archive out
+  // of its retention window, nor be pushed out by one.
+  const kept: Record<BackupOrigin, number> = { manual: 0, auto: 0 };
   for (const job of jobs) {
     if (job.state === "building" && live.has(job.id)) continue;
     const age = now - new Date(job.created_at).getTime();
-    const stale = age > MAX_AGE_MS;
+    const auto = job.origin === "auto";
+    const stale = age > MAX_AGE_MS && !(auto && job.state === "ready");
     // Only *ready* jobs count against the keep limit. A failed one holds no
     // archive worth space, and its index entry is the only record of why the
     // export failed — so it survives until it ages out rather than being swept
     // away the moment the operator retries.
     //
-    // The age test comes last so `++kept` still runs for every ready job:
-    // an archive spared by the grace window has still been counted, and the
-    // one after it is correctly seen as surplus too.
-    const superseded = job.state === "ready" && ++kept > KEEP_ARCHIVES;
+    // The age test comes last so the counter still advances for every ready
+    // job: an archive spared by the grace window has still been counted, and
+    // the one after it is correctly seen as surplus too.
+    let superseded = false;
+    if (job.state === "ready") {
+      const seen = ++kept[job.origin];
+      superseded = seen > (auto ? keepAuto : KEEP_ARCHIVES);
+    }
     const surplus = superseded && age >= MIN_AGE_MS;
 
     if (stale || surplus) {
@@ -450,10 +480,19 @@ export async function ensureSpace(
     .filter((j) => j.state === "ready")
     .sort((a, b) => (a.created_at < b.created_at ? -1 : 1));
 
-  const reclaimable = ready.filter(
+  // The newest archive is never reclaimed, even under disk pressure. Freeing
+  // it would leave the server with no restorable copy at all, in exchange for
+  // starting an export that has not finished yet and may itself fail — trading
+  // a backup that exists for one that might.
+  const newest = ready[ready.length - 1];
+  const candidates = ready.filter((j) => j.id !== newest?.id);
+  const reclaimable = candidates.filter(
     (j) => now - new Date(j.created_at).getTime() >= MIN_AGE_MS,
   );
-  const withheldYoung = reclaimable.length < ready.length;
+  // Compared against `candidates`, not `ready`: the newest archive is held
+  // back by the rule above, not by the grace window, and reporting it as
+  // "too young" would send the operator off to wait three hours for nothing.
+  const withheldYoung = reclaimable.length < candidates.length;
 
   for (const job of reclaimable) {
     await removeJob(job.id);

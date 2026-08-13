@@ -11,3 +11,9 @@ export { Placement } from "./Placement";
 export type { IPlacement, ITopRecruiter, INotablePlacement } from "./Placement";
 export { Testimonial } from "./Testimonial";
 export { AuditLog } from "./AuditLog";
+export { BackupSchedule } from "./BackupSchedule";
+export type {
+  IBackupSchedule,
+  BackupFrequency,
+  BackupRunOutcome,
+} from "./BackupSchedule";
