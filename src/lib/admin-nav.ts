@@ -426,14 +426,6 @@ const MAIN_GROUPS: AdminNavGroup[] = [
         description: "Site-wide news and event entries.",
       },
       {
-        // Read-only aggregate of every college's posts — the /blogs page they
-        // all publish to is institution-agnostic.
-        label: "Blogs",
-        href: "/admin/blogs?scope=main",
-        icon: Newspaper,
-        description: "Every blog post across all colleges.",
-      },
-      {
         label: "Campus Life",
         href: "/admin/campus-life",
         icon: TreePalm,
@@ -466,14 +458,27 @@ const GLOBAL_GROUPS: AdminNavGroup[] = [
     // content pages like the college ones, but belong to no college — so they
     // are listed here rather than under a college's "Other Pages" group.
     title: "Pages",
-    items: mainContentPages()
-      .filter((p) => !p.host)
-      .map((p) => ({
-        label: p.label,
-        href: `/admin/content/${p.slug}`,
-        icon: p.icon,
-        description: p.description,
-      })),
+    items: [
+      ...mainContentPages()
+        .filter((p) => !p.host)
+        .map((p) => ({
+          label: p.label,
+          href: `/admin/content/${p.slug}`,
+          icon: p.icon,
+          description: p.description,
+        })),
+      {
+        // /blogs is one institution-agnostic listing carrying every college's
+        // posts, and the footer links it from every site — so it belongs with
+        // the other footer pages here rather than under Main Website. This
+        // entry is the read-only aggregate; authoring happens in a college's
+        // own Blogs screen, which is what scopes who may edit a post.
+        label: "Blogs",
+        href: "/admin/blogs?scope=main",
+        icon: Newspaper,
+        description: "Every blog post across all colleges (read-only).",
+      },
+    ],
   },
 ];
 

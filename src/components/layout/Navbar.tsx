@@ -252,18 +252,22 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   let highlightHoverBgColor = "hover:bg-[#e8b84a]";
   let highlightShadowColor = "shadow-[#d4a024]/10";
 
+  // College names are set in capitals here rather than with a `uppercase`
+  // class, because the sub-text span already renders uppercase — casing the
+  // whole block in CSS would also shout the Polytechnic's "Est. 2009" tagline.
+  // "JCT Institutions" above is the group, not a college, so it keeps its case.
   if (institution === "engineering") {
-    logoText = "JCT College of";
+    logoText = "JCT COLLEGE OF";
     logoSubText = "Engineering & Technology";
   } else if (institution === "arts-science") {
-    logoText = "JCT College of";
+    logoText = "JCT COLLEGE OF";
     logoSubText = "Arts and Science";
     highlightColor = "text-arts-science-accent";
     highlightBgColor = "bg-arts-science-accent";
     highlightHoverBgColor = "hover:bg-arts-science-accent-dark";
     highlightShadowColor = "shadow-arts-science-accent/10";
   } else if (institution === "polytechnic") {
-    logoText = "JCT Polytechnic College";
+    logoText = "JCT POLYTECHNIC COLLEGE";
     logoSubText = "Est. 2009";
     highlightColor = "text-slate-400";
     highlightBgColor = "bg-slate-500";
