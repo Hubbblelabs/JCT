@@ -67,6 +67,66 @@ function checkStorage(): string | null {
   return `Object storage is partially configured — missing: ${missing.join(", ")}. Set all four or none. See .env.example.`;
 }
 
+/**
+ * `NEXT_PUBLIC_STORAGE_PUBLIC_URL` is the origin a *browser* reads assets from.
+ * It is not the S3 API endpoint with the bucket appended: Garage's S3 port
+ * refuses every unsigned request ("Garage does not support anonymous access
+ * yet"), so a public URL carrying the bucket segment serves 403 to every image
+ * on the site.
+ *
+ * That misconfiguration is worth failing the boot over because of how it
+ * presents. Uploads succeed, the object really is in the bucket, and the admin
+ * shows the picked file correctly — the preview at that point is a local blob:
+ * URL. Only once the value is saved does the field switch to the public URL and
+ * go blank. The visible symptom is "saving breaks the image", which sends you
+ * looking at the upload and save paths rather than at one env var.
+ */
+function checkPublicAssetUrl(): string | null {
+  const raw = (process.env.NEXT_PUBLIC_STORAGE_PUBLIC_URL || "").trim();
+  if (!raw) return null;
+
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return `NEXT_PUBLIC_STORAGE_PUBLIC_URL must be an absolute URL (got "${raw}").`;
+  }
+
+  const bucket = process.env.STORAGE_BUCKET?.trim();
+  const segments = url.pathname.split("/").filter(Boolean);
+  if (bucket && segments[segments.length - 1] === bucket) {
+    return (
+      `NEXT_PUBLIC_STORAGE_PUBLIC_URL must not end with the bucket name ("${bucket}") — ` +
+      `that is the path-style S3 URL, which answers 403 to the unsigned requests a browser makes. ` +
+      `Point it at the public read origin instead (probably "${url.origin}"), so a stored key ` +
+      `appends directly to give ${url.origin}/images/example.webp. See .env.example.`
+    );
+  }
+  return null;
+}
+
+/**
+ * `next.config.ts` allowlists the asset host for `/_next/image` with
+ * `protocol: "https"`, so a plain-HTTP origin fails every optimized image with
+ * '"url" parameter is not allowed'. Loopback is exempt — a local store over
+ * HTTP is a normal dev setup.
+ */
+function warnPublicAssetScheme(): string | null {
+  const raw = (process.env.NEXT_PUBLIC_STORAGE_PUBLIC_URL || "").trim();
+  if (!raw) return null;
+  let url: URL;
+  try {
+    url = new URL(raw);
+  } catch {
+    return null; // already reported by checkPublicAssetUrl
+  }
+  const loopback = ["localhost", "127.0.0.1", "[::1]", "::1"].includes(
+    url.hostname,
+  );
+  if (url.protocol === "https:" || loopback) return null;
+  return `NEXT_PUBLIC_STORAGE_PUBLIC_URL is not HTTPS ("${url.origin}"). next/image only allowlists the asset host over TLS, so optimized images will fail with '"url" parameter is not allowed'.`;
+}
+
 export function validateServerEnv(): void {
   const problems: string[] = [];
 
@@ -79,6 +139,12 @@ export function validateServerEnv(): void {
 
   const storage = checkStorage();
   if (storage) problems.push(storage);
+
+  const assetUrl = checkPublicAssetUrl();
+  if (assetUrl) problems.push(assetUrl);
+
+  const scheme = warnPublicAssetScheme();
+  if (scheme) console.warn(`[env] WARNING: ${scheme}`);
 
   if (problems.length === 0) return;
 

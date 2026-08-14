@@ -46,6 +46,7 @@ import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
 import { ContentPageBody } from "@/components/layout/ContentPageLayout";
 import { EditableRegion } from "@/components/admin/EditableRegion";
 import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
+import { useImageError } from "@/lib/use-image-error";
 import { getImageUrl } from "@/lib/utils";
 import { PLACEMENT_GALLERY_ANCHOR } from "@/lib/page-anchors";
 import { hostedSectionKey } from "@/lib/content-pages";
@@ -762,7 +763,7 @@ function BannerImage({
   // placeholder backed by a blob: URL — next/image accepts neither, so the
   // live preview falls back to a plain <img> until the upload is flushed.
   const deferred = useDeferredUploadsOptional();
-  const [failed, setFailed] = useState(false);
+  const [failed, onError] = useImageError(src);
   const isPending = src.startsWith("pending:");
   const pendingPreview = isPending ? (deferred?.getPreview(src) ?? null) : null;
   const url = isPending ? null : getImageUrl(src);
@@ -791,7 +792,7 @@ function BannerImage({
       sizes="(max-width: 1280px) 100vw, 1200px"
       className="h-auto w-full"
       priority={priority}
-      onError={() => setFailed(true)}
+      onError={onError}
     />
   );
 }
@@ -1524,7 +1525,7 @@ function RecruiterTile({ name, logo }: { name: string; logo: string | null }) {
   // Brand logos come from an external CDN and aren't guaranteed to exist for
   // every recruiter — if one 404s, fall back to a designed monogram so the
   // grid never shows a broken image.
-  const [failed, setFailed] = useState(false);
+  const [failed, onError] = useImageError(logo);
   const showLogo = logo && !failed;
   return (
     <div className="border-border group flex h-28 flex-col items-center justify-center gap-2.5 rounded-2xl border bg-white p-3 text-center shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
@@ -1537,7 +1538,7 @@ function RecruiterTile({ name, logo }: { name: string; logo: string | null }) {
             sizes="160px"
             className="object-contain"
             loading="lazy"
-            onError={() => setFailed(true)}
+            onError={onError}
           />
         </div>
       ) : (
@@ -1553,7 +1554,7 @@ function RecruiterTile({ name, logo }: { name: string; logo: string | null }) {
 function StudentCard({ student }: { student: PublicNotablePlacement }) {
   // Photo comes from the media library; if it's missing or 404s, fall back to a
   // designed monogram so the card never shows a broken image.
-  const [failed, setFailed] = useState(false);
+  const [failed, onError] = useImageError(student.image);
   const showPhoto = student.image && !failed;
   return (
     <div className="border-border group flex flex-col overflow-hidden rounded-xl border bg-white shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
@@ -1566,7 +1567,7 @@ function StudentCard({ student }: { student: PublicNotablePlacement }) {
             sizes="(max-width: 640px) 33vw, 160px"
             className="object-cover"
             loading="lazy"
-            onError={() => setFailed(true)}
+            onError={onError}
           />
         ) : (
           <Monogram
@@ -1679,7 +1680,7 @@ function TopRecruiters({
 }
 
 function CompanyLogo({ company }: { company: PublicCompanyPlacement }) {
-  const [failed, setFailed] = useState(false);
+  const [failed, onError] = useImageError(company.logo);
   const showLogo = company.logo && !failed;
   return showLogo ? (
     <div className="relative h-9 w-9 shrink-0">
@@ -1690,7 +1691,7 @@ function CompanyLogo({ company }: { company: PublicCompanyPlacement }) {
         sizes="40px"
         className="rounded-lg object-contain"
         loading="lazy"
-        onError={() => setFailed(true)}
+        onError={onError}
       />
     </div>
   ) : (

@@ -11,6 +11,7 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
+import { useImageError } from "@/lib/use-image-error";
 import { publicAssetBaseUrl } from "@/lib/storage-public";
 import {
   ALLOWED_MIME_TYPES,
@@ -429,7 +430,7 @@ export function ImageUploadInput({
 }: ImageUploadInputProps) {
   const deferred = useDeferredUploadsOptional();
   const [uploading, setUploading] = useState(false);
-  const [imgError, setImgError] = useState(false);
+  const [imgError, onImgError] = useImageError(value);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [ratioType, setRatioType] = useState<RatioType>(ratio);
   const [meta, setMeta] = useState<PreviewMeta | null>(null);
@@ -437,10 +438,6 @@ export function ImageUploadInput({
   const selectId = useId();
 
   const rule = IMAGE_RATIOS[ratioType];
-
-  useEffect(() => {
-    setImgError(false);
-  }, [value]);
 
   // A value arriving from outside (loaded record, or cleared) has no metadata
   // we can trust, so drop any badge from a previous upload in this session.
@@ -585,7 +582,7 @@ export function ImageUploadInput({
                   src={previewUrl}
                   alt=""
                   className={`h-full w-full ${previewFit}`}
-                  onError={() => setImgError(true)}
+                  onError={onImgError}
                 />
               )}
               {isPending && (

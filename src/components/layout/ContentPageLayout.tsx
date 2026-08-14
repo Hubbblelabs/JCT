@@ -19,6 +19,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EditableRegion } from "@/components/admin/EditableRegion";
 import { useLightbox } from "@/components/ui/Lightbox";
 import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
+import { useImageError } from "@/lib/use-image-error";
 import { getImageUrl } from "@/lib/utils";
 import { CONTENT_BLOCK_LABELS } from "@/lib/validation";
 import type {
@@ -181,8 +182,8 @@ function EmptyHint({ children }: { children: React.ReactNode }) {
  */
 function ContentImg({ image }: { image: ContentImageValue }) {
   const deferred = useDeferredUploadsOptional();
-  const [failed, setFailed] = useState(false);
   const src = image.src.trim();
+  const [failed, onError] = useImageError(src);
   const isPending = src.startsWith("pending:");
   const pendingPreview = isPending ? (deferred?.getPreview(src) ?? null) : null;
   const url = isPending ? null : getImageUrl(src);
@@ -207,7 +208,7 @@ function ContentImg({ image }: { image: ContentImageValue }) {
       height={900}
       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
       className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-      onError={() => setFailed(true)}
+      onError={onError}
     />
   );
 }
