@@ -247,6 +247,22 @@ function EditableRegion({
 const hasText = (s?: string) => typeof s === "string" && s.trim().length > 0;
 const hasArr = (a?: unknown[]) => Array.isArray(a) && a.length > 0;
 
+const HONORIFICS = /^(dr|prof|mr|mrs|ms|shri|smt)\.?$/i;
+
+/**
+ * Avatar initials for a person's name. Honorifics are dropped first, so
+ * "Dr. Sajitha M" reads "SM" rather than "DS".
+ */
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter((part) => part && !HONORIFICS.test(part))
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+}
+
 function hasAboutStats(d: ProgramData, editable?: boolean) {
   return (
     editable ||
@@ -806,11 +822,7 @@ function OverviewTab({
                     boxShadow: `0 12px 32px ${ac}50`,
                   }}
                 >
-                  {dept.hod.name
-                    .split(" ")
-                    .map((n) => n[0])
-                    .join("")
-                    .slice(0, 2)}
+                  {initials(dept.hod.name)}
                 </div>
                 <div className="flex-1">
                   <p className="text-lg font-bold text-white sm:text-2xl">
@@ -819,17 +831,24 @@ function OverviewTab({
                   <p className="text-sm font-medium text-white/75">
                     {dept.hod.designation}
                   </p>
-                  <div className="mt-2.5 flex flex-wrap gap-2">
-                    <span className="rounded-full bg-black/25 px-3 py-1 text-xs text-white/90 backdrop-blur-sm">
-                      {dept.hod.qualification}
-                    </span>
-                    <span
-                      className="rounded-full px-3 py-1 text-xs font-bold text-white"
-                      style={{ backgroundColor: `${ac}50` }}
-                    >
-                      {dept.hod.experience} experience
-                    </span>
-                  </div>
+                  {(hasText(dept.hod.qualification) ||
+                    hasText(dept.hod.experience)) && (
+                    <div className="mt-2.5 flex flex-wrap gap-2">
+                      {hasText(dept.hod.qualification) && (
+                        <span className="rounded-full bg-black/25 px-3 py-1 text-xs text-white/90 backdrop-blur-sm">
+                          {dept.hod.qualification}
+                        </span>
+                      )}
+                      {hasText(dept.hod.experience) && (
+                        <span
+                          className="rounded-full px-3 py-1 text-xs font-bold text-white"
+                          style={{ backgroundColor: `${ac}50` }}
+                        >
+                          {dept.hod.experience} experience
+                        </span>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
               {/* Message */}
