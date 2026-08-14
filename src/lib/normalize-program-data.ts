@@ -239,6 +239,7 @@ export function normalizeProgramData(
       designation: str(c.hodDesignation, "Head of Department"),
       qualification: str(c.hodQualification),
       experience: str(c.hodExperience),
+      photo: str(c.hodPhoto),
       message: lines(c.hodMessage),
     },
 

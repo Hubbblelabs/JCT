@@ -192,6 +192,8 @@ export type ProgramData = {
     designation: string;
     qualification: string;
     experience: string;
+    /** Storage key for the HOD's portrait. Empty falls back to initials. */
+    photo: string;
     message: string[];
   };
 

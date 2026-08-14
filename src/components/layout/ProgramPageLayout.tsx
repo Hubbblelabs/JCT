@@ -43,6 +43,8 @@ import type {
   TabConfigItem,
 } from "@/types/program";
 import { getImageUrl } from "@/lib/utils";
+import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
+import { useImageError } from "@/lib/use-image-error";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
@@ -247,6 +249,61 @@ function EditableRegion({
 const hasText = (s?: string) => typeof s === "string" && s.trim().length > 0;
 const hasArr = (a?: unknown[]) => Array.isArray(a) && a.length > 0;
 
+/**
+ * An image that may still be an unsaved pick.
+ *
+ * Inside the admin editor a freshly-chosen file is a `pending:` placeholder
+ * backed by a blob: URL, which next/image can neither fetch nor optimize — and
+ * `getImageUrl` passes the placeholder straight through, so <Image> would be
+ * handed a src it cannot resolve. Render those through a plain <img> until the
+ * upload is flushed on save. Returns null when there is nothing to show, so
+ * callers can fall back (initials, a plain background).
+ */
+function ProgramImage({
+  src,
+  alt,
+  className,
+  fill,
+  width,
+  height,
+  sizes,
+  priority,
+}: {
+  src: string;
+  alt: string;
+  className?: string;
+  fill?: boolean;
+  width?: number;
+  height?: number;
+  sizes?: string;
+  priority?: boolean;
+}) {
+  const deferred = useDeferredUploadsOptional();
+  const [failed, onError] = useImageError(src);
+  const isPending = src.startsWith("pending:");
+  const pendingPreview = isPending ? (deferred?.getPreview(src) ?? null) : null;
+
+  if (pendingPreview) {
+    // eslint-disable-next-line @next/next/no-img-element -- a deferred upload's preview is a local blob: URL, which /_next/image cannot fetch or optimize.
+    return <img src={pendingPreview} alt={alt} className={className} />;
+  }
+
+  const url = isPending ? null : getImageUrl(src);
+  if (!url || failed) return null;
+
+  return (
+    <Image
+      src={url}
+      alt={alt}
+      className={className}
+      onError={onError}
+      priority={priority}
+      sizes={sizes}
+      {...(fill ? { fill: true as const } : { width: width!, height: height! })}
+    />
+  );
+}
+
 const HONORIFICS = /^(dr|prof|mr|mrs|ms|shri|smt)\.?$/i;
 
 /**
@@ -282,6 +339,7 @@ function hasHodSection(d: ProgramData, editable?: boolean) {
     hasText(d.hod.designation) ||
     hasText(d.hod.qualification) ||
     hasText(d.hod.experience) ||
+    hasText(d.hod.photo) ||
     hasArr(d.hod.message)
   );
 }
@@ -816,13 +874,27 @@ function OverviewTab({
                   style={{ backgroundColor: ac }}
                 />
                 <div
-                  className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-2xl font-black text-white shadow-xl sm:h-20 sm:w-20 sm:text-3xl"
+                  className="relative h-16 w-16 shrink-0 overflow-hidden rounded-2xl shadow-xl sm:h-20 sm:w-20"
                   style={{
                     backgroundColor: ac,
                     boxShadow: `0 12px 32px ${ac}50`,
                   }}
                 >
-                  {initials(dept.hod.name)}
+                  {/* The portrait covers the tile when there is one; the
+                      initials sit underneath as the fallback, so a missing or
+                      broken photo degrades to a monogram rather than a hole. */}
+                  <span className="flex h-full w-full items-center justify-center text-2xl font-black text-white sm:text-3xl">
+                    {initials(dept.hod.name)}
+                  </span>
+                  {dept.hod.photo && (
+                    <ProgramImage
+                      src={dept.hod.photo}
+                      alt={dept.hod.name}
+                      fill
+                      sizes="80px"
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  )}
                 </div>
                 <div className="flex-1">
                   <p className="text-lg font-bold text-white sm:text-2xl">
@@ -2367,8 +2439,8 @@ export function ProgramPageLayout({
         {/* Background layers */}
         <div className="absolute inset-0 z-0">
           {dept.heroImage && (
-            <Image
-              src={getImageUrl(dept.heroImage) ?? dept.heroImage}
+            <ProgramImage
+              src={dept.heroImage}
               alt={dept.name}
               fill
               sizes="100vw"
