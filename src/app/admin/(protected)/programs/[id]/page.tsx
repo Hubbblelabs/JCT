@@ -174,6 +174,16 @@ function ProgramDetailInner() {
         [k: string]: unknown;
       };
 
+      // Adopt the flushed value as the new editor state. `flush` uploads each
+      // pending pick, revokes its blob: URL and forgets the placeholder, so
+      // state left holding `pending:` keys is state pointing at nothing: the
+      // field renders "No preview" under a stuck "Pending" badge, and — worse —
+      // the next save re-flushes a placeholder the queue no longer knows about,
+      // which passes through unreplaced and overwrites the real storage key in
+      // the database with a dead `pending:` string.
+      setProg((f) => ({ ...f, ...(flushedProg as Partial<ProgramFields>) }));
+      setContent(flushedContent as Record<string, unknown>);
+
       if (isNew) {
         const r = await fetch("/api/admin/programs", {
           method: "POST",

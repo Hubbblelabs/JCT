@@ -59,7 +59,12 @@ export function DeferredUploadsProvider({ children }: { children: ReactNode }) {
     },
     async flush<T>(value: T): Promise<T> {
       const map = pending.current;
-      if (map.size === 0) return value;
+      // An empty queue still has to be checked: a value carrying a placeholder
+      // with nothing queued to satisfy it is exactly the stale-key case below.
+      if (map.size === 0) {
+        assertNoPlaceholders(value);
+        return value;
+      }
       const replacements = new Map<string, string>();
       const errors: string[] = [];
       await Promise.all(
@@ -84,7 +89,9 @@ export function DeferredUploadsProvider({ children }: { children: ReactNode }) {
         }),
       );
       if (errors.length > 0) throw new Error(errors.join("; "));
-      return deepReplace(value, replacements) as T;
+      const flushed = deepReplace(value, replacements) as T;
+      assertNoPlaceholders(flushed);
+      return flushed;
     },
     discardAll() {
       for (const info of pending.current.values())
@@ -210,6 +217,40 @@ async function doPresignedDocumentUpload(file: File): Promise<string> {
   }
 
   return storage_key;
+}
+
+/**
+ * Refuse to hand back a value that still carries a `pending:` placeholder.
+ *
+ * Every placeholder in the value should have just been uploaded and replaced.
+ * One that survives is a placeholder the queue never knew about — almost always
+ * a caller that saved once without adopting the flushed result, then saved
+ * again with the now-forgotten key still in its state. Persisting that writes a
+ * dead `pending:` string over a real storage key, and the image disappears from
+ * the live site with nothing in the logs to say why. Failing the save is
+ * recoverable; silently publishing a broken reference is not.
+ */
+function assertNoPlaceholders(value: unknown): void {
+  const stale = collectPlaceholders(value);
+  if (stale.length === 0) return;
+  throw new Error(
+    `Save aborted: ${stale.length} image ${
+      stale.length === 1 ? "pick was" : "picks were"
+    } lost before upload (${stale.join(", ")}). Re-pick the image and save again.`,
+  );
+}
+
+function collectPlaceholders(value: unknown, found: string[] = []): string[] {
+  if (typeof value === "string") {
+    if (value.startsWith("pending:") && !found.includes(value))
+      found.push(value);
+  } else if (Array.isArray(value)) {
+    for (const v of value) collectPlaceholders(v, found);
+  } else if (value !== null && typeof value === "object") {
+    for (const v of Object.values(value as Record<string, unknown>))
+      collectPlaceholders(v, found);
+  }
+  return found;
 }
 
 function valueContains(value: unknown, needle: string): boolean {
