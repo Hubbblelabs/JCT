@@ -1643,25 +1643,47 @@
    here is prefixed `admin-doc-` — `.admin-help` is already taken by the hint
    text under a form field. */
 
+/* Every breakpoint below is a CONTAINER query, not a media query, and the
+   difference is load-bearing here. The viewport is not what this page gets:
+   the sidebar takes 264px of it, 60px when collapsed to the rail, none at all
+   on a phone. A viewport breakpoint therefore has to guess which of the three
+   is in force and is wrong for two of them — the two-column split fired at
+   1100px viewport into an 800px column, and collapsing the sidebar (a
+   deliberate "give me more room" gesture) changed nothing.
+
+   `.admin-doc-shell` is the container. It wraps the grid only — `container-type`
+   implies layout containment, which makes the element a containing block for
+   `position: fixed` descendants, and the back-to-top button has to escape it. */
+.admin-doc-shell {
+  container-type: inline-size;
+  container-name: doc;
+}
+
 .admin-doc-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--admin-space-5);
+  gap: var(--admin-space-4);
   align-items: start;
+  /* Prose, not UI chrome. The panel's 14px default is right for a dense table
+     and wrong for four hundred words of instructions, and it is also what made
+     a 74ch measure resolve to 518px — a column that looked lost inside a
+     1593px content area. */
+  font-size: var(--admin-text-lg);
 }
 
-/* The two-column layout needs room the *viewport* width does not describe —
-   the sidebar eats up to 264px of it first. Splitting earlier than this left
-   the rail squeezed against a half-width column.
-
-   Both tracks are capped and the pair is centred, rather than letting the
-   prose column take a `1fr` it cannot use: prose is capped at a readable
-   measure regardless, so a stretched column just parks the rail against the
-   far edge of a 1920px screen with a lake of empty canvas in between. */
-@media (min-width: 1280px) {
+/* The PAIR is capped and centred, and the prose column takes what is left of
+   it. Capping the prose track alone (measured: 518px of text beside 300px of
+   rail inside 1593px of container) just moved the dead space from one side to
+   both. Sized so the measure lands near 80 characters at the cap. */
+@container doc (min-width: 880px) {
   .admin-doc-layout {
-    grid-template-columns: minmax(0, 78ch) minmax(240px, 300px);
-    justify-content: center;
+    /* The prose track carries a FLOOR equal to its single-column measure, and
+       the rail yields to it. Without that floor the split narrowed the text on
+       the way in — 640px of prose at a 900px container became 585px at 917px,
+       so widening the window shrank the column you were reading. */
+    grid-template-columns: minmax(min(640px, 100%), 1fr) minmax(200px, 300px);
+    max-width: 980px;
+    margin-inline: auto;
     gap: var(--admin-space-8);
   }
 }
@@ -1672,11 +1694,13 @@
   min-width: 0;
   /* Prose, not a form: cap the measure so a wide monitor does not produce
      130-character lines nobody can track back to the next one. */
-  max-width: 78ch;
+  max-width: 80ch;
   margin-inline: auto;
   color: var(--admin-text-secondary);
-  font-size: var(--admin-text-body);
-  line-height: 1.65;
+  line-height: 1.7;
+  /* Nothing in a manual is worth a horizontal scrollbar on a 320px phone —
+     a long slug or URL breaks rather than pushing the page sideways. */
+  overflow-wrap: anywhere;
 }
 
 /* ── Toolbar above the chapters ───────────────────────────────────────────*/
@@ -1787,16 +1811,19 @@
   transform: rotate(180deg);
 }
 
-/* Only shown on hover/focus within the chapter — a permanent chain icon on
-   every heading is chrome the reader never asked for. */
+/* Dimmed rather than hidden. Revealing it on `:hover` alone made it
+   unreachable on every touch device — `:hover` never fires there, so there is
+   nothing to reveal it — and a media query guessing at pointer type gets that
+   wrong on hybrids. Always present, never loud. */
 .admin-doc-copy {
   flex-shrink: 0;
   margin-top: var(--admin-space-2);
-  opacity: 0;
+  opacity: 0.4;
   transition: opacity var(--admin-duration-fast);
 }
 
 .admin-doc-chapter:hover .admin-doc-copy,
+.admin-doc-copy:hover,
 .admin-doc-copy:focus-visible {
   opacity: 1;
 }
@@ -1845,7 +1872,9 @@
   color: var(--admin-text);
   font-size: 0.95em;
   font-weight: 600;
-  white-space: nowrap;
+  /* Deliberately not `nowrap`: a multi-word control name is wider than a 320px
+     column, and a chip that overflows the card is worse than one that wraps. */
+  overflow-wrap: anywhere;
 }
 
 /* ── Lists ────────────────────────────────────────────────────────────────*/
@@ -1884,7 +1913,6 @@
   border: 1px solid;
   border-left-width: 3px;
   border-radius: var(--admin-radius);
-  font-size: var(--admin-text-body);
 }
 
 .admin-doc-note-title {
@@ -1954,17 +1982,14 @@
 
 /* ── Comparison cards ─────────────────────────────────────────────────────*/
 
+/* `auto-fit` rather than a breakpoint: these sit inside the prose column, whose
+   width no viewport query describes. It pairs them up when there is room for
+   two 240px cards and stacks them when there is not, at any container size. */
 .admin-doc-cards {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   gap: var(--admin-space-3);
   margin: var(--admin-space-4) 0;
-}
-
-@media (min-width: 720px) {
-  .admin-doc-cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 .admin-doc-card {
@@ -2060,7 +2085,7 @@
 .admin-doc-screen-desc {
   grid-column: 2;
   color: var(--admin-text-muted);
-  font-size: var(--admin-text-sm);
+  font-size: var(--admin-text-body);
   line-height: 1.5;
 }
 
@@ -2073,7 +2098,7 @@
   order: -1;
 }
 
-@media (min-width: 1280px) {
+@container doc (min-width: 880px) {
   .admin-doc-toc {
     order: 0;
     position: sticky;
@@ -2115,7 +2140,7 @@
   cursor: pointer;
 }
 
-@media (max-width: 1279.98px) {
+@container doc (max-width: 879.98px) {
   .admin-doc-toc-trigger {
     display: flex;
   }
@@ -2153,7 +2178,7 @@
   }
 }
 
-@media (min-width: 1280px) {
+@container doc (min-width: 880px) {
   .admin-doc-toc-heading {
     display: block;
     margin-bottom: var(--admin-space-1);
@@ -2162,6 +2187,24 @@
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
+  }
+}
+
+/* Pre-2023 browsers (Chrome <105, Safari <16, Firefox <110) get the single
+   column at every width, with the contents as a disclosure. Narrower than ideal
+   on a desktop, but complete and coherent — which a half-applied two-column
+   grid would not be. */
+@supports not (container-type: inline-size) {
+  .admin-doc-toc-trigger {
+    display: flex;
+  }
+
+  .admin-doc-toc-list {
+    display: none;
+  }
+
+  .admin-doc-toc-list[data-open] {
+    display: block;
   }
 }
 
@@ -2243,6 +2286,78 @@
 
 .admin-doc-top:hover {
   background: var(--admin-hover);
+}
+
+/* A labelled pill spans a third of a 375px screen and sits over the text it is
+   offering to scroll away from. Below that it becomes the arrow alone. */
+@media (max-width: 480px) {
+  .admin-doc-top {
+    right: var(--admin-space-3);
+    bottom: var(--admin-space-3);
+    padding: var(--admin-space-3);
+  }
+
+  .admin-doc-top-label {
+    /* Same treatment as .admin-sr-only — the button keeps its accessible name
+       from aria-label, and the visible text stops taking room. */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+/* ── Narrow container: phones, and the drawer-width column behind them ────*/
+
+@container doc (max-width: 560px) {
+  .admin-doc-chapter-head {
+    padding: var(--admin-space-1) var(--admin-space-2) var(--admin-space-1)
+      var(--admin-space-1);
+  }
+
+  .admin-doc-toggle {
+    gap: var(--admin-space-2);
+    padding: var(--admin-space-2);
+  }
+
+  .admin-doc-toggle-title {
+    font-size: var(--admin-text-lg);
+  }
+
+  .admin-doc-toggle-summary {
+    font-size: var(--admin-text-base);
+  }
+
+  .admin-doc-body {
+    margin-inline: var(--admin-space-3);
+    padding-bottom: var(--admin-space-4);
+  }
+
+  .admin-doc-steps,
+  .admin-doc-bullets {
+    padding-left: var(--admin-space-5);
+  }
+
+  .admin-doc-note,
+  .admin-doc-card {
+    padding: var(--admin-space-3);
+  }
+
+  .admin-doc-def {
+    padding: var(--admin-space-2) var(--admin-space-3);
+  }
+
+  .admin-doc-screen {
+    padding: var(--admin-space-2);
+  }
+
+  .admin-doc-h3 {
+    margin-top: var(--admin-space-5);
+  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

@@ -250,159 +250,168 @@ export function HelpDoc({ items }: { items: HelpDocItem[] }) {
 
   return (
     <>
-      <div className="admin-doc-layout">
-        <div className="admin-doc">
-          <div className="admin-doc-toolbar">
-            <p className="admin-doc-count" role="status" aria-live="polite">
-              {searching
-                ? `${matches.length} of ${items.length} chapters match “${query.trim()}”`
-                : `${items.length} chapters`}
-            </p>
-            {matches.length > 0 && (
-              <button
-                type="button"
-                className="admin-btn admin-btn-ghost admin-btn-sm"
-                onClick={() =>
-                  setOpen(
-                    allOpen ? new Set() : new Set(matches.map((m) => m.id)),
-                  )
-                }
-              >
-                {allOpen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
-                {allOpen ? "Collapse all" : "Expand all"}
-              </button>
+      {/* The size container the layout queries. It wraps the grid only, never
+          the back-to-top button: `container-type` implies layout containment,
+          which would make this element the containing block for a
+          `position: fixed` descendant and pin the button inside the column. */}
+      <div className="admin-doc-shell">
+        <div className="admin-doc-layout">
+          <div className="admin-doc">
+            <div className="admin-doc-toolbar">
+              <p className="admin-doc-count" role="status" aria-live="polite">
+                {searching
+                  ? `${matches.length} of ${items.length} chapters match “${query.trim()}”`
+                  : `${items.length} chapters`}
+              </p>
+              {matches.length > 0 && (
+                <button
+                  type="button"
+                  className="admin-btn admin-btn-ghost admin-btn-sm"
+                  onClick={() =>
+                    setOpen(
+                      allOpen ? new Set() : new Set(matches.map((m) => m.id)),
+                    )
+                  }
+                >
+                  {allOpen ? <Minimize2 size={14} /> : <Maximize2 size={14} />}
+                  {allOpen ? "Collapse all" : "Expand all"}
+                </button>
+              )}
+            </div>
+
+            {matches.length === 0 ? (
+              <EmptyState
+                icon={<Search size={20} />}
+                title={`Nothing in the manual matches “${query.trim()}”`}
+                body="Try a single word — the name of a screen, or what you are trying to do."
+              />
+            ) : (
+              matches.map((item) => {
+                const isOpen = open.has(item.id);
+                return (
+                  <section
+                    key={item.id}
+                    id={item.id}
+                    className="admin-doc-chapter"
+                    data-open={isOpen || undefined}
+                    aria-labelledby={`${item.id}-title`}
+                  >
+                    <div className="admin-doc-chapter-head">
+                      <h2 id={`${item.id}-title`} className="admin-doc-h2">
+                        <button
+                          type="button"
+                          className="admin-doc-toggle"
+                          aria-expanded={isOpen}
+                          aria-controls={`${item.id}-body`}
+                          onClick={() => toggleChapter(item.id)}
+                        >
+                          <span
+                            className="admin-doc-h2-icon"
+                            aria-hidden="true"
+                          >
+                            {item.icon}
+                          </span>
+                          <span className="admin-doc-toggle-text">
+                            <span className="admin-doc-toggle-title">
+                              {item.title}
+                            </span>
+                            {!isOpen && (
+                              <span className="admin-doc-toggle-summary">
+                                {item.summary}
+                              </span>
+                            )}
+                          </span>
+                          <ChevronDown
+                            size={18}
+                            className="admin-doc-chevron"
+                            aria-hidden="true"
+                          />
+                        </button>
+                      </h2>
+
+                      <button
+                        type="button"
+                        className="admin-icon-btn admin-doc-copy"
+                        onClick={() => void copyLink(item.id)}
+                        title="Copy a link to this chapter"
+                        aria-label={`Copy a link to “${item.title}”`}
+                      >
+                        {copied === item.id ? (
+                          <Check size={15} className="text-emerald-600" />
+                        ) : (
+                          <Link2 size={15} />
+                        )}
+                      </button>
+                    </div>
+
+                    <div
+                      id={`${item.id}-body`}
+                      className="admin-doc-body"
+                      hidden={!isOpen}
+                    >
+                      {item.body}
+                    </div>
+                  </section>
+                );
+              })
             )}
           </div>
 
-          {matches.length === 0 ? (
-            <EmptyState
-              icon={<Search size={20} />}
-              title={`Nothing in the manual matches “${query.trim()}”`}
-              body="Try a single word — the name of a screen, or what you are trying to do."
-            />
-          ) : (
-            matches.map((item) => {
-              const isOpen = open.has(item.id);
-              return (
-                <section
-                  key={item.id}
-                  id={item.id}
-                  className="admin-doc-chapter"
-                  data-open={isOpen || undefined}
-                  aria-labelledby={`${item.id}-title`}
-                >
-                  <div className="admin-doc-chapter-head">
-                    <h2 id={`${item.id}-title`} className="admin-doc-h2">
-                      <button
-                        type="button"
-                        className="admin-doc-toggle"
-                        aria-expanded={isOpen}
-                        aria-controls={`${item.id}-body`}
-                        onClick={() => toggleChapter(item.id)}
-                      >
-                        <span className="admin-doc-h2-icon" aria-hidden="true">
-                          {item.icon}
-                        </span>
-                        <span className="admin-doc-toggle-text">
-                          <span className="admin-doc-toggle-title">
-                            {item.title}
-                          </span>
-                          {!isOpen && (
-                            <span className="admin-doc-toggle-summary">
-                              {item.summary}
-                            </span>
-                          )}
-                        </span>
-                        <ChevronDown
-                          size={18}
-                          className="admin-doc-chevron"
-                          aria-hidden="true"
-                        />
-                      </button>
-                    </h2>
+          <aside className="admin-doc-toc" aria-label="Contents">
+            <div className="admin-doc-toc-inner">
+              {searchBox}
 
-                    <button
-                      type="button"
-                      className="admin-icon-btn admin-doc-copy"
-                      onClick={() => void copyLink(item.id)}
-                      title="Copy a link to this chapter"
-                      aria-label={`Copy a link to “${item.title}”`}
-                    >
-                      {copied === item.id ? (
-                        <Check size={15} className="text-emerald-600" />
-                      ) : (
-                        <Link2 size={15} />
-                      )}
-                    </button>
-                  </div>
+              <button
+                type="button"
+                className="admin-doc-toc-trigger"
+                aria-expanded={tocOpen}
+                aria-controls="admin-doc-toc-list"
+                onClick={() => setTocOpen((o) => !o)}
+              >
+                <List size={14} aria-hidden="true" />
+                Contents
+                <span className="admin-doc-toc-count">{matches.length}</span>
+                <ChevronDown
+                  size={15}
+                  className="admin-doc-chevron"
+                  aria-hidden="true"
+                />
+              </button>
 
-                  <div
-                    id={`${item.id}-body`}
-                    className="admin-doc-body"
-                    hidden={!isOpen}
+              <p className="admin-doc-toc-heading">Contents</p>
+
+              <nav
+                id="admin-doc-toc-list"
+                className="admin-doc-toc-list"
+                data-open={tocOpen || undefined}
+              >
+                {matches.map((item) => (
+                  <a
+                    key={item.id}
+                    href={`#${item.id}`}
+                    className="admin-doc-toc-link"
+                    data-active={activeId === item.id || undefined}
+                    aria-current={activeId === item.id ? "true" : undefined}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      goTo(item.id);
+                    }}
                   >
-                    {item.body}
-                  </div>
-                </section>
-              );
-            })
-          )}
-        </div>
-
-        <aside className="admin-doc-toc" aria-label="Contents">
-          <div className="admin-doc-toc-inner">
-            {searchBox}
-
-            <button
-              type="button"
-              className="admin-doc-toc-trigger"
-              aria-expanded={tocOpen}
-              aria-controls="admin-doc-toc-list"
-              onClick={() => setTocOpen((o) => !o)}
-            >
-              <List size={14} aria-hidden="true" />
-              Contents
-              <span className="admin-doc-toc-count">{matches.length}</span>
-              <ChevronDown
-                size={15}
-                className="admin-doc-chevron"
-                aria-hidden="true"
-              />
-            </button>
-
-            <p className="admin-doc-toc-heading">Contents</p>
-
-            <nav
-              id="admin-doc-toc-list"
-              className="admin-doc-toc-list"
-              data-open={tocOpen || undefined}
-            >
-              {matches.map((item) => (
-                <a
-                  key={item.id}
-                  href={`#${item.id}`}
-                  className="admin-doc-toc-link"
-                  data-active={activeId === item.id || undefined}
-                  aria-current={activeId === item.id ? "true" : undefined}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    goTo(item.id);
-                  }}
-                >
-                  <span className="admin-doc-toc-icon" aria-hidden="true">
-                    {item.icon}
-                  </span>
-                  <span className="min-w-0">
-                    <span className="admin-doc-toc-title">{item.title}</span>
-                    <span className="admin-doc-toc-summary">
-                      {item.summary}
+                    <span className="admin-doc-toc-icon" aria-hidden="true">
+                      {item.icon}
                     </span>
-                  </span>
-                </a>
-              ))}
-            </nav>
-          </div>
-        </aside>
+                    <span className="min-w-0">
+                      <span className="admin-doc-toc-title">{item.title}</span>
+                      <span className="admin-doc-toc-summary">
+                        {item.summary}
+                      </span>
+                    </span>
+                  </a>
+                ))}
+              </nav>
+            </div>
+          </aside>
+        </div>
       </div>
 
       {showTop && (
@@ -412,9 +421,10 @@ export function HelpDoc({ items }: { items: HelpDocItem[] }) {
           onClick={() =>
             window.scrollTo({ top: 0, behavior: scrollBehavior() })
           }
+          aria-label="Back to top"
         >
           <ArrowUp size={15} />
-          Back to top
+          <span className="admin-doc-top-label">Back to top</span>
         </button>
       )}
     </>

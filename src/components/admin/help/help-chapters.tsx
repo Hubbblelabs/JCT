@@ -190,7 +190,7 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           The three colleges share the same screens. <UI>Hero</UI> for
           Engineering and <UI>Hero</UI> for Polytechnic look identical. The line
           at the top of the window —{" "}
-          <UI>Engineering College › Landing Page › Hero</UI> — is what tells
+          <em>Engineering College › Landing Page › Hero</em> — is what tells
           them apart. Read it before you edit, and you will never publish one
           college&apos;s copy onto another.
         </Note>
