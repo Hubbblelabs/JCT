@@ -1646,13 +1646,23 @@
 .admin-doc-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: var(--admin-space-8);
+  gap: var(--admin-space-5);
   align-items: start;
 }
 
-@media (min-width: 1100px) {
+/* The two-column layout needs room the *viewport* width does not describe —
+   the sidebar eats up to 264px of it first. Splitting earlier than this left
+   the rail squeezed against a half-width column.
+
+   Both tracks are capped and the pair is centred, rather than letting the
+   prose column take a `1fr` it cannot use: prose is capped at a readable
+   measure regardless, so a stretched column just parks the rail against the
+   far edge of a 1920px screen with a lake of empty canvas in between. */
+@media (min-width: 1280px) {
   .admin-doc-layout {
-    grid-template-columns: minmax(0, 1fr) 268px;
+    grid-template-columns: minmax(0, 78ch) minmax(240px, 300px);
+    justify-content: center;
+    gap: var(--admin-space-8);
   }
 }
 
@@ -1662,15 +1672,33 @@
   min-width: 0;
   /* Prose, not a form: cap the measure so a wide monitor does not produce
      130-character lines nobody can track back to the next one. */
-  max-width: 76ch;
+  max-width: 78ch;
+  margin-inline: auto;
   color: var(--admin-text-secondary);
   font-size: var(--admin-text-body);
   line-height: 1.65;
 }
 
+/* ── Toolbar above the chapters ───────────────────────────────────────────*/
+
+.admin-doc-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--admin-space-2);
+  margin-bottom: var(--admin-space-3);
+}
+
+.admin-doc-count {
+  color: var(--admin-text-muted);
+  font-size: var(--admin-text-sm);
+}
+
+/* ── Chapter accordion ────────────────────────────────────────────────────*/
+
 .admin-doc-chapter {
-  padding: var(--admin-space-6);
-  margin-bottom: var(--admin-space-5);
+  margin-bottom: var(--admin-space-3);
   border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius-lg);
   background: var(--admin-raised);
@@ -1679,22 +1707,108 @@
   scroll-margin-top: calc(var(--admin-topbar-h) + var(--admin-space-4));
 }
 
+.admin-doc-chapter[data-open] {
+  box-shadow: var(--admin-shadow);
+}
+
+.admin-doc-chapter-head {
+  display: flex;
+  align-items: start;
+  gap: var(--admin-space-1);
+  padding: var(--admin-space-2) var(--admin-space-3) var(--admin-space-2)
+    var(--admin-space-2);
+}
+
 .admin-doc-h2 {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+}
+
+/* The heading *is* the control — the whole row is the hit area, because a
+   chevron-sized target is a poor one on a touch screen. */
+.admin-doc-toggle {
   display: flex;
   align-items: center;
-  gap: var(--admin-space-2);
-  padding-bottom: var(--admin-space-3);
-  margin-bottom: var(--admin-space-4);
-  border-bottom: 2px solid var(--admin-gold);
-  color: var(--admin-text);
-  font-size: var(--admin-text-xl);
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  gap: var(--admin-space-3);
+  width: 100%;
+  padding: var(--admin-space-2) var(--admin-space-3);
+  border-radius: var(--admin-radius);
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--admin-duration-fast);
+}
+
+.admin-doc-toggle:hover {
+  background: var(--admin-hover);
+}
+
+.admin-doc-toggle:focus-visible {
+  outline: none;
+  box-shadow: var(--admin-focus-ring-tight);
 }
 
 .admin-doc-h2-icon {
   display: inline-flex;
+  flex-shrink: 0;
   color: var(--admin-gold-deep);
+}
+
+.admin-doc-toggle-text {
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-doc-toggle-title {
+  display: block;
+  color: var(--admin-text);
+  font-size: var(--admin-text-xl);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+
+.admin-doc-toggle-summary {
+  display: block;
+  margin-top: 0.1rem;
+  color: var(--admin-text-muted);
+  font-size: var(--admin-text-body);
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.admin-doc-chevron {
+  flex-shrink: 0;
+  color: var(--admin-text-faint);
+  transition: transform var(--admin-duration) var(--admin-ease);
+}
+
+[aria-expanded="true"] > .admin-doc-chevron {
+  transform: rotate(180deg);
+}
+
+/* Only shown on hover/focus within the chapter — a permanent chain icon on
+   every heading is chrome the reader never asked for. */
+.admin-doc-copy {
+  flex-shrink: 0;
+  margin-top: var(--admin-space-2);
+  opacity: 0;
+  transition: opacity var(--admin-duration-fast);
+}
+
+.admin-doc-chapter:hover .admin-doc-copy,
+.admin-doc-copy:focus-visible {
+  opacity: 1;
+}
+
+.admin-doc-body {
+  margin: 0 var(--admin-space-5) 0;
+  padding: var(--admin-space-4) 0 var(--admin-space-6);
+  border-top: 2px solid var(--admin-gold);
+}
+
+.admin-doc-body > :last-child {
+  margin-bottom: 0;
 }
 
 .admin-doc-h3 {
@@ -1707,9 +1821,9 @@
   font-weight: 650;
 }
 
-.admin-doc-chapter > .admin-doc-h3:first-of-type,
+.admin-doc-body > .admin-doc-h3:first-child,
 .admin-doc-screens > .admin-doc-h3 {
-  margin-top: var(--admin-space-2);
+  margin-top: 0;
 }
 
 .admin-doc-p {
@@ -1959,13 +2073,15 @@
   order: -1;
 }
 
-@media (min-width: 1100px) {
+@media (min-width: 1280px) {
   .admin-doc-toc {
     order: 0;
     position: sticky;
     top: calc(var(--admin-topbar-h) + var(--admin-space-4));
-    max-height: calc(100dvh - var(--admin-topbar-h) - var(--admin-space-8));
+    max-height: calc(100dvh - var(--admin-topbar-h) - var(--admin-space-10));
     overflow-y: auto;
+    /* Stops the rail's own scrollbar from sitting on the card's rounded edge */
+    padding-right: var(--admin-space-1);
   }
 }
 
@@ -1976,17 +2092,77 @@
   background: var(--admin-raised);
 }
 
-.admin-doc-toc-search {
-  margin-bottom: var(--admin-space-3);
+.admin-doc-search {
+  margin-bottom: var(--admin-space-2);
 }
 
-.admin-doc-toc-heading {
-  margin-bottom: var(--admin-space-1);
-  color: var(--admin-text-faint);
-  font-size: var(--admin-text-xs);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+.admin-doc-toc-heading,
+.admin-doc-toc-trigger {
+  display: none;
+}
+
+/* ── Contents: a disclosure below 1280px, a rail above it ─────────────────*/
+
+.admin-doc-toc-trigger {
+  align-items: center;
+  gap: var(--admin-space-2);
+  width: 100%;
+  padding: var(--admin-space-2);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-text);
+  font-size: var(--admin-text-body);
+  font-weight: 650;
+  cursor: pointer;
+}
+
+@media (max-width: 1279.98px) {
+  .admin-doc-toc-trigger {
+    display: flex;
+  }
+
+  .admin-doc-toc-trigger:hover {
+    background: var(--admin-hover);
+  }
+
+  .admin-doc-toc-trigger .admin-doc-chevron {
+    margin-left: auto;
+  }
+
+  .admin-doc-toc-count {
+    padding: 0 var(--admin-space-2);
+    border-radius: var(--admin-radius-full);
+    background: var(--admin-neutral-bg);
+    color: var(--admin-text-muted);
+    font-size: var(--admin-text-xs);
+    font-weight: 700;
+  }
+
+  /* Collapsed by default: on a laptop the full list is a screen of its own
+     before the reader reaches a single word of the manual. */
+  .admin-doc-toc-list {
+    display: none;
+    max-height: 50dvh;
+    overflow-y: auto;
+    margin-top: var(--admin-space-1);
+    padding-top: var(--admin-space-1);
+    border-top: 1px solid var(--admin-border-subtle);
+  }
+
+  .admin-doc-toc-list[data-open] {
+    display: block;
+  }
+}
+
+@media (min-width: 1280px) {
+  .admin-doc-toc-heading {
+    display: block;
+    margin-bottom: var(--admin-space-1);
+    color: var(--admin-text-faint);
+    font-size: var(--admin-text-xs);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
 }
 
 .admin-doc-toc-link {
@@ -1994,14 +2170,29 @@
   align-items: start;
   gap: var(--admin-space-2);
   padding: var(--admin-space-2);
+  border-left: 2px solid transparent;
   border-radius: var(--admin-radius-sm);
   color: var(--admin-text-secondary);
   text-decoration: none;
-  transition: background var(--admin-duration-fast);
+  transition:
+    background var(--admin-duration-fast),
+    border-color var(--admin-duration-fast);
 }
 
 .admin-doc-toc-link:hover {
   background: var(--admin-hover);
+}
+
+/* Where you are in the document — the rail's whole reason for existing once a
+   chapter runs past a screen. */
+.admin-doc-toc-link[data-active] {
+  border-left-color: var(--admin-gold);
+  background: var(--admin-selected);
+}
+
+.admin-doc-toc-link[data-active] .admin-doc-toc-title,
+.admin-doc-toc-link[data-active] .admin-doc-toc-icon {
+  color: var(--admin-gold-deep);
 }
 
 .admin-doc-toc-icon {
@@ -2023,6 +2214,35 @@
   color: var(--admin-text-muted);
   font-size: var(--admin-text-sm);
   line-height: 1.4;
+}
+
+.admin-doc-toc-link[data-active] .admin-doc-toc-summary {
+  color: var(--admin-text-secondary);
+}
+
+/* ── Back to top ──────────────────────────────────────────────────────────*/
+
+.admin-doc-top {
+  position: fixed;
+  right: var(--admin-space-5);
+  bottom: var(--admin-space-5);
+  z-index: var(--admin-z-sticky);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--admin-space-2);
+  padding: var(--admin-space-2) var(--admin-space-4);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-full);
+  background: var(--admin-raised);
+  color: var(--admin-text);
+  font-size: var(--admin-text-body);
+  font-weight: 600;
+  box-shadow: var(--admin-shadow-lg);
+  cursor: pointer;
+}
+
+.admin-doc-top:hover {
+  background: var(--admin-hover);
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -2193,7 +2413,8 @@
   .admin-shell-main,
   .admin-drawer,
   .admin-skeleton,
-  .admin-sidebar-section-chevron {
+  .admin-sidebar-section-chevron,
+  .admin-doc-chevron {
     transition: none;
     animation: none;
   }
