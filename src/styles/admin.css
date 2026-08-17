@@ -12,6 +12,7 @@
  *   8. Forms           — inputs, labels, help, errors
  *   9. Data            — tables, list rows
  *  10. Feedback        — empty states, skeletons, save bar, drawer
+ *  10b. Help manual    — prose styles for /admin/help
  *  11. Responsive      — tablet and mobile behaviour
  *  12. Motion & a11y   — reduced motion, focus, screen readers
  *
@@ -1631,6 +1632,397 @@
   background: var(--admin-danger-bg);
   border-color: var(--admin-danger-border);
   color: var(--admin-danger);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   10b. HELP MANUAL
+   ═══════════════════════════════════════════════════════════════════════════
+
+   The one screen in the panel that is prose rather than controls, so it is the
+   one place a measured line length and a real type scale matter. Everything
+   here is prefixed `admin-doc-` — `.admin-help` is already taken by the hint
+   text under a form field. */
+
+.admin-doc-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--admin-space-8);
+  align-items: start;
+}
+
+@media (min-width: 1100px) {
+  .admin-doc-layout {
+    grid-template-columns: minmax(0, 1fr) 268px;
+  }
+}
+
+/* ── Chapters ─────────────────────────────────────────────────────────────*/
+
+.admin-doc {
+  min-width: 0;
+  /* Prose, not a form: cap the measure so a wide monitor does not produce
+     130-character lines nobody can track back to the next one. */
+  max-width: 76ch;
+  color: var(--admin-text-secondary);
+  font-size: var(--admin-text-body);
+  line-height: 1.65;
+}
+
+.admin-doc-chapter {
+  padding: var(--admin-space-6);
+  margin-bottom: var(--admin-space-5);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-lg);
+  background: var(--admin-raised);
+  box-shadow: var(--admin-shadow-sm);
+  /* Anchor links land below the sticky topbar rather than under it. */
+  scroll-margin-top: calc(var(--admin-topbar-h) + var(--admin-space-4));
+}
+
+.admin-doc-h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-2);
+  padding-bottom: var(--admin-space-3);
+  margin-bottom: var(--admin-space-4);
+  border-bottom: 2px solid var(--admin-gold);
+  color: var(--admin-text);
+  font-size: var(--admin-text-xl);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.admin-doc-h2-icon {
+  display: inline-flex;
+  color: var(--admin-gold-deep);
+}
+
+.admin-doc-h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-2);
+  margin: var(--admin-space-6) 0 var(--admin-space-2);
+  color: var(--admin-text);
+  font-size: var(--admin-text-lg);
+  font-weight: 650;
+}
+
+.admin-doc-chapter > .admin-doc-h3:first-of-type,
+.admin-doc-screens > .admin-doc-h3 {
+  margin-top: var(--admin-space-2);
+}
+
+.admin-doc-p {
+  margin-bottom: var(--admin-space-3);
+}
+
+.admin-doc strong {
+  color: var(--admin-text);
+  font-weight: 650;
+}
+
+/* A control named exactly as the panel labels it. Deliberately not a link —
+   it names a button, and looking like one it is not would be worse. */
+.admin-doc-ui {
+  padding: 0.05em 0.4em;
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--admin-radius-sm);
+  background: var(--admin-sunken);
+  color: var(--admin-text);
+  font-size: 0.95em;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* ── Lists ────────────────────────────────────────────────────────────────*/
+
+.admin-doc-steps,
+.admin-doc-bullets {
+  margin: 0 0 var(--admin-space-4);
+  padding-left: var(--admin-space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-space-2);
+}
+
+.admin-doc-steps {
+  list-style: decimal;
+}
+
+.admin-doc-bullets {
+  list-style: disc;
+}
+
+.admin-doc-steps > li::marker {
+  color: var(--admin-gold-deep);
+  font-weight: 700;
+}
+
+.admin-doc-bullets > li::marker {
+  color: var(--admin-text-faint);
+}
+
+/* ── Callouts ─────────────────────────────────────────────────────────────*/
+
+.admin-doc-note {
+  padding: var(--admin-space-3) var(--admin-space-4);
+  margin: var(--admin-space-4) 0;
+  border: 1px solid;
+  border-left-width: 3px;
+  border-radius: var(--admin-radius);
+  font-size: var(--admin-text-body);
+}
+
+.admin-doc-note-title {
+  margin-bottom: var(--admin-space-1);
+  font-weight: 700;
+}
+
+.admin-doc-note-body > :last-child {
+  margin-bottom: 0;
+}
+
+.admin-doc-note--info {
+  background: var(--admin-info-bg);
+  border-color: var(--admin-info-border);
+  color: var(--admin-info);
+}
+
+.admin-doc-note--warning {
+  background: var(--admin-warning-bg);
+  border-color: var(--admin-warning-border);
+  color: var(--admin-warning);
+}
+
+.admin-doc-note--danger {
+  background: var(--admin-danger-bg);
+  border-color: var(--admin-danger-border);
+  color: var(--admin-danger);
+}
+
+.admin-doc-note .admin-doc-ui {
+  background: rgb(255 255 255 / 0.65);
+  border-color: currentColor;
+  color: inherit;
+}
+
+/* ── Definition lists ─────────────────────────────────────────────────────*/
+
+.admin-doc-defs {
+  margin: 0 0 var(--admin-space-4);
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--admin-radius);
+  overflow: hidden;
+}
+
+.admin-doc-def {
+  padding: var(--admin-space-3) var(--admin-space-4);
+  border-bottom: 1px solid var(--admin-border-subtle);
+}
+
+.admin-doc-def:last-child {
+  border-bottom: 0;
+}
+
+.admin-doc-def:nth-child(odd) {
+  background: var(--admin-sunken);
+}
+
+.admin-doc-def-term {
+  margin-bottom: var(--admin-space-1);
+  color: var(--admin-text);
+  font-weight: 650;
+}
+
+.admin-doc-def-body {
+  margin: 0;
+}
+
+/* ── Comparison cards ─────────────────────────────────────────────────────*/
+
+.admin-doc-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--admin-space-3);
+  margin: var(--admin-space-4) 0;
+}
+
+@media (min-width: 720px) {
+  .admin-doc-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.admin-doc-card {
+  padding: var(--admin-space-4);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  background: var(--admin-sunken);
+}
+
+.admin-doc-card-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--admin-space-2);
+  margin-bottom: var(--admin-space-2);
+  color: var(--admin-text);
+  font-weight: 700;
+}
+
+.admin-doc-card-body > p {
+  margin-bottom: var(--admin-space-2);
+}
+
+.admin-doc-card-body > p:last-child {
+  margin-bottom: 0;
+}
+
+/* ── Screen reference ─────────────────────────────────────────────────────*/
+
+.admin-doc-screens {
+  padding-top: var(--admin-space-4);
+  margin-top: var(--admin-space-4);
+  border-top: 1px solid var(--admin-border-subtle);
+}
+
+.admin-doc-screens:first-of-type {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: 0;
+}
+
+.admin-doc-screen-group {
+  margin-top: var(--admin-space-3);
+}
+
+.admin-doc-screen-group-title {
+  margin-bottom: var(--admin-space-1);
+  color: var(--admin-text-faint);
+  font-size: var(--admin-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-doc-screen-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--admin-radius);
+  overflow: hidden;
+}
+
+.admin-doc-screen {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: 0 var(--admin-space-2);
+  padding: var(--admin-space-2) var(--admin-space-3);
+  border-bottom: 1px solid var(--admin-border-subtle);
+}
+
+.admin-doc-screen:last-child {
+  border-bottom: 0;
+}
+
+.admin-doc-screen-icon {
+  margin-top: 0.15rem;
+  color: var(--admin-text-faint);
+}
+
+.admin-doc-screen-link {
+  color: var(--admin-text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.admin-doc-screen-link:hover {
+  color: var(--admin-gold-deep);
+  text-decoration: underline;
+}
+
+.admin-doc-screen-desc {
+  grid-column: 2;
+  color: var(--admin-text-muted);
+  font-size: var(--admin-text-sm);
+  line-height: 1.5;
+}
+
+/* ── Contents rail ────────────────────────────────────────────────────────*/
+
+.admin-doc-toc {
+  min-width: 0;
+  /* Above the chapters on narrow screens: reading order should put the map
+     before the territory when they cannot sit side by side. */
+  order: -1;
+}
+
+@media (min-width: 1100px) {
+  .admin-doc-toc {
+    order: 0;
+    position: sticky;
+    top: calc(var(--admin-topbar-h) + var(--admin-space-4));
+    max-height: calc(100dvh - var(--admin-topbar-h) - var(--admin-space-8));
+    overflow-y: auto;
+  }
+}
+
+.admin-doc-toc-inner {
+  padding: var(--admin-space-3);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-lg);
+  background: var(--admin-raised);
+}
+
+.admin-doc-toc-search {
+  margin-bottom: var(--admin-space-3);
+}
+
+.admin-doc-toc-heading {
+  margin-bottom: var(--admin-space-1);
+  color: var(--admin-text-faint);
+  font-size: var(--admin-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-doc-toc-link {
+  display: flex;
+  align-items: start;
+  gap: var(--admin-space-2);
+  padding: var(--admin-space-2);
+  border-radius: var(--admin-radius-sm);
+  color: var(--admin-text-secondary);
+  text-decoration: none;
+  transition: background var(--admin-duration-fast);
+}
+
+.admin-doc-toc-link:hover {
+  background: var(--admin-hover);
+}
+
+.admin-doc-toc-icon {
+  display: inline-flex;
+  margin-top: 0.1rem;
+  color: var(--admin-text-faint);
+}
+
+.admin-doc-toc-title {
+  display: block;
+  color: var(--admin-text);
+  font-size: var(--admin-text-base);
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.admin-doc-toc-summary {
+  display: block;
+  color: var(--admin-text-muted);
+  font-size: var(--admin-text-sm);
+  line-height: 1.4;
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════

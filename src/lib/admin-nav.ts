@@ -29,6 +29,7 @@ import {
   Info,
   Layers,
   LayoutGrid,
+  LifeBuoy,
   MessageSquare,
   MousePointerClick,
   Newspaper,
@@ -499,6 +500,22 @@ const GLOBAL_GROUPS: AdminNavGroup[] = [
 
 const ADMIN_GROUPS: AdminNavGroup[] = [
   {
+    // First group on purpose: the manual is only useful to someone who has not
+    // found their way yet, and burying it under Administration would hide it
+    // from the editors it is mostly written for.
+    title: "Help",
+    items: [
+      {
+        label: "Help & documentation",
+        href: "/admin/help",
+        icon: LifeBuoy,
+        description:
+          "How to use this panel — every screen, how publishing works, and what to do when something looks wrong.",
+        minRole: "editor",
+      },
+    ],
+  },
+  {
     title: "Content",
     items: [
       {
@@ -548,7 +565,8 @@ export const ADMIN_SECTIONS: AdminNavSection[] = [
     id: "admin",
     label: "Admin Tools",
     navLabel: "Admin",
-    description: "Dynamic pages, users, audit trail and site settings.",
+    description:
+      "The manual, dynamic pages, users, audit trail and site settings.",
     icon: Wrench,
     groups: ADMIN_GROUPS,
   },
