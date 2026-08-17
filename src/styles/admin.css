@@ -1657,6 +1657,9 @@
 .admin-doc-shell {
   container-type: inline-size;
   container-name: doc;
+  /* One definition of "a comfortable line of text", used by the single-column
+     column width and by every text block inside the wide layout. */
+  --admin-doc-measure: 80ch;
 }
 
 .admin-doc-layout {
@@ -1681,9 +1684,7 @@
        the rail yields to it. Without that floor the split narrowed the text on
        the way in — 640px of prose at a 900px container became 585px at 917px,
        so widening the window shrank the column you were reading. */
-    grid-template-columns: minmax(min(640px, 100%), 1fr) minmax(200px, 300px);
-    max-width: 980px;
-    margin-inline: auto;
+    grid-template-columns: minmax(min(640px, 100%), 1fr) minmax(200px, 320px);
     gap: var(--admin-space-8);
   }
 }
@@ -1694,13 +1695,37 @@
   min-width: 0;
   /* Prose, not a form: cap the measure so a wide monitor does not produce
      130-character lines nobody can track back to the next one. */
-  max-width: 80ch;
+  max-width: var(--admin-doc-measure);
   margin-inline: auto;
   color: var(--admin-text-secondary);
   line-height: 1.7;
   /* Nothing in a manual is worth a horizontal scrollbar on a 320px phone —
      a long slug or URL breaks rather than pushing the page sideways. */
   overflow-wrap: anywhere;
+}
+
+/* The COLUMN fills the container; the MEASURE is capped per text block instead
+   (see `--admin-doc-measure`). Capping the column was what left a 1775px-wide
+   page with a 1130px band of content and 300px of dead canvas down either side
+   — while the page header and the banner above it spanned the full width,
+   which is what made the gap read as a mistake rather than as a margin.
+
+   What gains from the width is the material that is not prose: the
+   save-behaviour cards, the glossary, the screen reference. Those tile across
+   it; paragraphs keep their measure.
+
+   Must come AFTER the rule above, not inside the layout block earlier in this
+   section — same specificity, and the later declaration wins. */
+@container doc (min-width: 880px) {
+  .admin-doc {
+    max-width: none;
+    /* `stretch` behaves as `start` when either inline margin is `auto`, so the
+       centring margin the single-column layout needs stops this from filling
+       its grid track: it shrink-to-fit to its own max-content, which — every
+       text block inside being capped at the measure — came out at 760px inside
+       a 1241px track. Lifting the margin is what lets the column fill. */
+    margin-inline: 0;
+  }
 }
 
 /* ── Toolbar above the chapters ───────────────────────────────────────────*/
@@ -1801,6 +1826,31 @@
   line-height: 1.45;
 }
 
+/* Wide enough for one line: the summary moves up beside the title instead of
+   under it, so a collapsed row reads across the width rather than stopping a
+   third of the way in. */
+@container doc (min-width: 1100px) {
+  .admin-doc-toggle-text {
+    display: flex;
+    align-items: baseline;
+    gap: var(--admin-space-4);
+  }
+
+  .admin-doc-toggle-title {
+    flex: none;
+  }
+
+  .admin-doc-toggle-summary {
+    flex: 1;
+    min-width: 0;
+    margin-top: 0;
+    /* Keeps a long summary from pushing the chevron off the row. */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 .admin-doc-chevron {
   flex-shrink: 0;
   color: var(--admin-text-faint);
@@ -1851,6 +1901,15 @@
 .admin-doc-body > .admin-doc-h3:first-child,
 .admin-doc-screens > .admin-doc-h3 {
   margin-top: 0;
+}
+
+/* The reading measure, applied to running text only. Every wide element below
+   deliberately ignores it. */
+.admin-doc-p,
+.admin-doc-steps,
+.admin-doc-bullets,
+.admin-doc-note {
+  max-width: var(--admin-doc-measure);
 }
 
 .admin-doc-p {
@@ -1950,23 +2009,21 @@
 
 /* ── Definition lists ─────────────────────────────────────────────────────*/
 
+/* Cells rather than stacked rows. Term/explanation pairs are independent of
+   one another, so they tile across whatever width is going — and unlike the
+   divided list this replaced, tiling does not turn zebra striping into a
+   random-looking checkerboard. */
 .admin-doc-defs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: var(--admin-space-2);
   margin: 0 0 var(--admin-space-4);
-  border: 1px solid var(--admin-border-subtle);
-  border-radius: var(--admin-radius);
-  overflow: hidden;
 }
 
 .admin-doc-def {
   padding: var(--admin-space-3) var(--admin-space-4);
-  border-bottom: 1px solid var(--admin-border-subtle);
-}
-
-.admin-doc-def:last-child {
-  border-bottom: 0;
-}
-
-.admin-doc-def:nth-child(odd) {
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--admin-radius);
   background: var(--admin-sunken);
 }
 
@@ -1987,7 +2044,7 @@
    two 240px cards and stacks them when there is not, at any container size. */
 .admin-doc-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
   gap: var(--admin-space-3);
   margin: var(--admin-space-4) 0;
 }
@@ -2044,13 +2101,16 @@
   text-transform: uppercase;
 }
 
+/* Same treatment as the glossary: one screen per cell, tiling across the
+   width. This is the longest section of the manual — a single column of forty
+   entries is a lot of scrolling past empty canvas. */
 .admin-doc-screen-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  gap: var(--admin-space-2);
   list-style: none;
   margin: 0;
   padding: 0;
-  border: 1px solid var(--admin-border-subtle);
-  border-radius: var(--admin-radius);
-  overflow: hidden;
 }
 
 .admin-doc-screen {
@@ -2059,11 +2119,9 @@
   align-items: start;
   gap: 0 var(--admin-space-2);
   padding: var(--admin-space-2) var(--admin-space-3);
-  border-bottom: 1px solid var(--admin-border-subtle);
-}
-
-.admin-doc-screen:last-child {
-  border-bottom: 0;
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--admin-radius);
+  background: var(--admin-sunken);
 }
 
 .admin-doc-screen-icon {
