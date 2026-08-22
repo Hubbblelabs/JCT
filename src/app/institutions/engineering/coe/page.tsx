@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
     scope: "engineering",
     path: "/institutions/engineering/coe",
     fallbackTitle:
-      "Centre of Excellence | JCT College of Engineering & Technology",
+      "Controller of Examination | JCT College of Engineering & Technology",
     fallbackDescription:
       "Industry-partnered Centres of Excellence at JCT College of Engineering & Technology, Coimbatore — advanced labs, certifications, and applied research.",
   });

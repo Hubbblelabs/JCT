@@ -45,6 +45,20 @@ function ShellInner({ children }: { children: ReactNode }) {
   const [userCollapsed, setUserCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Mirrors admin.css's mobile breakpoint so the toggle, the button's label
+  // and the stylesheet can never disagree about which layout is on screen.
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 640px)");
+    const sync = () => {
+      setIsMobile(mq.matches);
+      if (!mq.matches) setDrawerOpen(false);
+    };
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   // Below the tablet breakpoint the rail is the default, but it is decided
   // here rather than in CSS: the stylesheet used to shrink the sidebar width
@@ -68,10 +82,12 @@ function ShellInner({ children }: { children: ReactNode }) {
 
   // One button now does both jobs: below the drawer breakpoint the rail is
   // off-screen (transformed, not just narrowed), so "collapse" has nothing to
-  // toggle — open the drawer instead. Matches the CSS breakpoint in
-  // admin.css's mobile section.
+  // toggle — open the drawer instead. This reads the same media query the CSS
+  // uses rather than comparing `innerWidth`: at exactly 640px the two
+  // disagreed, CSS putting the sidebar off-screen while the button went on
+  // toggling a width nobody could see, and the navigation became unreachable.
   const toggleCollapse = () => {
-    if (typeof window !== "undefined" && window.innerWidth < 640) {
+    if (isMobile) {
       setDrawerOpen((prev) => !prev);
       return;
     }
@@ -81,6 +97,17 @@ function ShellInner({ children }: { children: ReactNode }) {
       return next;
     });
   };
+
+  // Escape closes the drawer — on a phone the backdrop is the only other way
+  // out, and a keyboard user tabbing through the tree has none.
+  useEffect(() => {
+    if (!drawerOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDrawerOpen(false);
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [drawerOpen]);
 
   // Route change closes the mobile drawer; without this it stays over the page
   // the user just navigated to.
@@ -98,7 +125,7 @@ function ShellInner({ children }: { children: ReactNode }) {
   return (
     <div
       className="admin-shell"
-      data-collapsed={collapsed || undefined}
+      data-collapsed={(collapsed && !drawerOpen) || undefined}
       data-drawer={drawerOpen ? "open" : undefined}
     >
       <a href="#admin-main" className="admin-skip-link">
@@ -127,7 +154,8 @@ function ShellInner({ children }: { children: ReactNode }) {
           trail={trail}
           userName={userName}
           userRole={role}
-          collapsed={collapsed}
+          collapsed={isMobile ? !drawerOpen : collapsed}
+          mobile={isMobile}
           onToggleCollapse={toggleCollapse}
           onOpenPalette={() => setPaletteOpen(true)}
         />

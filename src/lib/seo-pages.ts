@@ -40,7 +40,7 @@ export const ENGINEERING_SEO_PAGES: SeoPageDefault[] = [
   { path: "/institutions/engineering", label: "Landing page" },
   { path: "/institutions/engineering/courses", label: "Courses" },
   { path: "/institutions/engineering/about", label: "About" },
-  { path: "/institutions/engineering/coe", label: "Centre of Excellence" },
+  { path: "/institutions/engineering/coe", label: "Controller of Examination" },
   { path: "/institutions/engineering/placements", label: "Placements" },
   { path: "/institutions/engineering/events", label: "News & Events" },
   { path: "/institutions/engineering/accreditations", label: "Accreditations" },

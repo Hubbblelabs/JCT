@@ -255,7 +255,7 @@ function collegeGroups(college: College): AdminNavGroup[] {
     ...(eng
       ? [
           {
-            label: "Centre of Excellence",
+            label: "Controller of Examination",
             href: "/admin/coe",
             icon: ScrollText,
             description: "CoE page sections, live preview editor.",

@@ -7,11 +7,13 @@ import {
   ExternalLink,
   Loader2,
   LogOut,
+  Menu,
   PanelLeftClose,
   PanelLeftOpen,
   RefreshCw,
   Search,
   User,
+  X,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { type NavTrail } from "@/lib/admin-nav";
@@ -29,6 +31,7 @@ export function AdminTopbar({
   userName,
   userRole,
   collapsed,
+  mobile = false,
   onToggleCollapse,
   onOpenPalette,
 }: {
@@ -36,6 +39,9 @@ export function AdminTopbar({
   userName: string;
   userRole: string;
   collapsed: boolean;
+  /** Below the drawer breakpoint the same button opens the drawer instead of
+      narrowing the rail, so it has to say so. */
+  mobile?: boolean;
   onToggleCollapse: () => void;
   onOpenPalette: () => void;
 }) {
@@ -103,10 +109,29 @@ export function AdminTopbar({
         type="button"
         onClick={onToggleCollapse}
         className="admin-icon-btn"
-        aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        aria-pressed={collapsed}
+        aria-label={
+          mobile
+            ? collapsed
+              ? "Open navigation"
+              : "Close navigation"
+            : collapsed
+              ? "Expand sidebar"
+              : "Collapse sidebar"
+        }
+        aria-expanded={mobile ? !collapsed : undefined}
+        aria-pressed={mobile ? undefined : collapsed}
       >
-        {collapsed ? <PanelLeftOpen size={17} /> : <PanelLeftClose size={17} />}
+        {mobile ? (
+          collapsed ? (
+            <Menu size={18} />
+          ) : (
+            <X size={18} />
+          )
+        ) : collapsed ? (
+          <PanelLeftOpen size={17} />
+        ) : (
+          <PanelLeftClose size={17} />
+        )}
       </button>
 
       <nav aria-label="Breadcrumb" className="admin-breadcrumb min-w-0">

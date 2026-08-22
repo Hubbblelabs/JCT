@@ -318,7 +318,7 @@ export const HELP_CHAPTERS: HelpChapter[] = [
             <p>
               <UI>Save</UI> keeps your work as a draft — the live page does not
               change. <UI>Save &amp; Publish</UI> makes it live. Use this for
-              About Us, Centre of Excellence, Campus Life, Research, Clubs,
+              About Us, Controller of Examination, Campus Life, Research, Clubs,
               Committees, Accreditations, Reports &amp; Downloads, NAAC,
               Placements and every standalone content page.
             </p>

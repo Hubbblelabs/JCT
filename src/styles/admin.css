@@ -2444,11 +2444,18 @@
     margin-left: 0;
   }
 
-  .admin-sidebar {
-    width: var(--admin-sidebar-w-expanded-mobile, 264px);
+  /* The drawer is never a rail: it is either off-screen or full width. Both
+     selectors are needed — `[data-collapsed]` outranks a bare `.admin-sidebar`,
+     which is what left the drawer rendering full-size labels inside a 60px
+     column on every phone. AdminShell also drops `data-collapsed` while the
+     drawer is open; this is the belt to that braces. */
+  .admin-sidebar,
+  .admin-shell[data-collapsed="true"] .admin-sidebar {
+    width: min(84vw, 300px);
     transform: translateX(-100%);
     transition: transform var(--admin-duration) var(--admin-ease);
     box-shadow: var(--admin-shadow-xl);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   .admin-shell[data-drawer="open"] .admin-sidebar {
@@ -2472,11 +2479,29 @@
     padding-right: var(--admin-space-3);
   }
 
+  .admin-shell[data-drawer="open"] .admin-sidebar-link {
+    margin-left: var(--admin-space-2);
+  }
+
+  /* Section rows are the whole navigation on a phone and are hit with a
+     thumb, so they get the 44px target the pointer version doesn't need. */
+  .admin-sidebar-section,
+  .admin-sidebar-link {
+    min-height: 44px;
+  }
+
+  .admin-sidebar-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .admin-sidebar-backdrop {
     position: fixed;
     inset: 0;
     z-index: calc(var(--admin-z-sidebar) - 1);
     background: rgb(15 23 42 / 0.45);
+    touch-action: none;
   }
 
   .admin-content {
