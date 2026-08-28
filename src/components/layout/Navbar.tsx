@@ -268,7 +268,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
     highlightShadowColor = "shadow-arts-science-accent/10";
   } else if (institution === "polytechnic") {
     logoText = "JCT POLYTECHNIC COLLEGE";
-    logoSubText = "Est. 2009";
+    logoSubText = "Est. 2014";
     highlightColor = "text-slate-400";
     highlightBgColor = "bg-slate-500";
     highlightHoverBgColor = "hover:bg-slate-600";
