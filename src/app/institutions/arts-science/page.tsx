@@ -24,6 +24,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 import { Hero } from "@/modules/arts-science/Hero";
 import { UgPrograms } from "@/modules/arts-science/UgPrograms";
+import { AddOnPrograms } from "@/modules/arts-science/AddOnPrograms";
+import { CareerDevelopmentCentre } from "@/modules/arts-science/CareerDevelopmentCentre";
 import { AdmissionProcess } from "@/modules/arts-science/AdmissionProcess";
 import { CampusLife } from "@/components/layout/CampusLife";
 import { Testimonials } from "@/modules/arts-science/Testimonials";
@@ -43,6 +45,8 @@ export default async function ArtsSciencePage() {
         <div id="main-content" tabIndex={-1} className="outline-none" />
         <Hero />
         <UgPrograms />
+        <AddOnPrograms />
+        <CareerDevelopmentCentre />
         <NewsEvents institution="arts-science" />
         <AdmissionProcess />
         <Placements institution="arts-science" />

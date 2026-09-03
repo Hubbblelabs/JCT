@@ -72,6 +72,17 @@ export {
 } from "./engineeringSections";
 
 export {
+  AddOnProgramsSchema,
+  CareerCentreSchema,
+  ADD_ON_PROGRAMS_LIMITS,
+  CAREER_CENTRE_LIMITS,
+} from "./artsScienceSections";
+export type {
+  AddOnProgramsValue,
+  CareerCentreValue,
+} from "./artsScienceSections";
+
+export {
   TestimonialSchema,
   TestimonialCreateSchema,
   TestimonialUpdateSchema,

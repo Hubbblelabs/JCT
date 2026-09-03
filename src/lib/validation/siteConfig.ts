@@ -53,6 +53,7 @@ import {
   GroupsPageSchema,
   DocumentsPageSchema,
 } from "./engineeringPages";
+import { AddOnProgramsSchema, CareerCentreSchema } from "./artsScienceSections";
 
 // Every site-config key the admin UI writes must have an entry below.
 // Keys in this map are validated strictly; unknown keys are rejected.
@@ -81,6 +82,8 @@ export const SITE_CONFIG_SCHEMAS = {
   artsScienceUpcomingEvents: UpcomingEventsSchema,
   polytechnicUpcomingEvents: UpcomingEventsSchema,
   artsScienceHero: ArtsScienceHeroSchema,
+  artsScienceAddOnPrograms: AddOnProgramsSchema,
+  artsScienceCareerCentre: CareerCentreSchema,
   artsScienceHeroStats: HeroStatsListSchema,
   artsScienceLifeAtJct: LifeAtJctSchema,
   artsScienceAdmissions: AdmissionsSchema,
@@ -232,6 +235,8 @@ export const SITE_CONFIG_KEY_INSTITUTION: Partial<
   artsSciencePlacementInfo: "arts-science",
   polytechnicPlacementInfo: "polytechnic",
   artsScienceHero: "arts-science",
+  artsScienceAddOnPrograms: "arts-science",
+  artsScienceCareerCentre: "arts-science",
   artsScienceHeroStats: "arts-science",
   artsScienceLifeAtJct: "arts-science",
   artsScienceAdmissions: "arts-science",

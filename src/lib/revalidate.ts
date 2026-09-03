@@ -144,6 +144,8 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   artsScienceUpcomingEvents: ["arts-science"],
   polytechnicUpcomingEvents: ["polytechnic"],
   artsScienceHero: ["arts-science"],
+  artsScienceAddOnPrograms: ["arts-science"],
+  artsScienceCareerCentre: ["arts-science"],
   artsScienceHeroStats: ["arts-science"],
   artsScienceLifeAtJct: ["arts-science"],
   artsScienceAdmissions: ["arts-science"],

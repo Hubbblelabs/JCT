@@ -22,6 +22,8 @@ import {
   AdmissionsForm,
   LifeAtJctForm,
   MetricsForm,
+  AddOnProgramsForm,
+  CareerCentreForm,
   NavbarAdminSection,
   UpcomingEventsForm,
   SeoPagesForm,
@@ -34,6 +36,8 @@ import {
   type GenericAdmissionsVal,
   type LifeAtJctVal,
   type Metric,
+  type AddOnProgramsVal,
+  type CareerCentreVal,
   type NavbarVal,
   type UpcomingEventsVal,
 } from "@/components/admin/PageContentForms";
@@ -52,6 +56,10 @@ import {
   type NavItem as StaticNavItem,
 } from "@/data/all-navigations";
 import { reconcileSeoPages, seoPagesDefaultValue } from "@/lib/seo-pages";
+import {
+  ARTS_SCIENCE_ADD_ON_PROGRAMS_DEFAULT,
+  ARTS_SCIENCE_CAREER_CENTRE_DEFAULT,
+} from "@/lib/arts-science-section-defaults";
 
 type College = "engineering" | "arts-science" | "polytechnic";
 
@@ -681,6 +689,32 @@ function sectionsFor(college: College): SectionDef[] {
         render: (v, onChange) => (
           <ArtsScienceHeroForm
             value={(v as ArtsHeroVal) ?? {}}
+            onChange={onChange}
+          />
+        ),
+      },
+      {
+        id: "addOnPrograms",
+        label: "Add-on Programs",
+        kind: "form",
+        configKey: "artsScienceAddOnPrograms",
+        defaultValue: ARTS_SCIENCE_ADD_ON_PROGRAMS_DEFAULT,
+        render: (v, onChange) => (
+          <AddOnProgramsForm
+            value={(v as AddOnProgramsVal) ?? {}}
+            onChange={onChange}
+          />
+        ),
+      },
+      {
+        id: "careerCentre",
+        label: "Career Development Centre",
+        kind: "form",
+        configKey: "artsScienceCareerCentre",
+        defaultValue: ARTS_SCIENCE_CAREER_CENTRE_DEFAULT,
+        render: (v, onChange) => (
+          <CareerCentreForm
+            value={(v as CareerCentreVal) ?? {}}
             onChange={onChange}
           />
         ),

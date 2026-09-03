@@ -7,6 +7,10 @@ import { revalidateForConfigKey } from "@/lib/revalidate";
 import { CONTENT_PAGE_SEEDS } from "@/lib/content-page-seeds";
 import { getContentPage } from "@/lib/content-pages";
 import { ContentPageSchema } from "@/lib/validation";
+import {
+  ARTS_SCIENCE_ADD_ON_PROGRAMS_DEFAULT,
+  ARTS_SCIENCE_CAREER_CENTRE_DEFAULT,
+} from "@/lib/arts-science-section-defaults";
 
 // Image values below are deliberately empty. They used to be hardcoded
 // /campus-life-assets/*.webp paths under a /public directory that no longer
@@ -97,6 +101,27 @@ const SEEDS: Seed[] = [
       studentsPlaced: "98%",
       industryAwards: "50+",
     },
+  },
+  // Arts & Science-only landing sections. Published on insert so the section
+  // is live the moment the key exists, and insertOnly so re-seeding never
+  // reverts copy an editor has since rewritten.
+  {
+    config_key: "artsScienceAddOnPrograms",
+    value: ARTS_SCIENCE_ADD_ON_PROGRAMS_DEFAULT as unknown as Record<
+      string,
+      unknown
+    >,
+    publish: true,
+    insertOnly: true,
+  },
+  {
+    config_key: "artsScienceCareerCentre",
+    value: ARTS_SCIENCE_CAREER_CENTRE_DEFAULT as unknown as Record<
+      string,
+      unknown
+    >,
+    publish: true,
+    insertOnly: true,
   },
   // About pages — empty placeholders, to be filled in via the admin CMS
   {
@@ -334,7 +359,7 @@ export async function POST(req: NextRequest) {
       "site-config",
       "seeded",
       session!.user?.email ?? "",
-      "Seeded site config keys (footer content pages, homeStats, About pages, COE page, Campus Life page)",
+      "Seeded site config keys (footer content pages, homeStats, About pages, COE page, Campus Life page, Arts & Science add-on programs and career centre)",
     );
 
     return json({ message: "Default content seeded successfully." });

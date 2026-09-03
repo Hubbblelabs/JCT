@@ -179,6 +179,8 @@ export const ENGINEERING_CONFIG_KEYS = [
 
 export const ARTS_SCIENCE_CONFIG_KEYS = [
   "artsScienceHero",
+  "artsScienceAddOnPrograms",
+  "artsScienceCareerCentre",
   "artsScienceAdmissions",
   "artsSciencePlacementHighlights",
   "artsScienceLifeAtJct",

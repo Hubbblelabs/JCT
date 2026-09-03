@@ -18,6 +18,7 @@ import {
   CalendarDays,
   Camera,
   ClipboardList,
+  Compass,
   DatabaseBackup,
   FileEdit,
   FlaskConical,
@@ -35,6 +36,7 @@ import {
   Newspaper,
   PanelBottom,
   PanelTop,
+  Plane,
   ScrollText,
   Sparkles,
   TreePalm,
@@ -179,6 +181,27 @@ function collegeGroups(college: College): AdminNavGroup[] {
             href: pc("metrics"),
             icon: BarChart3,
             description: "The numbers strip on the landing page.",
+          },
+        ]
+      : []),
+    // Arts & Science alone publishes the add-on certificate tracks and the
+    // Career Development Centre grid, between the program cards and the
+    // events strip — the order the landing page renders them.
+    ...(college === "arts-science"
+      ? [
+          {
+            label: "Add-on Programs",
+            href: pc("addOnPrograms"),
+            icon: Plane,
+            description:
+              "Certificate tracks taken alongside the degree, grouped by field.",
+          },
+          {
+            label: "Career Development Centre",
+            href: pc("careerCentre"),
+            icon: Compass,
+            description:
+              "Higher education, competitive exams, placements and counselling support.",
           },
         ]
       : []),

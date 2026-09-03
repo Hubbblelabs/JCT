@@ -35,6 +35,8 @@ import {
   RESEARCH_HIGHLIGHTS_LIMITS,
   HERO_STATS_LIMITS,
   ADMISSIONS_LIMITS,
+  ADD_ON_PROGRAMS_LIMITS,
+  CAREER_CENTRE_LIMITS,
   WHY_CHOOSE_JCT_LIMITS,
   HOME_ADMISSIONS_LIMITS,
   HOME_STATISTICS_LIMITS,
@@ -2586,6 +2588,409 @@ export function AdmissionsForm({
           />
         </>
       )}
+    </FormGrid>
+  );
+}
+
+/* ─── Arts & Science: Add-on Programs ─── */
+
+export type AddOnProgramGroup = {
+  icon?: string;
+  title?: string;
+  description?: string;
+  items?: string[];
+};
+export type AddOnProgramsVal = {
+  enabled?: boolean;
+  eyebrow?: string;
+  title?: string;
+  titleHighlight?: string;
+  description?: string;
+  groups?: AddOnProgramGroup[];
+  ctaLabel?: string;
+  ctaHref?: string;
+};
+
+export function AddOnProgramsForm({
+  value,
+  onChange,
+}: {
+  value: AddOnProgramsVal;
+  onChange: (v: AddOnProgramsVal) => void;
+}) {
+  const groups = Array.isArray(value.groups) ? value.groups : [];
+  const atMax = groups.length >= ADD_ON_PROGRAMS_LIMITS.groupsMax;
+
+  const patchGroup = (i: number, patch: Partial<AddOnProgramGroup>) =>
+    onChange({
+      ...value,
+      groups: groups.map((g, j) => (j === i ? { ...g, ...patch } : g)),
+    });
+
+  // Heading → tracks (each a card of courses) → CTA, as rendered publicly.
+  return (
+    <FormGrid>
+      <Field label="Visibility" span={2}>
+        <label className="flex items-center gap-2 pt-2 text-sm">
+          <input
+            type="checkbox"
+            checked={value.enabled !== false}
+            onChange={(e) => onChange({ ...value, enabled: e.target.checked })}
+          />
+          Show section
+        </label>
+      </Field>
+      <TextInput
+        label="Eyebrow"
+        span={3}
+        value={value.eyebrow ?? ""}
+        maxLength={ADD_ON_PROGRAMS_LIMITS.eyebrowMax}
+        onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
+        placeholder="Add-on Programs"
+      />
+      <TextInput
+        label="Title"
+        span={4}
+        value={value.title ?? ""}
+        maxLength={ADD_ON_PROGRAMS_LIMITS.titleMax}
+        onChange={(e) => onChange({ ...value, title: e.target.value })}
+        placeholder="Skills that stack on"
+      />
+      <TextInput
+        label="Title Highlight"
+        span={3}
+        value={value.titleHighlight ?? ""}
+        maxLength={ADD_ON_PROGRAMS_LIMITS.titleHighlightMax}
+        onChange={(e) => onChange({ ...value, titleHighlight: e.target.value })}
+        hint="Rendered in accent color within the title"
+      />
+      <TextArea
+        label="Description"
+        span="full"
+        rows={2}
+        value={value.description ?? ""}
+        maxLength={ADD_ON_PROGRAMS_LIMITS.descriptionMax}
+        onChange={(e) => onChange({ ...value, description: e.target.value })}
+      />
+
+      <Field
+        label="Tracks"
+        span="full"
+        hint={`Up to ${ADD_ON_PROGRAMS_LIMITS.groupsMax} cards, ${ADD_ON_PROGRAMS_LIMITS.itemsPerGroupMax} courses each. Icon is a Lucide icon name (e.g. Plane, Cpu).`}
+      >
+        <div className="admin-form-grid admin-form-grid--tight">
+          {groups.map((group, i) => {
+            const items = Array.isArray(group.items) ? group.items : [];
+            return (
+              <div
+                key={i}
+                className="admin-col-6 rounded-lg border border-gray-200 p-3"
+              >
+                <FormGrid tight>
+                  <TextInput
+                    label="Icon"
+                    span={4}
+                    value={group.icon ?? ""}
+                    maxLength={ADD_ON_PROGRAMS_LIMITS.groupIconMax}
+                    onChange={(e) => patchGroup(i, { icon: e.target.value })}
+                    placeholder="Plane"
+                  />
+                  <TextInput
+                    label="Track Title"
+                    span={8}
+                    value={group.title ?? ""}
+                    maxLength={ADD_ON_PROGRAMS_LIMITS.groupTitleMax}
+                    onChange={(e) => patchGroup(i, { title: e.target.value })}
+                    placeholder="Aviation"
+                  />
+                  <TextArea
+                    label="Description (optional)"
+                    span="full"
+                    rows={2}
+                    value={group.description ?? ""}
+                    maxLength={ADD_ON_PROGRAMS_LIMITS.groupDescMax}
+                    onChange={(e) =>
+                      patchGroup(i, { description: e.target.value })
+                    }
+                  />
+                </FormGrid>
+                <Field label="Courses">
+                  <div className="space-y-2">
+                    {items.map((item, k) => (
+                      <div key={k} className="flex gap-2">
+                        <input
+                          className="admin-input"
+                          value={item}
+                          maxLength={ADD_ON_PROGRAMS_LIMITS.itemMax}
+                          aria-label={`Course ${k + 1}`}
+                          onChange={(e) =>
+                            patchGroup(i, {
+                              items: items.map((it, m) =>
+                                m === k ? e.target.value : it,
+                              ),
+                            })
+                          }
+                        />
+                        <button
+                          type="button"
+                          onClick={() =>
+                            patchGroup(i, {
+                              items: items.filter((_, m) => m !== k),
+                            })
+                          }
+                          className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+                        >
+                          <Trash2 size={13} />
+                        </button>
+                      </div>
+                    ))}
+                    <div className="flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() => patchGroup(i, { items: [...items, ""] })}
+                        disabled={
+                          items.length >=
+                          ADD_ON_PROGRAMS_LIMITS.itemsPerGroupMax
+                        }
+                        className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        <Plus size={14} /> Add Course
+                      </button>
+                      <LimitHint
+                        count={items.length}
+                        max={ADD_ON_PROGRAMS_LIMITS.itemsPerGroupMax}
+                      />
+                    </div>
+                  </div>
+                </Field>
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChange({
+                      ...value,
+                      groups: groups.filter((_, j) => j !== i),
+                    })
+                  }
+                  className="admin-btn admin-btn-danger admin-btn-sm mt-2"
+                >
+                  <Trash2 size={13} /> Remove Track
+                </button>
+              </div>
+            );
+          })}
+          <div className="admin-col-full flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() =>
+                onChange({
+                  ...value,
+                  groups: [
+                    ...groups,
+                    { icon: "", title: "", description: "", items: [] },
+                  ],
+                })
+              }
+              disabled={atMax}
+              className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus size={14} /> Add Track
+            </button>
+            <LimitHint
+              count={groups.length}
+              max={ADD_ON_PROGRAMS_LIMITS.groupsMax}
+            />
+          </div>
+        </div>
+      </Field>
+
+      <TextInput
+        label="CTA Label (optional)"
+        span={4}
+        value={value.ctaLabel ?? ""}
+        maxLength={ADD_ON_PROGRAMS_LIMITS.ctaLabelMax}
+        onChange={(e) => onChange({ ...value, ctaLabel: e.target.value })}
+      />
+      <TextInput
+        label="CTA Link (optional)"
+        span={8}
+        value={value.ctaHref ?? ""}
+        maxLength={500}
+        onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
+        placeholder="/institutions/arts-science/courses"
+      />
+    </FormGrid>
+  );
+}
+
+/* ─── Arts & Science: Career Development Centre ─── */
+
+export type CareerCentreService = {
+  icon?: string;
+  title?: string;
+  description?: string;
+};
+export type CareerCentreVal = {
+  enabled?: boolean;
+  eyebrow?: string;
+  title?: string;
+  titleHighlight?: string;
+  description?: string;
+  services?: CareerCentreService[];
+  ctaLabel?: string;
+  ctaHref?: string;
+};
+
+export function CareerCentreForm({
+  value,
+  onChange,
+}: {
+  value: CareerCentreVal;
+  onChange: (v: CareerCentreVal) => void;
+}) {
+  const services = Array.isArray(value.services) ? value.services : [];
+  const atMax = services.length >= CAREER_CENTRE_LIMITS.servicesMax;
+
+  const patchService = (i: number, patch: Partial<CareerCentreService>) =>
+    onChange({
+      ...value,
+      services: services.map((s, j) => (j === i ? { ...s, ...patch } : s)),
+    });
+
+  return (
+    <FormGrid>
+      <Field label="Visibility" span={2}>
+        <label className="flex items-center gap-2 pt-2 text-sm">
+          <input
+            type="checkbox"
+            checked={value.enabled !== false}
+            onChange={(e) => onChange({ ...value, enabled: e.target.checked })}
+          />
+          Show section
+        </label>
+      </Field>
+      <TextInput
+        label="Eyebrow"
+        span={3}
+        value={value.eyebrow ?? ""}
+        maxLength={CAREER_CENTRE_LIMITS.eyebrowMax}
+        onChange={(e) => onChange({ ...value, eyebrow: e.target.value })}
+        placeholder="Career Development Centre"
+      />
+      <TextInput
+        label="Title"
+        span={4}
+        value={value.title ?? ""}
+        maxLength={CAREER_CENTRE_LIMITS.titleMax}
+        onChange={(e) => onChange({ ...value, title: e.target.value })}
+      />
+      <TextInput
+        label="Title Highlight"
+        span={3}
+        value={value.titleHighlight ?? ""}
+        maxLength={CAREER_CENTRE_LIMITS.titleHighlightMax}
+        onChange={(e) => onChange({ ...value, titleHighlight: e.target.value })}
+        hint="Rendered in accent color within the title"
+      />
+      <TextArea
+        label="Description"
+        span="full"
+        rows={2}
+        value={value.description ?? ""}
+        maxLength={CAREER_CENTRE_LIMITS.descriptionMax}
+        onChange={(e) => onChange({ ...value, description: e.target.value })}
+      />
+
+      <Field
+        label="Support Areas"
+        span="full"
+        hint={`Up to ${CAREER_CENTRE_LIMITS.servicesMax} cards. Icon is a Lucide icon name (e.g. GraduationCap, Globe, Briefcase).`}
+      >
+        <div className="admin-form-grid admin-form-grid--tight">
+          {services.map((service, i) => (
+            <div
+              key={i}
+              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+            >
+              <FormGrid tight>
+                <TextInput
+                  label="Icon"
+                  span={5}
+                  value={service.icon ?? ""}
+                  maxLength={CAREER_CENTRE_LIMITS.serviceIconMax}
+                  onChange={(e) => patchService(i, { icon: e.target.value })}
+                  placeholder="GraduationCap"
+                />
+                <TextInput
+                  label="Title"
+                  span={7}
+                  value={service.title ?? ""}
+                  maxLength={CAREER_CENTRE_LIMITS.serviceTitleMax}
+                  onChange={(e) => patchService(i, { title: e.target.value })}
+                />
+                <TextArea
+                  label="Description"
+                  span="full"
+                  rows={2}
+                  value={service.description ?? ""}
+                  maxLength={CAREER_CENTRE_LIMITS.serviceDescMax}
+                  onChange={(e) =>
+                    patchService(i, { description: e.target.value })
+                  }
+                />
+              </FormGrid>
+              <button
+                type="button"
+                onClick={() =>
+                  onChange({
+                    ...value,
+                    services: services.filter((_, j) => j !== i),
+                  })
+                }
+                className="admin-btn admin-btn-danger admin-btn-sm"
+              >
+                <Trash2 size={13} /> Remove
+              </button>
+            </div>
+          ))}
+          <div className="admin-col-full flex items-center justify-between">
+            <button
+              type="button"
+              onClick={() =>
+                onChange({
+                  ...value,
+                  services: [
+                    ...services,
+                    { icon: "", title: "", description: "" },
+                  ],
+                })
+              }
+              disabled={atMax}
+              className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus size={14} /> Add Support Area
+            </button>
+            <LimitHint
+              count={services.length}
+              max={CAREER_CENTRE_LIMITS.servicesMax}
+            />
+          </div>
+        </div>
+      </Field>
+
+      <TextInput
+        label="CTA Label (optional)"
+        span={4}
+        value={value.ctaLabel ?? ""}
+        maxLength={CAREER_CENTRE_LIMITS.ctaLabelMax}
+        onChange={(e) => onChange({ ...value, ctaLabel: e.target.value })}
+      />
+      <TextInput
+        label="CTA Link (optional)"
+        span={8}
+        value={value.ctaHref ?? ""}
+        maxLength={500}
+        onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
+      />
     </FormGrid>
   );
 }
