@@ -175,6 +175,11 @@ const GROUPS: LabelGroup[] = [
             label: "Column: Specialization",
             placeholder: "Specialization",
           },
+          {
+            key: "colAicteId",
+            label: "Column: AICTE ID",
+            placeholder: "AICTE ID",
+          },
         ],
       },
       {

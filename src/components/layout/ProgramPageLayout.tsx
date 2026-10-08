@@ -38,6 +38,7 @@ import type {
   ProgramData,
   FacilitiesLabels,
   FacultyLabels,
+  FacultyMember,
   LifeLabels,
   OverviewLabels,
   TabConfigItem,
@@ -1373,12 +1374,32 @@ function FacultyTab({
   const showBos =
     labels?.bos?.visible !== false && hasBosSection(dept, editable);
 
+  // Optional columns render only when some row fills them, so a roster
+  // authored as name + designation + photo doesn't show three empty columns.
+  const facultyCols = (
+    [
+      {
+        key: "qualification",
+        label: labels?.coreFaculty?.colQualification || "Qualification",
+      },
+      {
+        key: "experience",
+        label: labels?.coreFaculty?.colExperience || "Experience",
+      },
+      {
+        key: "specialization",
+        label: labels?.coreFaculty?.colSpecialization || "Specialization",
+      },
+      {
+        key: "aicteId",
+        label: labels?.coreFaculty?.colAicteId || "AICTE ID",
+      },
+    ] as const
+  ).filter((c) => dept.faculty.some((f) => hasText(f[c.key])));
   const facultyHeaders = [
     labels?.coreFaculty?.colName || "Faculty Member",
     labels?.coreFaculty?.colDesignation || "Designation",
-    labels?.coreFaculty?.colQualification || "Qualification",
-    labels?.coreFaculty?.colExperience || "Experience",
-    labels?.coreFaculty?.colSpecialization || "Specialization",
+    ...facultyCols.map((c) => c.label),
   ];
 
   return (
@@ -1402,17 +1423,13 @@ function FacultyTab({
             {dept.faculty.map((f) => (
               <FadeUp key={f.name}>
                 <Card className="p-5">
-                  <div className="flex items-start gap-3">
-                    <div
-                      className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xs font-black text-white"
-                      style={{ backgroundColor: ac }}
-                    >
-                      {f.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")
-                        .slice(0, 2)}
-                    </div>
+                  <div className="flex items-center gap-3">
+                    <FacultyAvatar
+                      member={f}
+                      ac={ac}
+                      className="h-16 w-14 text-sm"
+                      sizes="56px"
+                    />
                     <div>
                       <p className="text-sm font-bold text-gray-900">
                         {f.name}
@@ -1420,10 +1437,17 @@ function FacultyTab({
                       <p className="text-xs text-gray-500">{f.designation}</p>
                     </div>
                   </div>
-                  <div className="mt-4 space-y-1.5">
-                    <Detail label="Qualification" value={f.qualification} />
-                    <Detail label="Experience" value={f.experience} />
-                    <Detail label="Specialization" value={f.specialization} />
+                  <div className="mt-4 space-y-1.5 empty:hidden">
+                    {facultyCols.map(
+                      (c) =>
+                        hasText(f[c.key]) && (
+                          <Detail
+                            key={c.key}
+                            label={c.label}
+                            value={f[c.key] ?? ""}
+                          />
+                        ),
+                    )}
                     {f.email && (
                       <div className="flex items-center gap-1.5 text-xs">
                         <Mail
@@ -1463,16 +1487,12 @@ function FacultyTab({
                     >
                       <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div
-                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-xs font-black text-white"
-                            style={{ backgroundColor: ac }}
-                          >
-                            {f.name
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")
-                              .slice(0, 2)}
-                          </div>
+                          <FacultyAvatar
+                            member={f}
+                            ac={ac}
+                            className="h-14 w-12 text-xs"
+                            sizes="48px"
+                          />
                           <span className="font-bold text-gray-900">
                             {f.name}
                           </span>
@@ -1481,15 +1501,11 @@ function FacultyTab({
                       <td className="px-5 py-3.5 font-medium text-gray-700">
                         {f.designation}
                       </td>
-                      <td className="px-5 py-3.5 text-gray-500">
-                        {f.qualification}
-                      </td>
-                      <td className="px-5 py-3.5 text-gray-500">
-                        {f.experience}
-                      </td>
-                      <td className="px-5 py-3.5 text-gray-500">
-                        {f.specialization}
-                      </td>
+                      {facultyCols.map((c) => (
+                        <td key={c.key} className="px-5 py-3.5 text-gray-500">
+                          {f[c.key]}
+                        </td>
+                      ))}
                     </tr>
                   ))}
                 </tbody>
@@ -2211,7 +2227,42 @@ function CareerTab({
   );
 }
 
-// ─── Small helper used in faculty mobile card ─────────────────────────────────
+// ─── Small helpers used in the faculty table and mobile cards ────────────────
+
+/**
+ * Faculty portrait over an initials tile — same layering as the HOD tile, so a
+ * missing or broken photo degrades to a monogram rather than a hole.
+ */
+function FacultyAvatar({
+  member,
+  ac,
+  className,
+  sizes,
+}: {
+  member: FacultyMember;
+  ac: string;
+  className: string;
+  sizes: string;
+}) {
+  return (
+    <div
+      className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-xl font-black text-white ${className}`}
+      style={{ backgroundColor: ac }}
+    >
+      {initials(member.name)}
+      {member.photo && (
+        <ProgramImage
+          src={member.photo}
+          alt={member.name}
+          fill
+          sizes={sizes}
+          className="absolute inset-0 h-full w-full object-cover object-top"
+        />
+      )}
+    </div>
+  );
+}
+
 function Detail({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start gap-1 text-xs">

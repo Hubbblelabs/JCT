@@ -5,6 +5,12 @@ export type FacultyMember = {
   experience: string;
   specialization: string;
   email?: string;
+  /** Storage key for the portrait. Empty falls back to initials. */
+  photo?: string;
+  /** AICTE faculty ID — public on the AICTE portal, shown as a column. */
+  aicteId?: string;
+  /** Anna University faculty ID. Stored for records, never rendered. */
+  auFin?: string;
 };
 
 export type Lab = {
@@ -105,6 +111,7 @@ export type FacultyLabels = {
     colQualification?: string;
     colExperience?: string;
     colSpecialization?: string;
+    colAicteId?: string;
   };
   advisoryBoard?: { visible?: boolean; title?: string };
   pac?: { visible?: boolean; title?: string };

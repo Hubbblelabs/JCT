@@ -948,6 +948,8 @@ export type FieldDef = {
   /** Columns of the 12-column row this field takes. Defaults to half a row. */
   span?: FieldSpan;
   placeholder?: string;
+  /** Upload preset for `type: "image"` fields. Defaults to "auto". */
+  ratio?: RatioType;
 };
 
 export function ItemsEditor({
@@ -992,6 +994,7 @@ export function ItemsEditor({
                       value={String(item[f.key] ?? "")}
                       onChange={(v) => upd(i, f.key, v)}
                       hint={f.placeholder}
+                      ratio={f.ratio}
                       hideUrlField
                     />
                   </div>

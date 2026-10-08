@@ -33,20 +33,31 @@ const PO_FIELDS: FieldDef[] = [
 const E_PO = { code: "", title: "", description: "" };
 
 const FACULTY_FIELDS: FieldDef[] = [
-  { key: "name", label: "Name", span: 4 },
+  { key: "photo", label: "Photo", type: "image", ratio: "portrait", span: 3 },
+  { key: "name", label: "Name", span: 5 },
   { key: "designation", label: "Designation", span: 4 },
   { key: "qualification", label: "Qualification", span: 4 },
   { key: "experience", label: "Experience", placeholder: "10+ years", span: 3 },
   { key: "specialization", label: "Specialization", span: 5 },
   { key: "email", label: "Email", span: 4 },
+  { key: "aicteId", label: "AICTE ID", placeholder: "1-7342956647", span: 4 },
+  {
+    key: "auFin",
+    label: "AU-FIN (not shown publicly)",
+    placeholder: "2630071980",
+    span: 4,
+  },
 ];
 const E_FACULTY = {
+  photo: "",
   name: "",
   designation: "",
   qualification: "",
   experience: "",
   specialization: "",
   email: "",
+  aicteId: "",
+  auFin: "",
 };
 
 const BOARD_FIELDS: FieldDef[] = [

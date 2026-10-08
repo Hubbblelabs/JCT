@@ -226,6 +226,7 @@ const FacultyLabelsSchema = z
         colQualification: columnHeader,
         colExperience: columnHeader,
         colSpecialization: columnHeader,
+        colAicteId: columnHeader,
       })
       .partial()
       .optional(),
