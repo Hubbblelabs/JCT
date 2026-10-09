@@ -155,11 +155,9 @@ export async function DELETE(
     const { id } = await params;
     const badId = invalidId(id);
     if (badId) return badId;
-    // Check scope before deleting — editors may only remove their own
-    // college's programs.
-    const existing = await Program.findById(id).select("institution").lean<{
-      institution?: string;
-    }>();
+    const existing = await Program.findById(id)
+      .select("institution")
+      .lean<{ institution?: string } | null>();
     if (!existing) return notFound();
     const scope = enforceInstitutionScope(session, existing.institution);
     if (scope) return scope;

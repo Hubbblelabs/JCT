@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { Page } from "@/lib/models";
 import {
   requireRole,
+  enforceInstitutionScope,
   json,
   notFound,
   serverError,
@@ -37,7 +38,9 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { session, error } = await requireRole(req, "admin");
+  // Editors publish their own college's pages; `main` pages stay out of
+  // their reach because no editor is scoped to "main".
+  const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
   try {
@@ -47,6 +50,8 @@ export async function POST(
     if (badId) return badId;
     const doc = await Page.findById(id);
     if (!doc) return notFound();
+    const scope = enforceInstitutionScope(session, doc.institution);
+    if (scope) return scope;
 
     // Assets held only by the outgoing published snapshot are orphaned once it
     // is overwritten below.
