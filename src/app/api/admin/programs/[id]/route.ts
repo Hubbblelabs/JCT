@@ -147,7 +147,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { session, error } = await requireRole(req, "admin");
+  const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
   try {
@@ -155,6 +155,15 @@ export async function DELETE(
     const { id } = await params;
     const badId = invalidId(id);
     if (badId) return badId;
+    // Check scope before deleting — editors may only remove their own
+    // college's programs.
+    const existing = await Program.findById(id).select("institution").lean<{
+      institution?: string;
+    }>();
+    if (!existing) return notFound();
+    const scope = enforceInstitutionScope(session, existing.institution);
+    if (scope) return scope;
+
     const doc = await Program.findByIdAndDelete(id);
     if (!doc) return notFound();
 

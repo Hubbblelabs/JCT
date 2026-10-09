@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/mongodb";
 import { Program } from "@/lib/models";
 import {
   requireRole,
+  enforceInstitutionScope,
   json,
   notFound,
   serverError,
@@ -17,7 +18,9 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { session, error } = await requireRole(req, "admin");
+  // Editors publish their own college's programs, the same as they publish
+  // its SiteConfig keys — scope is enforced against the stored institution.
+  const { session, error } = await requireRole(req, "editor");
   if (error) return error;
 
   try {
@@ -27,6 +30,8 @@ export async function POST(
     if (badId) return badId;
     const current = await Program.findById(id);
     if (!current) return notFound("Program not found");
+    const scope = enforceInstitutionScope(session, current.institution);
+    if (scope) return scope;
 
     // Assets the outgoing published snapshot held. Publishing overwrites it,
     // so anything the new draft doesn't carry is orphaned from here on.
