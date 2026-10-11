@@ -15,6 +15,17 @@ import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
 import { hostedContentPages } from "@/lib/content-pages";
 import { resolveSidebarItems, type SidebarNavDefault } from "@/lib/sidebar-nav";
 import { getImageUrl } from "@/lib/utils";
+import {
+  cellValue,
+  displayColumns,
+  type TableColumn,
+} from "@/lib/table-columns";
+import {
+  NAAC_CENTERED,
+  NAAC_HIGHLIGHTED,
+  naacQualitativeBuiltins,
+  naacQuantitativeBuiltins,
+} from "@/lib/naac-table-columns";
 import type {
   NaacDocValue,
   NaacDocSectionValue,
@@ -293,6 +304,49 @@ const TD =
  * can render it as the first panel of its sidebar, alongside the content pages
  * that used to be separate routes (AQAR, best practices, distinctiveness).
  */
+/**
+ * One appeal-table row, its cells in column order. The supporting documents
+ * follow the text of the last column, wherever the columns have moved.
+ */
+function AppealRow({
+  row,
+  columns,
+  editable,
+}: {
+  row: { docs: NaacDocValue[] };
+  columns: TableColumn[];
+  editable: boolean;
+}) {
+  return (
+    <tr className="transition-colors hover:bg-white/5">
+      {columns.map((c, i) => {
+        const value = cellValue(row, c.id);
+        const last = i === columns.length - 1;
+        const cls =
+          c.id === "metric"
+            ? `${TD} text-foreground font-bold`
+            : NAAC_HIGHLIGHTED.has(c.id)
+              ? `${TD} text-gold text-center font-bold`
+              : NAAC_CENTERED.has(c.id)
+                ? `${TD} text-center`
+                : TD;
+        return (
+          <td key={c.id} className={cls}>
+            {last ? (
+              <>
+                <span className="block whitespace-pre-line">{value}</span>
+                <DocLinks docs={row.docs} editable={editable} />
+              </>
+            ) : (
+              <span className="whitespace-pre-line">{value}</span>
+            )}
+          </td>
+        );
+      })}
+    </tr>
+  );
+}
+
 export function NaacPageBody({
   data,
   editable = false,
@@ -317,6 +371,25 @@ export function NaacPageBody({
     : data.quantitative.rows.filter(
         (r) => r.metric.trim() !== "" || r.parameter.trim() !== "",
       );
+  const qualitativeColumns = displayColumns(
+    data.qualitative.columnList,
+    naacQualitativeBuiltins(data.qualitative.columns),
+    qualitativeRows,
+    ["metric"],
+  );
+  // Without a column list the grouped two-row header draws all seven, so
+  // none may be dropped for being empty.
+  const quantitativeBuiltins = naacQuantitativeBuiltins(
+    data.quantitative.columns,
+  );
+  const quantitativeColumns = data.quantitative.columnList
+    ? displayColumns(
+        data.quantitative.columnList,
+        quantitativeBuiltins,
+        quantitativeRows,
+        ["metric"],
+      )
+    : quantitativeBuiltins.map((b) => ({ id: b.id, label: b.label }));
   const docSections = editable
     ? data.docSections
     : data.docSections.filter((b) => b.groups.some((g) => g.docs.some(hasDoc)));
@@ -446,50 +519,26 @@ export function NaacPageBody({
                   <table className="w-full min-w-[900px] border-collapse">
                     <thead className="bg-white/5">
                       <tr>
-                        <th className={TH}>
-                          {data.qualitative.columns.metric}
-                        </th>
-                        <th className={TH}>
-                          {data.qualitative.columns.description}
-                        </th>
-                        <th className={TH}>
-                          {data.qualitative.columns.expertsMarks}
-                        </th>
-                        <th className={TH}>
-                          {data.qualitative.columns.marksRequested}
-                        </th>
-                        <th className={TH}>
-                          {data.qualitative.columns.justification}
-                        </th>
+                        {qualitativeColumns.map((c) => (
+                          <th
+                            key={c.id}
+                            className={
+                              NAAC_CENTERED.has(c.id) ? `${TH} text-center` : TH
+                            }
+                          >
+                            {c.label}
+                          </th>
+                        ))}
                       </tr>
                     </thead>
                     <tbody>
                       {qualitativeRows.map((row, i) => (
-                        <tr
+                        <AppealRow
                           key={i}
-                          className="transition-colors hover:bg-white/5"
-                        >
-                          <td className={`${TD} text-foreground font-bold`}>
-                            {row.metric}
-                          </td>
-                          <td className={`${TD} whitespace-pre-line`}>
-                            {row.description}
-                          </td>
-                          <td className={`${TD} text-center`}>
-                            {row.expertsMarks}
-                          </td>
-                          <td
-                            className={`${TD} text-gold text-center font-bold`}
-                          >
-                            {row.marksRequested}
-                          </td>
-                          <td className={TD}>
-                            <span className="block whitespace-pre-line">
-                              {row.justification}
-                            </span>
-                            <DocLinks docs={row.docs} editable={editable} />
-                          </td>
-                        </tr>
+                          row={row}
+                          columns={qualitativeColumns}
+                          editable={editable}
+                        />
                       ))}
                     </tbody>
                   </table>
@@ -519,63 +568,65 @@ export function NaacPageBody({
                 <div className="overflow-x-auto rounded-2xl border border-white/10">
                   <table className="w-full min-w-[1000px] border-collapse">
                     <thead className="bg-white/5">
-                      <tr>
-                        <th className={TH} rowSpan={2}>
-                          {data.quantitative.columns.metric}
-                        </th>
-                        <th className={TH} rowSpan={2}>
-                          {data.quantitative.columns.parameter}
-                        </th>
-                        <th className={`${TH} text-center`} colSpan={2}>
-                          {data.quantitative.columns.values}
-                        </th>
-                        <th className={`${TH} text-center`} colSpan={2}>
-                          {data.quantitative.columns.marks}
-                        </th>
-                        <th className={TH} rowSpan={2}>
-                          {data.quantitative.columns.justification}
-                        </th>
-                      </tr>
-                      <tr>
-                        <th className={`${TH} text-center`}>
-                          {data.quantitative.columns.ssr}
-                        </th>
-                        <th className={`${TH} text-center`}>
-                          {data.quantitative.columns.dvv}
-                        </th>
-                        <th className={`${TH} text-center`}>
-                          {data.quantitative.columns.awarded}
-                        </th>
-                        <th className={`${TH} text-center`}>
-                          {data.quantitative.columns.requested}
-                        </th>
-                      </tr>
+                      {data.quantitative.columnList ? (
+                        <tr>
+                          {quantitativeColumns.map((c) => (
+                            <th
+                              key={c.id}
+                              className={
+                                NAAC_CENTERED.has(c.id)
+                                  ? `${TH} text-center`
+                                  : TH
+                              }
+                            >
+                              {c.label}
+                            </th>
+                          ))}
+                        </tr>
+                      ) : (
+                        <>
+                          <tr>
+                            <th className={TH} rowSpan={2}>
+                              {data.quantitative.columns.metric}
+                            </th>
+                            <th className={TH} rowSpan={2}>
+                              {data.quantitative.columns.parameter}
+                            </th>
+                            <th className={`${TH} text-center`} colSpan={2}>
+                              {data.quantitative.columns.values}
+                            </th>
+                            <th className={`${TH} text-center`} colSpan={2}>
+                              {data.quantitative.columns.marks}
+                            </th>
+                            <th className={TH} rowSpan={2}>
+                              {data.quantitative.columns.justification}
+                            </th>
+                          </tr>
+                          <tr>
+                            <th className={`${TH} text-center`}>
+                              {data.quantitative.columns.ssr}
+                            </th>
+                            <th className={`${TH} text-center`}>
+                              {data.quantitative.columns.dvv}
+                            </th>
+                            <th className={`${TH} text-center`}>
+                              {data.quantitative.columns.awarded}
+                            </th>
+                            <th className={`${TH} text-center`}>
+                              {data.quantitative.columns.requested}
+                            </th>
+                          </tr>
+                        </>
+                      )}
                     </thead>
                     <tbody>
                       {quantitativeRows.map((row, i) => (
-                        <tr
+                        <AppealRow
                           key={i}
-                          className="transition-colors hover:bg-white/5"
-                        >
-                          <td className={`${TD} text-foreground font-bold`}>
-                            {row.metric}
-                          </td>
-                          <td className={TD}>{row.parameter}</td>
-                          <td className={`${TD} text-center`}>{row.ssr}</td>
-                          <td className={`${TD} text-center`}>{row.dvv}</td>
-                          <td className={`${TD} text-center`}>{row.awarded}</td>
-                          <td
-                            className={`${TD} text-gold text-center font-bold`}
-                          >
-                            {row.requested}
-                          </td>
-                          <td className={TD}>
-                            <span className="block whitespace-pre-line">
-                              {row.justification}
-                            </span>
-                            <DocLinks docs={row.docs} editable={editable} />
-                          </td>
-                        </tr>
+                          row={row}
+                          columns={quantitativeColumns}
+                          editable={editable}
+                        />
                       ))}
                     </tbody>
                   </table>

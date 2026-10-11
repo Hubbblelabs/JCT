@@ -7,6 +7,7 @@ import { Award, ArrowRight } from "lucide-react";
 import { resolveIcon } from "@/lib/lucide-icon";
 import { useSiteConfig } from "@/lib/use-site-config";
 import { ArtsAndScienceHeroBg } from "./ArtsAndScienceHeroBg";
+import { readHeroOverlay } from "@/lib/hero-overlay";
 
 type HeroStat = {
   value: string;
@@ -28,6 +29,8 @@ type HeroContent = {
   subsections: Subsection[];
   stats: HeroStat[];
   intervalMs: number;
+  /** Admin-set darkness (%), or null for the original gradients. */
+  overlay: number | null;
 };
 
 function normalizeHero(raw: unknown): HeroContent | null {
@@ -88,6 +91,7 @@ function normalizeHero(raw: unknown): HeroContent | null {
       typeof r.intervalMs === "number" && r.intervalMs > 0
         ? r.intervalMs
         : 6000,
+    overlay: readHeroOverlay(r.overlayOpacity),
   };
 }
 
@@ -151,6 +155,7 @@ export function Hero() {
         <ArtsAndScienceHeroBg
           images={hero.backgroundImages}
           intervalMs={hero.intervalMs}
+          overlay={hero.overlay}
         />
       </div>
 
@@ -169,7 +174,11 @@ export function Hero() {
         </div>
       </div>
 
-      <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(112deg,rgba(4,13,30,0.92)_8%,rgba(5,15,35,0.76)_46%,rgba(7,20,42,0.58)_100%)]" />
+      {/* The design's own shading. A custom darkness replaces it — the even
+          layer drawn inside ArtsAndScienceHeroBg does all of the dimming. */}
+      {hero.overlay === null && (
+        <div className="pointer-events-none absolute inset-0 z-[1] bg-[linear-gradient(112deg,rgba(4,13,30,0.92)_8%,rgba(5,15,35,0.76)_46%,rgba(7,20,42,0.58)_100%)]" />
+      )}
 
       {/* Hero Content */}
       <div className="relative z-10 container mx-auto flex flex-1 flex-col items-center justify-center gap-4 px-4 pt-20 pb-4 text-center sm:gap-8 sm:pt-32 sm:pb-16 md:gap-10 md:pt-36 md:pb-20 lg:pt-40 lg:pb-24">

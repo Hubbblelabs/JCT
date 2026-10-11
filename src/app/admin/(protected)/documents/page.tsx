@@ -25,8 +25,14 @@ export default function DocumentsEditorPage() {
     <LivePageEditor<DocumentsPageValue>
       configKey="engineeringDocuments"
       publicPath={PUBLIC_PATH}
-      title="Reports & Downloads Editor"
-      subtitle="Engineering — downloads and the NIRF / financial statements / ICT content tabs"
+      title="Engineering — Reports & Downloads"
+      subtitle="Click any part of the page to edit it. Save draft keeps changes private; Publish puts them on the live site."
+      sectionHelp={{
+        hero: "The banner at the top of the page: title and subtitle.",
+        intro: "The paragraph introducing the downloads.",
+        categories:
+          "The groups of downloadable files. Add a category, then add files to it.",
+      }}
       emptyValue={() => DocumentsPageSchema.parse({})}
       sectionOrder={DOCUMENTS_SECTION_ORDER}
       sectionLabels={DOCUMENTS_SECTION_LABELS}

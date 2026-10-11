@@ -10,6 +10,7 @@ import {
   PanelLeft,
 } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
+import { PageShell } from "@/components/admin/kit";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 
 type Template = "standard" | "hero-content" | "sidebar" | "gallery" | "contact";
@@ -133,16 +134,12 @@ export default function NewPagePage() {
   };
 
   return (
-    <div className="admin-content">
-      <div className="admin-page-header">
-        <div>
-          <h1 className="admin-page-title">Create Page</h1>
-          <p className="admin-page-subtitle">
-            Pick a template, name the page, and you&apos;ll land in the editor.
-          </p>
-        </div>
-      </div>
-
+    <PageShell
+      title="Create Page"
+      description={
+        <>Pick a template, name the page, and you&apos;ll land in the editor.</>
+      }
+    >
       {apiError && (
         <ValidationErrors
           error={apiError.message ?? apiError.error}
@@ -252,11 +249,11 @@ export default function NewPagePage() {
           type="button"
           onClick={handleCreate}
           disabled={busy}
-          className="admin-btn admin-btn-gold"
+          className="admin-btn admin-btn-primary"
         >
           {busy ? "Creating…" : "Create & Edit"}
         </button>
       </div>
-    </div>
+    </PageShell>
   );
 }

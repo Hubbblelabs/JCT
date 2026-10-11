@@ -4,13 +4,17 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
 import { getImageUrl } from "@/lib/utils";
+import { HeroOverlay } from "@/components/ui/HeroOverlay";
 
 export function ArtsAndScienceHeroBg({
   images,
   intervalMs = 5500,
+  overlay = null,
 }: {
   images?: string[];
   intervalMs?: number;
+  /** Admin-set darkness (%), or null for the original look. */
+  overlay?: number | null;
 }) {
   const slides = images && images.length > 0 ? images : [];
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -51,8 +55,14 @@ export function ArtsAndScienceHeroBg({
         </motion.div>
       </AnimatePresence>
 
-      <div className="absolute inset-0 bg-black/0" />
-      <div className="absolute inset-0 bg-linear-to-t from-black/0 via-transparent to-black/0" />
+      {overlay !== null ? (
+        <HeroOverlay opacity={overlay} color="#000000" />
+      ) : (
+        <>
+          <div className="absolute inset-0 bg-black/0" />
+          <div className="absolute inset-0 bg-linear-to-t from-black/0 via-transparent to-black/0" />
+        </>
+      )}
 
       <div
         className="absolute inset-0 opacity-[0.1]"

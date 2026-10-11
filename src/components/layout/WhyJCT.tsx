@@ -208,6 +208,9 @@ export function WhyJCT() {
         {/* Counter Strip */}
         {counters.length > 0 && (
           <motion.div
+            // Edited separately in the admin (Stat Counters) — the live
+            // preview reads this to open that form when the strip is clicked.
+            data-preview-section="card"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}

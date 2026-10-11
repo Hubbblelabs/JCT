@@ -34,6 +34,8 @@ const zPhone = z
   .or(z.literal(""));
 
 export const PAMPHLET_LAYOUTS = [
+  /** One image filling the whole popup, sized to the image. Uses `leftSlot`. */
+  "image",
   "image-image",
   "image-text",
   "text-image",

@@ -118,6 +118,7 @@ function normalizePamphlet(raw: unknown): PamphletConfig | null {
   };
 
   const allowedLayouts: PamphletLayout[] = [
+    "image",
     "image-image",
     "image-text",
     "text-image",
@@ -178,6 +179,8 @@ function normalizePamphlet(raw: unknown): PamphletConfig | null {
 }
 
 function slotIsImage(layout: PamphletLayout, side: "left" | "right"): boolean {
+  // The single-image layout has only the left slot; the right one is unused.
+  if (layout === "image") return side === "left";
   if (layout === "image-image") return true;
   if (layout === "text-text") return false;
   if (layout === "image-text") return side === "left";
@@ -344,11 +347,19 @@ function CountdownBar({
   );
 }
 
-export function Pamphlet() {
+export function Pamphlet({
+  preview = false,
+}: {
+  /**
+   * Admin live preview: the popup is drawn in place, already open, with no
+   * delay and no close button — instead of covering the editor.
+   */
+  preview?: boolean;
+} = {}) {
   const { data } = useSiteConfig("homePamphlet");
   const config = normalizePamphlet(data);
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(preview);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
 
   const enabled = config?.enabled ?? false;
@@ -376,6 +387,7 @@ export function Pamphlet() {
   const applyHref = config?.applyHref ?? "https://admissions.jct.ac.in";
   const delayMs = config?.delayMs ?? 2000;
 
+  const single = layout === "image";
   const leftIsImage = slotIsImage(layout, "left");
   const rightIsImage = slotIsImage(layout, "right");
 
@@ -383,20 +395,33 @@ export function Pamphlet() {
   const leftHasContent = leftIsImage
     ? Boolean(leftSlot.image)
     : Boolean(leftSlot.heading || leftSlot.subheading || leftSlot.body);
-  const rightHasContent = rightIsImage
-    ? Boolean(rightSlot.image)
-    : Boolean(rightSlot.heading || rightSlot.subheading || rightSlot.body);
+  const rightHasContent = single
+    ? false
+    : rightIsImage
+      ? Boolean(rightSlot.image)
+      : Boolean(rightSlot.heading || rightSlot.subheading || rightSlot.body);
   const hasAnyContent = leftHasContent || rightHasContent;
 
   useEffect(() => {
-    if (!enabled || !hasAnyContent) return;
+    if (preview || !enabled || !hasAnyContent) return;
     const timer = setTimeout(() => setIsOpen(true), delayMs);
     return () => clearTimeout(timer);
-  }, [enabled, hasAnyContent, delayMs]);
+  }, [preview, enabled, hasAnyContent, delayMs]);
 
-  const handleClose = () => setIsOpen(false);
+  const handleClose = () => {
+    if (!preview) setIsOpen(false);
+  };
 
-  if (!enabled || !hasAnyContent) return null;
+  if (!enabled || !hasAnyContent) {
+    // In the editor an absent popup still needs something to click on.
+    return preview ? (
+      <div className="flex items-center justify-center bg-slate-100 px-6 py-10 text-center text-sm text-slate-500">
+        {enabled
+          ? "Entry popup — add an image or text to show it to visitors."
+          : "Entry popup is switched off — visitors don't see it."}
+      </div>
+    ) : null;
+  }
 
   const showVirtualTour = virtualTour.enabled && Boolean(virtualTour.url);
   const tourEmbeds = showVirtualTour && isEmbeddableVideo(virtualTour.url);
@@ -407,10 +432,77 @@ export function Pamphlet() {
   const leftSplit = layout === "image-text" ? "md:w-[45%]" : "md:w-1/2";
   const rightSplit = layout === "image-text" ? "md:w-[55%]" : "md:w-1/2";
 
+  const actions = (
+    <div className="absolute inset-x-3 bottom-3 z-50 flex flex-col items-center gap-2 sm:inset-x-auto sm:right-6 sm:bottom-4 sm:items-end sm:gap-3 md:right-8 md:bottom-6">
+      {showCountdown && (
+        <CountdownBar
+          label={countdown.label}
+          startsAt={countdown.startsAt}
+          endsAt={countdown.endsAt}
+        />
+      )}
+
+      <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end sm:gap-3">
+        {showVirtualTour && tourEmbeds && (
+          <button
+            onClick={() => setIsVideoOpen(true)}
+            className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
+          >
+            <Play size={18} className="fill-current sm:size-5" />{" "}
+            {virtualTour.label}
+          </button>
+        )}
+        {showVirtualTour && !tourEmbeds && (
+          <a
+            href={virtualTour.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
+          >
+            <Play size={18} className="fill-current sm:size-5" />{" "}
+            {virtualTour.label}
+          </a>
+        )}
+        {showCallNow && (
+          <a
+            href={`tel:${callNow.phone.replace(/[^0-9+]/g, "")}`}
+            onClick={handleClose}
+            className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
+          >
+            <Phone size={18} className="sm:size-5" />
+            {callNow.label}
+          </a>
+        )}
+        {showApply && (
+          <Link
+            href={applyHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleClose}
+            className="group bg-gold flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-black shadow-[0_20px_40px_-10px_rgba(212,160,36,0.6)] transition-all hover:scale-105 hover:bg-white active:scale-95 sm:gap-3 sm:px-10 sm:py-4 sm:text-base md:px-12 md:text-lg"
+          >
+            {applyLabel}{" "}
+            <ArrowRight
+              size={18}
+              className="transition-transform group-hover:translate-x-1 sm:size-[22px]"
+            />
+          </Link>
+        )}
+      </div>
+    </div>
+  );
+
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-[999999] flex items-center justify-center px-4 sm:px-6">
+        <div
+          className={
+            preview
+              ? // Top padding clears the navbar drawn over the page top.
+                "relative flex min-h-[760px] items-center justify-center px-6 pt-28 pb-12"
+              : "fixed inset-0 z-[999999] flex items-center justify-center px-4 sm:px-6"
+          }
+        >
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -424,98 +516,65 @@ export function Pamphlet() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 40 }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
-            className="relative w-full max-w-5xl overflow-hidden rounded-3xl bg-white shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)]"
+            className={`relative max-w-5xl overflow-hidden rounded-3xl shadow-[0_32px_64px_-12px_rgba(0,0,0,0.5)] ${
+              // A single image sizes the popup to itself; the split layouts
+              // take the full width and a fixed height.
+              single ? "bg-black" : "w-full bg-white"
+            }`}
           >
-            <button
-              onClick={handleClose}
-              className="absolute top-4 right-4 z-[60] flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white shadow-lg backdrop-blur-md transition-all hover:rotate-90 hover:bg-black/80 md:h-12 md:w-12"
-              aria-label="Close popup"
-            >
-              <X size={24} />
-            </button>
-
-            <div className="relative flex h-[75vh] min-h-[550px] flex-col overflow-hidden md:flex-row">
-              <div
-                className={`relative h-1/2 w-full overflow-hidden bg-white md:h-auto ${leftSplit}`}
+            {!preview && (
+              <button
+                onClick={handleClose}
+                className="absolute top-4 right-4 z-[60] flex h-10 w-10 items-center justify-center rounded-full bg-black/60 text-white shadow-lg backdrop-blur-md transition-all hover:rotate-90 hover:bg-black/80 md:h-12 md:w-12"
+                aria-label="Close popup"
               >
-                {leftIsImage ? (
-                  <ImageSlot src={leftSlot.image} alt="JCT Brochure" />
-                ) : (
-                  <TextSlot slot={leftSlot} accent={false} />
-                )}
+                <X size={24} />
+              </button>
+            )}
+
+            {single ? (
+              <div className="relative">
+                {/* Intrinsic sizing (not `fill`) so a portrait poster and a
+                    landscape banner each keep their own shape, capped to the
+                    viewport rather than cropped into a fixed box. */}
+                <Image
+                  src={getImageUrl(leftSlot.image) ?? leftSlot.image}
+                  alt="JCT announcement"
+                  width={1600}
+                  height={1600}
+                  sizes="(min-width: 1024px) 64rem, 100vw"
+                  className="block h-auto max-h-[85vh] w-auto max-w-[calc(100vw-2rem)] sm:max-w-[calc(100vw-3rem)]"
+                />
+                {actions}
               </div>
-
-              <div
-                className={`relative h-1/2 w-full overflow-hidden bg-white md:h-auto ${rightSplit}`}
-              >
-                {rightIsImage ? (
-                  <ImageSlot src={rightSlot.image} alt="JCT Programs" />
-                ) : (
-                  <TextSlot
-                    slot={rightSlot}
-                    accent={layout === "text-text" || layout === "image-text"}
-                  />
-                )}
-              </div>
-
-              <div className="absolute inset-x-3 bottom-3 z-50 flex flex-col items-center gap-2 sm:inset-x-auto sm:right-6 sm:bottom-4 sm:items-end sm:gap-3 md:right-8 md:bottom-6">
-                {showCountdown && (
-                  <CountdownBar
-                    label={countdown.label}
-                    startsAt={countdown.startsAt}
-                    endsAt={countdown.endsAt}
-                  />
-                )}
-
-                <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-end sm:gap-3">
-                  {showVirtualTour && tourEmbeds && (
-                    <button
-                      onClick={() => setIsVideoOpen(true)}
-                      className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
-                    >
-                      <Play size={18} className="fill-current sm:size-5" />{" "}
-                      {virtualTour.label}
-                    </button>
-                  )}
-                  {showVirtualTour && !tourEmbeds && (
-                    <a
-                      href={virtualTour.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
-                    >
-                      <Play size={18} className="fill-current sm:size-5" />{" "}
-                      {virtualTour.label}
-                    </a>
-                  )}
-                  {showCallNow && (
-                    <a
-                      href={`tel:${callNow.phone.replace(/[^0-9+]/g, "")}`}
-                      onClick={handleClose}
-                      className="group flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-bold text-black shadow-lg ring-1 ring-black/5 transition-all hover:scale-105 hover:bg-black hover:text-white active:scale-95 sm:gap-3 sm:px-8 sm:py-4 sm:text-base md:px-10"
-                    >
-                      <Phone size={18} className="sm:size-5" />
-                      {callNow.label}
-                    </a>
-                  )}
-                  {showApply && (
-                    <Link
-                      href={applyHref}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={handleClose}
-                      className="group bg-gold flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-black shadow-[0_20px_40px_-10px_rgba(212,160,36,0.6)] transition-all hover:scale-105 hover:bg-white active:scale-95 sm:gap-3 sm:px-10 sm:py-4 sm:text-base md:px-12 md:text-lg"
-                    >
-                      {applyLabel}{" "}
-                      <ArrowRight
-                        size={18}
-                        className="transition-transform group-hover:translate-x-1 sm:size-[22px]"
-                      />
-                    </Link>
+            ) : (
+              <div className="relative flex h-[75vh] min-h-[550px] flex-col overflow-hidden md:flex-row">
+                <div
+                  className={`relative h-1/2 w-full overflow-hidden bg-white md:h-auto ${leftSplit}`}
+                >
+                  {leftIsImage ? (
+                    <ImageSlot src={leftSlot.image} alt="JCT Brochure" />
+                  ) : (
+                    <TextSlot slot={leftSlot} accent={false} />
                   )}
                 </div>
+
+                <div
+                  className={`relative h-1/2 w-full overflow-hidden bg-white md:h-auto ${rightSplit}`}
+                >
+                  {rightIsImage ? (
+                    <ImageSlot src={rightSlot.image} alt="JCT Programs" />
+                  ) : (
+                    <TextSlot
+                      slot={rightSlot}
+                      accent={layout === "text-text" || layout === "image-text"}
+                    />
+                  )}
+                </div>
+
+                {actions}
               </div>
-            </div>
+            )}
 
             <AnimatePresence>
               {isVideoOpen && tourEmbeds && (

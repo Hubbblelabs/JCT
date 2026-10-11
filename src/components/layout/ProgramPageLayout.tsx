@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, type ElementType } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ElementType,
+  type ReactNode,
+} from "react";
 import { motion, useInView, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
@@ -31,8 +38,12 @@ import {
   BookMarked,
   Zap,
   Pencil,
+  Images,
+  X,
+  Expand,
 } from "lucide-react";
 import type {
+  CardExtras,
   AcademicsLabels,
   CareerLabels,
   ProgramData,
@@ -44,11 +55,21 @@ import type {
   TabConfigItem,
 } from "@/types/program";
 import { getImageUrl } from "@/lib/utils";
+import {
+  cellValue,
+  displayColumns,
+  type TableColumn,
+} from "@/lib/table-columns";
+import {
+  programTableBuiltins,
+  type ProgramTableId,
+} from "@/lib/program-table-columns";
 import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
 import { useImageError } from "@/lib/use-image-error";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
+import { useLightbox } from "@/components/ui/Lightbox";
 
 // ─── Tab Definition ──────────────────────────────────────────────────────────
 
@@ -678,6 +699,230 @@ function Card({
   );
 }
 
+/**
+ * A card that can open a popup. When the item carries photos or longer
+ * details, the card shows the first photo, a "View details" cue, and opens a
+ * popup with every photo (each opens full size) and the full text. Without
+ * extras it renders exactly like `Card`.
+ *
+ * In the editor (`editable`) a click selects the section for editing instead,
+ * so the popup is not wired up there.
+ */
+function ExpandableCard({
+  item,
+  title,
+  ac,
+  editable,
+  className = "",
+  insetClassName = "",
+  children,
+}: {
+  item: CardExtras;
+  title: string;
+  ac: string;
+  editable?: boolean;
+  className?: string;
+  /** Padding for the "View details" cue on a card whose content brings its
+   *  own (the lab card's padding is inside its body, not on the card). */
+  insetClassName?: string;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const images = (item.images ?? []).filter((src) => src && src.trim());
+  const details = item.details?.trim() ?? "";
+  if (images.length === 0 && !details) {
+    return <Card className={className}>{children}</Card>;
+  }
+
+  const openPopup = () => {
+    if (!editable) setOpen(true);
+  };
+
+  return (
+    <>
+      <Card className={`${className} flex flex-col overflow-hidden`}>
+        <div
+          role={editable ? undefined : "button"}
+          tabIndex={editable ? undefined : 0}
+          aria-haspopup={editable ? undefined : "dialog"}
+          aria-label={editable ? undefined : `${title} — view details`}
+          onClick={openPopup}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") {
+              e.preventDefault();
+              openPopup();
+            }
+          }}
+          className="flex h-full cursor-pointer flex-col text-left"
+        >
+          {images[0] && (
+            <div className="relative mb-4 aspect-video w-full overflow-hidden rounded-xl bg-gray-100">
+              <ProgramImage
+                src={images[0]}
+                alt={title}
+                fill
+                sizes="(min-width: 768px) 420px, 100vw"
+                className="object-cover"
+              />
+              {images.length > 1 && (
+                <span className="absolute right-2 bottom-2 inline-flex items-center gap-1 rounded-full bg-black/60 px-2 py-0.5 text-[11px] font-bold text-white">
+                  <Images className="h-3 w-3" /> {images.length}
+                </span>
+              )}
+            </div>
+          )}
+          <div className="flex-1">{children}</div>
+          <span
+            className={`mt-3 inline-flex items-center gap-1 text-xs font-bold ${insetClassName}`}
+            style={{ color: ac }}
+          >
+            View details{images.length > 0 ? " & photos" : ""}
+            <ChevronRight className="h-3.5 w-3.5" />
+          </span>
+        </div>
+      </Card>
+      {open && (
+        <CardDetailDialog
+          title={title}
+          images={images}
+          details={details}
+          onClose={() => setOpen(false)}
+        >
+          {children}
+        </CardDetailDialog>
+      )}
+    </>
+  );
+}
+
+/** The popup behind an ExpandableCard. */
+function CardDetailDialog({
+  title,
+  images,
+  details,
+  onClose,
+  children,
+}: {
+  title: string;
+  images: string[];
+  details: string;
+  onClose: () => void;
+  children: ReactNode;
+}) {
+  const headingId = useId();
+  const closeRef = useRef<HTMLButtonElement>(null);
+  const viewer = images
+    .map((src, i) => ({
+      src: getImageUrl(src) ?? "",
+      alt: `${title} — photo ${i + 1}`,
+    }))
+    .filter((img) => img.src);
+  const { open, index: photoIndex, overlay } = useLightbox(viewer);
+
+  // Read through refs so the effect below runs once for the popup's lifetime:
+  // re-running it whenever the parent re-rendered would re-save the scroll
+  // lock mid-way and leave the page unscrollable after closing.
+  const onCloseRef = useRef(onClose);
+  const photoOpenRef = useRef(false);
+  useEffect(() => {
+    onCloseRef.current = onClose;
+    photoOpenRef.current = photoIndex !== null;
+  });
+
+  useEffect(() => {
+    const returnTo = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      // While a photo is open full size, Escape closes that first — one
+      // layer per press.
+      if (e.key === "Escape" && !photoOpenRef.current) onCloseRef.current();
+    };
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKey);
+      returnTo?.focus?.();
+    };
+  }, []);
+
+  return (
+    <div
+      className="fixed inset-0 z-90 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={headingId}
+        className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-3xl bg-white shadow-2xl"
+      >
+        <div className="sticky top-0 z-10 flex items-center justify-between gap-4 border-b border-gray-100 bg-white px-6 py-4">
+          <h3 id={headingId} className="font-bold text-gray-900">
+            {title}
+          </h3>
+          <button
+            ref={closeRef}
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition hover:bg-gray-200"
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="space-y-6 p-6">
+          {images.length > 0 && (
+            <div
+              className={`grid gap-3 ${
+                images.length === 1
+                  ? "grid-cols-1"
+                  : "grid-cols-2 sm:grid-cols-3"
+              }`}
+            >
+              {images.map((src, i) => (
+                <button
+                  key={`${src}-${i}`}
+                  type="button"
+                  onClick={() => open(i)}
+                  aria-label={`View photo ${i + 1} of ${images.length} full size`}
+                  className={`group relative w-full cursor-zoom-in overflow-hidden rounded-xl bg-gray-100 ${
+                    images.length === 1 ? "aspect-video" : "aspect-[4/3]"
+                  }`}
+                >
+                  <ProgramImage
+                    src={src}
+                    alt={`${title} — photo ${i + 1}`}
+                    fill
+                    sizes="(min-width: 768px) 260px, 50vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <span className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Expand className="h-5 w-5 text-white" />
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          <div>{children}</div>
+
+          {details && (
+            <p className="text-sm leading-relaxed whitespace-pre-line text-gray-700">
+              {details}
+            </p>
+          )}
+        </div>
+      </div>
+      {overlay}
+    </div>
+  );
+}
+
 function Badge({
   children,
   ac,
@@ -704,48 +949,79 @@ function Badge({
   );
 }
 
+/** A program table's columns as the editor arranged them, minus empty ones. */
+function tableColumnsFor(
+  dept: ProgramData,
+  table: ProgramTableId,
+  rows: readonly unknown[],
+): TableColumn[] {
+  return displayColumns(
+    dept.tableColumns?.[table],
+    programTableBuiltins(table, dept.labels),
+    rows,
+    ["name"],
+  );
+}
+
+function TableHead({ columns, ac }: { columns: TableColumn[]; ac: string }) {
+  return (
+    <thead>
+      <tr style={{ backgroundColor: `${ac}08` }}>
+        {columns.map((c) => (
+          <th
+            key={c.id}
+            className="px-5 py-3.5 text-left text-[11px] font-black tracking-wider text-gray-500 uppercase"
+          >
+            {c.label}
+          </th>
+        ))}
+      </tr>
+    </thead>
+  );
+}
+
 function BoardTable({
-  members,
+  dept,
+  table,
   ac,
-  cols,
 }: {
-  members: ProgramData["advisoryBoard"];
+  dept: ProgramData;
+  table: "advisoryBoard" | "pac" | "bos";
   ac: string;
-  cols?: FacultyLabels["boardCols"];
 }) {
+  const members = dept[table];
   if (!members || members.length === 0) return null;
-  const headers = [
-    cols?.colName || "Name",
-    cols?.colDesignation || "Designation",
-    cols?.colOrganization || "Organization",
-    cols?.colRole || "Role",
-  ];
+  const columns = tableColumnsFor(dept, table, members);
   return (
     <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
       <table className="w-full text-sm">
-        <thead>
-          <tr style={{ backgroundColor: `${ac}08` }}>
-            {headers.map((h) => (
-              <th
-                key={h}
-                className="px-5 py-3.5 text-left text-[11px] font-black tracking-wider text-gray-500 uppercase"
-              >
-                {h}
-              </th>
-            ))}
-          </tr>
-        </thead>
+        <TableHead columns={columns} ac={ac} />
         <tbody className="divide-y divide-gray-50">
           {members.map((m, i) => (
             <tr key={i} className="transition-colors hover:bg-gray-50/70">
-              <td className="px-5 py-3.5 font-semibold text-gray-900">
-                {m.name}
-              </td>
-              <td className="px-5 py-3.5 text-gray-600">{m.designation}</td>
-              <td className="px-5 py-3.5 text-gray-500">{m.organization}</td>
-              <td className="px-5 py-3.5">
-                {m.role && <Badge ac={ac}>{m.role}</Badge>}
-              </td>
+              {columns.map((c) => {
+                const value = cellValue(m, c.id);
+                if (c.id === "role")
+                  return (
+                    <td key={c.id} className="px-5 py-3.5">
+                      {value && <Badge ac={ac}>{value}</Badge>}
+                    </td>
+                  );
+                return (
+                  <td
+                    key={c.id}
+                    className={`px-5 py-3.5 ${
+                      c.id === "name"
+                        ? "font-semibold text-gray-900"
+                        : c.id === "designation"
+                          ? "text-gray-600"
+                          : "text-gray-500"
+                    }`}
+                  >
+                    {value}
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>
@@ -1090,12 +1366,13 @@ function AcademicsTab({
     labels?.valueAddedCourses?.visible !== false &&
     hasValueAddedSection(dept, editable);
 
-  const courseHeaders = [
-    labels?.curriculum?.colCode || "Code",
-    labels?.curriculum?.colName || "Course Name",
-    labels?.curriculum?.colCredits || "Credits",
-    labels?.curriculum?.colType || "Type",
-  ];
+  // One set of columns for every regulation and semester, so the table
+  // doesn't change shape as visitors switch between them.
+  const courseColumns = tableColumnsFor(
+    dept,
+    "curriculum",
+    dept.curriculum.flatMap((r) => r.semesters.flatMap((sem) => sem.subjects)),
+  );
 
   return (
     <div className="space-y-14">
@@ -1175,51 +1452,72 @@ function AcademicsTab({
               >
                 <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
                   <table className="w-full text-sm">
-                    <thead>
-                      <tr style={{ backgroundColor: `${ac}08` }}>
-                        {courseHeaders.map((h) => (
-                          <th
-                            key={h}
-                            className="px-5 py-3.5 text-left text-[11px] font-black tracking-wider text-gray-500 uppercase"
-                          >
-                            {h}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
+                    <TableHead columns={courseColumns} ac={ac} />
                     <tbody className="divide-y divide-gray-50">
-                      {semesters[activeSemester].subjects.map((sub) => (
+                      {semesters[activeSemester].subjects.map((sub, si) => (
                         <tr
-                          key={sub.code}
+                          key={`${sub.code}-${si}`}
                           className="transition-colors hover:bg-gray-50/70"
                         >
-                          <td className="px-5 py-3.5 font-mono text-xs font-semibold text-gray-400">
-                            {sub.code}
-                          </td>
-                          <td className="px-5 py-3.5 font-medium text-gray-900">
-                            {sub.name}
-                          </td>
-                          <td
-                            className="px-5 py-3.5 font-bold"
-                            style={{ color: ac }}
-                          >
-                            {sub.credits}
-                          </td>
-                          <td className="px-5 py-3.5">
-                            <span
-                              className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase ${
-                                sub.type === "Lab"
-                                  ? "bg-emerald-50 text-emerald-700"
-                                  : sub.type === "Elective"
-                                    ? "bg-violet-50 text-violet-700"
-                                    : sub.type === "Project"
-                                      ? "bg-orange-50 text-orange-700"
-                                      : "bg-sky-50 text-sky-700"
-                              }`}
-                            >
-                              {sub.type}
-                            </span>
-                          </td>
+                          {courseColumns.map((c) => {
+                            const value = cellValue(sub, c.id);
+                            if (c.id === "code")
+                              return (
+                                <td
+                                  key={c.id}
+                                  className="px-5 py-3.5 font-mono text-xs font-semibold text-gray-400"
+                                >
+                                  {value}
+                                </td>
+                              );
+                            if (c.id === "name")
+                              return (
+                                <td
+                                  key={c.id}
+                                  className="px-5 py-3.5 font-medium text-gray-900"
+                                >
+                                  {value}
+                                </td>
+                              );
+                            if (c.id === "credits")
+                              return (
+                                <td
+                                  key={c.id}
+                                  className="px-5 py-3.5 font-bold"
+                                  style={{ color: ac }}
+                                >
+                                  {value}
+                                </td>
+                              );
+                            if (c.id === "type")
+                              return (
+                                <td key={c.id} className="px-5 py-3.5">
+                                  {value && (
+                                    <span
+                                      className={`inline-flex rounded-full px-2.5 py-0.5 text-[10px] font-bold tracking-wider uppercase ${
+                                        value === "Lab"
+                                          ? "bg-emerald-50 text-emerald-700"
+                                          : value === "Elective"
+                                            ? "bg-violet-50 text-violet-700"
+                                            : value === "Project"
+                                              ? "bg-orange-50 text-orange-700"
+                                              : "bg-sky-50 text-sky-700"
+                                      }`}
+                                    >
+                                      {value}
+                                    </span>
+                                  )}
+                                </td>
+                              );
+                            return (
+                              <td
+                                key={c.id}
+                                className="px-5 py-3.5 text-gray-500"
+                              >
+                                {value}
+                              </td>
+                            );
+                          })}
                         </tr>
                       ))}
                     </tbody>
@@ -1325,7 +1623,13 @@ function AcademicsTab({
           <div className="grid gap-5 md:grid-cols-2">
             {dept.valueAddedCourses.map((course, ci) => (
               <FadeUp key={course.name} delay={ci * 0.07}>
-                <Card className="h-full p-6">
+                <ExpandableCard
+                  item={course}
+                  title={course.name}
+                  ac={ac}
+                  editable={editable}
+                  className="h-full p-6"
+                >
                   <div className="mb-3 flex items-start justify-between gap-4">
                     <h4 className="font-bold text-gray-900">{course.name}</h4>
                     <Badge ac={ac}>{course.hours}</Badge>
@@ -1340,7 +1644,7 @@ function AcademicsTab({
                   <p className="text-sm leading-relaxed text-gray-600">
                     {course.description}
                   </p>
-                </Card>
+                </ExpandableCard>
               </FadeUp>
             ))}
           </div>
@@ -1374,33 +1678,14 @@ function FacultyTab({
   const showBos =
     labels?.bos?.visible !== false && hasBosSection(dept, editable);
 
-  // Optional columns render only when some row fills them, so a roster
-  // authored as name + designation + photo doesn't show three empty columns.
-  const facultyCols = (
-    [
-      {
-        key: "qualification",
-        label: labels?.coreFaculty?.colQualification || "Qualification",
-      },
-      {
-        key: "experience",
-        label: labels?.coreFaculty?.colExperience || "Experience",
-      },
-      {
-        key: "specialization",
-        label: labels?.coreFaculty?.colSpecialization || "Specialization",
-      },
-      {
-        key: "aicteId",
-        label: labels?.coreFaculty?.colAicteId || "AICTE ID",
-      },
-    ] as const
-  ).filter((c) => dept.faculty.some((f) => hasText(f[c.key])));
-  const facultyHeaders = [
-    labels?.coreFaculty?.colName || "Faculty Member",
-    labels?.coreFaculty?.colDesignation || "Designation",
-    ...facultyCols.map((c) => c.label),
-  ];
+  // Columns render only when some row fills them, so a roster authored as
+  // name + designation + photo doesn't show four empty columns.
+  const facultyColumns = tableColumnsFor(dept, "faculty", dept.faculty);
+  const showDesignation = facultyColumns.some((c) => c.id === "designation");
+  // On a phone, name and designation head the card; the rest are listed.
+  const facultyDetails = facultyColumns.filter(
+    (c) => c.id !== "name" && c.id !== "designation",
+  );
 
   return (
     <div className="space-y-14">
@@ -1420,8 +1705,8 @@ function FacultyTab({
 
           {/* Mobile cards */}
           <div className="grid gap-4 sm:grid-cols-2 md:hidden">
-            {dept.faculty.map((f) => (
-              <FadeUp key={f.name}>
+            {dept.faculty.map((f, i) => (
+              <FadeUp key={i}>
                 <Card className="p-5">
                   <div className="flex items-center gap-3">
                     <FacultyAvatar
@@ -1434,20 +1719,20 @@ function FacultyTab({
                       <p className="text-sm font-bold text-gray-900">
                         {f.name}
                       </p>
-                      <p className="text-xs text-gray-500">{f.designation}</p>
+                      {showDesignation && (
+                        <p className="text-xs text-gray-500">{f.designation}</p>
+                      )}
                     </div>
                   </div>
                   <div className="mt-4 space-y-1.5 empty:hidden">
-                    {facultyCols.map(
-                      (c) =>
-                        hasText(f[c.key]) && (
-                          <Detail
-                            key={c.key}
-                            label={c.label}
-                            value={f[c.key] ?? ""}
-                          />
-                        ),
-                    )}
+                    {facultyDetails.map((c) => {
+                      const value = cellValue(f, c.id);
+                      return (
+                        hasText(value) && (
+                          <Detail key={c.id} label={c.label} value={value} />
+                        )
+                      );
+                    })}
                     {f.email && (
                       <div className="flex items-center gap-1.5 text-xs">
                         <Mail
@@ -1467,45 +1752,41 @@ function FacultyTab({
           <FadeUp className="hidden md:block">
             <div className="overflow-x-auto rounded-2xl border border-gray-100 bg-white shadow-sm">
               <table className="w-full text-sm">
-                <thead>
-                  <tr style={{ backgroundColor: `${ac}08` }}>
-                    {facultyHeaders.map((h) => (
-                      <th
-                        key={h}
-                        className="px-5 py-3.5 text-left text-[11px] font-black tracking-wider text-gray-500 uppercase"
-                      >
-                        {h}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
+                <TableHead columns={facultyColumns} ac={ac} />
                 <tbody className="divide-y divide-gray-50">
-                  {dept.faculty.map((f) => (
+                  {dept.faculty.map((f, i) => (
                     <tr
-                      key={f.name}
+                      key={i}
                       className="transition-colors hover:bg-gray-50/70"
                     >
-                      <td className="px-5 py-3.5">
-                        <div className="flex items-center gap-3">
-                          <FacultyAvatar
-                            member={f}
-                            ac={ac}
-                            className="h-14 w-12 text-xs"
-                            sizes="48px"
-                          />
-                          <span className="font-bold text-gray-900">
-                            {f.name}
-                          </span>
-                        </div>
-                      </td>
-                      <td className="px-5 py-3.5 font-medium text-gray-700">
-                        {f.designation}
-                      </td>
-                      {facultyCols.map((c) => (
-                        <td key={c.key} className="px-5 py-3.5 text-gray-500">
-                          {f[c.key]}
-                        </td>
-                      ))}
+                      {facultyColumns.map((c) =>
+                        c.id === "name" ? (
+                          <td key={c.id} className="px-5 py-3.5">
+                            <div className="flex items-center gap-3">
+                              <FacultyAvatar
+                                member={f}
+                                ac={ac}
+                                className="h-14 w-12 text-xs"
+                                sizes="48px"
+                              />
+                              <span className="font-bold text-gray-900">
+                                {f.name}
+                              </span>
+                            </div>
+                          </td>
+                        ) : (
+                          <td
+                            key={c.id}
+                            className={`px-5 py-3.5 ${
+                              c.id === "designation"
+                                ? "font-medium text-gray-700"
+                                : "text-gray-500"
+                            }`}
+                          >
+                            {cellValue(f, c.id)}
+                          </td>
+                        ),
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -1531,11 +1812,7 @@ function FacultyTab({
             ac={ac}
           />
           <FadeUp>
-            <BoardTable
-              members={dept.advisoryBoard}
-              ac={ac}
-              cols={labels?.boardCols}
-            />
+            <BoardTable dept={dept} table="advisoryBoard" ac={ac} />
           </FadeUp>
         </EditableRegion>
       )}
@@ -1554,7 +1831,7 @@ function FacultyTab({
             ac={ac}
           />
           <FadeUp>
-            <BoardTable members={dept.pac} ac={ac} cols={labels?.boardCols} />
+            <BoardTable dept={dept} table="pac" ac={ac} />
           </FadeUp>
         </EditableRegion>
       )}
@@ -1573,7 +1850,7 @@ function FacultyTab({
             ac={ac}
           />
           <FadeUp>
-            <BoardTable members={dept.bos} ac={ac} cols={labels?.boardCols} />
+            <BoardTable dept={dept} table="bos" ac={ac} />
           </FadeUp>
         </EditableRegion>
       )}
@@ -1617,7 +1894,14 @@ function FacilitiesTab({
           <div className="grid gap-5 md:grid-cols-2">
             {dept.labs.map((lab, li) => (
               <FadeUp key={lab.name} delay={li * 0.07}>
-                <Card className="h-full overflow-hidden">
+                <ExpandableCard
+                  item={lab}
+                  title={lab.name}
+                  ac={ac}
+                  editable={editable}
+                  className="h-full"
+                  insetClassName="px-6 pb-5"
+                >
                   {/* Lab header */}
                   <div
                     className="flex items-center gap-3.5 px-6 py-4"
@@ -1655,7 +1939,7 @@ function FacilitiesTab({
                       ))}
                     </div>
                   </div>
-                </Card>
+                </ExpandableCard>
               </FadeUp>
             ))}
           </div>
@@ -1787,7 +2071,13 @@ function LifeTab({
                       className="absolute -left-[1.85rem] mt-1 h-5 w-5 rounded-full border-4 border-white shadow-sm"
                       style={{ backgroundColor: ac }}
                     />
-                    <Card className="p-5">
+                    <ExpandableCard
+                      item={ev}
+                      title={ev.title}
+                      ac={ac}
+                      editable={editable}
+                      className="p-5"
+                    >
                       <div className="mb-2.5 flex flex-wrap items-start justify-between gap-2">
                         <h4 className="leading-snug font-bold text-gray-900">
                           {ev.title}
@@ -1813,7 +2103,7 @@ function LifeTab({
                           </span>
                         </div>
                       )}
-                    </Card>
+                    </ExpandableCard>
                   </div>
                 </FadeUp>
               ))}
@@ -1840,7 +2130,13 @@ function LifeTab({
               <div className="space-y-4">
                 {dept.studentAchievements.map((a, i) => (
                   <FadeUp key={i} delay={i * 0.05}>
-                    <Card className="p-5">
+                    <ExpandableCard
+                      item={a}
+                      title={a.title || a.name}
+                      ac={ac}
+                      editable={editable}
+                      className="p-5"
+                    >
                       <div className="flex items-start gap-4">
                         <div
                           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
@@ -1866,7 +2162,7 @@ function LifeTab({
                           </p>
                         </div>
                       </div>
-                    </Card>
+                    </ExpandableCard>
                   </FadeUp>
                 ))}
               </div>
@@ -1891,7 +2187,13 @@ function LifeTab({
               <div className="space-y-4">
                 {dept.facultyAchievements.map((a, i) => (
                   <FadeUp key={i} delay={i * 0.05}>
-                    <Card className="p-5">
+                    <ExpandableCard
+                      item={a}
+                      title={a.title || a.name}
+                      ac={ac}
+                      editable={editable}
+                      className="p-5"
+                    >
                       <div className="flex items-start gap-4">
                         <div
                           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
@@ -1915,7 +2217,7 @@ function LifeTab({
                           </p>
                         </div>
                       </div>
-                    </Card>
+                    </ExpandableCard>
                   </FadeUp>
                 ))}
               </div>
@@ -2283,6 +2585,7 @@ export function ProgramPageLayout({
   editable = false,
   onEditTab,
   onEditSection,
+  focusTab,
 }: {
   dept: ProgramData;
   backHref: string;
@@ -2293,6 +2596,11 @@ export function ProgramPageLayout({
   onEditTab?: (tabId: string) => void;
   /** Called with the clicked page section in builder mode. */
   onEditSection?: (section: ProgramEditableSection) => void;
+  /**
+   * Builder only: show this tab. Changes when the editor picks a section that
+   * lives on another tab, so the preview follows the panel.
+   */
+  focusTab?: string;
 }) {
   const ac = dept.accentColor;
   const bg = dept.bgColor;
@@ -2329,6 +2637,15 @@ export function ProgramPageLayout({
       setActiveTab(visibleTabs[0].id);
     }
   }, [visibleTabs, activeTab]);
+
+  useEffect(() => {
+    if (focusTab && visibleTabs.some((t) => t.id === focusTab)) {
+      setActiveTab(focusTab);
+    }
+    // Only a change of the requested tab should move the preview; the tab
+    // list is rebuilt every render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusTab]);
 
   useEffect(() => {
     const root = document.documentElement;

@@ -11,6 +11,19 @@ const zIntervalMs = z
   .optional()
   .default(CAROUSEL.defaultMs);
 
+// Background darkness — see src/lib/hero-overlay.ts. Deliberately no default:
+// absent means "keep the hero's original gradients".
+export const HERO_OVERLAY_LIMITS = { min: 0, max: 90 } as const;
+const zOverlayOpacity = z
+  .number()
+  .int("Darkness must be a whole number")
+  .min(HERO_OVERLAY_LIMITS.min)
+  .max(
+    HERO_OVERLAY_LIMITS.max,
+    `Darkness must be at most ${HERO_OVERLAY_LIMITS.max}%`,
+  )
+  .optional();
+
 // Accreditation badge — a logo plus its name/description. Reused by the
 // home Accreditations section and the Engineering hero accreditation strip.
 const AccreditationItemSchema = z.object({
@@ -66,6 +79,7 @@ export const HomeHeroSchema = z.object({
     .default([]),
   tourVideoUrl: zOptionalString(HOME_LIMITS.tourVideoUrlMax).default(""),
   intervalMs: zIntervalMs,
+  overlayOpacity: zOverlayOpacity,
 });
 
 // Stat cards shown below the hero (Years of Excellence, Alumni, etc.)
@@ -131,6 +145,7 @@ export const EngineeringHeroSchema = z.object({
     ENG_HERO_LIMITS.accreditationCaptionMax,
   ).default(""),
   intervalMs: zIntervalMs,
+  overlayOpacity: zOverlayOpacity,
 });
 
 // Arts & Science Hero — split title into 3 parts (line1 + highlight + line2),
@@ -195,15 +210,21 @@ export const ArtsScienceHeroSchema = z.object({
     .optional()
     .default([]),
   intervalMs: zIntervalMs,
+  overlayOpacity: zOverlayOpacity,
 });
 
-// Polytechnic Hero — eyebrow + two title lines, carousel with intervalMs.
+// Polytechnic Hero — eyebrow + two title lines, carousel with intervalMs,
+// plus the stat row (as on Arts & Science) and the accreditation logo strip
+// (as on Engineering), each of which can be switched off.
 export const POLY_HERO_LIMITS = {
   backgroundImagesMax: 6,
   eyebrowMax: 60,
   titleLineMax: 60,
   subtitleMax: 240,
   ctas: 3,
+  statsMax: 6,
+  accreditationsMax: 10,
+  accreditationCaptionMax: 80,
   minIntervalMs: CAROUSEL.minMs,
   maxIntervalMs: CAROUSEL.maxMs,
 } as const;
@@ -219,7 +240,24 @@ export const PolytechnicHeroSchema = z.object({
   titleLine2: zOptionalString(POLY_HERO_LIMITS.titleLineMax).default(""),
   subtitle: zOptionalString(POLY_HERO_LIMITS.subtitleMax).default(""),
   ctas: z.array(zCta).max(POLY_HERO_LIMITS.ctas).optional().default([]),
+  stats: z
+    .array(ArtsHeroStatSchema)
+    .max(POLY_HERO_LIMITS.statsMax)
+    .optional()
+    .default([]),
+  /** Absent means shown — the switch only hides a filled-in row. */
+  showStats: z.boolean().optional(),
+  accreditations: z
+    .array(AccreditationItemSchema)
+    .max(POLY_HERO_LIMITS.accreditationsMax)
+    .optional()
+    .default([]),
+  accreditationsCaption: zOptionalString(
+    POLY_HERO_LIMITS.accreditationCaptionMax,
+  ).default(""),
+  showAccreditations: z.boolean().optional(),
   intervalMs: zIntervalMs,
+  overlayOpacity: zOverlayOpacity,
 });
 
 export type HomeHeroValue = z.infer<typeof HomeHeroSchema>;

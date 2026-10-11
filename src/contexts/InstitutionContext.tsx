@@ -88,6 +88,27 @@ export function InstitutionProvider({
   );
 }
 
+/**
+ * Pins the institution for a subtree regardless of the URL. The admin's live
+ * previews render a college's public components under an /admin path, which
+ * would otherwise resolve to "main" and draw the wrong navbar and colours.
+ */
+export function FixedInstitutionProvider({
+  institution,
+  children,
+}: {
+  institution: Institution;
+  children: React.ReactNode;
+}) {
+  return (
+    <InstitutionContext.Provider
+      value={{ institution, setInstitution: () => {} }}
+    >
+      {children}
+    </InstitutionContext.Provider>
+  );
+}
+
 export function useInstitution() {
   const context = useContext(InstitutionContext);
   if (context === undefined) {

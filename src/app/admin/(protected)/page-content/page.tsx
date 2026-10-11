@@ -6,9 +6,17 @@ import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { useSearchParams } from "next/navigation";
 import { Check, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
 import {
-  PageContentShell,
-  type SectionDef,
-} from "@/components/admin/PageContentShell";
+  SiteSectionsEditor,
+  type SiteSectionDef,
+} from "@/components/admin/SiteSectionsEditor";
+import {
+  announcementSection,
+  footerLinkSection,
+  formSection,
+  navbarSection,
+  seoSection,
+} from "@/components/admin/site-sections";
+import { NewsEventsPreview } from "@/components/admin/previews/NewsEventsPreview";
 import {
   DeferredUploadsProvider,
   useDeferredUploads,
@@ -17,21 +25,17 @@ import {
   EngineeringHeroForm,
   ArtsScienceHeroForm,
   PolytechnicHeroForm,
-  AnnouncementForm,
   PolytechnicAdmissionsForm,
   AdmissionsForm,
   LifeAtJctForm,
   MetricsForm,
   AddOnProgramsForm,
   CareerCentreForm,
-  NavbarAdminSection,
   UpcomingEventsForm,
-  SeoPagesForm,
-  type SeoPagesVal,
+  RecruitersSectionForm,
   type EngHeroVal,
   type ArtsHeroVal,
   type PolyHeroVal,
-  type AnnouncementVal,
   type AdmissionsVal,
   type GenericAdmissionsVal,
   type LifeAtJctVal,
@@ -40,6 +44,7 @@ import {
   type CareerCentreVal,
   type NavbarVal,
   type UpcomingEventsVal,
+  type RecruitersSectionVal,
 } from "@/components/admin/PageContentForms";
 import {
   Field,
@@ -55,113 +60,30 @@ import {
   polytechnicNavigation,
   type NavItem as StaticNavItem,
 } from "@/data/all-navigations";
-import { reconcileSeoPages, seoPagesDefaultValue } from "@/lib/seo-pages";
 import {
   ARTS_SCIENCE_ADD_ON_PROGRAMS_DEFAULT,
   ARTS_SCIENCE_CAREER_CENTRE_DEFAULT,
 } from "@/lib/arts-science-section-defaults";
+// The public sections themselves, drawn in the live preview.
+import { Placements } from "@/components/layout/Placements";
+import { CampusLife } from "@/components/layout/CampusLife";
+import { EngineeringHero } from "@/modules/engineering/EngineeringHero";
+import { EngineeringDomains } from "@/modules/engineering/EngineeringDomains";
+import { EngineeringMetrics } from "@/modules/engineering/EngineeringMetrics";
+import { Admissions as EngineeringAdmissions } from "@/modules/engineering/Admissions";
+import { Testimonials as EngineeringTestimonials } from "@/modules/engineering/Testimonials";
+import { Hero as ArtsHero } from "@/modules/arts-science/Hero";
+import { UgPrograms } from "@/modules/arts-science/UgPrograms";
+import { AddOnPrograms } from "@/modules/arts-science/AddOnPrograms";
+import { CareerDevelopmentCentre } from "@/modules/arts-science/CareerDevelopmentCentre";
+import { AdmissionProcess } from "@/modules/arts-science/AdmissionProcess";
+import { Testimonials as ArtsTestimonials } from "@/modules/arts-science/Testimonials";
+import { Hero as PolyHero } from "@/modules/polytechnic/Hero";
+import { DiplomaPrograms } from "@/modules/polytechnic/DiplomaPrograms";
+import { Admissions as PolyAdmissions } from "@/modules/polytechnic/Admissions";
+import { Testimonials as PolyTestimonials } from "@/modules/polytechnic/Testimonials";
 
 type College = "engineering" | "arts-science" | "polytechnic";
-
-const SEO_CONFIG_KEY: Record<College, string> = {
-  engineering: "engineeringSeo",
-  "arts-science": "artsScienceSeo",
-  polytechnic: "polytechnicSeo",
-};
-
-/** Meta title/description for every public page of one college. */
-function seoSection(college: College): SectionDef {
-  return {
-    id: "seo",
-    label: "SEO / Meta Tags",
-    kind: "form",
-    configKey: SEO_CONFIG_KEY[college],
-    defaultValue: seoPagesDefaultValue(college) as SeoPagesVal,
-    reconcile: (v) => reconcileSeoPages(college, v),
-    render: (v, onChange) => (
-      <SeoPagesForm value={(v as SeoPagesVal) ?? {}} onChange={onChange} />
-    ),
-  };
-}
-
-const UPCOMING_EVENTS_CONFIG_KEY: Record<College, string> = {
-  engineering: "engineeringUpcomingEvents",
-  "arts-science": "artsScienceUpcomingEvents",
-  polytechnic: "polytechnicUpcomingEvents",
-};
-
-/**
- * Wording for the landing-page "News & Events" strip. The entries it lists are
- * Event records edited under /admin/events — only the copy lives here.
- */
-function upcomingEventsSection(college: College): SectionDef {
-  const eventsHref = `/institutions/${college}/events`;
-  return {
-    id: "upcomingEvents",
-    label: "News & Events",
-    kind: "form",
-    configKey: UPCOMING_EVENTS_CONFIG_KEY[college],
-    defaultValue: {
-      enabled: true,
-      eyebrow: "Happenings",
-      heading: "News & Events",
-      maxItems: 3,
-      ctaLabel: "News & Events",
-      ctaHref: eventsHref,
-      fallbackToRecent: true,
-      upcomingBadge: "Upcoming",
-    } as UpcomingEventsVal,
-    render: (v, onChange) => (
-      <UpcomingEventsForm
-        value={(v as UpcomingEventsVal) ?? {}}
-        onChange={onChange}
-        eventsHref={eventsHref}
-      />
-    ),
-  };
-}
-
-function navDefaultFor(college: College): NavbarVal {
-  const src: StaticNavItem[] =
-    college === "engineering"
-      ? engineeringNavigation
-      : college === "arts-science"
-        ? artsNavigation
-        : polytechnicNavigation;
-  return {
-    items: src.map((it) => ({
-      label: it.name,
-      href: it.href,
-      visible: true,
-      inMore: false,
-      children: it.children?.map((c) => ({
-        label: c.name,
-        href: c.href,
-        desc: c.desc,
-        visible: true,
-      })),
-    })),
-  };
-}
-
-function navbarSection(
-  headerConfigKey: string,
-  navbarConfigKey: string,
-  navDefault: NavbarVal,
-): SectionDef {
-  return {
-    id: "navbar",
-    label: "Navbar",
-    kind: "custom",
-    customRender: () => (
-      <NavbarAdminSection
-        headerConfigKey={headerConfigKey}
-        navbarConfigKey={navbarConfigKey}
-        navDefault={navDefault}
-      />
-    ),
-  };
-}
 
 /* ─── Inline Testimonials Manager ─── */
 
@@ -339,7 +261,7 @@ function TestimonialFormInner({
           type="button"
           onClick={handleSave}
           disabled={busy}
-          className="admin-btn admin-btn-gold admin-btn-sm"
+          className="admin-btn admin-btn-primary admin-btn-sm"
         >
           {busy ? (
             <Loader2 size={13} className="animate-spin" />
@@ -586,246 +508,362 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
   );
 }
 
-function sectionsFor(college: College): SectionDef[] {
-  if (college === "engineering") {
-    return [
-      navbarSection(
-        "engineeringHeader",
-        "engineeringNavbar",
-        navDefaultFor("engineering"),
-      ),
-      {
-        id: "announcement",
-        label: "Announcement Bar",
-        kind: "form",
-        configKey: "engineeringAnnouncement",
-        defaultValue: { enabled: false, text: "" } as AnnouncementVal,
-        render: (v, onChange) => (
-          <AnnouncementForm
-            value={(v as AnnouncementVal) ?? {}}
-            onChange={onChange}
-          />
-        ),
-      },
-      {
-        id: "hero",
-        label: "Hero",
-        kind: "form",
-        configKey: "engineeringHero",
-        defaultValue: {} as EngHeroVal,
-        render: (v, onChange) => (
-          <EngineeringHeroForm
-            value={(v as EngHeroVal) ?? {}}
-            onChange={onChange}
-          />
-        ),
-      },
-      {
-        id: "metrics",
-        label: "Performance That Speaks",
-        kind: "form",
-        configKey: "engineeringMetrics",
-        defaultValue: [] as Metric[],
-        render: (v, onChange) => (
-          <MetricsForm value={(v as Metric[]) ?? []} onChange={onChange} />
-        ),
-      },
-      {
-        id: "admissions",
-        label: "Admissions",
-        kind: "form",
-        configKey: "engineeringAdmissions",
-        defaultValue: {} as GenericAdmissionsVal,
-        render: (v, onChange) => (
-          <AdmissionsForm
-            value={(v as GenericAdmissionsVal) ?? {}}
-            onChange={onChange}
-            showContact={true}
-          />
-        ),
-      },
-      {
-        id: "lifeAtJct",
-        label: "Life at JCT",
-        kind: "form",
-        configKey: "engineeringLifeAtJct",
-        defaultValue: {
-          categories: ["All", "Labs", "Sports", "Events", "Clubs"],
-          photos: [],
-        } as LifeAtJctVal,
-        render: (v, onChange) => (
-          <LifeAtJctForm
-            value={(v as LifeAtJctVal) ?? {}}
-            onChange={onChange}
-          />
-        ),
-      },
-      upcomingEventsSection("engineering"),
-      {
-        id: "testimonials",
-        label: "Voices / Testimonials",
-        kind: "custom",
-        customRender: () => (
-          <CollegeTestimonialsManager institution="engineering" />
-        ),
-      },
-      seoSection("engineering"),
-    ];
-  }
+/* ─── Landing page editor ─── */
 
-  if (college === "arts-science") {
-    return [
-      navbarSection(
-        "artsScienceHeader",
-        "artsScienceNavbar",
-        navDefaultFor("arts-science"),
-      ),
-      {
-        id: "hero",
-        label: "Hero",
-        kind: "form",
-        configKey: "artsScienceHero",
-        defaultValue: {} as ArtsHeroVal,
-        render: (v, onChange) => (
-          <ArtsScienceHeroForm
-            value={(v as ArtsHeroVal) ?? {}}
-            onChange={onChange}
-          />
-        ),
-      },
-      {
-        id: "addOnPrograms",
-        label: "Add-on Programs",
-        kind: "form",
-        configKey: "artsScienceAddOnPrograms",
-        defaultValue: ARTS_SCIENCE_ADD_ON_PROGRAMS_DEFAULT,
-        render: (v, onChange) => (
-          <AddOnProgramsForm
-            value={(v as AddOnProgramsVal) ?? {}}
-            onChange={onChange}
-          />
-        ),
-      },
-      {
-        id: "careerCentre",
-        label: "Career Development Centre",
-        kind: "form",
-        configKey: "artsScienceCareerCentre",
-        defaultValue: ARTS_SCIENCE_CAREER_CENTRE_DEFAULT,
-        render: (v, onChange) => (
-          <CareerCentreForm
-            value={(v as CareerCentreVal) ?? {}}
-            onChange={onChange}
-          />
-        ),
-      },
-      {
-        id: "admissions",
-        label: "Admissions",
-        kind: "form",
-        configKey: "artsScienceAdmissions",
-        defaultValue: {} as GenericAdmissionsVal,
-        render: (v, onChange) => (
-          <AdmissionsForm
-            value={(v as GenericAdmissionsVal) ?? {}}
-            onChange={onChange}
-            showContact={true}
-          />
-        ),
-      },
-      {
-        id: "lifeAtJct",
-        label: "Life at JCT",
-        kind: "form",
-        configKey: "artsScienceLifeAtJct",
-        defaultValue: {
-          categories: ["All", "Labs", "Sports", "Events", "Clubs"],
-          photos: [],
-        } as LifeAtJctVal,
-        render: (v, onChange) => (
-          <LifeAtJctForm
-            value={(v as LifeAtJctVal) ?? {}}
-            onChange={onChange}
-          />
-        ),
-      },
-      upcomingEventsSection("arts-science"),
-      {
-        id: "testimonials",
-        label: "Testimonials",
-        kind: "custom",
-        customRender: () => (
-          <CollegeTestimonialsManager institution="arts-science" />
-        ),
-      },
-      seoSection("arts-science"),
-    ];
+const KEYS: Record<
+  College,
+  {
+    announcement: string;
+    header: string;
+    navbar: string;
+    hero: string;
+    admissions: string;
+    placements: string;
+    lifeAtJct: string;
+    upcomingEvents: string;
+    seo: string;
   }
-
-  // polytechnic
-  return [
-    navbarSection(
-      "polytechnicHeader",
-      "polytechnicNavbar",
-      navDefaultFor("polytechnic"),
-    ),
-    {
-      id: "hero",
-      label: "Hero",
-      kind: "form",
-      configKey: "polytechnicHero",
-      defaultValue: {} as PolyHeroVal,
-      render: (v, onChange) => (
-        <PolytechnicHeroForm
-          value={(v as PolyHeroVal) ?? {}}
-          onChange={onChange}
-        />
-      ),
-    },
-    {
-      id: "admissions",
-      label: "Admissions",
-      kind: "form",
-      configKey: "polytechnicAdmissions",
-      defaultValue: {} as AdmissionsVal,
-      render: (v, onChange) => (
-        <PolytechnicAdmissionsForm
-          value={(v as AdmissionsVal) ?? {}}
-          onChange={onChange}
-        />
-      ),
-    },
-    {
-      id: "lifeAtJct",
-      label: "Life at JCT",
-      kind: "form",
-      configKey: "polytechnicLifeAtJct",
-      defaultValue: {
-        categories: ["All", "Labs", "Sports", "Events", "Clubs"],
-        photos: [],
-      } as LifeAtJctVal,
-      render: (v, onChange) => (
-        <LifeAtJctForm value={(v as LifeAtJctVal) ?? {}} onChange={onChange} />
-      ),
-    },
-    upcomingEventsSection("polytechnic"),
-    {
-      id: "testimonials",
-      label: "Testimonials",
-      kind: "custom",
-      customRender: () => (
-        <CollegeTestimonialsManager institution="polytechnic" />
-      ),
-    },
-    seoSection("polytechnic"),
-  ];
-}
+> = {
+  engineering: {
+    announcement: "engineeringAnnouncement",
+    header: "engineeringHeader",
+    navbar: "engineeringNavbar",
+    hero: "engineeringHero",
+    admissions: "engineeringAdmissions",
+    placements: "engineeringPlacementHighlights",
+    lifeAtJct: "engineeringLifeAtJct",
+    upcomingEvents: "engineeringUpcomingEvents",
+    seo: "engineeringSeo",
+  },
+  "arts-science": {
+    announcement: "artsScienceAnnouncement",
+    header: "artsScienceHeader",
+    navbar: "artsScienceNavbar",
+    hero: "artsScienceHero",
+    admissions: "artsScienceAdmissions",
+    placements: "artsSciencePlacementHighlights",
+    lifeAtJct: "artsScienceLifeAtJct",
+    upcomingEvents: "artsScienceUpcomingEvents",
+    seo: "artsScienceSeo",
+  },
+  polytechnic: {
+    announcement: "polytechnicAnnouncement",
+    header: "polytechnicHeader",
+    navbar: "polytechnicNavbar",
+    hero: "polytechnicHero",
+    admissions: "polytechnicAdmissions",
+    placements: "polytechnicPlacementHighlights",
+    lifeAtJct: "polytechnicLifeAtJct",
+    upcomingEvents: "polytechnicUpcomingEvents",
+    seo: "polytechnicSeo",
+  },
+};
 
 const PRETTY: Record<College, string> = {
   engineering: "Engineering",
   "arts-science": "Arts & Science",
   polytechnic: "Polytechnic",
 };
+
+/** The landing page's own `<main>` classes, so its theme styles apply. */
+const FRAME_CLASS: Record<College, string> = {
+  engineering: "bg-background text-foreground engineering-theme",
+  "arts-science": "bg-background text-foreground arts-science-theme",
+  polytechnic: "polytechnic-theme bg-[#F8F9FA] font-sans",
+};
+
+const LIFE_AT_JCT_DEFAULT = {
+  categories: ["All", "Labs", "Sports", "Events", "Clubs"],
+  photos: [],
+} as LifeAtJctVal;
+
+function navDefaultFor(college: College): NavbarVal {
+  const src: StaticNavItem[] =
+    college === "engineering"
+      ? engineeringNavigation
+      : college === "arts-science"
+        ? artsNavigation
+        : polytechnicNavigation;
+  return {
+    items: src.map((it) => ({
+      label: it.name,
+      href: it.href,
+      visible: true,
+      inMore: false,
+      children: it.children?.map((c) => ({
+        label: c.name,
+        href: c.href,
+        desc: c.desc,
+        visible: true,
+      })),
+    })),
+  };
+}
+
+function heroSection(college: College): SiteSectionDef {
+  const common = {
+    id: "hero",
+    label: "Hero",
+    help: "The large banner visitors see first: headline, buttons and the rotating background photos.",
+    group: "Page sections",
+    configKey: KEYS[college].hero,
+  };
+  if (college === "engineering")
+    return formSection<EngHeroVal>({
+      ...common,
+      defaultValue: {},
+      form: (value, onChange) => (
+        <EngineeringHeroForm value={value} onChange={onChange} />
+      ),
+      preview: <EngineeringHero />,
+    });
+  if (college === "arts-science")
+    return formSection<ArtsHeroVal>({
+      ...common,
+      defaultValue: {},
+      form: (value, onChange) => (
+        <ArtsScienceHeroForm value={value} onChange={onChange} />
+      ),
+      preview: <ArtsHero />,
+    });
+  return formSection<PolyHeroVal>({
+    ...common,
+    defaultValue: {},
+    form: (value, onChange) => (
+      <PolytechnicHeroForm value={value} onChange={onChange} />
+    ),
+    preview: <PolyHero />,
+  });
+}
+
+function programsSection(college: College): SiteSectionDef {
+  const preview =
+    college === "engineering" ? (
+      <EngineeringDomains />
+    ) : college === "arts-science" ? (
+      <UgPrograms />
+    ) : (
+      <DiplomaPrograms />
+    );
+  return {
+    id: "programs",
+    label: "Programs",
+    help: "The program cards. Each card is a program — add, reorder or edit them (and their detail pages) in Programs.",
+    group: "Page sections",
+    links: [
+      { href: `/admin/programs?college=${college}`, label: "Open Programs" },
+    ],
+    preview,
+  };
+}
+
+function upcomingEventsSection(college: College): SiteSectionDef {
+  const eventsHref = `/institutions/${college}/events`;
+  return {
+    ...formSection<UpcomingEventsVal>({
+      id: "upcomingEvents",
+      label: "News & Events",
+      help: "The events strip: its heading and wording are edited here; the events themselves are added in News & Events.",
+      group: "Page sections",
+      configKey: KEYS[college].upcomingEvents,
+      defaultValue: {
+        enabled: true,
+        eyebrow: "Happenings",
+        heading: "News & Events",
+        maxItems: 3,
+        ctaLabel: "News & Events",
+        ctaHref: eventsHref,
+        fallbackToRecent: true,
+        upcomingBadge: "Upcoming",
+      },
+      form: (value, onChange) => (
+        <UpcomingEventsForm
+          value={value}
+          onChange={onChange}
+          eventsHref={eventsHref}
+        />
+      ),
+      preview: <NewsEventsPreview institution={college} />,
+    }),
+    links: [
+      { href: `/admin/events?college=${college}`, label: "Open News & Events" },
+    ],
+  };
+}
+
+function admissionsSection(college: College): SiteSectionDef {
+  const common = {
+    id: "admissions",
+    label: "Admissions",
+    help: "The admissions block — the steps to apply, key dates and who to contact.",
+    group: "Page sections",
+    configKey: KEYS[college].admissions,
+  };
+  if (college === "polytechnic")
+    return formSection<AdmissionsVal>({
+      ...common,
+      defaultValue: {},
+      form: (value, onChange) => (
+        <PolytechnicAdmissionsForm value={value} onChange={onChange} />
+      ),
+      preview: <PolyAdmissions />,
+    });
+  return formSection<GenericAdmissionsVal>({
+    ...common,
+    defaultValue: {},
+    form: (value, onChange) => (
+      <AdmissionsForm value={value} onChange={onChange} showContact />
+    ),
+    preview:
+      college === "engineering" ? (
+        <EngineeringAdmissions />
+      ) : (
+        <AdmissionProcess />
+      ),
+  });
+}
+
+function placementsSection(college: College): SiteSectionDef {
+  return {
+    ...formSection<RecruitersSectionVal>({
+      id: "placements",
+      label: "Placement Highlights",
+      help: "The placement section: heading, description and stat cards. The company logos come from the year-wise placement records.",
+      group: "Page sections",
+      configKey: KEYS[college].placements,
+      defaultValue: {},
+      form: (value, onChange) => (
+        <RecruitersSectionForm value={value} onChange={onChange} />
+      ),
+      preview: <Placements institution={college} />,
+    }),
+    links: [
+      {
+        href: `/admin/placements-page?college=${college}`,
+        label: "Open placement records",
+      },
+    ],
+  };
+}
+
+function lifeAtJctSection(college: College): SiteSectionDef {
+  return formSection<LifeAtJctVal>({
+    id: "lifeAtJct",
+    label: "Life at JCT",
+    help: "The photo gallery of campus life, with its category filters.",
+    group: "Page sections",
+    configKey: KEYS[college].lifeAtJct,
+    defaultValue: LIFE_AT_JCT_DEFAULT,
+    form: (value, onChange) => (
+      <LifeAtJctForm value={value} onChange={onChange} />
+    ),
+    preview: (
+      <CampusLife
+        configKey={KEYS[college].lifeAtJct}
+        eventsHref={`/institutions/${college}/events`}
+      />
+    ),
+  });
+}
+
+function testimonialsSection(college: College): SiteSectionDef {
+  return {
+    id: "testimonials",
+    label: "Testimonials",
+    help: "Quotes from alumni, students and recruiters shown near the bottom of the page.",
+    group: "Page sections",
+    manager: () => <CollegeTestimonialsManager institution={college} />,
+    preview:
+      college === "engineering" ? (
+        <EngineeringTestimonials />
+      ) : college === "arts-science" ? (
+        <ArtsTestimonials />
+      ) : (
+        <PolyTestimonials />
+      ),
+  };
+}
+
+/** Sections in the order the college's landing page renders them. */
+function sectionsFor(college: College): SiteSectionDef[] {
+  const top = [
+    announcementSection(KEYS[college].announcement),
+    navbarSection(
+      { header: KEYS[college].header, navbar: KEYS[college].navbar },
+      navDefaultFor(college),
+    ),
+    heroSection(college),
+    programsSection(college),
+  ];
+  const bottom = [
+    placementsSection(college),
+    lifeAtJctSection(college),
+    testimonialsSection(college),
+    footerLinkSection(),
+    seoSection(college, KEYS[college].seo),
+  ];
+
+  if (college === "engineering") {
+    return [
+      ...top,
+      formSection<Metric[]>({
+        id: "metrics",
+        label: "Performance Metrics",
+        help: "The strip of headline numbers below the programs.",
+        group: "Page sections",
+        configKey: "engineeringMetrics",
+        defaultValue: [],
+        form: (value, onChange) => (
+          <MetricsForm value={value} onChange={onChange} />
+        ),
+        preview: <EngineeringMetrics />,
+      }),
+      upcomingEventsSection(college),
+      admissionsSection(college),
+      ...bottom,
+    ];
+  }
+
+  if (college === "arts-science") {
+    return [
+      ...top,
+      formSection<AddOnProgramsVal>({
+        id: "addOnPrograms",
+        label: "Add-on Programs",
+        help: "Certificate tracks students can take alongside their degree, grouped by field.",
+        group: "Page sections",
+        configKey: "artsScienceAddOnPrograms",
+        defaultValue: ARTS_SCIENCE_ADD_ON_PROGRAMS_DEFAULT,
+        form: (value, onChange) => (
+          <AddOnProgramsForm value={value} onChange={onChange} />
+        ),
+        preview: <AddOnPrograms />,
+      }),
+      formSection<CareerCentreVal>({
+        id: "careerCentre",
+        label: "Career Development Centre",
+        help: "Support for higher education, competitive exams, placements and counselling.",
+        group: "Page sections",
+        configKey: "artsScienceCareerCentre",
+        defaultValue: ARTS_SCIENCE_CAREER_CENTRE_DEFAULT,
+        form: (value, onChange) => (
+          <CareerCentreForm value={value} onChange={onChange} />
+        ),
+        preview: <CareerDevelopmentCentre />,
+      }),
+      upcomingEventsSection(college),
+      admissionsSection(college),
+      ...bottom,
+    ];
+  }
+
+  return [
+    ...top,
+    upcomingEventsSection(college),
+    admissionsSection(college),
+    ...bottom,
+  ];
+}
 
 function Inner() {
   const params = useSearchParams();
@@ -834,10 +872,15 @@ function Inner() {
     raw === "arts-science" || raw === "polytechnic" ? raw : "engineering";
 
   return (
-    <PageContentShell
-      pageTitle={`${PRETTY[college]} Page Content`}
-      pageSubtitle="Hero, sections, and other page-specific content for this institution."
+    <SiteSectionsEditor
+      // A college switch is a different page: remount so nothing carries over.
+      key={college}
+      title={`${PRETTY[college]} — Landing Page`}
+      description="Click any part of the page to edit it. Save draft keeps changes private; Publish puts them on the live site."
+      publicHref={`/institutions/${college}`}
+      institution={college}
       sections={sectionsFor(college)}
+      frameClassName={FRAME_CLASS[college]}
     />
   );
 }

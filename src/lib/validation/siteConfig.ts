@@ -72,6 +72,8 @@ export const SITE_CONFIG_SCHEMAS = {
   whyChooseJct: WhyChooseJctSchema,
   lifeAtJct: LifeAtJctSchema,
   engineeringAnnouncement: AnnouncementSchema,
+  artsScienceAnnouncement: AnnouncementSchema,
+  polytechnicAnnouncement: AnnouncementSchema,
   engineeringHero: EngineeringHeroSchema,
   engineeringMetrics: MetricsSchema,
   engineeringFacilities: FacilitiesSchema,
@@ -118,6 +120,7 @@ export const SITE_CONFIG_SCHEMAS = {
   engineeringCommittees: GroupsPageSchema,
   engineeringDocuments: DocumentsPageSchema,
   polytechnicCommittees: GroupsPageSchema,
+  polytechnicClubs: GroupsPageSchema,
   campusLifePage: CampusLifePageSchema,
   mainAccreditations: AccreditationsPageSchema,
   engineeringAccreditations: AccreditationsPageSchema,
@@ -210,6 +213,8 @@ export const SITE_CONFIG_KEY_INSTITUTION: Partial<
   Record<SiteConfigKey, "engineering" | "arts-science" | "polytechnic">
 > = {
   engineeringAnnouncement: "engineering",
+  artsScienceAnnouncement: "arts-science",
+  polytechnicAnnouncement: "polytechnic",
   engineeringHero: "engineering",
   engineeringMetrics: "engineering",
   engineeringFacilities: "engineering",
@@ -244,6 +249,7 @@ export const SITE_CONFIG_KEY_INSTITUTION: Partial<
   artsScienceHeader: "arts-science",
   artsScienceNavbar: "arts-science",
   polytechnicCommittees: "polytechnic",
+  polytechnicClubs: "polytechnic",
   polytechnicFineArtsClub: "polytechnic",
   polytechnicHero: "polytechnic",
   polytechnicLifeAtJct: "polytechnic",

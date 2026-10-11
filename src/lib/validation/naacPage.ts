@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SidebarNavItemSchema } from "./sidebarNav";
+import { zCells, zTableColumns } from "./tableColumns";
 
 // ──────────────────────────────────────────────────────────────────────────
 // The standalone NAAC page (/institutions/engineering/naac),
@@ -49,6 +50,8 @@ const NaacQualitativeRowSchema = z.object({
   marksRequested: s(20),
   justification: s(2000),
   docs: z.array(NaacDocSchema).max(NAAC_PAGE_LIMITS.rowDocsMax).default([]),
+  /** Values for the table's added columns. */
+  cells: zCells,
 });
 
 const NaacQuantitativeRowSchema = z.object({
@@ -62,6 +65,7 @@ const NaacQuantitativeRowSchema = z.object({
   requested: s(20),
   justification: s(2000),
   docs: z.array(NaacDocSchema).max(NAAC_PAGE_LIMITS.rowDocsMax).default([]),
+  cells: zCells,
 });
 
 const QualitativeColumnsSchema = z
@@ -110,7 +114,10 @@ const QualitativeTableSchema = z
   .object({
     title: s(200),
     description: s(600),
+    /** Default column names — see src/lib/naac-table-columns.ts. */
     columns: QualitativeColumnsSchema,
+    /** The editable column list. Absent means the built-in five. */
+    columnList: zTableColumns,
     rows: z
       .array(NaacQualitativeRowSchema)
       .max(NAAC_PAGE_LIMITS.qualitativeRowsMax)
@@ -127,7 +134,13 @@ const QuantitativeTableSchema = z
   .object({
     title: s(200),
     description: s(600),
+    /** Default column names, including the two group headings. */
     columns: QuantitativeColumnsSchema,
+    /**
+     * The editable column list. Absent means the built-in seven under the
+     * grouped two-row header; once set, the header is one row.
+     */
+    columnList: zTableColumns,
     rows: z
       .array(NaacQuantitativeRowSchema)
       .max(NAAC_PAGE_LIMITS.quantitativeRowsMax)

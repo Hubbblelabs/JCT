@@ -5,9 +5,7 @@ import {
   ArrowDown,
   ArrowUp,
   ChevronDown as ChevronDownIcon,
-  Loader2,
   Plus,
-  Save,
   Trash2,
 } from "lucide-react";
 import {
@@ -22,10 +20,15 @@ import {
   type FieldSpan,
 } from "@/components/admin/inputs";
 import { SeoFields } from "@/components/admin/SeoFields";
-import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
+import {
+  SOCIAL_DEFS,
+  SOCIAL_KEYS,
+  type SocialKey,
+} from "@/components/layout/social-links";
 import {
   LIMITS_pamphlet,
   ENG_HERO_LIMITS,
+  HERO_OVERLAY_LIMITS,
   ARTS_HERO_LIMITS,
   POLY_HERO_LIMITS,
   LIMITS_lifeAtJct,
@@ -273,6 +276,75 @@ function IntervalInput({
   );
 }
 
+/* ─── Hero background darkness ─── */
+
+/** Where the slider starts the first time "Custom darkness" is switched on. */
+const HERO_OVERLAY_START = 40;
+
+/**
+ * Slider for a hero's `overlayOpacity`. Unset keeps the hero's original
+ * gradients, so the control is off until an admin opts in — switching it off
+ * again clears the value rather than saving some number that only looks like
+ * the original.
+ */
+export function HeroOverlayInput({
+  value,
+  onChange,
+  span = "full",
+}: {
+  value: number | undefined;
+  onChange: (v: number | undefined) => void;
+  span?: FieldSpan;
+}) {
+  const custom = typeof value === "number";
+  const current = custom ? value : HERO_OVERLAY_START;
+  return (
+    <Field
+      label="Background Image Visibility"
+      span={span}
+      hint="How dark the layer over the background photos is. Lower shows the photo more clearly; higher makes the headline easier to read. Leave off to keep the original design."
+    >
+      <div className="flex flex-wrap items-center gap-4">
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={custom}
+            onChange={(e) =>
+              onChange(e.target.checked ? HERO_OVERLAY_START : undefined)
+            }
+          />
+          Custom darkness
+        </label>
+        <div
+          className={`flex min-w-64 flex-1 items-center gap-3 ${custom ? "" : "opacity-40"}`}
+        >
+          <span className="text-xs whitespace-nowrap text-gray-500">
+            Photo clearer
+          </span>
+          <input
+            type="range"
+            className="flex-1 accent-[#d4a024]"
+            min={HERO_OVERLAY_LIMITS.min}
+            max={HERO_OVERLAY_LIMITS.max}
+            step={5}
+            value={current}
+            disabled={!custom}
+            aria-label="Background darkness"
+            aria-valuetext={`${current}% dark`}
+            onChange={(e) => onChange(Number(e.target.value))}
+          />
+          <span className="text-xs whitespace-nowrap text-gray-500">
+            Text clearer
+          </span>
+          <span className="w-12 text-right text-sm font-semibold text-gray-700 tabular-nums">
+            {custom ? `${current}%` : "—"}
+          </span>
+        </div>
+      </div>
+    </Field>
+  );
+}
+
 /* ─── Accreditations editor (logo + name + description) ─── */
 
 export type AccreditationItem = {
@@ -380,6 +452,7 @@ export type EngHeroVal = {
   accreditations?: AccreditationItem[];
   accreditationsCaption?: string;
   intervalMs?: number;
+  overlayOpacity?: number;
 };
 
 export function EngineeringHeroForm({
@@ -478,6 +551,10 @@ export function EngineeringHeroForm({
         max={ENG_HERO_LIMITS.maxIntervalMs}
         onChange={(intervalMs) => onChange({ ...value, intervalMs })}
       />
+      <HeroOverlayInput
+        value={value.overlayOpacity}
+        onChange={(overlayOpacity) => onChange({ ...value, overlayOpacity })}
+      />
     </FormGrid>
   );
 }
@@ -498,6 +575,7 @@ export type ArtsHeroVal = {
   subsections?: ArtsHeroSubsection[];
   stats?: HeroStat[];
   intervalMs?: number;
+  overlayOpacity?: number;
 };
 
 function ArtsSubsectionList({
@@ -671,6 +749,10 @@ export function ArtsScienceHeroForm({
         max={ARTS_HERO_LIMITS.maxIntervalMs}
         onChange={(intervalMs) => onChange({ ...value, intervalMs })}
       />
+      <HeroOverlayInput
+        value={value.overlayOpacity}
+        onChange={(overlayOpacity) => onChange({ ...value, overlayOpacity })}
+      />
     </FormGrid>
   );
 }
@@ -774,8 +856,36 @@ export type PolyHeroVal = {
   titleLine2?: string;
   subtitle?: string;
   ctas?: Cta[];
+  stats?: HeroStat[];
+  showStats?: boolean;
+  accreditations?: AccreditationItem[];
+  accreditationsCaption?: string;
+  showAccreditations?: boolean;
   intervalMs?: number;
+  overlayOpacity?: number;
 };
+
+/** A "Show on the page" switch for an optional hero part. */
+function ShowPartSwitch({
+  checked,
+  onChange,
+  label,
+}: {
+  checked: boolean;
+  onChange: (next: boolean) => void;
+  label: string;
+}) {
+  return (
+    <label className="mb-3 flex items-center gap-2 text-sm font-medium text-gray-700">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+      />
+      {label}
+    </label>
+  );
+}
 
 export function PolytechnicHeroForm({
   value,
@@ -784,7 +894,8 @@ export function PolytechnicHeroForm({
   value: PolyHeroVal;
   onChange: (v: PolyHeroVal) => void;
 }) {
-  // Eyebrow → two title lines → subtitle → CTAs, matching the public hero.
+  // Top to bottom as the public hero: eyebrow → two title lines → subtitle →
+  // buttons → stat row → logo strip, then the background carousel behind it.
   return (
     <FormGrid>
       <TextInput
@@ -822,6 +933,54 @@ export function PolytechnicHeroForm({
         max={POLY_HERO_LIMITS.ctas}
         onChange={(next) => onChange({ ...value, ctas: next })}
       />
+      <Field
+        label="Stat Row"
+        span="full"
+        hint={`Headline numbers under the buttons, e.g. "25+ Years" (up to ${POLY_HERO_LIMITS.statsMax}).`}
+      >
+        <ShowPartSwitch
+          label="Show the stat row"
+          checked={value.showStats !== false}
+          onChange={(showStats) => onChange({ ...value, showStats })}
+        />
+        <HeroStatsForm
+          value={value.stats ?? []}
+          onChange={(next) =>
+            onChange({
+              ...value,
+              stats: next.slice(0, POLY_HERO_LIMITS.statsMax),
+            })
+          }
+        />
+      </Field>
+      <Field
+        label="Accreditation Logos"
+        span="full"
+        hint={`A strip of approval and accreditation logos at the bottom of the hero (up to ${POLY_HERO_LIMITS.accreditationsMax}).`}
+      >
+        <ShowPartSwitch
+          label="Show the logo strip"
+          checked={value.showAccreditations !== false}
+          onChange={(showAccreditations) =>
+            onChange({ ...value, showAccreditations })
+          }
+        />
+        <AccreditationList
+          value={value.accreditations ?? []}
+          max={POLY_HERO_LIMITS.accreditationsMax}
+          onChange={(next) => onChange({ ...value, accreditations: next })}
+        />
+      </Field>
+      <TextInput
+        label="Accreditation Caption"
+        span="full"
+        value={value.accreditationsCaption ?? ""}
+        maxLength={POLY_HERO_LIMITS.accreditationCaptionMax}
+        onChange={(e) =>
+          onChange({ ...value, accreditationsCaption: e.target.value })
+        }
+        hint='Text shown next to the logos, e.g. "Approved by AICTE · Affiliated to DOTE"'
+      />
       <ImageList
         label="Background Carousel Images"
         max={POLY_HERO_LIMITS.backgroundImagesMax}
@@ -835,6 +994,10 @@ export function PolytechnicHeroForm({
         min={POLY_HERO_LIMITS.minIntervalMs}
         max={POLY_HERO_LIMITS.maxIntervalMs}
         onChange={(intervalMs) => onChange({ ...value, intervalMs })}
+      />
+      <HeroOverlayInput
+        value={value.overlayOpacity}
+        onChange={(overlayOpacity) => onChange({ ...value, overlayOpacity })}
       />
     </FormGrid>
   );
@@ -870,7 +1033,7 @@ type PamphletCountdownVal = {
 };
 
 type PamphletLayoutVal =
-  "image-image" | "image-text" | "text-image" | "text-text";
+  "image" | "image-image" | "image-text" | "text-image" | "text-text";
 
 export type PamphletPopupVal = {
   id: string;
@@ -909,6 +1072,7 @@ export type PamphletVal = {
 };
 
 const LAYOUT_OPTIONS: { value: PamphletLayoutVal; label: string }[] = [
+  { value: "image", label: "Single image (fills the popup)" },
   { value: "image-image", label: "Image (left) + Image (right)" },
   { value: "image-text", label: "Image (left) + Text (right)" },
   { value: "text-image", label: "Text (left) + Image (right)" },
@@ -919,7 +1083,7 @@ function slotKind(
   layout: PamphletLayoutVal,
   side: "left" | "right",
 ): "image" | "text" {
-  if (layout === "image-image") return "image";
+  if (layout === "image" || layout === "image-image") return "image";
   if (layout === "text-text") return "text";
   if (layout === "image-text") return side === "left" ? "image" : "text";
   return side === "left" ? "text" : "image";
@@ -931,7 +1095,8 @@ function PamphletSlotEditor({
   value,
   onChange,
 }: {
-  side: "Left" | "Right";
+  /** Omitted for the single-image layout, which has no sides. */
+  side?: "Left" | "Right";
   kind: "image" | "text";
   value: PamphletSlotVal;
   onChange: (next: PamphletSlotVal) => void;
@@ -939,8 +1104,16 @@ function PamphletSlotEditor({
   return (
     <div className="rounded-lg border border-gray-200 p-3">
       <p className="admin-label mb-2">
-        {side} Slot — {kind === "image" ? "Image" : "Text"}
+        {side
+          ? `${side} Slot — ${kind === "image" ? "Image" : "Text"}`
+          : "Popup Image"}
       </p>
+      {!side && (
+        <p className="mb-2 text-xs text-gray-500">
+          Shown on its own, at its own shape — a tall poster or a wide banner
+          both work. The buttons below sit over its bottom edge.
+        </p>
+      )}
       {kind === "image" ? (
         <ImageUploadInput
           label=""
@@ -1099,28 +1272,40 @@ function PamphletPopupEditor({
         span="full"
         value={layout}
         options={LAYOUT_OPTIONS}
-        hint="Choose how the two sides of the popup are filled — images, text, or a mix."
+        hint="One image on its own, or two sides filled with images, text, or a mix."
         onChange={(e) =>
           onChange({ ...popup, layout: e.target.value as PamphletLayoutVal })
         }
       />
 
-      <div className="admin-col-6">
-        <PamphletSlotEditor
-          side="Left"
-          kind={slotKind(layout, "left")}
-          value={leftSlot}
-          onChange={(next) => onChange({ ...popup, leftSlot: next })}
-        />
-      </div>
-      <div className="admin-col-6">
-        <PamphletSlotEditor
-          side="Right"
-          kind={slotKind(layout, "right")}
-          value={rightSlot}
-          onChange={(next) => onChange({ ...popup, rightSlot: next })}
-        />
-      </div>
+      {layout === "image" ? (
+        <div className="admin-col-full">
+          <PamphletSlotEditor
+            kind="image"
+            value={leftSlot}
+            onChange={(next) => onChange({ ...popup, leftSlot: next })}
+          />
+        </div>
+      ) : (
+        <>
+          <div className="admin-col-6">
+            <PamphletSlotEditor
+              side="Left"
+              kind={slotKind(layout, "left")}
+              value={leftSlot}
+              onChange={(next) => onChange({ ...popup, leftSlot: next })}
+            />
+          </div>
+          <div className="admin-col-6">
+            <PamphletSlotEditor
+              side="Right"
+              kind={slotKind(layout, "right")}
+              value={rightSlot}
+              onChange={(next) => onChange({ ...popup, rightSlot: next })}
+            />
+          </div>
+        </>
+      )}
 
       <Field
         label="Countdown Timer"
@@ -3382,12 +3567,24 @@ export function HomeAdmissionsForm({
 
 /* ─── Global CMS — Header ─── */
 
+export type HeaderPhoneVal = { number: string; label?: string };
+
 export type HeaderVal = {
+  phones?: HeaderPhoneVal[];
   phone?: string;
   studentLoginLabel?: string;
   studentLoginUrl?: string;
   showStudentLogin?: boolean;
 };
+
+/**
+ * The header's numbers as the editor shows them. A value saved before
+ * multi-number support has only `phone`, which becomes the first row.
+ */
+function headerPhoneRows(value: HeaderVal): HeaderPhoneVal[] {
+  if (Array.isArray(value.phones)) return value.phones;
+  return value.phone ? [{ number: value.phone, label: "" }] : [];
+}
 
 export function HeaderForm({
   value,
@@ -3396,19 +3593,94 @@ export function HeaderForm({
   value: HeaderVal;
   onChange: (v: HeaderVal) => void;
 }) {
-  // The header is a single strip — phone on the left, login button on the
-  // right — so its whole configuration fits one row.
+  const phones = headerPhoneRows(value);
+  const phonesAtMax = phones.length >= HEADER_LIMITS.phones;
+  // `phone` mirrors the first number so anything still reading the legacy
+  // single field keeps showing the right one.
+  const setPhones = (next: HeaderPhoneVal[]) =>
+    onChange({ ...value, phones: next, phone: next[0]?.number ?? "" });
+
   return (
     <FormGrid>
-      <TextInput
-        label="Phone Number"
-        span={3}
-        value={value.phone ?? ""}
-        maxLength={HEADER_LIMITS.phoneMax}
-        onChange={(e) => onChange({ ...value, phone: e.target.value })}
-        placeholder="+91 93614 88801"
-        hint="Shown in the public site header."
-      />
+      <Field
+        label="Phone Numbers"
+        span="full"
+        hint="The first number shows in the header; the rest appear when visitors hover over it. All of them are listed in the mobile menu. Labels are optional."
+      >
+        <div className="space-y-2">
+          {phones.map((p, i) => (
+            <div key={i} className="flex flex-wrap items-center gap-2">
+              <input
+                className="admin-input min-w-0 flex-1 basis-48"
+                value={p.number}
+                maxLength={HEADER_LIMITS.phoneMax}
+                placeholder="+91 93614 88801"
+                aria-label={`Phone number ${i + 1}`}
+                onChange={(e) =>
+                  setPhones(
+                    phones.map((x, j) =>
+                      j === i ? { ...x, number: e.target.value } : x,
+                    ),
+                  )
+                }
+              />
+              <input
+                className="admin-input min-w-0 flex-1 basis-40"
+                value={p.label ?? ""}
+                maxLength={HEADER_LIMITS.phoneLabelMax}
+                placeholder="Label (optional) — e.g. Admissions"
+                aria-label={`Label for phone number ${i + 1}`}
+                onChange={(e) =>
+                  setPhones(
+                    phones.map((x, j) =>
+                      j === i ? { ...x, label: e.target.value } : x,
+                    ),
+                  )
+                }
+              />
+              <div className="flex shrink-0 gap-1">
+                <button
+                  type="button"
+                  disabled={i === 0}
+                  onClick={() => setPhones(moveItem(phones, i, i - 1))}
+                  className="admin-btn admin-btn-outline admin-btn-sm disabled:opacity-40"
+                  aria-label={`Move phone number ${i + 1} up`}
+                >
+                  <ArrowUp size={13} />
+                </button>
+                <button
+                  type="button"
+                  disabled={i === phones.length - 1}
+                  onClick={() => setPhones(moveItem(phones, i, i + 1))}
+                  className="admin-btn admin-btn-outline admin-btn-sm disabled:opacity-40"
+                  aria-label={`Move phone number ${i + 1} down`}
+                >
+                  <ArrowDown size={13} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPhones(phones.filter((_, j) => j !== i))}
+                  className="admin-btn admin-btn-danger admin-btn-sm"
+                  aria-label={`Remove phone number ${i + 1}`}
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+            </div>
+          ))}
+          <div className="flex items-center justify-between">
+            <button
+              type="button"
+              disabled={phonesAtMax}
+              onClick={() => setPhones([...phones, { number: "", label: "" }])}
+              className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Plus size={14} /> Add Phone Number
+            </button>
+            <LimitHint count={phones.length} max={HEADER_LIMITS.phones} />
+          </div>
+        </div>
+      </Field>
       <Field label="Student Login" span={3}>
         <label className="flex items-center gap-2 pt-2 text-sm">
           <input
@@ -3827,144 +4099,6 @@ export function NavbarForm({
   );
 }
 
-/* ─── Navbar admin section (header bar + nav items in one panel) ─── */
-
-const NAVBAR_HEADER_DEFAULT: HeaderVal = {
-  phone: "",
-  studentLoginLabel: "",
-  studentLoginUrl: "",
-  showStudentLogin: true,
-};
-
-export function NavbarAdminSection({
-  headerConfigKey,
-  navbarConfigKey,
-  navDefault,
-}: {
-  headerConfigKey: string;
-  navbarConfigKey: string;
-  navDefault?: NavbarVal;
-}) {
-  const [headerVal, setHeaderVal] = useState<HeaderVal>(NAVBAR_HEADER_DEFAULT);
-  const [navbarVal, setNavbarVal] = useState<NavbarVal>(navDefault ?? {});
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
-  // This section renders inside PageContentShell's DeferredUploadsProvider, so
-  // PDF picks are held as `pending:` placeholders until flushed. Its own save
-  // button bypasses the shell's save, so it has to flush them itself.
-  const deferred = useDeferredUploadsOptional();
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const r = await fetch("/api/admin/site-config");
-        const data: Array<{ config_key: string; value: unknown }> =
-          await r.json();
-        if (cancelled) return;
-        const h = data.find((d) => d.config_key === headerConfigKey);
-        const n = data.find((d) => d.config_key === navbarConfigKey);
-        if (h?.value) setHeaderVal(h.value as HeaderVal);
-        if (n?.value) setNavbarVal(n.value as NavbarVal);
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [headerConfigKey, navbarConfigKey]);
-
-  const save = async () => {
-    setSaving(true);
-    setMsg(null);
-    try {
-      // Both values go through ONE flush. `flush` drops any pending upload it
-      // cannot find in the value it is handed, so flushing the navbar alone
-      // would discard a file picked in the header form — and this component
-      // shares its provider with the whole PageContentShell.
-      const flushed = deferred
-        ? ((await deferred.flush({
-            header: headerVal,
-            navbar: navbarVal,
-          })) as { header: HeaderVal; navbar: NavbarVal })
-        : { header: headerVal, navbar: navbarVal };
-      if (deferred) {
-        setHeaderVal(flushed.header);
-        setNavbarVal(flushed.navbar);
-      }
-      const put = (config_key: string, value: unknown) =>
-        fetch("/api/admin/site-config", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ config_key, value }),
-        });
-      const [hr, nr] = await Promise.all([
-        put(headerConfigKey, flushed.header),
-        put(navbarConfigKey, flushed.navbar),
-      ]);
-      const ok = hr.ok && nr.ok;
-      setMsg({ ok, text: ok ? "Saved!" : "Save failed." });
-    } catch (err) {
-      setMsg({
-        ok: false,
-        text: err instanceof Error ? err.message : "Save failed.",
-      });
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center py-12">
-        <Loader2 size={24} className="animate-spin text-gray-400" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-8">
-      {/* The save button shares the "Header Bar" row rather than owning a bare
-          row of its own, which left a band of empty space above the form. */}
-      <div>
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-          <h3 className="font-semibold text-gray-800">Header Bar</h3>
-          <div className="flex items-center gap-3">
-            {msg && (
-              <span
-                className={`text-sm font-medium ${msg.ok ? "text-green-600" : "text-red-500"}`}
-              >
-                {msg.text}
-              </span>
-            )}
-            <button
-              type="button"
-              onClick={save}
-              disabled={saving}
-              className="admin-btn admin-btn-gold admin-btn-sm"
-            >
-              {saving ? (
-                <Loader2 size={15} className="animate-spin" />
-              ) : (
-                <Save size={15} />
-              )}
-              {saving ? "Saving…" : "Save Navbar"}
-            </button>
-          </div>
-        </div>
-        <HeaderForm value={headerVal} onChange={setHeaderVal} />
-      </div>
-      <hr className="border-gray-200" />
-      <div>
-        <h3 className="mb-3 font-semibold text-gray-800">Navigation Items</h3>
-        <NavbarForm value={navbarVal} onChange={setNavbarVal} />
-      </div>
-    </div>
-  );
-}
-
 /* ─── Global CMS — Footer ─── */
 
 export type FooterVal = {
@@ -4229,7 +4363,105 @@ export type FloatingElementsVal = {
   meritto?: {
     enabled?: boolean;
   };
+  social?: {
+    enabled?: boolean;
+    /** Absent = every network that has a link in the Footer settings. */
+    networks?: SocialKey[];
+  };
 };
+
+/**
+ * Which networks have a URL in the Footer settings — the floating strip has
+ * nothing to show for the others. Reads the admin endpoint, so a link saved as
+ * a draft counts too.
+ */
+function useFooterSocialLinks(): Partial<Record<SocialKey, string>> | null {
+  const [links, setLinks] = useState<Partial<Record<SocialKey, string>> | null>(
+    null,
+  );
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/admin/site-config?key=footer")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((docs: Array<{ config_key: string; value: unknown }>) => {
+        if (cancelled) return;
+        const v = Array.isArray(docs)
+          ? docs.find((d) => d.config_key === "footer")?.value
+          : null;
+        setLinks((v as Partial<Record<SocialKey, string>>) ?? {});
+      })
+      .catch(() => !cancelled && setLinks({}));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return links;
+}
+
+function SocialStripField({
+  value,
+  onChange,
+}: {
+  value: NonNullable<FloatingElementsVal["social"]>;
+  onChange: (next: NonNullable<FloatingElementsVal["social"]>) => void;
+}) {
+  const footerLinks = useFooterSocialLinks();
+  const selected = Array.isArray(value.networks)
+    ? value.networks
+    : [...SOCIAL_KEYS];
+  const toggle = (key: SocialKey, on: boolean) =>
+    onChange({
+      ...value,
+      networks: SOCIAL_KEYS.filter((k) =>
+        k === key ? on : selected.includes(k),
+      ),
+    });
+
+  return (
+    <Field
+      label="Social Media Icons"
+      span="full"
+      hint="A slim strip of social icons fixed to the left edge of every public page (desktop only). The links come from the Footer section — set a network's URL there for it to appear."
+    >
+      <div className="rounded-lg border border-gray-200 p-3">
+        <label className="mb-3 flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={value.enabled === true}
+            onChange={(e) => onChange({ ...value, enabled: e.target.checked })}
+          />
+          Show floating social icons
+        </label>
+        <div
+          className={`flex flex-wrap gap-x-6 gap-y-2 ${value.enabled ? "" : "opacity-50"}`}
+        >
+          {SOCIAL_DEFS.map(({ key, label, Icon }) => {
+            const hasLink = !!footerLinks?.[key]?.trim();
+            return (
+              <label
+                key={key}
+                className="flex items-center gap-2 text-sm"
+                title={hasLink ? undefined : "No link set in the Footer"}
+              >
+                <input
+                  type="checkbox"
+                  checked={selected.includes(key)}
+                  disabled={!value.enabled}
+                  onChange={(e) => toggle(key, e.target.checked)}
+                />
+                <Icon size={14} className="text-gray-500" />
+                {label}
+                {footerLinks && !hasLink && (
+                  <span className="text-xs text-amber-600">(no link)</span>
+                )}
+              </label>
+            );
+          })}
+        </div>
+      </div>
+    </Field>
+  );
+}
 
 export function FloatingElementsForm({
   value,
@@ -4337,6 +4569,11 @@ export function FloatingElementsForm({
           </label>
         </div>
       </Field>
+
+      <SocialStripField
+        value={value.social ?? {}}
+        onChange={(social) => onChange({ ...value, social })}
+      />
     </FormGrid>
   );
 }

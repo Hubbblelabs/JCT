@@ -3,11 +3,27 @@
 import { useEffect, useState, Suspense, useRef } from "react";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
-import { Plus, Trash2, Loader2, Pencil, X, Check, Save } from "lucide-react";
+import { Plus, Trash2, Loader2, Pencil, X, Check } from "lucide-react";
 import {
-  PageContentShell,
-  type SectionDef,
-} from "@/components/admin/PageContentShell";
+  SiteSectionsEditor,
+  type SectionIO,
+  type SiteSectionDef,
+} from "@/components/admin/SiteSectionsEditor";
+import {
+  footerLinkSection,
+  formSection,
+  navbarSection,
+  seoSection,
+} from "@/components/admin/site-sections";
+import { Fieldset } from "@/components/admin/kit";
+import { Pamphlet } from "@/components/layout/Pamphlet";
+import { HomeHero } from "@/components/layout/HomeHero";
+import { TrustHighlightsRow } from "@/components/layout/TrustHighlightsRow";
+import { WhyJCT } from "@/components/layout/WhyJCT";
+import { Placements } from "@/components/layout/Placements";
+import { CampusLife } from "@/components/layout/CampusLife";
+import { Testimonials } from "@/components/layout/Testimonials";
+import { AdmissionsCTA } from "@/components/layout/AdmissionsCTA";
 import {
   PamphletForm,
   LifeAtJctForm,
@@ -15,9 +31,9 @@ import {
   HomeAdmissionsForm,
   AccreditationsForm,
   StatisticsForm,
-  NavbarAdminSection,
-  SeoPagesForm,
-  type SeoPagesVal,
+  HeroOverlayInput,
+  RecruitersSectionForm,
+  type RecruitersSectionVal,
   type PamphletVal,
   type LifeAtJctVal,
   type WhyChooseJctVal,
@@ -27,7 +43,6 @@ import {
   type NavbarVal,
 } from "@/components/admin/PageContentForms";
 import { mainNavigation } from "@/data/all-navigations";
-import { reconcileSeoPages, seoPagesDefaultValue } from "@/lib/seo-pages";
 import {
   Field,
   FormGrid,
@@ -58,6 +73,7 @@ type HomeVal = {
   cards?: HeroCard[];
   tourVideoUrl?: string;
   intervalMs?: number;
+  overlayOpacity?: number;
 };
 
 type HomeStatsVal = {
@@ -187,6 +203,10 @@ function HomeHeroForm({
             onChange={(intervalMs) => onChange({ ...value, intervalMs })}
           />
         </div>
+        <HeroOverlayInput
+          value={value.overlayOpacity}
+          onChange={(overlayOpacity) => onChange({ ...value, overlayOpacity })}
+        />
       </FormGrid>
 
       {/* Background Images — up to 6, add / replace / remove */}
@@ -571,7 +591,7 @@ function TestimonialFormInner({
           type="button"
           onClick={handleSave}
           disabled={busy}
-          className="admin-btn admin-btn-gold admin-btn-sm"
+          className="admin-btn admin-btn-primary admin-btn-sm"
         >
           {busy ? (
             <Loader2 size={13} className="animate-spin" />
@@ -603,129 +623,39 @@ const LIFE_AT_JCT_INSTITUTIONS = [
   { key: "polytechnicLifeAtJct", label: "Polytechnic" },
 ] as const;
 
-function LifeAtJctMainEditor() {
-  const toast = useToast();
-  const { flush } = useDeferredUploads();
-  const [value, setValue] = useState<LifeAtJctVal>(LIFE_AT_JCT_DEFAULT);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [applyTo, setApplyTo] = useState<Record<string, boolean>>({});
-
-  const load = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const r = await fetch("/api/admin/site-config");
-      const data: { config_key: string; value: unknown }[] = await r.json();
-      const found = data.find((d) => d.config_key === "lifeAtJct");
-      setValue((found?.value as LifeAtJctVal) ?? LIFE_AT_JCT_DEFAULT);
-    } catch {
-      setError("Failed to load configuration.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    load();
-  }, []);
-
-  const putConfig = async (configKey: string, val: unknown) => {
-    const r = await fetch("/api/admin/site-config", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ config_key: configKey, value: val }),
-    });
-    if (!r.ok) {
-      const body = await r.json().catch(() => null);
-      throw new Error(
-        `${configKey}: ${body?.message ?? body?.error ?? "Save failed"}`,
-      );
-    }
-  };
-
-  const save = async () => {
-    setSaving(true);
-    setError(null);
-    try {
-      const flushed = (await flush(value)) as LifeAtJctVal;
-      setValue(flushed);
-      const targetKeys = LIFE_AT_JCT_INSTITUTIONS.filter(
-        ({ key }) => applyTo[key],
-      ).map(({ key }) => key);
-
-      await putConfig("lifeAtJct", flushed);
-      for (const key of targetKeys) await putConfig(key, flushed);
-
-      toast.success(
-        targetKeys.length > 0
-          ? `Saved and applied to ${targetKeys.length} institution${targetKeys.length > 1 ? "s" : ""}.`
-          : "Saved!",
-      );
-      setApplyTo({});
-      await load();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Save failed.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex justify-center py-8">
-        <Loader2 size={20} className="animate-spin text-gray-400" />
-      </div>
-    );
-  }
-
+/**
+ * Copies the home gallery into a college's own Life at JCT draft. The copies
+ * are saved by the page's Save draft / Publish like any other edit, and each
+ * college stays independently editable afterwards.
+ */
+function LifeAtJctCopyControl({ io }: { io: SectionIO }) {
+  const [copied, setCopied] = useState<string[]>([]);
   return (
-    <div className="space-y-5">
-      {error && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-          {error}
+    <Fieldset
+      legend="Use this gallery on the college pages too"
+      hint="Replaces that college's own Life at JCT photos with the ones above. It is saved when you save or publish this page."
+    >
+      <div className="flex flex-wrap gap-2">
+        {LIFE_AT_JCT_INSTITUTIONS.map(({ key, label }) => (
+          <button
+            key={key}
+            type="button"
+            className="admin-btn admin-btn-outline admin-btn-sm"
+            onClick={() => {
+              io.set(key, structuredClone(io.get("lifeAtJct")));
+              setCopied((prev) => [...new Set([...prev, label])]);
+            }}
+          >
+            Copy to {label}
+          </button>
+        ))}
+      </div>
+      {copied.length > 0 && (
+        <p className="admin-help mt-2">
+          Copied to {copied.join(", ")} — save or publish to apply.
         </p>
       )}
-      <LifeAtJctForm value={value} onChange={(next) => setValue(next)} />
-      <div className="rounded-lg border border-gray-200 p-4">
-        <p className="mb-2 text-sm font-medium text-gray-700">
-          Also apply this content to:
-        </p>
-        <div className="space-y-2">
-          {LIFE_AT_JCT_INSTITUTIONS.map(({ key, label }) => (
-            <label key={key} className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={Boolean(applyTo[key])}
-                onChange={(e) =>
-                  setApplyTo((prev) => ({ ...prev, [key]: e.target.checked }))
-                }
-              />
-              {label}
-            </label>
-          ))}
-        </div>
-        <p className="mt-2 text-xs text-gray-500">
-          Overwrites the checked institution&apos;s own Life at JCT content with
-          what&apos;s shown above on save. Each institution stays independently
-          editable afterward.
-        </p>
-      </div>
-      <button
-        type="button"
-        onClick={save}
-        disabled={saving}
-        className="admin-btn admin-btn-gold"
-      >
-        {saving ? (
-          <Loader2 size={15} className="animate-spin" />
-        ) : (
-          <Save size={15} />
-        )}
-        {saving ? "Saving…" : "Save"}
-      </button>
-    </div>
+    </Fieldset>
   );
 }
 
@@ -972,142 +902,158 @@ const MAIN_NAVBAR_DEFAULT: NavbarVal = {
 };
 
 function Inner() {
-  // Same order as the Main section of the sidebar (see MAIN_GROUPS in
-  // src/lib/admin-nav.ts) — the two lists are read together.
-  const sections: SectionDef[] = [
-    {
+  // In the order the home page renders.
+  const sections: SiteSectionDef[] = [
+    formSection<PamphletVal>({
       id: "pamphlet",
-      label: "Pamphlet Popup",
-      kind: "form",
+      label: "Entry Popup",
+      help: "The popup that greets visitors a moment after the home page opens — a poster, or two images or text panels side by side.",
+      group: "Top of the page",
       configKey: "homePamphlet",
-      defaultValue: { enabled: true, images: [], delayMs: 2000 } as PamphletVal,
-      render: (v, onChange) => (
-        <PamphletForm
-          value={(v as PamphletVal) ?? {}}
-          onChange={(next) => onChange(next)}
-        />
+      defaultValue: { enabled: true, images: [], delayMs: 2000 },
+      form: (value, onChange) => (
+        <PamphletForm value={value} onChange={onChange} />
       ),
-    },
-    {
-      id: "navbar",
-      label: "Navbar",
-      kind: "custom",
-      customRender: () => (
-        <NavbarAdminSection
-          headerConfigKey="mainHeader"
-          navbarConfigKey="mainNavbar"
-          navDefault={MAIN_NAVBAR_DEFAULT}
-        />
-      ),
-    },
-    {
+      preview: <Pamphlet preview />,
+    }),
+    navbarSection(
+      { header: "mainHeader", navbar: "mainNavbar" },
+      MAIN_NAVBAR_DEFAULT,
+    ),
+    formSection<HomeVal>({
       id: "hero",
       label: "Hero",
-      kind: "form",
+      help: "The large banner at the top: headline, buttons, the three college cards and the rotating background photos.",
+      group: "Page sections",
       configKey: "home",
-      defaultValue: {} as HomeVal,
-      render: (v, onChange) => (
-        <HomeHeroForm
-          value={(v as HomeVal) ?? {}}
-          onChange={(next) => onChange(next)}
-        />
+      defaultValue: {},
+      form: (value, onChange) => (
+        <HomeHeroForm value={value} onChange={onChange} />
       ),
-    },
-    {
+      preview: <HomeHero />,
+    }),
+    formSection<AccreditationItem[]>({
       id: "accreditations",
-      label: "Accreditations",
-      kind: "form",
+      label: "Accreditation Logos",
+      help: "The rotating strip of accreditation logos inside the hero.",
+      group: "Page sections",
       configKey: "accreditations",
-      defaultValue: [] as AccreditationItem[],
-      render: (v, onChange) => (
-        <AccreditationsForm
-          value={(v as AccreditationItem[]) ?? []}
-          onChange={(next) => onChange(next)}
-        />
+      defaultValue: [],
+      form: (value, onChange) => (
+        <AccreditationsForm value={value} onChange={onChange} />
       ),
-    },
-    {
+      // Drawn inside the hero, which marks the strip as this section.
+    }),
+    formSection<HomeStatisticItem[]>({
       id: "statistics",
       label: "Statistics",
-      kind: "form",
+      help: "The row of headline numbers just below the hero.",
+      group: "Page sections",
       configKey: "homeStatistics",
-      defaultValue: [] as HomeStatisticItem[],
-      render: (v, onChange) => (
-        <StatisticsForm
-          value={(v as HomeStatisticItem[]) ?? []}
-          onChange={(next) => onChange(next)}
-        />
+      defaultValue: [],
+      form: (value, onChange) => (
+        <StatisticsForm value={value} onChange={onChange} />
       ),
-    },
-    {
+      preview: <TrustHighlightsRow />,
+    }),
+    formSection<WhyChooseJctVal>({
       id: "whyChooseJct",
       label: "Why Choose JCT",
-      kind: "form",
+      help: "The value-proposition block: heading, description and feature cards.",
+      group: "Page sections",
       configKey: "whyChooseJct",
-      defaultValue: {} as WhyChooseJctVal,
-      render: (v, onChange) => (
-        <WhyChooseJctForm
-          value={(v as WhyChooseJctVal) ?? {}}
-          onChange={(next) => onChange(next)}
-        />
+      defaultValue: {},
+      form: (value, onChange) => (
+        <WhyChooseJctForm value={value} onChange={onChange} />
       ),
-    },
-    {
+      preview: <WhyJCT />,
+    }),
+    formSection<HomeStatsVal>({
       id: "card",
-      label: "Card",
-      kind: "form",
+      label: "Stat Counters",
+      help: "The dark strip of counters (years of excellence, alumni…) at the bottom of Why Choose JCT.",
+      group: "Page sections",
       configKey: "homeStats",
-      defaultValue: {} as HomeStatsVal,
-      render: (v, onChange) => (
-        <HomeStatsForm
-          value={(v as HomeStatsVal) ?? {}}
-          onChange={(next) => onChange(next)}
-        />
+      defaultValue: {},
+      form: (value, onChange) => (
+        <HomeStatsForm value={value} onChange={onChange} />
       ),
-    },
+      // Drawn inside Why Choose JCT, which marks the strip as this section.
+    }),
+    formSection<RecruitersSectionVal>({
+      id: "placements",
+      label: "Placement Highlights",
+      help: "The placement section: heading, description and stat cards. The company logos come from every college's placement records.",
+      group: "Page sections",
+      configKey: "mainPlacementHighlights",
+      defaultValue: {},
+      form: (value, onChange) => (
+        <RecruitersSectionForm value={value} onChange={onChange} />
+      ),
+      preview: <Placements />,
+    }),
     {
       id: "lifeAtJct",
       label: "Life at JCT",
-      kind: "custom",
-      customRender: () => <LifeAtJctMainEditor />,
+      help: "The photo gallery of campus life, with its category filters.",
+      group: "Page sections",
+      keys: [
+        { key: "lifeAtJct", defaultValue: LIFE_AT_JCT_DEFAULT },
+        // Loaded so "Copy to …" can write them; saved with the page.
+        ...LIFE_AT_JCT_INSTITUTIONS.map(({ key }) => ({
+          key,
+          defaultValue: LIFE_AT_JCT_DEFAULT,
+        })),
+      ],
+      render: (io) => (
+        <div className="space-y-6">
+          <LifeAtJctForm
+            value={(io.get("lifeAtJct") as LifeAtJctVal) ?? LIFE_AT_JCT_DEFAULT}
+            onChange={(next) => io.set("lifeAtJct", next)}
+          />
+          <LifeAtJctCopyControl io={io} />
+        </div>
+      ),
+      preview: (
+        <CampusLife
+          configKey="lifeAtJct"
+          campusLifeHref="/campus-life"
+          eventsHref="/events"
+        />
+      ),
     },
     {
       id: "testimonials",
       label: "Testimonials",
-      kind: "custom",
-      customRender: () => <VoicesInlineManager />,
+      help: "Quotes from alumni, students and recruiters across all three colleges.",
+      group: "Page sections",
+      manager: () => <VoicesInlineManager />,
+      preview: <Testimonials />,
     },
-    {
+    formSection<HomeAdmissionsVal>({
       id: "homeAdmissions",
       label: "Admissions",
-      kind: "form",
+      help: "The admissions call-to-action near the bottom of the page.",
+      group: "Page sections",
       configKey: "homeAdmissions",
-      defaultValue: {} as HomeAdmissionsVal,
-      render: (v, onChange) => (
-        <HomeAdmissionsForm
-          value={(v as HomeAdmissionsVal) ?? {}}
-          onChange={(next) => onChange(next)}
-        />
+      defaultValue: {},
+      form: (value, onChange) => (
+        <HomeAdmissionsForm value={value} onChange={onChange} />
       ),
-    },
-    {
-      id: "seo",
-      label: "SEO / Meta Tags",
-      kind: "form",
-      configKey: "mainSeo",
-      defaultValue: seoPagesDefaultValue("main") as SeoPagesVal,
-      reconcile: (v) => reconcileSeoPages("main", v),
-      render: (v, onChange) => (
-        <SeoPagesForm value={(v as SeoPagesVal) ?? {}} onChange={onChange} />
-      ),
-    },
+      preview: <AdmissionsCTA />,
+    }),
+    footerLinkSection(),
+    seoSection("main", "mainSeo"),
   ];
 
   return (
-    <PageContentShell
-      pageTitle="Main Landing Page"
-      pageSubtitle="Hero, stat cards, Life at JCT gallery, testimonials, and admissions."
+    <SiteSectionsEditor
+      title="Home — Landing Page"
+      description="Click any part of the page to edit it. Save draft keeps changes private; Publish puts them on the live site."
+      publicHref="/"
+      institution="main"
       sections={sections}
+      frameClassName="bg-surface text-foreground"
     />
   );
 }

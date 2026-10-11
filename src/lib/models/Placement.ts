@@ -55,6 +55,8 @@ export interface IPlacement extends Document {
   company_placements: ICompanyPlacement[];
   is_active: boolean;
   sort_order: number;
+  /** This year's values for the history table's added columns, by column id. */
+  history_cells?: Record<string, string>;
   created_at: Date;
   updated_at: Date;
   updated_by?: string;
@@ -120,6 +122,7 @@ const PlacementSchema = new Schema<IPlacement>(
     company_placements: { type: [CompanyPlacementSchema], default: [] },
     is_active: { type: Boolean, default: true },
     sort_order: { type: Number, default: 0 },
+    history_cells: { type: Schema.Types.Mixed },
     updated_by: String,
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } },

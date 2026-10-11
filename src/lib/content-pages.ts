@@ -31,7 +31,6 @@ import {
   Lock,
   MessageSquare,
   MonitorPlay,
-  Palette,
   ScrollText,
   ShieldCheck,
   Sparkles,
@@ -78,9 +77,7 @@ export type ContentPageDef = {
 };
 
 const ENG = "/institutions/engineering";
-const POLY = "/institutions/polytechnic";
 const SUFFIX = "JCT College of Engineering & Technology, Coimbatore";
-const POLY_SUFFIX = "JCT Polytechnic College, Coimbatore";
 const MAIN_SUFFIX = "JCT Institutions";
 
 export const CONTENT_PAGES: ContentPageDef[] = [
@@ -300,20 +297,10 @@ export const CONTENT_PAGES: ContentPageDef[] = [
       "Photographs from campus recruitment drives and placement events at JCT College of Engineering & Technology, year by year.",
     icon: Camera,
   },
-  {
-    slug: "fine-arts-club",
-    configKey: "polytechnicFineArtsClub",
-    institution: "polytechnic",
-    path: `${POLY}/fine-arts-club`,
-    label: "Fine Arts Club",
-    description:
-      "Movie, cultural, arts and photography clubs and their gallery.",
-    seoLabel: "Fine Arts Club",
-    seoTitle: `Fine Arts Club | ${POLY_SUFFIX}`,
-    seoDescription:
-      "The Fine Arts Club at JCT Polytechnic College — its movie, cultural, arts and photography wings, objectives and event gallery.",
-    icon: Palette,
-  },
+  // The Polytechnic "Fine Arts Club" page that used to sit here is now one
+  // club on the Polytechnic Clubs & Cells page (src/lib/polytechnic-clubs.ts);
+  // its old route redirects there. Its config key stays registered in
+  // SITE_CONFIG_SCHEMAS so the stored content is still readable.
   // Pages linked from the footer of every page on every site. Their copy is
   // bootstrapped into SiteConfig by `POST /api/admin/site-config/seed` (see
   // `content-page-seeds.ts`) because the text has to be live from the moment

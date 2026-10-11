@@ -78,6 +78,10 @@ export const POLYTECHNIC_SEO_PAGES: SeoPageDefault[] = [
     path: "/institutions/polytechnic/committees",
     label: "Committees & Cells",
   },
+  {
+    path: "/institutions/polytechnic/clubs-and-cells",
+    label: "Clubs & Cells",
+  },
   ...contentPageSeoRows("polytechnic"),
 ];
 

@@ -9,6 +9,7 @@ import {
 } from "./_primitives";
 import { PageBodySectionSchema } from "./pages";
 import { ProgramSeoSchema } from "./seo";
+import { zTableColumns } from "./tableColumns";
 
 export const INSTITUTIONS = [
   "engineering",
@@ -356,6 +357,17 @@ export const ProgramContentSchema = z
       .max(LIMITS.sidebarTabsMax)
       .optional(),
     labels: LabelsTreeSchema.optional(),
+    // Each table's columns (src/lib/program-table-columns.ts). A table absent
+    // here shows its built-in columns, named by `labels`.
+    tableColumns: z
+      .object({
+        faculty: zTableColumns,
+        advisoryBoard: zTableColumns,
+        pac: zTableColumns,
+        bos: zTableColumns,
+        curriculum: zTableColumns,
+      })
+      .optional(),
     // Meta title/description for the program's public detail page. Lives in
     // `content` so it follows the program's draft → publish cycle.
     seo: ProgramSeoSchema.optional(),

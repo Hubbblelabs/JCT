@@ -14,6 +14,10 @@ export interface IEvent extends Document {
   // Extra photos shown as a grid on the detail page, below the body. The cover
   // `image` is separate — it drives the card thumbnail and the detail hero.
   gallery: string[];
+  /** Links to videos (YouTube, Vimeo, Facebook…) shown on the detail page. */
+  videos: string[];
+  /** Pinned to the carousel at the top of the News & Events pages. */
+  featured: boolean;
   institution: "engineering" | "arts-science" | "polytechnic";
   is_active: boolean;
   sort_order: number;
@@ -33,6 +37,8 @@ const EventSchema = new Schema<IEvent>(
     location: { type: String, default: "" },
     image: { type: String, default: "" },
     gallery: { type: [String], default: [] },
+    videos: { type: [String], default: [] },
+    featured: { type: Boolean, default: false },
     institution: {
       type: String,
       enum: ["engineering", "arts-science", "polytechnic"],

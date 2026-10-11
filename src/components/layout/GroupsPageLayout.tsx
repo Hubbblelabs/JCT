@@ -15,7 +15,7 @@ import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { EditableRegion } from "@/components/admin/EditableRegion";
 import { getImageUrl } from "@/lib/utils";
-import { resolveGroupSlugs } from "@/lib/group-slugs";
+import { isPublicGroup, resolveGroupSlugs } from "@/lib/group-slugs";
 import {
   GROUPS_INSTITUTION_LABELS,
   GROUPS_SECTION_LABELS,
@@ -245,8 +245,10 @@ export function GroupsPageLayout({
   const slugs = resolveGroupSlugs(data.groups);
   const entries: Entry[] = data.groups
     .map((group, index) => ({ group, index, slug: slugs[index] }))
-    // Unnamed rows are placeholders the admin hasn't filled in yet.
-    .filter((e) => editable || e.group.name.trim() !== "");
+    // Unnamed rows are placeholders the admin hasn't filled in yet; hidden
+    // ones are switched off. The editor still shows both so they can be
+    // opened and finished or switched back on.
+    .filter((e) => editable || isPublicGroup(e.group));
 
   return (
     <main className="bg-surface text-foreground min-h-screen">
@@ -340,8 +342,13 @@ export function GroupsPageLayout({
                           label={group.name || "Untitled"}
                           editable
                           onEditSection={onEditSection}
-                          className={cardClass}
+                          className={`${cardClass} relative ${group.hidden ? "opacity-45" : ""}`}
                         >
+                          {group.hidden && (
+                            <span className="absolute top-3 left-3 z-10 rounded-full bg-black/70 px-2.5 py-1 text-[10px] font-bold tracking-wider text-white uppercase">
+                              Hidden
+                            </span>
+                          )}
                           <CardBody group={group} meta={meta} />
                         </EditableRegion>
                       ) : (

@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useInstitution } from "@/contexts/InstitutionContext";
 import { useSiteConfig } from "@/lib/use-site-config";
 import { getImageUrl } from "@/lib/utils";
+import { headerPhones, telHref } from "@/lib/header-phones";
 import {
   mainNavigation,
   engineeringNavigation,
@@ -30,6 +31,7 @@ type NavbarProps = {
 };
 
 type HeaderConfig = {
+  phones?: { number?: string; label?: string }[];
   phone?: string;
   studentLoginLabel?: string;
   studentLoginUrl?: string;
@@ -69,6 +71,13 @@ function headerKeyFor(institution: string): string {
   if (institution === "arts-science") return "artsScienceHeader";
   if (institution === "polytechnic") return "polytechnicHeader";
   return "mainHeader";
+}
+
+function announcementKeyFor(institution: string): string | null {
+  if (institution === "engineering") return "engineeringAnnouncement";
+  if (institution === "arts-science") return "artsScienceAnnouncement";
+  if (institution === "polytechnic") return "polytechnicAnnouncement";
+  return null;
 }
 
 function staticNavFor(institution: string): NavItem[] {
@@ -136,20 +145,22 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   const { data: headerCfgRaw } = useSiteConfig<HeaderConfig>(headerKey);
   const { data: legacyHeader } = useSiteConfig<HeaderConfig>("header");
   const header = headerCfgRaw ?? legacyHeader;
+  const phones = headerPhones(header);
+  const [primaryPhone, ...otherPhones] = phones;
 
-  const isEngineeringPage = institution === "engineering";
+  const announcementKey = announcementKeyFor(institution);
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const [showBanner, setShowBanner] = useState(true);
-  const [announcementConfig, setAnnouncementConfig] = useState<{
+  const { data: announcementConfig } = useSiteConfig<{
     enabled?: boolean;
     text?: string;
     ctaLabel?: string;
     ctaHref?: string;
-  } | null>(null);
+  }>(announcementKey);
   const bannerVisible =
-    isEngineeringPage &&
+    !!announcementKey &&
     showBanner &&
     !!announcementConfig?.enabled &&
     !!announcementConfig?.text;
@@ -205,22 +216,6 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   }, [isOpen, desktopExpanded]);
 
   useEffect(() => {
-    if (!isEngineeringPage) return;
-    let cancelled = false;
-    fetch("/api/public/site-config?key=engineeringAnnouncement")
-      .then((r) => r.json())
-      .then((res) => {
-        if (!cancelled && res?.source === "db" && res.data) {
-          setAnnouncementConfig(res.data);
-        }
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, [isEngineeringPage]);
-
-  useEffect(() => {
     if (!scrolled && !forceSolidOnTop) {
       setDropdownSolidOverride(true);
       if (solidOverrideTimeoutRef.current) {
@@ -251,21 +246,25 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   let highlightBgColor = "bg-[#d4a024]";
   let highlightHoverBgColor = "hover:bg-[#e8b84a]";
   let highlightShadowColor = "shadow-[#d4a024]/10";
+  // Announcement strip colours — each college's own brand, so the strip reads
+  // as part of that college's chrome rather than Engineering's gold everywhere.
+  let bannerColors = "bg-gold text-navy";
 
   // College names are set in capitals here rather than with a `uppercase`
   // class, because the sub-text span already renders uppercase — casing the
   // whole block in CSS would also shout the Polytechnic's "Est. 2009" tagline.
   // "JCT Institutions" above is the group, not a college, so it keeps its case.
   if (institution === "engineering") {
-    logoText = "JCT COLLEGE OF";
-    logoSubText = "Engineering & Technology";
+    logoText = "JCT COLLEGE";
+    logoSubText = "Of Engineering & Technology";
   } else if (institution === "arts-science") {
-    logoText = "JCT COLLEGE OF";
-    logoSubText = "Arts and Science";
+    logoText = "JCT COLLEGE";
+    logoSubText = "Of Arts and Science";
     highlightColor = "text-arts-science-accent";
     highlightBgColor = "bg-arts-science-accent";
     highlightHoverBgColor = "hover:bg-arts-science-accent-dark";
     highlightShadowColor = "shadow-arts-science-accent/10";
+    bannerColors = "bg-arts-science-accent text-white";
   } else if (institution === "polytechnic") {
     logoText = "JCT POLYTECHNIC COLLEGE";
     logoSubText = "Est. 2014";
@@ -273,6 +272,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
     highlightBgColor = "bg-slate-500";
     highlightHoverBgColor = "hover:bg-slate-600";
     highlightShadowColor = "shadow-slate-500/10";
+    bannerColors = "bg-polytechnic-muted text-polytechnic-dark";
   }
 
   const navigationLinks = useMemo<NavItem[]>(
@@ -331,7 +331,12 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
   return (
     <>
       {bannerVisible && (
-        <div className="bg-gold text-navy fixed top-0 right-0 left-0 z-60 px-3 py-2 text-center font-sans text-[11px] font-bold tracking-wide sm:px-4 sm:text-xs">
+        <div
+          // Inert on the live site; the admin's live preview reads it so a
+          // click on the strip opens the announcement editor, not the navbar.
+          data-preview-section="announcement"
+          className={`${bannerColors} fixed top-0 right-0 left-0 z-60 px-3 py-2 text-center font-sans text-[11px] font-bold tracking-wide sm:px-4 sm:text-xs`}
+        >
           <div className="flex items-center justify-center gap-2 overflow-hidden whitespace-nowrap">
             <span className="truncate">{announcementConfig?.text}</span>
 
@@ -366,6 +371,7 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
       )}
 
       <nav
+        data-preview-section="navbar"
         className={`fixed ${bannerVisible ? "top-10" : "top-4"} right-0 left-0 z-50 px-4 transition-all duration-300 md:px-8`}
       >
         <div
@@ -607,17 +613,55 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
           </div>
 
           <div className="z-50 hidden shrink-0 items-center justify-end gap-2 whitespace-nowrap xl:flex xl:flex-1 xl:gap-3 2xl:gap-6">
-            {header?.phone && (
-              <a
-                href={`tel:${header.phone.replace(/\s/g, "")}`}
-                className="flex max-w-[180px] items-center gap-1 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white min-[1400px]:max-w-none xl:gap-1.5 xl:text-[14px] 2xl:text-[15px]"
-              >
-                <Phone
-                  size={16}
-                  className="h-3.5 w-3.5 shrink-0 xl:h-4 xl:w-4"
-                />
-                <span className="truncate">{header.phone}</span>
-              </a>
+            {primaryPhone && (
+              // Only the first number fits the bar; the rest open on hover or
+              // keyboard focus, so a list of four doesn't crowd the links.
+              <div className="group/phones relative">
+                <a
+                  href={telHref(primaryPhone.number)}
+                  title={primaryPhone.label || undefined}
+                  aria-haspopup={otherPhones.length > 0 ? "true" : undefined}
+                  className="flex max-w-[180px] items-center gap-1 font-sans text-sm font-medium text-white/90 transition-colors hover:text-white min-[1400px]:max-w-none xl:gap-1.5 xl:text-[14px] 2xl:text-[15px]"
+                >
+                  <Phone
+                    size={16}
+                    className="h-3.5 w-3.5 shrink-0 xl:h-4 xl:w-4"
+                  />
+                  <span className="truncate">{primaryPhone.number}</span>
+                  {otherPhones.length > 0 && (
+                    <ChevronDown
+                      size={14}
+                      className="shrink-0 transition-transform duration-200 group-focus-within/phones:rotate-180 group-hover/phones:rotate-180"
+                    />
+                  )}
+                </a>
+                {otherPhones.length > 0 && (
+                  <div className="invisible absolute top-full right-0 pt-3 opacity-0 transition-all duration-200 group-focus-within/phones:visible group-focus-within/phones:opacity-100 group-hover/phones:visible group-hover/phones:opacity-100">
+                    <ul className="min-w-56 rounded-2xl border border-white/10 bg-[#0a1628]/95 p-2 shadow-[0_8px_30px_rgba(0,0,0,0.4)] backdrop-blur-md">
+                      {phones.map((p, i) => (
+                        <li key={`${p.number}-${i}`}>
+                          <a
+                            href={telHref(p.number)}
+                            className="flex items-center gap-2.5 rounded-xl px-3 py-2 font-sans text-white/90 transition-colors hover:bg-white/10 hover:text-white"
+                          >
+                            <Phone size={14} className="shrink-0" />
+                            <span className="flex flex-col">
+                              {p.label && (
+                                <span className="text-[11px] font-medium tracking-wide text-white/55 uppercase">
+                                  {p.label}
+                                </span>
+                              )}
+                              <span className="text-sm font-medium">
+                                {p.number}
+                              </span>
+                            </span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
             )}
             {pathname === "/" &&
               header?.showStudentLogin !== false &&
@@ -815,14 +859,19 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
               </div>
 
               <div className="space-y-3 border-t border-white/5 p-5 pt-2">
-                {header?.phone && (
+                {phones.map((p, i) => (
                   <a
-                    href={`tel:${header.phone.replace(/\s/g, "")}`}
-                    className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-white/5 font-sans text-sm font-medium text-white transition-all hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98]"
+                    key={`${p.number}-${i}`}
+                    href={telHref(p.number)}
+                    className="flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-white/5 px-3 py-2 font-sans text-sm font-medium text-white transition-all hover:scale-[1.02] hover:bg-white/10 active:scale-[0.98]"
                   >
-                    <Phone size={16} /> {header.phone}
+                    <Phone size={16} className="shrink-0" />
+                    {p.label && (
+                      <span className="text-white/55">{p.label}:</span>
+                    )}
+                    {p.number}
                   </a>
-                )}
+                ))}
                 {pathname === "/" &&
                   header?.showStudentLogin !== false &&
                   header?.studentLoginUrl && (

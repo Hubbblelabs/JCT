@@ -3,11 +3,6 @@
 import { useEffect, useMemo, useState, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
-  FormGrid,
-  TextInput,
-  ImageUploadInput,
-} from "@/components/admin/inputs";
-import {
   PROGRAM_CONTENT_SECTION_LABELS,
   ProgramSectionInspector,
   type ProgramContentSection,
@@ -17,19 +12,13 @@ import {
   normalizeProgramData,
   withProgramCardFields,
 } from "@/lib/normalize-program-data";
-import {
-  Send,
-  Save,
-  Trash2,
-  EyeOff,
-  ArrowLeft,
-  Loader2,
-  Check,
-  ExternalLink,
-  Search,
-  X,
-} from "lucide-react";
+import { Trash2, EyeOff, ArrowLeft, Loader2, Check } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
+import {
+  EditorSaveBar,
+  EditorWorkspace,
+  type WorkspaceSection,
+} from "@/components/admin/kit";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 import {
   DeferredUploadsProvider,
@@ -72,6 +61,63 @@ const EMPTY_PROG: ProgramFields = {
   sort_order: 0,
 };
 
+/** The sections of a program page, grouped by the tab they appear on. */
+const SECTION_GROUPS: {
+  group: string;
+  tab?: string;
+  ids: ProgramContentSection[];
+}[] = [
+  { group: "Top of the page", ids: ["hero", "stats"] },
+  {
+    group: "Overview tab",
+    tab: "overview",
+    ids: ["about", "hod", "visionMission", "programOutcomes"],
+  },
+  {
+    group: "Academics tab",
+    tab: "academics",
+    ids: ["curriculum", "teachingLearning", "valueAddedCourses"],
+  },
+  {
+    group: "Faculty tab",
+    tab: "faculty",
+    ids: ["faculty", "advisoryBoard", "pac", "bos"],
+  },
+  { group: "Facilities tab", tab: "facilities", ids: ["labs", "library"] },
+  {
+    group: "Student life tab",
+    tab: "life",
+    ids: [
+      "events",
+      "studentAchievements",
+      "facultyAchievements",
+      "magazine",
+      "participation",
+    ],
+  },
+  {
+    group: "Career tab",
+    tab: "career",
+    ids: ["careerProgression", "feedback"],
+  },
+  { group: "Page settings", ids: ["tabs", "seo"] },
+];
+
+const SECTION_HELP: Partial<Record<ProgramContentSection, string>> = {
+  hero: "The banner at the top: program name, photo and the key facts strip. Also the program card shown on the college pages.",
+  stats: "The row of quick numbers under the banner.",
+  tabs: "The tabs down the side of the page: rename, reorder or hide them, and add tabs of your own or links to other pages.",
+  seo: "The title and description Google shows for this program. Not visible on the page itself.",
+};
+
+/** Which tab a section lives on, so the preview can switch to it. */
+function tabForSection(section: string): string | undefined {
+  if (section.startsWith("tab:")) return section.slice("tab:".length);
+  return SECTION_GROUPS.find((g) =>
+    g.ids.includes(section as ProgramContentSection),
+  )?.tab;
+}
+
 function ProgramDetailInner() {
   const { flush } = useDeferredUploads();
   const toast = useToast();
@@ -91,13 +137,16 @@ function ProgramDetailInner() {
   });
   const [content, setContent] = useState<Record<string, unknown>>({});
   const [status, setStatus] = useState<string>("draft");
-  const [selectedSection, setSelectedSection] = useState<string>(
+  const [selectedSection, setSelectedSection] = useState<string | null>(
     selectedFromUrl && selectedFromUrl in PROGRAM_CONTENT_SECTION_LABELS
       ? selectedFromUrl
-      : "hero",
+      : // A new program starts on Hero, which holds its name and slug.
+        isNew
+        ? "hero"
+        : null,
   );
-
-  const [isInspectorOpen, setIsInspectorOpen] = useState(false);
+  /** The saved `{prog, content}` the editor compares against. */
+  const [baseline, setBaseline] = useState<string | null>(null);
 
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
@@ -114,8 +163,14 @@ function ProgramDetailInner() {
 
       const { _id, content: c, status: st, ...pRest } = pData;
       void _id;
-      setProg({ ...EMPTY_PROG, ...(pRest as unknown as ProgramFields) });
-      setContent((c as Record<string, unknown>) ?? {});
+      const loadedProg = {
+        ...EMPTY_PROG,
+        ...(pRest as unknown as ProgramFields),
+      };
+      const loadedContent = (c as Record<string, unknown>) ?? {};
+      setProg(loadedProg);
+      setContent(loadedContent);
+      setBaseline(JSON.stringify({ prog: loadedProg, content: loadedContent }));
       setStatus(typeof st === "string" ? st : "draft");
       setLoading(false);
     })();
@@ -142,24 +197,35 @@ function ProgramDetailInner() {
     router.replace(`?${params.toString()}`, { scroll: false });
   };
 
-  const selectSection = (section: string) => {
+  const selectSection = (section: string | null) => {
     setSelectedSection(section);
-    setParam({ section });
-    setIsInspectorOpen(true);
+    if (section) setParam({ section });
   };
 
-  const inspectorTitle = selectedSection.startsWith("tab:")
-    ? (() => {
-        const tabId = selectedSection.slice("tab:".length);
-        const tabs = Array.isArray(content.tabsConfig)
-          ? (content.tabsConfig as Array<Record<string, unknown>>)
-          : [];
-        const t = tabs.find((it) => (it.id as string) === tabId);
-        return (t?.label as string)?.trim() || "Custom Tab";
-      })()
-    : (PROGRAM_CONTENT_SECTION_LABELS[
-        selectedSection as ProgramContentSection
-      ] ?? "Section");
+  const current = JSON.stringify({ prog, content });
+  // A new program has nothing saved: anything typed is unsaved.
+  const savedState =
+    baseline ??
+    JSON.stringify({
+      prog: { ...EMPTY_PROG, institution: urlCollege },
+      content: {},
+    });
+  const dirty = current !== savedState;
+
+  const inspectorTitle = !selectedSection
+    ? undefined
+    : selectedSection.startsWith("tab:")
+      ? (() => {
+          const tabId = selectedSection.slice("tab:".length);
+          const tabs = Array.isArray(content.tabsConfig)
+            ? (content.tabsConfig as Array<Record<string, unknown>>)
+            : [];
+          const t = tabs.find((it) => (it.id as string) === tabId);
+          return (t?.label as string)?.trim() || "Custom Tab";
+        })()
+      : (PROGRAM_CONTENT_SECTION_LABELS[
+          selectedSection as ProgramContentSection
+        ] ?? "Section");
 
   /** Returns whether the write landed — "Save & Publish" needs to know. */
   const save = async (): Promise<boolean> => {
@@ -226,7 +292,13 @@ function ProgramDetailInner() {
       }
 
       setStatus("draft");
-      setMsg({ text: "Draft saved successfully", ok: true });
+      setBaseline(
+        JSON.stringify({
+          prog: { ...prog, ...(flushedProg as Partial<ProgramFields>) },
+          content: flushedContent,
+        }),
+      );
+      setMsg({ text: "Draft saved — not on the live site yet", ok: true });
       return true;
     } catch (err) {
       setMsg({
@@ -252,7 +324,7 @@ function ProgramDetailInner() {
       });
       if (r.ok) {
         setStatus("published");
-        setMsg({ text: "Published successfully", ok: true });
+        setMsg({ text: "Published — the live page is updated", ok: true });
       } else {
         const err = await parseApiError(r);
         setApiError(err);
@@ -330,94 +402,65 @@ function ProgramDetailInner() {
     setProg((f) => ({ ...f, [k]: v }));
   const backHref = `/admin/programs?college=${isNew ? urlCollege : prog.institution}`;
 
-  if (loading) {
-    return (
-      <div className="admin-content flex items-center justify-center py-20">
-        <Loader2 size={24} className="animate-spin text-gray-400" />
-      </div>
-    );
-  }
+  const customTabs = (
+    Array.isArray(content.tabsConfig)
+      ? (content.tabsConfig as Array<Record<string, unknown>>)
+      : []
+  ).filter((t) => Array.isArray(t.blocks));
+
+  const sections: WorkspaceSection[] = [
+    ...SECTION_GROUPS.flatMap(({ group, ids }) =>
+      ids.map((id) => ({
+        id,
+        label: PROGRAM_CONTENT_SECTION_LABELS[id],
+        help: SECTION_HELP[id],
+        group,
+      })),
+    ),
+    ...customTabs.map((t) => ({
+      id: `tab:${t.id as string}`,
+      label: ((t.label as string) || "").trim() || "Custom Tab",
+      help: "A tab of your own, built from content blocks.",
+      group: "Your custom tabs",
+    })),
+  ];
+
+  const collegeLabel =
+    (isNew ? urlCollege : prog.institution) === "arts-science"
+      ? "Arts & Science"
+      : (isNew ? urlCollege : prog.institution) === "polytechnic"
+        ? "Polytechnic"
+        : "Engineering";
 
   return (
-    <div className="admin-content">
-      <div className="admin-page-header">
-        <div className="flex items-center gap-3">
+    <EditorWorkspace
+      title={isNew ? "New Program" : `${prog.name || "Program"} — Program Page`}
+      description={
+        isNew
+          ? `A new ${collegeLabel} program. Fill in the name and save it as a draft — you can publish it once it has been created.`
+          : `${collegeLabel} · ${prog.is_active ? "Shown on the site" : "Hidden from the site"}. Click any part of the page to edit it.`
+      }
+      publicHref={
+        !isNew && prog.slug
+          ? `/institutions/${prog.institution}/programs/${prog.slug}`
+          : undefined
+      }
+      unpublished={!isNew && status !== "published"}
+      loading={loading}
+      headerExtra={
+        <>
           <button
             onClick={() => router.push(backHref)}
-            className="admin-btn admin-btn-outline admin-btn-sm"
+            className="admin-btn admin-btn-ghost admin-btn-sm"
           >
-            <ArrowLeft size={14} />
+            <ArrowLeft size={14} /> All programs
           </button>
-          <div>
-            <h1 className="admin-page-title">
-              {isNew ? "New Program" : prog.name || id}
-            </h1>
-            {!isNew && (
-              <p className="admin-page-subtitle">
-                {prog.institution === "arts-science"
-                  ? "Arts & Science"
-                  : prog.institution}
-              </p>
-            )}
-          </div>
-          {!isNew && (
-            <span
-              className={`admin-badge ${
-                status === "published"
-                  ? "admin-badge-green"
-                  : "admin-badge-yellow"
-              }`}
-            >
-              {status}
-            </span>
-          )}
-          {!isNew && (
-            <span
-              className={`admin-badge ${
-                prog.is_active ? "admin-badge-green" : "admin-badge-red"
-              }`}
-            >
-              {prog.is_active ? "Active" : "Inactive"}
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-2">
-          {msg && (
-            <span
-              className={`text-sm font-medium ${
-                msg.ok ? "text-green-600" : "text-red-500"
-              }`}
-            >
-              {msg.text}
-            </span>
-          )}
-
-          {/* SEO edits the page's <head>, so there is nothing in the preview
-              to click — it needs its own way into the inspector. */}
-          {!isNew && (
-            <button
-              onClick={() => selectSection("seo")}
-              className="admin-btn admin-btn-outline admin-btn-sm"
-            >
-              <Search size={14} /> SEO
-            </button>
-          )}
-          {!isNew && prog.slug && (
-            <a
-              href={`/institutions/${prog.institution}/programs/${prog.slug}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="admin-btn admin-btn-outline admin-btn-sm"
-            >
-              <ExternalLink size={14} /> Public Page
-            </a>
-          )}
           {!isNew && prog.is_active && (
             <button
               onClick={deactivate}
               className="admin-btn admin-btn-outline admin-btn-sm"
             >
-              <EyeOff size={14} /> Deactivate
+              <EyeOff size={14} /> Hide from site
             </button>
           )}
           {!isNew && !prog.is_active && (
@@ -425,7 +468,7 @@ function ProgramDetailInner() {
               onClick={activate}
               className="admin-btn admin-btn-green admin-btn-sm"
             >
-              <Check size={14} /> Activate
+              <Check size={14} /> Show on site
             </button>
           )}
           {!isNew && (
@@ -439,165 +482,106 @@ function ProgramDetailInner() {
               ) : (
                 <Trash2 size={14} />
               )}
-              {deleting ? "Deleting…" : "Delete"}
+              Delete
             </button>
           )}
-          <button
-            onClick={() => void save()}
-            disabled={saving || publishing}
-            className="admin-btn admin-btn-outline"
-          >
-            {saving ? (
-              <Loader2 size={15} className="animate-spin" />
-            ) : (
-              <Save size={15} />
-            )}
-            {saving ? "Saving…" : isNew ? "Create Program" : "Save"}
-          </button>
-          {!isNew && (
-            <button
-              onClick={() => void publish()}
-              disabled={publishing || saving}
-              className="admin-btn admin-btn-primary"
-            >
-              {publishing ? (
-                <Loader2 size={15} className="animate-spin" />
-              ) : (
-                <Send size={15} />
-              )}
-              {publishing ? "Publishing…" : "Save & Publish"}
-            </button>
-          )}
-        </div>
-      </div>
-
-      {apiError && (
-        <ValidationErrors
-          error={apiError.message ?? apiError.error}
-          details={apiError.details}
-        />
-      )}
-
-      <div>
-        <div className="-mx-6 -mb-6 overflow-hidden rounded-t-xl border-t border-gray-200 bg-white xl:mx-0 xl:rounded-xl xl:border">
-          {previewData ? (
-            <ProgramPageLayout
-              key={`${prog.slug || "new"}-builder`}
-              dept={previewData}
-              backHref={backHref}
-              backLabel="Back"
-              editable
-              onEditSection={selectSection}
-              onEditTab={(tabId) => {
-                const defaults: Record<string, ProgramContentSection> = {
-                  overview: "about",
-                  academics: "curriculum",
-                  faculty: "faculty",
-                  facilities: "labs",
-                  life: "events",
-                  career: "careerProgression",
-                };
-                // Built-in tabs map to their default section; custom content
-                // tabs open their own block editor (tab:<id>).
-                selectSection(defaults[tabId] ?? `tab:${tabId}`);
-              }}
-            />
-          ) : (
-            <div className="px-6 py-16 text-sm text-gray-400">
-              <div className="mx-auto max-w-4xl text-left">
-                <h3 className="mb-6 text-xl font-bold text-gray-900">
-                  Create New Program
-                </h3>
-                <FormGrid>
-                  <TextInput
-                    label="Program Name"
-                    span={5}
-                    value={prog.name}
-                    onChange={(e) => setP("name", e.target.value)}
-                    placeholder="e.g. Artificial Intelligence"
-                    required
-                  />
-                  <TextInput
-                    label="Abbreviation / Short Name"
-                    span={3}
-                    value={prog.abbr}
-                    onChange={(e) => setP("abbr", e.target.value)}
-                    placeholder="e.g. AI"
-                    required
-                  />
-                  <TextInput
-                    label="Slug"
-                    span={4}
-                    value={prog.slug}
-                    onChange={(e) => setP("slug", e.target.value)}
-                    placeholder="e.g. artificial-intelligence"
-                    required
-                  />
-                  <ImageUploadInput
-                    label="Program Photo"
-                    span="full"
-                    ratio="hero"
-                    value={prog.image}
-                    onChange={(v) => setP("image", v)}
-                    hideUrlField
-                  />
-                </FormGrid>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {isInspectorOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-end bg-black/50 p-0 sm:p-4">
-            {/* Wide enough for the inspector's two-column form grid. */}
-            <aside className="flex h-full w-full flex-col overflow-y-auto bg-white shadow-2xl sm:max-w-3xl sm:rounded-xl">
-              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
-                <div>
-                  <p className="text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">
-                    Inspector
-                  </p>
-                  <h2 className="mt-0.5 font-semibold text-gray-900">
-                    {inspectorTitle}
-                  </h2>
-                </div>
-                <button
-                  onClick={() => setIsInspectorOpen(false)}
-                  className="admin-btn admin-btn-outline admin-btn-sm shrink-0"
-                >
-                  <X size={14} />
-                  <span className="sr-only">Close Settings</span>
-                </button>
-              </div>
-              <div className="p-6">
-                <ProgramSectionInspector
-                  section={selectedSection}
-                  content={content}
-                  onChange={setContent}
-                  programName={prog.name}
-                  onProgramNameChange={(name) => setP("name", name)}
-                  programAbbr={prog.abbr}
-                  onProgramAbbrChange={(abbr) => setP("abbr", abbr)}
-                  programSlug={prog.slug}
-                  onProgramSlugChange={(slug) => setP("slug", slug)}
-                  programCollege={prog.institution}
-                  programCard={{
-                    degree: prog.degree,
-                    duration: prog.duration,
-                    seats: prog.seats,
-                    highlight: prog.highlight,
-                    description: prog.description,
-                    accreditations: prog.accreditations ?? [],
-                  }}
-                  onProgramCardChange={(patch) =>
-                    setProg((f) => ({ ...f, ...patch }))
-                  }
-                />
-              </div>
-            </aside>
+        </>
+      }
+      banner={
+        apiError && (
+          <ValidationErrors
+            error={apiError.message ?? apiError.error}
+            details={apiError.details}
+          />
+        )
+      }
+      sections={sections}
+      selected={selectedSection}
+      onSelect={selectSection}
+      panelTitle={inspectorTitle}
+      preview={
+        previewData ? (
+          <ProgramPageLayout
+            key={`${prog.slug || "new"}-builder`}
+            dept={previewData}
+            backHref={backHref}
+            backLabel="Back"
+            editable
+            focusTab={
+              selectedSection ? tabForSection(selectedSection) : undefined
+            }
+            onEditSection={selectSection}
+            onEditTab={(tabId) => {
+              const defaults: Record<string, ProgramContentSection> = {
+                overview: "about",
+                academics: "curriculum",
+                faculty: "faculty",
+                facilities: "labs",
+                life: "events",
+                career: "careerProgression",
+              };
+              // Built-in tabs map to their default section; custom content
+              // tabs open their own block editor (tab:<id>).
+              selectSection(defaults[tabId] ?? `tab:${tabId}`);
+            }}
+          />
+        ) : (
+          <div className="px-6 py-16 text-center text-sm text-gray-400">
+            Enter the program name in the panel to see the page.
           </div>
-        )}
-      </div>
-    </div>
+        )
+      }
+      panel={
+        selectedSection && (
+          <ProgramSectionInspector
+            section={selectedSection}
+            content={content}
+            onChange={setContent}
+            programName={prog.name}
+            onProgramNameChange={(name) => setP("name", name)}
+            programAbbr={prog.abbr}
+            onProgramAbbrChange={(abbr) => setP("abbr", abbr)}
+            programSlug={prog.slug}
+            onProgramSlugChange={(slug) => setP("slug", slug)}
+            programCollege={prog.institution}
+            programCard={{
+              degree: prog.degree,
+              duration: prog.duration,
+              seats: prog.seats,
+              highlight: prog.highlight,
+              description: prog.description,
+              accreditations: prog.accreditations ?? [],
+            }}
+            onProgramCardChange={(patch) =>
+              setProg((f) => ({ ...f, ...patch }))
+            }
+          />
+        )
+      }
+      saveBar={
+        <EditorSaveBar
+          dirty={dirty}
+          saving={saving ? "draft" : publishing ? "publish" : null}
+          unpublished={!isNew && status !== "published"}
+          message={msg}
+          disabled={loading}
+          onSaveDraft={() => void save()}
+          onPublish={isNew ? undefined : () => void publish()}
+          onDiscard={
+            isNew || baseline === null
+              ? undefined
+              : () => {
+                  const snap = JSON.parse(baseline) as {
+                    prog: ProgramFields;
+                    content: Record<string, unknown>;
+                  };
+                  setProg(snap.prog);
+                  setContent(snap.content);
+                }
+          }
+        />
+      }
+    />
   );
 }
 

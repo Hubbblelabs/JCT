@@ -8,8 +8,9 @@ import {
   TextArea,
   ImageUploadInput,
 } from "@/components/admin/inputs";
-import { Plus, Pencil, Trash2, X, Loader2, Check } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Check, Newspaper } from "lucide-react";
 import { DataTable, type Column } from "@/components/admin/kit/DataTable";
+import { Drawer, PageShell } from "@/components/admin/kit";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 import {
@@ -283,38 +284,33 @@ function BlogsPageInner() {
 
   return (
     <>
-      <div className="admin-content">
-        <div className="admin-page-header">
-          <div>
-            <h1 className="admin-page-title">
-              Blogs
-              {filterInst ? ` — ${INSTITUTION_LABELS[filterInst]}` : " — All"}
-            </h1>
-            <p className="admin-page-subtitle">
-              {isMain ? (
-                <>
-                  Every post across all colleges (read-only). The College column
-                  shows which college each entry belongs to — edit it from that
-                  college&apos;s Blogs page. All of them list together on{" "}
-                  <code>/blogs</code>.
-                </>
-              ) : (
-                <>
-                  {blogs.filter((b) => b.is_active).length} active posts — shown
-                  on the site-wide /blogs page
-                </>
-              )}
-            </p>
-          </div>
-          {!isMain && (
-            <div className="flex gap-2">
-              <button onClick={openNew} className="admin-btn admin-btn-primary">
-                <Plus size={16} /> Add Blog
-              </button>
-            </div>
-          )}
-        </div>
-
+      <PageShell
+        title={`Blogs${filterInst ? ` — ${INSTITUTION_LABELS[filterInst]}` : " — All"}`}
+        description={
+          <>
+            {isMain ? (
+              <>
+                Every post across all colleges (read-only). The College column
+                shows which college each entry belongs to — edit it from that
+                college&apos;s Blogs page. All of them list together on{" "}
+                <code>/blogs</code>.
+              </>
+            ) : (
+              <>
+                {blogs.filter((b) => b.is_active).length} active posts — shown
+                on the site-wide /blogs page
+              </>
+            )}
+          </>
+        }
+        actions={
+          !isMain && (
+            <button onClick={openNew} className="admin-btn admin-btn-primary">
+              <Plus size={16} /> Add Blog
+            </button>
+          )
+        }
+      >
         <DataTable
           rows={blogs}
           columns={columns}
@@ -334,137 +330,131 @@ function BlogsPageInner() {
             ),
           }}
         />
-      </div>
+      </PageShell>
 
-      {editing && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 pt-10">
-          <div className="w-full max-w-5xl rounded-xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <h2 className="font-semibold text-gray-900">
-                {editing._id ? "Edit Blog" : "New Blog"}
-              </h2>
-              <button
-                onClick={close}
-                className="admin-btn admin-btn-outline admin-btn-sm"
-              >
-                <X size={14} />
-              </button>
-            </div>
-            <div className="space-y-1 p-6">
-              {apiError && (
-                <ValidationErrors
-                  error={apiError.message ?? apiError.error}
-                  details={apiError.details}
-                />
+      <Drawer
+        open={!!editing}
+        onClose={close}
+        title={editing?._id ? "Edit Blog" : "New Blog"}
+        icon={Newspaper}
+        footer={
+          <div className="flex justify-end gap-2">
+            <button onClick={close} className="admin-btn admin-btn-outline">
+              Cancel
+            </button>
+            <button
+              onClick={save}
+              disabled={saving}
+              className="admin-btn admin-btn-primary"
+            >
+              {saving ? (
+                <Loader2 size={15} className="animate-spin" />
+              ) : (
+                <Check size={15} />
               )}
-              {/* Identity and publishing date first, then the cover, then the
-                  copy that fills the detail page. */}
-              <FormGrid>
-                <TextInput
-                  label="Title"
-                  span={5}
-                  value={form.title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                />
-                <TextInput
-                  label="Slug (URL)"
-                  span={4}
-                  value={form.slug}
-                  onChange={(e) => {
-                    setSlugTouched(true);
-                    set("slug", slugify(e.target.value));
-                  }}
-                  hint="Lowercase letters, numbers, and dashes"
-                  required
-                />
-                <TextInput
-                  label="Published on"
-                  span={3}
-                  type="date"
-                  value={form.published_at}
-                  onChange={(e) => set("published_at", e.target.value)}
-                  required
-                />
-                <TextInput
-                  label="Category"
-                  span={4}
-                  value={form.category}
-                  onChange={(e) => set("category", e.target.value)}
-                  list="blog-category-suggestions"
-                  required
-                />
-                <datalist id="blog-category-suggestions">
-                  {BLOG_CATEGORY_SUGGESTIONS.map((c) => (
-                    <option key={c} value={c} />
-                  ))}
-                </datalist>
-                {/* No College field: authoring only happens inside a college
-                    scope, so the college is fixed by the URL. */}
-                <TextInput
-                  label="Author"
-                  span={8}
-                  value={form.author}
-                  onChange={(e) => set("author", e.target.value)}
-                  placeholder="JCT Admissions Team"
-                />
-                <ImageUploadInput
-                  label="Cover image"
-                  span="full"
-                  ratio="hero"
-                  value={form.image}
-                  onChange={(url) => set("image", url)}
-                  hideUrlField
-                />
-
-                <TextArea
-                  label="Excerpt (card summary)"
-                  span={4}
-                  value={form.excerpt}
-                  onChange={(e) => set("excerpt", e.target.value)}
-                  rows={14}
-                />
-                <TextArea
-                  label="Post content"
-                  span={8}
-                  value={form.content}
-                  onChange={(e) => set("content", e.target.value)}
-                  rows={14}
-                  hint="Shown on the blog detail page. Basic HTML is supported (<p>, <h2>, <ul>, <a>…) and is sanitized on render."
-                />
-                <div className="admin-col-full flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="b_active"
-                    checked={form.is_active}
-                    onChange={(e) => set("is_active", e.target.checked)}
-                  />
-                  <label htmlFor="b_active" className="text-sm text-gray-700">
-                    Active (shown on website)
-                  </label>
-                </div>
-              </FormGrid>
-            </div>
-            <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
-              <button onClick={close} className="admin-btn admin-btn-outline">
-                Cancel
-              </button>
-              <button
-                onClick={save}
-                disabled={saving}
-                className="admin-btn admin-btn-gold"
-              >
-                {saving ? (
-                  <Loader2 size={15} className="animate-spin" />
-                ) : (
-                  <Check size={15} />
-                )}
-                {saving ? "Saving…" : "Save"}
-              </button>
-            </div>
+              {saving ? "Saving…" : "Save"}
+            </button>
           </div>
-        </div>
-      )}
+        }
+      >
+        {editing && (
+          <div className="space-y-1">
+            {apiError && (
+              <ValidationErrors
+                error={apiError.message ?? apiError.error}
+                details={apiError.details}
+              />
+            )}
+            {/* Identity and publishing date first, then the cover, then the
+                  copy that fills the detail page. */}
+            <FormGrid>
+              <TextInput
+                label="Title"
+                span={5}
+                value={form.title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+              <TextInput
+                label="Slug (URL)"
+                span={4}
+                value={form.slug}
+                onChange={(e) => {
+                  setSlugTouched(true);
+                  set("slug", slugify(e.target.value));
+                }}
+                hint="Lowercase letters, numbers, and dashes"
+                required
+              />
+              <TextInput
+                label="Published on"
+                span={3}
+                type="date"
+                value={form.published_at}
+                onChange={(e) => set("published_at", e.target.value)}
+                required
+              />
+              <TextInput
+                label="Category"
+                span={4}
+                value={form.category}
+                onChange={(e) => set("category", e.target.value)}
+                list="blog-category-suggestions"
+                required
+              />
+              <datalist id="blog-category-suggestions">
+                {BLOG_CATEGORY_SUGGESTIONS.map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
+              {/* No College field: authoring only happens inside a college
+                    scope, so the college is fixed by the URL. */}
+              <TextInput
+                label="Author"
+                span={8}
+                value={form.author}
+                onChange={(e) => set("author", e.target.value)}
+                placeholder="JCT Admissions Team"
+              />
+              <ImageUploadInput
+                label="Cover image"
+                span="full"
+                ratio="hero"
+                value={form.image}
+                onChange={(url) => set("image", url)}
+                hideUrlField
+              />
+
+              <TextArea
+                label="Excerpt (card summary)"
+                span={4}
+                value={form.excerpt}
+                onChange={(e) => set("excerpt", e.target.value)}
+                rows={14}
+              />
+              <TextArea
+                label="Post content"
+                span={8}
+                value={form.content}
+                onChange={(e) => set("content", e.target.value)}
+                rows={14}
+                hint="Shown on the blog detail page. Basic HTML is supported (<p>, <h2>, <ul>, <a>…) and is sanitized on render."
+              />
+              <div className="admin-col-full flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="b_active"
+                  checked={form.is_active}
+                  onChange={(e) => set("is_active", e.target.checked)}
+                />
+                <label htmlFor="b_active" className="text-sm text-gray-700">
+                  Active (shown on website)
+                </label>
+              </div>
+            </FormGrid>
+          </div>
+        )}
+      </Drawer>
     </>
   );
 }

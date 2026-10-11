@@ -9,6 +9,8 @@ import { ArrowRight, X } from "lucide-react";
 import { Accreditations } from "@/components/layout/Accreditations";
 import { getImageUrl } from "@/lib/utils";
 import { useSiteConfig } from "@/lib/use-site-config";
+import { readHeroOverlay } from "@/lib/hero-overlay";
+import { HeroOverlay } from "@/components/ui/HeroOverlay";
 
 type HeroCta = { label: string; href: string; primary: boolean };
 type HeroCard = {
@@ -27,6 +29,8 @@ type HeroContent = {
   cards: HeroCard[];
   tourVideoUrl: string;
   intervalMs: number;
+  /** Admin-set darkness (%), or null for the original gradients. */
+  overlay: number | null;
 };
 
 function normalizeHero(raw: unknown): HeroContent | null {
@@ -91,6 +95,7 @@ function normalizeHero(raw: unknown): HeroContent | null {
       typeof r.intervalMs === "number" && r.intervalMs > 0
         ? r.intervalMs
         : 6000,
+    overlay: readHeroOverlay(r.overlayOpacity),
   };
 }
 
@@ -142,6 +147,7 @@ export function HomeHero() {
   const ctas = hero?.ctas ?? [];
   const cards = hero?.cards ?? [];
   const intervalMs = hero?.intervalMs ?? 6000;
+  const overlay = hero?.overlay ?? null;
 
   useEffect(() => {
     const media = window.matchMedia("(hover: none), (pointer: coarse)");
@@ -283,11 +289,17 @@ export function HomeHero() {
         }}
       />
 
-      {/* Primary overlay */}
-      <div className="absolute inset-0 bg-[#081a34]/20" />
+      {overlay !== null ? (
+        <HeroOverlay opacity={overlay} color="#081327" />
+      ) : (
+        <>
+          {/* Primary overlay */}
+          <div className="absolute inset-0 bg-[#081a34]/20" />
 
-      {/* Gradient overlay with refined opacity */}
-      <div className="absolute inset-0 bg-linear-to-r from-[#081327]/50 via-[#081327]/24 to-[#081327]/10" />
+          {/* Gradient overlay with refined opacity */}
+          <div className="absolute inset-0 bg-linear-to-r from-[#081327]/50 via-[#081327]/24 to-[#081327]/10" />
+        </>
+      )}
 
       <div className="relative z-10 mx-auto grid w-full max-w-352 grid-cols-1 items-center gap-10 px-4 md:px-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] lg:gap-12 lg:px-10 xl:gap-16">
         {/* Left Content */}

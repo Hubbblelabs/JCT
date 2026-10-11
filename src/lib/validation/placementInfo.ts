@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SidebarNavItemSchema } from "./sidebarNav";
+import { zTableColumns } from "./tableColumns";
 
 // Static, year-independent content for a college's placement page: MoUs, the
 // "Why Recruit at JCT" pitch, the placement process, and TPO contacts. The
@@ -133,6 +134,12 @@ export const PlacementInfoSchema = z.object({
       navItems: z.array(SidebarNavItemSchema).optional(),
     })
     .default({ navItems: [] }),
+  /**
+   * Columns of the year-wise history table, after "Academic Year". Absent
+   * means the built-in figures (src/lib/placement-history-columns.ts); an
+   * added column's per-year values live on each Placement's `history_cells`.
+   */
+  historyColumns: zTableColumns,
 });
 
 export type PlacementInfoValue = z.infer<typeof PlacementInfoSchema>;

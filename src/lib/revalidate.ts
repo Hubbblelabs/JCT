@@ -48,6 +48,7 @@ const POLYTECHNIC_PATHS = [
   "/institutions/polytechnic/placements",
   "/institutions/polytechnic/accreditations",
   "/institutions/polytechnic/committees",
+  "/institutions/polytechnic/clubs-and-cells",
   ...CONTENT_PAGES.filter((p) => p.institution === "polytechnic").map(
     (p) => p.path,
   ),
@@ -133,7 +134,11 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   artsSciencePlacementInfo: ["arts-science"],
   polytechnicPlacementInfo: ["polytechnic"],
   lifeAtJct: ["home"],
-  engineeringAnnouncement: ["engineering"],
+  // The strip is also server-rendered into the chrome of the site-wide pages
+  // (/events, /blogs, …) a visitor reaches from a college, hence "home".
+  engineeringAnnouncement: ["engineering", "home"],
+  artsScienceAnnouncement: ["arts-science", "home"],
+  polytechnicAnnouncement: ["polytechnic", "home"],
   engineeringHero: ["engineering"],
   engineeringMetrics: ["engineering"],
   engineeringFacilities: ["engineering"],
@@ -162,6 +167,7 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   engineeringCommittees: ["engineering"],
   engineeringDocuments: ["engineering"],
   polytechnicCommittees: ["polytechnic"],
+  polytechnicClubs: ["polytechnic"],
   campusLifePage: ["home"],
   mainAccreditations: ["home"],
   engineeringAccreditations: ["engineering"],
@@ -189,7 +195,10 @@ const DYNAMIC_PAGE_PATTERNS: Partial<Record<RevalidateTarget, string[]>> = {
     "/institutions/engineering/committees/[slug]",
     "/institutions/engineering/clubs-and-cells/[slug]",
   ],
-  polytechnic: ["/institutions/polytechnic/committees/[slug]"],
+  polytechnic: [
+    "/institutions/polytechnic/committees/[slug]",
+    "/institutions/polytechnic/clubs-and-cells/[slug]",
+  ],
 };
 DYNAMIC_PAGE_PATTERNS["all-institutions"] = [
   ...(DYNAMIC_PAGE_PATTERNS.engineering ?? []),
@@ -218,6 +227,18 @@ export function revalidateTargets(...targets: RevalidateTarget[]): void {
     } catch {
       /* non-fatal */
     }
+  }
+}
+
+/**
+ * Every News & Events detail page. Each one lists the latest entries beside
+ * the article, so adding, editing or hiding any event changes all of them.
+ */
+export function revalidateEventDetailPages(): void {
+  try {
+    revalidatePath("/events/[slug]", "page");
+  } catch {
+    /* non-fatal */
   }
 }
 

@@ -1,10 +1,12 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, Loader2, ExternalLink } from "lucide-react";
-import { SaveButtons } from "@/components/admin/LivePageEditor";
-import { InspectorOverlay } from "@/components/admin/InspectorOverlay";
+import { useSearchParams } from "next/navigation";
+import {
+  EditorSaveBar,
+  EditorWorkspace,
+  type WorkspaceSection,
+} from "@/components/admin/kit";
 import {
   loadEditableConfig,
   saveEditableConfig,
@@ -39,6 +41,12 @@ import {
   type AdminPlacementRecord,
 } from "@/lib/admin-placement-records";
 import { hostedSectionKey } from "@/lib/content-pages";
+import {
+  columnsToStore,
+  resolveColumns,
+  type TableColumn,
+} from "@/lib/table-columns";
+import { PLACEMENT_HISTORY_COLUMNS } from "@/lib/placement-history-columns";
 import { emptyContentBlock, PlacementInfoSchema } from "@/lib/validation";
 import type { PlacementInfoValue } from "@/lib/validation";
 import { useToast } from "@/components/ui/Toast";
@@ -65,8 +73,16 @@ const COLLEGES: Record<College, { configKey: string; label: string }> = {
   },
 };
 
+const SECTION_HELP: Record<PlacementEditableSection, string> = {
+  banner: "The highlight figures at the top of the page.",
+  process: "How placements work, step by step.",
+  tpo: "The Training & Placement Officer and other contacts.",
+  mou: "Companies and organisations the college has MoUs with.",
+  "why-recruit": "Reasons recruiters should hire from JCT.",
+  sidebar: "The side menu of this page.",
+};
+
 function PlacementsPageEditorInner() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const { flush, getPreview } = useDeferredUploads();
   const toast = useToast();
@@ -99,15 +115,20 @@ function PlacementsPageEditorInner() {
   );
   const [recordBusy, setRecordBusy] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState<SaveMode | null>(null);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
-  const [selected, setSelected] = useState<string>("process");
-  const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [unpublished, setUnpublished] = useState(false);
+  const [selected, setSelectedRaw] = useState<string | null>(null);
+  /** The saved state `{host, hosted, records}` is compared against. */
+  const [baseline, setBaseline] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setDraft(null);
+    setBaseline(null);
+    setLoadError(null);
     setMsg(null);
     Promise.all([
       loadEditableConfig<PlacementInfoValue>(configKey).catch(() => null),
@@ -119,13 +140,16 @@ function PlacementsPageEditorInner() {
         // arrives fully shaped — every inspector field reads `data.x.y`.
         const parsed = PlacementInfoSchema.safeParse(configRes?.value ?? {});
         setDraft(parsed.success ? parsed.data : PlacementInfoSchema.parse({}));
+        setUnpublished(configRes?.status === "draft");
         setRecords(placementRecords);
         setLoadedRecords(placementRecords);
       })
       .catch((err) => {
         if (!cancelled) {
           console.error("[PlacementsPageEditor]", err);
-          setMsg({ text: "Failed to load content", ok: false });
+          setLoadError(
+            "This page's content could not be loaded. Reload to retry.",
+          );
         }
       })
       .finally(() => {
@@ -136,9 +160,33 @@ function PlacementsPageEditorInner() {
     };
   }, [configKey, college]);
 
-  const selectSection = (s: string) => {
-    setSelected(s);
-    setInspectorOpen(true);
+  const setSelected = setSelectedRaw;
+  const selectSection = (s: string) => setSelected(s);
+
+  const ready = !loading && !hostedLoading && draft !== null;
+  const current = useMemo(
+    () => JSON.stringify({ host: draft, hosted: hostedDrafts, records }),
+    [draft, hostedDrafts, records],
+  );
+  // The first settled state is the saved state everything is compared with.
+  useEffect(() => {
+    if (ready && baseline === null) setBaseline(current);
+  }, [ready, baseline, current]);
+  const dirty = baseline !== null && current !== baseline;
+  useEffect(() => {
+    if (dirty) setMsg(null);
+  }, [dirty]);
+
+  const discard = () => {
+    if (baseline === null) return;
+    const snap = JSON.parse(baseline) as {
+      host: PlacementInfoValue;
+      hosted: typeof hostedDrafts;
+      records: AdminPlacementRecord[];
+    };
+    setDraft(snap.host);
+    setHostedDrafts(snap.hosted);
+    setRecords(snap.records);
   };
 
   // Which year the preview shows — held here rather than inside the layout so
@@ -152,7 +200,7 @@ function PlacementsPageEditorInner() {
     : fallbackRecordId;
   const activeRecord = records.find((r) => r._id === resolvedRecordId);
 
-  const recordSection = parsePlacementRecordSection(selected);
+  const recordSection = selected ? parsePlacementRecordSection(selected) : null;
 
   const previewRecords = useMemo(
     () => records.map((r) => toPreviewRecord(r, getPreview)),
@@ -176,9 +224,8 @@ function PlacementsPageEditorInner() {
       const next = [...blocks, { ...block, title: year }];
       setHostedDraft(gallerySlug, { ...current, blocks: next });
       setSelected(hostedSectionKey(gallerySlug, `block:${next.length - 1}`));
-      setInspectorOpen(true);
     },
-    [gallerySlug, hostedDrafts, setHostedDraft],
+    [gallerySlug, hostedDrafts, setHostedDraft, setSelected],
   );
 
   const patchRecord = useCallback((next: AdminPlacementRecord) => {
@@ -206,6 +253,11 @@ function PlacementsPageEditorInner() {
       );
       setRecords((prev) => [...prev, created]);
       setLoadedRecords((prev) => [...prev, created]);
+      setBaseline((prev) => {
+        if (prev === null) return prev;
+        const snap = JSON.parse(prev);
+        return JSON.stringify({ ...snap, records: [...snap.records, created] });
+      });
       setActiveRecordId(created._id);
       setSelected(placementRecordSection(created._id, "overview"));
       toast.success(`Added ${created.year}.`);
@@ -232,6 +284,16 @@ function PlacementsPageEditorInner() {
       await deletePlacementRecord(record._id);
       setRecords((prev) => prev.filter((r) => r._id !== record._id));
       setLoadedRecords((prev) => prev.filter((r) => r._id !== record._id));
+      setBaseline((prev) => {
+        if (prev === null) return prev;
+        const snap = JSON.parse(prev);
+        return JSON.stringify({
+          ...snap,
+          records: snap.records.filter(
+            (r: AdminPlacementRecord) => r._id !== record._id,
+          ),
+        });
+      });
       // The inspector was showing a year that no longer exists — fall back to
       // the year list rather than an empty panel.
       if (recordSection?.recordId === record._id)
@@ -246,7 +308,38 @@ function PlacementsPageEditorInner() {
     }
   };
 
+  const historyColumns = resolveColumns(
+    draft?.historyColumns,
+    PLACEMENT_HISTORY_COLUMNS,
+  );
+  // The column list is page copy (draft / publish); an added column's values
+  // live on each year's record, so deleting one clears it from every year.
+  const changeHistoryColumns = (next: TableColumn[], deletedId?: string) => {
+    setDraft((d) =>
+      d
+        ? {
+            ...d,
+            historyColumns: columnsToStore(
+              d.historyColumns,
+              next,
+              PLACEMENT_HISTORY_COLUMNS,
+            ),
+          }
+        : d,
+    );
+    if (deletedId)
+      setRecords((prev) =>
+        prev.map((r) => {
+          if (!(deletedId in r.history_cells)) return r;
+          const history_cells = { ...r.history_cells };
+          delete history_cells[deletedId];
+          return { ...r, history_cells };
+        }),
+      );
+  };
+
   const inspectorTitle = (() => {
+    if (!selected) return undefined;
     if (selected === PLACEMENT_RECORDS_SECTION) return "Placement Years";
     if (recordSection)
       return placementRecordInspectorTitle(activeRecord, recordSection.key);
@@ -282,8 +375,19 @@ function PlacementsPageEditorInner() {
       // way, which the subtitle spells out.
       await savePlacementRecords(flushed.records, loadedRecords);
       setLoadedRecords(flushed.records);
+      setBaseline(
+        JSON.stringify({
+          host: flushed.host,
+          hosted: flushed.hosted,
+          records: flushed.records,
+        }),
+      );
+      setUnpublished(mode === "draft");
       setMsg({
-        text: mode === "publish" ? "Saved & published" : "Draft saved",
+        text:
+          mode === "publish"
+            ? "Published — the live page is updated"
+            : "Draft saved — year-wise records are live already",
         ok: true,
       });
     } catch (err) {
@@ -296,56 +400,43 @@ function PlacementsPageEditorInner() {
     }
   };
 
+  const sections: WorkspaceSection[] = [
+    {
+      id: PLACEMENT_RECORDS_SECTION,
+      label: "Placement Years",
+      help: "Year-wise results: figures, recruiters and placed students for each academic year. These go live as soon as they are saved.",
+    },
+    ...(
+      Object.keys(PLACEMENT_SECTION_LABELS) as PlacementEditableSection[]
+    ).map((id) => ({
+      id,
+      label: PLACEMENT_SECTION_LABELS[id],
+      help: SECTION_HELP[id],
+    })),
+    ...hostedDefs.map((def) => ({
+      id: hostedSectionKey(def.slug, "hero"),
+      label: def.host?.navLabel ?? def.label,
+      help: def.description,
+      group: "Tabs on this page",
+    })),
+  ];
+
   return (
-    <div className="admin-content">
-      <div className="admin-page-header">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.push("/admin/dashboard")}
-            className="admin-btn admin-btn-outline admin-btn-sm"
-          >
-            <ArrowLeft size={14} />
-          </button>
-          <div>
-            <h1 className="admin-page-title">
-              {label} — Placements Page Editor
-            </h1>
-            <p className="admin-page-subtitle">
-              Live CMS editor — click any section to edit. Year-wise records go
-              live as soon as they are saved; the page copy follows the usual
-              draft/publish split.
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <a
-            href={publicPath}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="admin-btn admin-btn-outline admin-btn-sm"
-          >
-            <ExternalLink size={14} /> Public Page
-          </a>
-          {msg && (
-            <span
-              className={`text-sm font-medium ${
-                msg.ok ? "text-green-600" : "text-red-500"
-              }`}
-            >
-              {msg.text}
-            </span>
-          )}
-          <SaveButtons saving={saving} disabled={loading} onSave={save} />
-        </div>
-      </div>
-
-      {loading || hostedLoading || !draft ? (
-        <div className="flex items-center justify-center py-28">
-          <Loader2 size={24} className="animate-spin text-gray-400" />
-        </div>
-      ) : (
-        <div className="-mx-6 -mb-6 overflow-hidden border-t border-gray-200 bg-white xl:mx-0 xl:rounded-xl xl:border">
+    <EditorWorkspace
+      // A college switch is a different page: drop the selection.
+      key={college}
+      title={`${label} — Placements Page`}
+      description="Click any part of the page to edit it. The page text follows Save draft / Publish; year-wise records go live as soon as they are saved."
+      publicHref={publicPath}
+      unpublished={unpublished}
+      loading={!ready && !loadError}
+      error={loadError}
+      sections={sections}
+      selected={selected}
+      onSelect={setSelected}
+      panelTitle={inspectorTitle}
+      preview={
+        draft && (
           <PlacementsPageLayout
             institution={college}
             records={previewRecords}
@@ -358,57 +449,65 @@ function PlacementsPageEditorInner() {
             editable
             onEditSection={selectSection}
           />
-        </div>
-      )}
-
-      {inspectorOpen && (
-        <InspectorOverlay
-          title={inspectorTitle}
-          onClose={() => setInspectorOpen(false)}
-          footer={<SaveButtons saving={saving} onSave={save} full />}
-        >
-          {selected === PLACEMENT_RECORDS_SECTION ? (
-            <PlacementYearsInspector
-              records={records}
-              selectedId={resolvedRecordId}
-              busy={recordBusy}
-              onSelect={(id) => {
-                setActiveRecordId(id);
-                setSelected(placementRecordSection(id, "overview"));
-              }}
-              onAdd={() => void addYear()}
-              onDelete={(r) => void removeYear(r)}
-            />
-          ) : recordSection ? (
-            activeRecord ? (
-              <PlacementRecordInspector
-                record={activeRecord}
-                sectionKey={recordSection.key}
-                onChange={patchRecord}
-              />
-            ) : (
-              <p className="text-sm text-gray-500">
-                This year is no longer part of the page.
-              </p>
-            )
-          ) : selected.startsWith("hosted:") ? (
-            <HostedInspector
-              sectionKey={selected}
-              defs={hostedDefs}
-              drafts={hostedDrafts}
-              onChange={setHostedDraft}
-              onSelectSection={setSelected}
+        )
+      }
+      panel={
+        !selected || !draft ? null : selected === PLACEMENT_RECORDS_SECTION ? (
+          <PlacementYearsInspector
+            records={records}
+            selectedId={resolvedRecordId}
+            busy={recordBusy}
+            onSelect={(id) => {
+              setActiveRecordId(id);
+              setSelected(placementRecordSection(id, "overview"));
+            }}
+            onAdd={() => void addYear()}
+            onDelete={(r) => void removeYear(r)}
+            historyColumns={historyColumns}
+            onHistoryColumnsChange={changeHistoryColumns}
+          />
+        ) : recordSection ? (
+          activeRecord ? (
+            <PlacementRecordInspector
+              record={activeRecord}
+              sectionKey={recordSection.key}
+              historyColumns={historyColumns}
+              onChange={patchRecord}
             />
           ) : (
-            <PlacementSectionInspector
-              section={selected}
-              data={draft!}
-              onChange={setDraft}
-            />
-          )}
-        </InspectorOverlay>
-      )}
-    </div>
+            <p className="text-sm text-gray-500">
+              This year is no longer part of the page.
+            </p>
+          )
+        ) : selected.startsWith("hosted:") ? (
+          <HostedInspector
+            sectionKey={selected}
+            defs={hostedDefs}
+            drafts={hostedDrafts}
+            onChange={setHostedDraft}
+            onSelectSection={setSelected}
+          />
+        ) : (
+          <PlacementSectionInspector
+            section={selected}
+            data={draft}
+            onChange={setDraft}
+          />
+        )
+      }
+      saveBar={
+        <EditorSaveBar
+          dirty={dirty}
+          saving={saving}
+          unpublished={unpublished}
+          message={msg}
+          disabled={!ready}
+          onSaveDraft={() => save("draft")}
+          onPublish={() => save("publish")}
+          onDiscard={discard}
+        />
+      }
+    />
   );
 }
 

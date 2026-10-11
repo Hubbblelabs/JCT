@@ -21,6 +21,9 @@ import type {
   NotablePlacementValue,
   TopRecruiterValue,
 } from "@/lib/admin-placement-records";
+import { ColumnsPanel, columnLabel } from "@/components/admin/TableEditor";
+import { isCustomColumn, type TableColumn } from "@/lib/table-columns";
+import { PLACEMENT_HISTORY_COLUMNS } from "@/lib/placement-history-columns";
 
 /**
  * The year-wise placement data, edited from inside the Placements page editor.
@@ -33,14 +36,18 @@ import type {
 export function PlacementRecordInspector({
   record,
   sectionKey,
+  historyColumns = [],
   onChange,
 }: {
   record: AdminPlacementRecord;
   sectionKey: PlacementRecordSectionKey;
+  /** The history table's columns — added ones are filled in per year here. */
+  historyColumns?: TableColumn[];
   onChange: (next: AdminPlacementRecord) => void;
 }) {
   const patch = (p: Partial<AdminPlacementRecord>) =>
     onChange({ ...record, ...p });
+  const addedColumns = historyColumns.filter((c) => isCustomColumn(c.id));
 
   if (sectionKey === "overview") {
     return (
@@ -139,6 +146,36 @@ export function PlacementRecordInspector({
           onChange={(e) => patch({ companies_visited: Number(e.target.value) })}
           min={0}
         />
+
+        {addedColumns.length > 0 && (
+          <Field
+            label="Year-wise history — added columns"
+            span="full"
+            hint="This year's entry in the columns added to the history table (Placement Years → Columns)."
+            className="border-t border-gray-100 pt-3"
+          >
+            <div className="admin-form-grid admin-form-grid--tight">
+              {addedColumns.map((c) => (
+                <TextInput
+                  key={c.id}
+                  label={`${columnLabel(c, PLACEMENT_HISTORY_COLUMNS)}${
+                    c.hidden ? " (hidden)" : ""
+                  }`}
+                  span={4}
+                  value={record.history_cells[c.id] ?? ""}
+                  onChange={(e) =>
+                    patch({
+                      history_cells: {
+                        ...record.history_cells,
+                        [c.id]: e.target.value,
+                      },
+                    })
+                  }
+                />
+              ))}
+            </div>
+          </Field>
+        )}
       </FormGrid>
     );
   }
@@ -319,6 +356,8 @@ export function PlacementYearsInspector({
   onSelect,
   onAdd,
   onDelete,
+  historyColumns,
+  onHistoryColumnsChange,
 }: {
   records: AdminPlacementRecord[];
   selectedId: string;
@@ -326,6 +365,9 @@ export function PlacementYearsInspector({
   onSelect: (id: string) => void;
   onAdd: () => void;
   onDelete: (record: AdminPlacementRecord) => void;
+  historyColumns: TableColumn[];
+  /** A deleted added column must also be cleared from every year. */
+  onHistoryColumnsChange: (columns: TableColumn[], deletedId?: string) => void;
 }) {
   return (
     <div className="space-y-3">
@@ -396,6 +438,22 @@ export function PlacementYearsInspector({
         )}
         Add Year
       </button>
+
+      <div className="border-t border-gray-100 pt-4">
+        <p className="admin-label">Year-wise history table</p>
+        <p className="admin-help mb-3">
+          The figures every year carries can be renamed, reordered or hidden
+          here. Added columns are filled in per year, in that year&apos;s
+          overview.
+        </p>
+        <ColumnsPanel
+          label="year-wise history"
+          columns={historyColumns}
+          builtins={PLACEMENT_HISTORY_COLUMNS}
+          rows={records.map((r) => ({ cells: r.history_cells }))}
+          onChange={onHistoryColumnsChange}
+        />
+      </div>
     </div>
   );
 }

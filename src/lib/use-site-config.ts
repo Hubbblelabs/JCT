@@ -30,20 +30,23 @@ type FetchState<T> = {
  * navigation between two colleges under the same layout kept rendering the
  * college the visitor had just left.
  */
-export function useSiteConfig<T = unknown>(key: string): SiteConfigResult<T> {
+export function useSiteConfig<T = unknown>(
+  /** `null` reads nothing — for a component that only sometimes has a key. */
+  key: string | null,
+): SiteConfigResult<T> {
   const ctx = useSiteConfigContext();
-  const hasCtxData = key in ctx;
+  const hasCtxData = key !== null && key in ctx;
 
   const [fetched, setFetched] = useState<FetchState<T>>(() => ({
-    key,
+    key: key ?? "",
     data: null,
-    loading: !hasCtxData,
+    loading: key !== null && !hasCtxData,
     error: false,
   }));
 
   useEffect(() => {
     // Context provided server-side data — skip the client fetch entirely.
-    if (hasCtxData) return;
+    if (key === null || hasCtxData) return;
 
     let cancelled = false;
     setFetched({ key, data: null, loading: true, error: false });
@@ -73,6 +76,7 @@ export function useSiteConfig<T = unknown>(key: string): SiteConfigResult<T> {
     };
   }, [key, hasCtxData]);
 
+  if (key === null) return { data: null, loading: false, error: false };
   if (hasCtxData) {
     return { data: ctx[key] as T, loading: false, error: false };
   }

@@ -1,18 +1,9 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useMemo, useState, use } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ArrowDown,
-  ArrowUp,
-  ExternalLink,
-  Loader2,
-  Plus,
-  Save,
-  Send,
-  Trash2,
-} from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, Plus, Trash2 } from "lucide-react";
 import {
   Field,
   FormGrid,
@@ -29,6 +20,14 @@ import {
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { PageBodySectionsEditor } from "@/components/admin/PageBodySectionsEditor";
+import { EditableRegion } from "@/components/admin/EditableRegion";
+import {
+  EditorSaveBar,
+  EditorWorkspace,
+  type WorkspaceSection,
+} from "@/components/admin/kit";
+import { DynamicPageRenderer } from "@/components/layout/DynamicPageRenderer";
+import { PageHero as PageHeroBanner } from "@/components/ui/PageHero";
 import type {
   PageContent,
   PageBodySection,
@@ -55,27 +54,73 @@ type PageDoc = {
   content: PageContent;
 };
 
-const TAB_DEFS: { id: string; label: string; templates: Template[] }[] = [
+const ALL: Template[] = [
+  "standard",
+  "hero-content",
+  "sidebar",
+  "gallery",
+  "contact",
+];
+
+/** The page's editable sections — which ones apply depends on its template. */
+const SECTION_DEFS: {
+  id: string;
+  label: string;
+  help: string;
+  templates: Template[];
+}[] = [
   {
     id: "basic",
-    label: "Basic",
-    templates: ["standard", "hero-content", "sidebar", "gallery", "contact"],
+    label: "Page details",
+    help: "The page title, its web address and its layout.",
+    templates: ALL,
+  },
+  {
+    id: "hero",
+    label: "Hero",
+    help: "The large banner at the top: title, subtitle, image and button.",
+    templates: ["hero-content"],
+  },
+  {
+    id: "sections",
+    label: "Page content",
+    help: "The body of the page: headings, paragraphs, lists, images and more, in order.",
+    templates: ["standard", "hero-content", "sidebar"],
+  },
+  {
+    id: "sidebar",
+    label: "Sidebar",
+    help: "The box of links beside the content.",
+    templates: ["sidebar"],
+  },
+  {
+    id: "gallery",
+    label: "Gallery",
+    help: "The photos shown in a grid.",
+    templates: ["gallery"],
+  },
+  {
+    id: "contact",
+    label: "Contact details",
+    help: "Phone, email, address and the map.",
+    templates: ["contact"],
   },
   {
     id: "seo",
-    label: "SEO",
-    templates: ["standard", "hero-content", "sidebar", "gallery", "contact"],
+    label: "Search engine settings",
+    help: "The title and description Google shows for this page. Not visible on the page itself.",
+    templates: ALL,
   },
-  { id: "hero", label: "Hero", templates: ["hero-content"] },
-  {
-    id: "sections",
-    label: "Body Sections",
-    templates: ["standard", "hero-content", "sidebar"],
-  },
-  { id: "sidebar", label: "Sidebar", templates: ["sidebar"] },
-  { id: "gallery", label: "Gallery", templates: ["gallery"] },
-  { id: "contact", label: "Contact", templates: ["contact"] },
 ];
+
+/** Which section a click on the page body opens, per template. */
+const BODY_SECTION: Record<Template, string> = {
+  standard: "sections",
+  "hero-content": "sections",
+  sidebar: "sections",
+  gallery: "gallery",
+  contact: "contact",
+};
 
 function publicPathFor(institution: Institution, slug: string): string {
   if (institution === "main") return `/p/${slug}`;
@@ -96,7 +141,9 @@ function PageEditorInner({ id }: { id: string }) {
     text: string;
   } | null>(null);
   const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
-  const [activeTab, setActiveTab] = useState("basic");
+  const [selected, setSelected] = useState<string | null>(null);
+  /** The saved document the editor compares against. */
+  const [baseline, setBaseline] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -107,7 +154,9 @@ function PageEditorInner({ id }: { id: string }) {
         return;
       }
       const data = await r.json();
-      setDoc({ ...data, content: data.content ?? {} });
+      const loaded = { ...data, content: data.content ?? {} };
+      setDoc(loaded);
+      setBaseline(editableJson(loaded));
     } finally {
       setLoading(false);
     }
@@ -145,8 +194,11 @@ function PageEditorInner({ id }: { id: string }) {
       });
       if (r.ok) {
         const data = await r.json();
-        setDoc({ ...data, content: data.content ?? {} });
-        setMsg({ kind: "ok", text: "Saved." });
+        const saved = { ...data, content: data.content ?? {} };
+        setDoc(saved);
+        setBaseline(editableJson(saved));
+        setMsg({ kind: "ok", text: "Draft saved — not on the live site yet" });
+        return true;
       } else {
         const parsed = await parseApiError(r);
         setApiError(parsed);
@@ -163,6 +215,7 @@ function PageEditorInner({ id }: { id: string }) {
     } finally {
       setSaving(false);
     }
+    return false;
   };
 
   const publish = async () => {
@@ -173,7 +226,7 @@ function PageEditorInner({ id }: { id: string }) {
       confirmLabel: "Publish",
     });
     if (!ok) return;
-    await save();
+    if (!(await save())) return;
     setPublishing(true);
     try {
       const r = await fetch(`/api/admin/pages/${doc._id}/publish`, {
@@ -181,8 +234,13 @@ function PageEditorInner({ id }: { id: string }) {
       });
       if (r.ok) {
         const data = await r.json();
-        setDoc({ ...data, content: data.content ?? {} });
-        setMsg({ kind: "ok", text: `Published v${data.version}.` });
+        const published = { ...data, content: data.content ?? {} };
+        setDoc(published);
+        setBaseline(editableJson(published));
+        setMsg({
+          kind: "ok",
+          text: `Published — the live page is updated (v${data.version})`,
+        });
       } else {
         const parsed = await parseApiError(r);
         setMsg({
@@ -195,19 +253,38 @@ function PageEditorInner({ id }: { id: string }) {
     }
   };
 
+  const current = useMemo(() => (doc ? editableJson(doc) : null), [doc]);
+  const dirty = baseline !== null && current !== null && current !== baseline;
+
   if (loading || !doc) {
     return (
-      <div className="admin-content">
-        <div className="flex justify-center py-12">
-          <Loader2 size={24} className="animate-spin text-gray-400" />
-        </div>
-      </div>
+      <EditorWorkspace
+        title="Page"
+        loading={loading}
+        error={
+          !loading && !doc
+            ? (msg?.text ?? "This page could not be loaded.")
+            : null
+        }
+        sections={[]}
+        selected={null}
+        onSelect={() => {}}
+        preview={null}
+        saveBar={
+          <EditorSaveBar
+            dirty={false}
+            saving={null}
+            disabled
+            onPublish={() => {}}
+          />
+        }
+      />
     );
   }
 
-  const visibleTabs = TAB_DEFS.filter((t) =>
-    t.templates.includes(doc.template),
-  );
+  const sectionList: WorkspaceSection[] = SECTION_DEFS.filter((d) =>
+    d.templates.includes(doc.template),
+  ).map(({ id, label, help }) => ({ id, label, help }));
   const hero = (doc.content.hero ?? {}) as PageHero;
   const seo = (doc.content.seo ?? {}) as PageSeo;
   const sidebar = (doc.content.sidebar ?? {}) as SidebarBlock;
@@ -217,591 +294,608 @@ function PageEditorInner({ id }: { id: string }) {
   const sidebarItems = Array.isArray(sidebar.items) ? sidebar.items : [];
   const galleryImages = Array.isArray(gallery.images) ? gallery.images : [];
 
+  const deletePage = async () => {
+    const ok = await confirm({
+      title: "Delete page",
+      message: "Delete this page permanently? This cannot be undone.",
+      confirmLabel: "Delete",
+      destructive: true,
+    });
+    if (!ok) return;
+    const r = await fetch(`/api/admin/pages/${doc._id}`, { method: "DELETE" });
+    if (r.ok) router.push("/admin/pages");
+    else toast.error("Delete failed.");
+  };
+
+  const institutionLabel: Record<Institution, string> = {
+    main: "Main site",
+    engineering: "Engineering",
+    "arts-science": "Arts & Science",
+    polytechnic: "Polytechnic",
+  };
+
   return (
-    <div className="admin-content">
-      <div className="admin-page-header">
-        <div>
-          <h1 className="admin-page-title">{doc.title || "(untitled)"}</h1>
-          <p className="admin-page-subtitle">
-            {doc.institution} · {doc.template} · /{doc.slug} · v{doc.version} ·{" "}
-            <span
-              className={
-                doc.status === "published"
-                  ? "font-semibold text-green-700"
-                  : "font-semibold text-amber-700"
-              }
+    <EditorWorkspace
+      title={doc.title || "(untitled page)"}
+      description={`${institutionLabel[doc.institution]} · ${publicPathFor(doc.institution, doc.slug)}. Click any part of the page to edit it.`}
+      publicHref={
+        doc.status === "published"
+          ? publicPathFor(doc.institution, doc.slug)
+          : undefined
+      }
+      unpublished={doc.status !== "published"}
+      headerExtra={
+        <>
+          <Link
+            href="/admin/pages"
+            className="admin-btn admin-btn-ghost admin-btn-sm"
+          >
+            <ArrowLeft size={14} /> All pages
+          </Link>
+          <button
+            type="button"
+            onClick={() => void deletePage()}
+            className="admin-btn admin-btn-danger admin-btn-sm"
+          >
+            <Trash2 size={14} /> Delete
+          </button>
+        </>
+      }
+      banner={
+        apiError && (
+          <ValidationErrors
+            error={apiError.message ?? apiError.error}
+            details={apiError.details}
+          />
+        )
+      }
+      sections={sectionList}
+      selected={selected}
+      onSelect={setSelected}
+      preview={
+        <div className="bg-surface text-foreground">
+          {doc.template !== "hero-content" && (
+            <EditableRegion
+              as="div"
+              section="basic"
+              label="Page details"
+              editable
+              onEditSection={setSelected}
+              className="rounded-none!"
             >
-              {doc.status}
-            </span>
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          {doc.status === "published" && (
-            <a
-              href={publicPathFor(doc.institution, doc.slug)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="admin-btn admin-btn-outline"
-            >
-              <ExternalLink size={14} /> View
-            </a>
+              <PageHeroBanner
+                title={doc.title}
+                subtitle={doc.content.seo?.metaDescription}
+              />
+            </EditableRegion>
           )}
-          <button
-            onClick={() => save()}
-            disabled={saving}
-            className="admin-btn admin-btn-outline"
+          <EditableRegion
+            as="div"
+            section={BODY_SECTION[doc.template]}
+            label="Page content"
+            editable
+            onEditSection={setSelected}
+            className="rounded-none!"
           >
-            {saving ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              <Save size={14} />
-            )}
-            Save
-          </button>
-          <button
-            onClick={publish}
-            disabled={publishing || saving}
-            className="admin-btn admin-btn-primary"
-          >
-            {publishing ? (
-              <Loader2 size={14} className="animate-spin" />
-            ) : (
-              <Send size={14} />
-            )}
-            Save &amp; Publish
-          </button>
+            <DynamicPageRenderer
+              template={doc.template}
+              content={doc.content}
+            />
+          </EditableRegion>
         </div>
-      </div>
+      }
+      panel={
+        selected && (
+          <>
+            {selected === "basic" && (
+              <FormGrid>
+                <TextInput
+                  label="Title"
+                  span={4}
+                  value={doc.title}
+                  onChange={(e) => setDoc({ ...doc, title: e.target.value })}
+                />
+                <TextInput
+                  label="Slug (URL)"
+                  span={4}
+                  value={doc.slug}
+                  onChange={(e) => setDoc({ ...doc, slug: e.target.value })}
+                  hint="Lowercase letters, numbers, and dashes."
+                />
+                <Field label="Public URL" span={4}>
+                  <input
+                    className="admin-input"
+                    value={publicPathFor(doc.institution, doc.slug)}
+                    disabled
+                  />
+                </Field>
+                <Link
+                  href="/admin/pages"
+                  className="admin-col-full text-sm text-amber-700 hover:underline"
+                >
+                  ← Back to pages
+                </Link>
+              </FormGrid>
+            )}
 
-      {msg && msg.kind === "ok" && (
-        <p className="mb-4 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">
-          {msg.text}
-        </p>
-      )}
-      {apiError && (
-        <ValidationErrors
-          error={apiError.message ?? apiError.error}
-          details={apiError.details}
-        />
-      )}
-      {msg && msg.kind === "err" && !apiError && (
-        <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
-          {msg.text}
-        </p>
-      )}
-
-      <div className="admin-card mb-4">
-        <div className="mb-4 flex flex-wrap gap-1 border-b border-gray-200 pb-2">
-          {visibleTabs.map((t) => (
-            <button
-              key={t.id}
-              onClick={() => setActiveTab(t.id)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-all ${
-                activeTab === t.id
-                  ? "bg-amber-100 text-amber-900"
-                  : "text-gray-600 hover:bg-gray-100"
-              }`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        {activeTab === "basic" && (
-          <FormGrid>
-            <TextInput
-              label="Title"
-              span={4}
-              value={doc.title}
-              onChange={(e) => setDoc({ ...doc, title: e.target.value })}
-            />
-            <TextInput
-              label="Slug (URL)"
-              span={4}
-              value={doc.slug}
-              onChange={(e) => setDoc({ ...doc, slug: e.target.value })}
-              hint="Lowercase letters, numbers, and dashes."
-            />
-            <Field label="Public URL" span={4}>
-              <input
-                className="admin-input"
-                value={publicPathFor(doc.institution, doc.slug)}
-                disabled
-              />
-            </Field>
-            <Link
-              href="/admin/pages"
-              className="admin-col-full text-sm text-amber-700 hover:underline"
-            >
-              ← Back to pages
-            </Link>
-          </FormGrid>
-        )}
-
-        {activeTab === "seo" && (
-          <FormGrid>
-            <TextInput
-              label="Meta Title"
-              span={5}
-              value={seo.metaTitle ?? ""}
-              onChange={(e) =>
-                patchContent({ seo: { ...seo, metaTitle: e.target.value } })
-              }
-              hint="Defaults to the page title if blank."
-            />
-            <TextArea
-              label="Meta Description"
-              span={7}
-              rows={3}
-              value={seo.metaDescription ?? ""}
-              onChange={(e) =>
-                patchContent({
-                  seo: { ...seo, metaDescription: e.target.value },
-                })
-              }
-            />
-            <Field label="Keywords (comma-separated)" span={8}>
-              <input
-                className="admin-input"
-                value={(seo.keywords ?? []).join(", ")}
-                onChange={(e) =>
-                  patchContent({
-                    seo: {
-                      ...seo,
-                      keywords: e.target.value
-                        .split(",")
-                        .map((k) => k.trim())
-                        .filter(Boolean),
-                    },
-                  })
-                }
-              />
-            </Field>
-            <Field label="Indexing" span={4}>
-              <label className="flex items-center gap-2 pt-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={seo.noindex === true}
+            {selected === "seo" && (
+              <FormGrid>
+                <TextInput
+                  label="Meta Title"
+                  span={5}
+                  value={seo.metaTitle ?? ""}
                   onChange={(e) =>
-                    patchContent({ seo: { ...seo, noindex: e.target.checked } })
+                    patchContent({ seo: { ...seo, metaTitle: e.target.value } })
+                  }
+                  hint="Defaults to the page title if blank."
+                />
+                <TextArea
+                  label="Meta Description"
+                  span={7}
+                  rows={3}
+                  value={seo.metaDescription ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      seo: { ...seo, metaDescription: e.target.value },
+                    })
                   }
                 />
-                Hide from search engines (noindex)
-              </label>
-            </Field>
-            <ImageUploadInput
-              label="Open Graph Image (optional)"
-              span="full"
-              ratio="hero"
-              value={seo.ogImage ?? ""}
-              onChange={(ogImage) => patchContent({ seo: { ...seo, ogImage } })}
-              hideUrlField
-            />
-          </FormGrid>
-        )}
-
-        {activeTab === "hero" && (
-          <FormGrid>
-            <TextInput
-              label="Hero Title"
-              span={5}
-              value={hero.title ?? ""}
-              onChange={(e) =>
-                patchContent({ hero: { ...hero, title: e.target.value } })
-              }
-            />
-            <TextArea
-              label="Hero Subtitle"
-              span={7}
-              rows={3}
-              value={hero.subtitle ?? ""}
-              onChange={(e) =>
-                patchContent({ hero: { ...hero, subtitle: e.target.value } })
-              }
-            />
-            <TextInput
-              label="CTA Label"
-              span={4}
-              value={hero.ctaLabel ?? ""}
-              onChange={(e) =>
-                patchContent({
-                  hero: { ...hero, ctaLabel: e.target.value },
-                })
-              }
-            />
-            <TextInput
-              label="CTA URL"
-              span={8}
-              value={hero.ctaHref ?? ""}
-              onChange={(e) =>
-                patchContent({
-                  hero: { ...hero, ctaHref: e.target.value },
-                })
-              }
-            />
-            <ImageUploadInput
-              label="Hero Image"
-              span="full"
-              ratio="hero"
-              value={hero.image ?? ""}
-              onChange={(image) => patchContent({ hero: { ...hero, image } })}
-              hideUrlField
-            />
-          </FormGrid>
-        )}
-
-        {activeTab === "sections" && (
-          <PageBodySectionsEditor
-            value={sections as PageBodySection[]}
-            onChange={(next) => patchContent({ sections: next })}
-          />
-        )}
-
-        {activeTab === "sidebar" && (
-          <div className="space-y-3">
-            <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
-              Add a left-side navigation list of links. Body sections render to
-              the right of this sidebar.
-            </p>
-            <div className="admin-form-grid admin-form-grid--tight">
-              {sidebarItems.map((it, i) => (
-                <div
-                  key={i}
-                  className="admin-col-6 rounded-lg border border-gray-200 bg-white p-3"
-                >
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-medium text-gray-500">
-                      Item {i + 1}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        disabled={i === 0}
-                        onClick={() => {
-                          const next = sidebarItems.slice();
-                          const [v] = next.splice(i, 1);
-                          next.splice(i - 1, 0, v);
-                          patchContent({
-                            sidebar: { ...sidebar, items: next },
-                          });
-                        }}
-                        className="admin-btn admin-btn-outline admin-btn-sm disabled:opacity-40"
-                      >
-                        <ArrowUp size={12} />
-                      </button>
-                      <button
-                        type="button"
-                        disabled={i === sidebarItems.length - 1}
-                        onClick={() => {
-                          const next = sidebarItems.slice();
-                          const [v] = next.splice(i, 1);
-                          next.splice(i + 1, 0, v);
-                          patchContent({
-                            sidebar: { ...sidebar, items: next },
-                          });
-                        }}
-                        className="admin-btn admin-btn-outline admin-btn-sm disabled:opacity-40"
-                      >
-                        <ArrowDown size={12} />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          patchContent({
-                            sidebar: {
-                              ...sidebar,
-                              items: sidebarItems.filter((_, j) => j !== i),
-                            },
-                          })
-                        }
-                        className="admin-btn admin-btn-danger admin-btn-sm"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                  </div>
-                  <FormGrid tight>
-                    <TextInput
-                      label="Label"
-                      span={5}
-                      value={it.label ?? ""}
+                <Field label="Keywords (comma-separated)" span={8}>
+                  <input
+                    className="admin-input"
+                    value={(seo.keywords ?? []).join(", ")}
+                    onChange={(e) =>
+                      patchContent({
+                        seo: {
+                          ...seo,
+                          keywords: e.target.value
+                            .split(",")
+                            .map((k) => k.trim())
+                            .filter(Boolean),
+                        },
+                      })
+                    }
+                  />
+                </Field>
+                <Field label="Indexing" span={4}>
+                  <label className="flex items-center gap-2 pt-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={seo.noindex === true}
                       onChange={(e) =>
                         patchContent({
-                          sidebar: {
-                            ...sidebar,
-                            items: sidebarItems.map((x, j) =>
-                              j === i ? { ...x, label: e.target.value } : x,
-                            ),
-                          },
+                          seo: { ...seo, noindex: e.target.checked },
                         })
                       }
                     />
-                    <TextInput
-                      label="URL"
-                      span={7}
-                      value={it.href ?? ""}
-                      onChange={(e) =>
-                        patchContent({
-                          sidebar: {
-                            ...sidebar,
-                            items: sidebarItems.map((x, j) =>
-                              j === i ? { ...x, href: e.target.value } : x,
-                            ),
-                          },
-                        })
-                      }
-                    />
-                  </FormGrid>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={() =>
-                  patchContent({
-                    sidebar: {
-                      ...sidebar,
-                      items: [
-                        ...sidebarItems,
-                        { label: "", href: "", visible: true },
-                      ],
-                    },
-                  })
-                }
-                className="admin-btn admin-btn-outline admin-btn-sm admin-col-full"
-              >
-                <Plus size={12} /> Add Sidebar Item
-              </button>
-            </div>
-            <FormGrid>
-              <TextInput
-                label="CTA Button Label (optional)"
-                span={4}
-                value={sidebar.ctaLabel ?? ""}
-                onChange={(e) =>
-                  patchContent({
-                    sidebar: { ...sidebar, ctaLabel: e.target.value },
-                  })
-                }
-              />
-              <TextInput
-                label="CTA Button URL"
-                span={8}
-                value={sidebar.ctaHref ?? ""}
-                onChange={(e) =>
-                  patchContent({
-                    sidebar: { ...sidebar, ctaHref: e.target.value },
-                  })
-                }
-              />
-            </FormGrid>
-            <div className="mt-6">
-              <p className="admin-label mb-2">Body Sections</p>
+                    Hide from search engines (noindex)
+                  </label>
+                </Field>
+                <ImageUploadInput
+                  label="Open Graph Image (optional)"
+                  span="full"
+                  ratio="hero"
+                  value={seo.ogImage ?? ""}
+                  onChange={(ogImage) =>
+                    patchContent({ seo: { ...seo, ogImage } })
+                  }
+                  hideUrlField
+                />
+              </FormGrid>
+            )}
+
+            {selected === "hero" && (
+              <FormGrid>
+                <TextInput
+                  label="Hero Title"
+                  span={5}
+                  value={hero.title ?? ""}
+                  onChange={(e) =>
+                    patchContent({ hero: { ...hero, title: e.target.value } })
+                  }
+                />
+                <TextArea
+                  label="Hero Subtitle"
+                  span={7}
+                  rows={3}
+                  value={hero.subtitle ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      hero: { ...hero, subtitle: e.target.value },
+                    })
+                  }
+                />
+                <TextInput
+                  label="CTA Label"
+                  span={4}
+                  value={hero.ctaLabel ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      hero: { ...hero, ctaLabel: e.target.value },
+                    })
+                  }
+                />
+                <TextInput
+                  label="CTA URL"
+                  span={8}
+                  value={hero.ctaHref ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      hero: { ...hero, ctaHref: e.target.value },
+                    })
+                  }
+                />
+                <ImageUploadInput
+                  label="Hero Image"
+                  span="full"
+                  ratio="hero"
+                  value={hero.image ?? ""}
+                  onChange={(image) =>
+                    patchContent({ hero: { ...hero, image } })
+                  }
+                  hideUrlField
+                />
+              </FormGrid>
+            )}
+
+            {selected === "sections" && (
               <PageBodySectionsEditor
                 value={sections as PageBodySection[]}
                 onChange={(next) => patchContent({ sections: next })}
               />
-            </div>
-          </div>
-        )}
+            )}
 
-        {activeTab === "gallery" && (
-          <div className="space-y-3">
-            <TextArea
-              label="Intro Description (optional)"
-              rows={3}
-              value={gallery.description ?? ""}
-              onChange={(e) =>
-                patchContent({
-                  gallery: { ...gallery, description: e.target.value },
-                })
-              }
-            />
-            <div className="admin-form-grid admin-form-grid--tight">
-              {galleryImages.map((img, i) => (
-                <div
-                  key={i}
-                  className="admin-col-4 rounded-lg border border-gray-200 bg-white p-3"
-                >
-                  <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-medium text-gray-500">
-                      Image {i + 1}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        patchContent({
-                          gallery: {
-                            ...gallery,
-                            images: galleryImages.filter((_, j) => j !== i),
-                          },
-                        })
-                      }
-                      className="admin-btn admin-btn-danger admin-btn-sm"
+            {selected === "sidebar" && (
+              <div className="space-y-3">
+                <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                  Add a left-side navigation list of links. Body sections render
+                  to the right of this sidebar.
+                </p>
+                <div className="admin-form-grid admin-form-grid--tight">
+                  {sidebarItems.map((it, i) => (
+                    <div
+                      key={i}
+                      className="admin-col-6 rounded-lg border border-gray-200 bg-white p-3"
                     >
-                      <Trash2 size={12} />
-                    </button>
-                  </div>
-                  <ImageUploadInput
-                    label="Image"
-                    ratio="card"
-                    value={img.src}
-                    onChange={(src) =>
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-xs font-medium text-gray-500">
+                          Item {i + 1}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            disabled={i === 0}
+                            onClick={() => {
+                              const next = sidebarItems.slice();
+                              const [v] = next.splice(i, 1);
+                              next.splice(i - 1, 0, v);
+                              patchContent({
+                                sidebar: { ...sidebar, items: next },
+                              });
+                            }}
+                            className="admin-btn admin-btn-outline admin-btn-sm disabled:opacity-40"
+                          >
+                            <ArrowUp size={12} />
+                          </button>
+                          <button
+                            type="button"
+                            disabled={i === sidebarItems.length - 1}
+                            onClick={() => {
+                              const next = sidebarItems.slice();
+                              const [v] = next.splice(i, 1);
+                              next.splice(i + 1, 0, v);
+                              patchContent({
+                                sidebar: { ...sidebar, items: next },
+                              });
+                            }}
+                            className="admin-btn admin-btn-outline admin-btn-sm disabled:opacity-40"
+                          >
+                            <ArrowDown size={12} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              patchContent({
+                                sidebar: {
+                                  ...sidebar,
+                                  items: sidebarItems.filter((_, j) => j !== i),
+                                },
+                              })
+                            }
+                            className="admin-btn admin-btn-danger admin-btn-sm"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
+                      </div>
+                      <FormGrid tight>
+                        <TextInput
+                          label="Label"
+                          span={5}
+                          value={it.label ?? ""}
+                          onChange={(e) =>
+                            patchContent({
+                              sidebar: {
+                                ...sidebar,
+                                items: sidebarItems.map((x, j) =>
+                                  j === i ? { ...x, label: e.target.value } : x,
+                                ),
+                              },
+                            })
+                          }
+                        />
+                        <TextInput
+                          label="URL"
+                          span={7}
+                          value={it.href ?? ""}
+                          onChange={(e) =>
+                            patchContent({
+                              sidebar: {
+                                ...sidebar,
+                                items: sidebarItems.map((x, j) =>
+                                  j === i ? { ...x, href: e.target.value } : x,
+                                ),
+                              },
+                            })
+                          }
+                        />
+                      </FormGrid>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() =>
                       patchContent({
-                        gallery: {
-                          ...gallery,
-                          images: galleryImages.map((x, j) =>
-                            j === i ? { ...x, src } : x,
-                          ),
+                        sidebar: {
+                          ...sidebar,
+                          items: [
+                            ...sidebarItems,
+                            { label: "", href: "", visible: true },
+                          ],
                         },
                       })
                     }
-                    hideUrlField
-                  />
-                  <FormGrid tight>
-                    <TextInput
-                      label="Alt Text"
-                      span="full"
-                      value={img.alt ?? ""}
-                      onChange={(e) =>
-                        patchContent({
-                          gallery: {
-                            ...gallery,
-                            images: galleryImages.map((x, j) =>
-                              j === i ? { ...x, alt: e.target.value } : x,
-                            ),
-                          },
-                        })
-                      }
-                    />
-                    <TextInput
-                      label="Caption (optional)"
-                      span="full"
-                      value={img.caption ?? ""}
-                      onChange={(e) =>
-                        patchContent({
-                          gallery: {
-                            ...gallery,
-                            images: galleryImages.map((x, j) =>
-                              j === i ? { ...x, caption: e.target.value } : x,
-                            ),
-                          },
-                        })
-                      }
-                    />
-                  </FormGrid>
+                    className="admin-btn admin-btn-outline admin-btn-sm admin-col-full"
+                  >
+                    <Plus size={12} /> Add Sidebar Item
+                  </button>
                 </div>
-              ))}
-              <button
-                type="button"
-                onClick={() =>
-                  patchContent({
-                    gallery: {
-                      ...gallery,
-                      images: [
-                        ...galleryImages,
-                        { src: "", alt: "", caption: "" },
-                      ],
-                    },
-                  })
-                }
-                className="admin-btn admin-btn-outline admin-btn-sm admin-col-full"
-              >
-                <Plus size={12} /> Add Image
-              </button>
-            </div>
-          </div>
-        )}
+                <FormGrid>
+                  <TextInput
+                    label="CTA Button Label (optional)"
+                    span={4}
+                    value={sidebar.ctaLabel ?? ""}
+                    onChange={(e) =>
+                      patchContent({
+                        sidebar: { ...sidebar, ctaLabel: e.target.value },
+                      })
+                    }
+                  />
+                  <TextInput
+                    label="CTA Button URL"
+                    span={8}
+                    value={sidebar.ctaHref ?? ""}
+                    onChange={(e) =>
+                      patchContent({
+                        sidebar: { ...sidebar, ctaHref: e.target.value },
+                      })
+                    }
+                  />
+                </FormGrid>
+                <div className="mt-6">
+                  <p className="admin-label mb-2">Body Sections</p>
+                  <PageBodySectionsEditor
+                    value={sections as PageBodySection[]}
+                    onChange={(next) => patchContent({ sections: next })}
+                  />
+                </div>
+              </div>
+            )}
 
-        {activeTab === "contact" && (
-          <FormGrid>
-            <TextArea
-              label="Intro (optional)"
-              span="full"
-              rows={2}
-              value={contact.intro ?? ""}
-              onChange={(e) =>
-                patchContent({
-                  contact: { ...contact, intro: e.target.value },
-                })
-              }
-            />
-            <TextInput
-              label="Phone"
-              span={4}
-              value={contact.phone ?? ""}
-              onChange={(e) =>
-                patchContent({
-                  contact: { ...contact, phone: e.target.value },
-                })
-              }
-            />
-            <TextInput
-              label="Email"
-              span={4}
-              value={contact.email ?? ""}
-              onChange={(e) =>
-                patchContent({
-                  contact: { ...contact, email: e.target.value },
-                })
-              }
-            />
-            <Field label="Address Lines" span={4}>
-              <textarea
-                className="admin-textarea"
-                rows={4}
-                value={(contact.addressLines ?? []).join("\n")}
-                onChange={(e) =>
-                  patchContent({
-                    contact: {
-                      ...contact,
-                      addressLines: e.target.value
-                        .split(/\r?\n/)
-                        .map((s) => s.trim())
-                        .filter(Boolean),
-                    },
-                  })
-                }
-                placeholder={"One address line per line"}
-              />
-            </Field>
-            <TextInput
-              label="Google Map Embed URL (optional)"
-              span="full"
-              value={contact.mapEmbedUrl ?? ""}
-              onChange={(e) =>
-                patchContent({
-                  contact: { ...contact, mapEmbedUrl: e.target.value },
-                })
-              }
-              placeholder="https://www.google.com/maps/embed?pb=..."
-            />
-          </FormGrid>
-        )}
-      </div>
+            {selected === "gallery" && (
+              <div className="space-y-3">
+                <TextArea
+                  label="Intro Description (optional)"
+                  rows={3}
+                  value={gallery.description ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      gallery: { ...gallery, description: e.target.value },
+                    })
+                  }
+                />
+                <div className="admin-form-grid admin-form-grid--tight">
+                  {galleryImages.map((img, i) => (
+                    <div
+                      key={i}
+                      className="admin-col-4 rounded-lg border border-gray-200 bg-white p-3"
+                    >
+                      <div className="mb-2 flex items-center justify-between">
+                        <span className="text-xs font-medium text-gray-500">
+                          Image {i + 1}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            patchContent({
+                              gallery: {
+                                ...gallery,
+                                images: galleryImages.filter((_, j) => j !== i),
+                              },
+                            })
+                          }
+                          className="admin-btn admin-btn-danger admin-btn-sm"
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                      <ImageUploadInput
+                        label="Image"
+                        ratio="card"
+                        value={img.src}
+                        onChange={(src) =>
+                          patchContent({
+                            gallery: {
+                              ...gallery,
+                              images: galleryImages.map((x, j) =>
+                                j === i ? { ...x, src } : x,
+                              ),
+                            },
+                          })
+                        }
+                        hideUrlField
+                      />
+                      <FormGrid tight>
+                        <TextInput
+                          label="Alt Text"
+                          span="full"
+                          value={img.alt ?? ""}
+                          onChange={(e) =>
+                            patchContent({
+                              gallery: {
+                                ...gallery,
+                                images: galleryImages.map((x, j) =>
+                                  j === i ? { ...x, alt: e.target.value } : x,
+                                ),
+                              },
+                            })
+                          }
+                        />
+                        <TextInput
+                          label="Caption (optional)"
+                          span="full"
+                          value={img.caption ?? ""}
+                          onChange={(e) =>
+                            patchContent({
+                              gallery: {
+                                ...gallery,
+                                images: galleryImages.map((x, j) =>
+                                  j === i
+                                    ? { ...x, caption: e.target.value }
+                                    : x,
+                                ),
+                              },
+                            })
+                          }
+                        />
+                      </FormGrid>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() =>
+                      patchContent({
+                        gallery: {
+                          ...gallery,
+                          images: [
+                            ...galleryImages,
+                            { src: "", alt: "", caption: "" },
+                          ],
+                        },
+                      })
+                    }
+                    className="admin-btn admin-btn-outline admin-btn-sm admin-col-full"
+                  >
+                    <Plus size={12} /> Add Image
+                  </button>
+                </div>
+              </div>
+            )}
 
-      <button
-        onClick={() => {
-          (async () => {
-            const ok = await confirm({
-              title: "Delete page",
-              message: "Delete this page permanently? This cannot be undone.",
-              confirmLabel: "Delete",
-              destructive: true,
-            });
-            if (!ok) return;
-            const r = await fetch(`/api/admin/pages/${doc._id}`, {
-              method: "DELETE",
-            });
-            if (r.ok) router.push("/admin/pages");
-            else toast.error("Delete failed.");
-          })();
-        }}
-        className="admin-btn admin-btn-danger admin-btn-sm"
-      >
-        <Trash2 size={12} /> Delete Page
-      </button>
-    </div>
+            {selected === "contact" && (
+              <FormGrid>
+                <TextArea
+                  label="Intro (optional)"
+                  span="full"
+                  rows={2}
+                  value={contact.intro ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      contact: { ...contact, intro: e.target.value },
+                    })
+                  }
+                />
+                <TextInput
+                  label="Phone"
+                  span={4}
+                  value={contact.phone ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      contact: { ...contact, phone: e.target.value },
+                    })
+                  }
+                />
+                <TextInput
+                  label="Email"
+                  span={4}
+                  value={contact.email ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      contact: { ...contact, email: e.target.value },
+                    })
+                  }
+                />
+                <Field label="Address Lines" span={4}>
+                  <textarea
+                    className="admin-textarea"
+                    rows={4}
+                    value={(contact.addressLines ?? []).join("\n")}
+                    onChange={(e) =>
+                      patchContent({
+                        contact: {
+                          ...contact,
+                          addressLines: e.target.value
+                            .split(/\r?\n/)
+                            .map((s) => s.trim())
+                            .filter(Boolean),
+                        },
+                      })
+                    }
+                    placeholder={"One address line per line"}
+                  />
+                </Field>
+                <TextInput
+                  label="Google Map Embed URL (optional)"
+                  span="full"
+                  value={contact.mapEmbedUrl ?? ""}
+                  onChange={(e) =>
+                    patchContent({
+                      contact: { ...contact, mapEmbedUrl: e.target.value },
+                    })
+                  }
+                  placeholder="https://www.google.com/maps/embed?pb=..."
+                />
+              </FormGrid>
+            )}
+          </>
+        )
+      }
+      saveBar={
+        <EditorSaveBar
+          dirty={dirty}
+          saving={saving ? "draft" : publishing ? "publish" : null}
+          unpublished={doc.status !== "published"}
+          message={msg && { text: msg.text, ok: msg.kind === "ok" }}
+          onSaveDraft={() => void save()}
+          onPublish={() => void publish()}
+          onDiscard={() => {
+            if (baseline === null) return;
+            setDoc({ ...doc, ...(JSON.parse(baseline) as Partial<PageDoc>) });
+          }}
+        />
+      }
+    />
   );
+}
+
+/** The fields an editor changes — what dirtiness is measured on. */
+function editableJson(d: PageDoc): string {
+  return JSON.stringify({
+    title: d.title,
+    slug: d.slug,
+    template: d.template,
+    content: d.content,
+  });
 }
 
 export default function PageEditorPage({

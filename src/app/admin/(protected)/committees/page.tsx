@@ -48,8 +48,14 @@ function CommitteesEditorInner() {
       key={institution}
       configKey={configKey}
       publicPath={groupsBasePath("committees", institution)}
-      title="Committees Page Editor"
-      subtitle={`${GROUPS_INSTITUTION_LABELS[institution]} — click any section to edit`}
+      title={`${GROUPS_INSTITUTION_LABELS[institution]} — Committees & Cells`}
+      subtitle="Click any part of the page to edit it. Save draft keeps changes private; Publish puts them on the live site."
+      sectionHelp={{
+        hero: "The banner at the top of the page: title and subtitle.",
+        intro: "The paragraphs introducing the committees.",
+        groups:
+          "Add, remove or reorder committees, or show and hide them. Click one on the page to edit its details, members and photos.",
+      }}
       emptyValue={() => GroupsPageSchema.parse({})}
       sectionOrder={GROUPS_SECTION_ORDER}
       sectionLabels={LABELS}

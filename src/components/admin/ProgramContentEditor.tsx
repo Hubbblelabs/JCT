@@ -20,8 +20,15 @@ import {
 } from "@/components/admin/CurriculumEditor";
 import { PageBodySectionsEditor } from "@/components/admin/PageBodySectionsEditor";
 import { SeoFields } from "@/components/admin/SeoFields";
+import { TableEditor } from "@/components/admin/TableEditor";
 import type { PageBodySection } from "@/lib/validation";
-import type { HeroMetaItem, TabConfigItem } from "@/types/program";
+import type { HeroMetaItem, LabelsTree, TabConfigItem } from "@/types/program";
+import {
+  programTableBuiltins,
+  programTableColumns,
+  type ProgramTableId,
+} from "@/lib/program-table-columns";
+import { columnsToStore, type TableColumn } from "@/lib/table-columns";
 
 // ─── Field schemas reused across sections ───────────────────────────────────
 
@@ -32,22 +39,6 @@ const PO_FIELDS: FieldDef[] = [
 ];
 const E_PO = { code: "", title: "", description: "" };
 
-const FACULTY_FIELDS: FieldDef[] = [
-  { key: "photo", label: "Photo", type: "image", ratio: "portrait", span: 3 },
-  { key: "name", label: "Name", span: 5 },
-  { key: "designation", label: "Designation", span: 4 },
-  { key: "qualification", label: "Qualification", span: 4 },
-  { key: "experience", label: "Experience", placeholder: "10+ years", span: 3 },
-  { key: "specialization", label: "Specialization", span: 5 },
-  { key: "email", label: "Email", span: 4 },
-  { key: "aicteId", label: "AICTE ID", placeholder: "1-7342956647", span: 4 },
-  {
-    key: "auFin",
-    label: "AU-FIN (not shown publicly)",
-    placeholder: "2630071980",
-    span: 4,
-  },
-];
 const E_FACULTY = {
   photo: "",
   name: "",
@@ -60,13 +51,29 @@ const E_FACULTY = {
   auFin: "",
 };
 
-const BOARD_FIELDS: FieldDef[] = [
-  { key: "name", label: "Name", span: 3 },
-  { key: "designation", label: "Designation", span: 3 },
-  { key: "organization", label: "Organization", span: 3 },
-  { key: "role", label: "Role", span: 3 },
-];
 const E_BOARD = { name: "", designation: "", organization: "", role: "" };
+
+// Optional photos + longer text for a program-page card: a card that has
+// either opens a popup on the public page (see ExpandableCard).
+const CARD_EXTRA_FIELDS: FieldDef[] = [
+  {
+    key: "images",
+    label: "Photos (optional)",
+    type: "images",
+    span: "full",
+    placeholder:
+      "The first photo shows on the card; visitors click the card to see them all.",
+  },
+  {
+    key: "details",
+    label: "More details (optional)",
+    type: "textarea",
+    rows: 4,
+    span: "full",
+    placeholder:
+      "Longer text shown in the popup when a visitor clicks the card.",
+  },
+];
 
 const EVENT_FIELDS: FieldDef[] = [
   { key: "title", label: "Title", span: 5 },
@@ -79,6 +86,7 @@ const EVENT_FIELDS: FieldDef[] = [
   },
   { key: "description", label: "Description", type: "textarea", span: 8 },
   { key: "resourcePerson", label: "Resource Person", span: 4 },
+  ...CARD_EXTRA_FIELDS,
 ];
 const E_EVENT = {
   title: "",
@@ -93,6 +101,7 @@ const ACHIEV_FIELDS: FieldDef[] = [
   { key: "title", label: "Achievement Title", span: 6 },
   { key: "year", label: "Year", span: 2 },
   { key: "detail", label: "Detail", type: "textarea", span: "full" },
+  ...CARD_EXTRA_FIELDS,
 ];
 const E_ACHIEV = { name: "", title: "", detail: "", year: "" };
 
@@ -101,6 +110,7 @@ const VAC_FIELDS: FieldDef[] = [
   { key: "hours", label: "Hours", placeholder: "30 Hours", span: 3 },
   { key: "provider", label: "Provider", span: 4 },
   { key: "description", label: "Description", type: "textarea", span: "full" },
+  ...CARD_EXTRA_FIELDS,
 ];
 const E_VAC = { name: "", hours: "", provider: "", description: "" };
 
@@ -338,6 +348,28 @@ export function ProgramSectionInspector({
 }) {
   const set = (key: string, val: unknown) =>
     onChange({ ...content, [key]: val });
+  // Tables with editable columns: the column list lives under
+  // `tableColumns[table]`, the rows under the table's own key.
+  const labels = content.labels as LabelsTree | undefined;
+  const tableColumnsOf = (table: ProgramTableId) =>
+    programTableColumns(table, content.tableColumns, labels);
+  const setTable = (
+    table: ProgramTableId,
+    columns: TableColumn[],
+    rows: unknown,
+  ) => {
+    const all = {
+      ...((content.tableColumns as Record<string, unknown>) ?? {}),
+    };
+    const keep = columnsToStore(
+      all[table],
+      columns,
+      programTableBuiltins(table, labels),
+    );
+    if (keep) all[table] = keep;
+    else delete all[table];
+    onChange({ ...content, tableColumns: all, [table]: rows });
+  };
   const setObj = (key: string, sub: string, val: unknown) =>
     onChange({
       ...content,
@@ -682,6 +714,11 @@ export function ProgramSectionInspector({
               (content.curriculum as CurriculumRegulation[] | undefined) ?? []
             }
             onChange={(v) => set("curriculum", v)}
+            columns={tableColumnsOf("curriculum")}
+            builtins={programTableBuiltins("curriculum", labels)}
+            onColumnsChange={(columns, curriculum) =>
+              setTable("curriculum", columns, curriculum)
+            }
           />
         );
       case "teachingLearning":
@@ -740,24 +777,55 @@ export function ProgramSectionInspector({
         );
       case "faculty":
         return (
-          <ItemsEditor
-            items={flatArr<Record<string, unknown>>(content, "faculty")}
-            onChange={(v) => set("faculty", v)}
-            fields={FACULTY_FIELDS}
-            emptyItem={E_FACULTY}
-            addLabel="Add Faculty Member"
+          <TableEditor<Record<string, unknown>>
+            label="faculty"
+            columns={tableColumnsOf("faculty")}
+            builtins={programTableBuiltins("faculty", labels)}
+            rows={flatArr<Record<string, unknown>>(content, "faculty")}
+            rowsLabel="Faculty members"
+            newRow={() => ({ ...E_FACULTY })}
+            onChange={({ columns, rows }) => setTable("faculty", columns, rows)}
+            // Fields that are not table columns: the portrait beside the
+            // name, the email on the phone card, an ID kept for records.
+            renderExtra={(row, oc) => (
+              <FormGrid tight>
+                <ImageUploadInput
+                  label="Photo"
+                  span={4}
+                  ratio="portrait"
+                  value={String(row.photo ?? "")}
+                  onChange={(photo) => oc({ ...row, photo })}
+                  hideUrlField
+                />
+                <TextInput
+                  label="Email"
+                  span={8}
+                  value={String(row.email ?? "")}
+                  onChange={(e) => oc({ ...row, email: e.target.value })}
+                />
+                <TextInput
+                  label="AU-FIN (not shown publicly)"
+                  span={8}
+                  value={String(row.auFin ?? "")}
+                  placeholder="2630071980"
+                  onChange={(e) => oc({ ...row, auFin: e.target.value })}
+                />
+              </FormGrid>
+            )}
           />
         );
       case "advisoryBoard":
       case "pac":
       case "bos":
         return (
-          <ItemsEditor
-            items={flatArr<Record<string, unknown>>(content, section)}
-            onChange={(v) => set(section, v)}
-            fields={BOARD_FIELDS}
-            emptyItem={E_BOARD}
-            addLabel="Add Member"
+          <TableEditor<Record<string, unknown>>
+            label={PROGRAM_CONTENT_SECTION_LABELS[section]}
+            columns={tableColumnsOf(section)}
+            builtins={programTableBuiltins(section, labels)}
+            rows={flatArr<Record<string, unknown>>(content, section)}
+            rowsLabel="Members"
+            newRow={() => ({ ...E_BOARD })}
+            onChange={({ columns, rows }) => setTable(section, columns, rows)}
           />
         );
       case "labs":

@@ -100,6 +100,9 @@ const COLLEGE_NAV_LABELS: Record<College, string> = {
 /** Colleges that publish a committees & cells page — see /admin/committees. */
 const COMMITTEE_COLLEGES: College[] = ["engineering", "polytechnic"];
 
+/** Colleges that publish a clubs & cells page — see /admin/clubs. */
+const CLUB_COLLEGES: College[] = ["engineering", "polytechnic"];
+
 /**
  * Order of the standalone content-page editors inside "Other Pages". Anything
  * the registry gains later that is not listed here lands at the end rather
@@ -113,7 +116,6 @@ const CONTENT_PAGE_ORDER: string[] = [
   "feedback-system",
   "mandatory-disclosures",
   "hr-manual",
-  "fine-arts-club",
 ];
 
 /**
@@ -152,16 +154,12 @@ function collegeGroups(college: College): AdminNavGroup[] {
 
   // Ordered as every college landing page renders, top to bottom.
   const landingPage: AdminNavItem[] = [
-    ...(eng
-      ? [
-          {
-            label: "Announcement Bar",
-            href: pc("announcement"),
-            icon: Bell,
-            description: "The strip above the header — enable text and links.",
-          },
-        ]
-      : []),
+    {
+      label: "Announcement Bar",
+      href: pc("announcement"),
+      icon: Bell,
+      description: "The strip above the header — enable text and links.",
+    },
     {
       label: "Navbar",
       href: pc("navbar"),
@@ -220,7 +218,7 @@ function collegeGroups(college: College): AdminNavGroup[] {
     },
     {
       label: "Placement Highlights",
-      href: `/admin/recruiters?${q}`,
+      href: pc("placements"),
       icon: Award,
       description: "Recruiter logos and highlight stats.",
     },
@@ -308,11 +306,16 @@ function collegeGroups(college: College): AdminNavGroup[] {
             icon: FlaskConical,
             description: "Research page sections and publications.",
           },
+        ]
+      : []),
+    ...(CLUB_COLLEGES.includes(college)
+      ? [
           {
-            label: "Clubs",
-            href: "/admin/clubs",
+            label: "Clubs & Cells",
+            href: `/admin/clubs?${q}`,
             icon: Sparkles,
-            description: "Student clubs and cells page.",
+            description:
+              "Student clubs: each one's details, members, photos and its own page.",
           },
         ]
       : []),
@@ -359,10 +362,10 @@ const MAIN_GROUPS: AdminNavGroup[] = [
     title: "Landing Page",
     items: [
       {
-        label: "Pamphlet Popup",
+        label: "Entry Popup",
         href: "/admin/main/page-content?section=pamphlet",
         icon: Layers,
-        description: "Entry popup with the downloadable pamphlet.",
+        description: "The popup that greets visitors on the home page.",
       },
       {
         label: "Navbar",
@@ -395,14 +398,14 @@ const MAIN_GROUPS: AdminNavGroup[] = [
         description: "Value-proposition block.",
       },
       {
-        label: "Card",
+        label: "Stat Counters",
         href: "/admin/main/page-content?section=card",
         icon: LayoutGrid,
-        description: "Institution cards linking to each college.",
+        description: "The counters strip inside Why Choose JCT.",
       },
       {
         label: "Placement Highlights",
-        href: "/admin/recruiters?scope=main",
+        href: "/admin/main/page-content?section=placements",
         icon: Award,
         description: "Site-wide recruiter logos and highlights.",
       },
@@ -804,6 +807,10 @@ export function findNavTrail(
  * Back button.
  */
 const IMMERSIVE_ROUTES = [
+  // The landing-page and Global editors (SiteSectionsEditor).
+  "/admin/page-content",
+  "/admin/main/page-content",
+  "/admin/global/page-content",
   "/admin/about",
   "/admin/coe",
   "/admin/campus-life",

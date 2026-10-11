@@ -31,6 +31,7 @@ export {
   PolytechnicHeroSchema,
   HOME_LIMITS,
   ENG_HERO_LIMITS,
+  HERO_OVERLAY_LIMITS,
   ARTS_HERO_LIMITS,
   POLY_HERO_LIMITS,
 } from "./hero";
@@ -215,11 +216,12 @@ export type {
 
 export {
   HeaderSchema,
+  HeaderPhoneSchema,
   FooterSchema,
   HEADER_LIMITS,
   FOOTER_LIMITS,
 } from "./globalCms";
-export type { HeaderValue, FooterValue } from "./globalCms";
+export type { HeaderValue, HeaderPhone, FooterValue } from "./globalCms";
 
 export {
   NavbarSchema,

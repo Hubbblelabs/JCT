@@ -2,16 +2,16 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
-import {
-  Plus,
-  Loader2,
-  Trash2,
-  ExternalLink,
-  ChevronRight,
-} from "lucide-react";
+import { Plus, Loader2, Trash2, ExternalLink } from "lucide-react";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
+import {
+  DataTable,
+  PageShell,
+  PublishBadge,
+  StatusBadge,
+  type Column,
+} from "@/components/admin/kit";
 
 type PageRow = {
   _id: string;
@@ -26,9 +26,16 @@ type PageRow = {
   in_navigation?: boolean;
 };
 
+const INSTITUTION_LABELS: Record<PageRow["institution"], string> = {
+  main: "Main site",
+  engineering: "Engineering",
+  "arts-science": "Arts & Science",
+  polytechnic: "Polytechnic",
+};
+
 const INSTITUTION_FILTERS: { value: string; label: string }[] = [
-  { value: "", label: "All" },
-  { value: "main", label: "Main" },
+  { value: "", label: "All sites" },
+  { value: "main", label: "Main site" },
   { value: "engineering", label: "Engineering" },
   { value: "arts-science", label: "Arts & Science" },
   { value: "polytechnic", label: "Polytechnic" },
@@ -87,129 +94,142 @@ function PagesInner() {
     }
   };
 
-  return (
-    <div className="admin-content">
-      <div className="admin-page-header">
-        <div>
-          <h1 className="admin-page-title">Dynamic Pages</h1>
-          <p className="admin-page-subtitle">
-            Create and manage custom pages reachable via /p/&lt;slug&gt; (main)
-            or /institutions/&lt;inst&gt;/p/&lt;slug&gt; (per-institution).
+  const columns: Column<PageRow>[] = [
+    {
+      key: "title",
+      header: "Page",
+      sortable: true,
+      value: (r) => `${r.title} ${r.slug}`,
+      render: (r) => (
+        <div className="min-w-0">
+          <p className="font-semibold text-gray-900">
+            {r.title || "(untitled)"}
+          </p>
+          <p className="text-xs text-gray-500">
+            {publicPathFor(r.institution, r.slug)}
           </p>
         </div>
+      ),
+    },
+    {
+      key: "institution",
+      header: "Site",
+      sortable: true,
+      hideOnMobile: true,
+      value: (r) => INSTITUTION_LABELS[r.institution],
+      render: (r) => INSTITUTION_LABELS[r.institution],
+    },
+    {
+      key: "status",
+      header: "Status",
+      sortable: true,
+      value: (r) => r.status,
+      render: (r) => (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <PublishBadge status={r.status} />
+          {/* A published page nothing links to is reachable only by direct
+              URL — invisible to visitors, still indexed by search engines. */}
+          {r.status === "published" && r.in_navigation === false && (
+            <span title="No navbar links to this page — visitors can only reach it by typing the address.">
+              <StatusBadge tone="info" label="Not in any menu" />
+            </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "template",
+      header: "Layout",
+      hideOnMobile: true,
+      value: (r) => r.template,
+      render: (r) => <span className="capitalize">{r.template}</span>,
+    },
+    {
+      key: "actions",
+      header: "",
+      align: "right",
+      render: (r) => (
+        <div
+          className="flex justify-end gap-1.5"
+          onClick={(e) => e.stopPropagation()}
+        >
+          {r.status === "published" && (
+            <a
+              href={publicPathFor(r.institution, r.slug)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="admin-btn admin-btn-outline admin-btn-sm"
+              title="View the live page"
+            >
+              <ExternalLink size={13} />
+            </a>
+          )}
+          <button
+            onClick={() => handleDelete(r._id, r.title)}
+            disabled={deletingId === r._id}
+            className="admin-btn admin-btn-danger admin-btn-sm"
+            title="Delete page"
+          >
+            {deletingId === r._id ? (
+              <Loader2 size={13} className="animate-spin" />
+            ) : (
+              <Trash2 size={13} />
+            )}
+          </button>
+        </div>
+      ),
+    },
+  ];
+
+  return (
+    <PageShell
+      title="Dynamic Pages"
+      description="Stand-alone pages you create yourself, such as notices or one-off information pages. Click a page to edit it."
+      actions={
         <button
           onClick={() => router.push("/admin/pages/new")}
-          className="admin-btn admin-btn-gold"
+          className="admin-btn admin-btn-primary"
         >
           <Plus size={15} /> New Page
         </button>
-      </div>
-
-      <div className="admin-card mb-4 flex items-center gap-3">
-        <label
-          htmlFor="pages-institution-filter"
-          className="text-sm font-medium text-gray-700"
-        >
-          Institution
-        </label>
-        <select
-          id="pages-institution-filter"
-          className="admin-select max-w-xs"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-        >
-          {INSTITUTION_FILTERS.map((f) => (
-            <option key={f.value} value={f.value}>
-              {f.label}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="admin-card">
-        {loading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 size={24} className="animate-spin text-gray-400" />
-          </div>
-        ) : rows.length === 0 ? (
-          <p className="py-12 text-center text-sm text-gray-500">
-            No pages yet. Click &quot;New Page&quot; to create one.
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {rows.map((row) => (
-              <div
-                key={row._id}
-                className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 hover:bg-gray-50"
-              >
-                <Link
-                  href={`/admin/pages/${row._id}`}
-                  className="flex flex-1 items-center gap-3"
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-gray-900">
-                        {row.title || "(untitled)"}
-                      </span>
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold tracking-wide uppercase ${
-                          row.status === "published"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-amber-100 text-amber-700"
-                        }`}
-                      >
-                        {row.status}
-                      </span>
-                      <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-gray-600 uppercase">
-                        {row.template}
-                      </span>
-                      {/* A published page nothing links to is reachable only
-                          by direct URL — invisible to visitors, still indexed
-                          by search engines. */}
-                      {row.status === "published" &&
-                        row.in_navigation === false && (
-                          <span
-                            className="rounded-full bg-orange-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-orange-700 uppercase"
-                            title="No navbar links to this page — visitors can only reach it by typing the URL."
-                          >
-                            Not in navigation
-                          </span>
-                        )}
-                    </div>
-                    <p className="mt-0.5 text-xs text-gray-500">
-                      {row.institution} · /{row.slug} · v{row.version}
-                    </p>
-                  </div>
-                  <ChevronRight size={14} className="shrink-0 text-gray-400" />
-                </Link>
-                {row.status === "published" && (
-                  <a
-                    href={publicPathFor(row.institution, row.slug)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="admin-btn admin-btn-outline admin-btn-sm"
-                    title="View public page"
-                  >
-                    <ExternalLink size={12} />
-                  </a>
-                )}
-                <button
-                  onClick={() => handleDelete(row._id, row.title)}
-                  disabled={deletingId === row._id}
-                  className="admin-btn admin-btn-danger admin-btn-sm"
-                >
-                  {deletingId === row._id ? (
-                    <Loader2 size={12} className="animate-spin" />
-                  ) : (
-                    <Trash2 size={12} />
-                  )}
-                </button>
-              </div>
+      }
+    >
+      <DataTable
+        rows={rows}
+        columns={columns}
+        rowKey={(r) => r._id}
+        loading={loading}
+        searchPlaceholder="Search by title or address…"
+        onRowClick={(r) => router.push(`/admin/pages/${r._id}`)}
+        initialSort={{ key: "title", dir: "asc" }}
+        filters={
+          <select
+            aria-label="Filter by site"
+            className="admin-select"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+          >
+            {INSTITUTION_FILTERS.map((f) => (
+              <option key={f.value} value={f.value}>
+                {f.label}
+              </option>
             ))}
-          </div>
-        )}
-      </div>
-    </div>
+          </select>
+        }
+        empty={{
+          title: "No pages yet",
+          body: "A dynamic page is a stand-alone page with its own address.",
+          action: (
+            <button
+              onClick={() => router.push("/admin/pages/new")}
+              className="admin-btn admin-btn-primary"
+            >
+              <Plus size={15} /> New Page
+            </button>
+          ),
+        }}
+      />
+    </PageShell>
   );
 }
 

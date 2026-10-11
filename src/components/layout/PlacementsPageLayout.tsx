@@ -51,6 +51,12 @@ import { getImageUrl } from "@/lib/utils";
 import { PLACEMENT_GALLERY_ANCHOR } from "@/lib/page-anchors";
 import { hostedSectionKey } from "@/lib/content-pages";
 import {
+  resolveColumns,
+  withDefaultLabels,
+  type TableColumn,
+} from "@/lib/table-columns";
+import { PLACEMENT_HISTORY_COLUMNS } from "@/lib/placement-history-columns";
+import {
   resolveSidebarItems,
   type ResolvedSidebarItem,
   type SidebarNavDefault,
@@ -1787,9 +1793,11 @@ function CompanyPlacements({
 // ─── Year-wise history ───────────────────────────────────────────────────────
 
 /**
- * Columns of the history table. A column is dropped entirely when no year on
- * record carries it — a college that never tracked "offers made" shouldn't get
- * a column of dashes.
+ * How each built-in history column reads its figure off a year's record. The
+ * column list itself — names, order, hidden and added columns — comes from the
+ * page's `historyColumns` (see src/lib/placement-history-columns.ts). A column
+ * is dropped entirely when no year on record carries it — a college that never
+ * tracked "offers made" shouldn't get a column of dashes.
  */
 type HistoryColumn = {
   id: string;
@@ -1798,58 +1806,49 @@ type HistoryColumn = {
   format: (r: PublicPlacement) => string;
 };
 
-const HISTORY_COLUMNS: HistoryColumn[] = [
+const HISTORY_FIGURES: Omit<HistoryColumn, "label">[] = [
   {
     id: "placement_percentage",
-    label: "Placement Rate",
     has: (r) => r.placement_percentage > 0,
     format: (r) => `${r.placement_percentage}%`,
   },
   {
     id: "students_placed",
-    label: "Students Placed",
     has: (r) => r.students_placed > 0,
     format: (r) => String(r.students_placed),
   },
   {
     id: "total_students",
-    label: "Eligible",
     has: (r) => r.total_students > 0,
     format: (r) => String(r.total_students),
   },
   {
     id: "offers_made",
-    label: "Offers",
     has: (r) => r.offers_made > 0,
     format: (r) => String(r.offers_made),
   },
   {
     id: "companies_visited",
-    label: "Companies",
     has: (r) => r.companies_visited > 0,
     format: (r) => String(r.companies_visited),
   },
   {
     id: "recruiters",
-    label: "Recruiters Listed",
     has: (r) => r.top_recruiters.length > 0,
     format: (r) => String(r.top_recruiters.length),
   },
   {
     id: "highest_package",
-    label: "Highest",
     has: (r) => !!r.highest_package.trim(),
     format: (r) => r.highest_package,
   },
   {
     id: "average_package",
-    label: "Average",
     has: (r) => !!r.average_package.trim(),
     format: (r) => r.average_package,
   },
   {
     id: "median_package",
-    label: "Median",
     has: (r) => !!r.median_package.trim(),
     format: (r) => r.median_package,
   },
@@ -1914,12 +1913,15 @@ function galleryForYear(
  */
 function PlacementHistory({
   records,
+  storedColumns,
   selectedId,
   onSelectYear,
   editable,
   onEditSection,
 }: {
   records: PublicPlacement[];
+  /** The page's `historyColumns` — absent means the built-in figures. */
+  storedColumns: TableColumn[] | undefined;
   selectedId: string;
   onSelectYear: (id: string) => void;
 } & EditProps) {
@@ -1929,14 +1931,34 @@ function PlacementHistory({
     [records],
   );
   const columns = useMemo(() => {
-    const present = HISTORY_COLUMNS.filter((c) => rows.some((r) => c.has(r)));
+    const figures = new Map(HISTORY_FIGURES.map((f) => [f.id, f]));
+    const all: HistoryColumn[] = withDefaultLabels(
+      resolveColumns(storedColumns, PLACEMENT_HISTORY_COLUMNS),
+      PLACEMENT_HISTORY_COLUMNS,
+    )
+      .filter((c) => !c.hidden)
+      .map((c) => {
+        const figure = figures.get(c.id);
+        if (figure) return { ...figure, label: c.label };
+        // An added column: free text per year.
+        const text = (r: PublicPlacement) =>
+          (r.history_cells[c.id] ?? "").trim();
+        return {
+          id: c.id,
+          label: c.label,
+          has: (r) => text(r) !== "",
+          format: text,
+        };
+      });
+    const present = all.filter((c) => rows.some((r) => c.has(r)));
     // The recruiter count is derived from the listed logos and only stands in
     // for "companies visited" when that figure was never entered — showing both
-    // gives two near-identical columns.
-    return present.some((c) => c.id === "companies_visited")
+    // gives two near-identical columns. Once an editor has arranged the
+    // columns, hiding either is theirs to decide.
+    return !storedColumns && present.some((c) => c.id === "companies_visited")
       ? present.filter((c) => c.id !== "recruiters")
       : present;
-  }, [rows]);
+  }, [rows, storedColumns]);
   const peakRate = rows.reduce(
     (max, r) => Math.max(max, r.placement_percentage),
     0,
@@ -2388,6 +2410,7 @@ export function PlacementsPageLayout({
                       {present.has("history") && (
                         <PlacementHistory
                           records={records}
+                          storedColumns={info.historyColumns}
                           selectedId={active._id}
                           onSelectYear={handleSelectYear}
                           editable={editable}

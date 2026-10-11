@@ -9,11 +9,15 @@ import { useInstitution } from "@/contexts/InstitutionContext";
 export function StickyApplyButton({
   label = "Apply Now",
   href = "https://admissions.jct.ac.in",
+  alwaysVisible = false,
 }: {
   label?: string;
   href?: string;
+  /** Skip the scroll-past-the-hero rule (the admin preview never scrolls
+   *  the window). */
+  alwaysVisible?: boolean;
 } = {}) {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(alwaysVisible);
   const { institution } = useInstitution();
 
   let themeClasses = "bg-gold text-navy hover:bg-[#e8b84a]";
@@ -25,6 +29,7 @@ export function StickyApplyButton({
   }
 
   useEffect(() => {
+    if (alwaysVisible) return;
     const handleScroll = () => {
       // Show the button only after scrolling past the hero section (approx 80vh)
       if (window.scrollY > window.innerHeight * 0.8) {
@@ -39,7 +44,7 @@ export function StickyApplyButton({
     handleScroll();
 
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [alwaysVisible]);
 
   return (
     <AnimatePresence>

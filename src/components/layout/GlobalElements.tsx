@@ -1,10 +1,12 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import { StickyApplyButton } from "./StickyApplyButton";
 import { MerittoPositioner } from "./MerittoPositioner";
 import { ChatbotNotification } from "./ChatbotNotification";
 import { useSiteConfig } from "@/lib/use-site-config";
+import { socialLinksFrom, type SocialKey } from "./social-links";
 
 type FloatingConfig = {
   whatsapp?: {
@@ -19,13 +21,26 @@ type FloatingConfig = {
   meritto?: {
     enabled?: boolean;
   };
+  social?: {
+    enabled?: boolean;
+    networks?: SocialKey[];
+  };
 };
 
-export function GlobalElements() {
+type FooterSocials = Partial<Record<SocialKey, string>>;
+
+export function GlobalElements({
+  preview = false,
+}: {
+  /** Admin live preview: show the buttons (normally hidden under /admin),
+   *  without the third-party chat widget. */
+  preview?: boolean;
+} = {}) {
   const pathname = usePathname();
-  const isAdmin = pathname?.startsWith("/admin");
+  const isAdmin = !preview && pathname?.startsWith("/admin");
   const { data: floatingData } =
     useSiteConfig<FloatingConfig>("floatingElements");
+  const { data: footer } = useSiteConfig<FooterSocials>("footer");
 
   if (isAdmin) return null;
 
@@ -40,14 +55,61 @@ export function GlobalElements() {
   const apLabel = (ap.label && ap.label.trim()) || "Apply Now";
   const apHref = (ap.href && ap.href.trim()) || "https://admissions.jct.ac.in";
 
-  const mtEnabled = mt.enabled !== false;
+  // The chat widget is an external script with its own fixed UI — it can't
+  // be drawn inside a preview.
+  const mtEnabled = !preview && mt.enabled !== false;
+
+  // Off unless switched on — it is a new element, and it needs the Footer's
+  // social URLs before it has anything to show.
+  const sc = floatingData?.social ?? {};
+  const socials = sc.enabled
+    ? socialLinksFrom(footer).filter(
+        (s) => !Array.isArray(sc.networks) || sc.networks.includes(s.key),
+      )
+    : [];
 
   return (
     <>
-      {apEnabled && <StickyApplyButton label={apLabel} href={apHref} />}
+      {apEnabled && (
+        <StickyApplyButton
+          label={apLabel}
+          href={apHref}
+          alwaysVisible={preview}
+        />
+      )}
 
       {mtEnabled && <MerittoPositioner />}
       {mtEnabled && <ChatbotNotification />}
+
+      {socials.length > 0 && (
+        // Middle of the left edge: the bottom-left corner is WhatsApp's and the
+        // right side belongs to Apply Now and the chatbot. Desktop only — on a
+        // phone a fixed strip would sit on top of the page text, and the
+        // footer already carries the same links.
+        <nav
+          aria-label="Social media"
+          data-own-fixed
+          className="fixed top-1/2 left-0 z-40 hidden -translate-y-1/2 md:block"
+        >
+          <ul className="flex flex-col overflow-hidden rounded-r-xl bg-[#0a1628]/90 shadow-lg shadow-black/20 backdrop-blur-sm">
+            {socials.map(({ key, Icon, label, href, color }) => (
+              <li key={key}>
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
+                  title={label}
+                  style={{ "--brand": color } as CSSProperties}
+                  className="flex h-11 w-11 items-center justify-center text-white/85 transition-all duration-200 hover:w-14 hover:bg-(--brand) hover:text-white focus-visible:w-14 focus-visible:bg-(--brand) focus-visible:text-white focus-visible:outline-none"
+                >
+                  <Icon size={17} />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
 
       {waEnabled && waPhone && (
         <div

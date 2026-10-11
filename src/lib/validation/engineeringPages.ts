@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { ContentBlockSchema } from "./contentPage";
+import { zCells, zTableColumns } from "./tableColumns";
 
 // ──────────────────────────────────────────────────────────────────────────
 // Standalone Engineering sub-pages, each backed by its own SiteConfig key
@@ -7,6 +9,8 @@ import { z } from "zod";
 //   engineeringClubs       -> /institutions/engineering/clubs-and-cells
 //   engineeringCommittees  -> /institutions/engineering/committees
 //   engineeringDocuments   -> /institutions/engineering/documents
+//   polytechnicClubs       -> /institutions/polytechnic/clubs-and-cells
+//   polytechnicCommittees  -> /institutions/polytechnic/committees
 //
 // Clubs & Cells and Committees are the same shape — a list of groups with
 // members — so they share GroupsPageSchema and one layout/inspector pair.
@@ -177,6 +181,8 @@ export const GROUPS_PAGE_LIMITS = {
   membersMax: 40,
   activitiesMax: 20,
   galleryMax: 12,
+  // Same ceiling as a content page, so a page can move into a club whole.
+  blocksMax: 80,
 } as const;
 
 const GroupMemberSchema = z.object({
@@ -186,6 +192,8 @@ const GroupMemberSchema = z.object({
   dept: s(200),
   /** Phone or email published alongside the member. */
   contact: s(120),
+  /** Values for the members table's added columns. */
+  cells: zCells,
 });
 
 const GroupSchema = z.object({
@@ -208,7 +216,23 @@ const GroupSchema = z.object({
     .array(GroupMemberSchema)
     .max(GROUPS_PAGE_LIMITS.membersMax)
     .default([]),
+  /** The members table's columns. Absent means the built-in four. */
+  memberColumns: zTableColumns,
   activities: z.array(s(300)).max(GROUPS_PAGE_LIMITS.activitiesMax).default([]),
+  /**
+   * Hidden entries stay in the list (and keep their slug, so un-hiding one
+   * restores the same URL) but are left off the public page and 404 on their
+   * detail route. Absent means shown — every value saved before this existed.
+   */
+  hidden: z.boolean().optional(),
+  /**
+   * Optional richer content for the detail page — text, lists, tables,
+   * galleries… the same blocks content pages use. Absent on most groups.
+   */
+  blocks: z
+    .array(ContentBlockSchema)
+    .max(GROUPS_PAGE_LIMITS.blocksMax)
+    .optional(),
 });
 
 export const GroupsPageSchema = z.object({

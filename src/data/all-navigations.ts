@@ -252,9 +252,9 @@ export const polytechnicNavigation: NavItem[] = [
         desc: "Committees and cells across the college",
       },
       {
-        name: "Fine Arts Club",
-        href: "/institutions/polytechnic/fine-arts-club",
-        desc: "Movie, cultural, arts and photography wings",
+        name: "Clubs & Cells",
+        href: "/institutions/polytechnic/clubs-and-cells",
+        desc: "Fine arts and the other student clubs",
       },
     ],
   },

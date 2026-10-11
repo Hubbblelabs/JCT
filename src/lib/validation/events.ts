@@ -44,12 +44,29 @@ export const LIMITS = {
   // silently threw most of an album away; 24 still cut 64 of the imported
   // events short, the largest of which is a 172-photo graduation day.
   galleryMax: 200,
+  videosMax: 10,
+  videoUrlMax: 500,
 } as const;
 
 // Extra photos beyond the cover image, rendered as a grid on the detail page.
 const zEventGallery = z
   .array(zUrl)
   .max(LIMITS.galleryMax, `At most ${LIMITS.galleryMax} gallery images`);
+
+// Videos are links to third-party pages (YouTube, Vimeo, Facebook…), never
+// storage keys or site paths — so unlike `zUrl`, only absolute http(s).
+const zVideoUrl = z
+  .string()
+  .trim()
+  .max(
+    LIMITS.videoUrlMax,
+    `Video link must be at most ${LIMITS.videoUrlMax} characters`,
+  )
+  .regex(/^https?:\/\/\S+$/i, "Video link must start with https://");
+
+const zEventVideos = z
+  .array(zVideoUrl)
+  .max(LIMITS.videosMax, `At most ${LIMITS.videosMax} videos`);
 
 const zEventDate = z
   .string()
@@ -68,6 +85,8 @@ const EventBaseSchema = z.object({
   location: zOptionalString(LIMITS.locationMax),
   image: zUrl.optional().or(z.literal("")),
   gallery: zEventGallery,
+  videos: zEventVideos,
+  featured: z.boolean(),
   institution: zEnum(INSTITUTIONS),
   is_active: z.boolean(),
   sort_order: zNonNegativeInt,
@@ -81,6 +100,8 @@ export const EventCreateSchema = EventBaseSchema.extend({
   ),
   location: zOptionalString(LIMITS.locationMax).default(""),
   gallery: zEventGallery.default([]),
+  videos: zEventVideos.default([]),
+  featured: z.boolean().optional().default(false),
   is_active: z.boolean().optional().default(true),
   sort_order: zNonNegativeInt.optional().default(0),
 });

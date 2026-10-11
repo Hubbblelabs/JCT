@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SidebarNavItemSchema } from "./sidebarNav";
+import { zCells, zTableColumns } from "./tableColumns";
 
 // ─── Shared sub-schemas ──────────────────────────────────────────────────────
 
@@ -23,6 +24,8 @@ const HodMemberSchema = z.object({
 const CouncilMemberSchema = z.object({
   name: s(200),
   category: s(200),
+  /** Values for the council table's added columns. */
+  cells: zCells,
 });
 
 const ValueItemSchema = z.object({
@@ -69,11 +72,15 @@ const PlanningBoardMemberSchema = z.object({
   position: s(100),
   category: s(300),
   qualification: s(200),
+  /** Values for the board table's added columns. */
+  cells: zCells,
 });
 
 const PlanningBoardSchema = z.object({
   paragraphs: z.array(s(1500)).default([]),
   members: z.array(PlanningBoardMemberSchema).default([]),
+  /** The table's columns — absent means the built-in ones. */
+  columns: zTableColumns,
 });
 
 const QUALITY_POLICY_DEFAULT = { intro: "", points: [] };
@@ -104,6 +111,8 @@ const HodSchema = z.object({
 const GoverningCouncilSchema = z.object({
   description: s(1000),
   members: z.array(CouncilMemberSchema).default([]),
+  /** The table's columns — absent means the built-in ones. */
+  columns: zTableColumns,
 });
 
 const QuickFactSchema = z.object({

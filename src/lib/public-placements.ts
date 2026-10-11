@@ -1,6 +1,7 @@
 import { connectDB } from "@/lib/mongodb";
 import { Placement } from "@/lib/models";
 import { getImageUrl } from "@/lib/utils";
+import { cleanCells } from "@/lib/table-columns";
 
 type PlacementLean = {
   _id: unknown;
@@ -29,6 +30,7 @@ type PlacementLean = {
     logo?: string;
     students?: { name?: string; program?: string; package?: string }[];
   }[];
+  history_cells?: unknown;
 };
 
 export type PublicTopRecruiter = { name: string; logo: string | null };
@@ -68,6 +70,8 @@ export type PublicPlacement = {
   top_recruiters: PublicTopRecruiter[];
   notable_placements: PublicNotablePlacement[];
   company_placements: PublicCompanyPlacement[];
+  /** Values for the history table's added columns, by column id. */
+  history_cells: Record<string, string>;
 };
 
 // Top recruiter name + logo live directly on each placement-year record — the
@@ -123,6 +127,7 @@ function normalize(doc: PlacementLean): PublicPlacement {
           .filter((s) => s.name),
       }))
       .filter((c) => c.company && c.students.length > 0),
+    history_cells: cleanCells(doc.history_cells),
   };
 }
 

@@ -6,6 +6,7 @@ import {
   zOptionalString,
   zNonNegativeInt,
 } from "./_primitives";
+import { zCells } from "./tableColumns";
 
 // Per-college — placements are not a shared ("all") resource; each college
 // owns its own year-wise records.
@@ -80,6 +81,8 @@ const PlacementBaseSchema = z.object({
     .max(LIMITS.companyPlacementsMax),
   is_active: z.boolean(),
   sort_order: zNonNegativeInt,
+  /** This year's values for the history table's added columns. */
+  history_cells: zCells,
 });
 
 export const PlacementCreateSchema = PlacementBaseSchema.extend({

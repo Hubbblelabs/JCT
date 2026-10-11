@@ -6,6 +6,9 @@ import { Footer } from "@/components/layout/Footer";
 import { PageHero } from "@/components/ui/PageHero";
 import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { getImageUrl } from "@/lib/utils";
+import { ContentPageBody } from "@/components/layout/ContentPageLayout";
+import { cellValue, displayColumns, isCustomColumn } from "@/lib/table-columns";
+import { GROUP_MEMBER_COLUMNS } from "@/lib/group-member-columns";
 import {
   GROUPS_INSTITUTION_LABELS,
   GROUPS_VARIANT_META,
@@ -55,10 +58,18 @@ export function GroupDetailLayout({
   const galleryCols = GALLERY_COLS[gallery.length] ?? "grid-cols-2";
   const members = group.members.filter((m) => m.name.trim() !== "");
   const activities = group.activities.filter((a) => a.trim() !== "");
-  // Columns are dropped entirely when no member fills them, so a roster with
-  // only names and phone numbers doesn't render two dead columns.
-  const showDept = members.some((m) => m.dept.trim() !== "");
-  const showContact = members.some((m) => m.contact.trim() !== "");
+  const blocks = group.blocks ?? [];
+  // The roster's columns as the editor arranged them. Columns no member
+  // fills are dropped, so a list of names and phone numbers doesn't render
+  // two dead columns.
+  const columns = displayColumns(
+    group.memberColumns,
+    GROUP_MEMBER_COLUMNS,
+    members,
+    ["name"],
+  );
+  // On a phone the first detail column reads as the card's subtitle.
+  const subtitleId = columns.find((c) => c.id !== "name")?.id;
   const hasSidebarInfo = img || group.convenor || group.email;
 
   return (
@@ -111,22 +122,14 @@ export function GroupDetailLayout({
                         <th className="text-muted-foreground w-12 px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
                           #
                         </th>
-                        <th className="text-muted-foreground px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
-                          Name
-                        </th>
-                        <th className="text-muted-foreground px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
-                          Designation
-                        </th>
-                        {showDept && (
-                          <th className="text-muted-foreground px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
-                            Department / Affiliation
+                        {columns.map((c) => (
+                          <th
+                            key={c.id}
+                            className="text-muted-foreground px-4 py-3 text-[11px] font-bold tracking-wider uppercase"
+                          >
+                            {c.label}
                           </th>
-                        )}
-                        {showContact && (
-                          <th className="text-muted-foreground px-4 py-3 text-[11px] font-bold tracking-wider uppercase">
-                            Contact
-                          </th>
-                        )}
+                        ))}
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/5">
@@ -138,36 +141,41 @@ export function GroupDetailLayout({
                           <td className="text-muted-foreground px-4 py-3 text-xs">
                             {i + 1}
                           </td>
-                          <td className="text-foreground px-4 py-3 font-medium">
-                            {m.name}
-                          </td>
-                          <td className="text-muted-foreground px-4 py-3">
-                            {m.role}
-                          </td>
-                          {showDept && (
-                            <td className="text-muted-foreground px-4 py-3">
-                              {m.dept}
-                            </td>
-                          )}
-                          {showContact && (
-                            <td className="px-4 py-3">
-                              {m.contact && (
-                                <a
-                                  href={contactHref(m.contact)}
-                                  className="text-gold font-medium hover:underline"
-                                >
-                                  {m.contact}
-                                </a>
-                              )}
-                            </td>
-                          )}
+                          {columns.map((c) => {
+                            const value = cellValue(m, c.id);
+                            if (c.id === "contact")
+                              return (
+                                <td key={c.id} className="px-4 py-3">
+                                  {value && (
+                                    <a
+                                      href={contactHref(value)}
+                                      className="text-gold font-medium hover:underline"
+                                    >
+                                      {value}
+                                    </a>
+                                  )}
+                                </td>
+                              );
+                            return (
+                              <td
+                                key={c.id}
+                                className={
+                                  c.id === "name"
+                                    ? "text-foreground px-4 py-3 font-medium"
+                                    : "text-muted-foreground px-4 py-3"
+                                }
+                              >
+                                {value}
+                              </td>
+                            );
+                          })}
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
 
-                {/* Mobile: one card per member — a 5-column table can't shrink. */}
+                {/* Mobile: one card per member — a wide table can't shrink. */}
                 <ul className="space-y-3 sm:hidden">
                   {members.map((m, i) => (
                     <li
@@ -175,24 +183,40 @@ export function GroupDetailLayout({
                       className="rounded-2xl border border-white/10 bg-white/5 p-4"
                     >
                       <p className="text-foreground font-bold">{m.name}</p>
-                      {m.role && (
-                        <p className="text-gold mt-0.5 text-xs font-semibold">
-                          {m.role}
-                        </p>
-                      )}
-                      {m.dept && (
-                        <p className="text-muted-foreground mt-1 text-xs">
-                          {m.dept}
-                        </p>
-                      )}
-                      {m.contact && (
-                        <a
-                          href={contactHref(m.contact)}
-                          className="text-gold mt-2 inline-block text-xs font-bold hover:underline"
-                        >
-                          {m.contact}
-                        </a>
-                      )}
+                      {columns.map((c) => {
+                        const value = cellValue(m, c.id);
+                        if (c.id === "name" || !value) return null;
+                        if (c.id === "contact")
+                          return (
+                            <a
+                              key={c.id}
+                              href={contactHref(value)}
+                              className="text-gold mt-2 block text-xs font-bold hover:underline"
+                            >
+                              {value}
+                            </a>
+                          );
+                        if (c.id === subtitleId)
+                          return (
+                            <p
+                              key={c.id}
+                              className="text-gold mt-0.5 text-xs font-semibold"
+                            >
+                              {value}
+                            </p>
+                          );
+                        return (
+                          <p
+                            key={c.id}
+                            className="text-muted-foreground mt-1 text-xs"
+                          >
+                            {isCustomColumn(c.id) && (
+                              <span className="font-semibold">{c.label}: </span>
+                            )}
+                            {value}
+                          </p>
+                        );
+                      })}
                     </li>
                   ))}
                 </ul>
@@ -221,12 +245,29 @@ export function GroupDetailLayout({
               </section>
             )}
 
-            {members.length === 0 && activities.length === 0 && (
-              <p className="text-muted-foreground/60 mt-10 rounded-2xl border border-dashed border-white/15 py-12 text-center text-sm">
-                Details for this {meta.singular.toLowerCase()} will be published
-                soon.
-              </p>
+            {/* Optional richer content (text, tables, galleries…), drawn by
+                the same renderer as the block-based content pages. */}
+            {blocks.length > 0 && (
+              <div className="mt-2">
+                <ContentPageBody
+                  data={{
+                    hero: { title: "", subtitle: "" },
+                    breadcrumb: [],
+                    intro: [],
+                    blocks,
+                  }}
+                />
+              </div>
             )}
+
+            {members.length === 0 &&
+              activities.length === 0 &&
+              blocks.length === 0 && (
+                <p className="text-muted-foreground/60 mt-10 rounded-2xl border border-dashed border-white/15 py-12 text-center text-sm">
+                  Details for this {meta.singular.toLowerCase()} will be
+                  published soon.
+                </p>
+              )}
           </div>
 
           {/* Sidebar */}

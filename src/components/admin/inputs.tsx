@@ -941,8 +941,11 @@ export function DocumentUploadInput({
 export type FieldDef = {
   key: string;
   label: string;
-  /** "image" swaps the plain input for an ImageUploadInput (storage-backed). */
-  type?: "text" | "textarea" | "number" | "image";
+  /**
+   * "image" swaps the plain input for an ImageUploadInput (storage-backed);
+   * "images" is a list of them (the value is a string array).
+   */
+  type?: "text" | "textarea" | "number" | "image" | "images";
   /** @deprecated use `span` — kept so existing call sites keep compiling. */
   span2?: boolean;
   /** Columns of the 12-column row this field takes. Defaults to half a row. */
@@ -950,7 +953,75 @@ export type FieldDef = {
   placeholder?: string;
   /** Upload preset for `type: "image"` fields. Defaults to "auto". */
   ratio?: RatioType;
+  /** Rows for `type: "textarea"`. Defaults to 2. */
+  rows?: number;
+  /** Most photos for `type: "images"`. Defaults to 12. */
+  max?: number;
 };
+
+/** A repeatable photo list inside an ItemsEditor card. */
+function ImagesField({
+  label,
+  hint,
+  value,
+  max,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  value: string[];
+  max: number;
+  onChange: (next: string[]) => void;
+}) {
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between gap-2">
+        <span className="admin-label mb-0">{label}</span>
+        <span className="text-xs text-gray-400">
+          {value.length} / {max}
+        </span>
+      </div>
+      {hint && <p className="admin-help mb-2">{hint}</p>}
+      {value.length > 0 && (
+        <div className="admin-form-grid admin-form-grid--tight mb-2">
+          {value.map((src, j) => (
+            <div key={j} className="admin-col-4 relative">
+              <ImageUploadInput
+                label=""
+                value={src}
+                // Clearing a photo drops its slot rather than leaving a gap.
+                onChange={(v) =>
+                  onChange(
+                    v
+                      ? value.map((x, k) => (k === j ? v : x))
+                      : value.filter((_, k) => k !== j),
+                  )
+                }
+                hideUrlField
+              />
+              <button
+                type="button"
+                onClick={() => onChange(value.filter((_, k) => k !== j))}
+                aria-label={`Remove photo ${j + 1}`}
+                className="admin-btn admin-btn-danger admin-btn-sm absolute top-1 right-1"
+              >
+                <Trash2 size={12} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      <button
+        type="button"
+        disabled={value.length >= max}
+        onClick={() => onChange([...value, ""])}
+        className="admin-btn admin-btn-outline admin-btn-sm disabled:opacity-50"
+      >
+        <Plus size={13} /> Add photo
+      </button>
+    </div>
+  );
+}
 
 export function ItemsEditor({
   items,
@@ -986,6 +1057,22 @@ export function ItemsEditor({
               const span = f.span ?? (f.span2 ? "full" : undefined);
               // ImageUploadInput brings its own label + preview, so it replaces
               // the row entirely rather than sitting under a bare <label>.
+              if (f.type === "images") {
+                const list = Array.isArray(item[f.key])
+                  ? (item[f.key] as string[])
+                  : [];
+                return (
+                  <div key={f.key} className={colClass(span)}>
+                    <ImagesField
+                      label={f.label}
+                      hint={f.placeholder}
+                      value={list}
+                      max={f.max ?? 12}
+                      onChange={(v) => upd(i, f.key, v)}
+                    />
+                  </div>
+                );
+              }
               if (f.type === "image") {
                 return (
                   <div key={f.key} className={colClass(span)}>
@@ -1009,7 +1096,7 @@ export function ItemsEditor({
                     <textarea
                       id={fieldId}
                       className="admin-textarea"
-                      rows={2}
+                      rows={f.rows ?? 2}
                       value={String(item[f.key] ?? "")}
                       onChange={(e) => upd(i, f.key, e.target.value)}
                       placeholder={f.placeholder}
@@ -1064,6 +1151,9 @@ export type LabItem = {
   name: string;
   description: string;
   equipment: string[];
+  /** Optional — see CARD_EXTRA_FIELDS in ProgramContentEditor. */
+  images?: string[];
+  details?: string;
 };
 
 export function LabsEditor({
@@ -1107,6 +1197,23 @@ export function LabsEditor({
               values={lab.equipment ?? []}
               onChange={(v) => upd(i, "equipment", v)}
               placeholder="Equipment / software…"
+            />
+            <div className="admin-col-full">
+              <ImagesField
+                label="Photos (optional)"
+                hint="The first photo shows on the card; visitors click the card to see them all."
+                value={lab.images ?? []}
+                max={12}
+                onChange={(v) => upd(i, "images", v)}
+              />
+            </div>
+            <TextArea
+              label="More details (optional)"
+              span="full"
+              value={lab.details ?? ""}
+              onChange={(e) => upd(i, "details", e.target.value)}
+              rows={4}
+              hint="Longer text shown in the popup when a visitor clicks the card."
             />
           </FormGrid>
           <button

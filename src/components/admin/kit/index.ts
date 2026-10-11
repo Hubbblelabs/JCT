@@ -9,6 +9,9 @@ export { PageShell } from "./PageShell";
 export { DataTable, type Column, type BulkAction } from "./DataTable";
 export { Drawer } from "./Drawer";
 export { SaveBar, type SaveState } from "./SaveBar";
+export { EditorSaveBar, type EditorSaveMode } from "./EditorSaveBar";
+export { EditorWorkspace, type WorkspaceSection } from "./EditorWorkspace";
+export { ScaledPreview } from "./ScaledPreview";
 export { SortableList } from "./SortableList";
 export { useUnsavedGuard } from "./useUnsavedGuard";
 export {

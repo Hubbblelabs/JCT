@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { seoMetadata } from "@/lib/seo";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { PageHero } from "@/components/ui/PageHero";
 import { EventsPageLayout } from "@/components/layout/EventsPageLayout";
 import { listPublicEvents, type PublicEventCard } from "@/lib/public-events";
 
@@ -31,11 +30,11 @@ export default async function PolytechnicEventsPage() {
   return (
     <main className="bg-surface text-foreground min-h-screen">
       <Navbar forceSolidOnTop />
-      <PageHero
+      <EventsPageLayout
+        events={events}
         title="News & Events"
         subtitle="Latest news, events, and achievements at JCT Polytechnic."
       />
-      <EventsPageLayout events={events} />
       <Footer />
     </main>
   );

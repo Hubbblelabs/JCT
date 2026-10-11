@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { LivePageEditor } from "@/components/admin/LivePageEditor";
+import { PageShell } from "@/components/admin/kit";
 import {
   ContentPageLayout,
   CONTENT_SECTION_LABELS,
@@ -19,6 +20,15 @@ import {
 } from "@/lib/content-pages";
 import { ContentPageSchema } from "@/lib/validation";
 import type { ContentPageValue } from "@/lib/validation";
+
+const SECTION_HELP: Record<string, string> = {
+  hero: "The banner at the top of the page: title and subtitle.",
+  breadcrumb:
+    "The trail of links under the banner showing where this page sits.",
+  intro: "The opening paragraphs before the content blocks.",
+  blocks:
+    "The body of the page — text, tables, downloads, photos and more. Add, reorder or remove blocks here, or click one on the page to edit it.",
+};
 
 /**
  * One editor for every block-based content page — which page is being edited
@@ -50,16 +60,14 @@ export default function ContentPageEditor() {
 
   if (!def) {
     return (
-      <div className="admin-content">
-        <div className="admin-page-header">
-          <div>
-            <h1 className="admin-page-title">Page not found</h1>
-            <p className="admin-page-subtitle">
-              No content page is registered for &ldquo;{slug}&rdquo;.
-            </p>
-          </div>
-        </div>
-      </div>
+      <PageShell
+        title="Page not found"
+        description={
+          <>No content page is registered for &ldquo;{slug}&rdquo;.</>
+        }
+      >
+        {null}
+      </PageShell>
     );
   }
 
@@ -75,7 +83,7 @@ export default function ContentPageEditor() {
       configKey={def.configKey}
       // A hosted page has no URL of its own — link to the panel it renders as.
       publicPath={contentPageUrl(def)}
-      title={`${def.label} Editor`}
+      title={def.label}
       subtitle={def.description}
       // Blank, like every other content page. The footer pages used to open on
       // a module of hard-coded copy, which showed the editor text that did not
@@ -85,6 +93,7 @@ export default function ContentPageEditor() {
       emptyValue={() => ContentPageSchema.parse({})}
       sectionOrder={sectionOrder}
       sectionLabels={CONTENT_SECTION_LABELS}
+      sectionHelp={SECTION_HELP}
       sectionTitle={contentSectionTitle}
       initialSection="blocks"
       renderPreview={({ data, onEditSection }) => (

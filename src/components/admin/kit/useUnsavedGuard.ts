@@ -40,7 +40,12 @@ export function useUnsavedGuard(
       if (e.defaultPrevented || e.button !== 0) return;
       if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
 
-      const anchor = (e.target as HTMLElement | null)?.closest?.("a");
+      const target = e.target as HTMLElement | null;
+      // Links inside an editor's live preview never navigate (ScaledPreview
+      // cancels them) — the click opens that section's editor instead.
+      if (target?.closest?.("[data-admin-preview]")) return;
+
+      const anchor = target?.closest?.("a");
       if (!anchor) return;
 
       const href = anchor.getAttribute("href");

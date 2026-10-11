@@ -5,14 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { CSSProperties } from "react";
 import { Mail, MapPin, Phone } from "lucide-react";
-import {
-  FaFacebookF,
-  FaInstagram,
-  FaLinkedinIn,
-  FaYoutube,
-} from "react-icons/fa";
-import { FaXTwitter } from "react-icons/fa6";
 import { useSiteConfig } from "@/lib/use-site-config";
+import { socialLinksFrom } from "./social-links";
 
 type FooterConfig = {
   helplineLabel?: string;
@@ -26,14 +20,6 @@ type FooterConfig = {
   linkedin?: string;
   youtube?: string;
 };
-
-const SOCIAL_DEFS = [
-  { key: "facebook", Icon: FaFacebookF, label: "Facebook" },
-  { key: "instagram", Icon: FaInstagram, label: "Instagram" },
-  { key: "twitter", Icon: FaXTwitter, label: "X" },
-  { key: "linkedin", Icon: FaLinkedinIn, label: "LinkedIn" },
-  { key: "youtube", Icon: FaYoutube, label: "YouTube" },
-] as const;
 
 // Fixed footer chrome — not part of the editable Footer CMS.
 // Site-root routes, not per-institution ones: the footer renders on every site
@@ -126,11 +112,7 @@ export function Footer() {
   const addressLines = Array.isArray(footer?.addressLines)
     ? footer.addressLines.filter((l) => l.trim().length > 0)
     : [];
-  const socials = SOCIAL_DEFS.map((d) => ({
-    Icon: d.Icon,
-    label: d.label,
-    href: footer?.[d.key] ?? "",
-  })).filter((s) => s.href);
+  const socials = socialLinksFrom(footer);
   const phoneHref = footer?.phone
     ? `tel:${footer.phone.replace(/\s/g, "")}`
     : "";

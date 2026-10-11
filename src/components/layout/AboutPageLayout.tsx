@@ -49,6 +49,15 @@ import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
 import { ContentPageBody } from "@/components/layout/ContentPageLayout";
 import { hostedSectionKey } from "@/lib/content-pages";
 import {
+  cellValue,
+  displayColumns,
+  type TableColumn,
+} from "@/lib/table-columns";
+import {
+  GOVERNING_COUNCIL_COLUMNS,
+  PLANNING_BOARD_COLUMNS,
+} from "@/lib/about-table-columns";
+import {
   resolveSidebarItems,
   type ResolvedSidebarItem,
   type SidebarNavDefault,
@@ -300,6 +309,24 @@ export const ABOUT_NAV_DEFAULTS: SidebarNavDefault[] = [
 const imgUrl = (v: string) => getImageUrl(v) || "";
 
 // ─── Shared sub-components ────────────────────────────────────────────────────
+
+/** Header row of a table whose first column is an automatic S.No. */
+function NumberedTableHead({ columns }: { columns: TableColumn[] }) {
+  const th =
+    "text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase";
+  return (
+    <thead>
+      <tr className="border-b border-white/10 bg-white/5">
+        <th className={th}>S.No</th>
+        {columns.map((c) => (
+          <th key={c.id} className={th}>
+            {c.label}
+          </th>
+        ))}
+      </tr>
+    </thead>
+  );
+}
 
 function SectionHeading({
   icon: Icon,
@@ -660,6 +687,20 @@ export function AboutPageLayout({
     paragraphs: data.planningBoard?.paragraphs ?? [],
     members: data.planningBoard?.members ?? [],
   };
+  // Both tables keep their name column even when empty, and number their
+  // rows automatically.
+  const councilColumns = displayColumns(
+    data.governingCouncil.columns,
+    GOVERNING_COUNCIL_COLUMNS,
+    data.governingCouncil.members,
+    ["name"],
+  );
+  const boardColumns = displayColumns(
+    data.planningBoard?.columns,
+    PLANNING_BOARD_COLUMNS,
+    planningBoard.members,
+    ["name"],
+  );
 
   // In editable mode every section stays visible so it can be selected.
   const mobileVis = (anchor: string) =>
@@ -1203,19 +1244,7 @@ export function AboutPageLayout({
               </p>
               <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
                 <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-white/10 bg-white/5">
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
-                        S.No
-                      </th>
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
-                        Member
-                      </th>
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
-                        Category
-                      </th>
-                    </tr>
-                  </thead>
+                  <NumberedTableHead columns={councilColumns} />
                   <tbody className="divide-y divide-white/5">
                     {data.governingCouncil.members.map((m, i) => (
                       <tr
@@ -1225,12 +1254,18 @@ export function AboutPageLayout({
                         <td className="text-muted-foreground px-4 py-3 text-xs">
                           {i + 1}
                         </td>
-                        <td className="text-foreground px-4 py-3 font-medium">
-                          {m.name}
-                        </td>
-                        <td className="text-muted-foreground px-4 py-3 text-xs">
-                          {m.category}
-                        </td>
+                        {councilColumns.map((c) => (
+                          <td
+                            key={c.id}
+                            className={
+                              c.id === "name"
+                                ? "text-foreground px-4 py-3 font-medium"
+                                : "text-muted-foreground px-4 py-3 text-xs"
+                            }
+                          >
+                            {cellValue(m, c.id)}
+                          </td>
+                        ))}
                       </tr>
                     ))}
                   </tbody>
@@ -1260,25 +1295,7 @@ export function AboutPageLayout({
               </div>
               <div className="overflow-x-auto rounded-2xl border border-white/10 bg-white/5">
                 <table className="w-full min-w-[640px] text-sm">
-                  <thead>
-                    <tr className="border-b border-white/10 bg-white/5">
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
-                        S.No
-                      </th>
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
-                        Name
-                      </th>
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
-                        Position
-                      </th>
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
-                        Category
-                      </th>
-                      <th className="text-muted-foreground px-4 py-3 text-left text-xs font-bold tracking-wider uppercase">
-                        Qualification
-                      </th>
-                    </tr>
-                  </thead>
+                  <NumberedTableHead columns={boardColumns} />
                   <tbody className="divide-y divide-white/5">
                     {planningBoard.members.map((m, i) => (
                       <tr
@@ -1288,20 +1305,20 @@ export function AboutPageLayout({
                         <td className="text-muted-foreground px-4 py-3 text-xs">
                           {i + 1}
                         </td>
-                        <td className="text-foreground px-4 py-3 font-medium">
-                          {m.name}
-                        </td>
-                        <td
-                          className={`${theme.accentText} px-4 py-3 text-xs font-semibold`}
-                        >
-                          {m.position}
-                        </td>
-                        <td className="text-muted-foreground px-4 py-3 text-xs">
-                          {m.category}
-                        </td>
-                        <td className="text-muted-foreground px-4 py-3 text-xs">
-                          {m.qualification}
-                        </td>
+                        {boardColumns.map((c) => (
+                          <td
+                            key={c.id}
+                            className={
+                              c.id === "name"
+                                ? "text-foreground px-4 py-3 font-medium"
+                                : c.id === "position"
+                                  ? `${theme.accentText} px-4 py-3 text-xs font-semibold`
+                                  : "text-muted-foreground px-4 py-3 text-xs"
+                            }
+                          >
+                            {cellValue(m, c.id)}
+                          </td>
+                        ))}
                       </tr>
                     ))}
                   </tbody>

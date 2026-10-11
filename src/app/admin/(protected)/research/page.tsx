@@ -16,8 +16,17 @@ export default function ResearchEditorPage() {
     <LivePageEditor<ResearchPageValue>
       configKey="engineeringResearch"
       publicPath="/institutions/engineering/research"
-      title="Research Page Editor"
-      subtitle="Engineering — click any section to edit"
+      title="Engineering — Research"
+      subtitle="Click any part of the page to edit it. Save draft keeps changes private; Publish puts them on the live site."
+      sectionHelp={{
+        hero: "The banner at the top of the page: title and subtitle.",
+        tabs: "The tabs down the side of the page, and the content of any tab you add.",
+        intro: "The paragraphs introducing research at the college.",
+        stats: "The headline research numbers.",
+        areas: "The research focus areas.",
+        centres: "The research centres and what each one does.",
+        publications: "Published papers, patents and similar output.",
+      }}
       emptyValue={() => ResearchPageSchema.parse({})}
       sectionOrder={RESEARCH_SECTION_ORDER}
       sectionLabels={RESEARCH_SECTION_LABELS}

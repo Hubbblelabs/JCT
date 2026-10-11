@@ -1,9 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Check, Loader2, Save, ExternalLink } from "lucide-react";
-import { InspectorOverlay } from "@/components/admin/InspectorOverlay";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   DeferredUploadsProvider,
   useDeferredUploads,
@@ -19,16 +16,21 @@ import {
   useHostedDrafts,
   type HostedDrafts,
 } from "@/components/admin/hosted-content";
+import { hostedSectionKey } from "@/lib/content-pages";
+import {
+  EditorSaveBar,
+  EditorWorkspace,
+  type WorkspaceSection,
+} from "@/components/admin/kit";
 
 /**
- * Shared shell for the click-to-edit + inspector editors (the same pattern the
- * Programs builder and the COE/About editors use): loads a site-config key,
- * renders the real public layout in `editable` mode on the left, and opens a
- * slide-over inspector for whichever section was clicked.
+ * Shared editor for a page backed by one site-config key: loads the draft,
+ * renders the real public layout in `editable` mode inside the standard
+ * EditorWorkspace, and shows the form for whichever section was clicked.
  *
  * Callers supply the two page-specific halves — `renderPreview` (the public
- * layout) and `renderInspector` (its section inspector) — so a new page needs
- * only a schema, a layout and an inspector, not another copy of this file.
+ * layout) and `renderInspector` (its section forms) — so a new page needs only
+ * a schema, a layout and an inspector, not another copy of this file.
  */
 type Props<T> = {
   configKey: string;
@@ -37,20 +39,20 @@ type Props<T> = {
   subtitle: string;
   /** Parsed schema defaults, used when the key has not been seeded yet. */
   emptyValue: () => T;
-  /**
-   * Kept on the type because callers pass it, but no longer rendered: the
-   * quick-jump button strip duplicated the preview itself, where clicking the
-   * section you want is both faster and unambiguous.
-   */
+  /** The order sections are listed in the side panel. Defaults to the
+   *  order of `sectionLabels`. */
   sectionOrder?: readonly string[];
   sectionLabels: Record<string, string>;
+  /** One sentence per section explaining what it controls on the site. */
+  sectionHelp?: Record<string, string>;
   /**
-   * Inspector heading for the selected section. Needed when a page has
-   * per-item sections (e.g. `group:3`) whose titles come from the data rather
-   * than a fixed label map. Falls back to `sectionLabels`.
+   * Panel heading for the selected section. Needed when a page has per-item
+   * sections (e.g. `group:3`) whose titles come from the data rather than a
+   * fixed label map. Falls back to `sectionLabels`.
    */
   sectionTitle?: (section: string, data: T) => string;
-  initialSection: string;
+  /** Kept for callers; the panel now opens on the section list. */
+  initialSection?: string;
   renderPreview: (args: {
     data: T;
     /**
@@ -78,22 +80,24 @@ export function LivePageEditor<T>(props: Props<T>) {
   );
 }
 
+type Snapshot<T> = { host: T | null; hosted: HostedDrafts };
+
 function LivePageEditorInner<T>({
   configKey,
   publicPath,
   title,
   subtitle,
   emptyValue,
+  sectionOrder,
   sectionLabels,
+  sectionHelp,
   sectionTitle,
-  initialSection,
   renderPreview,
   renderInspector,
 }: Props<T>) {
-  const router = useRouter();
   const { flush } = useDeferredUploads();
   // The pages this route absorbs are edited here too, so the whole merged page
-  // is one preview, one inspector and one Save.
+  // is one preview, one panel and one Save.
   const {
     defs: hostedDefs,
     drafts: hosted,
@@ -105,15 +109,19 @@ function LivePageEditorInner<T>({
 
   const [draft, setDraft] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState<SaveMode | null>(null);
   const [msg, setMsg] = useState<{ text: string; ok: boolean } | null>(null);
-  const [selected, setSelected] = useState<string>(initialSection);
-  const [inspectorOpen, setInspectorOpen] = useState(false);
+  const [unpublished, setUnpublished] = useState(false);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [baseline, setBaseline] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
     setDraft(null);
+    setBaseline(null);
+    setError(null);
     setMsg(null);
     loadEditableConfig<T>(configKey)
       .then((res) => {
@@ -121,11 +129,12 @@ function LivePageEditorInner<T>({
         // Key not yet seeded — open the editor with schema defaults so the
         // admin can fill in a brand-new page instead of hitting an error.
         setDraft(res.value ?? emptyValue());
+        setUnpublished(res.status === "draft");
       })
       .catch((err) => {
         if (!cancelled) {
           console.error(`[LivePageEditor:${configKey}]`, err);
-          setMsg({ text: "Failed to load content", ok: false });
+          setError("This page's content could not be loaded. Reload to retry.");
         }
       })
       .finally(() => {
@@ -139,9 +148,27 @@ function LivePageEditorInner<T>({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configKey]);
 
-  const selectSection = (s: string) => {
-    setSelected(s);
-    setInspectorOpen(true);
+  const ready = !loading && !hostedLoading && draft !== null;
+  const current = useMemo(
+    () => JSON.stringify({ host: draft, hosted } satisfies Snapshot<T>),
+    [draft, hosted],
+  );
+  // The first settled state is the saved state everything is compared with.
+  useEffect(() => {
+    if (ready && baseline === null) setBaseline(current);
+  }, [ready, baseline, current]);
+  const dirty = baseline !== null && current !== baseline;
+
+  // Any edit makes the last save's message stale.
+  useEffect(() => {
+    if (dirty) setMsg(null);
+  }, [dirty]);
+
+  const discard = () => {
+    if (baseline === null) return;
+    const snap = JSON.parse(baseline) as Snapshot<T>;
+    setDraft(snap.host);
+    setHosted(snap.hosted);
   };
 
   const save = async (mode: SaveMode) => {
@@ -155,12 +182,22 @@ function LivePageEditorInner<T>({
         host: T;
         hosted: HostedDrafts;
       };
-      setDraft(flushed.host);
-      setHosted(flushed.hosted);
       await saveEditableConfig(configKey, flushed.host, mode);
       await saveHosted(flushed.hosted, mode);
+      setDraft(flushed.host);
+      setHosted(flushed.hosted);
+      setBaseline(
+        JSON.stringify({
+          host: flushed.host,
+          hosted: flushed.hosted,
+        } satisfies Snapshot<T>),
+      );
+      setUnpublished(mode === "draft");
       setMsg({
-        text: mode === "publish" ? "Saved & published" : "Draft saved",
+        text:
+          mode === "publish"
+            ? "Published — the live page is updated"
+            : "Draft saved — not on the live site yet",
         ok: true,
       });
     } catch (err) {
@@ -173,74 +210,54 @@ function LivePageEditorInner<T>({
     }
   };
 
-  const saveButtons = (full?: boolean) => (
-    <SaveButtons saving={saving} disabled={loading} onSave={save} full={full} />
-  );
+  const sections = useMemo<WorkspaceSection[]>(() => {
+    const ids = sectionOrder ?? Object.keys(sectionLabels);
+    const own = ids.map((id) => ({
+      id,
+      label: sectionLabels[id] ?? id,
+      help: sectionHelp?.[id],
+    }));
+    // Pages published as tabs of this one are edited here too.
+    const tabs = hostedDefs.map((def) => ({
+      id: hostedSectionKey(def.slug, "hero"),
+      label: def.host?.navLabel ?? def.label,
+      help: def.description,
+      group: "Tabs on this page",
+    }));
+    return [...own, ...tabs];
+  }, [sectionOrder, sectionLabels, sectionHelp, hostedDefs]);
+
+  const panelTitle =
+    selected && draft
+      ? (hostedInspectorTitle(selected, hostedDefs, hosted) ??
+        sectionTitle?.(selected, draft) ??
+        sectionLabels[selected] ??
+        "Section")
+      : undefined;
 
   return (
-    <div className="admin-content">
-      <div className="admin-page-header">
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => router.push("/admin/dashboard")}
-            className="admin-btn admin-btn-outline admin-btn-sm"
-          >
-            <ArrowLeft size={14} />
-          </button>
-          <div>
-            <h1 className="admin-page-title">{title}</h1>
-            <p className="admin-page-subtitle">{subtitle}</p>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          <a
-            href={publicPath}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="admin-btn admin-btn-outline admin-btn-sm"
-          >
-            <ExternalLink size={14} /> Public Page
-          </a>
-          {msg && (
-            <span
-              className={`text-sm font-medium ${
-                msg.ok ? "text-green-600" : "text-red-500"
-              }`}
-            >
-              {msg.text}
-            </span>
-          )}
-          {saveButtons()}
-        </div>
-      </div>
-
-      {loading || hostedLoading || !draft ? (
-        <div className="flex items-center justify-center py-28">
-          <Loader2 size={24} className="animate-spin text-gray-400" />
-        </div>
-      ) : (
-        <div className="-mx-6 -mb-6 overflow-hidden border-t border-gray-200 bg-white xl:mx-0 xl:rounded-xl xl:border">
-          {renderPreview({
-            data: draft,
-            hosted,
-            onEditSection: selectSection,
-          })}
-        </div>
-      )}
-
-      {inspectorOpen && draft && (
-        <InspectorOverlay
-          title={
-            hostedInspectorTitle(selected, hostedDefs, hosted) ??
-            sectionTitle?.(selected, draft) ??
-            sectionLabels[selected] ??
-            "Section"
-          }
-          onClose={() => setInspectorOpen(false)}
-          footer={saveButtons(true)}
-        >
-          {selected.startsWith("hosted:") ? (
+    <EditorWorkspace
+      title={title}
+      description={subtitle}
+      publicHref={publicPath}
+      unpublished={unpublished}
+      loading={!ready && !error}
+      error={error}
+      sections={sections}
+      selected={selected}
+      onSelect={setSelected}
+      panelTitle={panelTitle}
+      preview={
+        draft &&
+        renderPreview({
+          data: draft,
+          hosted,
+          onEditSection: setSelected,
+        })
+      }
+      panel={
+        selected && draft ? (
+          selected.startsWith("hosted:") ? (
             <HostedInspector
               sectionKey={selected}
               defs={hostedDefs}
@@ -255,58 +272,21 @@ function LivePageEditorInner<T>({
               onChange: setDraft,
               onSelectSection: setSelected,
             })
-          )}
-        </InspectorOverlay>
-      )}
-    </div>
-  );
-}
-
-/**
- * The editors' one save control: "Save" keeps the change as a draft, "Save &
- * Publish" also makes it live. Shared so the header and the inspector footer
- * cannot drift apart.
- */
-export function SaveButtons({
-  saving,
-  disabled,
-  onSave,
-  full,
-}: {
-  saving: SaveMode | null;
-  disabled?: boolean;
-  onSave: (mode: SaveMode) => void;
-  /** Stretch to fill the row — used in the inspector footer. */
-  full?: boolean;
-}) {
-  const busy = saving !== null || disabled;
-  return (
-    <div className={`flex items-center gap-2 ${full ? "w-full" : ""}`}>
-      <button
-        onClick={() => onSave("draft")}
-        disabled={busy}
-        title="Save without publishing — the live page keeps its current content"
-        className={`admin-btn admin-btn-outline ${full ? "flex-1 justify-center" : ""}`}
-      >
-        {saving === "draft" ? (
-          <Loader2 size={15} className="animate-spin" />
-        ) : (
-          <Save size={15} />
-        )}
-        {saving === "draft" ? "Saving…" : "Save"}
-      </button>
-      <button
-        onClick={() => onSave("publish")}
-        disabled={busy}
-        className={`admin-btn admin-btn-primary ${full ? "flex-1 justify-center" : ""}`}
-      >
-        {saving === "publish" ? (
-          <Loader2 size={15} className="animate-spin" />
-        ) : (
-          <Check size={15} />
-        )}
-        {saving === "publish" ? "Publishing…" : "Save & Publish"}
-      </button>
-    </div>
+          )
+        ) : null
+      }
+      saveBar={
+        <EditorSaveBar
+          dirty={dirty}
+          saving={saving}
+          unpublished={unpublished}
+          message={msg}
+          disabled={!ready}
+          onSaveDraft={() => save("draft")}
+          onPublish={() => save("publish")}
+          onDiscard={discard}
+        />
+      }
+    />
   );
 }

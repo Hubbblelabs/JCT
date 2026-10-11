@@ -1485,6 +1485,232 @@
   background: var(--admin-danger);
 }
 
+/* ── Editor workspace ─────────────────────────────────────────────────────
+   The frame every page editor shares (EditorWorkspace): header, the live page
+   on the left, the edit panel on the right, the save bar along the bottom.
+   It fills the viewport under the topbar and scrolls its two columns
+   independently, so the save bar and the panel never leave the screen. */
+.admin-workspace {
+  --admin-panel-w: 460px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - var(--admin-topbar-h));
+  height: calc(100dvh - var(--admin-topbar-h));
+  min-height: 480px;
+  background: var(--admin-canvas);
+}
+
+@media (min-width: 1600px) {
+  .admin-workspace {
+    --admin-panel-w: 540px;
+  }
+}
+
+.admin-workspace-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-3) var(--admin-space-6);
+  background: var(--admin-raised);
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin-workspace-header .admin-page-subtitle {
+  margin-top: 2px;
+}
+
+.admin-workspace-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--admin-radius-full);
+  font-size: var(--admin-text-xs);
+  font-weight: 600;
+  color: var(--admin-published);
+  background: var(--admin-published-bg);
+  border: 1px solid var(--admin-published-border);
+}
+
+.admin-workspace-badge--draft {
+  color: var(--admin-draft);
+  background: var(--admin-draft-bg);
+  border-color: var(--admin-draft-border);
+}
+
+.admin-workspace-banner {
+  padding: var(--admin-space-3) var(--admin-space-6) 0;
+}
+
+.admin-workspace-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.admin-workspace-body[data-wide="true"] {
+  grid-template-columns: minmax(0, 1fr) var(--admin-panel-w);
+}
+
+.admin-workspace-preview {
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--admin-space-4);
+  background: var(--admin-sunken);
+}
+
+.admin-workspace-panel {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--admin-raised);
+  border-left: 1px solid var(--admin-border);
+}
+
+.admin-workspace-panel-head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--admin-space-1);
+  padding: var(--admin-space-3) var(--admin-space-5);
+  border-bottom: 1px solid var(--admin-border-subtle);
+}
+
+.admin-workspace-panel-title {
+  font-size: var(--admin-text-lg);
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+.admin-workspace-panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--admin-space-5);
+}
+
+.admin-workspace-help {
+  margin-bottom: var(--admin-space-4);
+  padding: var(--admin-space-3);
+  border-radius: var(--admin-radius-md);
+  font-size: var(--admin-text-sm);
+  line-height: 1.5;
+  color: var(--admin-info);
+  background: var(--admin-info-bg);
+  border: 1px solid var(--admin-info-border);
+}
+
+.admin-workspace-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-2);
+  font-size: var(--admin-text-sm);
+  color: var(--admin-text-muted);
+}
+
+.admin-workspace-outline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-space-1);
+}
+
+.admin-workspace-outline-group {
+  margin: var(--admin-space-4) 0 var(--admin-space-1);
+  font-size: var(--admin-text-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--admin-text-faint);
+}
+
+.admin-workspace-outline li:first-child .admin-workspace-outline-group {
+  margin-top: 0;
+}
+
+.admin-workspace-outline-item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: var(--admin-space-3);
+  padding: var(--admin-space-3);
+  border: 1px solid var(--admin-border-subtle);
+  border-radius: var(--admin-radius-md);
+  text-align: left;
+  background: var(--admin-raised);
+  transition:
+    background var(--admin-duration-fast) var(--admin-ease),
+    border-color var(--admin-duration-fast) var(--admin-ease);
+}
+
+.admin-workspace-outline-item:hover,
+.admin-workspace-outline-item[aria-current="true"] {
+  background: var(--admin-hover);
+  border-color: var(--admin-gold);
+}
+
+.admin-workspace-outline-label {
+  display: block;
+  font-weight: 600;
+  color: var(--admin-text);
+}
+
+.admin-workspace-outline-help {
+  display: block;
+  margin-top: 2px;
+  font-size: var(--admin-text-sm);
+  line-height: 1.4;
+  color: var(--admin-text-muted);
+}
+
+/* The live page inside an editor (ScaledPreview). */
+.admin-preview-host {
+  width: 100%;
+}
+
+.admin-preview-frame {
+  overflow: hidden;
+  border-radius: var(--admin-radius-lg);
+  background: #ffffff;
+  box-shadow: var(--admin-shadow-md);
+}
+
+/* A transformed ancestor is the containing block for position:fixed, which
+   keeps the public navbar and floating buttons inside the preview. */
+.admin-preview-page {
+  position: relative;
+  transform: translateZ(0);
+}
+
+/* A preview section whose public component rendered nothing (no content
+   saved yet) gets a placeholder, so it can still be found and clicked. Sized
+   for the page's own scale — the preview is zoomed down. */
+.admin-preview-empty {
+  display: none;
+}
+
+.admin-preview-slot:empty + .admin-preview-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 24px;
+  padding: 40px 24px;
+  border: 3px dashed #cbd5e1;
+  border-radius: 16px;
+  font-family: system-ui, sans-serif;
+  font-size: 22px;
+  text-align: center;
+  color: #64748b;
+  background: #f8fafc;
+}
+
+.admin-preview-slot:empty + .admin-preview-empty strong {
+  font-size: 26px;
+  color: #334155;
+}
+
 /* ── Drawer / inspector ───────────────────────────────────────────────────*/
 .admin-drawer-backdrop {
   position: fixed;

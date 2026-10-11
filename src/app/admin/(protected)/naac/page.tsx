@@ -26,8 +26,19 @@ export default function NaacEditorPage() {
     <LivePageEditor<NaacPageValue>
       configKey="engineeringNaac"
       publicPath={PUBLIC_PATH}
-      title="NAAC Page Editor"
-      subtitle="Engineering — appeal tables, documents, and the Best Practices / Distinctiveness / AQAR tabs"
+      title="Engineering — NAAC"
+      subtitle="Click any part of the page to edit it. Save draft keeps changes private; Publish puts them on the live site."
+      sectionHelp={{
+        hero: "The banner at the top of the page: title and subtitle.",
+        intro: "The paragraph introducing the NAAC accreditation.",
+        primaryDocs:
+          "The main NAAC documents, such as the SSR and certificate.",
+        appeal: "The heading above the appeal tables.",
+        qualitative: "The qualitative parameters table.",
+        quantitative: "The quantitative parameters table.",
+        docSections: "Further groups of supporting documents.",
+        sidebar: "The tabs down the side of the page.",
+      }}
       emptyValue={() => NaacPageSchema.parse({})}
       sectionOrder={NAAC_SECTION_ORDER}
       sectionLabels={NAAC_SECTION_LABELS}

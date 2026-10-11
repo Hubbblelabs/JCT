@@ -23,7 +23,7 @@ export function PageShell({
   flush = false,
 }: {
   title: string;
-  description?: string;
+  description?: ReactNode;
   actions?: ReactNode;
   children: ReactNode;
   wide?: boolean;

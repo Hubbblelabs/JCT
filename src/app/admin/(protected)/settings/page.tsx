@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
+import { PageShell } from "@/components/admin/kit";
 import { redirect } from "next/navigation";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import {
@@ -994,18 +995,16 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="admin-content">
-      <div className="admin-page-header">
-        <div>
-          <h1 className="admin-page-title">Backup &amp; restore</h1>
-          <p className="admin-page-subtitle">
-            Export an archive of everything on this site, schedule that export
-            to run on its own, restore one, or reset the site back to its
-            defaults. Clearing the page cache now lives in the top bar.
-          </p>
-        </div>
-      </div>
-
+    <PageShell
+      title="Backup & restore"
+      description={
+        <>
+          Export an archive of everything on this site, schedule that export to
+          run on its own, restore one, or reset the site back to its defaults.
+          Clearing the page cache now lives in the top bar.
+        </>
+      }
+    >
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* ── Export ── */}
         <div className="admin-card">
@@ -1235,7 +1234,7 @@ export default function SettingsPage() {
             <button
               onClick={handleRestore}
               disabled={!restoreFile || restoring}
-              className="admin-btn admin-btn-gold"
+              className="admin-btn admin-btn-primary"
             >
               {restoring ? (
                 <Loader2 size={15} className="animate-spin" />
@@ -1719,7 +1718,7 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
-    </div>
+    </PageShell>
   );
 }
 

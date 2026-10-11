@@ -121,7 +121,9 @@ const nextConfig: NextConfig = {
       "media-src 'self' https: data:",
       "worker-src 'self' blob:",
       "manifest-src 'self'",
-      "frame-src 'self' https://*.nopaperforms.com https://www.google.com https://www.gstatic.com https://www.youtube.com",
+      // Video players for the links an editor adds to a News & Events entry
+      // (src/lib/video-embed.ts builds these URLs — keep the two in step).
+      "frame-src 'self' https://*.nopaperforms.com https://www.google.com https://www.gstatic.com https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com https://www.facebook.com",
     ].join("; ");
 
     const securityHeaders = [

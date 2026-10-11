@@ -1,6 +1,15 @@
 import { z } from "zod";
 import { zUrl, zClampedString } from "./_primitives";
 
+// Mirrors SOCIAL_KEYS in src/components/layout/social-links.tsx.
+export const SOCIAL_NETWORKS = [
+  "facebook",
+  "instagram",
+  "twitter",
+  "linkedin",
+  "youtube",
+] as const;
+
 export const FLOATING_ELEMENTS_LIMITS = {
   labelMax: 40,
   phoneMax: 30,
@@ -37,6 +46,20 @@ export const FloatingElementsSchema = z.object({
     })
     .optional()
     .default({ enabled: true }),
+  /**
+   * The floating social strip on the left edge. The URLs are not stored here —
+   * they are the Footer's social links, entered once. `networks` narrows which
+   * of those appear; absent means every network that has a link.
+   */
+  social: z
+    .object({
+      enabled: z.boolean().optional(),
+      networks: z
+        .array(z.enum(SOCIAL_NETWORKS))
+        .max(SOCIAL_NETWORKS.length)
+        .optional(),
+    })
+    .optional(),
 });
 
 export type FloatingElementsValue = z.infer<typeof FloatingElementsSchema>;

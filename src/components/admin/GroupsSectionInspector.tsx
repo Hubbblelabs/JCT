@@ -1,6 +1,8 @@
 "use client";
 
-import { Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ContentPageInspector } from "@/components/admin/ContentPageInspector";
 import {
   Field,
   FormGrid,
@@ -9,9 +11,11 @@ import {
   TextAreaList,
   StringList,
   ImageUploadInput,
-  ItemsEditor,
   Repeater,
 } from "@/components/admin/inputs";
+import { TableEditor } from "@/components/admin/TableEditor";
+import { columnsToStore, resolveColumns } from "@/lib/table-columns";
+import { GROUP_MEMBER_COLUMNS } from "@/lib/group-member-columns";
 import {
   GROUPS_VARIANT_META,
   groupsBasePath,
@@ -21,7 +25,11 @@ import {
 } from "@/lib/groups-meta";
 import { resolveGroupSlugs, slugifyGroupName } from "@/lib/group-slugs";
 import { GROUPS_PAGE_LIMITS } from "@/lib/validation/engineeringPages";
-import type { GroupsPageValue, GroupValue } from "@/lib/validation";
+import type {
+  ContentBlockValue,
+  GroupsPageValue,
+  GroupValue,
+} from "@/lib/validation";
 
 type Member = GroupValue["members"][number];
 
@@ -120,6 +128,81 @@ export function groupsSectionTitle(
   return "Section";
 }
 
+/**
+ * The optional content blocks under a group's details — the content-page block
+ * editor, wrapped so its block list and single-block forms swap in place
+ * inside this panel.
+ */
+function GroupBlocksEditor({
+  blocks,
+  singular,
+  onChange,
+}: {
+  blocks: ContentBlockValue[];
+  singular: string;
+  onChange: (next: ContentBlockValue[]) => void;
+}) {
+  const [sub, setSub] = useState("blocks");
+  return (
+    <Field
+      label={`More about this ${singular.toLowerCase()} (optional)`}
+      span="full"
+      hint="Extra content shown below the details on its own page — text, lists, tables, photo galleries and more."
+      className="border-t border-gray-100 pt-3"
+    >
+      {sub !== "blocks" && (
+        <button
+          type="button"
+          onClick={() => setSub("blocks")}
+          className="admin-btn admin-btn-ghost admin-btn-sm mb-2"
+        >
+          <ArrowLeft size={14} /> All blocks
+        </button>
+      )}
+      <ContentPageInspector
+        section={sub}
+        data={{
+          hero: { title: "", subtitle: "" },
+          breadcrumb: [],
+          intro: [],
+          blocks,
+        }}
+        onChange={(next) => onChange(next.blocks)}
+        onSelectSection={setSub}
+      />
+    </Field>
+  );
+}
+
+/** The per-entry visibility switch. Hiding keeps the entry and its URL. */
+function ShowOnWebsite({
+  hidden,
+  singular,
+  onChange,
+}: {
+  hidden: boolean;
+  singular: string;
+  onChange: (hidden: boolean) => void;
+}) {
+  return (
+    <div className="admin-col-full flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+        <input
+          type="checkbox"
+          checked={!hidden}
+          onChange={(e) => onChange(!e.target.checked)}
+        />
+        Show this {singular.toLowerCase()} on the website
+      </label>
+      {hidden && (
+        <span className="text-xs text-gray-500">
+          Hidden — kept here, but left off the public page.
+        </span>
+      )}
+    </div>
+  );
+}
+
 /** Editor for one entry — the form behind a card click in the live preview. */
 function GroupFields({
   group,
@@ -141,6 +224,11 @@ function GroupFields({
   // order the public detail page presents them in.
   return (
     <FormGrid>
+      <ShowOnWebsite
+        hidden={group.hidden === true}
+        singular={meta.singular}
+        onChange={(hidden) => onChange({ ...group, hidden })}
+      />
       <TextInput
         label="Name"
         span={4}
@@ -206,39 +294,24 @@ function GroupFields({
         span="full"
         className="border-t border-gray-100 pt-3"
       >
-        <ItemsEditor
-          items={group.members as unknown as Record<string, unknown>[]}
-          onChange={(v) =>
-            onChange({ ...group, members: v as unknown as Member[] })
+        <TableEditor<Member>
+          label={meta.membersLabel}
+          columns={resolveColumns(group.memberColumns, GROUP_MEMBER_COLUMNS)}
+          builtins={GROUP_MEMBER_COLUMNS}
+          rows={group.members}
+          rowsLabel="Members"
+          newRow={() => ({ name: "", role: "", dept: "", contact: "" })}
+          onChange={({ columns, rows }) =>
+            onChange({
+              ...group,
+              memberColumns: columnsToStore(
+                group.memberColumns,
+                columns,
+                GROUP_MEMBER_COLUMNS,
+              ),
+              members: rows,
+            })
           }
-          fields={[
-            {
-              key: "name",
-              label: "Name",
-              placeholder: "Dr. K. Geetha",
-              span: 3,
-            },
-            {
-              key: "role",
-              label: "Designation",
-              placeholder: "Member",
-              span: 3,
-            },
-            {
-              key: "dept",
-              label: "Department / Affiliation",
-              placeholder: "Associate Professor - S&H",
-              span: 3,
-            },
-            {
-              key: "contact",
-              label: "Contact",
-              placeholder: "9789650151",
-              span: 3,
-            },
-          ]}
-          emptyItem={{ name: "", role: "", dept: "", contact: "" }}
-          addLabel="Add member"
         />
       </Field>
 
@@ -254,6 +327,15 @@ function GroupFields({
       <GalleryEditor
         values={group.gallery ?? []}
         onChange={(gallery) => onChange({ ...group, gallery })}
+      />
+
+      <GroupBlocksEditor
+        // A different club starts on its block list, not on whichever block
+        // was open for the previous one.
+        key={resolvedSlug}
+        blocks={group.blocks ?? []}
+        singular={meta.singular}
+        onChange={(blocks) => onChange({ ...group, blocks })}
       />
     </FormGrid>
   );
@@ -372,6 +454,14 @@ export function GroupsSectionInspector({
                   }
                   onChange={(e) => oc({ ...item, category: e.target.value })}
                 />
+                <label className="admin-col-full flex items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={item.hidden !== true}
+                    onChange={(e) => oc({ ...item, hidden: !e.target.checked })}
+                  />
+                  Show on website
+                </label>
                 <p className="admin-col-full text-xs text-gray-400">
                   {item.members.length} {meta.membersLabel.toLowerCase()} ·{" "}
                   <span className="font-mono">/{slugs[i]}</span>

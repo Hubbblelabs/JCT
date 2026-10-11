@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import {
+  Field,
   FormGrid,
   TextInput,
   TextArea,
@@ -12,13 +13,16 @@ import {
   Plus,
   Pencil,
   Trash2,
-  X,
   Loader2,
   Check,
   ChevronLeft,
   ChevronRight,
+  CalendarDays,
+  PlayCircle,
+  Star,
 } from "lucide-react";
 import { DataTable, type Column } from "@/components/admin/kit/DataTable";
+import { Drawer, PageShell } from "@/components/admin/kit";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 import {
@@ -30,6 +34,7 @@ import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { EVENT_CATEGORY_SUGGESTIONS, LIMITS_event } from "@/lib/validation";
 
 const GALLERY_MAX = LIMITS_event.galleryMax;
+const VIDEOS_MAX = LIMITS_event.videosMax;
 
 interface EventItem {
   _id: string;
@@ -42,6 +47,8 @@ interface EventItem {
   location: string;
   image: string;
   gallery: string[];
+  videos: string[];
+  featured: boolean;
   institution: string;
   is_active: boolean;
   sort_order: number;
@@ -57,6 +64,8 @@ const EMPTY: Omit<EventItem, "_id"> = {
   location: "",
   image: "",
   gallery: [],
+  videos: [],
+  featured: false,
   institution: "engineering",
   is_active: true,
   sort_order: 0,
@@ -136,8 +145,10 @@ function EventsPageInner() {
     setForm({
       ...e,
       event_date: e.event_date?.slice(0, 10) ?? "",
-      // Records created before the gallery field existed have no array.
+      // Records created before these fields existed have no value for them.
       gallery: Array.isArray(e.gallery) ? e.gallery : [],
+      videos: Array.isArray(e.videos) ? e.videos : [],
+      featured: e.featured === true,
     });
     setSlugTouched(true);
     setApiError(null);
@@ -194,10 +205,12 @@ function EventsPageInner() {
     setApiError(null);
     try {
       const flushed = (await flush(form)) as Omit<EventItem, "_id">;
-      // A slot the editor added but never filled would fail zUrl — drop it.
+      // A slot the editor added but never filled would fail validation — drop
+      // it.
       const flushedForm = {
         ...flushed,
         gallery: flushed.gallery.filter(Boolean),
+        videos: flushed.videos.map((v) => v.trim()).filter(Boolean),
       };
       setForm(flushedForm);
       const isNew = !editing?._id;
@@ -246,7 +259,22 @@ function EventsPageInner() {
       value: (e) => `${e.title} ${e.slug} ${e.location}`,
       render: (e) => (
         <span className="block">
-          <span className="block font-medium">{e.title}</span>
+          <span className="flex flex-wrap items-center gap-1.5 font-medium">
+            {e.title}
+            {e.featured && (
+              <span
+                className="admin-badge admin-badge-yellow"
+                title="Pinned to the carousel at the top of the News & Events page"
+              >
+                <Star size={11} /> Featured
+              </span>
+            )}
+            {(e.videos?.length ?? 0) > 0 && (
+              <span className="admin-badge admin-badge-gray" title="Has video">
+                <PlayCircle size={11} /> Video
+              </span>
+            )}
+          </span>
           <span className="block text-xs text-gray-400">/events/{e.slug}</span>
         </span>
       ),
@@ -334,40 +362,34 @@ function EventsPageInner() {
 
   return (
     <>
-      <div className="admin-content">
-        <div className="admin-page-header">
-          <div>
-            <h1 className="admin-page-title">
-              News &amp; Events
-              {filterInst
-                ? ` — ${INSTITUTION_LABELS[filterInst]}`
-                : " — Latest"}
-            </h1>
-            <p className="admin-page-subtitle">
-              {isMain ? (
-                <>
-                  Latest events across all colleges (read-only). The College
-                  column shows which college each entry belongs to — edit it
-                  from that college&apos;s News &amp; Events page.
-                </>
-              ) : (
-                <>
-                  {events.filter((e) => e.is_active).length} active events —
-                  shown on the {INSTITUTION_LABELS[filterInst]} News &amp;
-                  Events page
-                </>
-              )}
-            </p>
-          </div>
-          {!isMain && (
-            <div className="flex gap-2">
-              <button onClick={openNew} className="admin-btn admin-btn-primary">
-                <Plus size={16} /> Add Event
-              </button>
-            </div>
-          )}
-        </div>
-
+      <PageShell
+        title={`News & Events${
+          filterInst ? ` — ${INSTITUTION_LABELS[filterInst]}` : " — Latest"
+        }`}
+        description={
+          <>
+            {isMain ? (
+              <>
+                Latest events across all colleges (read-only). The College
+                column shows which college each entry belongs to — edit it from
+                that college&apos;s News &amp; Events page.
+              </>
+            ) : (
+              <>
+                {events.filter((e) => e.is_active).length} active events — shown
+                on the {INSTITUTION_LABELS[filterInst]} News &amp; Events page
+              </>
+            )}
+          </>
+        }
+        actions={
+          !isMain && (
+            <button onClick={openNew} className="admin-btn admin-btn-primary">
+              <Plus size={16} /> Add Event
+            </button>
+          )
+        }
+      >
         <DataTable
           rows={events}
           columns={columns}
@@ -390,215 +412,273 @@ function EventsPageInner() {
             ),
           }}
         />
-      </div>
+      </PageShell>
 
-      {editing && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-black/50 p-4 pt-10">
-          <div className="w-full max-w-5xl rounded-xl bg-white shadow-2xl">
-            <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
-              <h2 className="font-semibold text-gray-900">
-                {editing._id ? "Edit Event" : "New Event"}
-              </h2>
-              <button
-                onClick={close}
-                className="admin-btn admin-btn-outline admin-btn-sm"
-              >
-                <X size={14} />
-              </button>
-            </div>
-            <div className="space-y-1 p-6">
-              {apiError && (
-                <ValidationErrors
-                  error={apiError.message ?? apiError.error}
-                  details={apiError.details}
-                />
+      <Drawer
+        open={!!editing}
+        onClose={close}
+        title={editing?._id ? "Edit Event" : "New Event"}
+        icon={CalendarDays}
+        footer={
+          <div className="flex justify-end gap-2">
+            <button onClick={close} className="admin-btn admin-btn-outline">
+              Cancel
+            </button>
+            <button
+              onClick={save}
+              disabled={saving}
+              className="admin-btn admin-btn-primary"
+            >
+              {saving ? (
+                <Loader2 size={15} className="animate-spin" />
+              ) : (
+                <Check size={15} />
               )}
-              {/* Identity and scheduling first, then the imagery, then the
+              {saving ? "Saving…" : "Save"}
+            </button>
+          </div>
+        }
+      >
+        {editing && (
+          <div className="space-y-1">
+            {apiError && (
+              <ValidationErrors
+                error={apiError.message ?? apiError.error}
+                details={apiError.details}
+              />
+            )}
+            {/* Identity and scheduling first, then the imagery, then the
                   copy that fills the detail page. */}
-              <FormGrid>
-                <TextInput
-                  label="Title"
-                  span={5}
-                  value={form.title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  required
-                />
-                <TextInput
-                  label="Slug (URL)"
-                  span={4}
-                  value={form.slug}
-                  onChange={(e) => {
-                    setSlugTouched(true);
-                    set("slug", slugify(e.target.value));
-                  }}
-                  hint="Lowercase letters, numbers, and dashes"
-                  required
-                />
-                <TextInput
-                  label="Date"
-                  span={3}
-                  type="date"
-                  value={form.event_date}
-                  onChange={(e) => set("event_date", e.target.value)}
-                  required
-                />
-                <TextInput
-                  label="Category"
-                  span={3}
-                  value={form.category}
-                  onChange={(e) => set("category", e.target.value)}
-                  list="event-category-suggestions"
-                  required
-                />
-                <datalist id="event-category-suggestions">
-                  {EVENT_CATEGORY_SUGGESTIONS.map((c) => (
-                    <option key={c} value={c} />
-                  ))}
-                </datalist>
-                {/* No College or Sort order field: authoring only happens
+            <FormGrid>
+              <TextInput
+                label="Title"
+                span={5}
+                value={form.title}
+                onChange={(e) => setTitle(e.target.value)}
+                required
+              />
+              <TextInput
+                label="Slug (URL)"
+                span={4}
+                value={form.slug}
+                onChange={(e) => {
+                  setSlugTouched(true);
+                  set("slug", slugify(e.target.value));
+                }}
+                hint="Lowercase letters, numbers, and dashes"
+                required
+              />
+              <TextInput
+                label="Date"
+                span={3}
+                type="date"
+                value={form.event_date}
+                onChange={(e) => set("event_date", e.target.value)}
+                required
+              />
+              <TextInput
+                label="Category"
+                span={3}
+                value={form.category}
+                onChange={(e) => set("category", e.target.value)}
+                list="event-category-suggestions"
+                required
+              />
+              <datalist id="event-category-suggestions">
+                {EVENT_CATEGORY_SUGGESTIONS.map((c) => (
+                  <option key={c} value={c} />
+                ))}
+              </datalist>
+              {/* No College or Sort order field: authoring only happens
                     inside a college scope, so the college is fixed by the URL,
                     and events are ordered by date. */}
-                <TextInput
-                  label="Location"
-                  span={6}
-                  value={form.location}
-                  onChange={(e) => set("location", e.target.value)}
-                  placeholder="Main Auditorium"
-                />
-                <ImageUploadInput
-                  label="Cover image"
-                  span="full"
-                  ratio="hero"
-                  value={form.image}
-                  onChange={(url) => set("image", url)}
-                  hideUrlField
-                />
+              <TextInput
+                label="Location"
+                span={6}
+                value={form.location}
+                onChange={(e) => set("location", e.target.value)}
+                placeholder="Main Auditorium"
+              />
+              <ImageUploadInput
+                label="Cover image"
+                span="full"
+                ratio="hero"
+                value={form.image}
+                onChange={(url) => set("image", url)}
+                hideUrlField
+              />
 
-                <div className="admin-col-full">
-                  <div className="mb-2 flex items-center justify-between gap-3">
-                    <div>
-                      <span className="admin-label mb-0">Gallery images</span>
-                      <p className="mt-0.5 text-xs text-gray-400">
-                        Shown as a grid on the event detail page, below the
-                        content. Visitors click a photo to open it full size —
-                        this order is the order they page through.
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 items-center gap-2">
-                      <span className="text-xs font-medium text-gray-400">
-                        {form.gallery.length} / {GALLERY_MAX}
-                      </span>
+              <div className="admin-col-full">
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <div>
+                    <span className="admin-label mb-0">Gallery images</span>
+                    <p className="mt-0.5 text-xs text-gray-400">
+                      Shown as a grid on the event detail page, below the
+                      content. Visitors click a photo to open it full size —
+                      this order is the order they page through.
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="text-xs font-medium text-gray-400">
+                      {form.gallery.length} / {GALLERY_MAX}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={addGallerySlot}
+                      disabled={form.gallery.length >= GALLERY_MAX}
+                      className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      <Plus size={14} /> Add image
+                    </button>
+                  </div>
+                </div>
+
+                {form.gallery.length === 0 ? (
+                  <p className="rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-400">
+                    No gallery images. Add up to {GALLERY_MAX}.
+                  </p>
+                ) : (
+                  <div className="admin-form-grid admin-form-grid--tight">
+                    {form.gallery.map((url, i) => (
+                      <div
+                        key={i}
+                        className="admin-col-4 relative rounded-lg border border-gray-200 p-3"
+                      >
+                        <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => moveGallery(i, -1)}
+                            disabled={i === 0}
+                            aria-label={`Move image ${i + 1} earlier`}
+                            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            <ChevronLeft size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => moveGallery(i, 1)}
+                            disabled={i === form.gallery.length - 1}
+                            aria-label={`Move image ${i + 1} later`}
+                            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+                          >
+                            <ChevronRight size={13} />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeGalleryAt(i)}
+                            aria-label={`Remove image ${i + 1}`}
+                            className="admin-btn admin-btn-danger admin-btn-sm"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                        <ImageUploadInput
+                          label={`Image ${i + 1}`}
+                          ratio="card"
+                          value={url}
+                          onChange={(next) => setGalleryAt(i, next)}
+                          hideUrlField
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <TextArea
+                label="Excerpt (card summary)"
+                span={4}
+                value={form.excerpt}
+                onChange={(e) => set("excerpt", e.target.value)}
+                rows={8}
+              />
+              <TextArea
+                label="Detail content"
+                span={8}
+                value={form.description}
+                onChange={(e) => set("description", e.target.value)}
+                rows={8}
+                hint="Shown on the event detail page. Basic HTML is supported (<p>, <h2>, <ul>, <a>…) and is sanitized on render."
+              />
+              <Field
+                label="Videos"
+                span="full"
+                hint="Paste the link to a YouTube, Vimeo or Facebook video and it plays on the event page. Links to other sites are shown as a button that opens them."
+              >
+                <div className="space-y-2">
+                  {form.videos.map((v, i) => (
+                    <div key={i} className="flex gap-2">
+                      <input
+                        className="admin-input"
+                        value={v}
+                        placeholder="https://www.youtube.com/watch?v=…"
+                        aria-label={`Video link ${i + 1}`}
+                        onChange={(e) =>
+                          set(
+                            "videos",
+                            form.videos.map((x, j) =>
+                              j === i ? e.target.value : x,
+                            ),
+                          )
+                        }
+                      />
                       <button
                         type="button"
-                        onClick={addGallerySlot}
-                        disabled={form.gallery.length >= GALLERY_MAX}
-                        className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+                        onClick={() =>
+                          set(
+                            "videos",
+                            form.videos.filter((_, j) => j !== i),
+                          )
+                        }
+                        className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+                        aria-label={`Remove video link ${i + 1}`}
                       >
-                        <Plus size={14} /> Add image
+                        <Trash2 size={13} />
                       </button>
                     </div>
-                  </div>
-
-                  {form.gallery.length === 0 ? (
-                    <p className="rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-400">
-                      No gallery images. Add up to {GALLERY_MAX}.
-                    </p>
-                  ) : (
-                    <div className="admin-form-grid admin-form-grid--tight">
-                      {form.gallery.map((url, i) => (
-                        <div
-                          key={i}
-                          className="admin-col-4 relative rounded-lg border border-gray-200 p-3"
-                        >
-                          <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
-                            <button
-                              type="button"
-                              onClick={() => moveGallery(i, -1)}
-                              disabled={i === 0}
-                              aria-label={`Move image ${i + 1} earlier`}
-                              className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
-                            >
-                              <ChevronLeft size={13} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => moveGallery(i, 1)}
-                              disabled={i === form.gallery.length - 1}
-                              aria-label={`Move image ${i + 1} later`}
-                              className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
-                            >
-                              <ChevronRight size={13} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => removeGalleryAt(i)}
-                              aria-label={`Remove image ${i + 1}`}
-                              className="admin-btn admin-btn-danger admin-btn-sm"
-                            >
-                              <Trash2 size={13} />
-                            </button>
-                          </div>
-                          <ImageUploadInput
-                            label={`Image ${i + 1}`}
-                            ratio="card"
-                            value={url}
-                            onChange={(next) => setGalleryAt(i, next)}
-                            hideUrlField
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  ))}
+                  <button
+                    type="button"
+                    disabled={form.videos.length >= VIDEOS_MAX}
+                    onClick={() => set("videos", [...form.videos, ""])}
+                    className="admin-btn admin-btn-outline admin-btn-sm disabled:opacity-50"
+                  >
+                    <Plus size={14} /> Add video link
+                  </button>
                 </div>
-
-                <TextArea
-                  label="Excerpt (card summary)"
-                  span={4}
-                  value={form.excerpt}
-                  onChange={(e) => set("excerpt", e.target.value)}
-                  rows={8}
+              </Field>
+              <div className="admin-col-full flex items-start gap-2">
+                <input
+                  type="checkbox"
+                  id="e_featured"
+                  className="mt-1"
+                  checked={form.featured}
+                  onChange={(e) => set("featured", e.target.checked)}
                 />
-                <TextArea
-                  label="Detail content"
-                  span={8}
-                  value={form.description}
-                  onChange={(e) => set("description", e.target.value)}
-                  rows={8}
-                  hint="Shown on the event detail page. Basic HTML is supported (<p>, <h2>, <ul>, <a>…) and is sanitized on render."
+                <label htmlFor="e_featured" className="text-sm text-gray-700">
+                  Feature in the carousel
+                  <span className="block text-xs text-gray-500">
+                    Pinned to the slideshow at the top of the News &amp; Events
+                    page. With nothing featured, the slideshow shows the latest
+                    entries.
+                  </span>
+                </label>
+              </div>
+              <div className="admin-col-full flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="e_active"
+                  checked={form.is_active}
+                  onChange={(e) => set("is_active", e.target.checked)}
                 />
-                <div className="admin-col-full flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="e_active"
-                    checked={form.is_active}
-                    onChange={(e) => set("is_active", e.target.checked)}
-                  />
-                  <label htmlFor="e_active" className="text-sm text-gray-700">
-                    Active (shown on website)
-                  </label>
-                </div>
-              </FormGrid>
-            </div>
-            <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
-              <button onClick={close} className="admin-btn admin-btn-outline">
-                Cancel
-              </button>
-              <button
-                onClick={save}
-                disabled={saving}
-                className="admin-btn admin-btn-gold"
-              >
-                {saving ? (
-                  <Loader2 size={15} className="animate-spin" />
-                ) : (
-                  <Check size={15} />
-                )}
-                {saving ? "Saving…" : "Save"}
-              </button>
-            </div>
+                <label htmlFor="e_active" className="text-sm text-gray-700">
+                  Active (shown on website)
+                </label>
+              </div>
+            </FormGrid>
           </div>
-        </div>
-      )}
+        )}
+      </Drawer>
     </>
   );
 }

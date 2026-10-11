@@ -12,7 +12,7 @@ import {
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { EventCreateSchema } from "@/lib/validation";
-import { revalidatePaths } from "@/lib/revalidate";
+import { revalidateEventDetailPages, revalidatePaths } from "@/lib/revalidate";
 
 // Events render in the "Life at JCT" grid on the home page and all three
 // institution landing pages, in the /events listing, and on their own detail
@@ -30,6 +30,8 @@ function revalidateEventPages(slug?: string) {
   ];
   if (slug) paths.push(`/events/${slug}`);
   revalidatePaths(...paths);
+  // Every detail page lists the latest events in its sidebar.
+  revalidateEventDetailPages();
 }
 
 function isDuplicateKeyError(e: unknown): boolean {

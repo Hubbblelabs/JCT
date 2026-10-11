@@ -142,6 +142,9 @@ export const SITE_CHROME_CONFIG_KEYS = [
   "engineeringNavbar",
   "artsScienceNavbar",
   "polytechnicNavbar",
+  "engineeringAnnouncement",
+  "artsScienceAnnouncement",
+  "polytechnicAnnouncement",
   "footer",
 ] as const;
 
@@ -172,6 +175,7 @@ export const ENGINEERING_CONFIG_KEYS = [
   "header",
   "engineeringHeader",
   "engineeringNavbar",
+  "engineeringAnnouncement",
   "footer",
   "floatingElements",
   "accreditations",
@@ -187,6 +191,7 @@ export const ARTS_SCIENCE_CONFIG_KEYS = [
   "header",
   "artsScienceHeader",
   "artsScienceNavbar",
+  "artsScienceAnnouncement",
   "footer",
   "floatingElements",
   "accreditations",
@@ -200,6 +205,7 @@ export const POLYTECHNIC_CONFIG_KEYS = [
   "header",
   "polytechnicHeader",
   "polytechnicNavbar",
+  "polytechnicAnnouncement",
   "footer",
   "floatingElements",
   "accreditations",

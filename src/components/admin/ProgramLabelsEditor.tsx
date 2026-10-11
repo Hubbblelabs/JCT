@@ -96,21 +96,9 @@ const GROUPS: LabelGroup[] = [
       {
         key: "curriculum",
         label: "Curriculum & Syllabus",
-        fields: [
-          TITLE("Curriculum & Syllabus"),
-          { key: "colCode", label: "Column: Code", placeholder: "Code" },
-          {
-            key: "colName",
-            label: "Column: Course Name",
-            placeholder: "Course Name",
-          },
-          {
-            key: "colCredits",
-            label: "Column: Credits",
-            placeholder: "Credits",
-          },
-          { key: "colType", label: "Column: Type", placeholder: "Type" },
-        ],
+        // Column names are edited with the table itself (Curriculum
+        // section → Columns), alongside adding and removing columns.
+        fields: [TITLE("Curriculum & Syllabus")],
       },
       {
         key: "teachingLearning",
@@ -148,39 +136,7 @@ const GROUPS: LabelGroup[] = [
       {
         key: "coreFaculty",
         label: "Core Faculty",
-        fields: [
-          TITLE("Core Faculty"),
-          {
-            key: "colName",
-            label: "Column: Faculty Member",
-            placeholder: "Faculty Member",
-          },
-          {
-            key: "colDesignation",
-            label: "Column: Designation",
-            placeholder: "Designation",
-          },
-          {
-            key: "colQualification",
-            label: "Column: Qualification",
-            placeholder: "Qualification",
-          },
-          {
-            key: "colExperience",
-            label: "Column: Experience",
-            placeholder: "Experience",
-          },
-          {
-            key: "colSpecialization",
-            label: "Column: Specialization",
-            placeholder: "Specialization",
-          },
-          {
-            key: "colAicteId",
-            label: "Column: AICTE ID",
-            placeholder: "AICTE ID",
-          },
-        ],
+        fields: [TITLE("Core Faculty")],
       },
       {
         key: "advisoryBoard",
@@ -196,24 +152,6 @@ const GROUPS: LabelGroup[] = [
         key: "bos",
         label: "Board of Studies",
         fields: [TITLE("Board of Studies (BOS)")],
-      },
-      {
-        key: "boardCols",
-        label: "Board tables — column headers (DAB / PAC / BOS share)",
-        fields: [
-          { key: "colName", label: "Column: Name", placeholder: "Name" },
-          {
-            key: "colDesignation",
-            label: "Column: Designation",
-            placeholder: "Designation",
-          },
-          {
-            key: "colOrganization",
-            label: "Column: Organization",
-            placeholder: "Organization",
-          },
-          { key: "colRole", label: "Column: Role", placeholder: "Role" },
-        ],
       },
     ],
   },
@@ -422,35 +360,32 @@ export function ProgramLabelsEditor({
   return (
     <div>
       <p className="mb-3 text-xs text-gray-500">
-        Override the headings, column labels, and visibility of every section on
-        the public department page. Leave a field blank to use the default.
+        Override the headings and visibility of every section on the public
+        department page. Leave a field blank to use the default. The faculty,
+        board and curriculum tables name their columns in their own sections.
       </p>
       {GROUPS.map((group) => (
         <Collapsible key={group.key} title={group.label}>
           {group.sections.map((section) => {
             const current = readSection(group.key, section.key);
-            const hasVisible = "visible" in section.fields ? false : true; // always show toggle unless boardCols
-            const supportsVisible = section.key !== "boardCols";
             const visibleValue =
               current.visible === undefined ? true : Boolean(current.visible);
             return (
               <Collapsible key={section.key} title={section.label}>
-                {supportsVisible && hasVisible && (
-                  <label className="mb-3 flex items-center gap-2 text-sm text-gray-700">
-                    <input
-                      type="checkbox"
-                      checked={visibleValue}
-                      onChange={(e) =>
-                        setSection(group.key, section.key, {
-                          ...current,
-                          visible: e.target.checked ? undefined : false,
-                        })
-                      }
-                    />
-                    Show this section on the public page
-                  </label>
-                )}
-                {/* Column-header overrides are short: three to a row. */}
+                <label className="mb-3 flex items-center gap-2 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    checked={visibleValue}
+                    onChange={(e) =>
+                      setSection(group.key, section.key, {
+                        ...current,
+                        visible: e.target.checked ? undefined : false,
+                      })
+                    }
+                  />
+                  Show this section on the public page
+                </label>
+                {/* Short label overrides: three to a row. */}
                 <div className="admin-form-grid admin-form-grid--tight">
                   {section.fields.map((f) => {
                     const fieldId = `pl-${group.key}-${section.key}-${f.key}`;

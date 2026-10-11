@@ -16,7 +16,13 @@ import type { AboutPageValue } from "@/lib/validation";
 import type { SidebarNavItemRaw } from "@/lib/sidebar-nav";
 import { SidebarNavEditor } from "@/components/admin/SidebarNavEditor";
 import { PageBodySectionsEditor } from "@/components/admin/PageBodySectionsEditor";
+import { TableEditor } from "@/components/admin/TableEditor";
 import type { PageBodySection } from "@/lib/validation";
+import { columnsToStore, resolveColumns } from "@/lib/table-columns";
+import {
+  GOVERNING_COUNCIL_COLUMNS,
+  PLANNING_BOARD_COLUMNS,
+} from "@/lib/about-table-columns";
 
 type Stat = AboutPageValue["about"]["stats"][number];
 type MgmtMember = AboutPageValue["management"]["members"][number];
@@ -198,6 +204,7 @@ export function AboutSectionInspector({
       const pb = {
         paragraphs: data.planningBoard?.paragraphs ?? [],
         members: data.planningBoard?.members ?? [],
+        columns: data.planningBoard?.columns,
       };
       return (
         <FormGrid>
@@ -210,50 +217,33 @@ export function AboutSectionInspector({
             }
             placeholder="What this committee does…"
           />
-          <Field label="Members" span="full">
-            <ItemsEditor
-              items={pb.members as unknown as Record<string, unknown>[]}
-              onChange={(v) =>
-                patch({
-                  planningBoard: {
-                    ...pb,
-                    members: v as unknown as BoardMember[],
-                  },
-                })
-              }
-              fields={[
-                {
-                  key: "name",
-                  label: "Name",
-                  placeholder: "Dr. MANOHARAN S",
-                  span: 3,
-                },
-                {
-                  key: "position",
-                  label: "Position",
-                  placeholder: "Chairman",
-                  span: 3,
-                },
-                {
-                  key: "qualification",
-                  label: "Qualification",
-                  placeholder: "Ph.D. — Electrical Machines",
-                  span: 3,
-                },
-                {
-                  key: "category",
-                  label: "Category",
-                  placeholder: "Senior faculty member of the College",
-                  span: 3,
-                },
-              ]}
-              emptyItem={{
+          <Field label="Members table" span="full">
+            <TableEditor<BoardMember>
+              label="Planning & Monitoring Board"
+              columns={resolveColumns(pb.columns, PLANNING_BOARD_COLUMNS)}
+              builtins={PLANNING_BOARD_COLUMNS}
+              rows={pb.members}
+              rowsLabel="Members"
+              hint="Rows are numbered automatically (S.No)."
+              newRow={() => ({
                 name: "",
                 position: "",
                 category: "",
                 qualification: "",
-              }}
-              addLabel="Add member"
+              })}
+              onChange={({ columns, rows }) =>
+                patch({
+                  planningBoard: {
+                    ...pb,
+                    columns: columnsToStore(
+                      pb.columns,
+                      columns,
+                      PLANNING_BOARD_COLUMNS,
+                    ),
+                    members: rows,
+                  },
+                })
+              }
             />
           </Field>
         </FormGrid>
@@ -505,29 +495,31 @@ export function AboutSectionInspector({
               })
             }
           />
-          <Field label="Council Members" span="full">
-            <ItemsEditor
-              items={
-                data.governingCouncil.members as unknown as Record<
-                  string,
-                  unknown
-                >[]
-              }
-              onChange={(v) =>
+          <Field label="Council table" span="full">
+            <TableEditor<CouncilMember>
+              label="Governing Council"
+              columns={resolveColumns(
+                data.governingCouncil.columns,
+                GOVERNING_COUNCIL_COLUMNS,
+              )}
+              builtins={GOVERNING_COUNCIL_COLUMNS}
+              rows={data.governingCouncil.members}
+              rowsLabel="Council members"
+              hint="Rows are numbered automatically (S.No)."
+              newRow={() => ({ name: "", category: "" })}
+              onChange={({ columns, rows }) =>
                 patch({
                   governingCouncil: {
                     ...data.governingCouncil,
-                    members: v as unknown as CouncilMember[],
+                    columns: columnsToStore(
+                      data.governingCouncil.columns,
+                      columns,
+                      GOVERNING_COUNCIL_COLUMNS,
+                    ),
+                    members: rows,
                   },
                 })
               }
-              fields={[
-                { key: "name", label: "Member", span: 5 },
-                { key: "category", label: "Category", span: 7 },
-              ]}
-              emptyItem={{ name: "", category: "" }}
-              addLabel="Add member"
-              cardSpan={6}
             />
           </Field>
         </FormGrid>

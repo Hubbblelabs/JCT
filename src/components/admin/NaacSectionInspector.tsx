@@ -14,6 +14,12 @@ import {
 import { SidebarNavEditor } from "@/components/admin/SidebarNavEditor";
 import { PageBodySectionsEditor } from "@/components/admin/PageBodySectionsEditor";
 import { NAAC_NAV_DEFAULTS } from "@/components/layout/NaacPageLayout";
+import { TableEditor } from "@/components/admin/TableEditor";
+import { columnsToStore, resolveColumns } from "@/lib/table-columns";
+import {
+  naacQualitativeBuiltins,
+  naacQuantitativeBuiltins,
+} from "@/lib/naac-table-columns";
 import type { SidebarNavItemRaw } from "@/lib/sidebar-nav";
 import type {
   NaacDocGroupValue,
@@ -300,6 +306,7 @@ export function NaacSectionInspector({
       const t = data.qualitative;
       const patchTable = (p: Partial<typeof t>) =>
         patch({ qualitative: { ...t, ...p } });
+      const qualitativeBuiltins = naacQualitativeBuiltins(t.columns);
       return (
         <FormGrid>
           <TextInput
@@ -316,123 +323,40 @@ export function NaacSectionInspector({
             value={t.description}
             onChange={(e) => patchTable({ description: e.target.value })}
           />
-          {/* Column headings edit in the order the table renders them. */}
-          <Field label="Column Headings" span="full">
-            <div className="admin-form-grid admin-form-grid--tight rounded-lg border border-gray-200 p-3">
-              <TextInput
-                label="Metrics"
-                span={2}
-                value={t.columns.metric}
-                onChange={(e) =>
-                  patchTable({
-                    columns: { ...t.columns, metric: e.target.value },
-                  })
-                }
-              />
-              <TextInput
-                label="Description"
-                span={3}
-                value={t.columns.description}
-                onChange={(e) =>
-                  patchTable({
-                    columns: { ...t.columns, description: e.target.value },
-                  })
-                }
-              />
-              <TextInput
-                label="Experts Marks"
-                span={2}
-                value={t.columns.expertsMarks}
-                onChange={(e) =>
-                  patchTable({
-                    columns: { ...t.columns, expertsMarks: e.target.value },
-                  })
-                }
-              />
-              <TextInput
-                label="Marks Requested"
-                span={2}
-                value={t.columns.marksRequested}
-                onChange={(e) =>
-                  patchTable({
-                    columns: { ...t.columns, marksRequested: e.target.value },
-                  })
-                }
-              />
-              <TextInput
-                label="Justification"
-                span={3}
-                value={t.columns.justification}
-                onChange={(e) =>
-                  patchTable({
-                    columns: { ...t.columns, justification: e.target.value },
-                  })
-                }
-              />
-            </div>
-          </Field>
-          <Repeater<NaacQualitativeRowValue>
-            label="Rows"
-            span="full"
-            items={t.rows}
-            onChange={(rows) => patchTable({ rows })}
-            newItem={() => ({
-              metric: "",
-              description: "",
-              expertsMarks: "",
-              marksRequested: "",
-              justification: "",
-              docs: [],
-            })}
-            renderItem={(row, _i, oc) => (
-              <FormGrid tight>
-                <TextInput
-                  label="Metric"
-                  span={2}
-                  value={row.metric}
-                  placeholder="2.2.1"
-                  onChange={(e) => oc({ ...row, metric: e.target.value })}
-                />
-                <TextArea
-                  label="Description"
-                  span={6}
-                  rows={2}
-                  value={row.description}
-                  onChange={(e) => oc({ ...row, description: e.target.value })}
-                />
-                <TextInput
-                  label="Experts Marks"
-                  span={2}
-                  value={row.expertsMarks}
-                  placeholder="2"
-                  onChange={(e) => oc({ ...row, expertsMarks: e.target.value })}
-                />
-                <TextInput
-                  label="Marks Requested"
-                  span={2}
-                  value={row.marksRequested}
-                  placeholder="4"
-                  onChange={(e) =>
-                    oc({ ...row, marksRequested: e.target.value })
-                  }
-                />
-                <TextArea
-                  label="Justification"
-                  span="full"
-                  rows={2}
-                  value={row.justification}
-                  onChange={(e) =>
-                    oc({ ...row, justification: e.target.value })
-                  }
-                />
+          <Field label="Table" span="full">
+            <TableEditor<NaacQualitativeRowValue>
+              label="Qualitative Parameters"
+              columns={resolveColumns(t.columnList, qualitativeBuiltins)}
+              builtins={qualitativeBuiltins}
+              rows={t.rows}
+              onChange={({ columns, rows }) =>
+                patchTable({
+                  columnList: columnsToStore(
+                    t.columnList,
+                    columns,
+                    qualitativeBuiltins,
+                  ),
+                  rows,
+                })
+              }
+              newRow={() => ({
+                metric: "",
+                description: "",
+                expertsMarks: "",
+                marksRequested: "",
+                justification: "",
+                docs: [],
+              })}
+              hint="Supporting documents are listed under the last column."
+              renderExtra={(row, oc) => (
                 <DocRepeater
                   label="Supporting Documents"
                   docs={row.docs}
                   onChange={(docs) => oc({ ...row, docs })}
                 />
-              </FormGrid>
-            )}
-          />
+              )}
+            />
+          </Field>
         </FormGrid>
       );
     }
@@ -441,20 +365,7 @@ export function NaacSectionInspector({
       const t = data.quantitative;
       const patchTable = (p: Partial<typeof t>) =>
         patch({ quantitative: { ...t, ...p } });
-      const col = (
-        key: keyof typeof t.columns,
-        label: string,
-        span: FieldSpan,
-      ) => (
-        <TextInput
-          label={label}
-          span={span}
-          value={t.columns[key]}
-          onChange={(e) =>
-            patchTable({ columns: { ...t.columns, [key]: e.target.value } })
-          }
-        />
-      );
+      const quantitativeBuiltins = naacQuantitativeBuiltins(t.columns);
       return (
         <FormGrid>
           <TextInput
@@ -471,95 +382,74 @@ export function NaacSectionInspector({
             value={t.description}
             onChange={(e) => patchTable({ description: e.target.value })}
           />
-          <Field label="Column Headings" span="full">
-            <div className="admin-form-grid admin-form-grid--tight rounded-lg border border-gray-200 p-3">
-              {col("metric", "Metrics", 3)}
-              {col("parameter", "Parameter", 5)}
-              {col("values", "Values (group heading)", 2)}
-              {col("marks", "Marks (group heading)", 2)}
-              {col("ssr", "SSR", 3)}
-              {col("dvv", "DVV", 3)}
-              {col("awarded", "Awarded", 3)}
-              {col("requested", "Requested", 3)}
-              {col("justification", "Justification", "full")}
-            </div>
-          </Field>
-          <Repeater<NaacQuantitativeRowValue>
-            label="Rows"
-            span="full"
-            items={t.rows}
-            onChange={(rows) => patchTable({ rows })}
-            newItem={() => ({
-              metric: "",
-              parameter: "",
-              ssr: "",
-              dvv: "",
-              awarded: "",
-              requested: "",
-              justification: "",
-              docs: [],
-            })}
-            renderItem={(row, _i, oc) => (
-              <FormGrid tight>
+          {/* The grouped header exists only until the columns are changed:
+              a column list is drawn as one header row. */}
+          {!t.columnList && (
+            <Field
+              label="Group headings"
+              span="full"
+              hint="Shown above the SSR / DVV and Awarded / Requested columns. Changing the columns below switches the table to a single header row."
+            >
+              <div className="admin-form-grid admin-form-grid--tight">
                 <TextInput
-                  label="Metric"
-                  span={3}
-                  value={row.metric}
-                  placeholder="3.4.3"
-                  onChange={(e) => oc({ ...row, metric: e.target.value })}
-                />
-                <TextArea
-                  label="Parameter"
-                  span={9}
-                  rows={2}
-                  value={row.parameter}
-                  onChange={(e) => oc({ ...row, parameter: e.target.value })}
-                />
-                <TextInput
-                  label="SSR Values"
-                  span={3}
-                  value={row.ssr}
-                  placeholder="11/10/5/4/4, 30"
-                  onChange={(e) => oc({ ...row, ssr: e.target.value })}
-                />
-                <TextInput
-                  label="DVV Values"
-                  span={3}
-                  value={row.dvv}
-                  placeholder="5/8/4/2/3, 22"
-                  onChange={(e) => oc({ ...row, dvv: e.target.value })}
-                />
-                <TextInput
-                  label="Marks Awarded"
-                  span={3}
-                  value={row.awarded}
-                  placeholder="1"
-                  onChange={(e) => oc({ ...row, awarded: e.target.value })}
-                />
-                <TextInput
-                  label="Marks Requested"
-                  span={3}
-                  value={row.requested}
-                  placeholder="2"
-                  onChange={(e) => oc({ ...row, requested: e.target.value })}
-                />
-                <TextArea
-                  label="Justification"
-                  span="full"
-                  rows={2}
-                  value={row.justification}
+                  label="Over SSR and DVV"
+                  span={6}
+                  value={t.columns.values}
                   onChange={(e) =>
-                    oc({ ...row, justification: e.target.value })
+                    patchTable({
+                      columns: { ...t.columns, values: e.target.value },
+                    })
                   }
                 />
+                <TextInput
+                  label="Over Awarded and Requested"
+                  span={6}
+                  value={t.columns.marks}
+                  onChange={(e) =>
+                    patchTable({
+                      columns: { ...t.columns, marks: e.target.value },
+                    })
+                  }
+                />
+              </div>
+            </Field>
+          )}
+          <Field label="Table" span="full">
+            <TableEditor<NaacQuantitativeRowValue>
+              label="Quantitative Parameters"
+              columns={resolveColumns(t.columnList, quantitativeBuiltins)}
+              builtins={quantitativeBuiltins}
+              rows={t.rows}
+              onChange={({ columns, rows }) =>
+                patchTable({
+                  columnList: columnsToStore(
+                    t.columnList,
+                    columns,
+                    quantitativeBuiltins,
+                  ),
+                  rows,
+                })
+              }
+              newRow={() => ({
+                metric: "",
+                parameter: "",
+                ssr: "",
+                dvv: "",
+                awarded: "",
+                requested: "",
+                justification: "",
+                docs: [],
+              })}
+              hint="Supporting documents are listed under the last column."
+              renderExtra={(row, oc) => (
                 <DocRepeater
                   label="Supporting Documents"
                   docs={row.docs}
                   onChange={(docs) => oc({ ...row, docs })}
                 />
-              </FormGrid>
-            )}
-          />
+              )}
+            />
+          </Field>
         </FormGrid>
       );
     }

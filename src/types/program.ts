@@ -11,9 +11,22 @@ export type FacultyMember = {
   aicteId?: string;
   /** Anna University faculty ID. Stored for records, never rendered. */
   auFin?: string;
+  /** Values for the faculty table's added columns. */
+  cells?: Record<string, string>;
 };
 
-export type Lab = {
+/**
+ * Optional extras on a program-page card. A card that has any opens a popup
+ * with the photos and the longer text; without them it stays a plain card.
+ */
+export type CardExtras = {
+  /** Storage keys of photos. The first one also shows on the card. */
+  images?: string[];
+  /** Longer text shown only in the popup. */
+  details?: string;
+};
+
+export type Lab = CardExtras & {
   name: string;
   description: string;
   equipment: string[];
@@ -24,16 +37,17 @@ export type BoardMember = {
   designation: string;
   organization: string;
   role?: string;
+  cells?: Record<string, string>;
 };
 
-export type Achievement = {
+export type Achievement = CardExtras & {
   name: string;
   title: string;
   detail: string;
   year: string;
 };
 
-export type ValueAddedCourse = {
+export type ValueAddedCourse = CardExtras & {
   name: string;
   hours: string;
   provider: string;
@@ -45,6 +59,7 @@ export type CurriculumSubject = {
   name: string;
   credits: number;
   type: "Theory" | "Lab" | "Core" | "Elective" | "Project";
+  cells?: Record<string, string>;
 };
 
 export type HeroMetaItem = {
@@ -246,13 +261,13 @@ export type ProgramData = {
     description: string;
   };
 
-  events: {
+  events: (CardExtras & {
     title: string;
     date: string;
     type: string;
     description: string;
     resourcePerson?: string;
-  }[];
+  })[];
 
   studentParticipation: {
     clubs: string[];
@@ -301,6 +316,8 @@ export type ProgramData = {
   heroMeta?: HeroMetaItem[];
   tabsConfig?: TabConfigItem[];
   labels?: LabelsTree;
+  /** Columns of the faculty, board and curriculum tables. */
+  tableColumns?: import("@/lib/program-table-columns").ProgramTableColumns;
 
   /**
    * Free-form content blocks appended to a built-in section, keyed by

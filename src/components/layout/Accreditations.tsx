@@ -72,6 +72,8 @@ export function Accreditations({ variant = "default" }: AccreditationsProps) {
 
   return (
     <section
+      // Lets the admin's live preview open the logo editor from inside the hero.
+      data-preview-section="accreditations"
       className={`relative overflow-hidden ${isHero ? "py-1" : "bg-white/95 py-4 shadow-inner"}`}
     >
       <div className="mx-auto flex w-full max-w-5xl flex-col items-center px-4">

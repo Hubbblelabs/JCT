@@ -275,90 +275,54 @@ export const HELP_CHAPTERS: HelpChapter[] = [
     body: () => (
       <>
         <P>
-          Screens in this panel save in one of four ways. Which one you are
-          looking at decides whether pressing <UI>Save</UI> changes what
-          visitors see <em>right now</em>. Learn the four and nothing in the
-          panel can surprise you.
+          Screens in this panel save in one of two ways. Which one you are
+          looking at decides whether saving changes what visitors see{" "}
+          <em>right now</em>.
         </P>
 
         <Cards>
           <Card
-            title="1 · Section forms"
-            badge={
-              <span className="admin-badge admin-badge-published">
-                Save = live
-              </span>
-            }
-          >
-            <p>
-              A single gold <UI>Save</UI> button at the top right, one form
-              below it.
-            </p>
-            <p>
-              <strong>Saving publishes immediately.</strong> There is no draft
-              step. These are the screens reached from a college&apos;s
-              <UI>Landing Page</UI> group and from <UI>Global CMS</UI> — Navbar,
-              Hero, Admissions, Life at JCT, Footer, Floating Elements, the
-              Pamphlet popup and so on.
-            </p>
-          </Card>
-
-          <Card
-            title="2 · Live-preview editors"
+            title="1 · Page editors"
             badge={
               <span className="admin-badge admin-badge-draft">
-                Save = draft
+                Save draft = private
               </span>
             }
           >
             <p>
-              The real public page fills the screen and you click a section to
-              edit it. Two buttons:
+              Every page — the landing pages, Global, About Us, Controller of
+              Examination, Campus Life, Research, Clubs, Committees,
+              Accreditations, Reports &amp; Downloads, NAAC, Placements, every
+              content page, Programs and Dynamic Pages — opens in the same
+              editor, with one bar along the bottom:
             </p>
             <p>
-              <UI>Save</UI> keeps your work as a draft — the live page does not
-              change. <UI>Save &amp; Publish</UI> makes it live. Use this for
-              About Us, Controller of Examination, Campus Life, Research, Clubs,
-              Committees, Accreditations, Reports &amp; Downloads, NAAC,
-              Placements and every standalone content page.
-            </p>
-          </Card>
-
-          <Card
-            title="3 · Programs and Dynamic Pages"
-            badge={
+              <UI>Save draft</UI> keeps your work without changing the live
+              page. <UI>Publish</UI> puts it live. <UI>Discard changes</UI>{" "}
+              throws away everything since the last save. The badge next to the
+              title reads{" "}
+              <span className="admin-badge admin-badge-published">Live</span> or{" "}
               <span className="admin-badge admin-badge-draft">
-                Save = draft
-              </span>
-            }
-          >
-            <p>
-              Same two buttons, plus a badge near the title showing{" "}
-              <span className="admin-badge admin-badge-draft">Draft</span> or{" "}
-              <span className="admin-badge admin-badge-published">
-                Published
+                Unpublished changes
               </span>
               .
             </p>
             <p>
-              A record can be published <em>and</em> hold a newer draft at the
-              same time: visitors keep reading the published version until you
-              press <UI>Save &amp; Publish</UI> again.
+              Two things inside these editors save straight away instead:
+              testimonials (they have their own buttons) and the year-wise
+              placement records.
             </p>
           </Card>
 
           <Card
-            title="4 · Lists"
+            title="2 · Lists"
             badge={
               <span className="admin-badge admin-badge-published">
                 Save = live
               </span>
             }
           >
-            <p>
-              News &amp; Events, Blogs, Testimonials, Recruiters and the
-              year-wise placement records.
-            </p>
+            <p>News &amp; Events, Blogs, Testimonials and Users.</p>
             <p>
               These have no draft. Saving a row writes it through. To keep
               something off the site, set it to{" "}
@@ -373,9 +337,10 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           tone="warning"
           title="A draft that is never published is invisible"
         >
-          Pressing <UI>Save</UI> on a live-preview editor is safe, but it is not
-          the finish line. Nobody outside this panel sees the change until you
-          press <UI>Save &amp; Publish</UI>.
+          <UI>Save draft</UI> is safe, but it is not the finish line. Nobody
+          outside this panel sees the change until you press <UI>Publish</UI>. A
+          draft saved earlier can be published later — the <UI>Publish</UI>{" "}
+          button stays available while one is waiting.
         </Note>
 
         <H3>Why the site did not change yet</H3>
@@ -417,27 +382,32 @@ export const HELP_CHAPTERS: HelpChapter[] = [
         <Steps>
           <li>
             Open the page from the sidebar. It loads with the current draft
-            already applied.
+            already applied. The page is on the left; the list of its sections,
+            each with a one-line explanation, is on the right.
           </li>
           <li>
-            Move the pointer over the page. Editable sections highlight. Click
-            the one you want.
+            Click a section — on the page or in the list. It is outlined in gold
+            and its fields replace the list. The blue note at the top of the
+            panel says what that section controls.
+          </li>
+          <li>Edit the fields. The page on the left updates as you type.</li>
+          <li>
+            Press <UI>Save draft</UI> to keep your work privately, or{" "}
+            <UI>Publish</UI> to put it live. <Key>Ctrl</Key> <Key>S</Key> saves
+            a draft.
           </li>
           <li>
-            A panel slides in from the right with just that section&apos;s
-            fields. Edit them — the preview updates as you type.
-          </li>
-          <li>
-            Press <UI>Save</UI> to keep a draft, or <UI>Save &amp; Publish</UI>{" "}
-            to put it live. Both buttons appear at the top of the screen and at
-            the bottom of the panel, and both do the same thing.
-          </li>
-          <li>
-            Close the panel with the × to pick a different section. Closing it
-            does not discard anything — your edits stay in the preview until you
-            save or leave the screen.
+            Press <UI>All sections</UI> to go back to the list. Nothing is lost
+            by switching sections — every edit stays until you save or discard.
           </li>
         </Steps>
+
+        <P>
+          A section with nothing in it yet shows a dashed box on the page, so it
+          can still be clicked and filled in. Content that lives elsewhere —
+          program cards, events — has a button in the panel that takes you
+          there.
+        </P>
 
         <H3>Pages that contain other pages</H3>
         <P>
@@ -445,14 +415,15 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           Timeline inside About Us, NIRF and the financial statements inside
           Reports &amp; Downloads, the NAAC sub-pages inside NAAC, the gallery
           inside Placements. You edit those tabs here too: click the tab in the
-          preview and its own fields open in the same panel. One{" "}
-          <UI>Save &amp; Publish</UI> covers the whole page and all its tabs.
+          preview, or pick it under <UI>Tabs on this page</UI> in the list, and
+          its own fields open in the same panel. One <UI>Publish</UI> covers the
+          whole page and all its tabs.
         </P>
 
-        <Note tone="warning" title="Leaving the screen drops unsaved edits">
-          There is no automatic save. If you close the tab or click away to
-          another screen with unsaved changes, they are gone. Save before you
-          navigate.
+        <Note tone="warning" title="There is no automatic save">
+          While there are unsaved changes the bar at the bottom says so, and the
+          panel asks before you leave the screen. Save a draft before you step
+          away.
         </Note>
       </>
     ),
@@ -461,18 +432,19 @@ export const HELP_CHAPTERS: HelpChapter[] = [
   /* ── 5. Section forms ───────────────────────────────────────────────────*/
   {
     id: "forms",
-    title: "Editing a section form",
+    title: "Filling in a section's fields",
     icon: FileEdit,
-    summary: "The straight forms behind the landing pages and site-wide bits.",
+    summary:
+      "The fields you meet in the edit panel, and what to do if a save is refused.",
     keywords:
       "page content form fields hero navbar footer admissions statistics validation error required save gold button",
     body: () => (
       <>
         <P>
-          Each entry in a college&apos;s <UI>Landing Page</UI> group, and each
-          entry under <UI>Global CMS</UI> and <UI>Main Website</UI>, opens one
-          form for one block of one page. Fill it in and press the gold{" "}
-          <UI>Save</UI>.
+          Every section you open — from the page, the section list, or a sidebar
+          entry such as a college&apos;s <UI>Landing Page</UI> items — shows its
+          fields in the panel on the right. Fill them in and save with the bar
+          at the bottom.
         </P>
 
         <H3>What you will meet in these forms</H3>
@@ -501,14 +473,13 @@ export const HELP_CHAPTERS: HelpChapter[] = [
         <P>
           A red box appears at the top listing exactly which fields are wrong
           and why — a heading that is too long, a link that is not a valid
-          address, a required field left empty. Fix those fields and press{" "}
-          <UI>Save</UI> again. Nothing was written, so nothing is half-saved.
+          address, a required field left empty. Fix those fields and save again.
+          Nothing was written, so nothing is half-saved.
         </P>
 
         <Note tone="info">
-          These forms publish as soon as you save. If you need to prepare a
-          change without showing it yet, switch the block to hidden, save, and
-          switch it back on when you are ready.
+          To prepare a change without showing it yet, use <UI>Save draft</UI>.
+          It stays private until you press <UI>Publish</UI>.
         </Note>
       </>
     ),
@@ -573,10 +544,10 @@ export const HELP_CHAPTERS: HelpChapter[] = [
 
         <H3>Publishing</H3>
         <P>
-          <UI>Save</UI> stores a draft; <UI>Save &amp; Publish</UI> makes the
-          current draft the live page. The badge next to the title tells you
-          which state the program is in. Nothing you type reaches the public
-          course listing until the program is published <em>and</em> visible.
+          <UI>Save draft</UI> stores a draft; <UI>Publish</UI> makes the current
+          draft the live page. The badge next to the title tells you which state
+          the program is in. Nothing you type reaches the public course listing
+          until the program is published <em>and</em> visible.
         </P>
 
         <Note tone="info" title="Retiring a program">
@@ -628,12 +599,14 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           be scoped to a single college or shown on the home page.
         </P>
 
-        <H3>Recruiters</H3>
+        <H3>Recruiter logos</H3>
         <P>
-          The recruiter logos on the landing page are not typed in here — they
-          are collected from the year-wise placement records. Adding a company
-          to a placement year adds its logo to the carousel; the same company
-          named in two colleges appears once.
+          The recruiter logos on the landing pages are not typed in anywhere —
+          they are collected from the year-wise placement records. Adding a
+          company to a placement year adds its logo to the carousel; the same
+          company named in two colleges appears once. The heading and stats
+          around them are the <UI>Placement Highlights</UI> section of each
+          landing page.
         </P>
 
         <Note tone="warning" title="Deleting a row is permanent">
@@ -682,8 +655,8 @@ export const HELP_CHAPTERS: HelpChapter[] = [
 
         <Note tone="warning" title="Year figures do not wait for publish">
           The page layout follows the usual draft rules, but the year records do
-          not have a draft version. Editing a figure and pressing <UI>Save</UI>{" "}
-          updates it on the site straight away.
+          not have a draft version. Editing a figure and saving — even with{" "}
+          <UI>Save draft</UI> — updates it on the site straight away.
         </Note>
       </>
     ),
@@ -777,8 +750,7 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           </li>
           <li>Add the body blocks and fill them in.</li>
           <li>
-            <UI>Save</UI> keeps a draft. <UI>Save &amp; Publish</UI> puts it
-            online.
+            <UI>Save draft</UI> keeps a draft. <UI>Publish</UI> puts it online.
           </li>
         </Steps>
 
@@ -976,7 +948,7 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           rows={[
             {
               term: "I saved, but the site still shows the old version",
-              body: "Either the change is still a draft — check for a Save & Publish button you did not press — or the page is cached. Hard refresh, try a private window, then ask an admin to press Clear cache.",
+              body: "Either the change is still a draft — check whether the bar at the bottom of its editor says “Draft saved — not on the live site yet”, and press Publish — or the page is cached. Hard refresh, try a private window, then ask an admin to press Clear cache.",
             },
             {
               term: "My edit vanished",
@@ -1048,8 +1020,8 @@ export const HELP_CHAPTERS: HelpChapter[] = [
             body: "One block of a page: the hero, the statistics strip, the admissions box. Sidebar entries under Landing Page are sections.",
           },
           {
-            term: "Inspector",
-            body: "The panel that slides in from the right in the live-preview editors, holding the fields for whichever section you clicked.",
+            term: "Edit panel",
+            body: "The column on the right of every page editor: the list of the page's sections, or the fields of the one you picked. On a small screen it slides in over the page instead.",
           },
           {
             term: "Scope",

@@ -13,7 +13,7 @@ import {
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { EventUpdateSchema } from "@/lib/validation";
-import { revalidatePaths } from "@/lib/revalidate";
+import { revalidateEventDetailPages, revalidatePaths } from "@/lib/revalidate";
 import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 
 // Events render in the "Life at JCT" grid on the home page and all three
@@ -33,6 +33,8 @@ function revalidateEventPages(...slugs: (string | undefined)[]) {
   ]);
   for (const slug of slugs) if (slug) paths.add(`/events/${slug}`);
   revalidatePaths(...paths);
+  // Every detail page lists the latest events in its sidebar.
+  revalidateEventDetailPages();
 }
 
 function isDuplicateKeyError(e: unknown): boolean {

@@ -2,6 +2,7 @@ import { connectDB } from "@/lib/mongodb";
 import { Event } from "@/lib/models";
 import { getImageUrl } from "@/lib/utils";
 import { sanitizeHtml } from "@/lib/sanitize-html";
+import { toVideoEmbeds, type VideoEmbed } from "@/lib/video-embed";
 
 type EventLean = {
   _id: unknown;
@@ -14,6 +15,8 @@ type EventLean = {
   location?: string;
   image?: string;
   gallery?: string[];
+  videos?: string[];
+  featured?: boolean;
   institution?: string;
 };
 
@@ -27,6 +30,10 @@ export type PublicEventCard = {
   location: string;
   image: string | null;
   institution: string;
+  /** Pinned to the carousel at the top of the listing. */
+  featured: boolean;
+  /** Carries at least one video — badged on the card. */
+  hasVideo: boolean;
 };
 
 export type PublicEventDetail = PublicEventCard & {
@@ -35,7 +42,13 @@ export type PublicEventDetail = PublicEventCard & {
   // Resolved URLs for the extra photos. Detail-only — the list query does not
   // fetch them, so cards never pay for images they don't render.
   gallery: string[];
+  // Embeddable players (or plain links) for the event's videos.
+  videos: VideoEmbed[];
 };
+
+/** Fields every card query needs — keep in step with `asCard`. */
+const CARD_FIELDS =
+  "title slug excerpt category event_date location image institution featured videos";
 
 function asCard(doc: EventLean): PublicEventCard {
   return {
@@ -48,6 +61,8 @@ function asCard(doc: EventLean): PublicEventCard {
     location: doc.location ?? "",
     image: getImageUrl(doc.image),
     institution: doc.institution ?? "all",
+    featured: doc.featured === true,
+    hasVideo: (doc.videos ?? []).some((v) => v.trim() !== ""),
   };
 }
 
@@ -64,7 +79,7 @@ export async function listPublicEvents({
   if (institution) query.institution = institution;
 
   let cursor = Event.find(query)
-    .select("title slug excerpt category event_date location image institution")
+    .select(CARD_FIELDS)
     .sort({ event_date: -1, sort_order: 1 });
   if (limit && limit > 0) cursor = cursor.limit(limit);
 
@@ -100,8 +115,7 @@ export async function listNewsEvents({
   startOfToday.setHours(0, 0, 0, 0);
 
   const base = { is_active: true, institution };
-  const select =
-    "title slug excerpt category event_date location image institution";
+  const select = CARD_FIELDS;
 
   const upcoming = await Event.find({
     ...base,
@@ -164,9 +178,7 @@ export async function getPublicEventBySlug(
   await connectDB();
 
   const doc = await Event.findOne({ slug, is_active: true })
-    .select(
-      "title slug excerpt description category event_date location image gallery institution",
-    )
+    .select(`${CARD_FIELDS} description gallery`)
     .lean<EventLean | null>();
   if (!doc) return null;
 
@@ -176,5 +188,6 @@ export async function getPublicEventBySlug(
     gallery: (doc.gallery ?? [])
       .map((key) => getImageUrl(key))
       .filter((url): url is string => !!url),
+    videos: toVideoEmbeds(doc.videos),
   };
 }

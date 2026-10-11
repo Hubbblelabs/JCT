@@ -41,19 +41,28 @@ export function resolveGroupSlugs(groups: GroupValue[]): string[] {
   });
 }
 
-/** The group a detail route should render, or null when the slug is unknown. */
+/** Whether a group appears on the public site — named and not hidden. */
+export function isPublicGroup(group: GroupValue): boolean {
+  return group.name.trim() !== "" && group.hidden !== true;
+}
+
+/**
+ * The group a detail route should render, or null when the slug is unknown or
+ * the entry is hidden. Slugs are still resolved over the WHOLE list, hidden
+ * entries included, so hiding one never shifts another's URL.
+ */
 export function findGroupBySlug(
   groups: GroupValue[],
   slug: string,
 ): { group: GroupValue; slug: string } | null {
   const slugs = resolveGroupSlugs(groups);
   const idx = slugs.indexOf(slug);
-  if (idx === -1) return null;
+  if (idx === -1 || groups[idx].hidden === true) return null;
   return { group: groups[idx], slug: slugs[idx] };
 }
 
-/** Slugs worth pre-rendering — skips unnamed placeholder rows. */
+/** Slugs worth pre-rendering — skips unnamed placeholders and hidden rows. */
 export function listGroupSlugs(groups: GroupValue[]): string[] {
   const slugs = resolveGroupSlugs(groups);
-  return slugs.filter((_, i) => groups[i].name.trim() !== "");
+  return slugs.filter((_, i) => isPublicGroup(groups[i]));
 }

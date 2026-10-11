@@ -2,6 +2,7 @@
 
 import { getImageUrl } from "@/lib/utils";
 import type { PublicPlacement } from "@/lib/public-placements";
+import { cleanCells } from "@/lib/table-columns";
 import type {
   CompanyPlacementValue,
   CompanyStudentValue,
@@ -44,6 +45,8 @@ export type AdminPlacementRecord = {
   company_placements: CompanyPlacementValue[];
   is_active: boolean;
   sort_order: number;
+  /** Values for the history table's added columns, by column id. */
+  history_cells: Record<string, string>;
 };
 
 /** Fields the editor writes back — `_id` and `institution` are not among them. */
@@ -64,6 +67,7 @@ const EDITABLE_FIELDS = [
   "company_placements",
   "is_active",
   "sort_order",
+  "history_cells",
 ] as const;
 
 /** Fills in fields an older document predates, so every input is controlled. */
@@ -90,6 +94,7 @@ function normalize(raw: Record<string, unknown>): AdminPlacementRecord {
     company_placements: arr<CompanyPlacementValue>(raw.company_placements),
     is_active: raw.is_active !== false,
     sort_order: num(raw.sort_order),
+    history_cells: cleanCells(raw.history_cells),
   };
 }
 
@@ -245,5 +250,6 @@ export function toPreviewRecord(
         package: s.package ?? "",
       })),
     })),
+    history_cells: record.history_cells,
   };
 }

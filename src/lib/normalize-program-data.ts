@@ -5,6 +5,7 @@ import type {
   TabConfigItem,
 } from "@/types/program";
 import type { PageBodySection } from "@/lib/validation";
+import { normalizeProgramTableColumns } from "@/lib/program-table-columns";
 
 const KNOWN_LABEL_KEYS = [
   "overview",
@@ -311,6 +312,7 @@ export function normalizeProgramData(
     heroMeta: normalizeHeroMeta(c.heroMeta),
     tabsConfig: normalizeTabsConfig(c.tabsConfig),
     labels: normalizeLabels(c.labels),
+    tableColumns: normalizeProgramTableColumns(c.tableColumns),
     sectionBlocks: normalizeSectionBlocks(c.sectionBlocks),
     sectionBlocksPosition: normalizeSectionBlocksPosition(
       c.sectionBlocksPosition,

@@ -11,6 +11,8 @@ import {
 } from "framer-motion";
 import { getImageUrl } from "@/lib/utils";
 import { useSiteConfig } from "@/lib/use-site-config";
+import { readHeroOverlay } from "@/lib/hero-overlay";
+import { HeroOverlay } from "@/components/ui/HeroOverlay";
 
 type HeroCta = { label: string; href: string; primary: boolean };
 type Accreditation = { name: string; logo: string };
@@ -26,6 +28,8 @@ type HeroConfig = {
   accreditations: Accreditation[];
   accreditationsCaption: string;
   intervalMs: number;
+  /** Admin-set darkness (%), or null for the original gradients. */
+  overlay: number | null;
 };
 
 function normalizeHero(raw: unknown): HeroConfig | null {
@@ -77,6 +81,7 @@ function normalizeHero(raw: unknown): HeroConfig | null {
       typeof r.intervalMs === "number" && r.intervalMs > 0
         ? r.intervalMs
         : 6000,
+    overlay: readHeroOverlay(r.overlayOpacity),
   };
 }
 
@@ -150,13 +155,20 @@ export function EngineeringHero() {
                     fill
                     priority
                     sizes="100vw"
-                    className="object-cover object-center opacity-40"
+                    // The original design dims the photo itself; a custom
+                    // darkness does all of it in the overlay instead, so the
+                    // slider's 0% really is the untouched photo.
+                    className={`object-cover object-center ${hero.overlay === null ? "opacity-40" : ""}`}
                   />
                 </motion.div>
               )}
             </AnimatePresence>
 
-            <div className="absolute inset-0 bg-gradient-to-b from-[#07111d]/80 via-[#07111d]/45 to-[#07111d]/0" />
+            {hero.overlay !== null ? (
+              <HeroOverlay opacity={hero.overlay} color="#07111d" />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-b from-[#07111d]/80 via-[#07111d]/45 to-[#07111d]/0" />
+            )}
             <div className="absolute top-0 right-0 h-[50rem] w-[50rem] translate-x-1/3 -translate-y-1/2 rounded-full bg-[#d4a024]/10 mix-blend-screen blur-[120px]" />
             <div className="absolute bottom-0 left-0 h-[40rem] w-[40rem] -translate-x-1/3 translate-y-1/3 rounded-full bg-[#1d4ed8]/10 mix-blend-screen blur-[120px]" />
           </motion.div>

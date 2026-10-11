@@ -2,14 +2,33 @@ import { z } from "zod";
 import { zUrl, zClampedString, zOptionalString } from "./_primitives";
 
 // ── Header ───────────────────────────────────────────────────────────────────
-// Admin-managed header content is limited to the phone number and the
+// Admin-managed header content is limited to the phone numbers and the
 // Student Login button; everything else in the header is fixed chrome.
 export const HEADER_LIMITS = {
   ctaLabelMax: 40,
   phoneMax: 40,
+  phoneLabelMax: 30,
+  phones: 6,
 } as const;
 
+export const HeaderPhoneSchema = z.object({
+  number: zClampedString(0, HEADER_LIMITS.phoneMax, "Phone number"),
+  /** Optional — "Admissions", "Office", … shown beside the number. */
+  label: zOptionalString(HEADER_LIMITS.phoneLabelMax),
+});
+export type HeaderPhone = z.infer<typeof HeaderPhoneSchema>;
+
 export const HeaderSchema = z.object({
+  /**
+   * The header's phone numbers, first one shown in the bar and the rest in a
+   * hover list. Values saved before multi-number support carry only `phone`,
+   * which readers fall back to when this is absent.
+   */
+  phones: z
+    .array(HeaderPhoneSchema)
+    .max(HEADER_LIMITS.phones, `At most ${HEADER_LIMITS.phones} phone numbers`)
+    .optional(),
+  /** Legacy single number. Kept in step with `phones[0]` on save. */
   phone: zOptionalString(HEADER_LIMITS.phoneMax).default(""),
   studentLoginLabel: zOptionalString(HEADER_LIMITS.ctaLabelMax).default(""),
   studentLoginUrl: zUrl.optional().or(z.literal("")),
