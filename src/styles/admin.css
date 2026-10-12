@@ -382,10 +382,40 @@
   font-weight: 600;
 }
 
+/* Search, public site, Clear cache and the account menu. */
 .admin-sidebar-footer {
   flex-shrink: 0;
-  padding: var(--admin-space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--admin-space-2);
   border-top: 1px solid rgb(255 255 255 / 0.08);
+}
+
+/* A footer row: a sidebar link that may be a <button>. */
+.admin-sidebar-tool {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.admin-sidebar-tool:disabled {
+  cursor: progress;
+}
+
+.admin-sidebar-kbd {
+  margin-left: auto;
+  padding: 1px 5px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: var(--admin-radius-sm);
+  font-family: inherit;
+  font-size: var(--admin-text-xs);
+  font-weight: 600;
+  color: var(--admin-text-on-navy-muted);
+  line-height: 1.4;
 }
 
 /* Collapsed rail — labels are hidden, icons stay centred and tooltipped. */
@@ -441,6 +471,17 @@
     padding-left: var(--admin-space-3);
     padding-right: var(--admin-space-3);
   }
+}
+
+/* Footer rows line up with the section rows, not the indented links — in
+   every rail state. The hover selector is needed to outrank the rail's own
+   hover rule, which re-indents every `.admin-sidebar-link`. */
+.admin-sidebar .admin-sidebar-footer .admin-sidebar-tool,
+.admin-shell[data-collapsed="true"]
+  .admin-sidebar:hover
+  .admin-sidebar-footer
+  .admin-sidebar-tool {
+  margin-left: 0;
 }
 
 /* Focus is always visible on the navy background. */
@@ -499,11 +540,173 @@
 }
 
 .admin-breadcrumb-current {
+  min-width: 0;
   color: var(--admin-text);
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+/* Ancestors give way before the current page does when the row is tight. */
+.admin-breadcrumb-crumb {
+  min-width: 0;
+  flex-shrink: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Tablet: drop the group crumb. Phone: only the current page. */
+@media (max-width: 767.98px) {
+  .admin-breadcrumb-group {
+    display: none;
+  }
+}
+@media (max-width: 639.98px) {
+  .admin-breadcrumb-ancestor {
+    display: none;
+  }
+}
+
+/* The help icon beside the page name, and the description it reveals. */
+.admin-page-help {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  margin-left: 2px;
+}
+
+.admin-page-help-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: var(--admin-radius-full);
+  background: transparent;
+  color: var(--admin-text-muted);
+  cursor: help;
+  transition:
+    background var(--admin-duration-fast),
+    color var(--admin-duration-fast);
+}
+
+.admin-page-help-btn:hover,
+.admin-page-help-btn[aria-expanded="true"] {
+  background: var(--admin-hover);
+  color: var(--admin-text);
+}
+
+.admin-page-help-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--admin-focus-ring);
+}
+
+.admin-page-help-tip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: -8px;
+  z-index: var(--admin-z-modal);
+  display: none;
+  width: max-content;
+  max-width: min(24rem, calc(100vw - 2rem));
+  padding: var(--admin-space-3) var(--admin-space-4);
+  border-radius: var(--admin-radius-lg);
+  background: var(--admin-navy);
+  color: var(--admin-text-inverse);
+  font-size: var(--admin-text-base);
+  font-weight: 400;
+  line-height: 1.5;
+  white-space: normal;
+  box-shadow: var(--admin-shadow-lg);
+}
+
+.admin-page-help-tip[data-open="true"] {
+  display: block;
+}
+
+/* On a phone the icon can sit anywhere in the row; pin the text under the
+   topbar, full width, so it never runs off the screen. */
+@media (max-width: 639.98px) {
+  .admin-page-help-tip {
+    position: fixed;
+    top: calc(var(--admin-topbar-h) + 4px);
+    left: var(--admin-space-4);
+    right: var(--admin-space-4);
+    width: auto;
+    max-width: none;
+  }
+}
+
+/* The open screen's own controls (portalled in by EditorWorkspace). */
+.admin-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-2);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.admin-topbar-actions:empty {
+  display: none;
+}
+
+.admin-topbar-save {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-2);
+  padding-left: var(--admin-space-3);
+  border-left: 1px solid var(--admin-border);
+}
+
+.admin-topbar-save-status {
+  display: flex;
+  align-items: center;
+  gap: var(--admin-space-2);
+  padding: 0 var(--admin-space-1);
+  font-size: var(--admin-text-base);
+  color: var(--admin-text-muted);
+  white-space: nowrap;
+}
+
+.admin-topbar-save[data-dirty="true"] .admin-topbar-save-status {
+  color: var(--admin-text);
+  font-weight: 600;
+}
+
+/* Button labels give way to icons (each keeps a tooltip) as the row narrows:
+   secondary ones first, then Save draft / Publish on phones. */
+@media (max-width: 1279.98px) {
+  .admin-tb-label--secondary {
+    display: none;
+  }
+}
+@media (max-width: 767.98px) {
+  .admin-tb-label {
+    display: none;
+  }
+
+  .admin-topbar-actions {
+    gap: var(--admin-space-1);
+  }
+
+  .admin-topbar-save {
+    padding-left: var(--admin-space-2);
+  }
+}
+
+/* The save status reads as a dot alone until there is room for the words;
+   the words stay available to screen readers and in the tooltip. */
+@media (max-width: 1535.98px) {
+  .admin-topbar-save-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }
 
 .admin-breadcrumb-sep {
@@ -552,35 +755,6 @@
   box-shadow: var(--admin-focus-ring-navy);
 }
 
-/* The Cmd+K affordance in the topbar. */
-.admin-search-trigger {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--admin-space-2);
-  height: 32px;
-  min-width: 200px;
-  padding: 0 var(--admin-space-2) 0 var(--admin-space-3);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
-  background: var(--admin-sunken);
-  color: var(--admin-text-muted);
-  font-size: var(--admin-text-base);
-  cursor: pointer;
-  transition:
-    border-color var(--admin-duration-fast),
-    background var(--admin-duration-fast);
-}
-
-.admin-search-trigger:hover {
-  border-color: var(--admin-border-strong);
-  background: var(--admin-raised);
-}
-
-.admin-search-trigger:focus-visible {
-  outline: none;
-  box-shadow: var(--admin-focus-ring);
-}
-
 .admin-kbd {
   display: inline-flex;
   align-items: center;
@@ -595,42 +769,6 @@
   font-weight: 600;
   color: var(--admin-text-muted);
   line-height: 1.4;
-}
-
-/* ── Topbar breakpoint visibility ─────────────────────────────────────────
-   These are media queries rather than Tailwind's `hidden md:inline-flex` for
-   the same reason the search-field padding is: `.admin-icon-btn` and
-   `.admin-search-trigger` set `display` from unlayered CSS, which outranks a
-   layered utility — so `hidden` was silently discarded and all of this chrome
-   stayed visible at every width, phone search bar included. They must also stay
-   *after* those component rules, since both sides have one class of
-   specificity and the later declaration is the one that wins. */
-.admin-topbar-only-md,
-.admin-topbar-only-sm,
-.admin-topbar-only-lg {
-  display: none;
-}
-
-/* Public-site link: tablet and up. */
-@media (min-width: 768px) {
-  .admin-topbar-only-md {
-    display: inline-flex;
-  }
-}
-
-/* Compact search button: only in the band where the full trigger will not fit
-   but the row still has room for it. Phones get neither form of search. */
-@media (min-width: 640px) and (max-width: 1023.98px) {
-  .admin-topbar-only-sm {
-    display: inline-flex;
-  }
-}
-
-/* Full Ctrl-K search trigger: desktop only. */
-@media (min-width: 1024px) {
-  .admin-topbar-only-lg {
-    display: inline-flex;
-  }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════════
@@ -1486,10 +1624,10 @@
 }
 
 /* ── Editor workspace ─────────────────────────────────────────────────────
-   The frame every page editor shares (EditorWorkspace): header, the live page
-   on the left, the edit panel on the right, the save bar along the bottom.
-   It fills the viewport under the topbar and scrolls its two columns
-   independently, so the save bar and the panel never leave the screen. */
+   The frame every page editor shares (EditorWorkspace): the live page on the
+   left, the edit panel on the right. Its title, help and save controls live in
+   the topbar, so it fills the whole viewport under it and scrolls its two
+   columns independently — the panel never leaves the screen. */
 .admin-workspace {
   --admin-panel-w: 460px;
   display: flex;
@@ -1506,37 +1644,16 @@
   }
 }
 
-.admin-workspace-header {
+/* Outside the admin shell there is no topbar to portal into. */
+.admin-workspace-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--admin-space-3);
+  justify-content: flex-end;
+  gap: var(--admin-space-2);
   padding: var(--admin-space-3) var(--admin-space-6);
   background: var(--admin-raised);
   border-bottom: 1px solid var(--admin-border);
-}
-
-.admin-workspace-header .admin-page-subtitle {
-  margin-top: 2px;
-}
-
-.admin-workspace-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 10px;
-  border-radius: var(--admin-radius-full);
-  font-size: var(--admin-text-xs);
-  font-weight: 600;
-  color: var(--admin-published);
-  background: var(--admin-published-bg);
-  border: 1px solid var(--admin-published-border);
-}
-
-.admin-workspace-badge--draft {
-  color: var(--admin-draft);
-  background: var(--admin-draft-bg);
-  border-color: var(--admin-draft-border);
 }
 
 .admin-workspace-banner {

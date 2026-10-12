@@ -240,7 +240,6 @@ function LivePageEditorInner<T>({
       title={title}
       description={subtitle}
       publicHref={publicPath}
-      unpublished={unpublished}
       loading={!ready && !error}
       error={error}
       sections={sections}

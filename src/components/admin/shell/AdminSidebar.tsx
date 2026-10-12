@@ -12,6 +12,7 @@ import {
   visibleSections,
   type NavScope,
 } from "@/lib/admin-nav";
+import { AdminSidebarFooter } from "./AdminSidebarFooter";
 
 // New key on purpose: the old one held a JSON array of open sections, which is
 // not a shape this reader understands.
@@ -30,6 +31,8 @@ export function AdminSidebar({
   pathname,
   url,
   collapsed,
+  userName,
+  onOpenPalette,
   onNavigate,
 }: {
   role: string;
@@ -37,6 +40,8 @@ export function AdminSidebar({
   pathname: string;
   url: NavScope;
   collapsed: boolean;
+  userName: string;
+  onOpenPalette: () => void;
   /** Closes the mobile drawer once a destination is picked. */
   onNavigate?: () => void;
 }) {
@@ -172,6 +177,14 @@ export function AdminSidebar({
           );
         })}
       </nav>
+
+      <AdminSidebarFooter
+        userName={userName}
+        userRole={role}
+        collapsed={collapsed}
+        onOpenPalette={onOpenPalette}
+        onNavigate={onNavigate}
+      />
     </aside>
   );
 }

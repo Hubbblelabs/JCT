@@ -428,7 +428,6 @@ function PlacementsPageEditorInner() {
       title={`${label} — Placements Page`}
       description="Click any part of the page to edit it. The page text follows Save draft / Publish; year-wise records go live as soon as they are saved."
       publicHref={publicPath}
-      unpublished={unpublished}
       loading={!ready && !loadError}
       error={loadError}
       sections={sections}

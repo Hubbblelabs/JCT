@@ -323,21 +323,28 @@ function PageEditorInner({ id }: { id: string }) {
           ? publicPathFor(doc.institution, doc.slug)
           : undefined
       }
-      unpublished={doc.status !== "published"}
       headerExtra={
         <>
           <Link
             href="/admin/pages"
             className="admin-btn admin-btn-ghost admin-btn-sm"
+            title="Back to all pages"
           >
-            <ArrowLeft size={14} /> All pages
+            <ArrowLeft size={14} />
+            <span className="admin-tb-label admin-tb-label--secondary">
+              All pages
+            </span>
           </Link>
           <button
             type="button"
             onClick={() => void deletePage()}
             className="admin-btn admin-btn-danger admin-btn-sm"
+            title="Delete this page"
           >
-            <Trash2 size={14} /> Delete
+            <Trash2 size={14} />
+            <span className="admin-tb-label admin-tb-label--secondary">
+              Delete
+            </span>
           </button>
         </>
       }

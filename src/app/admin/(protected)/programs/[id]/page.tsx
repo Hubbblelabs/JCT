@@ -445,30 +445,41 @@ function ProgramDetailInner() {
           ? `/institutions/${prog.institution}/programs/${prog.slug}`
           : undefined
       }
-      unpublished={!isNew && status !== "published"}
       loading={loading}
       headerExtra={
         <>
           <button
             onClick={() => router.push(backHref)}
             className="admin-btn admin-btn-ghost admin-btn-sm"
+            title="Back to all programs"
           >
-            <ArrowLeft size={14} /> All programs
+            <ArrowLeft size={14} />
+            <span className="admin-tb-label admin-tb-label--secondary">
+              All programs
+            </span>
           </button>
           {!isNew && prog.is_active && (
             <button
               onClick={deactivate}
               className="admin-btn admin-btn-outline admin-btn-sm"
+              title="Hide this program from the site"
             >
-              <EyeOff size={14} /> Hide from site
+              <EyeOff size={14} />
+              <span className="admin-tb-label admin-tb-label--secondary">
+                Hide from site
+              </span>
             </button>
           )}
           {!isNew && !prog.is_active && (
             <button
               onClick={activate}
               className="admin-btn admin-btn-green admin-btn-sm"
+              title="Show this program on the site"
             >
-              <Check size={14} /> Show on site
+              <Check size={14} />
+              <span className="admin-tb-label admin-tb-label--secondary">
+                Show on site
+              </span>
             </button>
           )}
           {!isNew && (
@@ -476,13 +487,16 @@ function ProgramDetailInner() {
               onClick={remove}
               disabled={deleting}
               className="admin-btn admin-btn-danger admin-btn-sm"
+              title="Delete this program"
             >
               {deleting ? (
                 <Loader2 size={14} className="animate-spin" />
               ) : (
                 <Trash2 size={14} />
               )}
-              Delete
+              <span className="admin-tb-label admin-tb-label--secondary">
+                Delete
+              </span>
             </button>
           )}
         </>

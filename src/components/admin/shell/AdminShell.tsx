@@ -7,6 +7,7 @@ import { findNavTrail, isImmersiveRoute, type NavScope } from "@/lib/admin-nav";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminTopbar } from "./AdminTopbar";
 import { AdminCommandPalette } from "./AdminCommandPalette";
+import { TopbarSlotProvider, useTopbarSlotState } from "./topbar-slot";
 
 const COLLAPSED_KEY = "jct-admin-sidebar-collapsed";
 
@@ -41,6 +42,8 @@ function ShellInner({ children }: { children: ReactNode }) {
     () => findNavTrail(role, institution, pathname, url),
     [role, institution, pathname, url],
   );
+
+  const slot = useTopbarSlotState();
 
   const [userCollapsed, setUserCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -138,6 +141,8 @@ function ShellInner({ children }: { children: ReactNode }) {
         pathname={pathname}
         url={url}
         collapsed={collapsed && !drawerOpen}
+        userName={userName}
+        onOpenPalette={() => setPaletteOpen(true)}
         onNavigate={() => setDrawerOpen(false)}
       />
 
@@ -152,15 +157,15 @@ function ShellInner({ children }: { children: ReactNode }) {
       <div className="admin-shell-main">
         <AdminTopbar
           trail={trail}
-          userName={userName}
-          userRole={role}
+          pathname={pathname}
+          page={slot.page}
+          actionsRef={slot.actionsRef}
           collapsed={isMobile ? !drawerOpen : collapsed}
           mobile={isMobile}
           onToggleCollapse={toggleCollapse}
-          onOpenPalette={() => setPaletteOpen(true)}
         />
         <main id="admin-main" className="admin-main">
-          {children}
+          <TopbarSlotProvider value={slot.value}>{children}</TopbarSlotProvider>
         </main>
       </div>
 

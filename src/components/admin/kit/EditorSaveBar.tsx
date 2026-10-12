@@ -7,8 +7,9 @@ import { useUnsavedGuard } from "./useUnsavedGuard";
 export type EditorSaveMode = "draft" | "publish";
 
 /**
- * The one save control every page editor shares: status on the left, then
- * Discard, Save draft and Publish.
+ * The one save control every page editor shares: status, then Discard, Save
+ * draft and Publish. EditorWorkspace shows it at the right of the admin
+ * topbar, so it is laid out as one compact row rather than a bar.
  *
  * "Save draft" keeps the change out of the live site; "Publish" makes it live.
  * Publish stays enabled with nothing edited when a saved draft is still
@@ -70,57 +71,63 @@ export function EditorSaveBar({
   })();
 
   return (
-    <div className="admin-savebar" data-dirty={dirty || undefined}>
-      <p className="admin-savebar-status" role="status" aria-live="polite">
+    <div className="admin-topbar-save" data-dirty={dirty || undefined}>
+      <p
+        className="admin-topbar-save-status"
+        role="status"
+        aria-live="polite"
+        title={status.text}
+      >
         <span className={`admin-dot admin-dot--${status.dot}`} />
-        <span>{status.text}</span>
+        <span className="admin-topbar-save-text">{status.text}</span>
       </p>
 
-      <div className="flex flex-wrap items-center gap-2">
-        {onDiscard && dirty && (
-          <button
-            type="button"
-            onClick={onDiscard}
-            disabled={busy}
-            className="admin-btn admin-btn-ghost admin-btn-sm"
-          >
-            <RotateCcw size={14} />
-            Discard changes
-          </button>
-        )}
-        {onSaveDraft && (
-          <button
-            type="button"
-            onClick={onSaveDraft}
-            disabled={busy || !dirty}
-            title="Save without changing the live site"
-            className="admin-btn admin-btn-outline"
-          >
-            {saving === "draft" ? (
-              <Loader2 size={15} className="animate-spin" />
-            ) : (
-              <Save size={15} />
-            )}
-            Save draft
-          </button>
-        )}
-        {onPublish && (
-          <button
-            type="button"
-            onClick={onPublish}
-            disabled={busy || (!dirty && !unpublished)}
-            title="Save and show the changes on the live site"
-            className="admin-btn admin-btn-primary"
-          >
-            {saving === "publish" ? (
-              <Loader2 size={15} className="animate-spin" />
-            ) : (
-              <Check size={15} />
-            )}
-            Publish
-          </button>
-        )}
-      </div>
+      {onDiscard && dirty && (
+        <button
+          type="button"
+          onClick={onDiscard}
+          disabled={busy}
+          title="Discard changes"
+          className="admin-btn admin-btn-ghost admin-btn-sm"
+        >
+          <RotateCcw size={14} />
+          <span className="admin-tb-label admin-tb-label--secondary">
+            Discard
+          </span>
+        </button>
+      )}
+      {onSaveDraft && (
+        <button
+          type="button"
+          onClick={onSaveDraft}
+          disabled={busy || !dirty}
+          title="Save without changing the live site (Ctrl+S)"
+          className="admin-btn admin-btn-outline admin-btn-sm"
+        >
+          {saving === "draft" ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Save size={14} />
+          )}
+          <span className="admin-tb-label">Save draft</span>
+        </button>
+      )}
+      {onPublish && (
+        <button
+          type="button"
+          onClick={onPublish}
+          disabled={busy || (!dirty && !unpublished)}
+          title="Save and show the changes on the live site"
+          className="admin-btn admin-btn-primary admin-btn-sm"
+        >
+          {saving === "publish" ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Check size={14} />
+          )}
+          <span className="admin-tb-label">Publish</span>
+        </button>
+      )}
     </div>
   );
 }

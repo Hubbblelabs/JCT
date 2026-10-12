@@ -154,8 +154,8 @@ export const HELP_CHAPTERS: HelpChapter[] = [
             password again — that is normal, not a fault.
           </li>
           <li>
-            To sign out, open the menu with your name at the top right and
-            choose <UI>Sign out</UI>.
+            To sign out, open the menu with your name at the bottom of the
+            sidebar and choose <UI>Sign out</UI>.
           </li>
         </Steps>
         <P>
@@ -228,26 +228,28 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           The line across the top always says where you are:{" "}
           <UI>section › group › page</UI>. It is the only thing on screen that
           distinguishes one college&apos;s copy of a screen from another&apos;s.
+          On an editor, hover the <UI>?</UI> icon beside the page name to read
+          what the page controls.
         </P>
 
         <H3>Search</H3>
         <P>
           Press <Key>Ctrl</Key> <Key>K</Key> (<Key>⌘</Key> <Key>K</Key> on a
-          Mac) anywhere in the panel, or click <UI>Search pages…</UI> in the top
-          bar. Type a few letters of a page name, move with the arrow keys,
-          press <Key>Enter</Key> to go. <Key>Esc</Key> closes it. This is
-          usually faster than clicking through the tree.
+          Mac) anywhere in the panel, or click <UI>Search pages…</UI> at the
+          bottom of the sidebar. Type a few letters of a page name, move with
+          the arrow keys, press <Key>Enter</Key> to go. <Key>Esc</Key> closes
+          it. This is usually faster than clicking through the tree.
         </P>
 
         <H3>Seeing the real page</H3>
         <Bullets>
           <li>
-            The <MousePointerClick size={13} aria-hidden="true" /> external-link
-            button in the top bar opens the public website in a new tab.
+            <UI>View public site</UI> at the bottom of the sidebar opens the
+            public website in a new tab.
           </li>
           <li>
-            The live-preview editors have their own <UI>Public Page</UI> button
-            that opens the exact page you are editing.
+            The live-preview editors have their own <UI>View live page</UI>{" "}
+            button in the top bar that opens the exact page you are editing.
           </li>
         </Bullets>
 
@@ -294,18 +296,14 @@ export const HELP_CHAPTERS: HelpChapter[] = [
               Examination, Campus Life, Research, Clubs, Committees,
               Accreditations, Reports &amp; Downloads, NAAC, Placements, every
               content page, Programs and Dynamic Pages — opens in the same
-              editor, with one bar along the bottom:
+              editor, with its save controls at the right of the top bar:
             </p>
             <p>
               <UI>Save draft</UI> keeps your work without changing the live
               page. <UI>Publish</UI> puts it live. <UI>Discard changes</UI>{" "}
-              throws away everything since the last save. The badge next to the
-              title reads{" "}
-              <span className="admin-badge admin-badge-published">Live</span> or{" "}
-              <span className="admin-badge admin-badge-draft">
-                Unpublished changes
-              </span>
-              .
+              throws away everything since the last save. The dot beside them is
+              green when everything is live and gold when something is not yet
+              published; hover it to read which.
             </p>
             <p>
               Two things inside these editors save straight away instead:
@@ -356,8 +354,8 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           </li>
           <li>Try it in a private window, which has no old copy to reuse.</li>
           <li>
-            Still old? Ask an admin to press <UI>Clear cache</UI> in the top
-            bar. Every public page then rebuilds on its next visit.
+            Still old? Ask an admin to press <UI>Clear cache</UI> at the bottom
+            of the sidebar. Every public page then rebuilds on its next visit.
           </li>
         </Steps>
       </>
@@ -393,8 +391,8 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           <li>Edit the fields. The page on the left updates as you type.</li>
           <li>
             Press <UI>Save draft</UI> to keep your work privately, or{" "}
-            <UI>Publish</UI> to put it live. <Key>Ctrl</Key> <Key>S</Key> saves
-            a draft.
+            <UI>Publish</UI> to put it live — both are at the right of the top
+            bar. <Key>Ctrl</Key> <Key>S</Key> saves a draft.
           </li>
           <li>
             Press <UI>All sections</UI> to go back to the list. Nothing is lost
@@ -421,9 +419,9 @@ export const HELP_CHAPTERS: HelpChapter[] = [
         </P>
 
         <Note tone="warning" title="There is no automatic save">
-          While there are unsaved changes the bar at the bottom says so, and the
-          panel asks before you leave the screen. Save a draft before you step
-          away.
+          While there are unsaved changes the dot in the top bar turns gold, and
+          the panel asks before you leave the screen. Save a draft before you
+          step away.
         </Note>
       </>
     ),
@@ -443,8 +441,8 @@ export const HELP_CHAPTERS: HelpChapter[] = [
         <P>
           Every section you open — from the page, the section list, or a sidebar
           entry such as a college&apos;s <UI>Landing Page</UI> items — shows its
-          fields in the panel on the right. Fill them in and save with the bar
-          at the bottom.
+          fields in the panel on the right. Fill them in and save with the
+          buttons at the right of the top bar.
         </P>
 
         <H3>What you will meet in these forms</H3>
@@ -948,7 +946,7 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           rows={[
             {
               term: "I saved, but the site still shows the old version",
-              body: "Either the change is still a draft — check whether the bar at the bottom of its editor says “Draft saved — not on the live site yet”, and press Publish — or the page is cached. Hard refresh, try a private window, then ask an admin to press Clear cache.",
+              body: "Either the change is still a draft — hover the dot next to Publish in its editor, and if it says “Draft saved — not on the live site yet”, press Publish — or the page is cached. Hard refresh, try a private window, then ask an admin to press Clear cache.",
             },
             {
               term: "My edit vanished",

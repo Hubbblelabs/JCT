@@ -326,7 +326,6 @@ function SiteSectionsEditorInner({
       description={description}
       publicHref={publicHref}
       headerExtra={headerExtra}
-      unpublished={drafted.size > 0}
       loading={loading}
       error={error}
       sections={outline}

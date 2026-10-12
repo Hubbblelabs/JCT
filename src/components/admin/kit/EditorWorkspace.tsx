@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import {
   ArrowLeft,
   ChevronRight,
@@ -10,6 +11,7 @@ import {
   MousePointerClick,
 } from "lucide-react";
 import { InspectorOverlay } from "@/components/admin/InspectorOverlay";
+import { useTopbarSlot } from "@/components/admin/shell/topbar-slot";
 import { ScaledPreview } from "./ScaledPreview";
 
 /** One editable part of the page, as listed in the side panel. */
@@ -75,15 +77,18 @@ function revealInPreview(root: HTMLElement, scope: string, id: string) {
 /**
  * The layout every page editor in the admin shares.
  *
- *  ┌──────────────────────────────────────────────┐
- *  │ Title · what it controls      View live page │
- *  ├────────────────────────────┬─────────────────┤
- *  │                            │ Sections list,  │
- *  │  The real page, clickable  │ or the form for │
- *  │  section by section        │ the one picked  │
- *  ├────────────────────────────┴─────────────────┤
- *  │ Unsaved changes      Discard · Save · Publish│
- *  └──────────────────────────────────────────────┘
+ *  ┌───────────────────────────────────────────────────────┐
+ *  │ Topbar: breadcrumb (?)     View live · Save · Publish │
+ *  ├─────────────────────────────┬─────────────────────────┤
+ *  │                             │ Sections list,          │
+ *  │  The real page, clickable   │ or the form for         │
+ *  │  section by section         │ the one picked          │
+ *  └─────────────────────────────┴─────────────────────────┘
+ *
+ * The page has no heading of its own: the breadcrumb already names it, the
+ * description sits behind the help icon beside it, and the header controls
+ * and save bar are portalled into the admin topbar so the preview gets the
+ * full height.
  *
  * Editors used to each build this frame themselves — a modal on one page, a
  * plain form with no preview on another, the save button in a different
@@ -98,7 +103,6 @@ export function EditorWorkspace({
   description,
   publicHref,
   headerExtra,
-  unpublished = false,
   loading = false,
   error,
   preview,
@@ -112,14 +116,14 @@ export function EditorWorkspace({
   saveBar,
   banner,
 }: {
+  /** Names the page in the breadcrumb when the nav trail doesn't. */
   title: string;
+  /** Shown behind the help icon next to the breadcrumb. */
   description?: string;
   /** The live page this editor changes. */
   publicHref?: string;
-  /** Extra header controls, e.g. a college switcher. */
+  /** Extra topbar controls, e.g. back to the list or Delete. */
   headerExtra?: ReactNode;
-  /** A saved draft exists that is not live yet. */
-  unpublished?: boolean;
   loading?: boolean;
   error?: string | null;
   preview: ReactNode;
@@ -134,14 +138,16 @@ export function EditorWorkspace({
   panelHelp?: ReactNode;
   /** The form for the selected section. */
   panel?: ReactNode;
+  /** An EditorSaveBar — shown in the topbar. */
   saveBar: ReactNode;
-  /** Full-width notice under the header — e.g. validation errors. */
+  /** Full-width notice above the page — e.g. validation errors. */
   banner?: ReactNode;
 }) {
   const wide = useIsWide();
   const [outlineOpen, setOutlineOpen] = useState(false);
   const scope = useId();
   const rootRef = useRef<HTMLDivElement>(null);
+  const topbar = useTopbarSlot({ title, description });
 
   const current = sections.find((s) => s.id === selected);
   const heading = panelTitle ?? current?.label ?? "Section";
@@ -176,47 +182,47 @@ export function EditorWorkspace({
     </>
   );
 
+  const actions = (
+    <>
+      {headerExtra}
+      {!wide && sections.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setOutlineOpen(true)}
+          className="admin-btn admin-btn-outline admin-btn-sm"
+          title="Page sections"
+        >
+          <ListTree size={14} />
+          <span className="admin-tb-label admin-tb-label--secondary">
+            Sections
+          </span>
+        </button>
+      )}
+      {publicHref && (
+        <a
+          href={publicHref}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="admin-btn admin-btn-outline admin-btn-sm"
+          title="Open the live page in a new tab"
+        >
+          <ExternalLink size={14} />
+          <span className="admin-tb-label admin-tb-label--secondary">
+            View live page
+          </span>
+        </a>
+      )}
+      {saveBar}
+    </>
+  );
+
   return (
     <div className="admin-workspace" ref={rootRef} data-workspace={scope}>
-      <header className="admin-workspace-header">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="admin-page-title truncate">{title}</h1>
-            {!loading && (
-              <span
-                className={`admin-workspace-badge ${
-                  unpublished ? "admin-workspace-badge--draft" : ""
-                }`}
-              >
-                {unpublished ? "Unpublished changes" : "Live"}
-              </span>
-            )}
-          </div>
-          {description && <p className="admin-page-subtitle">{description}</p>}
-        </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
-          {headerExtra}
-          {!wide && sections.length > 0 && (
-            <button
-              type="button"
-              onClick={() => setOutlineOpen(true)}
-              className="admin-btn admin-btn-outline admin-btn-sm"
-            >
-              <ListTree size={14} /> Sections
-            </button>
-          )}
-          {publicHref && (
-            <a
-              href={publicHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="admin-btn admin-btn-outline admin-btn-sm"
-            >
-              <ExternalLink size={14} /> View live page
-            </a>
-          )}
-        </div>
-      </header>
+      {topbar === undefined ? (
+        <div className="admin-workspace-actions">{actions}</div>
+      ) : (
+        topbar && createPortal(actions, topbar)
+      )}
 
       {banner && <div className="admin-workspace-banner">{banner}</div>}
 
@@ -274,8 +280,6 @@ export function EditorWorkspace({
           </aside>
         )}
       </div>
-
-      {saveBar}
 
       {!wide && selected && !loading && (
         <InspectorOverlay
