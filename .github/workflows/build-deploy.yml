@@ -76,7 +76,11 @@ jobs:
 
           command_timeout: "30m"
 
+          # `set -e` is load-bearing: without it a failed `build` falls
+          # through to `up -d`, which just keeps the old container running,
+          # and the job still reports success because the last command did.
           script: |
+            set -e
             cd jctSite
             git fetch --all --tags
             git reset --hard origin/v3-admin
