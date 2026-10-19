@@ -180,8 +180,9 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   engineeringSeo: ["engineering"],
   artsScienceSeo: ["arts-science"],
   polytechnicSeo: ["polytechnic"],
-  // Rendered in the root layout, so it affects every public page. "home"
-  // is included because "all-institutions" doesn't cover /campus-life.
+  // Rendered in the root layout, so it affects every public page — which is
+  // why it is also in SITE_WIDE_CONFIG_KEYS, and that set wins. Kept here so
+  // the key still has a mapping if it ever leaves that set.
   floatingElements: ["home", "all-institutions"],
 };
 
@@ -293,6 +294,9 @@ const SITE_WIDE_CONFIG_KEYS = new Set([
   "artsScienceNavbar",
   "polytechnicNavbar",
   "footer",
+  // Server-rendered in the root layout (GlobalConfig), so it is baked into
+  // every public page, detail routes included.
+  "floatingElements",
 ]);
 
 export function revalidateForConfigKey(key: string): void {

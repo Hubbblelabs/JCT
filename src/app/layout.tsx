@@ -3,6 +3,7 @@ import Script from "next/script";
 import { Playfair_Display, Inter } from "next/font/google";
 import "@/styles/globals.css";
 import { GlobalElements } from "@/components/layout/GlobalElements";
+import { GlobalConfig } from "@/components/layout/GlobalConfig";
 import { RouteQuickNav } from "@/components/layout/RouteQuickNav";
 import { MerittoScript } from "@/components/layout/MerittoScript";
 import { InstitutionProvider } from "@/contexts/InstitutionContext";
@@ -97,14 +98,16 @@ export default function RootLayout({
         </a>
         <InstitutionProvider>
           {children}
-          {/* Global elements - conditionally shown based on route */}
-          <GlobalElements />
+          {/* Global elements (conditionally shown based on route) and the
+              Meritto chatbot loader (public pages only) — with their config
+              rendered on the server, see GlobalConfig. */}
+          <GlobalConfig>
+            <GlobalElements />
+            <MerittoScript />
+          </GlobalConfig>
           {/* Route quick nav - dev only, server component */}
           {process.env.NODE_ENV !== "production" && <RouteQuickNav />}
         </InstitutionProvider>
-
-        {/* Meritto Chatbot - conditionally loaded on public pages only */}
-        <MerittoScript />
 
         {/* Google Analytics (gtag.js) — googletagmanager.com must stay
             allowlisted in the CSP script-src in next.config.ts. */}

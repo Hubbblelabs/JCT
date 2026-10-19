@@ -95,17 +95,29 @@ export async function getPublishedConfigs(
   let docs: unknown[];
   try {
     await connectDB();
-    docs = await SiteConfig.find({ config_key: { $in: keys } }).lean();
+    // Only the published side is ever served, so the draft `value` (often
+    // the larger of the two) is never read off the wire.
+    docs = await SiteConfig.find({ config_key: { $in: keys } })
+      .select("config_key published_value")
+      .lean();
   } catch (err) {
     console.warn("[site-config-server] getPublishedConfigs failed:", err);
     return {};
   }
-  const result: Record<string, unknown> = {};
+  // Every requested key is present in the result, `null` when nothing is
+  // published under it. `useSiteConfig` treats a key that is *in* the context
+  // as answered and only fetches the ones that are absent — so leaving
+  // unpublished keys out sent a client request per empty section on every
+  // page view (twenty-odd on a sparsely filled landing page), each one coming
+  // back with the same "nothing here" the server already knew. The DB-failure
+  // branch above still returns `{}`, which is what keeps that fetch as the
+  // fallback when the server genuinely could not read the config.
+  const result: Record<string, unknown> = Object.fromEntries(
+    keys.map((key) => [key, null]),
+  );
   for (const doc of docs as Array<{
     config_key: string;
-    status: string;
     published_value?: unknown;
-    value: unknown;
   }>) {
     // Public pages must only ever render published values. Falling back to
     // the draft `value` would leak unpublished edits to anonymous visitors
