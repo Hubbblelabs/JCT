@@ -62,7 +62,7 @@ function StatsSectionEditor({
         {section.items.map((item, i) => (
           <div
             key={i}
-            className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 rounded-md border border-slate-100 p-2"
+            className="grid grid-cols-[1fr_1fr_1fr_auto] gap-2 rounded-md border border-[var(--admin-border-subtle)] p-2"
           >
             <TextInput
               label=""
@@ -214,7 +214,7 @@ function CardsSectionEditor({
           {section.items.map((item, i) => (
             <div
               key={i}
-              className="admin-col-4 rounded-md border border-slate-100 p-3"
+              className="admin-col-4 rounded-md border border-[var(--admin-border-subtle)] p-3"
             >
               <TextInput
                 label="Title"
@@ -303,7 +303,7 @@ function PeopleSectionEditor({
         {section.items.map((p, i) => (
           <div
             key={i}
-            className="admin-col-6 rounded-md border border-slate-100 p-3"
+            className="admin-col-6 rounded-md border border-[var(--admin-border-subtle)] p-3"
           >
             <div className="admin-form-grid admin-form-grid--tight">
               <TextInput
@@ -423,9 +423,9 @@ function SectionEditor({
   onMoveDown: () => void;
 }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white p-3">
+    <div className="rounded-lg border border-[var(--admin-border)] bg-white p-3">
       <div className="mb-3 flex items-center justify-between">
-        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold tracking-wider text-slate-600 uppercase">
+        <span className="rounded-full bg-[var(--admin-neutral-bg)] px-2 py-0.5 text-[11px] font-semibold tracking-wider text-[var(--admin-text-secondary)] uppercase">
           {section.kind}
         </span>
         <div className="flex gap-1">
@@ -504,7 +504,7 @@ export function ProgramTabsEditor({ tabs, onChange }: Props) {
   return (
     <div className="space-y-3">
       {tabs.length === 0 && (
-        <p className="rounded-lg border border-dashed border-slate-200 p-6 text-center text-sm text-slate-400">
+        <p className="rounded-lg border border-dashed border-[var(--admin-border)] p-6 text-center text-sm text-[var(--admin-text-faint)]">
           No tabs yet. Click &quot;Add Tab&quot; to start, or use &quot;Migrate
           to tabs&quot; on the toolbar to generate the default six tabs from
           legacy fields.
@@ -513,7 +513,7 @@ export function ProgramTabsEditor({ tabs, onChange }: Props) {
       {tabs.map((tab, i) => (
         <div
           key={i}
-          className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-sunken)] p-4"
         >
           <div className="mb-3 flex flex-wrap items-end gap-3">
             <div className="min-w-48 flex-1">

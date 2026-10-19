@@ -229,12 +229,15 @@ export function EditorWorkspace({
       <div className="admin-workspace-body" data-wide={wide || undefined}>
         <div className="admin-workspace-preview">
           {error ? (
-            <p className="m-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
+            <p className="m-6 rounded-lg bg-[var(--admin-danger-bg)] px-4 py-3 text-sm text-[var(--admin-danger)]">
               {error}
             </p>
           ) : loading ? (
             <div className="flex h-full items-center justify-center">
-              <Loader2 size={24} className="animate-spin text-gray-400" />
+              <Loader2
+                size={24}
+                className="animate-spin text-[var(--admin-text-faint)]"
+              />
             </div>
           ) : (
             <>
@@ -337,7 +340,10 @@ function SectionOutline({
                   <span className="admin-workspace-outline-help">{s.help}</span>
                 )}
               </span>
-              <ChevronRight size={16} className="shrink-0 text-gray-400" />
+              <ChevronRight
+                size={16}
+                className="shrink-0 text-[var(--admin-text-faint)]"
+              />
             </button>
           </li>
         );

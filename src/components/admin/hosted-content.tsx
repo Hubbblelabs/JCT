@@ -200,7 +200,7 @@ export function HostedInspector({
   const data = parsed ? drafts[parsed.slug] : undefined;
   if (!parsed || !def || !data) {
     return (
-      <p className="text-sm text-gray-500">
+      <p className="text-sm text-[var(--admin-text-muted)]">
         This panel is no longer part of the page.
       </p>
     );

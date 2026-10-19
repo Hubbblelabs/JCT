@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
-import { BookOpen, ChevronRight, LayoutDashboard } from "lucide-react";
+import { Fragment, useEffect, useMemo, useState } from "react";
+import { ChevronRight, LayoutDashboard } from "lucide-react";
 import { hasMinRole } from "@/lib/permissions";
 import {
   findNavTrail,
@@ -13,6 +14,24 @@ import {
   type NavScope,
 } from "@/lib/admin-nav";
 import { AdminSidebarFooter } from "./AdminSidebarFooter";
+
+/**
+ * Headings the sections are filed under. Day-to-day content work comes first
+ * and the admin tools last — they used to sit at the top of the tree, above
+ * every college, although most sessions never open them.
+ */
+const COLLEGE_SECTION_IDS = ["engineering", "arts-science", "polytechnic"];
+
+// "Website" takes anything the other two don't claim, so a section added to
+// the registry later still appears instead of silently dropping out.
+const SECTION_BLOCKS: { heading: string; match: (id: string) => boolean }[] = [
+  {
+    heading: "Website",
+    match: (id) => !COLLEGE_SECTION_IDS.includes(id) && id !== "admin",
+  },
+  { heading: "Colleges", match: (id) => COLLEGE_SECTION_IDS.includes(id) },
+  { heading: "Administration", match: (id) => id === "admin" },
+];
 
 // New key on purpose: the old one held a JSON array of open sections, which is
 // not a shape this reader understands.
@@ -93,13 +112,15 @@ export function AdminSidebar({
         className="admin-sidebar-brand"
         onClick={onNavigate}
       >
-        <BookOpen size={18} color="var(--admin-gold)" className="shrink-0" />
+        <span className="admin-sidebar-logo">
+          <Image src="/jct_logo.webp" alt="" width={22} height={22} priority />
+        </span>
         <span className="admin-sidebar-brand-text">
           <span className="block text-[length:var(--admin-text-body)] leading-tight font-bold text-white">
-            JCT Admin
+            JCT Institutions
           </span>
           <span className="block text-[length:var(--admin-text-xs)] leading-tight text-[var(--admin-text-on-navy-muted)]">
-            Content Management
+            Content admin
           </span>
         </span>
       </Link>
@@ -111,69 +132,86 @@ export function AdminSidebar({
             onClick={onNavigate}
             className="admin-sidebar-section"
             data-active={dashActive || undefined}
+            aria-current={dashActive ? "page" : undefined}
             title={collapsed ? "Dashboard" : undefined}
           >
-            <LayoutDashboard size={15} className="shrink-0" />
+            <span className="admin-sidebar-icon">
+              <LayoutDashboard size={16} />
+            </span>
             <span className="admin-sidebar-label">Dashboard</span>
           </Link>
         )}
 
-        {sections.map((section) => {
-          const open = expanded === section.id;
-          const groups = visibleGroups(section, role);
-          const isCurrent = trail.section?.id === section.id;
-
+        {SECTION_BLOCKS.map((block) => {
+          const blockSections = sections.filter((s) => block.match(s.id));
+          if (blockSections.length === 0) return null;
           return (
-            <div key={section.id} className="mt-0.5">
-              <button
-                type="button"
-                onClick={() => toggle(section.id)}
-                className="admin-sidebar-section"
-                aria-expanded={open}
-                data-active={isCurrent || undefined}
-                title={collapsed ? section.label : undefined}
-              >
-                <section.icon size={15} className="shrink-0" />
-                <span className="admin-sidebar-label">{section.navLabel}</span>
-                <ChevronRight
-                  size={14}
-                  className="admin-sidebar-section-chevron"
-                  aria-hidden="true"
-                />
-              </button>
+            <Fragment key={block.heading}>
+              <p className="admin-sidebar-heading">{block.heading}</p>
+              {blockSections.map((section) => {
+                const open = expanded === section.id;
+                const groups = visibleGroups(section, role);
+                const isCurrent = trail.section?.id === section.id;
 
-              {/* Rendered whenever the section is open, collapsed or not —
-                  the rail hides this in CSS and reveals it again on hover, so
-                  it has to exist in the DOM to be revealable. */}
-              {open && (
-                <div className="admin-sidebar-sub mt-0.5 mb-2">
-                  {groups.map((group) => (
-                    <div key={group.title}>
-                      <p className="admin-sidebar-group">{group.title}</p>
-                      {group.items.map((item) => (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          onClick={onNavigate}
-                          className="admin-sidebar-link"
-                          title={item.description}
-                          aria-current={
-                            isItemActive(item.href, pathname, url)
-                              ? "page"
-                              : undefined
-                          }
-                        >
-                          <item.icon size={14} className="shrink-0" />
-                          <span className="admin-sidebar-label truncate">
-                            {item.label}
-                          </span>
-                        </Link>
-                      ))}
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                return (
+                  <div key={section.id} className="mt-0.5">
+                    <button
+                      type="button"
+                      onClick={() => toggle(section.id)}
+                      className="admin-sidebar-section"
+                      aria-expanded={open}
+                      data-active={isCurrent || undefined}
+                      title={collapsed ? section.label : undefined}
+                    >
+                      <span className="admin-sidebar-icon">
+                        <section.icon size={16} />
+                      </span>
+                      <span className="admin-sidebar-label">
+                        {section.navLabel}
+                      </span>
+                      <ChevronRight
+                        size={14}
+                        className="admin-sidebar-section-chevron"
+                        aria-hidden="true"
+                      />
+                    </button>
+
+                    {/* Rendered whenever the section is open, collapsed or
+                        not — the rail hides this in CSS and reveals it again
+                        on hover, so it has to exist in the DOM to be
+                        revealable. */}
+                    {open && (
+                      <div className="admin-sidebar-sub mt-1 mb-2">
+                        {groups.map((group) => (
+                          <div key={group.title}>
+                            <p className="admin-sidebar-group">{group.title}</p>
+                            {group.items.map((item) => (
+                              <Link
+                                key={item.href}
+                                href={item.href}
+                                onClick={onNavigate}
+                                className="admin-sidebar-link"
+                                title={item.description}
+                                aria-current={
+                                  isItemActive(item.href, pathname, url)
+                                    ? "page"
+                                    : undefined
+                                }
+                              >
+                                <item.icon size={14} className="shrink-0" />
+                                <span className="admin-sidebar-label truncate">
+                                  {item.label}
+                                </span>
+                              </Link>
+                            ))}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </Fragment>
           );
         })}
       </nav>

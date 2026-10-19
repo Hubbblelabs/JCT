@@ -238,10 +238,10 @@ function SectionEditor({
             {section.items.map((card, i) => (
               <div
                 key={i}
-                className="admin-col-4 rounded-lg border border-gray-200 bg-white p-3"
+                className="admin-col-4 rounded-lg border border-[var(--admin-border)] bg-white p-3"
               >
                 <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-medium text-gray-500">
+                  <span className="text-xs font-medium text-[var(--admin-text-muted)]">
                     Card {i + 1}
                   </span>
                   <button
@@ -388,10 +388,10 @@ export function PageBodySectionsEditor({
       {sections.map((sec, i) => (
         <div
           key={i}
-          className="rounded-xl border border-gray-200 bg-gray-50 p-3"
+          className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-sunken)] p-3"
         >
           <div className="mb-2 flex items-center justify-between gap-2">
-            <span className="text-sm font-semibold text-gray-700">
+            <span className="text-sm font-semibold text-[var(--admin-text-secondary)]">
               Block {i + 1} · {sec.name?.trim() || sec.type}
             </span>
             <div className="flex items-center gap-1">

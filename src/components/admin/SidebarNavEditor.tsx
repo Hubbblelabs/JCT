@@ -78,7 +78,7 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
 
   return (
     <div className="space-y-3">
-      <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+      <p className="rounded-lg border border-[var(--admin-warning-border)] bg-[var(--admin-warning-bg)] px-3 py-2 text-xs text-[var(--admin-warning)]">
         Reorder, rename, hide, or add sidebar items. Built-in items scroll to a
         page section; custom links open any URL; page sections create a new
         in-page section you fill with content blocks. Removing a built-in only
@@ -100,10 +100,10 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
           return (
             <div
               key={item.id ?? `${item.key ?? "c"}-${i}`}
-              className="admin-col-6 rounded-lg border border-gray-200 bg-white p-3"
+              className="admin-col-6 rounded-lg border border-[var(--admin-border)] bg-white p-3"
             >
               <div className="mb-2 flex items-center justify-between gap-2">
-                <span className="text-xs font-medium text-gray-500">
+                <span className="text-xs font-medium text-[var(--admin-text-muted)]">
                   {kindLabel}
                 </span>
                 <div className="flex items-center gap-1">
@@ -158,7 +158,7 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                   </Field>
                 ) : isSection ? (
                   <Field label="Content" span={6}>
-                    <p className="flex h-9 items-center text-xs text-gray-500">
+                    <p className="flex h-9 items-center text-xs text-[var(--admin-text-muted)]">
                       Edit blocks by clicking the section in the live preview.
                     </p>
                   </Field>

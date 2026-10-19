@@ -101,7 +101,7 @@ export function NaacSectionInspector({
     const idx = items.findIndex((it) => (it.id || "") === anchor);
     if (idx === -1) {
       return (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-[var(--admin-text-muted)]">
           This tab no longer exists. Re-open the inspector.
         </p>
       );
@@ -144,7 +144,11 @@ export function NaacSectionInspector({
     const index = Number(blockMatch[1]);
     const block = data.docSections[index];
     if (!block)
-      return <p className="text-sm text-gray-500">Section removed.</p>;
+      return (
+        <p className="text-sm text-[var(--admin-text-muted)]">
+          Section removed.
+        </p>
+      );
     return (
       <FormGrid>
         <TextInput
@@ -493,7 +497,7 @@ export function NaacSectionInspector({
                 value={block.description}
                 onChange={(e) => oc({ ...block, description: e.target.value })}
               />
-              <p className="admin-col-full text-xs text-gray-500">
+              <p className="admin-col-full text-xs text-[var(--admin-text-muted)]">
                 {block.groups.length} group
                 {block.groups.length === 1 ? "" : "s"} —{" "}
                 {block.groups.reduce((n, g) => n + g.docs.length, 0)}{" "}
@@ -508,7 +512,7 @@ export function NaacSectionInspector({
     case "sidebar":
       return (
         <>
-          <p className="mb-3 text-xs text-gray-500">
+          <p className="mb-3 text-xs text-[var(--admin-text-muted)]">
             Rename, reorder or hide the NAAC page&rsquo;s tabs — its own appeal
             panel and the Best Practices / Institutional Distinctiveness / AQAR
             pages — and add custom link or content tabs. A hosted tab stays
@@ -530,6 +534,10 @@ export function NaacSectionInspector({
       );
 
     default:
-      return <p className="text-sm text-gray-500">Select a section to edit.</p>;
+      return (
+        <p className="text-sm text-[var(--admin-text-muted)]">
+          Select a section to edit.
+        </p>
+      );
   }
 }

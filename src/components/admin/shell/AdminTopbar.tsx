@@ -7,6 +7,7 @@ import {
   Menu,
   PanelLeftClose,
   PanelLeftOpen,
+  Search,
   X,
 } from "lucide-react";
 import { type NavTrail } from "@/lib/admin-nav";
@@ -39,6 +40,8 @@ export function AdminTopbar({
   collapsed,
   mobile = false,
   onToggleCollapse,
+  showSearch = false,
+  onOpenPalette,
 }: {
   trail: NavTrail;
   pathname: string;
@@ -51,6 +54,9 @@ export function AdminTopbar({
       narrowing the rail, so it has to say so. */
   mobile?: boolean;
   onToggleCollapse: () => void;
+  /** Off in the full-width editors, whose own actions need the room. */
+  showSearch?: boolean;
+  onOpenPalette?: () => void;
 }) {
   // A detail route (one program, one page) sits under a nav item without
   // being it, so the trail alone would name the list, not what is open.
@@ -148,15 +154,44 @@ export function AdminTopbar({
           </Fragment>
         ) : (
           <span className="admin-breadcrumb-current" aria-current="page">
-            {titleCrumb ?? "Dashboard"}
+            {titleCrumb ?? fallbackCrumb(pathname)}
           </span>
         )}
         {help}
       </nav>
 
+      {showSearch && onOpenPalette && (
+        <button
+          type="button"
+          onClick={onOpenPalette}
+          className="admin-topbar-search"
+          aria-label="Search admin pages"
+          aria-keyshortcuts="Control+K"
+        >
+          <Search size={15} className="shrink-0" aria-hidden="true" />
+          <span className="admin-topbar-search-text">Search pages…</span>
+          <kbd className="admin-kbd">Ctrl K</kbd>
+        </button>
+      )}
+
       <div ref={actionsRef} className="admin-topbar-actions" />
     </header>
   );
+}
+
+/**
+ * The page name when the nav registry has no entry for this route. It used to
+ * fall back to "Dashboard" for every such screen, so /admin/testimonials
+ * announced itself as the dashboard.
+ */
+export function fallbackCrumb(pathname: string): string {
+  if (pathname === "/admin/dashboard" || pathname === "/admin") {
+    return "Dashboard";
+  }
+  const last = pathname.replace(/\/+$/, "").split("/").pop() ?? "";
+  if (!last || last === "admin") return "Dashboard";
+  const words = decodeURIComponent(last).replace(/[-_]+/g, " ").trim();
+  return words.charAt(0).toUpperCase() + words.slice(1);
 }
 
 /**

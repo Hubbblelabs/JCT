@@ -41,7 +41,7 @@ export function PlacementSectionInspector({
     case "banner":
       return (
         <FormGrid>
-          <p className="admin-col-full text-xs text-gray-500">
+          <p className="admin-col-full text-xs text-[var(--admin-text-muted)]">
             Poster-style images for the &ldquo;Highlights&rdquo; section — the
             first item in the page&apos;s sidebar — e.g. the annual
             &ldquo;Distinguished Alumni Students&rdquo; sheet. Each one renders
@@ -202,7 +202,7 @@ export function PlacementSectionInspector({
           />
 
           <Field label="Placement Office" span={7}>
-            <div className="admin-form-grid admin-form-grid--tight rounded-lg border border-gray-100 bg-gray-50/60 p-3">
+            <div className="admin-form-grid admin-form-grid--tight rounded-lg border border-[var(--admin-border-subtle)] bg-gray-50/60 p-3">
               <TextArea
                 label="Address"
                 span="full"
@@ -249,7 +249,7 @@ export function PlacementSectionInspector({
           </Field>
 
           <Field label="Officer Photos" span={5}>
-            <label className="flex items-start gap-2 rounded-lg border border-gray-100 bg-gray-50/60 p-3 text-sm text-gray-700">
+            <label className="flex items-start gap-2 rounded-lg border border-[var(--admin-border-subtle)] bg-gray-50/60 p-3 text-sm text-[var(--admin-text-secondary)]">
               <input
                 type="checkbox"
                 className="mt-0.5"
@@ -260,7 +260,7 @@ export function PlacementSectionInspector({
               />
               <span>
                 Show officer photos
-                <span className="mt-0.5 block text-xs text-gray-500">
+                <span className="mt-0.5 block text-xs text-[var(--admin-text-muted)]">
                   Off hides the photo (and its initials placeholder) on every
                   officer card, leaving name, designation and contact details.
                 </span>
@@ -502,7 +502,7 @@ export function PlacementSectionInspector({
     case "sidebar":
       return (
         <>
-          <p className="mb-3 text-xs text-gray-500">
+          <p className="mb-3 text-xs text-[var(--admin-text-muted)]">
             Rename, reorder, or hide the &ldquo;On This Page&rdquo; entries, and
             add custom links or extra in-page sections. A built-in entry stays
             hidden on the public page while its section has no content.
@@ -527,7 +527,7 @@ export function PlacementSectionInspector({
       // point the editor at the one place that owns them.
       if (section.startsWith("custom:")) {
         return (
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-[var(--admin-text-muted)]">
             This section&apos;s content blocks are edited from the{" "}
             <span className="font-medium">Sidebar Navigation</span> section —
             click the sidebar card in the preview.
@@ -535,7 +535,7 @@ export function PlacementSectionInspector({
         );
       }
       return (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-[var(--admin-text-muted)]">
           The year-wise placement numbers, recruiters, and placed students are
           managed under <span className="font-medium">Placements</span>.
         </p>

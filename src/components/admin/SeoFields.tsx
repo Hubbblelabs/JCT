@@ -23,10 +23,10 @@ function Counter({
   // the hard cap is an error (the API rejects the save).
   const tone =
     count > max
-      ? "text-red-600"
+      ? "text-[var(--admin-danger)]"
       : count > recommended
-        ? "text-amber-600"
-        : "text-gray-400";
+        ? "text-[var(--admin-warning)]"
+        : "text-[var(--admin-text-faint)]";
   return (
     <p className={`-mt-3 mb-4 text-right text-xs ${tone}`}>
       {count} / {recommended} recommended
@@ -51,16 +51,18 @@ function SerpPreview({
     description.trim() ||
     "No description set — search engines will pick their own snippet.";
   return (
-    <div className="rounded-lg border border-gray-100 bg-gray-50 p-3">
-      <p className="mb-1 text-[10px] font-bold tracking-[0.15em] text-gray-400 uppercase">
+    <div className="rounded-lg border border-[var(--admin-border-subtle)] bg-[var(--admin-sunken)] p-3">
+      <p className="mb-1 text-[10px] font-bold tracking-[0.15em] text-[var(--admin-text-faint)] uppercase">
         Search preview
       </p>
-      <p className="text-xs text-gray-500">
+      <p className="text-xs text-[var(--admin-text-muted)]">
         {SITE_ORIGIN}
         {path ?? ""}
       </p>
       <p className="truncate text-base text-[#1a0dab]">{shownTitle}</p>
-      <p className="line-clamp-2 text-xs text-gray-600">{shownDesc}</p>
+      <p className="line-clamp-2 text-xs text-[var(--admin-text-secondary)]">
+        {shownDesc}
+      </p>
     </div>
   );
 }

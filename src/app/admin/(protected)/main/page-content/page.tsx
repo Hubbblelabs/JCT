@@ -211,11 +211,13 @@ function HomeHeroForm({
 
       {/* Background Images — up to 6, add / replace / remove */}
       <div>
-        <h3 className="mb-1 text-sm font-semibold text-gray-700">
+        <h3 className="mb-1 text-sm font-semibold text-[var(--admin-text-secondary)]">
           Background Images{" "}
-          <span className="font-normal text-gray-400">(up to {BG_LIMIT})</span>
+          <span className="font-normal text-[var(--admin-text-faint)]">
+            (up to {BG_LIMIT})
+          </span>
         </h3>
-        <p className="mb-3 text-xs text-gray-400">
+        <p className="mb-3 text-xs text-[var(--admin-text-faint)]">
           Images rotate behind the hero. Upload, replace, or remove each one.
         </p>
         <div className="admin-form-grid admin-form-grid--tight">
@@ -262,9 +264,11 @@ function HomeHeroForm({
 
       {/* Title Lines (exactly 3, fixed count) — one row, as they render */}
       <div>
-        <h3 className="mb-2 text-sm font-semibold text-gray-700">
+        <h3 className="mb-2 text-sm font-semibold text-[var(--admin-text-secondary)]">
           Title Lines{" "}
-          <span className="font-normal text-gray-400">(fixed — 3 lines)</span>
+          <span className="font-normal text-[var(--admin-text-faint)]">
+            (fixed — 3 lines)
+          </span>
         </h3>
         <FormGrid tight>
           {titles.map((line, i) => (
@@ -285,20 +289,22 @@ function HomeHeroForm({
 
       {/* Institution Cards (3 fixed) — side by side, as the home page shows them */}
       <div>
-        <h3 className="mb-1 text-sm font-semibold text-gray-700">
+        <h3 className="mb-1 text-sm font-semibold text-[var(--admin-text-secondary)]">
           Institution Cards{" "}
-          <span className="font-normal text-gray-400">(fixed — 3 cards)</span>
+          <span className="font-normal text-[var(--admin-text-faint)]">
+            (fixed — 3 cards)
+          </span>
         </h3>
-        <p className="mb-3 text-xs text-gray-400">
+        <p className="mb-3 text-xs text-[var(--admin-text-faint)]">
           Edit the title, description, and highlights for each institution card.
         </p>
         <div className="admin-form-grid admin-form-grid--tight">
           {cards.map((card, i) => (
             <div
               key={i}
-              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+              className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
             >
-              <p className="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+              <p className="mb-2 text-xs font-semibold tracking-wide text-[var(--admin-text-faint)] uppercase">
                 Card {i + 1}
               </p>
               <TextInput
@@ -385,16 +391,16 @@ function HomeStatsForm({
   return (
     // The stat cards render as a row on the home page; they edit as one too.
     <div className="admin-form-grid admin-form-grid--tight">
-      <p className="admin-col-full text-xs text-gray-500">
+      <p className="admin-col-full text-xs text-[var(--admin-text-muted)]">
         Each card shows a value (e.g. &ldquo;60+&rdquo;) and a label (e.g.
         &ldquo;Years of Excellence&rdquo;). Both are fully customizable.
       </p>
       {STAT_CARD_FIELDS.map(({ valueKey, labelKey, defaultLabel }, i) => (
         <div
           key={valueKey}
-          className="admin-col-3 rounded-lg border border-gray-200 p-3"
+          className="admin-col-3 rounded-lg border border-[var(--admin-border)] p-3"
         >
-          <p className="mb-2 text-xs font-semibold tracking-wide text-gray-400 uppercase">
+          <p className="mb-2 text-xs font-semibold tracking-wide text-[var(--admin-text-faint)] uppercase">
             Card {i + 1}
           </p>
           <TextInput
@@ -514,7 +520,7 @@ function TestimonialFormInner({
   const busy = saving || flushing;
 
   return (
-    <div className="rounded-lg border border-blue-100 bg-blue-50/40 p-4">
+    <div className="rounded-lg border border-[var(--admin-info-border)] bg-blue-50/40 p-4">
       <FormGrid>
         <TextInput
           label="Name"
@@ -585,7 +591,9 @@ function TestimonialFormInner({
           hideUrlField
         />
       </FormGrid>
-      {flushError && <p className="mb-2 text-xs text-red-600">{flushError}</p>}
+      {flushError && (
+        <p className="mb-2 text-xs text-[var(--admin-danger)]">{flushError}</p>
+      )}
       <div className="flex gap-2">
         <button
           type="button"
@@ -778,7 +786,10 @@ function VoicesInlineManager() {
   if (loading) {
     return (
       <div className="flex justify-center py-8">
-        <Loader2 size={20} className="animate-spin text-gray-400" />
+        <Loader2
+          size={20}
+          className="animate-spin text-[var(--admin-text-faint)]"
+        />
       </div>
     );
   }
@@ -786,7 +797,7 @@ function VoicesInlineManager() {
   return (
     <div className="space-y-4">
       {error && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="rounded-lg bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
           {error}
         </p>
       )}
@@ -813,7 +824,9 @@ function VoicesInlineManager() {
       )}
 
       {items.length === 0 && !addingNew && (
-        <p className="text-sm text-gray-400">No testimonials yet.</p>
+        <p className="text-sm text-[var(--admin-text-faint)]">
+          No testimonials yet.
+        </p>
       )}
 
       <div className="space-y-2">
@@ -830,28 +843,28 @@ function VoicesInlineManager() {
           ) : (
             <div
               key={item._id}
-              className="flex items-start gap-3 rounded-lg border border-gray-100 bg-white p-3"
+              className="flex items-start gap-3 rounded-lg border border-[var(--admin-border-subtle)] bg-white p-3"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-semibold text-gray-800">
+                  <span className="text-sm font-semibold text-[var(--admin-text)]">
                     {item.name}
                   </span>
-                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-gray-500 uppercase">
+                  <span className="rounded-full bg-[var(--admin-neutral-bg)] px-2 py-0.5 text-[10px] font-bold tracking-wide text-[var(--admin-text-muted)] uppercase">
                     {item.category}
                   </span>
                   {!item.is_active && (
-                    <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold tracking-wide text-red-400 uppercase">
+                    <span className="rounded-full bg-[var(--admin-danger-bg)] px-2 py-0.5 text-[10px] font-bold tracking-wide text-red-400 uppercase">
                       Inactive
                     </span>
                   )}
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-[var(--admin-text-faint)]">
                     {[item.batch, item.course, item.company]
                       .filter(Boolean)
                       .join(" · ")}
                   </span>
                 </div>
-                <p className="mt-1 line-clamp-2 text-xs text-gray-500 italic">
+                <p className="mt-1 line-clamp-2 text-xs text-[var(--admin-text-muted)] italic">
                   &ldquo;{item.quote}&rdquo;
                 </p>
               </div>

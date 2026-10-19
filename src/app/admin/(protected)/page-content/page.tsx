@@ -184,7 +184,7 @@ function TestimonialFormInner({
   const busy = saving || flushing;
 
   return (
-    <div className="rounded-lg border border-blue-100 bg-blue-50/40 p-4">
+    <div className="rounded-lg border border-[var(--admin-info-border)] bg-blue-50/40 p-4">
       <FormGrid>
         <TextInput
           label="Name"
@@ -255,7 +255,9 @@ function TestimonialFormInner({
           hideUrlField
         />
       </FormGrid>
-      {flushError && <p className="mb-2 text-xs text-red-600">{flushError}</p>}
+      {flushError && (
+        <p className="mb-2 text-xs text-[var(--admin-danger)]">{flushError}</p>
+      )}
       <div className="flex gap-2">
         <button
           type="button"
@@ -388,7 +390,10 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
   if (loading) {
     return (
       <div className="flex justify-center py-8">
-        <Loader2 size={20} className="animate-spin text-gray-400" />
+        <Loader2
+          size={20}
+          className="animate-spin text-[var(--admin-text-faint)]"
+        />
       </div>
     );
   }
@@ -396,7 +401,7 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
   return (
     <div className="space-y-4">
       {error && (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="rounded-lg bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
           {error}
         </p>
       )}
@@ -423,7 +428,7 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
       )}
 
       {items.length === 0 && !addingNew && (
-        <p className="text-sm text-gray-400">
+        <p className="text-sm text-[var(--admin-text-faint)]">
           No testimonials yet for this college.
         </p>
       )}
@@ -442,28 +447,28 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
           ) : (
             <div
               key={item._id}
-              className="flex items-start gap-3 rounded-lg border border-gray-100 bg-white p-3"
+              className="flex items-start gap-3 rounded-lg border border-[var(--admin-border-subtle)] bg-white p-3"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-sm font-semibold text-gray-800">
+                  <span className="text-sm font-semibold text-[var(--admin-text)]">
                     {item.name}
                   </span>
-                  <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-bold tracking-wide text-gray-500 uppercase">
+                  <span className="rounded-full bg-[var(--admin-neutral-bg)] px-2 py-0.5 text-[10px] font-bold tracking-wide text-[var(--admin-text-muted)] uppercase">
                     {item.category}
                   </span>
                   {!item.is_active && (
-                    <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-bold tracking-wide text-red-400 uppercase">
+                    <span className="rounded-full bg-[var(--admin-danger-bg)] px-2 py-0.5 text-[10px] font-bold tracking-wide text-red-400 uppercase">
                       Inactive
                     </span>
                   )}
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-[var(--admin-text-faint)]">
                     {[item.batch, item.course, item.company]
                       .filter(Boolean)
                       .join(" · ")}
                   </span>
                 </div>
-                <p className="mt-1 line-clamp-2 text-xs text-gray-500 italic">
+                <p className="mt-1 line-clamp-2 text-xs text-[var(--admin-text-muted)] italic">
                   &ldquo;{item.quote}&rdquo;
                 </p>
               </div>

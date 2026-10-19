@@ -418,7 +418,7 @@ function PageEditorInner({ id }: { id: string }) {
                 </Field>
                 <Link
                   href="/admin/pages"
-                  className="admin-col-full text-sm text-amber-700 hover:underline"
+                  className="admin-col-full text-sm text-[var(--admin-warning)] hover:underline"
                 >
                   ← Back to pages
                 </Link>
@@ -554,7 +554,7 @@ function PageEditorInner({ id }: { id: string }) {
 
             {selected === "sidebar" && (
               <div className="space-y-3">
-                <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                <p className="rounded-lg border border-[var(--admin-warning-border)] bg-[var(--admin-warning-bg)] px-3 py-2 text-xs text-[var(--admin-warning)]">
                   Add a left-side navigation list of links. Body sections render
                   to the right of this sidebar.
                 </p>
@@ -562,10 +562,10 @@ function PageEditorInner({ id }: { id: string }) {
                   {sidebarItems.map((it, i) => (
                     <div
                       key={i}
-                      className="admin-col-6 rounded-lg border border-gray-200 bg-white p-3"
+                      className="admin-col-6 rounded-lg border border-[var(--admin-border)] bg-white p-3"
                     >
                       <div className="mb-2 flex items-center justify-between">
-                        <span className="text-xs font-medium text-gray-500">
+                        <span className="text-xs font-medium text-[var(--admin-text-muted)]">
                           Item {i + 1}
                         </span>
                         <div className="flex items-center gap-1">
@@ -715,10 +715,10 @@ function PageEditorInner({ id }: { id: string }) {
                   {galleryImages.map((img, i) => (
                     <div
                       key={i}
-                      className="admin-col-4 rounded-lg border border-gray-200 bg-white p-3"
+                      className="admin-col-4 rounded-lg border border-[var(--admin-border)] bg-white p-3"
                     >
                       <div className="mb-2 flex items-center justify-between">
-                        <span className="text-xs font-medium text-gray-500">
+                        <span className="text-xs font-medium text-[var(--admin-text-muted)]">
                           Image {i + 1}
                         </span>
                         <button

@@ -61,7 +61,7 @@ function GalleryEditor({
       <div className="mb-2 flex items-center justify-between gap-3">
         <span className="admin-label mb-0">Gallery (shown in the sidebar)</span>
         <div className="flex shrink-0 items-center gap-2">
-          <span className="text-xs font-medium text-gray-400">
+          <span className="text-xs font-medium text-[var(--admin-text-faint)]">
             {values.length} / {max}
           </span>
           <button
@@ -76,7 +76,7 @@ function GalleryEditor({
       </div>
 
       {values.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-400">
+        <p className="rounded-lg border border-dashed border-[var(--admin-border)] p-4 text-center text-sm text-[var(--admin-text-faint)]">
           No gallery photos. Add up to {max}.
         </p>
       ) : (
@@ -84,7 +84,7 @@ function GalleryEditor({
           {values.map((url, i) => (
             <div
               key={i}
-              className="admin-col-4 relative rounded-lg border border-gray-200 p-3"
+              className="admin-col-4 relative rounded-lg border border-[var(--admin-border)] p-3"
             >
               <button
                 type="button"
@@ -148,7 +148,7 @@ function GroupBlocksEditor({
       label={`More about this ${singular.toLowerCase()} (optional)`}
       span="full"
       hint="Extra content shown below the details on its own page — text, lists, tables, photo galleries and more."
-      className="border-t border-gray-100 pt-3"
+      className="border-t border-[var(--admin-border-subtle)] pt-3"
     >
       {sub !== "blocks" && (
         <button
@@ -185,8 +185,8 @@ function ShowOnWebsite({
   onChange: (hidden: boolean) => void;
 }) {
   return (
-    <div className="admin-col-full flex flex-wrap items-center justify-between gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
-      <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+    <div className="admin-col-full flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-sunken)] px-3 py-2">
+      <label className="flex items-center gap-2 text-sm font-medium text-[var(--admin-text-secondary)]">
         <input
           type="checkbox"
           checked={!hidden}
@@ -195,7 +195,7 @@ function ShowOnWebsite({
         Show this {singular.toLowerCase()} on the website
       </label>
       {hidden && (
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-[var(--admin-text-muted)]">
           Hidden — kept here, but left off the public page.
         </span>
       )}
@@ -292,7 +292,7 @@ function GroupFields({
       <Field
         label={meta.membersLabel}
         span="full"
-        className="border-t border-gray-100 pt-3"
+        className="border-t border-[var(--admin-border-subtle)] pt-3"
       >
         <TableEditor<Member>
           label={meta.membersLabel}
@@ -366,7 +366,7 @@ export function GroupsSectionInspector({
     const group = data.groups[idx];
     if (!group) {
       return (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-[var(--admin-text-muted)]">
           This entry no longer exists. Re-open the inspector.
         </p>
       );
@@ -425,7 +425,7 @@ export function GroupsSectionInspector({
     case "groups":
       return (
         <>
-          <p className="mb-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+          <p className="mb-3 rounded-lg border border-[var(--admin-warning-border)] bg-[var(--admin-warning-bg)] px-3 py-2 text-xs text-[var(--admin-warning)]">
             Add, remove, and reorder entries here. To edit one in detail, click
             its card in the preview instead.
           </p>
@@ -462,7 +462,7 @@ export function GroupsSectionInspector({
                   />
                   Show on website
                 </label>
-                <p className="admin-col-full text-xs text-gray-400">
+                <p className="admin-col-full text-xs text-[var(--admin-text-faint)]">
                   {item.members.length} {meta.membersLabel.toLowerCase()} ·{" "}
                   <span className="font-mono">/{slugs[i]}</span>
                 </p>

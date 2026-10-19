@@ -200,12 +200,12 @@ export function CurriculumEditor({
             key={i}
             className={`flex items-center gap-1 rounded-lg border px-2 py-1.5 transition-colors ${
               i === activeReg
-                ? "border-blue-300 bg-blue-50"
-                : "border-gray-200 bg-white hover:border-gray-300"
+                ? "border-[var(--admin-info-border)] bg-[var(--admin-info-bg)]"
+                : "border-[var(--admin-border)] bg-white hover:border-[var(--admin-border-strong)]"
             }`}
           >
             <input
-              className="w-36 bg-transparent text-sm font-semibold text-gray-800 outline-none"
+              className="w-36 bg-transparent text-sm font-semibold text-[var(--admin-text)] outline-none"
               value={r.regulationName}
               onChange={(e) => updReg(i, { regulationName: e.target.value })}
               onClick={() => setActiveReg(i)}
@@ -213,7 +213,7 @@ export function CurriculumEditor({
             <button
               type="button"
               onClick={() => remReg(i)}
-              className="ml-1 text-gray-400 hover:text-red-500"
+              className="ml-1 text-[var(--admin-text-faint)] hover:text-red-500"
               title="Remove regulation"
             >
               <Trash2 size={12} />
@@ -231,7 +231,7 @@ export function CurriculumEditor({
 
       {/* Semesters for active regulation */}
       {!reg ? (
-        <p className="rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-400">
+        <p className="rounded-lg border border-dashed border-[var(--admin-border)] p-4 text-center text-sm text-[var(--admin-text-faint)]">
           No regulations yet. Click "Add Regulation" to get started.
         </p>
       ) : (
@@ -239,12 +239,12 @@ export function CurriculumEditor({
           {reg.semesters.map((sem, sI) => (
             <div
               key={sI}
-              className="rounded-lg border border-gray-200 bg-gray-50/50 p-3"
+              className="rounded-lg border border-[var(--admin-border)] bg-gray-50/50 p-3"
             >
               {/* Semester header */}
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2">
-                  <span className="text-sm font-semibold text-gray-700">
+                  <span className="text-sm font-semibold text-[var(--admin-text-secondary)]">
                     Semester
                   </span>
                   <input
@@ -281,7 +281,7 @@ export function CurriculumEditor({
                       {columns.map((c) => (
                         <span
                           key={c.id}
-                          className="truncate text-xs font-semibold text-gray-400"
+                          className="truncate text-xs font-semibold text-[var(--admin-text-faint)]"
                         >
                           {columnLabel(c, builtins)}
                           {c.hidden ? " (hidden)" : ""}

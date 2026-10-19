@@ -134,7 +134,9 @@ export function Field({
       {label && (
         <label className="admin-label" htmlFor={htmlFor}>
           {label}
-          {required && <span className="ml-1 text-red-500">*</span>}
+          {required && (
+            <span className="ml-1 text-[var(--admin-danger)]">*</span>
+          )}
         </label>
       )}
       {children}
@@ -363,13 +365,15 @@ export function Accordion({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between text-left font-semibold text-gray-800"
+        className="flex w-full items-center justify-between text-left font-semibold text-[var(--admin-text)]"
       >
         {title}
         {open ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
       </button>
       {open && (
-        <div className="mt-4 border-t border-gray-100 pt-4">{children}</div>
+        <div className="mt-4 border-t border-[var(--admin-border-subtle)] pt-4">
+          {children}
+        </div>
       )}
     </div>
   );
@@ -570,10 +574,10 @@ export function ImageUploadInput({
         {value && (
           <div className="shrink-0 space-y-1">
             <div
-              className={`relative overflow-hidden rounded-lg border border-gray-200 bg-gray-50 ${previewFrame}`}
+              className={`relative overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-sunken)] ${previewFrame}`}
             >
               {imgError || !previewUrl ? (
-                <span className="flex h-full w-full items-center justify-center text-xs text-gray-400">
+                <span className="flex h-full w-full items-center justify-center text-xs text-[var(--admin-text-faint)]">
                   No preview
                 </span>
               ) : (
@@ -601,9 +605,9 @@ export function ImageUploadInput({
               </button>
             </div>
             {meta && (
-              <p className="w-48 text-[11px] leading-tight text-gray-500">
+              <p className="w-48 text-[11px] leading-tight text-[var(--admin-text-muted)]">
                 {meta.width && meta.height ? (
-                  <span className="font-medium text-gray-700">
+                  <span className="font-medium text-[var(--admin-text-secondary)]">
                     {meta.width} × {meta.height}
                   </span>
                 ) : null}
@@ -678,7 +682,7 @@ export function ImageUploadInput({
             <div className="min-w-[12rem] flex-1">
               <label
                 htmlFor={selectId}
-                className="mb-1 block text-[11px] font-medium text-gray-600"
+                className="mb-1 block text-[11px] font-medium text-[var(--admin-text-secondary)]"
               >
                 Image ratio
               </label>
@@ -701,16 +705,18 @@ export function ImageUploadInput({
                 })}
               </select>
             </div>
-            <p className="min-w-[12rem] flex-1 pt-4 text-[11px] leading-tight text-gray-500">
+            <p className="min-w-[12rem] flex-1 pt-4 text-[11px] leading-tight text-[var(--admin-text-muted)]">
               {rule.height !== null && (
                 <>
-                  <span className="font-medium text-gray-700">Required:</span>{" "}
+                  <span className="font-medium text-[var(--admin-text-secondary)]">
+                    Required:
+                  </span>{" "}
                   {rule.ratio} — at least {rule.width}×{rule.height}px
                 </>
               )}
               <span className="block">{rule.hint}</span>
               {staleRatio && (
-                <span className="block text-amber-700">
+                <span className="block text-[var(--admin-warning)]">
                   Ratio changed — re-upload to apply it to this image.
                 </span>
               )}
@@ -718,7 +724,7 @@ export function ImageUploadInput({
           </div>
 
           {uploadError && (
-            <p className="flex items-start gap-1 text-xs text-red-600">
+            <p className="flex items-start gap-1 text-xs text-[var(--admin-danger)]">
               <AlertCircle size={12} className="mt-0.5 shrink-0" />
               <span>{uploadError}</span>
             </p>
@@ -882,8 +888,8 @@ export function DocumentUploadInput({
     <Field label={label} hint={hint} span={span}>
       <div className="flex flex-wrap items-center gap-2">
         {value && (
-          <div className="flex min-w-[16rem] flex-1 items-center gap-2 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
-            <span className="flex-1 truncate text-sm text-gray-700">
+          <div className="flex min-w-[16rem] flex-1 items-center gap-2 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-sunken)] px-3 py-2">
+            <span className="flex-1 truncate text-sm text-[var(--admin-text-secondary)]">
               {displayName || value}
             </span>
             {isPending && (
@@ -926,7 +932,7 @@ export function DocumentUploadInput({
               : "Upload document"}
         </button>
         {uploadError && (
-          <p className="mt-1 flex w-full items-start gap-1 text-xs text-red-600">
+          <p className="mt-1 flex w-full items-start gap-1 text-xs text-[var(--admin-danger)]">
             <AlertCircle size={12} className="mt-0.5 shrink-0" />
             <span>{uploadError}</span>
           </p>
@@ -977,7 +983,7 @@ function ImagesField({
     <div>
       <div className="mb-1 flex items-center justify-between gap-2">
         <span className="admin-label mb-0">{label}</span>
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-[var(--admin-text-faint)]">
           {value.length} / {max}
         </span>
       </div>
@@ -1049,7 +1055,7 @@ export function ItemsEditor({
       {items.map((item, i) => (
         <div
           key={i}
-          className={`rounded-lg border border-gray-200 bg-gray-50/50 p-3 ${colClass(cardSpan)}`}
+          className={`rounded-lg border border-[var(--admin-border)] bg-gray-50/50 p-3 ${colClass(cardSpan)}`}
         >
           <div className="admin-form-grid admin-form-grid--tight">
             {fields.map((f) => {
@@ -1174,7 +1180,7 @@ export function LabsEditor({
       {labs.map((lab, i) => (
         <div
           key={i}
-          className="rounded-lg border border-gray-200 bg-gray-50/50 p-3"
+          className="rounded-lg border border-[var(--admin-border)] bg-gray-50/50 p-3"
         >
           <FormGrid tight>
             <TextInput
@@ -1288,7 +1294,7 @@ export function Repeater<T>({
         {items.map((item, i) => (
           <div
             key={i}
-            className={`relative rounded-lg border border-gray-200 p-3 pr-12 ${colClass(itemSpan)}`}
+            className={`relative rounded-lg border border-[var(--admin-border)] p-3 pr-12 ${colClass(itemSpan)}`}
           >
             <button
               type="button"
@@ -1306,7 +1312,7 @@ export function Repeater<T>({
           </div>
         ))}
         {items.length === 0 && (
-          <p className="admin-col-full rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-400">
+          <p className="admin-col-full rounded-lg border border-dashed border-[var(--admin-border)] p-4 text-center text-sm text-[var(--admin-text-faint)]">
             No items yet. Click "Add" to get started.
           </p>
         )}

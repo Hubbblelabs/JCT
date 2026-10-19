@@ -300,16 +300,20 @@ function Collapsible({
 }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
-    <div className="mb-2 rounded-lg border border-gray-200 bg-white">
+    <div className="mb-2 rounded-lg border border-[var(--admin-border)] bg-white">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between px-3 py-2 text-left text-sm font-semibold text-gray-700"
+        className="flex w-full items-center justify-between px-3 py-2 text-left text-sm font-semibold text-[var(--admin-text-secondary)]"
       >
         {title}
         {open ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
       </button>
-      {open && <div className="border-t border-gray-100 p-3">{children}</div>}
+      {open && (
+        <div className="border-t border-[var(--admin-border-subtle)] p-3">
+          {children}
+        </div>
+      )}
     </div>
   );
 }
@@ -359,7 +363,7 @@ export function ProgramLabelsEditor({
 
   return (
     <div>
-      <p className="mb-3 text-xs text-gray-500">
+      <p className="mb-3 text-xs text-[var(--admin-text-muted)]">
         Override the headings and visibility of every section on the public
         department page. Leave a field blank to use the default. The faculty,
         board and curriculum tables name their columns in their own sections.
@@ -372,7 +376,7 @@ export function ProgramLabelsEditor({
               current.visible === undefined ? true : Boolean(current.visible);
             return (
               <Collapsible key={section.key} title={section.label}>
-                <label className="mb-3 flex items-center gap-2 text-sm text-gray-700">
+                <label className="mb-3 flex items-center gap-2 text-sm text-[var(--admin-text-secondary)]">
                   <input
                     type="checkbox"
                     checked={visibleValue}

@@ -319,7 +319,7 @@ function BlockEditor({
             })}
             renderItem={(row, _i, oc) => (
               <>
-                <label className="mb-2 flex items-center gap-2 text-xs font-semibold text-gray-600">
+                <label className="mb-2 flex items-center gap-2 text-xs font-semibold text-[var(--admin-text-secondary)]">
                   <input
                     type="checkbox"
                     checked={row.heading}
@@ -333,7 +333,7 @@ function BlockEditor({
                   {row.cells.map((cell, ci) => (
                     <div
                       key={ci}
-                      className="admin-col-4 rounded-lg border border-gray-100 p-2"
+                      className="admin-col-4 rounded-lg border border-[var(--admin-border-subtle)] p-2"
                     >
                       <TextArea
                         label={block.columns[ci]?.trim() || `Column ${ci + 1}`}
@@ -666,18 +666,18 @@ function BlockList({
         {blocks.map((block, i) => (
           <div
             key={i}
-            className="admin-col-6 flex items-start gap-2 rounded-lg border border-gray-200 p-3"
+            className="admin-col-6 flex items-start gap-2 rounded-lg border border-[var(--admin-border)] p-3"
           >
             <button
               type="button"
               onClick={() => onSelect(i)}
               className="min-w-0 flex-1 text-left"
             >
-              <span className="block text-sm font-semibold text-gray-900">
+              <span className="block text-sm font-semibold text-[var(--admin-text)]">
                 {block.title?.trim() ||
                   `${CONTENT_BLOCK_LABELS[block.type]} ${i + 1}`}
               </span>
-              <span className="mt-0.5 block text-xs text-gray-500">
+              <span className="mt-0.5 block text-xs text-[var(--admin-text-muted)]">
                 {CONTENT_BLOCK_LABELS[block.type]} — {blockSummary(block)}
               </span>
             </button>
@@ -712,13 +712,13 @@ function BlockList({
           </div>
         ))}
         {blocks.length === 0 && (
-          <p className="admin-col-full rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-400">
+          <p className="admin-col-full rounded-lg border border-dashed border-[var(--admin-border)] p-4 text-center text-sm text-[var(--admin-text-faint)]">
             No blocks yet — add one below.
           </p>
         )}
       </div>
 
-      <div className="rounded-lg border border-gray-200 p-3">
+      <div className="rounded-lg border border-[var(--admin-border)] p-3">
         <p className="admin-label mb-2">Add a block</p>
         <div className="flex flex-wrap gap-2">
           {CONTENT_BLOCK_TYPES.map((type) => (
@@ -760,10 +760,13 @@ export function ContentPageInspector({
   if (blockMatch) {
     const index = Number(blockMatch[1]);
     const block = data.blocks[index];
-    if (!block) return <p className="text-sm text-gray-500">Block removed.</p>;
+    if (!block)
+      return (
+        <p className="text-sm text-[var(--admin-text-muted)]">Block removed.</p>
+      );
     return (
       <>
-        <div className="mb-4 rounded-lg bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-500">
+        <div className="mb-4 rounded-lg bg-[var(--admin-sunken)] px-3 py-2 text-xs font-semibold text-[var(--admin-text-muted)]">
           {CONTENT_BLOCK_LABELS[block.type]} block · #{index + 1}
         </div>
         <BlockEditor
@@ -852,6 +855,10 @@ export function ContentPageInspector({
       );
 
     default:
-      return <p className="text-sm text-gray-500">Select a section to edit.</p>;
+      return (
+        <p className="text-sm text-[var(--admin-text-muted)]">
+          Select a section to edit.
+        </p>
+      );
   }
 }

@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { PageShell } from "@/components/admin/kit";
+import { useTopbarSlot } from "@/components/admin/shell/topbar-slot";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 
 type Template = "standard" | "hero-content" | "sidebar" | "gallery" | "contact";
@@ -80,6 +81,9 @@ function slugify(s: string): string {
 }
 
 export default function NewPagePage() {
+  // Without it the breadcrumb ends at "Dynamic Pages", as if the list itself
+  // were open.
+  useTopbarSlot({ title: "New page" });
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [slug, setSlug] = useState("");
@@ -147,7 +151,7 @@ export default function NewPagePage() {
         />
       )}
       {msg && !apiError && (
-        <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
+        <p className="mb-4 rounded-lg bg-[var(--admin-danger-bg)] px-3 py-2 text-sm text-[var(--admin-danger)]">
           {msg}
         </p>
       )}
@@ -217,19 +221,23 @@ export default function NewPagePage() {
                 className={`admin-col-4 flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${
                   active
                     ? "border-amber-400 bg-amber-50/40 ring-2 ring-amber-200"
-                    : "border-gray-200 bg-white hover:border-gray-300"
+                    : "border-[var(--admin-border)] bg-white hover:border-[var(--admin-border-strong)]"
                 }`}
               >
                 <span
                   className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-lg ${
-                    active ? "bg-amber-200" : "bg-gray-100"
+                    active ? "bg-amber-200" : "bg-[var(--admin-neutral-bg)]"
                   }`}
                 >
                   <Icon size={18} />
                 </span>
                 <div>
-                  <p className="font-semibold text-gray-900">{t.label}</p>
-                  <p className="mt-0.5 text-xs text-gray-500">{t.desc}</p>
+                  <p className="font-semibold text-[var(--admin-text)]">
+                    {t.label}
+                  </p>
+                  <p className="mt-0.5 text-xs text-[var(--admin-text-muted)]">
+                    {t.desc}
+                  </p>
                 </div>
               </button>
             );

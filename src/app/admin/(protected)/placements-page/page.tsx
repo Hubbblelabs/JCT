@@ -474,7 +474,7 @@ function PlacementsPageEditorInner() {
               onChange={patchRecord}
             />
           ) : (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-[var(--admin-text-muted)]">
               This year is no longer part of the page.
             </p>
           )

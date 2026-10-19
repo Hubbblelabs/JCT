@@ -3,14 +3,26 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Check,
+  ChevronsUpDown,
   ExternalLink,
   Loader2,
   LogOut,
   RefreshCw,
   Search,
-  User,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
+
+/** "Audit Admin" → "AA", "editor@jct.ac.in" → "E". */
+function initials(name: string): string {
+  const words = name
+    .replace(/@.*$/, "")
+    .split(/[\s._-]+/)
+    .filter(Boolean);
+  if (words.length === 0) return "?";
+  const first = words[0][0] ?? "";
+  const last = words.length > 1 ? (words[words.length - 1][0] ?? "") : "";
+  return (first + last).toUpperCase();
+}
 
 /**
  * The foot of the sidebar: page search, the public site, Clear cache and the
@@ -161,8 +173,18 @@ export function AdminSidebarFooter({
           aria-expanded={menuOpen}
           title={collapsed ? userName : undefined}
         >
-          <User size={14} className="shrink-0" />
-          <span className="admin-sidebar-label truncate">{userName}</span>
+          <span className="admin-avatar" aria-hidden="true">
+            {initials(userName)}
+          </span>
+          <span className="admin-sidebar-label admin-sidebar-user-text">
+            <span className="admin-sidebar-user-name">{userName}</span>
+            <span className="admin-sidebar-user-role">{userRole}</span>
+          </span>
+          <ChevronsUpDown
+            size={14}
+            className="admin-sidebar-label shrink-0 opacity-50"
+            aria-hidden="true"
+          />
         </button>
 
         {menuOpen && (

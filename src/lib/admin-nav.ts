@@ -828,7 +828,13 @@ export function isImmersiveRoute(pathname: string): boolean {
   // The program builder and the Page editor are split-pane too.
   if (pathname.startsWith("/admin/programs/") && pathname !== "/admin/programs")
     return true;
-  if (pathname.startsWith("/admin/pages/") && pathname !== "/admin/pages")
+  // `/admin/pages/new` is a short form, not an editor — collapsing the rail
+  // there only took the navigation away for no gain.
+  if (
+    pathname.startsWith("/admin/pages/") &&
+    pathname !== "/admin/pages" &&
+    pathname !== "/admin/pages/new"
+  )
     return true;
   if (pathname.startsWith("/admin/content/")) return true;
   return false;

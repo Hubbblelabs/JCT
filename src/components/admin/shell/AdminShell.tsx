@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { findNavTrail, isImmersiveRoute, type NavScope } from "@/lib/admin-nav";
 import { AdminSidebar } from "./AdminSidebar";
-import { AdminTopbar } from "./AdminTopbar";
+import { AdminTopbar, fallbackCrumb } from "./AdminTopbar";
 import { AdminCommandPalette } from "./AdminCommandPalette";
 import { TopbarSlotProvider, useTopbarSlotState } from "./topbar-slot";
 
@@ -116,6 +116,43 @@ function ShellInner({ children }: { children: ReactNode }) {
   // the user just navigated to.
   useEffect(() => setDrawerOpen(false), [pathname]);
 
+  // Every admin tab used to be titled "JCT Admin", so with a few editors open
+  // there was no telling them apart in the tab strip or the history menu. The
+  // title names the page first and its college second, which is the part a
+  // narrow tab still shows.
+  //
+  // The screen's own title leads only where the topbar shows it too — on a
+  // record opened under a nav item (one program, one page). On a nav item's
+  // own route the screen title is the editor's generic name ("Home — Landing
+  // Page"), and the item label is the more specific of the two.
+  const onItemRoute =
+    !!trail.item && trail.item.href.split("?")[0] === pathname;
+  const docTitle = [
+    onItemRoute ? undefined : slot.page?.title,
+    trail.item?.label,
+    trail.section?.label,
+  ].filter((part, i, all): part is string => !!part && all.indexOf(part) === i);
+  const titleText = `${
+    docTitle.length > 0 ? docTitle.join(" · ") : fallbackCrumb(pathname)
+  } · JCT Admin`;
+  useEffect(() => {
+    const apply = () => {
+      if (document.title !== titleText) document.title = titleText;
+    };
+    apply();
+    // Next streams the layout's metadata <title> in after hydration and on
+    // every client navigation, which would put "JCT Admin" straight back.
+    // Re-applying on a head mutation settles in one step: writing the same
+    // value again is a no-op, so this cannot loop.
+    const observer = new MutationObserver(apply);
+    observer.observe(document.head, {
+      subtree: true,
+      childList: true,
+      characterData: true,
+    });
+    return () => observer.disconnect();
+  }, [titleText]);
+
   useEffect(() => {
     if (!drawerOpen) return;
     const previous = document.body.style.overflow;
@@ -130,6 +167,7 @@ function ShellInner({ children }: { children: ReactNode }) {
       className="admin-shell"
       data-collapsed={(collapsed && !drawerOpen) || undefined}
       data-drawer={drawerOpen ? "open" : undefined}
+      data-immersive={immersive || undefined}
     >
       <a href="#admin-main" className="admin-skip-link">
         Skip to content
@@ -163,6 +201,8 @@ function ShellInner({ children }: { children: ReactNode }) {
           collapsed={isMobile ? !drawerOpen : collapsed}
           mobile={isMobile}
           onToggleCollapse={toggleCollapse}
+          showSearch={!immersive}
+          onOpenPalette={() => setPaletteOpen(true)}
         />
         <main id="admin-main" className="admin-main">
           <TopbarSlotProvider value={slot.value}>{children}</TopbarSlotProvider>

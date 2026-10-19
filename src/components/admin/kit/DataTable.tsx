@@ -362,8 +362,24 @@ export function DataTable<T>({
                   <tr
                     key={key}
                     data-selected={selected.has(key) || undefined}
+                    data-clickable={onRowClick ? true : undefined}
                     onClick={onRowClick ? () => onRowClick(row) : undefined}
-                    style={onRowClick ? { cursor: "pointer" } : undefined}
+                    // A clickable row was mouse-only: no tab stop, no key
+                    // binding, so a keyboard user could not open a record at
+                    // all on screens without a separate edit button. Keys
+                    // pressed inside the row's own controls are theirs.
+                    tabIndex={onRowClick ? 0 : undefined}
+                    onKeyDown={
+                      onRowClick
+                        ? (e) => {
+                            if (e.target !== e.currentTarget) return;
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              onRowClick(row);
+                            }
+                          }
+                        : undefined
+                    }
                   >
                     {showBulk && (
                       <td

@@ -97,7 +97,7 @@ export function ColumnsPanel({
   };
 
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-3">
+    <div className="rounded-lg border border-[var(--admin-border)] bg-white p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="admin-label mb-0 inline-flex items-center gap-1.5">
           <Columns3 size={14} /> Columns
@@ -125,7 +125,7 @@ export function ColumnsPanel({
           return (
             <li key={c.id} className="flex items-center gap-1.5">
               <input
-                className={`admin-input min-w-0 flex-1 ${c.hidden ? "text-gray-400 line-through" : ""}`}
+                className={`admin-input min-w-0 flex-1 ${c.hidden ? "text-[var(--admin-text-faint)] line-through" : ""}`}
                 value={c.label}
                 placeholder={builtin?.label ?? "Column name"}
                 maxLength={TABLE_COLUMN_LIMITS.labelMax}

@@ -6,6 +6,11 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** "1 visible event", "3 visible events" — a count with its noun agreeing. */
+export function plural(count: number, noun: string, many = `${noun}s`): string {
+  return `${count} ${count === 1 ? noun : many}`;
+}
+
 /**
  * Formats an ISO date string as e.g. "04 Mar 2026" for event cards.
  * Returns "" for missing/invalid input.

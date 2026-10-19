@@ -434,7 +434,7 @@ function ProgramDetailInner() {
 
   return (
     <EditorWorkspace
-      title={isNew ? "New Program" : `${prog.name || "Program"} — Program Page`}
+      title={isNew ? "New Program" : prog.name || "Untitled program"}
       description={
         isNew
           ? `A new ${collegeLabel} program. Fill in the name and save it as a draft — you can publish it once it has been created.`
@@ -540,7 +540,7 @@ function ProgramDetailInner() {
             }}
           />
         ) : (
-          <div className="px-6 py-16 text-center text-sm text-gray-400">
+          <div className="px-6 py-16 text-center text-sm text-[var(--admin-text-faint)]">
             Enter the program name in the panel to see the page.
           </div>
         )

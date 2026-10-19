@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
     fallbackTitle:
       "Controller of Examination | JCT College of Engineering & Technology",
     fallbackDescription:
-      "Industry-partnered Centres of Excellence at JCT College of Engineering & Technology, Coimbatore — advanced labs, certifications, and applied research.",
+      "Office of the Controller of Examinations at JCT College of Engineering & Technology, Coimbatore — examination schedules, results, circulars and academic regulations.",
   });
 }
 

@@ -414,8 +414,12 @@ export function Pamphlet({
 
   if (!enabled || !hasAnyContent) {
     // In the editor an absent popup still needs something to click on.
+    // It is the first block of the home-page preview, so the fixed navbar is
+    // drawn over it. That navbar is transparent with white links until the
+    // page scrolls — over the old light-grey strip it was unreadable. A dark
+    // strip, padded clear of the navbar, keeps both legible.
     return preview ? (
-      <div className="flex items-center justify-center bg-slate-100 px-6 py-10 text-center text-sm text-slate-500">
+      <div className="flex items-center justify-center bg-[#0a1628] px-6 pt-32 pb-10 text-center text-sm text-white/70">
         {enabled
           ? "Entry popup — add an image or text to show it to visitors."
           : "Entry popup is switched off — visitors don't see it."}

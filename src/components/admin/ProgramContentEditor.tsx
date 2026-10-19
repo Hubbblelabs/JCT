@@ -388,7 +388,7 @@ export function ProgramSectionInspector({
     const idx = tabs.findIndex((t) => (t.id as string) === tabId);
     if (idx === -1) {
       return (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-[var(--admin-text-muted)]">
           This tab no longer exists. Re-open the inspector.
         </p>
       );
@@ -1086,7 +1086,7 @@ export function ProgramSectionInspector({
       case "tabs":
         return (
           <>
-            <p className="mb-3 text-xs text-gray-500">
+            <p className="mb-3 text-xs text-[var(--admin-text-muted)]">
               Reorder, rename, hide, or add custom sidebar entries. Set a Custom
               URL to turn any entry into a direct link. For a custom content
               tab, add an entry with a unique id and no URL, then click that tab
@@ -1113,7 +1113,7 @@ export function ProgramSectionInspector({
         const seo = flatObj(content, "seo");
         return (
           <>
-            <p className="mb-3 text-xs text-gray-500">
+            <p className="mb-3 text-xs text-[var(--admin-text-muted)]">
               The title and description search engines show for this
               program&apos;s public page. Leave blank to fall back to the
               program name and its first About paragraph. Publish the program
@@ -1196,7 +1196,7 @@ function SectionBlocksEditor({
         <span className="flex items-center gap-2">
           Additional Content Blocks
           {blocks.length > 0 && (
-            <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium tracking-wide text-gray-500">
+            <span className="rounded-full bg-[var(--admin-neutral-bg)] px-2 py-0.5 text-[10px] font-medium tracking-wide text-[var(--admin-text-muted)]">
               {blocks.length}
             </span>
           )}
@@ -1204,7 +1204,7 @@ function SectionBlocksEditor({
       }
       defaultOpen={blocks.length > 0}
     >
-      <p className="mb-3 text-xs text-gray-500">
+      <p className="mb-3 text-xs text-[var(--admin-text-muted)]">
         Add extra paragraphs, images, lists, cards, or a call-to-action button
         alongside this section&apos;s fields above — the same block types
         available on custom tabs.

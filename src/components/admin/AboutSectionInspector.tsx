@@ -52,7 +52,7 @@ export function AboutSectionInspector({
     const idx = items.findIndex((it) => (it.id || "") === anchor);
     if (idx === -1) {
       return (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-[var(--admin-text-muted)]">
           This section no longer exists. Re-open the inspector.
         </p>
       );

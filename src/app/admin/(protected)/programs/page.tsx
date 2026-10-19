@@ -188,18 +188,24 @@ function ProgramsPageInner() {
         </span>
       ),
     },
-    {
-      key: "institution",
-      header: "College",
-      sortable: true,
-      hideOnMobile: true,
-      value: (p) => collegeLabel(p.institution),
-      render: (p) => (
-        <span className="text-[var(--admin-text-secondary)]">
-          {collegeLabel(p.institution)}
-        </span>
-      ),
-    },
+    // A college's own list is already filtered to that college; the column
+    // is only worth its width on the unscoped list of every program.
+    ...(college
+      ? []
+      : ([
+          {
+            key: "institution",
+            header: "College",
+            sortable: true,
+            hideOnMobile: true,
+            value: (p) => collegeLabel(p.institution),
+            render: (p) => (
+              <span className="text-[var(--admin-text-secondary)]">
+                {collegeLabel(p.institution)}
+              </span>
+            ),
+          },
+        ] satisfies Column<Program>[])),
     {
       key: "status",
       header: "Page content",

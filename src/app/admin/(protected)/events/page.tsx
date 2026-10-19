@@ -22,13 +22,14 @@ import {
   Star,
 } from "lucide-react";
 import { DataTable, type Column } from "@/components/admin/kit/DataTable";
-import { Drawer, PageShell } from "@/components/admin/kit";
+import { Drawer, PageShell, VisibilityBadge } from "@/components/admin/kit";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 import {
   DeferredUploadsProvider,
   useDeferredUploads,
 } from "@/lib/deferred-uploads";
+import { plural } from "@/lib/utils";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { EVENT_CATEGORY_SUGGESTIONS, LIMITS_event } from "@/lib/validation";
@@ -275,7 +276,9 @@ function EventsPageInner() {
               </span>
             )}
           </span>
-          <span className="block text-xs text-gray-400">/events/{e.slug}</span>
+          <span className="block text-xs text-[var(--admin-text-faint)]">
+            /events/{e.slug}
+          </span>
         </span>
       ),
     },
@@ -287,7 +290,7 @@ function EventsPageInner() {
       // "10 Jan" is what alphabetical ordering of the formatted date gives.
       value: (e) => e.event_date ?? "",
       render: (e) => (
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-[var(--admin-text-muted)]">
           {formatDate(e.event_date)}
         </span>
       ),
@@ -301,30 +304,30 @@ function EventsPageInner() {
         <span className="admin-badge admin-badge-blue">{e.category}</span>
       ),
     },
-    {
-      key: "institution",
-      header: "College",
-      sortable: true,
-      hideOnMobile: true,
-      value: (e) => INSTITUTION_LABELS[e.institution] ?? e.institution,
-      render: (e) => (
-        <span className="admin-badge admin-badge-gray">
-          {INSTITUTION_LABELS[e.institution] ?? e.institution}
-        </span>
-      ),
-    },
+    // Inside one college's list every row is that college — the column only
+    // earns its width on the Main aggregate, where it says whose entry it is.
+    ...(isMain
+      ? ([
+          {
+            key: "institution",
+            header: "College",
+            sortable: true,
+            hideOnMobile: true,
+            value: (e) => INSTITUTION_LABELS[e.institution] ?? e.institution,
+            render: (e) => (
+              <span className="admin-badge admin-badge-gray">
+                {INSTITUTION_LABELS[e.institution] ?? e.institution}
+              </span>
+            ),
+          },
+        ] satisfies Column<EventItem>[])
+      : []),
     {
       key: "is_active",
-      header: "Status",
+      header: "On public site",
       sortable: true,
-      value: (e) => (e.is_active ? "Active" : "Hidden"),
-      render: (e) => (
-        <span
-          className={`admin-badge ${e.is_active ? "admin-badge-green" : "admin-badge-red"}`}
-        >
-          {e.is_active ? "Active" : "Hidden"}
-        </span>
-      ),
+      value: (e) => (e.is_active ? "Visible" : "Hidden"),
+      render: (e) => <VisibilityBadge isActive={e.is_active} />,
     },
     {
       key: "actions",
@@ -376,8 +379,12 @@ function EventsPageInner() {
               </>
             ) : (
               <>
-                {events.filter((e) => e.is_active).length} active events — shown
-                on the {INSTITUTION_LABELS[filterInst]} News &amp; Events page
+                {plural(
+                  events.filter((e) => e.is_active).length,
+                  "visible event",
+                )}{" "}
+                — shown on the {INSTITUTION_LABELS[filterInst]} News &amp;
+                Events page
               </>
             )}
           </>
@@ -404,7 +411,9 @@ function EventsPageInner() {
           pageSize={20}
           empty={{
             title: "No events yet",
-            body: "Announcements, events and news entries for this college.",
+            body: isMain
+              ? "Nothing has been posted by any college yet. Events are added from each college's own News & Events page in the sidebar."
+              : "Announcements, events and news entries for this college. Add the first one to start the News & Events page.",
             action: isMain ? undefined : (
               <button onClick={openNew} className="admin-btn admin-btn-primary">
                 <Plus size={16} /> Add Event
@@ -512,14 +521,14 @@ function EventsPageInner() {
                 <div className="mb-2 flex items-center justify-between gap-3">
                   <div>
                     <span className="admin-label mb-0">Gallery images</span>
-                    <p className="mt-0.5 text-xs text-gray-400">
+                    <p className="mt-0.5 text-xs text-[var(--admin-text-faint)]">
                       Shown as a grid on the event detail page, below the
                       content. Visitors click a photo to open it full size —
                       this order is the order they page through.
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <span className="text-xs font-medium text-gray-400">
+                    <span className="text-xs font-medium text-[var(--admin-text-faint)]">
                       {form.gallery.length} / {GALLERY_MAX}
                     </span>
                     <button
@@ -534,7 +543,7 @@ function EventsPageInner() {
                 </div>
 
                 {form.gallery.length === 0 ? (
-                  <p className="rounded-lg border border-dashed border-gray-200 p-4 text-center text-sm text-gray-400">
+                  <p className="rounded-lg border border-dashed border-[var(--admin-border)] p-4 text-center text-sm text-[var(--admin-text-faint)]">
                     No gallery images. Add up to {GALLERY_MAX}.
                   </p>
                 ) : (
@@ -542,7 +551,7 @@ function EventsPageInner() {
                     {form.gallery.map((url, i) => (
                       <div
                         key={i}
-                        className="admin-col-4 relative rounded-lg border border-gray-200 p-3"
+                        className="admin-col-4 relative rounded-lg border border-[var(--admin-border)] p-3"
                       >
                         <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
                           <button
@@ -587,14 +596,14 @@ function EventsPageInner() {
 
               <TextArea
                 label="Excerpt (card summary)"
-                span={4}
+                span="full"
                 value={form.excerpt}
                 onChange={(e) => set("excerpt", e.target.value)}
-                rows={8}
+                rows={3}
               />
               <TextArea
                 label="Detail content"
-                span={8}
+                span="full"
                 value={form.description}
                 onChange={(e) => set("description", e.target.value)}
                 rows={8}
@@ -655,9 +664,12 @@ function EventsPageInner() {
                   checked={form.featured}
                   onChange={(e) => set("featured", e.target.checked)}
                 />
-                <label htmlFor="e_featured" className="text-sm text-gray-700">
+                <label
+                  htmlFor="e_featured"
+                  className="text-sm text-[var(--admin-text-secondary)]"
+                >
                   Feature in the carousel
-                  <span className="block text-xs text-gray-500">
+                  <span className="block text-xs text-[var(--admin-text-muted)]">
                     Pinned to the slideshow at the top of the News &amp; Events
                     page. With nothing featured, the slideshow shows the latest
                     entries.
@@ -671,8 +683,11 @@ function EventsPageInner() {
                   checked={form.is_active}
                   onChange={(e) => set("is_active", e.target.checked)}
                 />
-                <label htmlFor="e_active" className="text-sm text-gray-700">
-                  Active (shown on website)
+                <label
+                  htmlFor="e_active"
+                  className="text-sm text-[var(--admin-text-secondary)]"
+                >
+                  Visible on the website
                 </label>
               </div>
             </FormGrid>

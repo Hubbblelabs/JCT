@@ -70,7 +70,7 @@ function LimitHint({ count, max }: { count: number; max?: number }) {
   const atLimit = count >= max;
   return (
     <p
-      className={`text-xs ${atLimit ? "font-medium text-amber-600" : "text-gray-400"}`}
+      className={`text-xs ${atLimit ? "font-medium text-[var(--admin-warning)]" : "text-[var(--admin-text-faint)]"}`}
     >
       {count}/{max} {atLimit ? "— max reached" : ""}
     </p>
@@ -159,7 +159,7 @@ function CtaList({
         {safe.map((cta, i) => (
           <div
             key={i}
-            className="admin-col-6 rounded-lg border border-gray-200 p-3"
+            className="admin-col-6 rounded-lg border border-[var(--admin-border)] p-3"
           >
             <FormGrid tight>
               <TextInput
@@ -318,7 +318,7 @@ export function HeroOverlayInput({
         <div
           className={`flex min-w-64 flex-1 items-center gap-3 ${custom ? "" : "opacity-40"}`}
         >
-          <span className="text-xs whitespace-nowrap text-gray-500">
+          <span className="text-xs whitespace-nowrap text-[var(--admin-text-muted)]">
             Photo clearer
           </span>
           <input
@@ -333,10 +333,10 @@ export function HeroOverlayInput({
             aria-valuetext={`${current}% dark`}
             onChange={(e) => onChange(Number(e.target.value))}
           />
-          <span className="text-xs whitespace-nowrap text-gray-500">
+          <span className="text-xs whitespace-nowrap text-[var(--admin-text-muted)]">
             Text clearer
           </span>
-          <span className="w-12 text-right text-sm font-semibold text-gray-700 tabular-nums">
+          <span className="w-12 text-right text-sm font-semibold text-[var(--admin-text-secondary)] tabular-nums">
             {custom ? `${current}%` : "—"}
           </span>
         </div>
@@ -369,7 +369,7 @@ function AccreditationList({
       {safe.map((item, i) => (
         <div
           key={i}
-          className="admin-col-6 rounded-lg border border-gray-200 p-3"
+          className="admin-col-6 rounded-lg border border-[var(--admin-border)] p-3"
         >
           <FormGrid tight>
             <TextInput
@@ -594,7 +594,7 @@ function ArtsSubsectionList({
       {safe.map((item, i) => (
         <div
           key={i}
-          className="admin-col-4 rounded-lg border border-gray-200 p-3"
+          className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
         >
           <FormGrid tight>
             <TextInput
@@ -775,7 +775,7 @@ export function HeroStatsForm({
       {safe.map((item, i) => (
         <div
           key={i}
-          className="admin-col-6 rounded-lg border border-gray-200 p-3"
+          className="admin-col-6 rounded-lg border border-[var(--admin-border)] p-3"
         >
           <FormGrid tight>
             <TextInput
@@ -876,7 +876,7 @@ function ShowPartSwitch({
   label: string;
 }) {
   return (
-    <label className="mb-3 flex items-center gap-2 text-sm font-medium text-gray-700">
+    <label className="mb-3 flex items-center gap-2 text-sm font-medium text-[var(--admin-text-secondary)]">
       <input
         type="checkbox"
         checked={checked}
@@ -1102,14 +1102,14 @@ function PamphletSlotEditor({
   onChange: (next: PamphletSlotVal) => void;
 }) {
   return (
-    <div className="rounded-lg border border-gray-200 p-3">
+    <div className="rounded-lg border border-[var(--admin-border)] p-3">
       <p className="admin-label mb-2">
         {side
           ? `${side} Slot — ${kind === "image" ? "Image" : "Text"}`
           : "Popup Image"}
       </p>
       {!side && (
-        <p className="mb-2 text-xs text-gray-500">
+        <p className="mb-2 text-xs text-[var(--admin-text-muted)]">
           Shown on its own, at its own shape — a tall poster or a wide banner
           both work. The buttons below sit over its bottom edge.
         </p>
@@ -1312,7 +1312,7 @@ function PamphletPopupEditor({
         span="full"
         hint="Optional. Shows a live countdown strip just above the popup buttons. Times are entered and stored in IST. The timer stays hidden before the start time and disappears once the deadline passes — the popup itself keeps showing either way."
       >
-        <div className="rounded-lg border border-gray-200 p-3">
+        <div className="rounded-lg border border-[var(--admin-border)] p-3">
           <label className="mb-2 flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -1383,7 +1383,7 @@ function PamphletPopupEditor({
         span={4}
         hint="The primary button inside the pamphlet popup."
       >
-        <div className="rounded-lg border border-gray-200 p-3">
+        <div className="rounded-lg border border-[var(--admin-border)] p-3">
           <label className="mb-2 flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -1416,7 +1416,7 @@ function PamphletPopupEditor({
         span={4}
         hint="Optional. A YouTube/embed link opens an in-popup player; any other URL opens in a new tab."
       >
-        <div className="rounded-lg border border-gray-200 p-3">
+        <div className="rounded-lg border border-[var(--admin-border)] p-3">
           <label className="mb-2 flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -1470,7 +1470,7 @@ function PamphletPopupEditor({
         span={4}
         hint="Optional. Dials the given phone number on tap."
       >
-        <div className="rounded-lg border border-gray-200 p-3">
+        <div className="rounded-lg border border-[var(--admin-border)] p-3">
           <label className="mb-2 flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -1613,7 +1613,7 @@ export function PamphletForm({
                 className={`rounded-lg border p-3 ${
                   isActive
                     ? "border-gold bg-gold/5"
-                    : "border-gray-200 bg-white"
+                    : "border-[var(--admin-border)] bg-white"
                 }`}
               >
                 <div className="flex flex-wrap items-center gap-3">
@@ -1688,7 +1688,7 @@ export function PamphletForm({
             <Plus size={12} /> Add popup
           </button>
           {atMax && (
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-[var(--admin-text-faint)]">
               Maximum of {LIMITS_pamphlet.popups} popups reached.
             </p>
           )}
@@ -1802,7 +1802,7 @@ export function LifeAtJctForm({
           {photos.map((photo, i) => (
             <div
               key={i}
-              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+              className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
             >
               <FormGrid tight>
                 <TextInput
@@ -2001,7 +2001,7 @@ export function UpcomingEventsForm({
   // settings, then the button under it, then the fallback behaviour.
   return (
     <FormGrid>
-      <p className="admin-col-full rounded-lg bg-gray-50 p-3 text-xs text-gray-500">
+      <p className="admin-col-full rounded-lg bg-[var(--admin-sunken)] p-3 text-xs text-[var(--admin-text-muted)]">
         The events themselves are managed under{" "}
         <span className="font-semibold">News &amp; Events</span>. This section
         shows the events still to come, soonest first, and tops the row up with
@@ -2196,7 +2196,7 @@ export function PolytechnicAdmissionsForm({
           {criteria.map((block, i) => (
             <div
               key={i}
-              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+              className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
             >
               <TextInput
                 label="Block Title"
@@ -2365,7 +2365,7 @@ export function MetricsForm({
       {safe.map((item, i) => (
         <div
           key={i}
-          className="admin-col-4 rounded-lg border border-gray-200 p-3"
+          className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
         >
           <FormGrid tight>
             <TextInput
@@ -2449,7 +2449,7 @@ export function FacilitiesForm({
       {safe.map((item, i) => (
         <div
           key={i}
-          className="admin-col-4 rounded-lg border border-gray-200 p-3"
+          className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
         >
           <TextInput
             label="Title"
@@ -2628,7 +2628,7 @@ export function AdmissionsForm({
           {criteria.map((block, i) => (
             <div
               key={i}
-              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+              className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
             >
               <TextInput
                 label="Block Title"
@@ -2869,7 +2869,7 @@ export function AddOnProgramsForm({
             return (
               <div
                 key={i}
-                className="admin-col-6 rounded-lg border border-gray-200 p-3"
+                className="admin-col-6 rounded-lg border border-[var(--admin-border)] p-3"
               >
                 <FormGrid tight>
                   <TextInput
@@ -3094,7 +3094,7 @@ export function CareerCentreForm({
           {services.map((service, i) => (
             <div
               key={i}
-              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+              className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
             >
               <FormGrid tight>
                 <TextInput
@@ -3245,7 +3245,7 @@ export function WhyChooseJctForm({
           {features.map((feat, i) => (
             <div
               key={i}
-              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+              className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
             >
               <FormGrid tight>
                 <TextInput
@@ -3441,7 +3441,7 @@ export function HomeAdmissionsForm({
           {pathways.map((p, i) => (
             <div
               key={i}
-              className="admin-col-4 rounded-lg border border-gray-200 p-3"
+              className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
             >
               <FormGrid tight>
                 <TextInput
@@ -3774,9 +3774,11 @@ function ChildEditor({
   canDown: boolean;
 }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-3">
+    <div className="rounded-lg border border-[var(--admin-border)] bg-white p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
-        <span className="text-xs font-medium text-gray-500">Submenu Item</span>
+        <span className="text-xs font-medium text-[var(--admin-text-muted)]">
+          Submenu Item
+        </span>
         <div className="flex items-center gap-1">
           <button
             type="button"
@@ -3875,12 +3877,12 @@ function NavbarItemEditor({
   const children = Array.isArray(item.children) ? item.children : [];
   const childAtMax = children.length >= NAVBAR_LIMITS.children;
   return (
-    <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+    <div className="rounded-xl border border-[var(--admin-border)] bg-[var(--admin-sunken)] p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="flex items-center gap-2 text-sm font-medium text-gray-800"
+          className="flex items-center gap-2 text-sm font-medium text-[var(--admin-text)]"
         >
           <ChevronDownIcon size={14} className={expanded ? "" : "-rotate-90"} />
           <span>{item.label || "(unnamed item)"}</span>
@@ -3919,7 +3921,7 @@ function NavbarItemEditor({
         </div>
       </div>
       {expanded && (
-        <div className="border-t border-gray-200 pt-3">
+        <div className="border-t border-[var(--admin-border)] pt-3">
           <FormGrid tight>
             <TextInput
               label="Label"
@@ -4257,7 +4259,7 @@ export function AccreditationsForm({
 }) {
   return (
     <div className="space-y-3">
-      <p className="text-xs text-gray-400">
+      <p className="text-xs text-[var(--admin-text-faint)]">
         Accreditation logos and titles shown in the hero of the main landing
         page.
       </p>
@@ -4285,14 +4287,14 @@ export function StatisticsForm({
   const atMax = safe.length >= HOME_STATISTICS_LIMITS.itemsMax;
   return (
     <div className="admin-form-grid admin-form-grid--tight">
-      <p className="admin-col-full text-xs text-gray-500">
+      <p className="admin-col-full text-xs text-[var(--admin-text-muted)]">
         The row of badges shown directly beneath the home hero. Icon is one of:
         laurel, users, cap, badge, growth.
       </p>
       {safe.map((item, i) => (
         <div
           key={i}
-          className="admin-col-4 rounded-lg border border-gray-200 p-3"
+          className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
         >
           <FormGrid tight>
             <TextInput
@@ -4423,7 +4425,7 @@ function SocialStripField({
       span="full"
       hint="A slim strip of social icons fixed to the left edge of every public page (desktop only). The links come from the Footer section — set a network's URL there for it to appear."
     >
-      <div className="rounded-lg border border-gray-200 p-3">
+      <div className="rounded-lg border border-[var(--admin-border)] p-3">
         <label className="mb-3 flex items-center gap-2 text-sm">
           <input
             type="checkbox"
@@ -4449,10 +4451,12 @@ function SocialStripField({
                   disabled={!value.enabled}
                   onChange={(e) => toggle(key, e.target.checked)}
                 />
-                <Icon size={14} className="text-gray-500" />
+                <Icon size={14} className="text-[var(--admin-text-muted)]" />
                 {label}
                 {footerLinks && !hasLink && (
-                  <span className="text-xs text-amber-600">(no link)</span>
+                  <span className="text-xs text-[var(--admin-warning)]">
+                    (no link)
+                  </span>
                 )}
               </label>
             );
@@ -4481,7 +4485,7 @@ export function FloatingElementsForm({
         span={4}
         hint="Floating WhatsApp icon shown on all public pages."
       >
-        <div className="rounded-lg border border-gray-200 p-3">
+        <div className="rounded-lg border border-[var(--admin-border)] p-3">
           <label className="mb-2 flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -4513,7 +4517,7 @@ export function FloatingElementsForm({
         span={4}
         hint="Floating Apply Now button shown on all public pages."
       >
-        <div className="rounded-lg border border-gray-200 p-3">
+        <div className="rounded-lg border border-[var(--admin-border)] p-3">
           <label className="mb-2 flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -4553,7 +4557,7 @@ export function FloatingElementsForm({
         span={4}
         hint="Show/hide the Meritto chatbot on public pages."
       >
-        <div className="rounded-lg border border-gray-200 p-3">
+        <div className="rounded-lg border border-[var(--admin-border)] p-3">
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -4606,16 +4610,16 @@ export function RecruitersSectionForm({
   return (
     <FormGrid>
       <Field label="Visibility" span={3}>
-        <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 p-3">
+        <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[var(--admin-border)] p-3">
           <input
             type="checkbox"
             checked={value.show_section !== false}
             onChange={(e) =>
               onChange({ ...value, show_section: e.target.checked })
             }
-            className="h-4 w-4 rounded border-gray-300 accent-amber-500"
+            className="h-4 w-4 rounded border-[var(--admin-border)] accent-amber-500"
           />
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-[var(--admin-text-secondary)]">
             Show on public pages
           </span>
         </label>
@@ -4661,7 +4665,7 @@ export function RecruitersSectionForm({
           {stats.map((stat, i) => (
             <div
               key={i}
-              className="admin-col-3 rounded-lg border border-gray-200 p-3"
+              className="admin-col-3 rounded-lg border border-[var(--admin-border)] p-3"
             >
               <FormGrid tight>
                 <TextInput
@@ -4782,14 +4786,16 @@ export function SeoPagesForm({
 
   return (
     <div className="space-y-3">
-      <p className="text-xs text-gray-500">
+      <p className="text-xs text-[var(--admin-text-muted)]">
         The title and description search engines show for each page. Leave a
         field blank to keep the page&apos;s built-in default. Program pages are
         edited on the program itself, under Programs → SEO.
       </p>
 
       {pages.length === 0 && (
-        <p className="text-sm text-gray-400">No pages configured yet.</p>
+        <p className="text-sm text-[var(--admin-text-faint)]">
+          No pages configured yet.
+        </p>
       )}
 
       {pages.map((page, i) => (
@@ -4801,7 +4807,7 @@ export function SeoPagesForm({
                 {page.label?.trim() || page.path || "Untitled page"}
               </span>
               {!page.title?.trim() && !page.description?.trim() && (
-                <span className="rounded-full bg-gray-100 px-2 py-0.5 text-[10px] font-medium tracking-wide text-gray-500">
+                <span className="rounded-full bg-[var(--admin-neutral-bg)] px-2 py-0.5 text-[10px] font-medium tracking-wide text-[var(--admin-text-muted)]">
                   not set
                 </span>
               )}

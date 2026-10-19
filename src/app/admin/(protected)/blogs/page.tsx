@@ -10,13 +10,14 @@ import {
 } from "@/components/admin/inputs";
 import { Plus, Pencil, Trash2, Loader2, Check, Newspaper } from "lucide-react";
 import { DataTable, type Column } from "@/components/admin/kit/DataTable";
-import { Drawer, PageShell } from "@/components/admin/kit";
+import { Drawer, PageShell, VisibilityBadge } from "@/components/admin/kit";
 import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
 import {
   DeferredUploadsProvider,
   useDeferredUploads,
 } from "@/lib/deferred-uploads";
+import { plural } from "@/lib/utils";
 import { useToast } from "@/components/ui/Toast";
 import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { BLOG_CATEGORY_SUGGESTIONS } from "@/lib/validation";
@@ -197,7 +198,9 @@ function BlogsPageInner() {
       render: (b) => (
         <span className="block">
           <span className="block font-medium">{b.title}</span>
-          <span className="block text-xs text-gray-400">/blogs/{b.slug}</span>
+          <span className="block text-xs text-[var(--admin-text-faint)]">
+            /blogs/{b.slug}
+          </span>
         </span>
       ),
     },
@@ -209,7 +212,7 @@ function BlogsPageInner() {
       // "10 Jan" is what alphabetical ordering of the formatted date gives.
       value: (b) => b.published_at ?? "",
       render: (b) => (
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-[var(--admin-text-muted)]">
           {formatDate(b.published_at)}
         </span>
       ),
@@ -223,30 +226,30 @@ function BlogsPageInner() {
         <span className="admin-badge admin-badge-blue">{b.category}</span>
       ),
     },
-    {
-      key: "institution",
-      header: "College",
-      sortable: true,
-      hideOnMobile: true,
-      value: (b) => INSTITUTION_LABELS[b.institution] ?? b.institution,
-      render: (b) => (
-        <span className="admin-badge admin-badge-gray">
-          {INSTITUTION_LABELS[b.institution] ?? b.institution}
-        </span>
-      ),
-    },
+    // Only the Main aggregate mixes colleges; inside one college the column
+    // would repeat the page title on every row.
+    ...(isMain
+      ? ([
+          {
+            key: "institution",
+            header: "College",
+            sortable: true,
+            hideOnMobile: true,
+            value: (b) => INSTITUTION_LABELS[b.institution] ?? b.institution,
+            render: (b) => (
+              <span className="admin-badge admin-badge-gray">
+                {INSTITUTION_LABELS[b.institution] ?? b.institution}
+              </span>
+            ),
+          },
+        ] satisfies Column<BlogItem>[])
+      : []),
     {
       key: "is_active",
-      header: "Status",
+      header: "On public site",
       sortable: true,
-      value: (b) => (b.is_active ? "Active" : "Hidden"),
-      render: (b) => (
-        <span
-          className={`admin-badge ${b.is_active ? "admin-badge-green" : "admin-badge-red"}`}
-        >
-          {b.is_active ? "Active" : "Hidden"}
-        </span>
-      ),
+      value: (b) => (b.is_active ? "Visible" : "Hidden"),
+      render: (b) => <VisibilityBadge isActive={b.is_active} />,
     },
     {
       key: "actions",
@@ -297,8 +300,11 @@ function BlogsPageInner() {
               </>
             ) : (
               <>
-                {blogs.filter((b) => b.is_active).length} active posts — shown
-                on the site-wide /blogs page
+                {plural(
+                  blogs.filter((b) => b.is_active).length,
+                  "visible post",
+                )}{" "}
+                — shown on the site-wide /blogs page
               </>
             )}
           </>
@@ -427,14 +433,14 @@ function BlogsPageInner() {
 
               <TextArea
                 label="Excerpt (card summary)"
-                span={4}
+                span="full"
                 value={form.excerpt}
                 onChange={(e) => set("excerpt", e.target.value)}
-                rows={14}
+                rows={3}
               />
               <TextArea
                 label="Post content"
-                span={8}
+                span="full"
                 value={form.content}
                 onChange={(e) => set("content", e.target.value)}
                 rows={14}
@@ -447,7 +453,10 @@ function BlogsPageInner() {
                   checked={form.is_active}
                   onChange={(e) => set("is_active", e.target.checked)}
                 />
-                <label htmlFor="b_active" className="text-sm text-gray-700">
+                <label
+                  htmlFor="b_active"
+                  className="text-sm text-[var(--admin-text-secondary)]"
+                >
                   Active (shown on website)
                 </label>
               </div>

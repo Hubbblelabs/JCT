@@ -97,12 +97,15 @@ export function InspectorOverlay({
         aria-labelledby={headingId}
         className="flex h-full w-full flex-col overflow-y-auto bg-white shadow-2xl sm:max-w-3xl sm:rounded-xl"
       >
-        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-100 bg-white px-6 py-4">
+        <div className="sticky top-0 z-10 flex items-center justify-between border-b border-[var(--admin-border-subtle)] bg-white px-6 py-4">
           <div>
-            <p className="text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase">
+            <p className="text-[10px] font-bold tracking-[0.2em] text-[var(--admin-text-faint)] uppercase">
               {eyebrow}
             </p>
-            <h2 id={headingId} className="mt-0.5 font-semibold text-gray-900">
+            <h2
+              id={headingId}
+              className="mt-0.5 font-semibold text-[var(--admin-text)]"
+            >
               {title}
             </h2>
           </div>
@@ -118,7 +121,7 @@ export function InspectorOverlay({
         </div>
         <div className="p-6">{children}</div>
         {footer && (
-          <div className="sticky bottom-0 mt-auto border-t border-gray-100 bg-white px-6 py-3">
+          <div className="sticky bottom-0 mt-auto border-t border-[var(--admin-border-subtle)] bg-white px-6 py-3">
             {footer}
           </div>
         )}

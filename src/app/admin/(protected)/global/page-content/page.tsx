@@ -23,10 +23,10 @@ import { GlobalElements } from "@/components/layout/GlobalElements";
 function FloatingElementsStage() {
   return (
     <div
-      className="relative h-[640px] overflow-hidden bg-slate-100"
+      className="relative h-[640px] overflow-hidden bg-[var(--admin-neutral-bg)]"
       style={{ transform: "translateZ(0)" }}
     >
-      <div className="mx-auto max-w-3xl px-8 pt-24 text-center text-slate-400">
+      <div className="mx-auto max-w-3xl px-8 pt-24 text-center text-[var(--admin-text-faint)]">
         <p className="text-3xl font-semibold">Any page of the website</p>
         <p className="mt-3 text-lg">
           The floating buttons stay on screen while visitors scroll.

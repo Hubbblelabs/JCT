@@ -315,11 +315,11 @@ export default function UsersPage() {
 
   return (
     <PageShell
-      title="People"
+      title="Users"
       description="Who can sign in to this panel and what they are allowed to change. Editors are limited to one college; admins can edit everything."
       actions={
         <button onClick={openNew} className="admin-btn admin-btn-primary">
-          <Plus size={15} /> Add person
+          <Plus size={15} /> Add user
         </button>
       }
     >
@@ -355,7 +355,7 @@ export default function UsersPage() {
           body: "Add the people who will maintain the site. Give each one the narrowest role that lets them do their job.",
           action: (
             <button onClick={openNew} className="admin-btn admin-btn-primary">
-              <UserPlus size={15} /> Add the first person
+              <UserPlus size={15} /> Add the first user
             </button>
           ),
         }}
@@ -366,7 +366,7 @@ export default function UsersPage() {
         onClose={close}
         icon={Users}
         eyebrow={editing ? "Edit" : "New"}
-        title={editing ? editing.email : "Add a person"}
+        title={editing ? editing.email : "Add a user"}
         description={
           editing
             ? "Changes take effect the next time they load a page."

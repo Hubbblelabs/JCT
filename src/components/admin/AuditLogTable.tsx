@@ -331,17 +331,17 @@ function PurgeDialog({
         className="w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
       >
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
-            <AlertTriangle size={20} className="text-red-600" />
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--admin-danger-bg)]">
+            <AlertTriangle size={20} className="text-[var(--admin-danger)]" />
           </div>
           <div className="flex-1">
             <h2
               id="audit-purge-title"
-              className="text-base font-bold text-gray-900"
+              className="text-base font-bold text-[var(--admin-text)]"
             >
               Delete old audit entries
             </h2>
-            <p className="mt-1 text-sm text-gray-600">
+            <p className="mt-1 text-sm text-[var(--admin-text-secondary)]">
               Choose how far back to keep. Everything older is deleted
               permanently, including entries not loaded into this view. This
               cannot be undone.

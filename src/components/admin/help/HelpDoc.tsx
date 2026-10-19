@@ -337,7 +337,10 @@ export function HelpDoc({ items }: { items: HelpDocItem[] }) {
                         aria-label={`Copy a link to “${item.title}”`}
                       >
                         {copied === item.id ? (
-                          <Check size={15} className="text-emerald-600" />
+                          <Check
+                            size={15}
+                            className="text-[var(--admin-success)]"
+                          />
                         ) : (
                           <Link2 size={15} />
                         )}

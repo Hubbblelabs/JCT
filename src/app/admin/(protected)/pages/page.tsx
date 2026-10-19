@@ -102,10 +102,10 @@ function PagesInner() {
       value: (r) => `${r.title} ${r.slug}`,
       render: (r) => (
         <div className="min-w-0">
-          <p className="font-semibold text-gray-900">
+          <p className="font-semibold text-[var(--admin-text)]">
             {r.title || "(untitled)"}
           </p>
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-[var(--admin-text-muted)]">
             {publicPathFor(r.institution, r.slug)}
           </p>
         </div>

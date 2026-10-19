@@ -54,7 +54,7 @@ export function CoeSectionInspector({
     const idx = items.findIndex((it) => (it.id || "") === anchor);
     if (idx === -1) {
       return (
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-[var(--admin-text-muted)]">
           This section no longer exists. Re-open the inspector.
         </p>
       );
@@ -126,7 +126,7 @@ export function CoeSectionInspector({
             placeholder="A paragraph about the COE office…"
           />
 
-          <h3 className="admin-col-full admin-section-label border-t border-gray-100 pt-4">
+          <h3 className="admin-col-full admin-section-label border-t border-[var(--admin-border-subtle)] pt-4">
             Controller Profile
           </h3>
           <TextInput
@@ -205,7 +205,7 @@ export function CoeSectionInspector({
           <Field
             label="Autonomous Academic Governance"
             span="full"
-            className="border-t border-gray-100 pt-4"
+            className="border-t border-[var(--admin-border-subtle)] pt-4"
             hint="Icons are assigned automatically by position."
           >
             <ItemsEditor

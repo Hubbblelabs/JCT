@@ -61,7 +61,7 @@ export function PlacementRecordInspector({
           required
         />
         <Field label="Visibility" span={8}>
-          <label className="flex items-center gap-2 text-sm text-gray-700">
+          <label className="flex items-center gap-2 text-sm text-[var(--admin-text-secondary)]">
             <input
               type="checkbox"
               checked={record.is_current}
@@ -69,7 +69,7 @@ export function PlacementRecordInspector({
             />
             Current year (selected first on the public page)
           </label>
-          <label className="mt-2 flex items-center gap-2 text-sm text-gray-700">
+          <label className="mt-2 flex items-center gap-2 text-sm text-[var(--admin-text-secondary)]">
             <input
               type="checkbox"
               checked={record.is_active}
@@ -152,7 +152,7 @@ export function PlacementRecordInspector({
             label="Year-wise history — added columns"
             span="full"
             hint="This year's entry in the columns added to the history table (Placement Years → Columns)."
-            className="border-t border-gray-100 pt-3"
+            className="border-t border-[var(--admin-border-subtle)] pt-3"
           >
             <div className="admin-form-grid admin-form-grid--tight">
               {addedColumns.map((c) => (
@@ -183,7 +183,7 @@ export function PlacementRecordInspector({
   if (sectionKey === "recruiters") {
     return (
       <>
-        <p className="mb-3 text-xs text-gray-500">
+        <p className="mb-3 text-xs text-[var(--admin-text-muted)]">
           Company name and logo. These recruiters also power the recruiter
           carousel under Placement Highlights.
         </p>
@@ -274,7 +274,7 @@ export function PlacementRecordInspector({
 
   return (
     <>
-      <p className="mb-3 text-xs text-gray-500">
+      <p className="mb-3 text-xs text-[var(--admin-text-muted)]">
         Group placed students under the company that hired them. Add a company,
         then each student with their program and package.
       </p>
@@ -300,7 +300,7 @@ export function PlacementRecordInspector({
               onChange={(logo) => oc({ ...item, logo })}
               hideUrlField
             />
-            <div className="admin-col-full rounded-lg border border-gray-100 bg-gray-50/60 p-3">
+            <div className="admin-col-full rounded-lg border border-[var(--admin-border-subtle)] bg-gray-50/60 p-3">
               <Repeater<CompanyStudentValue>
                 label="Placed Students"
                 itemSpan={4}
@@ -371,7 +371,7 @@ export function PlacementYearsInspector({
 }) {
   return (
     <div className="space-y-3">
-      <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+      <p className="rounded-lg border border-[var(--admin-warning-border)] bg-[var(--admin-warning-bg)] px-3 py-2 text-xs text-[var(--admin-warning)]">
         Each year is a record of its own. Pick one to load it into the preview,
         then click any block on the page to edit that year&apos;s figures,
         recruiters or students. Adding and deleting a year takes effect
@@ -379,7 +379,7 @@ export function PlacementYearsInspector({
       </p>
 
       {records.length === 0 ? (
-        <p className="text-sm text-gray-500">No years yet.</p>
+        <p className="text-sm text-[var(--admin-text-muted)]">No years yet.</p>
       ) : (
         <div className="space-y-2">
           {records.map((r) => (
@@ -387,20 +387,23 @@ export function PlacementYearsInspector({
               key={r._id}
               className={`flex items-center gap-3 rounded-lg border p-3 ${
                 r._id === selectedId
-                  ? "border-gray-900 bg-gray-50"
-                  : "border-gray-200"
+                  ? "border-gray-900 bg-[var(--admin-sunken)]"
+                  : "border-[var(--admin-border)]"
               }`}
             >
-              <CalendarDays size={16} className="shrink-0 text-gray-400" />
+              <CalendarDays
+                size={16}
+                className="shrink-0 text-[var(--admin-text-faint)]"
+              />
               <button
                 type="button"
                 onClick={() => onSelect(r._id)}
                 className="min-w-0 flex-1 text-left"
               >
-                <span className="block text-sm font-semibold text-gray-900">
+                <span className="block text-sm font-semibold text-[var(--admin-text)]">
                   {r.year || "Untitled year"}
                 </span>
-                <span className="block text-xs text-gray-400">
+                <span className="block text-xs text-[var(--admin-text-faint)]">
                   {r.notable_placements.length} students ·{" "}
                   {r.top_recruiters.length} recruiters
                   {r.is_active ? "" : " · hidden"}
@@ -439,7 +442,7 @@ export function PlacementYearsInspector({
         Add Year
       </button>
 
-      <div className="border-t border-gray-100 pt-4">
+      <div className="border-t border-[var(--admin-border-subtle)] pt-4">
         <p className="admin-label">Year-wise history table</p>
         <p className="admin-help mb-3">
           The figures every year carries can be renamed, reordered or hidden

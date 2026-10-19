@@ -214,7 +214,7 @@ Separate from Program content, the **`Page`** model (`src/lib/models/Page.ts`) b
   - `revalidateTargets(...targets)` — targets are `"home" | "engineering" | "arts-science" | "polytechnic" | "all-institutions"`. Note `all-institutions` does **not** include `/campus-life`; only `home` does.
   - `revalidateForConfigKey(key)` — looks up the affected pages via the `SITE_CONFIG_KEY_TARGETS` map. When adding a new SiteConfig key in `src/lib/validation/siteConfig.ts`, add an entry to `SITE_CONFIG_KEY_TARGETS` in `src/lib/revalidate.ts` mapping that key to the targets it affects — without this mapping, the cache invalidation will be incomplete.
   - `revalidatePaths(...paths)` — revalidate explicit paths.
-  - `revalidateEverything()` — `publicCacheClear()` + `revalidatePath("/", "layout")`, i.e. every public route including the dynamic detail pages. Not for write routes (use the targeted helpers); it backs the **Clear Cache** button on the admin Settings page via `POST /api/admin/cache`, for when the targeted mapping was bypassed — a restore, a hand-edited document, a config key with no `SITE_CONFIG_KEY_TARGETS` entry.
+  - `revalidateEverything()` — `publicCacheClear()` + `revalidatePath("/", "layout")`, i.e. every public route including the dynamic detail pages. Not for write routes (use the targeted helpers); it backs the **Clear cache** button at the foot of the admin sidebar via `POST /api/admin/cache`, for when the targeted mapping was bypassed — a restore, a hand-edited document, a config key with no `SITE_CONFIG_KEY_TARGETS` entry.
 
 ### Frontend structure & state
 

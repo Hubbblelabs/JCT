@@ -634,7 +634,10 @@ export default function SettingsPage() {
   if (status === "loading") {
     return (
       <div className="admin-content flex items-center justify-center py-24">
-        <Loader2 size={28} className="animate-spin text-gray-400" />
+        <Loader2
+          size={28}
+          className="animate-spin text-[var(--admin-text-faint)]"
+        />
       </div>
     );
   }
@@ -1001,7 +1004,8 @@ export default function SettingsPage() {
         <>
           Export an archive of everything on this site, schedule that export to
           run on its own, restore one, or reset the site back to its defaults.
-          Clearing the page cache now lives in the top bar.
+          To clear the page cache, use <strong>Clear cache</strong> at the foot
+          of the sidebar.
         </>
       }
     >
@@ -1009,12 +1013,14 @@ export default function SettingsPage() {
         {/* ── Export ── */}
         <div className="admin-card">
           <div className="mb-4 flex items-start gap-3">
-            <div className="rounded-lg bg-blue-50 p-2">
-              <Download size={18} className="text-blue-600" />
+            <div className="rounded-lg bg-[var(--admin-info-bg)] p-2">
+              <Download size={18} className="text-[var(--admin-info)]" />
             </div>
             <div>
-              <h2 className="font-semibold text-gray-900">Export Backup</h2>
-              <p className="mt-0.5 text-sm text-gray-500">
+              <h2 className="font-semibold text-[var(--admin-text)]">
+                Export Backup
+              </h2>
+              <p className="mt-0.5 text-sm text-[var(--admin-text-muted)]">
                 Builds one ZIP containing all site config, content, and — if
                 selected — every uploaded file, then downloads it. The archive
                 is assembled on the server first, so the download runs at full
@@ -1023,38 +1029,38 @@ export default function SettingsPage() {
             </div>
           </div>
 
-          <div className="mb-4 space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-3">
-            <p className="text-xs font-medium tracking-wide text-gray-500 uppercase">
+          <div className="mb-4 space-y-2 rounded-lg border border-[var(--admin-border-subtle)] bg-[var(--admin-sunken)] p-3">
+            <p className="text-xs font-medium tracking-wide text-[var(--admin-text-muted)] uppercase">
               Include in backup
             </p>
-            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-gray-700">
+            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-[var(--admin-text-secondary)]">
               <input
                 type="checkbox"
                 checked={includeImages}
                 onChange={(e) => setIncludeImages(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300"
+                className="h-4 w-4 rounded border-[var(--admin-border)]"
               />
-              <Image size={14} className="text-gray-400" />
+              <Image size={14} className="text-[var(--admin-text-faint)]" />
               Uploaded images
             </label>
-            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-gray-700">
+            <label className="flex cursor-pointer items-center gap-2.5 text-sm text-[var(--admin-text-secondary)]">
               <input
                 type="checkbox"
                 checked={includeDocs}
                 onChange={(e) => setIncludeDocs(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300"
+                className="h-4 w-4 rounded border-[var(--admin-border)]"
               />
-              <FileText size={14} className="text-gray-400" />
+              <FileText size={14} className="text-[var(--admin-text-faint)]" />
               Uploaded documents / files
             </label>
             {includeImages || includeDocs ? (
-              <p className="pt-1 text-xs text-amber-600">
+              <p className="pt-1 text-xs text-[var(--admin-warning)]">
                 Keep this tab open while the archive builds. Once it is ready
                 the download is a normal file transfer — closing the tab then
                 will not lose it. Requires object storage to be configured.
               </p>
             ) : (
-              <p className="pt-1 text-xs text-red-600">
+              <p className="pt-1 text-xs text-[var(--admin-danger)]">
                 Without assets this archive is <strong>not restorable</strong>{" "}
                 on its own — it carries no image or document files, and no list
                 of which ones are missing. Only uncheck these if the storage
@@ -1069,10 +1075,10 @@ export default function SettingsPage() {
 
           {job?.state === "ready" && (
             <div className="mb-3 space-y-1.5">
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-[var(--admin-text-muted)]">
                 Download didn&apos;t start?{" "}
                 <a
-                  className="font-medium text-blue-600 underline"
+                  className="font-medium text-[var(--admin-info)] underline"
                   href={`/api/admin/site-config/backup/file?jobId=${job.id}`}
                 >
                   Get {job.filename} ({formatBytes(job.size ?? 0)})
@@ -1084,13 +1090,13 @@ export default function SettingsPage() {
                   the next export on a tight disk — so once the download is
                   safely finished there has to be a way to give the space back
                   sooner. This is it. */}
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-[var(--admin-text-muted)]">
                 Saved it already?{" "}
                 <button
                   type="button"
                   onClick={() => void handleDeleteArchive(job)}
                   disabled={discarding}
-                  className="font-medium text-blue-600 underline disabled:opacity-50"
+                  className="font-medium text-[var(--admin-info)] underline disabled:opacity-50"
                 >
                   {discarding
                     ? "Deleting…"
@@ -1122,14 +1128,14 @@ export default function SettingsPage() {
         {/* ── Restore ── */}
         <div className="admin-card">
           <div className="mb-4 flex items-start gap-3">
-            <div className="rounded-lg bg-green-50 p-2">
-              <Upload size={18} className="text-green-600" />
+            <div className="rounded-lg bg-[var(--admin-success-bg)] p-2">
+              <Upload size={18} className="text-[var(--admin-success)]" />
             </div>
             <div>
-              <h2 className="font-semibold text-gray-900">
+              <h2 className="font-semibold text-[var(--admin-text)]">
                 Restore from Backup
               </h2>
-              <p className="mt-0.5 text-sm text-gray-500">
+              <p className="mt-0.5 text-sm text-[var(--admin-text-muted)]">
                 Select a backup archive. Site configs, content, images, and
                 documents in the archive overwrite what is stored now. Anything
                 created since the backup is left untouched, not deleted — this
@@ -1141,11 +1147,11 @@ export default function SettingsPage() {
           <StatusBanner status={restoreStatus} />
 
           {restoreWarnings.length > 0 && (
-            <details className="mb-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">
-              <summary className="cursor-pointer font-medium text-amber-800">
+            <details className="mb-3 rounded-lg border border-[var(--admin-warning-border)] bg-[var(--admin-warning-bg)] p-3 text-sm">
+              <summary className="cursor-pointer font-medium text-[var(--admin-warning)]">
                 {restoreWarnings.length} entry(s) not restored — details
               </summary>
-              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-amber-800">
+              <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[var(--admin-warning)]">
                 {restoreWarnings.map((w, i) => (
                   <li key={i}>{w}</li>
                 ))}
@@ -1155,7 +1161,7 @@ export default function SettingsPage() {
 
           <div className="space-y-3">
             <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-[var(--admin-text-secondary)]">
                 Backup archive (.zip)
               </span>
               <input
@@ -1163,55 +1169,57 @@ export default function SettingsPage() {
                 type="file"
                 accept=".zip,application/zip"
                 onChange={handleFileChange}
-                className="block w-full text-sm text-gray-600 file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-200"
+                className="block w-full text-sm text-[var(--admin-text-secondary)] file:mr-3 file:rounded-md file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-[var(--admin-text-secondary)] hover:file:bg-gray-200"
               />
             </label>
 
-            {fileError && <p className="text-sm text-red-600">{fileError}</p>}
+            {fileError && (
+              <p className="text-sm text-[var(--admin-danger)]">{fileError}</p>
+            )}
 
             {/* Restore mode. Upserts alone never delete, so a plain restore is
                 additive: rows created after the backup survive it. That is the
                 wrong default for undoing a bad import, so state it explicitly
                 rather than leaving the operator to discover it. */}
-            <div className="space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-3">
-              <p className="text-xs font-medium tracking-wide text-gray-500 uppercase">
+            <div className="space-y-2 rounded-lg border border-[var(--admin-border-subtle)] bg-[var(--admin-sunken)] p-3">
+              <p className="text-xs font-medium tracking-wide text-[var(--admin-text-muted)] uppercase">
                 Content restore mode
               </p>
-              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-gray-700">
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-[var(--admin-text-secondary)]">
                 <input
                   type="radio"
                   name="restoreMode"
                   checked={restoreMode === "merge"}
                   onChange={() => setRestoreMode("merge")}
-                  className="mt-0.5 h-4 w-4 border-gray-300"
+                  className="mt-0.5 h-4 w-4 border-[var(--admin-border)]"
                 />
                 <span>
                   <span className="font-medium">Merge</span> — restore the
                   archive&apos;s documents over the current ones.
-                  <span className="block text-xs text-gray-500">
+                  <span className="block text-xs text-[var(--admin-text-muted)]">
                     Anything created after the backup is kept.
                   </span>
                 </span>
               </label>
-              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-gray-700">
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-[var(--admin-text-secondary)]">
                 <input
                   type="radio"
                   name="restoreMode"
                   checked={restoreMode === "replace"}
                   onChange={() => setRestoreMode("replace")}
-                  className="mt-0.5 h-4 w-4 border-gray-300"
+                  className="mt-0.5 h-4 w-4 border-[var(--admin-border)]"
                 />
                 <span>
                   <span className="font-medium">Replace</span> — make content
                   match the archive exactly.
-                  <span className="block text-xs text-gray-500">
+                  <span className="block text-xs text-[var(--admin-text-muted)]">
                     Programs, pages, placements, testimonials and events created
                     after the backup are <strong>deleted</strong>.
                   </span>
                 </span>
               </label>
               {restoreMode === "replace" && (
-                <p className="pt-1 text-xs text-red-600">
+                <p className="pt-1 text-xs text-[var(--admin-danger)]">
                   Replace deletes content permanently. It is skipped for any
                   collection that does not restore cleanly, so a partial failure
                   cannot wipe live data.
@@ -1220,10 +1228,10 @@ export default function SettingsPage() {
             </div>
 
             {restoreFile && (
-              <div className="flex items-center gap-1.5 rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
+              <div className="flex items-center gap-1.5 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-sunken)] p-3 text-sm text-[var(--admin-text-secondary)]">
                 <FileArchive size={14} />
                 {restoreFile.name}
-                <span className="text-gray-500">
+                <span className="text-[var(--admin-text-muted)]">
                   ({formatBytes(restoreFile.size)})
                 </span>
               </div>
@@ -1249,12 +1257,14 @@ export default function SettingsPage() {
         {/* ── Automatic backups ── */}
         <div className="admin-card lg:col-span-2">
           <div className="mb-4 flex items-start gap-3">
-            <div className="rounded-lg bg-indigo-50 p-2">
-              <CalendarClock size={18} className="text-indigo-600" />
+            <div className="rounded-lg bg-[var(--admin-info-bg)] p-2">
+              <CalendarClock size={18} className="text-[var(--admin-info)]" />
             </div>
             <div>
-              <h2 className="font-semibold text-gray-900">Automatic backups</h2>
-              <p className="mt-0.5 text-sm text-gray-500">
+              <h2 className="font-semibold text-[var(--admin-text)]">
+                Automatic backups
+              </h2>
+              <p className="mt-0.5 text-sm text-[var(--admin-text-muted)]">
                 Builds the same archive as the button above, on a schedule, and
                 keeps it on the server. Nothing is emailed or uploaded elsewhere
                 — download a copy from the list below, or restore straight from
@@ -1267,24 +1277,24 @@ export default function SettingsPage() {
           <StatusBanner status={scheduleStatus} />
 
           {!schedule ? (
-            <div className="flex items-center gap-2 py-4 text-sm text-gray-500">
+            <div className="flex items-center gap-2 py-4 text-sm text-[var(--admin-text-muted)]">
               <Loader2 size={15} className="animate-spin" />
               Loading schedule…
             </div>
           ) : (
             <div className="space-y-4">
-              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-gray-700">
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-[var(--admin-text-secondary)]">
                 <input
                   type="checkbox"
                   checked={schedule.enabled}
                   onChange={(e) =>
                     setSchedule({ ...schedule, enabled: e.target.checked })
                   }
-                  className="mt-0.5 h-4 w-4 rounded border-gray-300"
+                  className="mt-0.5 h-4 w-4 rounded border-[var(--admin-border)]"
                 />
                 <span>
                   <span className="font-medium">Run backups automatically</span>
-                  <span className="block text-xs text-gray-500">
+                  <span className="block text-xs text-[var(--admin-text-muted)]">
                     Off by default. Nothing runs and no disk is used until this
                     is ticked and saved.
                   </span>
@@ -1293,7 +1303,7 @@ export default function SettingsPage() {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <label className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-[var(--admin-text-secondary)]">
                     How often
                   </span>
                   <select
@@ -1315,7 +1325,7 @@ export default function SettingsPage() {
 
                 {schedule.frequency === "weekly" && (
                   <label className="flex flex-col gap-1">
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-[var(--admin-text-secondary)]">
                       Day of week
                     </span>
                     <select
@@ -1339,7 +1349,7 @@ export default function SettingsPage() {
 
                 {schedule.frequency === "monthly" && (
                   <label className="flex flex-col gap-1">
-                    <span className="text-sm font-medium text-gray-700">
+                    <span className="text-sm font-medium text-[var(--admin-text-secondary)]">
                       Day of month
                     </span>
                     <select
@@ -1364,7 +1374,9 @@ export default function SettingsPage() {
                 )}
 
                 <label className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-700">At</span>
+                  <span className="text-sm font-medium text-[var(--admin-text-secondary)]">
+                    At
+                  </span>
                   <input
                     type="time"
                     value={`${String(schedule.hour).padStart(2, "0")}:${String(
@@ -1380,7 +1392,7 @@ export default function SettingsPage() {
                 </label>
 
                 <label className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-[var(--admin-text-secondary)]">
                     Time zone
                   </span>
                   <select
@@ -1399,7 +1411,7 @@ export default function SettingsPage() {
                 </label>
 
                 <label className="flex flex-col gap-1">
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium text-[var(--admin-text-secondary)]">
                     Archives to keep
                   </span>
                   <input
@@ -1421,11 +1433,11 @@ export default function SettingsPage() {
                 </label>
               </div>
 
-              <div className="space-y-2 rounded-lg border border-gray-100 bg-gray-50 p-3">
-                <p className="text-xs font-medium tracking-wide text-gray-500 uppercase">
+              <div className="space-y-2 rounded-lg border border-[var(--admin-border-subtle)] bg-[var(--admin-sunken)] p-3">
+                <p className="text-xs font-medium tracking-wide text-[var(--admin-text-muted)] uppercase">
                   Include in each automatic backup
                 </p>
-                <label className="flex cursor-pointer items-center gap-2.5 text-sm text-gray-700">
+                <label className="flex cursor-pointer items-center gap-2.5 text-sm text-[var(--admin-text-secondary)]">
                   <input
                     type="checkbox"
                     checked={schedule.include_images}
@@ -1435,12 +1447,12 @@ export default function SettingsPage() {
                         include_images: e.target.checked,
                       })
                     }
-                    className="h-4 w-4 rounded border-gray-300"
+                    className="h-4 w-4 rounded border-[var(--admin-border)]"
                   />
-                  <Image size={14} className="text-gray-400" />
+                  <Image size={14} className="text-[var(--admin-text-faint)]" />
                   Uploaded images
                 </label>
-                <label className="flex cursor-pointer items-center gap-2.5 text-sm text-gray-700">
+                <label className="flex cursor-pointer items-center gap-2.5 text-sm text-[var(--admin-text-secondary)]">
                   <input
                     type="checkbox"
                     checked={schedule.include_docs}
@@ -1450,14 +1462,17 @@ export default function SettingsPage() {
                         include_docs: e.target.checked,
                       })
                     }
-                    className="h-4 w-4 rounded border-gray-300"
+                    className="h-4 w-4 rounded border-[var(--admin-border)]"
                   />
-                  <FileText size={14} className="text-gray-400" />
+                  <FileText
+                    size={14}
+                    className="text-[var(--admin-text-faint)]"
+                  />
                   Uploaded documents / files
                 </label>
                 {/* Disk is the whole cost of this feature, and it is easy to
                     tick "keep 10" without picturing 75 GB. */}
-                <p className="flex items-start gap-1.5 pt-1 text-xs text-amber-600">
+                <p className="flex items-start gap-1.5 pt-1 text-xs text-[var(--admin-warning)]">
                   <AlertTriangle size={13} className="mt-0.5 shrink-0" />
                   Each archive with images and documents is currently several
                   gigabytes. Keeping {schedule.keep} means roughly{" "}
@@ -1467,28 +1482,34 @@ export default function SettingsPage() {
                 </p>
               </div>
 
-              <dl className="grid grid-cols-1 gap-3 rounded-lg border border-gray-100 bg-white p-3 text-sm sm:grid-cols-3">
+              <dl className="grid grid-cols-1 gap-3 rounded-lg border border-[var(--admin-border-subtle)] bg-white p-3 text-sm sm:grid-cols-3">
                 <div>
-                  <dt className="text-xs text-gray-500">Next run</dt>
-                  <dd className="font-medium text-gray-900">
+                  <dt className="text-xs text-[var(--admin-text-muted)]">
+                    Next run
+                  </dt>
+                  <dd className="font-medium text-[var(--admin-text)]">
                     {schedule.enabled
                       ? formatWhen(schedule.next_run_at)
                       : "Not scheduled"}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-gray-500">Last run</dt>
-                  <dd className="font-medium text-gray-900">
+                  <dt className="text-xs text-[var(--admin-text-muted)]">
+                    Last run
+                  </dt>
+                  <dd className="font-medium text-[var(--admin-text)]">
                     {formatWhen(schedule.last_run_at)}
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-xs text-gray-500">Last result</dt>
+                  <dt className="text-xs text-[var(--admin-text-muted)]">
+                    Last result
+                  </dt>
                   <dd
                     className={
                       schedule.last_status === "failed"
-                        ? "font-medium text-red-700"
-                        : "font-medium text-gray-900"
+                        ? "font-medium text-[var(--admin-danger)]"
+                        : "font-medium text-[var(--admin-text)]"
                     }
                   >
                     {schedule.last_status === "ready"
@@ -1519,14 +1540,17 @@ export default function SettingsPage() {
         {/* ── Archives held on the server ── */}
         <div className="admin-card lg:col-span-2">
           <div className="mb-4 flex items-start gap-3">
-            <div className="rounded-lg bg-slate-100 p-2">
-              <HardDrive size={18} className="text-slate-600" />
+            <div className="rounded-lg bg-[var(--admin-neutral-bg)] p-2">
+              <HardDrive
+                size={18}
+                className="text-[var(--admin-text-secondary)]"
+              />
             </div>
             <div>
-              <h2 className="font-semibold text-gray-900">
+              <h2 className="font-semibold text-[var(--admin-text)]">
                 Archives on the server
               </h2>
-              <p className="mt-0.5 text-sm text-gray-500">
+              <p className="mt-0.5 text-sm text-[var(--admin-text-muted)]">
                 Every backup still held on disk, newest first. Download one to
                 keep a copy off the server, or delete it to reclaim the space.
               </p>
@@ -1534,12 +1558,12 @@ export default function SettingsPage() {
           </div>
 
           {!archivesLoaded ? (
-            <div className="flex items-center gap-2 py-3 text-sm text-gray-500">
+            <div className="flex items-center gap-2 py-3 text-sm text-[var(--admin-text-muted)]">
               <Loader2 size={15} className="animate-spin" />
               Loading…
             </div>
           ) : archives.length === 0 ? (
-            <p className="py-3 text-sm text-gray-500">
+            <p className="py-3 text-sm text-[var(--admin-text-muted)]">
               No archives on the server. Build one above, or turn on automatic
               backups.
             </p>
@@ -1547,7 +1571,7 @@ export default function SettingsPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-gray-200 text-left text-xs tracking-wide text-gray-500 uppercase">
+                  <tr className="border-b border-[var(--admin-border)] text-left text-xs tracking-wide text-[var(--admin-text-muted)] uppercase">
                     <th className="py-2 pr-3 font-medium">Archive</th>
                     <th className="py-2 pr-3 font-medium">Built</th>
                     <th className="py-2 pr-3 font-medium">Size</th>
@@ -1559,36 +1583,40 @@ export default function SettingsPage() {
                   {archives.map((a) => (
                     <tr
                       key={a.id}
-                      className="border-b border-gray-100 last:border-0"
+                      className="border-b border-[var(--admin-border-subtle)] last:border-0"
                     >
                       <td className="py-2 pr-3">
                         <span className="flex items-center gap-1.5">
                           <FileArchive
                             size={14}
-                            className="shrink-0 text-gray-400"
+                            className="shrink-0 text-[var(--admin-text-faint)]"
                           />
                           <span className="break-all">{a.filename}</span>
                           {a.origin === "auto" && (
-                            <span className="shrink-0 rounded bg-indigo-50 px-1.5 py-0.5 text-[11px] font-medium text-indigo-700">
+                            <span className="shrink-0 rounded bg-[var(--admin-info-bg)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--admin-info)]">
                               Scheduled
                             </span>
                           )}
                         </span>
                       </td>
-                      <td className="py-2 pr-3 whitespace-nowrap text-gray-600">
+                      <td className="py-2 pr-3 whitespace-nowrap text-[var(--admin-text-secondary)]">
                         {formatWhen(a.created_at)}
                       </td>
-                      <td className="py-2 pr-3 whitespace-nowrap text-gray-600 tabular-nums">
+                      <td className="py-2 pr-3 whitespace-nowrap text-[var(--admin-text-secondary)] tabular-nums">
                         {a.state === "ready" ? formatBytes(a.size ?? 0) : "—"}
                       </td>
                       <td className="py-2 pr-3">
                         {a.state === "ready" ? (
-                          <span className="text-green-700">Ready</span>
+                          <span className="text-[var(--admin-success)]">
+                            Ready
+                          </span>
                         ) : a.state === "building" ? (
-                          <span className="text-blue-700">Building…</span>
+                          <span className="text-[var(--admin-info)]">
+                            Building…
+                          </span>
                         ) : (
                           <span
-                            className="text-red-700"
+                            className="text-[var(--admin-danger)]"
                             title={a.error ?? undefined}
                           >
                             Failed
@@ -1598,7 +1626,7 @@ export default function SettingsPage() {
                       <td className="py-2 text-right whitespace-nowrap">
                         {a.state === "ready" && (
                           <a
-                            className="mr-3 font-medium text-blue-600 underline"
+                            className="mr-3 font-medium text-[var(--admin-info)] underline"
                             href={`/api/admin/site-config/backup/file?jobId=${a.id}`}
                           >
                             Download
@@ -1609,7 +1637,7 @@ export default function SettingsPage() {
                             type="button"
                             onClick={() => void handleDeleteArchive(a)}
                             disabled={discarding}
-                            className="font-medium text-red-600 underline disabled:opacity-50"
+                            className="font-medium text-[var(--admin-danger)] underline disabled:opacity-50"
                           >
                             Delete
                           </button>
@@ -1624,13 +1652,15 @@ export default function SettingsPage() {
         </div>
 
         {/* ── Reset ── */}
-        <div className="admin-card border-red-200 bg-red-50/30 lg:col-span-2">
+        <div className="admin-card border-[var(--admin-danger-border)] bg-red-50/30 lg:col-span-2">
           <div className="mb-4 flex items-start gap-3">
-            <div className="rounded-lg bg-red-100 p-2">
-              <ShieldAlert size={18} className="text-red-600" />
+            <div className="rounded-lg bg-[var(--admin-danger-bg)] p-2">
+              <ShieldAlert size={18} className="text-[var(--admin-danger)]" />
             </div>
             <div>
-              <h2 className="font-semibold text-red-800">Reset All Data</h2>
+              <h2 className="font-semibold text-[var(--admin-danger)]">
+                Reset All Data
+              </h2>
               <p className="mt-0.5 text-sm text-red-700/80">
                 Permanently deletes every site config entry, plus every uploaded
                 file nothing references — from the database and from object
@@ -1647,28 +1677,28 @@ export default function SettingsPage() {
           <StatusBanner status={resetStatus} />
 
           <div className="space-y-3">
-            <div className="space-y-2 rounded-lg border border-red-200 bg-white/60 p-3">
+            <div className="space-y-2 rounded-lg border border-[var(--admin-danger-border)] bg-white/60 p-3">
               <p className="text-xs font-medium tracking-wide text-red-700/70 uppercase">
                 Also delete
               </p>
-              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-red-900">
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-[var(--admin-danger)]">
                 <input
                   type="checkbox"
                   checked={resetContent}
                   onChange={(e) => setResetContent(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-red-300"
+                  className="mt-0.5 h-4 w-4 rounded border-[var(--admin-danger-border)]"
                 />
                 <span>
                   <span className="font-medium">Content</span> — every program,
                   page, event, placement and testimonial.
                 </span>
               </label>
-              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-red-900">
+              <label className="flex cursor-pointer items-start gap-2.5 text-sm text-[var(--admin-danger)]">
                 <input
                   type="checkbox"
                   checked={resetAssets}
                   onChange={(e) => setResetAssets(e.target.checked)}
-                  className="mt-0.5 h-4 w-4 rounded border-red-300"
+                  className="mt-0.5 h-4 w-4 rounded border-[var(--admin-danger-border)]"
                 />
                 <span>
                   <span className="font-medium">Every uploaded file</span> — all
@@ -1677,7 +1707,7 @@ export default function SettingsPage() {
                 </span>
               </label>
               {resetAssets && !resetContent && (
-                <p className="flex items-start gap-1.5 text-xs text-red-700">
+                <p className="flex items-start gap-1.5 text-xs text-[var(--admin-danger)]">
                   <AlertTriangle size={13} className="mt-0.5 shrink-0" />
                   Purging every file while keeping content leaves surviving
                   programs, events, placements and testimonials with broken
@@ -1692,7 +1722,7 @@ export default function SettingsPage() {
             </div>
 
             <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium text-red-700">
+              <span className="text-sm font-medium text-[var(--admin-danger)]">
                 Type <strong>RESET</strong> to confirm
               </span>
               <input
@@ -1700,7 +1730,7 @@ export default function SettingsPage() {
                 value={resetConfirm}
                 onChange={(e) => setResetConfirm(e.target.value)}
                 placeholder="RESET"
-                className="admin-input max-w-xs border-red-200 focus:ring-red-300"
+                className="admin-input max-w-xs border-[var(--admin-danger-border)] focus:ring-red-300"
               />
             </label>
             <button
@@ -1742,8 +1772,8 @@ function RestoreProgressBar({ state }: { state: RestoreProgressState }) {
       ? null
       : Math.min(100, Math.max(0, Math.round(state.ratio * 100)));
   return (
-    <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-      <div className="mb-1.5 flex items-center justify-between gap-3 text-xs text-green-800">
+    <div className="rounded-lg border border-[var(--admin-success-border)] bg-[var(--admin-success-bg)] p-3">
+      <div className="mb-1.5 flex items-center justify-between gap-3 text-xs text-[var(--admin-success)]">
         <span className="truncate">
           {state.label}
           {pct !== null && ` — ${pct}%`}
@@ -1769,8 +1799,8 @@ function BuildProgress({ job }: { job: BackupJob }) {
     ? Math.min(100, Math.round((job.bytes / job.expected_bytes) * 100))
     : 0;
   return (
-    <div className="mb-3 rounded-lg border border-blue-200 bg-blue-50 p-3">
-      <div className="mb-1.5 flex items-center justify-between text-xs text-blue-800">
+    <div className="mb-3 rounded-lg border border-[var(--admin-info-border)] bg-[var(--admin-info-bg)] p-3">
+      <div className="mb-1.5 flex items-center justify-between text-xs text-[var(--admin-info)]">
         <span>
           Building archive — {job.entries_done}/{job.entries_total} files
         </span>
@@ -1795,9 +1825,12 @@ function BuildProgress({ job }: { job: BackupJob }) {
 function StatusBanner({ status }: { status: Status | null }) {
   if (!status) return null;
   const styles = {
-    success: "bg-green-50 text-green-700 border-green-200",
-    error: "bg-red-50 text-red-700 border-red-200",
-    warning: "bg-yellow-50 text-yellow-700 border-yellow-200",
+    success:
+      "bg-[var(--admin-success-bg)] text-[var(--admin-success)] border-[var(--admin-success-border)]",
+    error:
+      "bg-[var(--admin-danger-bg)] text-[var(--admin-danger)] border-[var(--admin-danger-border)]",
+    warning:
+      "bg-[var(--admin-warning-bg)] text-[var(--admin-warning)] border-[var(--admin-warning-border)]",
   };
   const Icon = status.type === "success" ? CheckCircle : AlertTriangle;
   return (

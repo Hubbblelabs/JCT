@@ -1,9 +1,10 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { BookOpen, Loader2 } from "lucide-react";
+import { AlertCircle, Eye, EyeOff, Loader2 } from "lucide-react";
 import "@/styles/admin.css";
 
 function LoginForm() {
@@ -13,6 +14,11 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  // A password typed with Caps Lock on fails like a wrong one, and after a
+  // few of those the rate limiter locks the account for minutes — say so
+  // before the attempt is spent.
+  const [capsLock, setCapsLock] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +34,11 @@ function LoginForm() {
     setLoading(false);
 
     if (result?.error) {
-      setError("Invalid email or password");
+      // The limiter answers the same way as a bad password (it cannot tell
+      // the client which), so the message covers both.
+      setError(
+        "That email and password don’t match. After several failed attempts sign-in pauses for a few minutes.",
+      );
     } else {
       // Only follow same-origin relative paths. A raw callbackUrl would let
       // `/admin/login?callbackUrl=https://evil.com` (or `//evil.com`) bounce
@@ -41,87 +51,128 @@ function LoginForm() {
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="login-email" className="admin-label">
-            Email
-          </label>
-          <input
-            id="login-email"
-            type="email"
-            autoComplete="email"
-            className="admin-input"
-            placeholder="admin@jct.ac.in"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoFocus
-          />
-        </div>
+    <form onSubmit={handleSubmit} className="admin-login-form">
+      <div>
+        <label htmlFor="login-email" className="admin-label">
+          Email
+        </label>
+        <input
+          id="login-email"
+          type="email"
+          autoComplete="username"
+          inputMode="email"
+          className="admin-input"
+          placeholder="you@jct.ac.in"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          autoFocus
+        />
+      </div>
 
-        <div>
-          <label htmlFor="login-password" className="admin-label">
-            Password
-          </label>
+      <div>
+        <label htmlFor="login-password" className="admin-label">
+          Password
+        </label>
+        <div className="admin-login-password">
           <input
             id="login-password"
-            type="password"
+            type={showPassword ? "text" : "password"}
             autoComplete="current-password"
             className="admin-input"
-            placeholder="••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onKeyUp={(e) => setCapsLock(e.getModifierState("CapsLock"))}
+            onKeyDown={(e) => setCapsLock(e.getModifierState("CapsLock"))}
+            aria-describedby={capsLock ? "login-caps" : undefined}
             required
           />
-        </div>
-
-        {error && (
-          <p
-            role="alert"
-            className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600"
+          <button
+            type="button"
+            className="admin-icon-btn admin-login-reveal"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
           >
-            {error}
+            {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+          </button>
+        </div>
+        {capsLock && (
+          <p id="login-caps" className="admin-help text-[var(--admin-warning)]">
+            Caps Lock is on.
           </p>
         )}
+      </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="admin-btn admin-btn-primary w-full justify-center"
-        >
-          {loading && <Loader2 size={16} className="animate-spin" />}
-          {loading ? "Signing in…" : "Sign in"}
-        </button>
-      </form>
-    </div>
+      {error && (
+        <p role="alert" className="admin-banner admin-banner--danger">
+          <AlertCircle size={16} className="mt-0.5 shrink-0" />
+          <span>{error}</span>
+        </p>
+      )}
+
+      <button
+        type="submit"
+        disabled={loading || !email || !password}
+        className="admin-btn admin-btn-primary admin-btn-lg admin-btn-block"
+      >
+        {loading && <Loader2 size={16} className="animate-spin" />}
+        {loading ? "Signing in…" : "Sign in"}
+      </button>
+    </form>
   );
 }
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f8f9fb]">
-      <div className="w-full max-w-sm">
-        <div className="mb-8 text-center">
-          <div className="mb-4 flex justify-center">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0a1628]">
-              <BookOpen size={22} color="#c9a84c" />
-            </div>
+    <div className="admin-layout admin-login">
+      <aside className="admin-login-brand" aria-hidden="true">
+        <div className="admin-login-brand-inner">
+          <span className="admin-login-crest">
+            <Image
+              src="/jct_logo.webp"
+              alt=""
+              width={40}
+              height={40}
+              priority
+            />
+          </span>
+          <p className="admin-login-eyebrow">JCT Institutions</p>
+          <p className="admin-login-headline">
+            One place for every page of the three colleges.
+          </p>
+          <ul className="admin-login-colleges">
+            <li>College of Engineering &amp; Technology</li>
+            <li>College of Arts &amp; Science</li>
+            <li>Polytechnic College</li>
+          </ul>
+        </div>
+      </aside>
+
+      <main className="admin-login-main">
+        <div className="admin-login-card">
+          <div className="admin-login-mobile-crest">
+            <Image src="/jct_logo.webp" alt="" width={32} height={32} />
           </div>
-          <h1 className="text-xl font-bold text-gray-900">JCT Admin</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            Sign in to manage content
+          <h1 className="admin-login-title">Sign in</h1>
+          <p className="admin-login-sub">
+            Use the email and password an administrator set up for you.
+          </p>
+
+          <Suspense
+            fallback={
+              <div className="admin-skeleton mt-6" style={{ height: 220 }} />
+            }
+          >
+            <LoginForm />
+          </Suspense>
+
+          <p className="admin-login-foot">
+            Forgot your password? Ask an administrator to set a new one from{" "}
+            <strong>Users</strong>.
           </p>
         </div>
-
-        <Suspense
-          fallback={
-            <div className="h-52 animate-pulse rounded-xl border border-gray-200 bg-white p-6 shadow-sm" />
-          }
-        >
-          <LoginForm />
-        </Suspense>
-      </div>
+      </main>
     </div>
   );
 }
