@@ -761,23 +761,28 @@ export function AboutPageLayout({
         editable={editable}
         onEditSection={onEditSection}
       >
-        <PageHero title={data.hero.title} subtitle={data.hero.subtitle} />
+        <PageHero
+          title={data.hero.title}
+          subtitle={data.hero.subtitle}
+          breadcrumb={
+            <Breadcrumb
+              tone="dark"
+              items={
+                institution === "main"
+                  ? [{ label: "Home", href: "/" }, { label: "About Us" }]
+                  : [
+                      { label: "Institutions", href: "/institutions" },
+                      { label: meta.label, href: meta.breadcrumbHref },
+                      { label: "About" },
+                    ]
+              }
+            />
+          }
+        />
       </EditableRegion>
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-        <Breadcrumb
-          items={
-            institution === "main"
-              ? [{ label: "Home", href: "/" }, { label: "About Us" }]
-              : [
-                  { label: "Institutions", href: "/institutions" },
-                  { label: meta.label, href: meta.breadcrumbHref },
-                  { label: "About" },
-                ]
-          }
-        />
-
-        <div id="mobile-nav-container" className="mt-8 lg:hidden">
+        <div id="mobile-nav-container" className="lg:hidden">
           <AboutSideNav
             data={data}
             theme={theme}
@@ -790,7 +795,7 @@ export function AboutPageLayout({
           />
         </div>
 
-        <div className="mt-8 lg:mt-12 lg:grid lg:grid-cols-[280px_1fr] lg:gap-12 xl:grid-cols-[300px_1fr]">
+        <div className="mt-8 lg:mt-0 lg:grid lg:grid-cols-[280px_1fr] lg:gap-12 xl:grid-cols-[300px_1fr]">
           <div className="hidden lg:block">
             {/* Capped to the viewport and scrollable so a long nav list stays
                 fully reachable — a pinned element can't be scrolled into view

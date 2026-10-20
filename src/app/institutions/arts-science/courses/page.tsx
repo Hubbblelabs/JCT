@@ -47,13 +47,13 @@ function CourseCard({
   href?: string;
   badge?: string;
 }) {
-  return (
+  const card = (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.35 }}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white shadow-sm transition-all hover:shadow-md"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white shadow-sm transition-all hover:shadow-md"
     >
       <div className="relative aspect-[16/9] overflow-hidden">
         {course.image && (
@@ -87,15 +87,25 @@ function CourseCard({
         </div>
 
         {href && (
-          <Link
-            href={href}
-            className="text-arts-science-accent mt-4 inline-flex items-center text-sm font-semibold hover:underline"
-          >
-            Course Details <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-          </Link>
+          <span className="text-arts-science-accent mt-4 inline-flex items-center text-sm font-semibold group-hover:underline">
+            Course Details{" "}
+            <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          </span>
         )}
       </div>
     </motion.article>
+  );
+
+  // The whole card is the link; "Course Details" is only its visual cue.
+  return href ? (
+    <Link
+      href={href}
+      className="focus-visible:ring-arts-science-accent block h-full rounded-2xl focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+    >
+      {card}
+    </Link>
+  ) : (
+    card
   );
 }
 
@@ -122,18 +132,23 @@ export default function ArtsScienceCoursesPage() {
   return (
     <main className="bg-surface text-foreground min-h-screen">
       <Navbar forceSolidOnTop />
-      <PageHero title="All Courses" subtitle="JCT College of Arts & Science" />
+      <PageHero
+        title="All Courses"
+        subtitle="JCT College of Arts & Science"
+        breadcrumb={
+          <Breadcrumb
+            tone="dark"
+            items={[
+              { label: "Institutions", href: "/institutions" },
+              { label: "Arts & Science", href: "/institutions/arts-science" },
+              { label: "Courses" },
+            ]}
+          />
+        }
+      />
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-        <Breadcrumb
-          items={[
-            { label: "Institutions", href: "/institutions" },
-            { label: "Arts & Science", href: "/institutions/arts-science" },
-            { label: "Courses" },
-          ]}
-        />
-
-        <section className="mt-12">
+        <section>
           <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <span className="text-arts-science-accent mb-2 block text-xs font-bold tracking-[0.2em] uppercase">

@@ -362,18 +362,20 @@ export function ResearchPageLayout({
         <PageHero
           title={data.hero.title || "Research & Innovation"}
           subtitle={data.hero.subtitle}
+          breadcrumb={
+            <Breadcrumb
+              tone="dark"
+              items={[
+                { label: "Engineering", href: "/institutions/engineering" },
+                { label: "Research" },
+              ]}
+            />
+          }
         />
       </EditableRegion>
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-        <Breadcrumb
-          items={[
-            { label: "Engineering", href: "/institutions/engineering" },
-            { label: "Research" },
-          ]}
-        />
-
-        <div className="mt-8 space-y-16">
+        <div className="space-y-16">
           {/* Sidebar tabs — the primary layout once any tab exists */}
           {(hasTabs || editable) && (
             <EditableRegion

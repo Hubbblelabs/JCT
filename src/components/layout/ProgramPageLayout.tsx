@@ -2805,7 +2805,9 @@ export function ProgramPageLayout({
         section="hero"
         editable={editable}
         onEditSection={onEditSection}
-        className="relative min-h-120 overflow-hidden pt-28 pb-14 md:min-h-135"
+        // Sized to its content, not a fixed min-height: a 540px band left the
+        // tabs and their content below the fold on a laptop screen.
+        className="relative overflow-hidden pt-28 pb-10 md:pt-32 md:pb-12"
         style={{ backgroundColor: bg }}
       >
         {/* Background layers */}
@@ -2862,7 +2864,7 @@ export function ProgramPageLayout({
                 delay: 0.18,
                 ease: [0.22, 1, 0.36, 1],
               }}
-              className="mb-6 text-4xl leading-[1.1] font-black tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl"
+              className="mb-4 text-3xl leading-[1.1] font-black tracking-tight text-white sm:text-4xl lg:text-5xl"
             >
               {degreePrefix}
               {dept.name}

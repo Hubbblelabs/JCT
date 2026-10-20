@@ -327,19 +327,24 @@ export function CoePageLayout({
         editable={editable}
         onEditSection={onEditSection}
       >
-        <PageHero title={data.hero.title} subtitle={data.hero.subtitle} />
+        <PageHero
+          title={data.hero.title}
+          subtitle={data.hero.subtitle}
+          breadcrumb={
+            <Breadcrumb
+              tone="dark"
+              items={[
+                { label: "Institutions", href: "/institutions" },
+                { label: "Engineering", href: "/institutions/engineering" },
+                { label: "COE" },
+              ]}
+            />
+          }
+        />
       </EditableRegion>
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-        <Breadcrumb
-          items={[
-            { label: "Institutions", href: "/institutions" },
-            { label: "Engineering", href: "/institutions/engineering" },
-            { label: "COE" },
-          ]}
-        />
-
-        <div id="mobile-nav-container" className="mt-8 lg:hidden">
+        <div id="mobile-nav-container" className="lg:hidden">
           <CoeSideNav
             data={data}
             activeId={activeId}
@@ -349,7 +354,7 @@ export function CoePageLayout({
           />
         </div>
 
-        <div className="mt-8 lg:mt-12 lg:grid lg:grid-cols-[280px_1fr] lg:gap-12 xl:grid-cols-[300px_1fr]">
+        <div className="mt-8 lg:mt-0 lg:grid lg:grid-cols-[280px_1fr] lg:gap-12 xl:grid-cols-[300px_1fr]">
           <div className="hidden lg:block">
             {/* Capped to the viewport (the `top-32` offset plus the bottom band
                 held by the floating Apply / WhatsApp buttons) and scrollable so

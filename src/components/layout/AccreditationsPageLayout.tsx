@@ -255,19 +255,24 @@ export function AccreditationsPageLayout({
         editable={editable}
         onEditSection={onEditSection}
       >
-        <PageHero title={data.hero.title} subtitle={data.hero.subtitle} />
+        <PageHero
+          title={data.hero.title}
+          subtitle={data.hero.subtitle}
+          breadcrumb={
+            <Breadcrumb
+              tone="dark"
+              items={[
+                ...(institution === "main"
+                  ? []
+                  : [{ label: meta.label, href: meta.breadcrumbHref }]),
+                { label: "Accreditations" },
+              ]}
+            />
+          }
+        />
       </EditableRegion>
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-        <Breadcrumb
-          items={[
-            ...(institution === "main"
-              ? []
-              : [{ label: meta.label, href: meta.breadcrumbHref }]),
-            { label: "Accreditations" },
-          ]}
-        />
-
         {(intro.length > 0 || editable) && (
           <EditableRegion
             as="section"
@@ -275,7 +280,7 @@ export function AccreditationsPageLayout({
             label={ACCREDITATIONS_SECTION_LABELS.intro}
             editable={editable}
             onEditSection={onEditSection}
-            className="mt-8 max-w-3xl"
+            className="max-w-3xl"
           >
             {intro.length > 0 ? (
               <div className="space-y-4">
@@ -302,7 +307,7 @@ export function AccreditationsPageLayout({
           label={ACCREDITATIONS_SECTION_LABELS.items}
           editable={editable}
           onEditSection={onEditSection}
-          className="mt-10"
+          className="mt-10 first:mt-0"
         >
           {items.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

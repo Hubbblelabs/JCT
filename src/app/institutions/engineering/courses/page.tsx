@@ -36,13 +36,13 @@ function CourseCard({
   showBadges?: boolean;
   badge?: string;
 }) {
-  return (
+  const card = (
     <motion.article
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.35 }}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-white shadow-sm transition-all hover:shadow-md"
+      className="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white shadow-sm transition-all hover:shadow-md"
     >
       <div className="relative aspect-[16/9] overflow-hidden">
         <Image
@@ -89,15 +89,25 @@ function CourseCard({
         </div>
 
         {href && (
-          <Link
-            href={href}
-            className="text-engineering mt-4 inline-flex items-center text-sm font-semibold hover:underline"
-          >
-            Course Details <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-          </Link>
+          <span className="text-engineering mt-4 inline-flex items-center text-sm font-semibold group-hover:underline">
+            Course Details{" "}
+            <ArrowRight className="ml-1.5 h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+          </span>
         )}
       </div>
     </motion.article>
+  );
+
+  // The whole card is the link; "Course Details" is only its visual cue.
+  return href ? (
+    <Link
+      href={href}
+      className="focus-visible:ring-engineering block h-full rounded-2xl focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none"
+    >
+      {card}
+    </Link>
+  ) : (
+    card
   );
 }
 
@@ -180,17 +190,19 @@ export default function EngineeringCoursesPage() {
       <PageHero
         title="All Courses"
         subtitle="JCT College of Engineering & Technology"
+        breadcrumb={
+          <Breadcrumb
+            tone="dark"
+            items={[
+              { label: "Institutions", href: "/institutions" },
+              { label: "Engineering", href: "/institutions/engineering" },
+              { label: "Courses" },
+            ]}
+          />
+        }
       />
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-        <Breadcrumb
-          items={[
-            { label: "Institutions", href: "/institutions" },
-            { label: "Engineering", href: "/institutions/engineering" },
-            { label: "Courses" },
-          ]}
-        />
-
         {loading ? (
           <div className="py-24 text-center text-sm text-slate-400">
             Loading courses…
@@ -202,10 +214,10 @@ export default function EngineeringCoursesPage() {
             No courses published yet.
           </div>
         ) : (
-          <>
+          <div className="space-y-16">
             {/* UG Courses */}
             {ugCourses.length > 0 && (
-              <section className="mt-12">
+              <section>
                 <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <span className="text-engineering-light mb-2 block text-xs font-bold tracking-[0.2em] uppercase">
@@ -237,7 +249,7 @@ export default function EngineeringCoursesPage() {
 
             {/* PG Courses */}
             {pgCourses.length > 0 && (
-              <section className="mt-16">
+              <section>
                 <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <span className="text-engineering-light mb-2 block text-xs font-bold tracking-[0.2em] uppercase">
@@ -267,7 +279,7 @@ export default function EngineeringCoursesPage() {
 
             {/* Research / PhD */}
             {researchCourses.length > 0 && (
-              <section className="mt-16 mb-12">
+              <section>
                 <div className="mb-6">
                   <span className="text-engineering-light mb-2 block text-xs font-bold tracking-[0.2em] uppercase">
                     Research Programs
@@ -289,7 +301,7 @@ export default function EngineeringCoursesPage() {
                 </div>
               </section>
             )}
-          </>
+          </div>
         )}
       </div>
 

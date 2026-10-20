@@ -1023,7 +1023,40 @@ export function ContentPageLayout({
         editable={editable}
         onEditSection={onEdit}
       >
-        <PageHero title={data.hero.title} subtitle={data.hero.subtitle} />
+        <PageHero
+          title={data.hero.title}
+          subtitle={data.hero.subtitle}
+          breadcrumb={
+            showBreadcrumb &&
+            (crumbs.length > 0 || editable) && (
+              // Its own region inside the hero's: the trail has a separate
+              // inspector, and the inner region stops the click reaching the
+              // outer one.
+              <EditableRegion
+                as="div"
+                section="breadcrumb"
+                label={CONTENT_SECTION_LABELS.breadcrumb}
+                editable={editable}
+                onEditSection={onEdit}
+                className={editable ? "px-2 py-1" : ""}
+              >
+                {crumbs.length > 0 ? (
+                  <Breadcrumb
+                    tone="dark"
+                    items={crumbs.map((c) => ({
+                      label: c.label,
+                      href: c.href.trim() || undefined,
+                    }))}
+                  />
+                ) : (
+                  <p className="text-sm text-white/50 italic">
+                    Click to add the breadcrumb trail…
+                  </p>
+                )}
+              </EditableRegion>
+            )
+          }
+        />
       </EditableRegion>
 
       {/*
@@ -1034,30 +1067,6 @@ export function ContentPageLayout({
        * column serves the public route and the admin live preview.
        */}
       <div className="mx-auto w-full max-w-5xl px-4 py-8 md:px-6 md:py-12">
-        {showBreadcrumb && (crumbs.length > 0 || editable) && (
-          <EditableRegion
-            as="div"
-            section="breadcrumb"
-            label={CONTENT_SECTION_LABELS.breadcrumb}
-            editable={editable}
-            onEditSection={onEdit}
-            className="mb-8"
-          >
-            {crumbs.length > 0 ? (
-              <Breadcrumb
-                items={crumbs.map((c) => ({
-                  label: c.label,
-                  href: c.href.trim() || undefined,
-                }))}
-              />
-            ) : (
-              <p className="text-muted-foreground/60 text-sm italic">
-                Click to add the breadcrumb trail…
-              </p>
-            )}
-          </EditableRegion>
-        )}
-
         <ContentPageBody
           data={data}
           editable={editable}

@@ -264,20 +264,22 @@ export function GroupsPageLayout({
         <PageHero
           title={data.hero.title || meta.defaultHeroTitle}
           subtitle={data.hero.subtitle}
+          breadcrumb={
+            <Breadcrumb
+              tone="dark"
+              items={[
+                {
+                  label: GROUPS_INSTITUTION_LABELS[institution],
+                  href: `/institutions/${institution}`,
+                },
+                { label: meta.breadcrumb },
+              ]}
+            />
+          }
         />
       </EditableRegion>
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-        <Breadcrumb
-          items={[
-            {
-              label: GROUPS_INSTITUTION_LABELS[institution],
-              href: `/institutions/${institution}`,
-            },
-            { label: meta.breadcrumb },
-          ]}
-        />
-
         {(intro.length > 0 || editable) && (
           <EditableRegion
             as="section"
@@ -285,7 +287,7 @@ export function GroupsPageLayout({
             label={GROUPS_SECTION_LABELS.intro}
             editable={editable}
             onEditSection={onEditSection}
-            className="mt-8 max-w-3xl"
+            className="max-w-3xl"
           >
             {intro.length > 0 ? (
               <div className="space-y-4">
@@ -312,7 +314,7 @@ export function GroupsPageLayout({
           label={`${meta.sectionLabel} — add, remove & reorder`}
           editable={editable}
           onEditSection={onEditSection}
-          className="mt-12"
+          className="mt-12 first:mt-0"
         >
           <h2 className="text-foreground mb-6 flex items-center gap-3 font-serif text-2xl font-bold md:text-3xl">
             <span className="bg-gold/20 text-gold flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">

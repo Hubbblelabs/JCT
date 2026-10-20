@@ -244,20 +244,21 @@ export function DocumentsPageLayout({
         <PageHero
           title={data.hero.title || "Documents & Downloads"}
           subtitle={data.hero.subtitle}
+          breadcrumb={
+            <Breadcrumb
+              tone="dark"
+              items={[
+                { label: "Engineering", href: "/institutions/engineering" },
+                { label: "Documents" },
+              ]}
+            />
+          }
         />
       </EditableRegion>
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-        <Breadcrumb
-          items={[
-            { label: "Engineering", href: "/institutions/engineering" },
-            { label: "Documents" },
-          ]}
-        />
-
         {sections.length > 0 ? (
           <SectionedPageShell
-            className="mt-8"
             navTitle="Documents"
             items={[
               {
@@ -270,7 +271,7 @@ export function DocumentsPageLayout({
             ]}
           />
         ) : (
-          <div className="mt-8">{body}</div>
+          body
         )}
       </div>
 

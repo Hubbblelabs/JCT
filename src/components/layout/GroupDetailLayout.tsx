@@ -76,23 +76,28 @@ export function GroupDetailLayout({
     <main className="bg-surface text-foreground min-h-screen">
       <Navbar forceSolidOnTop />
 
-      <PageHero title={group.name} subtitle={group.category} />
+      <PageHero
+        title={group.name}
+        subtitle={group.category}
+        breadcrumb={
+          <Breadcrumb
+            tone="dark"
+            items={[
+              {
+                label: GROUPS_INSTITUTION_LABELS[institution],
+                href: `/institutions/${institution}`,
+              },
+              { label: meta.breadcrumb, href: basePath },
+              { label: group.name },
+            ]}
+          />
+        }
+      />
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-        <Breadcrumb
-          items={[
-            {
-              label: GROUPS_INSTITUTION_LABELS[institution],
-              href: `/institutions/${institution}`,
-            },
-            { label: meta.breadcrumb, href: basePath },
-            { label: group.name },
-          ]}
-        />
-
         <Link
           href={basePath}
-          className="text-muted-foreground hover:text-gold mt-8 inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
+          className="text-muted-foreground hover:text-gold inline-flex items-center gap-1.5 text-sm font-medium transition-colors"
         >
           <ArrowLeft size={15} />
           All {meta.breadcrumb}

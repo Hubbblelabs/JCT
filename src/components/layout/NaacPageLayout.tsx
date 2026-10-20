@@ -770,22 +770,26 @@ export function NaacPageLayout({
         editable={editable}
         onEditSection={onEdit}
       >
-        <PageHero title={data.hero.title} subtitle={data.hero.subtitle} />
+        <PageHero
+          title={data.hero.title}
+          subtitle={data.hero.subtitle}
+          breadcrumb={
+            <Breadcrumb
+              tone="dark"
+              items={[
+                { label: "Engineering", href: "/institutions/engineering" },
+                { label: "NAAC" },
+              ]}
+            />
+          }
+        />
       </EditableRegion>
 
       <div className="container mx-auto px-4 py-8 md:px-6 md:py-12">
-        <Breadcrumb
-          items={[
-            { label: "Engineering", href: "/institutions/engineering" },
-            { label: "NAAC" },
-          ]}
-        />
-
         {single ? (
-          <div className="mt-8">{items[0]?.content ?? body}</div>
+          (items[0]?.content ?? body)
         ) : (
           <SectionedPageShell
-            className="mt-8"
             navTitle="NAAC"
             items={items}
             editable={editable}

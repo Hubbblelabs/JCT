@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  useCallback,
   useEffect,
   useId,
   useMemo,
@@ -164,7 +165,9 @@ export const PLACEMENT_NAV_DEFAULTS: SidebarNavDefault[] = [
   { anchor: "tpo", navLabel: "TPO Contacts", icon: Phone },
   { anchor: "mou", navLabel: "MoUs & Collaborations", icon: FileText },
   { anchor: "why-recruit", navLabel: "Why Recruit at JCT", icon: Star },
-  { anchor: "overview", navLabel: "Placement Highlights", icon: TrendingUp },
+  // Not "Placement Highlights": that is the Highlights panel's own heading,
+  // and two entries reading alike sent visitors to the wrong one.
+  { anchor: "overview", navLabel: "Placement Statistics", icon: TrendingUp },
   { anchor: "history", navLabel: "Year-wise History", icon: History },
   { anchor: "recruiters", navLabel: "Our Recruiters", icon: Building2 },
   { anchor: "achievers", navLabel: "Placed Students", icon: GraduationCap },
@@ -303,30 +306,21 @@ function Monogram({ name, className }: { name: string; className: string }) {
 
 // ─── Sidebar navigation ──────────────────────────────────────────────────────
 
+// Navigation only. The year picker used to sit at the foot of this card, under
+// every entry (often below the fold of the pinned sidebar), and came in two
+// parts: the latest year, then a "Past Years" dropdown. It is now one control
+// above the panels whose content depends on it — see `YearBar`.
 function PlacementSideNav({
   items,
   activeId,
   onNavigate,
-  records,
-  selectedId,
-  onSelectYear,
   editable,
   onEditSection,
 }: {
   items: ResolvedSidebarItem[];
   activeId: string;
   onNavigate: (anchor: string) => void;
-  records: PublicPlacement[];
-  selectedId: string;
-  onSelectYear: (id: string) => void;
 } & EditProps) {
-  // The year list is the entry point to the year-wise data: the current year is
-  // selected by default (records arrive is_current-first) and past years sit
-  // under it, so visitors switch years from the sidebar instead of a separate
-  // row above the stats.
-  const pastYears = records.filter((r) => !r.is_current);
-  const currentYears = records.filter((r) => r.is_current);
-
   return (
     <>
       {/* Mobile: horizontally scrollable pill bar */}
@@ -368,28 +362,6 @@ function PlacementSideNav({
           })}
         </div>
       </div>
-
-      {/* Mobile: current year + past-year dropdown */}
-      {records.length > 0 && (
-        <div className="mt-3 flex flex-wrap items-center gap-2 lg:hidden">
-          {currentYears.map((r) => (
-            <YearButton
-              key={r._id}
-              record={r}
-              active={r._id === selectedId}
-              onSelect={onSelectYear}
-              className="w-auto"
-            />
-          ))}
-          {pastYears.length > 0 && (
-            <PastYearSelect
-              records={pastYears}
-              selectedId={selectedId}
-              onSelect={onSelectYear}
-            />
-          )}
-        </div>
-      )}
 
       {/* Desktop: sticky "On This Page" card */}
       <EditableRegion
@@ -455,108 +427,67 @@ function PlacementSideNav({
             );
           })}
         </div>
-
-        {/* Nested region: the year list is the door to the year-wise records,
-            which are their own documents rather than page copy. Clicking a
-            year still switches years — only the surrounding chrome opens the
-            record inspector. */}
-        {(records.length > 0 || editable) && (
-          <EditableRegion
-            as="div"
-            section={PLACEMENT_RECORDS_SECTION}
-            label="Placement Years"
-            editable={editable}
-            onEditSection={onEditSection}
-            className="border-border mt-5 border-t pt-5"
-          >
-            <h3 className="text-navy mb-3 text-xs font-bold tracking-[0.15em] uppercase">
-              Placement Data
-            </h3>
-            {records.length === 0 ? (
-              <p className="text-sm text-stone-400 italic">
-                No years yet. Click to add the first one.
-              </p>
-            ) : (
-              <>
-                <div className="space-y-1">
-                  {currentYears.map((r) => (
-                    <YearButton
-                      key={r._id}
-                      record={r}
-                      active={r._id === selectedId}
-                      onSelect={onSelectYear}
-                    />
-                  ))}
-                </div>
-                {pastYears.length > 0 && (
-                  <div className="mt-3">
-                    <PastYearSelect
-                      records={pastYears}
-                      selectedId={selectedId}
-                      onSelect={onSelectYear}
-                    />
-                  </div>
-                )}
-              </>
-            )}
-          </EditableRegion>
-        )}
       </EditableRegion>
     </>
   );
 }
 
-function YearButton({
-  record,
-  active,
-  onSelect,
-  className = "w-full",
+// ─── Year selection ──────────────────────────────────────────────────────────
+
+/**
+ * Sits above the panels whose content belongs to one academic year, so the year
+ * being read is named — and changed — right next to its figures, and is out of
+ * the way on the panels it has no bearing on.
+ *
+ * In the admin preview it is also the door to the year list (add / delete /
+ * pick the current year), which the sidebar used to carry; picking a year in it
+ * still just switches years.
+ */
+function YearBar({
+  records,
+  selectedId,
+  onSelectYear,
+  editable,
+  onEditSection,
 }: {
-  record: PublicPlacement;
-  active: boolean;
-  onSelect: (id: string) => void;
-  className?: string;
-}) {
+  records: PublicPlacement[];
+  selectedId: string;
+  onSelectYear: (id: string) => void;
+} & EditProps) {
   return (
-    <button
-      type="button"
-      // Stop short of the surrounding EditableRegion in the admin preview:
-      // picking a year must switch years, not open the inspector.
-      onClick={(e) => {
-        e.stopPropagation();
-        onSelect(record._id);
-      }}
-      aria-pressed={active}
-      className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold transition-colors ${className} ${
-        active
-          ? "bg-accent/10 text-accent ring-accent/30 ring-1"
-          : "border-border text-navy border hover:bg-stone-50"
-      }`}
+    <EditableRegion
+      as="div"
+      section={PLACEMENT_RECORDS_SECTION}
+      label="Placement Years"
+      editable={editable}
+      onEditSection={onEditSection}
+      className="border-border mb-8 flex flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl border bg-white px-4 py-3 shadow-sm"
     >
-      <CalendarDays
-        size={16}
-        className={`shrink-0 ${active ? "text-accent" : "text-stone-400"}`}
-      />
-      <span className="min-w-0 flex-1">{record.year}</span>
-      {record.is_current && (
-        <span
-          className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold tracking-wide uppercase ${
-            active ? "bg-accent text-white" : "bg-accent/10 text-accent"
-          }`}
-        >
-          Latest
+      <span className="text-navy text-xs font-bold tracking-[0.15em] uppercase">
+        Academic Year
+      </span>
+      {records.length === 0 ? (
+        <span className="text-sm text-stone-400 italic">
+          No years yet. Click to add the first one.
         </span>
+      ) : (
+        <YearSelect
+          records={records}
+          selectedId={selectedId}
+          onSelect={onSelectYear}
+        />
       )}
-    </button>
+    </EditableRegion>
   );
 }
 
-// Past years collapse into a dropdown so the sidebar stays short no matter how
-// many academic years accumulate. Hand-rolled rather than a native <select> so
-// each year can carry its placement rate — and so it matches the page's card
-// styling instead of the OS widget. Implements the listbox keyboard contract
-// (arrows / Home / End / Enter / Escape) that <select> would have given us.
-function PastYearSelect({
+// Every year on record in one dropdown, in the order the records arrive (the
+// current year first, then newest to oldest). Hand-rolled rather than a native
+// <select> so each year can carry its placement rate — and so it matches the
+// page's card styling instead of the OS widget. Implements the listbox keyboard
+// contract (arrows / Home / End / Enter / Escape) that <select> would have
+// given us.
+function YearSelect({
   records,
   selectedId,
   onSelect,
@@ -567,8 +498,7 @@ function PastYearSelect({
 }) {
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
-  // Opens upward when the panel wouldn't fit below — the sidebar sits low on
-  // the page once it's pinned.
+  // Opens upward when the panel wouldn't fit below.
   const [dropUp, setDropUp] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -591,7 +521,7 @@ function PastYearSelect({
     return () => document.removeEventListener("mousedown", onPointerDown);
   }, [open]);
 
-  const panelHeight = Math.min(records.length * 52 + 16, 264);
+  const panelHeight = Math.min(records.length * 52 + 16, 320);
 
   const openPanel = () => {
     const rect = triggerRef.current?.getBoundingClientRect();
@@ -665,29 +595,27 @@ function PastYearSelect({
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-controls={listId}
+        aria-label={
+          selected ? `Academic year: ${selected.year}` : "Academic year"
+        }
         aria-activedescendant={
           open && records[activeIndex]
             ? optionId(records[activeIndex]._id)
             : undefined
         }
-        className={`group flex w-full items-center gap-3 rounded-xl border px-3 py-2.5 text-left transition-all ${
-          selected
-            ? "border-accent/40 bg-accent/10 text-accent"
-            : "border-border text-navy bg-white hover:border-stone-300 hover:bg-stone-50"
-        } ${open ? "ring-accent/20 ring-2" : ""}`}
+        className={`border-border text-navy flex min-w-[13rem] items-center gap-2.5 rounded-xl border bg-white px-3 py-2 text-left transition-all hover:border-stone-300 hover:bg-stone-50 ${
+          open ? "ring-accent/20 ring-2" : ""
+        }`}
       >
-        <CalendarDays
-          size={16}
-          className={`shrink-0 ${selected ? "text-accent" : "text-stone-400"}`}
-        />
-        <span className="min-w-0 flex-1">
-          <span className="block text-[10px] font-bold tracking-[0.14em] text-stone-400 uppercase">
-            Past Years
-          </span>
-          <span className="block text-sm font-semibold">
-            {selected ? selected.year : `${records.length} earlier batches`}
-          </span>
+        <CalendarDays size={16} className="text-accent shrink-0" />
+        <span className="min-w-0 flex-1 text-sm font-bold">
+          {selected?.year ?? "Select a year"}
         </span>
+        {selected?.is_current && (
+          <span className="bg-accent/10 text-accent shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-bold tracking-wide uppercase">
+            Latest
+          </span>
+        )}
         <ChevronDown
           size={15}
           className={`shrink-0 text-stone-400 transition-transform duration-200 ${
@@ -701,13 +629,13 @@ function PastYearSelect({
           <motion.ul
             id={listId}
             role="listbox"
-            aria-label="Past years"
+            aria-label="Academic years"
             initial={{ opacity: 0, y: dropUp ? 6 : -6, scale: 0.98 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: dropUp ? 4 : -4, scale: 0.98 }}
             transition={{ duration: 0.14, ease: "easeOut" }}
             style={{ maxHeight: panelHeight }}
-            className={`border-border absolute right-0 left-0 z-30 overflow-y-auto rounded-xl border bg-white p-1.5 shadow-xl ${
+            className={`border-border absolute left-0 z-30 w-full min-w-[15rem] overflow-y-auto rounded-xl border bg-white p-1.5 shadow-xl ${
               dropUp ? "bottom-full mb-2" : "top-full mt-2"
             }`}
           >
@@ -735,11 +663,16 @@ function PastYearSelect({
                   }`}
                 >
                   <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-semibold">
+                    <span className="flex items-center gap-2 text-sm font-semibold">
                       {r.year}
+                      {r.is_current && (
+                        <span className="bg-accent/10 text-accent rounded-full px-1.5 py-0.5 text-[10px] font-bold tracking-wide uppercase">
+                          Latest
+                        </span>
+                      )}
                     </span>
                     {r.placement_percentage > 0 && (
-                      <span className="block text-[11px] text-stone-400">
+                      <span className="block text-[11px] text-stone-500">
                         {r.placement_percentage}% placed
                         {r.students_placed > 0 &&
                           ` · ${r.students_placed} students`}
@@ -1919,8 +1852,8 @@ function galleryForYear(
 /**
  * Every academic year on record in one table — the page otherwise shows a
  * single selected year at a time, which hides the older batches behind the
- * sidebar's "Past Years" dropdown. No cap: as many years as the college has
- * published are listed here, newest first.
+ * year picker. No cap: as many years as the college has published are listed
+ * here, newest first.
  */
 function PlacementHistory({
   records,
@@ -2188,40 +2121,49 @@ export function PlacementsPageLayout({
   // dead anchor in the sidebar.
   // In the admin editor every CMS section is always shown, empty or not —
   // otherwise there'd be nothing to click to fill it in.
-  const present = useMemo(() => {
-    const set = new Set<string>();
-    if (editable || info.banner.images.some((img) => img.image))
-      set.add("banner");
-    if (editable || info.mou.items.length > 0) set.add("mou");
-    if (editable || info.whyRecruit.points.length > 0) set.add("why-recruit");
-    if (
-      editable ||
-      info.tpo.contacts.length > 0 ||
-      info.tpo.office.address ||
-      info.tpo.office.phone ||
-      info.tpo.office.email
-    )
-      set.add("tpo");
-    if (editable || info.process.steps.length > 0) set.add("process");
-    // Publicly the gallery appears only once it has content; in the editor it
-    // is always shown, empty or not, so there is something to click to fill in.
-    if (editable ? !!gallery : (visibleGallery?.blocks?.length ?? 0) > 0)
-      set.add(PLACEMENT_GALLERY_ANCHOR);
-    if (active) {
-      set.add("overview");
-      // The history table only earns its place once there is more than one year
-      // to compare — with a single record it would just restate the overview.
-      if (records.length > 1) set.add("history");
-      // Empty year-wise blocks are hidden publicly but always shown in the
-      // editor — otherwise there is nothing to click to add the first entry.
-      if (editable || active.top_recruiters.length > 0) set.add("recruiters");
-      if (editable || active.notable_placements.length > 0)
-        set.add("achievers");
-      if (editable || active.company_placements.length > 0)
-        set.add("company-wise");
-    }
-    return set;
-  }, [info, active, editable, gallery, visibleGallery, records.length]);
+  // Takes the year as an argument so a year switch can ask, before it happens,
+  // whether the panel being read will still exist for the new year.
+  const presentFor = useCallback(
+    (record: PublicPlacement | null) => {
+      const set = new Set<string>();
+      if (editable || info.banner.images.some((img) => img.image))
+        set.add("banner");
+      if (editable || info.mou.items.length > 0) set.add("mou");
+      if (editable || info.whyRecruit.points.length > 0) set.add("why-recruit");
+      if (
+        editable ||
+        info.tpo.contacts.length > 0 ||
+        info.tpo.office.address ||
+        info.tpo.office.phone ||
+        info.tpo.office.email
+      )
+        set.add("tpo");
+      if (editable || info.process.steps.length > 0) set.add("process");
+      // Publicly the gallery appears only once it has content; in the editor
+      // it is always shown, empty or not, so there is something to click to
+      // fill in.
+      const yearGallery = galleryForYear(gallery ?? null, record?.year ?? "");
+      if (editable ? !!gallery : (yearGallery.value?.blocks?.length ?? 0) > 0)
+        set.add(PLACEMENT_GALLERY_ANCHOR);
+      if (record) {
+        set.add("overview");
+        // The history table only earns its place once there is more than one
+        // year to compare — with a single record it would just restate the
+        // overview.
+        if (records.length > 1) set.add("history");
+        // Empty year-wise blocks are hidden publicly but always shown in the
+        // editor — otherwise there is nothing to click to add the first entry.
+        if (editable || record.top_recruiters.length > 0) set.add("recruiters");
+        if (editable || record.notable_placements.length > 0)
+          set.add("achievers");
+        if (editable || record.company_placements.length > 0)
+          set.add("company-wise");
+      }
+      return set;
+    },
+    [info, editable, gallery, records.length],
+  );
+  const present = useMemo(() => presentFor(active), [presentFor, active]);
 
   const navItems = useMemo(
     () =>
@@ -2244,17 +2186,30 @@ export function PlacementsPageLayout({
     { syncHash: !editable },
   );
 
-  // Switching years swaps the record in place. The year-wise panels show the
-  // new year at once; from any other — the history table the year was picked
-  // in, say — open the year's summary, which is what the choice changed.
+  // Switching years swaps the record in place, and a year-wise panel stays
+  // open when the new year has it too. Otherwise — the history table the year
+  // was picked in, or a list the new year has nothing in — open the year's
+  // summary, rather than letting the panel vanish and drop the reader back on
+  // the page's first panel.
   const handleSelectYear = (id: string) => {
+    const next = records.find((r) => r._id === id) ?? null;
     setSelectedId(id);
-    if (!YEAR_PANELS.has(activeId) && panelIds.includes("overview"))
-      select("overview");
+    const stays = YEAR_PANELS.has(activeId) && presentFor(next).has(activeId);
+    if (!stays && panelIds.includes("overview")) select("overview");
   };
 
+  // The year picker shows over the panels it drives, not over the process, TPO
+  // or MoU panels, which read the same every year. A single year leaves
+  // nothing to pick, though the editor keeps the bar as its door to the year
+  // list — and, with no years at all, shows it over every panel, since no
+  // year-wise panel exists yet to carry it.
+  const showYearBar =
+    records.length === 0
+      ? editable
+      : YEAR_PANELS.has(activeId) && (records.length > 1 || editable);
+
   // The editor always renders the shell, even for a college with nothing yet:
-  // the sidebar is where a first year — and every other section — is added.
+  // the page is where a first year — and every other section — is added.
   const hasSections = editable || records.length > 0 || present.size > 0;
   const isEmpty = !hasSections;
 
@@ -2267,18 +2222,18 @@ export function PlacementsPageLayout({
       <PageHero
         title="Placements"
         subtitle={`Career outcomes at JCT ${label}`}
+        breadcrumb={
+          <Breadcrumb
+            tone="dark"
+            items={[
+              { label, href: `/institutions/${institution}` },
+              { label: "Placements" },
+            ]}
+          />
+        }
       />
-      <div className="section-padding bg-surface">
+      <div className="bg-surface py-8 md:py-12">
         <div className="container mx-auto px-4 md:px-6">
-          <div className="mb-8">
-            <Breadcrumb
-              items={[
-                { label, href: `/institutions/${institution}` },
-                { label: "Placements" },
-              ]}
-            />
-          </div>
-
           {isEmpty ? (
             <div className="border-border rounded-2xl border border-dashed bg-white py-20 text-center">
               <Briefcase size={32} className="mx-auto mb-3 text-stone-300" />
@@ -2293,9 +2248,6 @@ export function PlacementsPageLayout({
                   items={navItems}
                   activeId={activeId}
                   onNavigate={select}
-                  records={records}
-                  selectedId={active?._id ?? ""}
-                  onSelectYear={handleSelectYear}
                   editable={editable}
                   onEditSection={onEditSection}
                 />
@@ -2316,9 +2268,6 @@ export function PlacementsPageLayout({
                     items={navItems}
                     activeId={activeId}
                     onNavigate={select}
-                    records={records}
-                    selectedId={active?._id ?? ""}
-                    onSelectYear={handleSelectYear}
                     editable={editable}
                     onEditSection={onEditSection}
                   />
@@ -2327,6 +2276,15 @@ export function PlacementsPageLayout({
                 {/* One panel at a time: each section sits in its own panel,
                     opened from the sidebar. */}
                 <div {...containerProps} className="min-w-0">
+                  {showYearBar && (
+                    <YearBar
+                      records={records}
+                      selectedId={active?._id ?? ""}
+                      onSelectYear={handleSelectYear}
+                      editable={editable}
+                      onEditSection={onEditSection}
+                    />
+                  )}
                   {present.has("banner") && (
                     <div {...panelProps("banner")}>
                       <BannerSection
