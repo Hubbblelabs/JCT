@@ -49,6 +49,7 @@ import {
   TextArea,
   TextInput,
   Select,
+  ImageGallery,
   ImageUploadInput,
 } from "@/components/admin/inputs";
 import {
@@ -209,58 +210,18 @@ function HomeHeroForm({
         />
       </FormGrid>
 
-      {/* Background Images — up to 6, add / replace / remove */}
-      <div>
-        <h3 className="mb-1 text-sm font-semibold text-[var(--admin-text-secondary)]">
-          Background Images{" "}
-          <span className="font-normal text-[var(--admin-text-faint)]">
-            (up to {BG_LIMIT})
-          </span>
-        </h3>
-        <p className="mb-3 text-xs text-[var(--admin-text-faint)]">
-          Images rotate behind the hero. Upload, replace, or remove each one.
-        </p>
-        <div className="admin-form-grid admin-form-grid--tight">
-          {bg.map((src, i) => (
-            <div key={i} className="admin-col-4 flex items-start gap-2">
-              <div className="min-w-0 flex-1">
-                <ImageUploadInput
-                  label={`Slide ${i + 1}`}
-                  ratio="hero"
-                  value={src}
-                  onChange={(url) =>
-                    onChange({
-                      ...value,
-                      backgroundImages: bg.map((s, j) => (j === i ? url : s)),
-                    })
-                  }
-                  hideUrlField
-                />
-              </div>
-              <button
-                type="button"
-                onClick={() =>
-                  onChange({
-                    ...value,
-                    backgroundImages: bg.filter((_, j) => j !== i),
-                  })
-                }
-                className="admin-btn admin-btn-danger admin-btn-sm"
-              >
-                <Trash2 size={13} />
-              </button>
-            </div>
-          ))}
-        </div>
-        <button
-          type="button"
-          onClick={() => onChange({ ...value, backgroundImages: [...bg, ""] })}
-          disabled={bg.length >= BG_LIMIT}
-          className="admin-btn admin-btn-outline admin-btn-sm mt-2 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Plus size={14} /> Add Background Image
-        </button>
-      </div>
+      {/* Background images as a strip of thumbnails, in rotation order. */}
+      <ImageGallery
+        label="Background Images"
+        hint="Images rotate behind the hero, in this order."
+        ratio="hero"
+        max={BG_LIMIT}
+        reorderable
+        value={bg}
+        onChange={(backgroundImages) =>
+          onChange({ ...value, backgroundImages })
+        }
+      />
 
       {/* Title Lines (exactly 3, fixed count) — one row, as they render */}
       <div>
@@ -307,45 +268,51 @@ function HomeHeroForm({
               <p className="mb-2 text-xs font-semibold tracking-wide text-[var(--admin-text-faint)] uppercase">
                 Card {i + 1}
               </p>
-              <TextInput
-                label="Title"
-                value={card.title}
-                onChange={(e) => {
-                  const next = [...cards];
-                  next[i] = { ...card, title: e.target.value };
-                  setCards(next);
-                }}
-              />
-              <TextInput
-                label="Link URL"
-                value={card.href}
-                onChange={(e) => {
-                  const next = [...cards];
-                  next[i] = { ...card, href: e.target.value };
-                  setCards(next);
-                }}
-                placeholder={CARD_HREF_PLACEHOLDERS[i]}
-                hint="Root-relative path to the institution page"
-              />
-              <TextArea
-                label="Description"
-                value={card.description}
-                rows={3}
-                onChange={(e) => {
-                  const next = [...cards];
-                  next[i] = { ...card, description: e.target.value };
-                  setCards(next);
-                }}
-              />
-              <TextInput
-                label="Highlights"
-                value={card.highlights}
-                onChange={(e) => {
-                  const next = [...cards];
-                  next[i] = { ...card, highlights: e.target.value };
-                  setCards(next);
-                }}
-              />
+              <FormGrid tight>
+                <TextInput
+                  label="Title"
+                  span={6}
+                  value={card.title}
+                  onChange={(e) => {
+                    const next = [...cards];
+                    next[i] = { ...card, title: e.target.value };
+                    setCards(next);
+                  }}
+                />
+                <TextInput
+                  label="Link URL"
+                  span={6}
+                  value={card.href}
+                  onChange={(e) => {
+                    const next = [...cards];
+                    next[i] = { ...card, href: e.target.value };
+                    setCards(next);
+                  }}
+                  placeholder={CARD_HREF_PLACEHOLDERS[i]}
+                  hint="Root-relative path to the institution page"
+                />
+                <TextArea
+                  label="Description"
+                  span="full"
+                  value={card.description}
+                  rows={3}
+                  onChange={(e) => {
+                    const next = [...cards];
+                    next[i] = { ...card, description: e.target.value };
+                    setCards(next);
+                  }}
+                />
+                <TextInput
+                  label="Highlights"
+                  span="full"
+                  value={card.highlights}
+                  onChange={(e) => {
+                    const next = [...cards];
+                    next[i] = { ...card, highlights: e.target.value };
+                    setCards(next);
+                  }}
+                />
+              </FormGrid>
             </div>
           ))}
         </div>
@@ -403,18 +370,26 @@ function HomeStatsForm({
           <p className="mb-2 text-xs font-semibold tracking-wide text-[var(--admin-text-faint)] uppercase">
             Card {i + 1}
           </p>
-          <TextInput
-            label="Value"
-            value={(value[valueKey] as string) ?? ""}
-            onChange={(e) => onChange({ ...value, [valueKey]: e.target.value })}
-            placeholder="e.g. 60+"
-          />
-          <TextInput
-            label="Label"
-            value={(value[labelKey] as string) ?? ""}
-            onChange={(e) => onChange({ ...value, [labelKey]: e.target.value })}
-            placeholder={defaultLabel}
-          />
+          <FormGrid tight>
+            <TextInput
+              label="Value"
+              span={4}
+              value={(value[valueKey] as string) ?? ""}
+              onChange={(e) =>
+                onChange({ ...value, [valueKey]: e.target.value })
+              }
+              placeholder="e.g. 60+"
+            />
+            <TextInput
+              label="Label"
+              span={8}
+              value={(value[labelKey] as string) ?? ""}
+              onChange={(e) =>
+                onChange({ ...value, [labelKey]: e.target.value })
+              }
+              placeholder={defaultLabel}
+            />
+          </FormGrid>
         </div>
       ))}
     </div>
@@ -562,7 +537,7 @@ function TestimonialFormInner({
             })
           }
         />
-        <Field label="Visibility" span={4}>
+        <Field label="Visibility" span={4} inline>
           <label className="flex items-center gap-2 pt-2 text-sm">
             <input
               type="checkbox"
@@ -854,7 +829,7 @@ function VoicesInlineManager() {
                     {item.category}
                   </span>
                   {!item.is_active && (
-                    <span className="rounded-full bg-[var(--admin-danger-bg)] px-2 py-0.5 text-[10px] font-bold tracking-wide text-red-400 uppercase">
+                    <span className="rounded-full bg-[var(--admin-danger-bg)] px-2 py-0.5 text-[10px] font-bold tracking-wide text-[var(--admin-danger)] uppercase">
                       Inactive
                     </span>
                   )}
@@ -873,6 +848,8 @@ function VoicesInlineManager() {
                   type="button"
                   onClick={() => startEdit(item)}
                   className="admin-btn admin-btn-outline admin-btn-sm"
+                  aria-label={`Edit ${item.name}`}
+                  title="Edit"
                 >
                   <Pencil size={12} />
                 </button>
@@ -881,6 +858,8 @@ function VoicesInlineManager() {
                   onClick={() => handleDelete(item._id)}
                   disabled={deletingId === item._id}
                   className="admin-btn admin-btn-danger admin-btn-sm"
+                  aria-label={`Delete ${item.name}`}
+                  title="Delete"
                 >
                   {deletingId === item._id ? (
                     <Loader2 size={12} className="animate-spin" />

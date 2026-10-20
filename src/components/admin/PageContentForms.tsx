@@ -12,8 +12,11 @@ import {
   Accordion,
   Field,
   FormGrid,
+  ImageGallery,
   ImageUploadInput,
   DocumentUploadInput,
+  ItemCard,
+  RowsEditor,
   Select,
   TextArea,
   TextInput,
@@ -77,6 +80,8 @@ function LimitHint({ count, max }: { count: number; max?: number }) {
   );
 }
 
+/** Carousel slides as a strip of thumbnails — six of them stacked one per row,
+ *  each with its own crop picker, buried every field below the fold. */
 function ImageList({
   label,
   value,
@@ -92,51 +97,15 @@ function ImageList({
   hint?: string;
   span?: FieldSpan;
 }) {
-  const safe = Array.isArray(value) ? value : [];
-  const atMax = max !== undefined && safe.length >= max;
   return (
-    <Field label={label} hint={hint} span={span}>
-      {/* Carousel slides read as a strip, not a queue — six of them stacked one
-          per row buried every field below the fold. */}
-      <div className="admin-form-grid admin-form-grid--tight">
-        {safe.map((src, i) => (
-          <div key={i} className="admin-col-4 flex items-start gap-2">
-            <div className="min-w-0 flex-1">
-              <ImageUploadInput
-                label=""
-                value={src}
-                onChange={(url) =>
-                  onChange(safe.map((s, j) => (j === i ? url : s)))
-                }
-                hideUrlField
-              />
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                onChange(safe.filter((_, j) => j !== i));
-              }}
-              className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
-              aria-label={`Remove image ${i + 1}`}
-            >
-              <Trash2 size={13} />
-            </button>
-          </div>
-        ))}
-        <div className="admin-col-full flex items-center justify-between">
-          <button
-            type="button"
-            onClick={() => onChange([...safe, ""])}
-            disabled={atMax}
-            title={atMax ? `Max ${max} images reached` : undefined}
-            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Plus size={14} /> Add Image
-          </button>
-          <LimitHint count={safe.length} max={max} />
-        </div>
-      </div>
-    </Field>
+    <ImageGallery
+      label={label}
+      hint={hint}
+      span={span}
+      max={max}
+      value={Array.isArray(value) ? value : []}
+      onChange={onChange}
+    />
   );
 }
 
@@ -157,9 +126,11 @@ function CtaList({
     <Field label="Call-to-Action Buttons" span={span}>
       <div className="admin-form-grid admin-form-grid--tight">
         {safe.map((cta, i) => (
-          <div
+          <ItemCard
             key={i}
-            className="admin-col-6 rounded-lg border border-[var(--admin-border)] p-3"
+            span={6}
+            onRemove={() => onChange(safe.filter((_, j) => j !== i))}
+            removeLabel={`Remove button ${i + 1}`}
           >
             <FormGrid tight>
               <TextInput
@@ -189,30 +160,21 @@ function CtaList({
                 }
               />
             </FormGrid>
-            <div className="mt-2 flex items-center justify-between gap-3">
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={cta.primary}
-                  onChange={(e) =>
-                    onChange(
-                      safe.map((c, j) =>
-                        j === i ? { ...c, primary: e.target.checked } : c,
-                      ),
-                    )
-                  }
-                />
-                Primary style
-              </label>
-              <button
-                type="button"
-                onClick={() => onChange(safe.filter((_, j) => j !== i))}
-                className="admin-btn admin-btn-danger admin-btn-sm"
-              >
-                <Trash2 size={13} /> Remove
-              </button>
-            </div>
-          </div>
+            <label className="mt-2 flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={cta.primary}
+                onChange={(e) =>
+                  onChange(
+                    safe.map((c, j) =>
+                      j === i ? { ...c, primary: e.target.checked } : c,
+                    ),
+                  )
+                }
+              />
+              Primary style
+            </label>
+          </ItemCard>
         ))}
         <div className="admin-col-full flex items-center justify-between">
           <button
@@ -367,9 +329,11 @@ function AccreditationList({
   return (
     <div className="admin-form-grid admin-form-grid--tight">
       {safe.map((item, i) => (
-        <div
+        <ItemCard
           key={i}
-          className="admin-col-6 rounded-lg border border-[var(--admin-border)] p-3"
+          span={6}
+          onRemove={() => onChange(safe.filter((_, j) => j !== i))}
+          removeLabel={`Remove accreditation ${i + 1}`}
         >
           <FormGrid tight>
             <TextInput
@@ -413,14 +377,7 @@ function AccreditationList({
               hideUrlField
             />
           </FormGrid>
-          <button
-            type="button"
-            onClick={() => onChange(safe.filter((_, j) => j !== i))}
-            className="admin-btn admin-btn-danger admin-btn-sm"
-          >
-            <Trash2 size={13} /> Remove
-          </button>
-        </div>
+        </ItemCard>
       ))}
       <div className="admin-col-full flex items-center justify-between">
         <button
@@ -592,9 +549,11 @@ function ArtsSubsectionList({
   return (
     <div className="admin-form-grid admin-form-grid--tight">
       {safe.map((item, i) => (
-        <div
+        <ItemCard
           key={i}
-          className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
+          span={4}
+          onRemove={() => onChange(safe.filter((_, j) => j !== i))}
+          removeLabel={`Remove subsection ${i + 1}`}
         >
           <FormGrid tight>
             <TextInput
@@ -640,14 +599,7 @@ function ArtsSubsectionList({
               }
             />
           </FormGrid>
-          <button
-            type="button"
-            onClick={() => onChange(safe.filter((_, j) => j !== i))}
-            className="admin-btn admin-btn-danger admin-btn-sm"
-          >
-            <Trash2 size={13} /> Remove
-          </button>
-        </div>
+        </ItemCard>
       ))}
       <div className="admin-col-full flex items-center justify-between">
         <button
@@ -769,83 +721,32 @@ export function HeroStatsForm({
   onChange: (v: HeroStat[]) => void;
 }) {
   const safe = Array.isArray(value) ? value : [];
-  const atMax = safe.length >= HERO_STATS_LIMITS.itemsMax;
+  // Two short values and a switch: one line per stat card.
   return (
-    <div className="admin-form-grid admin-form-grid--tight">
-      {safe.map((item, i) => (
-        <div
-          key={i}
-          className="admin-col-6 rounded-lg border border-[var(--admin-border)] p-3"
-        >
-          <FormGrid tight>
-            <TextInput
-              label="Value"
-              span={5}
-              value={item.value}
-              maxLength={HERO_STATS_LIMITS.valueMax}
-              placeholder="e.g. 2,500+"
-              onChange={(e) =>
-                onChange(
-                  safe.map((s, j) =>
-                    j === i ? { ...s, value: e.target.value } : s,
-                  ),
-                )
-              }
-            />
-            <TextInput
-              label="Label"
-              span={7}
-              value={item.label}
-              maxLength={HERO_STATS_LIMITS.labelMax}
-              placeholder="e.g. Students"
-              onChange={(e) =>
-                onChange(
-                  safe.map((s, j) =>
-                    j === i ? { ...s, label: e.target.value } : s,
-                  ),
-                )
-              }
-            />
-          </FormGrid>
-          <div className="mt-2 flex items-center justify-between gap-3">
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={Boolean(item.accent)}
-                onChange={(e) =>
-                  onChange(
-                    safe.map((s, j) =>
-                      j === i ? { ...s, accent: e.target.checked } : s,
-                    ),
-                  )
-                }
-              />
-              Accent color
-            </label>
-            <button
-              type="button"
-              onClick={() => onChange(safe.filter((_, j) => j !== i))}
-              className="admin-btn admin-btn-danger admin-btn-sm"
-            >
-              <Trash2 size={13} /> Remove
-            </button>
-          </div>
-        </div>
-      ))}
-      <div className="admin-col-full flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() =>
-            onChange([...safe, { value: "", label: "", accent: false }])
-          }
-          disabled={atMax}
-          className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Plus size={14} /> Add Stat Card
-        </button>
-        <LimitHint count={safe.length} max={HERO_STATS_LIMITS.itemsMax} />
-      </div>
-    </div>
+    <RowsEditor
+      items={safe as unknown as Record<string, unknown>[]}
+      onChange={(next) => onChange(next as unknown as HeroStat[])}
+      newItem={() => ({ value: "", label: "", accent: false })}
+      addLabel="Add Stat Card"
+      max={HERO_STATS_LIMITS.itemsMax}
+      columns={[
+        {
+          key: "value",
+          label: "Value",
+          weight: 5,
+          maxLength: HERO_STATS_LIMITS.valueMax,
+          placeholder: "e.g. 2,500+",
+        },
+        {
+          key: "label",
+          label: "Label",
+          weight: 7,
+          maxLength: HERO_STATS_LIMITS.labelMax,
+          placeholder: "e.g. Students",
+        },
+        { key: "accent", label: "Accent", type: "checkbox" },
+      ]}
+    />
   );
 }
 
@@ -1567,7 +1468,7 @@ export function PamphletForm({
 
   return (
     <FormGrid>
-      <Field label="Visibility" span={4}>
+      <Field label="Visibility" span={4} inline>
         <label className="flex items-center gap-2 pt-2 text-sm">
           <input
             type="checkbox"
@@ -1734,7 +1635,7 @@ export function LifeAtJctForm({
       >
         <div className="admin-form-grid admin-form-grid--tight">
           {categories.map((cat, i) => (
-            <div key={i} className="admin-col-6 flex gap-2">
+            <div key={i} className="admin-field-inline admin-col-6 flex gap-2">
               <input
                 className="admin-input"
                 value={cat}
@@ -1800,9 +1701,16 @@ export function LifeAtJctForm({
       >
         <div className="admin-form-grid admin-form-grid--tight">
           {photos.map((photo, i) => (
-            <div
+            <ItemCard
               key={i}
-              className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
+              span={4}
+              onRemove={() =>
+                onChange({
+                  ...value,
+                  photos: photos.filter((_, j) => j !== i),
+                })
+              }
+              removeLabel={`Remove photo ${i + 1}`}
             >
               <FormGrid tight>
                 <TextInput
@@ -1851,36 +1759,22 @@ export function LifeAtJctForm({
                   hideUrlField
                 />
               </FormGrid>
-              <div className="flex items-center justify-between gap-3">
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={Boolean(photo.isAll)}
-                    onChange={(e) =>
-                      onChange({
-                        ...value,
-                        photos: photos.map((p, j) =>
-                          j === i ? { ...p, isAll: e.target.checked } : p,
-                        ),
-                      })
-                    }
-                  />
-                  Show in &quot;All&quot;
-                </label>
-                <button
-                  type="button"
-                  onClick={() =>
+              <label className="mt-2 flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={Boolean(photo.isAll)}
+                  onChange={(e) =>
                     onChange({
                       ...value,
-                      photos: photos.filter((_, j) => j !== i),
+                      photos: photos.map((p, j) =>
+                        j === i ? { ...p, isAll: e.target.checked } : p,
+                      ),
                     })
                   }
-                  className="admin-btn admin-btn-danger admin-btn-sm"
-                >
-                  <Trash2 size={13} /> Remove
-                </button>
-              </div>
-            </div>
+                />
+                Show in &quot;All&quot;
+              </label>
+            </ItemCard>
           ))}
           <div className="admin-col-full flex items-center justify-between">
             <button
@@ -1932,7 +1826,7 @@ export function AnnouncementForm({
   // Reads left to right exactly as the bar renders: message, then its button.
   return (
     <FormGrid>
-      <Field label="Visibility" span={2}>
+      <Field label="Visibility" span={2} inline>
         <label className="flex items-center gap-2 pt-2 text-sm">
           <input
             type="checkbox"
@@ -2009,7 +1903,7 @@ export function UpcomingEventsForm({
         set here.
       </p>
 
-      <Field label="Visibility" span={3}>
+      <Field label="Visibility" span={3} inline>
         <label className="flex items-center gap-2 pt-2 text-sm">
           <input
             type="checkbox"
@@ -2103,7 +1997,7 @@ export function UpcomingEventsForm({
         hint={`Leave blank to link to ${eventsHref}`}
         onChange={(e) => onChange({ ...value, ctaHref: e.target.value })}
       />
-      <Field label="Spare Slots" span={4}>
+      <Field label="Spare Slots" span={4} inline>
         <label className="flex items-center gap-2 pt-2 text-sm">
           <input
             type="checkbox"
@@ -2194,9 +2088,16 @@ export function PolytechnicAdmissionsForm({
             three-across layout the visitor does. */}
         <div className="admin-form-grid admin-form-grid--tight">
           {criteria.map((block, i) => (
-            <div
+            <ItemCard
               key={i}
-              className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
+              span={4}
+              onRemove={() =>
+                onChange({
+                  ...value,
+                  criteria: criteria.filter((_, j) => j !== i),
+                })
+              }
+              removeLabel={`Remove block ${i + 1}`}
             >
               <TextInput
                 label="Block Title"
@@ -2281,19 +2182,7 @@ export function PolytechnicAdmissionsForm({
                   </button>
                 </div>
               </Field>
-              <button
-                type="button"
-                onClick={() =>
-                  onChange({
-                    ...value,
-                    criteria: criteria.filter((_, j) => j !== i),
-                  })
-                }
-                className="admin-btn admin-btn-danger admin-btn-sm mt-2"
-              >
-                <Trash2 size={13} /> Remove Block
-              </button>
-            </div>
+            </ItemCard>
           ))}
           <div className="admin-col-full flex items-center justify-between">
             <button
@@ -2358,78 +2247,36 @@ export function MetricsForm({
   onChange: (v: Metric[]) => void;
 }) {
   const safe = Array.isArray(value) ? value : [];
-  const atMax = safe.length >= METRICS_LIMITS.itemsMax;
-  // Metric cards render as a row on the public page; they edit as one too.
+  // Metric cards render as a row on the public page; each edits as a line of
+  // three short values.
   return (
-    <div className="admin-form-grid admin-form-grid--tight">
-      {safe.map((item, i) => (
-        <div
-          key={i}
-          className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
-        >
-          <FormGrid tight>
-            <TextInput
-              label="Value"
-              span={4}
-              value={item.value}
-              maxLength={METRICS_LIMITS.valueMax}
-              onChange={(e) =>
-                onChange(
-                  safe.map((m, j) =>
-                    j === i ? { ...m, value: e.target.value } : m,
-                  ),
-                )
-              }
-            />
-            <TextInput
-              label="Label"
-              span={8}
-              value={item.label}
-              maxLength={METRICS_LIMITS.labelMax}
-              onChange={(e) =>
-                onChange(
-                  safe.map((m, j) =>
-                    j === i ? { ...m, label: e.target.value } : m,
-                  ),
-                )
-              }
-            />
-            <TextInput
-              label="Sub"
-              span="full"
-              value={item.sub ?? ""}
-              maxLength={METRICS_LIMITS.subMax}
-              onChange={(e) =>
-                onChange(
-                  safe.map((m, j) =>
-                    j === i ? { ...m, sub: e.target.value } : m,
-                  ),
-                )
-              }
-            />
-          </FormGrid>
-          <button
-            type="button"
-            onClick={() => onChange(safe.filter((_, j) => j !== i))}
-            className="admin-btn admin-btn-danger admin-btn-sm"
-            aria-label={`Remove metric ${i + 1}`}
-          >
-            <Trash2 size={13} /> Remove
-          </button>
-        </div>
-      ))}
-      <div className="admin-col-full flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => onChange([...safe, { value: "", label: "", sub: "" }])}
-          disabled={atMax}
-          className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Plus size={14} /> Add Metric
-        </button>
-        <LimitHint count={safe.length} max={METRICS_LIMITS.itemsMax} />
-      </div>
-    </div>
+    <RowsEditor
+      items={safe as unknown as Record<string, unknown>[]}
+      onChange={(next) => onChange(next as unknown as Metric[])}
+      newItem={() => ({ value: "", label: "", sub: "" })}
+      addLabel="Add Metric"
+      max={METRICS_LIMITS.itemsMax}
+      columns={[
+        {
+          key: "value",
+          label: "Value",
+          weight: 3,
+          maxLength: METRICS_LIMITS.valueMax,
+        },
+        {
+          key: "label",
+          label: "Label",
+          weight: 5,
+          maxLength: METRICS_LIMITS.labelMax,
+        },
+        {
+          key: "sub",
+          label: "Sub",
+          weight: 4,
+          maxLength: METRICS_LIMITS.subMax,
+        },
+      ]}
+    />
   );
 }
 
@@ -2447,9 +2294,11 @@ export function FacilitiesForm({
   return (
     <div className="admin-form-grid admin-form-grid--tight">
       {safe.map((item, i) => (
-        <div
+        <ItemCard
           key={i}
-          className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
+          span={4}
+          onRemove={() => onChange(safe.filter((_, j) => j !== i))}
+          removeLabel={`Remove facility ${i + 1}`}
         >
           <TextInput
             label="Title"
@@ -2476,14 +2325,7 @@ export function FacilitiesForm({
               )
             }
           />
-          <button
-            type="button"
-            onClick={() => onChange(safe.filter((_, j) => j !== i))}
-            className="admin-btn admin-btn-danger admin-btn-sm"
-          >
-            <Trash2 size={13} /> Remove
-          </button>
-        </div>
+        </ItemCard>
       ))}
       <div className="admin-col-full flex items-center justify-between">
         <button
@@ -2512,7 +2354,7 @@ export function StringListForm({
   return (
     <div className="admin-form-grid admin-form-grid--tight">
       {safe.map((item, i) => (
-        <div key={i} className="admin-col-4 flex gap-2">
+        <div key={i} className="admin-field-inline admin-col-4 flex gap-2">
           <input
             className="admin-input"
             value={item}
@@ -2626,9 +2468,16 @@ export function AdmissionsForm({
       >
         <div className="admin-form-grid admin-form-grid--tight">
           {criteria.map((block, i) => (
-            <div
+            <ItemCard
               key={i}
-              className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
+              span={4}
+              onRemove={() =>
+                onChange({
+                  ...value,
+                  criteria: criteria.filter((_, j) => j !== i),
+                })
+              }
+              removeLabel={`Remove block ${i + 1}`}
             >
               <TextInput
                 label="Block Title"
@@ -2708,19 +2557,7 @@ export function AdmissionsForm({
                   </button>
                 </div>
               </Field>
-              <button
-                type="button"
-                onClick={() =>
-                  onChange({
-                    ...value,
-                    criteria: criteria.filter((_, j) => j !== i),
-                  })
-                }
-                className="admin-btn admin-btn-danger admin-btn-sm mt-2"
-              >
-                <Trash2 size={13} /> Remove Block
-              </button>
-            </div>
+            </ItemCard>
           ))}
           <div className="admin-col-full flex items-center justify-between">
             <button
@@ -2815,7 +2652,7 @@ export function AddOnProgramsForm({
   // Heading → tracks (each a card of courses) → CTA, as rendered publicly.
   return (
     <FormGrid>
-      <Field label="Visibility" span={2}>
+      <Field label="Visibility" span={2} inline>
         <label className="flex items-center gap-2 pt-2 text-sm">
           <input
             type="checkbox"
@@ -2867,9 +2704,16 @@ export function AddOnProgramsForm({
           {groups.map((group, i) => {
             const items = Array.isArray(group.items) ? group.items : [];
             return (
-              <div
+              <ItemCard
                 key={i}
-                className="admin-col-6 rounded-lg border border-[var(--admin-border)] p-3"
+                span={6}
+                onRemove={() =>
+                  onChange({
+                    ...value,
+                    groups: groups.filter((_, j) => j !== i),
+                  })
+                }
+                removeLabel={`Remove track ${i + 1}`}
               >
                 <FormGrid tight>
                   <TextInput
@@ -2948,19 +2792,7 @@ export function AddOnProgramsForm({
                     </div>
                   </div>
                 </Field>
-                <button
-                  type="button"
-                  onClick={() =>
-                    onChange({
-                      ...value,
-                      groups: groups.filter((_, j) => j !== i),
-                    })
-                  }
-                  className="admin-btn admin-btn-danger admin-btn-sm mt-2"
-                >
-                  <Trash2 size={13} /> Remove Track
-                </button>
-              </div>
+              </ItemCard>
             );
           })}
           <div className="admin-col-full flex items-center justify-between">
@@ -3043,7 +2875,7 @@ export function CareerCentreForm({
 
   return (
     <FormGrid>
-      <Field label="Visibility" span={2}>
+      <Field label="Visibility" span={2} inline>
         <label className="flex items-center gap-2 pt-2 text-sm">
           <input
             type="checkbox"
@@ -3092,9 +2924,16 @@ export function CareerCentreForm({
       >
         <div className="admin-form-grid admin-form-grid--tight">
           {services.map((service, i) => (
-            <div
+            <ItemCard
               key={i}
-              className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
+              span={4}
+              onRemove={() =>
+                onChange({
+                  ...value,
+                  services: services.filter((_, j) => j !== i),
+                })
+              }
+              removeLabel={`Remove support area ${i + 1}`}
             >
               <FormGrid tight>
                 <TextInput
@@ -3123,19 +2962,7 @@ export function CareerCentreForm({
                   }
                 />
               </FormGrid>
-              <button
-                type="button"
-                onClick={() =>
-                  onChange({
-                    ...value,
-                    services: services.filter((_, j) => j !== i),
-                  })
-                }
-                className="admin-btn admin-btn-danger admin-btn-sm"
-              >
-                <Trash2 size={13} /> Remove
-              </button>
-            </div>
+            </ItemCard>
           ))}
           <div className="admin-col-full flex items-center justify-between">
             <button
@@ -3243,9 +3070,16 @@ export function WhyChooseJctForm({
       >
         <div className="admin-form-grid admin-form-grid--tight">
           {features.map((feat, i) => (
-            <div
+            <ItemCard
               key={i}
-              className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
+              span={4}
+              onRemove={() =>
+                onChange({
+                  ...value,
+                  features: features.filter((_, j) => j !== i),
+                })
+              }
+              removeLabel={`Remove feature ${i + 1}`}
             >
               <FormGrid tight>
                 <TextInput
@@ -3293,19 +3127,7 @@ export function WhyChooseJctForm({
                   }
                 />
               </FormGrid>
-              <button
-                type="button"
-                onClick={() =>
-                  onChange({
-                    ...value,
-                    features: features.filter((_, j) => j !== i),
-                  })
-                }
-                className="admin-btn admin-btn-danger admin-btn-sm"
-              >
-                <Trash2 size={13} /> Remove
-              </button>
-            </div>
+            </ItemCard>
           ))}
           <div className="admin-col-full flex items-center justify-between">
             <button
@@ -3439,9 +3261,16 @@ export function HomeAdmissionsForm({
       >
         <div className="admin-form-grid admin-form-grid--tight">
           {pathways.map((p, i) => (
-            <div
+            <ItemCard
               key={i}
-              className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
+              span={4}
+              onRemove={() =>
+                onChange({
+                  ...value,
+                  pathways: pathways.filter((_, j) => j !== i),
+                })
+              }
+              removeLabel={`Remove pathway ${i + 1}`}
             >
               <FormGrid tight>
                 <TextInput
@@ -3517,19 +3346,7 @@ export function HomeAdmissionsForm({
                   }
                 />
               </FormGrid>
-              <button
-                type="button"
-                onClick={() =>
-                  onChange({
-                    ...value,
-                    pathways: pathways.filter((_, j) => j !== i),
-                  })
-                }
-                className="admin-btn admin-btn-danger admin-btn-sm"
-              >
-                <Trash2 size={13} /> Remove
-              </button>
-            </div>
+            </ItemCard>
           ))}
           <div className="admin-col-full flex items-center justify-between">
             <button
@@ -3681,7 +3498,7 @@ export function HeaderForm({
           </div>
         </div>
       </Field>
-      <Field label="Student Login" span={3}>
+      <Field label="Student Login" span={3} inline>
         <label className="flex items-center gap-2 pt-2 text-sm">
           <input
             type="checkbox"
@@ -3832,7 +3649,7 @@ function ChildEditor({
           maxLength={NAVBAR_LIMITS.descMax}
           onChange={(e) => onChange({ ...child, desc: e.target.value })}
         />
-        <Field label="Visibility" span={2}>
+        <Field label="Visibility" span={2} inline>
           <label className="flex items-center gap-2 pt-2 text-sm">
             <input
               type="checkbox"
@@ -3892,13 +3709,14 @@ function NavbarItemEditor({
             </span>
           )}
         </button>
-        <div className="flex items-center gap-1">
+        <div className="flex shrink-0 items-center gap-1">
           <button
             type="button"
             disabled={!canUp}
             onClick={onMoveUp}
             className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
             title="Move up"
+            aria-label={`Move ${item.label || "item"} up`}
           >
             <ArrowUp size={12} />
           </button>
@@ -3908,6 +3726,7 @@ function NavbarItemEditor({
             onClick={onMoveDown}
             className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
             title="Move down"
+            aria-label={`Move ${item.label || "item"} down`}
           >
             <ArrowDown size={12} />
           </button>
@@ -3915,8 +3734,10 @@ function NavbarItemEditor({
             type="button"
             onClick={onRemove}
             className="admin-btn admin-btn-danger admin-btn-sm"
+            title="Remove"
+            aria-label={`Remove ${item.label || "item"}`}
           >
-            <Trash2 size={12} /> Remove
+            <Trash2 size={12} />
           </button>
         </div>
       </div>
@@ -3949,7 +3770,7 @@ function NavbarItemEditor({
               maxLength={NAVBAR_LIMITS.descMax}
               onChange={(e) => onChange({ ...item, desc: e.target.value })}
             />
-            <Field label="Visibility" span={2}>
+            <Field label="Visibility" span={2} inline>
               <label className="flex items-center gap-2 pt-2 text-sm">
                 <input
                   type="checkbox"
@@ -4177,7 +3998,7 @@ export function FooterForm({
       >
         <div className="admin-form-grid admin-form-grid--tight">
           {addressLines.map((line, i) => (
-            <div key={i} className="admin-col-6 flex gap-2">
+            <div key={i} className="admin-field-inline admin-col-6 flex gap-2">
               <input
                 className="admin-input"
                 value={line}
@@ -4284,68 +4105,35 @@ export function StatisticsForm({
   onChange: (v: HomeStatisticItem[]) => void;
 }) {
   const safe = Array.isArray(value) ? value : [];
-  const atMax = safe.length >= HOME_STATISTICS_LIMITS.itemsMax;
   return (
-    <div className="admin-form-grid admin-form-grid--tight">
-      <p className="admin-col-full text-xs text-[var(--admin-text-muted)]">
+    <div className="space-y-3">
+      <p className="text-xs text-[var(--admin-text-muted)]">
         The row of badges shown directly beneath the home hero. Icon is one of:
         laurel, users, cap, badge, growth.
       </p>
-      {safe.map((item, i) => (
-        <div
-          key={i}
-          className="admin-col-4 rounded-lg border border-[var(--admin-border)] p-3"
-        >
-          <FormGrid tight>
-            <TextInput
-              label="Icon"
-              span={5}
-              value={item.icon}
-              maxLength={HOME_STATISTICS_LIMITS.iconMax}
-              placeholder="laurel"
-              onChange={(e) =>
-                onChange(
-                  safe.map((s, j) =>
-                    j === i ? { ...s, icon: e.target.value } : s,
-                  ),
-                )
-              }
-            />
-            <TextInput
-              label="Label"
-              span={7}
-              value={item.label}
-              maxLength={HOME_STATISTICS_LIMITS.labelMax}
-              placeholder="NAAC Accredited"
-              onChange={(e) =>
-                onChange(
-                  safe.map((s, j) =>
-                    j === i ? { ...s, label: e.target.value } : s,
-                  ),
-                )
-              }
-            />
-          </FormGrid>
-          <button
-            type="button"
-            onClick={() => onChange(safe.filter((_, j) => j !== i))}
-            className="admin-btn admin-btn-danger admin-btn-sm"
-          >
-            <Trash2 size={13} /> Remove
-          </button>
-        </div>
-      ))}
-      <div className="admin-col-full flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => onChange([...safe, { icon: "laurel", label: "" }])}
-          disabled={atMax}
-          className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Plus size={14} /> Add Statistic
-        </button>
-        <LimitHint count={safe.length} max={HOME_STATISTICS_LIMITS.itemsMax} />
-      </div>
+      <RowsEditor
+        items={safe as unknown as Record<string, unknown>[]}
+        onChange={(next) => onChange(next as unknown as HomeStatisticItem[])}
+        newItem={() => ({ icon: "laurel", label: "" })}
+        addLabel="Add Statistic"
+        max={HOME_STATISTICS_LIMITS.itemsMax}
+        columns={[
+          {
+            key: "icon",
+            label: "Icon",
+            weight: 2,
+            maxLength: HOME_STATISTICS_LIMITS.iconMax,
+            placeholder: "laurel",
+          },
+          {
+            key: "label",
+            label: "Label",
+            weight: 5,
+            maxLength: HOME_STATISTICS_LIMITS.labelMax,
+            placeholder: "NAAC Accredited",
+          },
+        ]}
+      />
     </div>
   );
 }
@@ -4606,10 +4394,9 @@ export function RecruitersSectionForm({
   onChange: (v: RecruitersSectionVal) => void;
 }) {
   const stats = Array.isArray(value.stats) ? value.stats : [];
-  const atMax = stats.length >= RECRUITERS_SECTION_LIMITS.statsMax;
   return (
     <FormGrid>
-      <Field label="Visibility" span={3}>
+      <Field label="Visibility" span={3} inline>
         <label className="flex cursor-pointer items-center gap-3 rounded-lg border border-[var(--admin-border)] p-3">
           <input
             type="checkbox"
@@ -4661,93 +4448,41 @@ export function RecruitersSectionForm({
         span="full"
         hint={`Up to ${RECRUITERS_SECTION_LIMITS.statsMax} cards. Icon is one of: trend, award, building, users.`}
       >
-        <div className="admin-form-grid admin-form-grid--tight">
-          {stats.map((stat, i) => (
-            <div
-              key={i}
-              className="admin-col-3 rounded-lg border border-[var(--admin-border)] p-3"
-            >
-              <FormGrid tight>
-                <TextInput
-                  label="Icon"
-                  span={5}
-                  value={stat.icon}
-                  maxLength={RECRUITERS_SECTION_LIMITS.statIconMax}
-                  placeholder="trend"
-                  onChange={(e) =>
-                    onChange({
-                      ...value,
-                      stats: stats.map((s, j) =>
-                        j === i ? { ...s, icon: e.target.value } : s,
-                      ),
-                    })
-                  }
-                />
-                <TextInput
-                  label="Value"
-                  span={7}
-                  value={stat.value}
-                  maxLength={RECRUITERS_SECTION_LIMITS.statValueMax}
-                  placeholder="98%"
-                  onChange={(e) =>
-                    onChange({
-                      ...value,
-                      stats: stats.map((s, j) =>
-                        j === i ? { ...s, value: e.target.value } : s,
-                      ),
-                    })
-                  }
-                />
-                <TextInput
-                  label="Label"
-                  span="full"
-                  value={stat.label}
-                  maxLength={RECRUITERS_SECTION_LIMITS.statLabelMax}
-                  placeholder="Placement Rate"
-                  onChange={(e) =>
-                    onChange({
-                      ...value,
-                      stats: stats.map((s, j) =>
-                        j === i ? { ...s, label: e.target.value } : s,
-                      ),
-                    })
-                  }
-                />
-              </FormGrid>
-              <button
-                type="button"
-                onClick={() =>
-                  onChange({
-                    ...value,
-                    stats: stats.filter((_, j) => j !== i),
-                  })
-                }
-                className="admin-btn admin-btn-danger admin-btn-sm"
-              >
-                <Trash2 size={13} /> Remove
-              </button>
-            </div>
-          ))}
-          <div className="admin-col-full flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() =>
-                onChange({
-                  ...value,
-                  stats: [...stats, { icon: "", value: "", label: "" }],
-                })
-              }
-              disabled={atMax}
-              className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Plus size={14} /> Add Stat
-            </button>
-            <LimitHint
-              count={stats.length}
-              max={RECRUITERS_SECTION_LIMITS.statsMax}
-            />
-          </div>
-        </div>
+        <RowsEditor
+          items={stats as unknown as Record<string, unknown>[]}
+          onChange={(next) =>
+            onChange({
+              ...value,
+              stats: next as unknown as RecruitersSectionStat[],
+            })
+          }
+          newItem={() => ({ icon: "", value: "", label: "" })}
+          addLabel="Add Stat"
+          max={RECRUITERS_SECTION_LIMITS.statsMax}
+          columns={[
+            {
+              key: "icon",
+              label: "Icon",
+              weight: 3,
+              maxLength: RECRUITERS_SECTION_LIMITS.statIconMax,
+              placeholder: "trend",
+            },
+            {
+              key: "value",
+              label: "Value",
+              weight: 3,
+              maxLength: RECRUITERS_SECTION_LIMITS.statValueMax,
+              placeholder: "98%",
+            },
+            {
+              key: "label",
+              label: "Label",
+              weight: 6,
+              maxLength: RECRUITERS_SECTION_LIMITS.statLabelMax,
+              placeholder: "Placement Rate",
+            },
+          ]}
+        />
       </Field>
     </FormGrid>
   );

@@ -35,59 +35,74 @@
   --admin-navy-hover: #1a2a42;
   --admin-gold: #c9a84c;
   --admin-gold-hover: #e0bf6b;
-  --admin-gold-deep: #8a6f1f;
-  --admin-gold-soft: rgb(201 168 76 / 0.14);
+  --admin-gold-deep: #7a611a; /* gold as text: 5.2:1 even on --admin-selected */
+  --admin-gold-soft: rgb(201 168 76 / 0.18);
+  /* The brand gold as a LINE on a light surface: focus rings, the selected or
+     current item's outline, a drop target. `--admin-gold` is 2.3:1 on white,
+     under the 3:1 a focus indicator or a state boundary needs; this clears
+     3.2:1 even on the canvas. Fills — the gold button, the rail's active
+     tile — keep the brand gold, where the text on them carries the contrast. */
+  --admin-gold-line: #a38128;
 
   /* The sidebar's own surface: a slow vertical fall from a lifted navy to the
      brand navy, so the rail reads as one lit panel rather than a flat slab. */
   --admin-sidebar-bg: linear-gradient(180deg, #0f1f38 0%, #0a1628 46%, #08111f);
-  --admin-sidebar-line: rgb(255 255 255 / 0.07);
-  --admin-sidebar-hover: rgb(255 255 255 / 0.06);
+  --admin-sidebar-line: rgb(255 255 255 / 0.1);
+  --admin-sidebar-hover: rgb(255 255 255 / 0.09);
 
   /* ── Surfaces ───────────────────────────────────────────────────────────
      `canvas` is the page background, `raised` is a card on top of it, `sunken`
-     is a well inside a card (repeater rows, code blocks, previews). */
-  --admin-canvas: #f5f6f8;
+     is a well inside a card (repeater rows, code blocks, previews). The canvas
+     sits a clear step below the cards (1.14:1; it was 1.08:1, which left a
+     card leaning on its shadow alone to read as one). */
+  --admin-canvas: #edf0f4;
   --admin-raised: #ffffff;
-  --admin-sunken: #f9fafb;
-  --admin-hover: #f2f4f7;
-  --admin-selected: rgb(201 168 76 / 0.12);
+  --admin-sunken: #f4f6f9;
+  --admin-hover: #eaeef3;
+  --admin-selected: rgb(201 168 76 / 0.16);
 
   /* ── Borders ────────────────────────────────────────────────────────────
      `subtle` separates content inside a card; `default` outlines a card
-     against the canvas; `strong` marks an active or focused boundary. */
-  --admin-border-subtle: #eef0f3;
-  --admin-border: #e1e5ea;
-  --admin-border-strong: #a3adba;
+     against the canvas; `control` is the edge of something you type into or
+     press, where WCAG 1.4.11 asks for 3:1 — at 1.3:1 an empty field was a
+     blank patch of card; `strong` marks a hovered or active boundary. A card
+     outline at control weight would be heavy, hence the separate role. */
+  --admin-border-subtle: #e3e7ec;
+  --admin-border: #cdd4dd;
+  --admin-border-control: #7f8a99; /* 3.5:1 on raised, 3.1:1 on the canvas */
+  --admin-border-strong: #667181; /* 5.0:1 */
 
   /* ── Text ───────────────────────────────────────────────────────────────
-     Contrast ratios on --admin-raised are noted; all body-size roles clear
-     WCAG AA 4.5:1. The old palette used gray-400 (#9ca3af, 2.8:1) for hints
-     and metadata, which failed — `muted` replaces it. */
-  --admin-text: #0f172a; /* 16.8:1 */
-  --admin-text-secondary: #3f4a5a; /*  9.4:1 */
-  --admin-text-muted: #5b6675; /*  6.0:1 */
-  --admin-text-faint: #6b7684; /*  4.9:1 — smallest passing role */
+     Ratios are on --admin-raised, then on --admin-canvas. Every role clears
+     WCAG AA 4.5:1 on every surface token, --admin-hover included. The previous
+     `faint` (#6b7684) was 4.6:1 on a card but 4.3:1 on the canvas, so section
+     labels and timestamps on the page background failed. */
+  --admin-text: #0f172a; /* 17.9:1 · 15.6:1 */
+  --admin-text-secondary: #2f3a4a; /* 11.5:1 · 10.1:1 */
+  --admin-text-muted: #485363; /*  7.8:1 ·  6.8:1 */
+  --admin-text-faint: #5a6573; /*  5.9:1 ·  5.2:1 — smallest passing role */
   --admin-text-inverse: #ffffff;
-  --admin-text-on-navy: rgb(255 255 255 / 0.82);
-  --admin-text-on-navy-muted: rgb(255 255 255 / 0.52);
+  --admin-text-on-navy: rgb(255 255 255 / 0.9); /* 14.8:1 */
+  --admin-text-on-navy-muted: rgb(255 255 255 / 0.66); /* 7.8:1 at worst */
 
   /* ── Status ─────────────────────────────────────────────────────────────
      Each state carries a foreground, a background and a border so badges,
-     banners and inline messages stay consistent. */
-  --admin-success: #15803d;
+     banners and inline messages stay consistent. Foregrounds are the -800
+     step of their hue: 6.4:1 or better on their own tint. The -700 step they
+     replaced left draft at 4.4:1 and success and warning at 4.6:1. */
+  --admin-success: #166534;
   --admin-success-bg: #dcfce7;
   --admin-success-border: #86efac;
 
-  --admin-warning: #a16207;
+  --admin-warning: #854d0e;
   --admin-warning-bg: #fef9c3;
   --admin-warning-border: #fde047;
 
-  --admin-danger: #b91c1c;
+  --admin-danger: #991b1b;
   --admin-danger-bg: #fee2e2;
   --admin-danger-border: #fca5a5;
 
-  --admin-info: #1d4ed8;
+  --admin-info: #1e40af;
   --admin-info-bg: #dbeafe;
   --admin-info-border: #93c5fd;
 
@@ -97,10 +112,10 @@
 
   /* Draft vs published — the single most important distinction in this CMS,
      so it gets its own roles rather than borrowing warning/success. */
-  --admin-draft: #a16207;
+  --admin-draft: #92400e;
   --admin-draft-bg: #fef3c7;
   --admin-draft-border: #fcd34d;
-  --admin-published: #15803d;
+  --admin-published: #166534;
   --admin-published-bg: #dcfce7;
   --admin-published-border: #86efac;
 
@@ -156,11 +171,13 @@
   --admin-shadow-xl: 0 28px 64px -16px rgb(16 24 40 / 0.3);
 
   /* ── Focus ──────────────────────────────────────────────────────────────
-     One ring for the whole panel. Gold on light surfaces reads clearly and
-     matches the brand; the offset keeps it off the control's own border. */
+     One ring for the whole panel, gold to match the brand: `gold-line` on
+     light surfaces, the brand gold itself on navy, where it is already 7:1.
+     The offset keeps it off the control's own border. `tight` is a halo for
+     a control whose border already turns gold — never a ring on its own. */
   --admin-focus-ring:
-    0 0 0 2px var(--admin-raised), 0 0 0 4px var(--admin-gold);
-  --admin-focus-ring-tight: 0 0 0 3px rgb(201 168 76 / 0.35);
+    0 0 0 2px var(--admin-raised), 0 0 0 4px var(--admin-gold-line);
+  --admin-focus-ring-tight: 0 0 0 3px rgb(163 129 40 / 0.3);
   --admin-focus-ring-navy:
     0 0 0 2px var(--admin-navy), 0 0 0 4px var(--admin-gold);
 
@@ -351,7 +368,7 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgb(255 255 255 / 0.38);
+  color: rgb(255 255 255 / 0.6); /* 6.7:1 at the top of the rail */
   white-space: nowrap;
 }
 
@@ -410,8 +427,8 @@
   height: 30px;
   flex-shrink: 0;
   border-radius: var(--admin-radius);
-  background: rgb(255 255 255 / 0.05);
-  color: rgb(255 255 255 / 0.72);
+  background: rgb(255 255 255 / 0.08);
+  color: rgb(255 255 255 / 0.85);
   transition:
     background var(--admin-duration-fast),
     color var(--admin-duration-fast),
@@ -419,7 +436,7 @@
 }
 
 .admin-sidebar-section:hover .admin-sidebar-icon {
-  background: rgb(255 255 255 / 0.09);
+  background: rgb(255 255 255 / 0.12);
   color: var(--admin-text-inverse);
 }
 
@@ -432,14 +449,14 @@
 .admin-sidebar-section-chevron {
   margin-left: auto;
   flex-shrink: 0;
-  opacity: 0.55;
+  opacity: 0.75;
   transition:
     transform var(--admin-duration) var(--admin-ease),
     opacity var(--admin-duration-fast);
 }
 
 .admin-sidebar-section:hover .admin-sidebar-section-chevron {
-  opacity: 0.9;
+  opacity: 1;
 }
 
 .admin-sidebar-section[aria-expanded="true"] .admin-sidebar-section-chevron {
@@ -452,7 +469,7 @@
   position: relative;
   margin-left: calc(var(--admin-space-2) + 14px);
   padding-left: var(--admin-space-2);
-  border-left: 1px solid rgb(255 255 255 / 0.1);
+  border-left: 1px solid rgb(255 255 255 / 0.16);
 }
 
 /* Group label inside an expanded section (Landing Page, Academics, …) */
@@ -475,7 +492,7 @@
   min-height: 32px;
   padding: var(--admin-space-1) var(--admin-space-2);
   border-radius: var(--admin-radius);
-  color: rgb(255 255 255 / 0.7);
+  color: rgb(255 255 255 / 0.82); /* 12.3:1 — a step under the section rows */
   font-size: var(--admin-text-base);
   text-decoration: none;
   white-space: nowrap;
@@ -710,7 +727,7 @@
   height: 36px;
   margin-left: auto;
   padding: 0 var(--admin-space-2) 0 var(--admin-space-3);
-  border: 1px solid var(--admin-border);
+  border: 1px solid var(--admin-border-control);
   border-radius: var(--admin-radius-md);
   background: var(--admin-sunken);
   color: var(--admin-text-faint);
@@ -1178,7 +1195,7 @@
 }
 
 .admin-card--interactive:hover {
-  border-color: rgb(201 168 76 / 0.7);
+  border-color: var(--admin-gold-line);
   box-shadow: var(--admin-shadow-md);
   transform: translateY(-1px);
 }
@@ -1393,7 +1410,7 @@
 
 .admin-btn-outline {
   background: var(--admin-raised);
-  border-color: var(--admin-border);
+  border-color: var(--admin-border-control);
   color: var(--admin-text);
   box-shadow: var(--admin-shadow-sm);
 }
@@ -1430,8 +1447,8 @@
   color: var(--admin-text-inverse);
 }
 .admin-btn-danger-solid:hover:not(:disabled) {
-  background: #991b1b;
-  border-color: #991b1b;
+  background: #7f1d1d;
+  border-color: #7f1d1d;
 }
 
 .admin-btn-sm {
@@ -1524,7 +1541,7 @@
   width: 100%;
   min-height: 38px;
   padding: 0.4375rem var(--admin-space-3);
-  border: 1px solid var(--admin-border);
+  border: 1px solid var(--admin-border-control);
   border-radius: var(--admin-radius);
   background: var(--admin-raised);
   color: var(--admin-text);
@@ -1572,13 +1589,16 @@
 .admin-input:focus,
 .admin-select:focus,
 .admin-textarea:focus {
-  border-color: var(--admin-gold);
+  border-color: var(--admin-gold-line);
   box-shadow: var(--admin-focus-ring-tight);
 }
 
+/* A disabled field steps back to the card-outline weight, so it no longer
+   reads as something waiting to be filled in. */
 .admin-input:disabled,
 .admin-select:disabled,
 .admin-textarea:disabled {
+  border-color: var(--admin-border);
   background: var(--admin-sunken);
   color: var(--admin-text-muted);
   cursor: not-allowed;
@@ -1603,6 +1623,15 @@
 .admin-select--auto {
   width: auto;
   min-width: 9rem;
+}
+
+/* A setting that rides along in a list's header (a gallery's crop): small
+   enough to sit beside the label rather than take a row of its own. */
+.admin-select--compact {
+  width: auto;
+  min-height: 28px;
+  padding: 0.125rem var(--admin-space-2);
+  font-size: var(--admin-text-sm);
 }
 
 /* ── Search field ─────────────────────────────────────────────────────────
@@ -1684,19 +1713,27 @@
    Every admin form used to be a single column of `width: 100%` controls, so a
    four-character "Counselling Code" box stretched the full content column and
    the next twelve fields queued below it off-screen. Fields now sit on a
-   12-column grid and declare how much of a row they need.
+   12-column row and declare how much of it they need (`span`).
+
+   The row is a wrapping flexbox rather than CSS grid so the narrower tiers can
+   *flow*. Single-line fields (`.admin-field-inline`: text, number and select
+   controls) keep a comfortable minimum width, sit as many to a line as fit,
+   and share out what is left — so whichever field ends up alone on a line
+   fills it instead of leaving a hole. Grid tracks cannot do that, which is why
+   the page editors' 460–540px side panel stacked even a four-digit year on a
+   row of its own, under a label, inside a card, above a Remove button.
 
    The breakpoints are *container* queries, not viewport ones: the same form
-   renders both in the full-width content column and inside a 440px inspector
-   drawer, and only the container knows which. `container-type: inline-size` on
-   the grid makes it the query container for its own children — an element
+   renders in the full-width content column, in a 760px drawer and in that side
+   panel, and only the container knows which. `container-type: inline-size` on
+   the row makes it the query container for its own children — an element
    cannot query itself, but its descendants can query it. */
 .admin-form-grid {
   container-type: inline-size;
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: var(--admin-space-4);
-  align-items: start;
 }
 
 /* Denser variant for the repeater rows inside a card, where the surrounding
@@ -1705,73 +1742,122 @@
   gap: var(--admin-space-3);
 }
 
-/* Half a row is the default: two short fields side by side. `margin-bottom` is
-   zeroed because `Field` carries `mb-4` for the stacked (non-grid) callers —
-   inside a grid the `gap` owns the spacing. */
+/* Wide container: a child takes exactly `--admin-span` twelfths of the row,
+   gaps included, so consecutive rows line up like grid columns. Half a row is
+   the default. The gap is restated on each child rather than read from the
+   row, because a nested FormGrid redefines it for its own children; the 0.1px
+   of slack stops sub-pixel rounding from wrapping a row that adds up to 12.
+   `margin-bottom` is zeroed because `Field` carries `mb-4` for the stacked
+   (non-grid) callers — inside a grid the `gap` owns the spacing. */
 .admin-form-grid > * {
-  grid-column: span 6;
+  --admin-fg-gap: var(--admin-space-4);
+  --admin-span: 6;
+  flex: 0 0
+    calc(
+      (100% - 11 * var(--admin-fg-gap)) * var(--admin-span) / 12 +
+        (var(--admin-span) - 1) * var(--admin-fg-gap) - 0.1px
+    );
   min-width: 0;
   margin-bottom: 0;
 }
 
+.admin-form-grid--tight > * {
+  --admin-fg-gap: var(--admin-space-3);
+}
+
 .admin-form-grid > .admin-col-2 {
-  grid-column: span 2;
+  --admin-span: 2;
 }
 .admin-form-grid > .admin-col-3 {
-  grid-column: span 3;
+  --admin-span: 3;
 }
 .admin-form-grid > .admin-col-4 {
-  grid-column: span 4;
+  --admin-span: 4;
 }
 .admin-form-grid > .admin-col-5 {
-  grid-column: span 5;
+  --admin-span: 5;
 }
 .admin-form-grid > .admin-col-6 {
-  grid-column: span 6;
+  --admin-span: 6;
 }
 .admin-form-grid > .admin-col-7 {
-  grid-column: span 7;
+  --admin-span: 7;
 }
 .admin-form-grid > .admin-col-8 {
-  grid-column: span 8;
+  --admin-span: 8;
 }
 .admin-form-grid > .admin-col-9 {
-  grid-column: span 9;
+  --admin-span: 9;
 }
 .admin-form-grid > .admin-col-10 {
-  grid-column: span 10;
+  --admin-span: 10;
 }
 .admin-form-grid > .admin-col-full {
-  grid-column: 1 / -1;
+  --admin-span: 12;
 }
 
-/* A field that should start its own row even though it is not full width —
-   used to keep a logical group from being tailgated by the next field. */
-.admin-form-grid > .admin-col-break {
-  grid-column-start: 1;
-}
-
-/* Medium container: thirds and quarters become halves, wide fields go full. */
+/* Medium container (a drawer, the inspector overlay): thirds and quarters
+   become halves and wide blocks go full, as before. Single-line fields flow:
+   at these minimums a 720px drawer holds three names, four years or a label
+   beside its link on one line. */
 @container (max-width: 960px) {
   .admin-form-grid > .admin-col-2,
   .admin-form-grid > .admin-col-3,
   .admin-form-grid > .admin-col-4,
   .admin-form-grid > .admin-col-5 {
-    grid-column: span 6;
+    --admin-span: 6;
   }
 
   .admin-form-grid > .admin-col-7,
   .admin-form-grid > .admin-col-8,
   .admin-form-grid > .admin-col-9,
   .admin-form-grid > .admin-col-10 {
-    grid-column: 1 / -1;
+    --admin-span: 12;
+  }
+
+  /* A field (text area, upload, list) that ends up alone on a line fills it
+     rather than leaving half the line empty. Cards and tiles don't stretch,
+     so a grid of them keeps one width. Before the inline rules on purpose:
+     those set their own growth. */
+  .admin-form-grid > .admin-field {
+    flex-grow: 1;
+  }
+
+  .admin-form-grid > .admin-field-inline {
+    flex: 6 1 12rem;
+  }
+  .admin-form-grid > .admin-field-inline.admin-col-2 {
+    flex: 2 1 7rem;
+  }
+  .admin-form-grid > .admin-field-inline.admin-col-3 {
+    flex: 3 1 9rem;
+  }
+  .admin-form-grid > .admin-field-inline.admin-col-4 {
+    flex: 4 1 10rem;
+  }
+  .admin-form-grid > .admin-field-inline.admin-col-5 {
+    flex: 5 1 12rem;
+  }
+  .admin-form-grid > .admin-field-inline.admin-col-7 {
+    flex: 7 1 12rem;
+  }
+  .admin-form-grid > .admin-field-inline.admin-col-8,
+  .admin-form-grid > .admin-field-inline.admin-col-9,
+  .admin-form-grid > .admin-field-inline.admin-col-10 {
+    flex: 8 1 18rem;
+  }
+  .admin-form-grid > .admin-field-inline.admin-col-full {
+    flex: 1 1 100%;
   }
 }
 
-/* Narrow container (a dragged-in inspector drawer, phones): one field per row,
-   which is what the whole panel used to do everywhere. The span classes are
-   listed out because the medium block above sets them at the same specificity
-   as this rule would otherwise have — `> *` alone loses to `> .admin-col-3`. */
+/* Narrow container (the page editors' side panel, phones): anything that is
+   not a single-line field takes a row of its own. Single-line fields keep
+   flowing at smaller minimums — two names, a code beside a label, three
+   counts, a link beside its button label — and only `full` ones always take
+   the whole row. The span classes are listed out because the medium block
+   above sets them at the same specificity as `> *` would have — `> *` alone
+   would lose. */
 @container (max-width: 620px) {
   .admin-form-grid > *,
   .admin-form-grid > .admin-col-2,
@@ -1783,7 +1869,235 @@
   .admin-form-grid > .admin-col-8,
   .admin-form-grid > .admin-col-9,
   .admin-form-grid > .admin-col-10 {
-    grid-column: 1 / -1;
+    --admin-span: 12;
+  }
+
+  .admin-form-grid > .admin-field-inline {
+    flex: 6 1 10rem;
+  }
+  .admin-form-grid > .admin-field-inline.admin-col-2 {
+    flex: 2 1 6rem;
+  }
+  .admin-form-grid > .admin-field-inline.admin-col-3 {
+    flex: 3 1 7.5rem;
+  }
+  .admin-form-grid > .admin-field-inline.admin-col-4 {
+    flex: 4 1 8rem;
+  }
+  .admin-form-grid > .admin-field-inline.admin-col-5 {
+    flex: 5 1 10rem;
+  }
+  .admin-form-grid > .admin-field-inline.admin-col-7 {
+    flex: 7 1 10rem;
+  }
+  .admin-form-grid > .admin-field-inline.admin-col-8,
+  .admin-form-grid > .admin-field-inline.admin-col-9,
+  .admin-form-grid > .admin-field-inline.admin-col-10 {
+    flex: 8 1 12rem;
+  }
+}
+
+/* ── Repeated items ───────────────────────────────────────────────────────
+   One bordered card per entry of a list (a stat, a member, a link). The
+   remove control is a small icon in the card's top-right corner, level with
+   the first row of labels, instead of a full-width "Remove" button on a row
+   of its own — that row cost ~40px per entry, which on a list of eight was a
+   screen of nothing. Labels inside the card keep clear of the corner. */
+.admin-item-card {
+  position: relative;
+  min-width: 0;
+  padding: var(--admin-space-3);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius-md);
+  background: var(--admin-sunken);
+}
+
+/* A card inside a card (a company's students, a group's documents) steps back
+   up to the raised surface so the two levels stay distinguishable; `--raised`
+   does the same inside any other sunken well. */
+.admin-item-card .admin-item-card,
+.admin-item-card--raised {
+  background: var(--admin-raised);
+}
+
+.admin-item-card .admin-label {
+  padding-right: 1.75rem;
+}
+
+.admin-item-remove {
+  position: absolute;
+  top: 0.375rem;
+  right: 0.375rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.625rem;
+  height: 1.625rem;
+  border: 1px solid transparent;
+  border-radius: var(--admin-radius);
+  background: transparent;
+  color: var(--admin-text-faint);
+  transition:
+    background var(--admin-duration-fast),
+    border-color var(--admin-duration-fast),
+    color var(--admin-duration-fast);
+}
+
+.admin-item-remove:hover,
+.admin-item-remove:focus-visible {
+  border-color: var(--admin-danger-border);
+  background: var(--admin-danger-bg);
+  color: var(--admin-danger);
+}
+
+.admin-item-remove:focus-visible {
+  outline: none;
+  box-shadow: var(--admin-focus-ring);
+}
+
+/* ── Photo tiles ──────────────────────────────────────────────────────────
+   A gallery's thumbnails: as many columns as fit at a thumbnail's width, and
+   a tile never stretches to fill a line — a lone "Add photo" tile stays a
+   tile, not a 300px drop zone. */
+.admin-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(7rem, 1fr));
+  align-items: start;
+  gap: var(--admin-space-3);
+}
+
+/* ── Compact rows ─────────────────────────────────────────────────────────
+   A list whose entries are two or three short values (label + value, value +
+   label, icon + label + value) edits as a small table: the column labels once
+   on top, then one line per entry with its delete button at the end. On a
+   container too narrow for the columns, each entry falls back to a card with
+   its own labels. The columns come from `--admin-rows-cols`, set inline. */
+.admin-rows {
+  container-type: inline-size;
+}
+
+.admin-rows-head,
+.admin-rows-row {
+  display: grid;
+  grid-template-columns: var(--admin-rows-cols) 2rem;
+  align-items: center;
+  gap: var(--admin-space-2);
+}
+
+.admin-rows-head {
+  padding: 0 0 var(--admin-space-1);
+  font-size: var(--admin-text-sm);
+  font-weight: 600;
+  color: var(--admin-text-secondary);
+}
+
+.admin-rows-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--admin-space-2);
+}
+
+.admin-rows-cell {
+  min-width: 0;
+}
+
+/* Visible only in the stacked fallback below; the head row labels the
+   columns otherwise. The inputs carry an aria-label either way. */
+.admin-rows-label {
+  display: none;
+}
+
+.admin-rows-row .admin-item-remove {
+  position: static;
+}
+
+/* A yes/no column (a stat's accent colour): the box centred under its head. */
+.admin-rows-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--admin-space-2);
+  min-height: 38px;
+  cursor: pointer;
+}
+
+.admin-rows-check .admin-rows-label {
+  margin: 0;
+}
+
+.admin-rows-empty {
+  padding: var(--admin-space-3);
+  border: 1px dashed var(--admin-border);
+  border-radius: var(--admin-radius-md);
+  text-align: center;
+  font-size: var(--admin-text-sm);
+  color: var(--admin-text-faint);
+}
+
+@container (max-width: 360px) {
+  .admin-rows[data-cols="3"] .admin-rows-head {
+    display: none;
+  }
+
+  .admin-rows[data-cols="3"] .admin-rows-row {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--admin-space-3);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius-md);
+    background: var(--admin-sunken);
+  }
+
+  .admin-rows[data-cols="3"] .admin-rows-label {
+    display: block;
+    margin-bottom: var(--admin-space-1);
+    padding-right: 1.75rem;
+    font-size: var(--admin-text-sm);
+    font-weight: 600;
+    color: var(--admin-text-secondary);
+  }
+
+  .admin-rows[data-cols="3"] .admin-rows-row .admin-item-remove {
+    position: absolute;
+  }
+
+  .admin-rows[data-cols="3"] .admin-rows-check {
+    justify-content: flex-start;
+    min-height: 0;
+  }
+}
+
+@container (max-width: 240px) {
+  .admin-rows[data-cols="2"] .admin-rows-head {
+    display: none;
+  }
+
+  .admin-rows[data-cols="2"] .admin-rows-row {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--admin-space-3);
+    border: 1px solid var(--admin-border);
+    border-radius: var(--admin-radius-md);
+    background: var(--admin-sunken);
+  }
+
+  .admin-rows[data-cols="2"] .admin-rows-label {
+    display: block;
+    margin-bottom: var(--admin-space-1);
+    padding-right: 1.75rem;
+    font-size: var(--admin-text-sm);
+    font-weight: 600;
+    color: var(--admin-text-secondary);
+  }
+
+  .admin-rows[data-cols="2"] .admin-rows-row .admin-item-remove {
+    position: absolute;
+  }
+
+  .admin-rows[data-cols="2"] .admin-rows-check {
+    justify-content: flex-start;
+    min-height: 0;
   }
 }
 
@@ -1821,7 +2135,7 @@
 
 /* Fieldset — groups a long form into named chunks. */
 .admin-fieldset {
-  border: 1px solid var(--admin-border-subtle);
+  border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius-lg);
   padding: var(--admin-space-4);
   margin-bottom: var(--admin-space-4);
@@ -1854,7 +2168,9 @@
   text-transform: uppercase;
   color: var(--admin-text-muted);
   background: var(--admin-sunken);
-  border-bottom: 1px solid var(--admin-border-subtle);
+  /* Heavier than the row dividers below it: the header is a different kind
+     of row, and the line is what says where the data starts. */
+  border-bottom: 1px solid var(--admin-border);
   white-space: nowrap;
 }
 
@@ -1891,7 +2207,7 @@
 }
 
 .admin-table tbody tr[data-clickable="true"]:focus-visible {
-  outline: 2px solid var(--admin-gold);
+  outline: 2px solid var(--admin-gold-line);
   outline-offset: -2px;
 }
 
@@ -2015,7 +2331,7 @@
 }
 
 .admin-savebar[data-dirty="true"] {
-  border-top-color: var(--admin-gold);
+  border-top-color: var(--admin-gold-line);
 }
 
 .admin-savebar-status {
@@ -2034,7 +2350,7 @@
 }
 
 .admin-dot--dirty {
-  background: var(--admin-gold);
+  background: var(--admin-gold-line);
 }
 .admin-dot--saved {
   background: var(--admin-success);
@@ -2099,11 +2415,38 @@
 }
 
 .admin-workspace-panel {
+  position: relative;
   min-height: 0;
   display: flex;
   flex-direction: column;
   background: var(--admin-raised);
   border-left: 1px solid var(--admin-border);
+}
+
+/* The panel's left edge is a drag handle (EditorWorkspace): wider for a long
+   form or a wide table, narrower for more preview. A thin strip that shows
+   itself on hover or focus, over the border it replaces. */
+.admin-workspace-resize {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -3px;
+  z-index: 2;
+  width: 6px;
+  cursor: col-resize;
+  background: transparent;
+  transition: background var(--admin-duration-fast);
+}
+
+.admin-workspace-resize:hover,
+.admin-workspace-resize[data-dragging="true"] {
+  background: var(--admin-gold-line);
+}
+
+.admin-workspace-resize:focus-visible {
+  outline: none;
+  background: var(--admin-gold-line);
+  box-shadow: var(--admin-focus-ring);
 }
 
 .admin-workspace-panel-head {
@@ -2172,7 +2515,7 @@
   align-items: center;
   gap: var(--admin-space-3);
   padding: var(--admin-space-3);
-  border: 1px solid var(--admin-border-subtle);
+  border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius-md);
   text-align: left;
   background: var(--admin-raised);
@@ -2184,7 +2527,7 @@
 .admin-workspace-outline-item:hover,
 .admin-workspace-outline-item[aria-current="true"] {
   background: var(--admin-hover);
-  border-color: var(--admin-gold);
+  border-color: var(--admin-gold-line);
 }
 
 .admin-workspace-outline-label {
@@ -2234,18 +2577,18 @@
   gap: 6px;
   margin: 24px;
   padding: 40px 24px;
-  border: 3px dashed #cbd5e1;
+  border: 3px dashed #94a3b8;
   border-radius: 16px;
   font-family: system-ui, sans-serif;
   font-size: 22px;
   text-align: center;
-  color: #64748b;
+  color: #475569;
   background: #f8fafc;
 }
 
 .admin-preview-slot:empty + .admin-preview-empty strong {
   font-size: 26px;
-  color: #334155;
+  color: #1e293b;
 }
 
 /* ── Drawer / inspector ───────────────────────────────────────────────────*/
@@ -2557,7 +2900,7 @@
 
 .admin-doc-toggle:focus-visible {
   outline: none;
-  box-shadow: var(--admin-focus-ring-tight);
+  box-shadow: var(--admin-focus-ring);
 }
 
 .admin-doc-h2-icon {
@@ -2631,7 +2974,7 @@
 .admin-doc-copy {
   flex-shrink: 0;
   margin-top: var(--admin-space-2);
-  opacity: 0.4;
+  opacity: 0.65; /* 3.3:1 as an icon; 0.4 was under 2:1 and read as disabled */
   transition: opacity var(--admin-duration-fast);
 }
 
@@ -2688,7 +3031,7 @@
    it names a button, and looking like one it is not would be worse. */
 .admin-doc-ui {
   padding: 0.05em 0.4em;
-  border: 1px solid var(--admin-border-subtle);
+  border: 1px solid var(--admin-border);
   border-radius: var(--admin-radius-sm);
   background: var(--admin-sunken);
   color: var(--admin-text);
@@ -3050,7 +3393,7 @@
 /* Where you are in the document — the rail's whole reason for existing once a
    chapter runs past a screen. */
 .admin-doc-toc-link[data-active] {
-  border-left-color: var(--admin-gold);
+  border-left-color: var(--admin-gold-line);
   background: var(--admin-selected);
 }
 

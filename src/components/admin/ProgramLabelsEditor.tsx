@@ -396,9 +396,9 @@ export function ProgramLabelsEditor({
                     return (
                       <div
                         key={f.key}
-                        className={
+                        className={`admin-field-inline ${
                           f.key === "title" ? "admin-col-full" : "admin-col-4"
-                        }
+                        }`}
                       >
                         <label htmlFor={fieldId} className="admin-label">
                           {f.label}

@@ -467,16 +467,21 @@ export function CoeSectionInspector({
                 })
               }
               fields={[
-                { key: "label", label: "Label", placeholder: "Controller" },
+                {
+                  key: "label",
+                  label: "Label",
+                  placeholder: "Controller",
+                  span: 5,
+                },
                 {
                   key: "value",
                   label: "Value",
                   placeholder: "Dr. D. Elangovan",
+                  span: 7,
                 },
               ]}
               emptyItem={{ label: "", value: "" }}
               addLabel="Add quick fact"
-              cardSpan={4}
             />
           </Field>
           <TextInput

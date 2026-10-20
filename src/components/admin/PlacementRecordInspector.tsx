@@ -8,6 +8,7 @@ import {
   TextArea,
   NumberInput,
   ImageUploadInput,
+  ItemsEditor,
   Repeater,
 } from "@/components/admin/inputs";
 import {
@@ -60,23 +61,25 @@ export function PlacementRecordInspector({
           placeholder="2024-2025"
           required
         />
-        <Field label="Visibility" span={8}>
-          <label className="flex items-center gap-2 text-sm text-[var(--admin-text-secondary)]">
-            <input
-              type="checkbox"
-              checked={record.is_current}
-              onChange={(e) => patch({ is_current: e.target.checked })}
-            />
-            Current year (selected first on the public page)
-          </label>
-          <label className="mt-2 flex items-center gap-2 text-sm text-[var(--admin-text-secondary)]">
-            <input
-              type="checkbox"
-              checked={record.is_active}
-              onChange={(e) => patch({ is_active: e.target.checked })}
-            />
-            Active (shown on the website)
-          </label>
+        <Field label="Visibility" span={8} inline>
+          <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1">
+            <label className="flex items-center gap-2 text-sm text-[var(--admin-text-secondary)]">
+              <input
+                type="checkbox"
+                checked={record.is_current}
+                onChange={(e) => patch({ is_current: e.target.checked })}
+              />
+              Current year (selected first on the public page)
+            </label>
+            <label className="flex items-center gap-2 text-sm text-[var(--admin-text-secondary)]">
+              <input
+                type="checkbox"
+                checked={record.is_active}
+                onChange={(e) => patch({ is_active: e.target.checked })}
+              />
+              Active (shown on the website)
+            </label>
+          </div>
         </Field>
         <TextArea
           label="Summary"
@@ -300,43 +303,37 @@ export function PlacementRecordInspector({
               onChange={(logo) => oc({ ...item, logo })}
               hideUrlField
             />
-            <div className="admin-col-full rounded-lg border border-[var(--admin-border-subtle)] bg-gray-50/60 p-3">
-              <Repeater<CompanyStudentValue>
-                label="Placed Students"
-                itemSpan={4}
-                items={item.students}
-                onChange={(students) => oc({ ...item, students })}
-                newItem={() => ({ name: "", program: "", package: "" })}
-                renderItem={(stu, _si, onStu) => (
-                  <FormGrid tight>
-                    <TextInput
-                      label="Student Name"
-                      span="full"
-                      value={stu.name}
-                      onChange={(e) => onStu({ ...stu, name: e.target.value })}
-                    />
-                    <TextInput
-                      label="Program"
-                      span={7}
-                      value={stu.program}
-                      onChange={(e) =>
-                        onStu({ ...stu, program: e.target.value })
-                      }
-                      placeholder="B.E. CSE"
-                    />
-                    <TextInput
-                      label="Package"
-                      span={5}
-                      value={stu.package}
-                      onChange={(e) =>
-                        onStu({ ...stu, package: e.target.value })
-                      }
-                      placeholder="6 LPA"
-                    />
-                  </FormGrid>
-                )}
+            {/* One line per student — name, program, package — rather than a
+                card of three stacked fields each: a recruiter that took
+                fifteen students was a long scroll. */}
+            <Field label="Placed Students" span="full">
+              <ItemsEditor
+                items={item.students as unknown as Record<string, unknown>[]}
+                onChange={(v) =>
+                  oc({
+                    ...item,
+                    students: v as unknown as CompanyStudentValue[],
+                  })
+                }
+                fields={[
+                  { key: "name", label: "Student Name", span: 6 },
+                  {
+                    key: "program",
+                    label: "Program",
+                    placeholder: "B.E. CSE",
+                    span: 3,
+                  },
+                  {
+                    key: "package",
+                    label: "Package",
+                    placeholder: "6 LPA",
+                    span: 3,
+                  },
+                ]}
+                emptyItem={{ name: "", program: "", package: "" }}
+                addLabel="Add student"
               />
-            </div>
+            </Field>
           </FormGrid>
         )}
       />

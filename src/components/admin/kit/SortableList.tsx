@@ -82,7 +82,7 @@ export function SortableList<T>({
           className="admin-well flex gap-2"
           style={
             overIndex === i && dragIndex !== null && dragIndex !== i
-              ? { borderColor: "var(--admin-gold)" }
+              ? { borderColor: "var(--admin-gold-line)" }
               : undefined
           }
         >

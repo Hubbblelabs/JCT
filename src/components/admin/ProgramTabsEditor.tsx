@@ -4,6 +4,7 @@ import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import {
   Field,
   ImageUploadInput,
+  ItemCard,
   Select,
   TextArea,
   TextInput,
@@ -151,7 +152,7 @@ function ListSectionEditor({
       <Field label="Items">
         <div className="admin-form-grid admin-form-grid--tight">
           {section.items.map((item, i) => (
-            <div key={i} className="admin-col-4 flex gap-2">
+            <div key={i} className="admin-field-inline admin-col-4 flex gap-2">
               <input
                 className="admin-input"
                 value={item}
@@ -212,9 +213,17 @@ function CardsSectionEditor({
       <Field label="Cards">
         <div className="admin-form-grid admin-form-grid--tight">
           {section.items.map((item, i) => (
-            <div
+            <ItemCard
               key={i}
-              className="admin-col-4 rounded-md border border-[var(--admin-border-subtle)] p-3"
+              span={4}
+              className="admin-item-card--raised"
+              onRemove={() =>
+                onChange({
+                  ...section,
+                  items: section.items.filter((_, j) => j !== i),
+                })
+              }
+              removeLabel={`Remove card ${i + 1}`}
             >
               <TextInput
                 label="Title"
@@ -255,19 +264,7 @@ function CardsSectionEditor({
                 }
                 hideUrlField
               />
-              <button
-                type="button"
-                onClick={() =>
-                  onChange({
-                    ...section,
-                    items: section.items.filter((_, j) => j !== i),
-                  })
-                }
-                className="admin-btn admin-btn-danger admin-btn-sm mt-2"
-              >
-                <Trash2 size={13} /> Remove card
-              </button>
-            </div>
+            </ItemCard>
           ))}
           <button
             type="button"
@@ -301,9 +298,17 @@ function PeopleSectionEditor({
     <Field label="People">
       <div className="admin-form-grid admin-form-grid--tight">
         {section.items.map((p, i) => (
-          <div
+          <ItemCard
             key={i}
-            className="admin-col-6 rounded-md border border-[var(--admin-border-subtle)] p-3"
+            span={6}
+            className="admin-item-card--raised"
+            onRemove={() =>
+              onChange({
+                ...section,
+                items: section.items.filter((_, j) => j !== i),
+              })
+            }
+            removeLabel={`Remove person ${i + 1}`}
           >
             <div className="admin-form-grid admin-form-grid--tight">
               <TextInput
@@ -369,19 +374,7 @@ function PeopleSectionEditor({
               }
               hideUrlField
             />
-            <button
-              type="button"
-              onClick={() =>
-                onChange({
-                  ...section,
-                  items: section.items.filter((_, j) => j !== i),
-                })
-              }
-              className="admin-btn admin-btn-danger admin-btn-sm mt-2"
-            >
-              <Trash2 size={13} /> Remove
-            </button>
-          </div>
+          </ItemCard>
         ))}
         <button
           type="button"

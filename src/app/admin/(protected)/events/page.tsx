@@ -7,6 +7,7 @@ import {
   FormGrid,
   TextInput,
   TextArea,
+  ImageGallery,
   ImageUploadInput,
 } from "@/components/admin/inputs";
 import {
@@ -15,8 +16,6 @@ import {
   Trash2,
   Loader2,
   Check,
-  ChevronLeft,
-  ChevronRight,
   CalendarDays,
   PlayCircle,
   Star,
@@ -169,37 +168,6 @@ function EventsPageInner() {
       title,
       slug: slugTouched ? f.slug : slugify(title),
     }));
-
-  const addGallerySlot = () =>
-    setForm((f) =>
-      f.gallery.length >= GALLERY_MAX
-        ? f
-        : { ...f, gallery: [...f.gallery, ""] },
-    );
-
-  // Clearing a slot from inside the uploader drops the slot entirely, so the
-  // grid never leaves a gap the editor has to tidy up by hand.
-  const setGalleryAt = (i: number, url: string) =>
-    setForm((f) => {
-      const next = [...f.gallery];
-      if (url) next[i] = url;
-      else next.splice(i, 1);
-      return { ...f, gallery: next };
-    });
-
-  const removeGalleryAt = (i: number) =>
-    setForm((f) => ({ ...f, gallery: f.gallery.filter((_, j) => j !== i) }));
-
-  // Gallery order is the order the public lightbox steps through, so the
-  // editor needs a way to change it without re-uploading.
-  const moveGallery = (i: number, delta: number) =>
-    setForm((f) => {
-      const to = i + delta;
-      if (to < 0 || to >= f.gallery.length) return f;
-      const next = [...f.gallery];
-      [next[i], next[to]] = [next[to], next[i]];
-      return { ...f, gallery: next };
-    });
 
   const save = async () => {
     setSaving(true);
@@ -461,7 +429,7 @@ function EventsPageInner() {
             <FormGrid>
               <TextInput
                 label="Title"
-                span={5}
+                span={8}
                 value={form.title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
@@ -517,82 +485,19 @@ function EventsPageInner() {
                 hideUrlField
               />
 
-              <div className="admin-col-full">
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <div>
-                    <span className="admin-label mb-0">Gallery images</span>
-                    <p className="mt-0.5 text-xs text-[var(--admin-text-faint)]">
-                      Shown as a grid on the event detail page, below the
-                      content. Visitors click a photo to open it full size —
-                      this order is the order they page through.
-                    </p>
-                  </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <span className="text-xs font-medium text-[var(--admin-text-faint)]">
-                      {form.gallery.length} / {GALLERY_MAX}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={addGallerySlot}
-                      disabled={form.gallery.length >= GALLERY_MAX}
-                      className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      <Plus size={14} /> Add image
-                    </button>
-                  </div>
-                </div>
-
-                {form.gallery.length === 0 ? (
-                  <p className="rounded-lg border border-dashed border-[var(--admin-border)] p-4 text-center text-sm text-[var(--admin-text-faint)]">
-                    No gallery images. Add up to {GALLERY_MAX}.
-                  </p>
-                ) : (
-                  <div className="admin-form-grid admin-form-grid--tight">
-                    {form.gallery.map((url, i) => (
-                      <div
-                        key={i}
-                        className="admin-col-4 relative rounded-lg border border-[var(--admin-border)] p-3"
-                      >
-                        <div className="absolute top-2 right-2 z-10 flex items-center gap-1">
-                          <button
-                            type="button"
-                            onClick={() => moveGallery(i, -1)}
-                            disabled={i === 0}
-                            aria-label={`Move image ${i + 1} earlier`}
-                            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
-                          >
-                            <ChevronLeft size={13} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => moveGallery(i, 1)}
-                            disabled={i === form.gallery.length - 1}
-                            aria-label={`Move image ${i + 1} later`}
-                            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
-                          >
-                            <ChevronRight size={13} />
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => removeGalleryAt(i)}
-                            aria-label={`Remove image ${i + 1}`}
-                            className="admin-btn admin-btn-danger admin-btn-sm"
-                          >
-                            <Trash2 size={13} />
-                          </button>
-                        </div>
-                        <ImageUploadInput
-                          label={`Image ${i + 1}`}
-                          ratio="card"
-                          value={url}
-                          onChange={(next) => setGalleryAt(i, next)}
-                          hideUrlField
-                        />
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
+              {/* Thumbnails several to a line, each with earlier/later
+                  arrows: the order here is the order the public lightbox
+                  steps through. */}
+              <ImageGallery
+                label="Gallery images"
+                span="full"
+                hint="Shown as a grid on the event detail page, below the content. Visitors click a photo to open it full size — this order is the order they page through."
+                ratio="card"
+                max={GALLERY_MAX}
+                reorderable
+                value={form.gallery}
+                onChange={(gallery) => setForm((f) => ({ ...f, gallery }))}
+              />
 
               <TextArea
                 label="Excerpt (card summary)"

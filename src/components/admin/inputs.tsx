@@ -1,8 +1,16 @@
 "use client";
 
-import { useState, useRef, useEffect, useId, type ReactNode } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  useId,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import {
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   Plus,
   Trash2,
@@ -73,7 +81,10 @@ function validateDocumentFile(file: File): string | null {
    Every control below renders inside a `Field` wrapper. When that wrapper is a
    direct child of a `FormGrid`, its `span` decides how much of the 12-column
    row it takes; outside a grid the class is inert and the field stacks as
-   before. See the `.admin-form-grid` block in admin.css. */
+   before. Single-line controls (text, number, select) are also marked
+   `inline`: in a narrow container they keep sharing a line with their
+   neighbours instead of each taking a full row. See the `.admin-form-grid`
+   block in admin.css. */
 
 export type FieldSpan = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | "full";
 
@@ -116,6 +127,12 @@ interface FieldProps {
   htmlFor?: string;
   /** Columns of a parent `FormGrid` this field occupies. */
   span?: FieldSpan;
+  /**
+   * A single-line control (a short input, a select, a checkbox): in a narrow
+   * container it may share a line with its neighbours rather than take a full
+   * row. Leave unset for anything tall or wide — text areas, lists, uploads.
+   */
+  inline?: boolean;
   className?: string;
   children: ReactNode;
 }
@@ -126,11 +143,16 @@ export function Field({
   hint,
   htmlFor,
   span,
+  inline,
   className = "",
   children,
 }: FieldProps) {
   return (
-    <div className={`mb-4 ${colClass(span)} ${className}`.trim()}>
+    <div
+      className={`admin-field mb-4 ${colClass(span)} ${inline ? "admin-field-inline" : ""} ${className}`
+        .replace(/\s+/g, " ")
+        .trim()}
+    >
       {label && (
         <label className="admin-label" htmlFor={htmlFor}>
           {label}
@@ -145,13 +167,26 @@ export function Field({
   );
 }
 
+// A date-and-time picker needs ~13rem to show its value at all, more than a
+// narrow line's minimum, so it keeps a row of its own there.
+const WIDE_INPUT_TYPES = new Set(["datetime-local"]);
+
 interface TextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   hint?: string;
   span?: FieldSpan;
+  /** Defaults to true — see `Field`. Pass false for a value that needs room. */
+  inline?: boolean;
 }
 
-export function TextInput({ label, hint, span, id, ...props }: TextInputProps) {
+export function TextInput({
+  label,
+  hint,
+  span,
+  inline,
+  id,
+  ...props
+}: TextInputProps) {
   const generatedId = useId();
   const fieldId = id ?? generatedId;
   return (
@@ -161,6 +196,7 @@ export function TextInput({ label, hint, span, id, ...props }: TextInputProps) {
       hint={hint}
       htmlFor={fieldId}
       span={span}
+      inline={inline ?? !WIDE_INPUT_TYPES.has(props.type ?? "")}
     >
       <input id={fieldId} className="admin-input" {...props} />
     </Field>
@@ -189,6 +225,7 @@ export function NumberInput({
       hint={hint}
       htmlFor={fieldId}
       span={span}
+      inline
     >
       <input type="number" id={fieldId} className="admin-input" {...props} />
     </Field>
@@ -241,6 +278,7 @@ export function Select({
       hint={hint}
       htmlFor={fieldId}
       span={span}
+      inline
     >
       <select id={fieldId} className="admin-select" {...props}>
         {options.map((o) => (
@@ -276,12 +314,14 @@ export function StringList({
   if (columns) {
     return (
       <Field label={label} hint={hint} span={span}>
+        {/* Short entries (tags, equipment) flow several to a line at any width. */}
         <div className="admin-form-grid admin-form-grid--tight">
           {values.map((v, i) => (
-            <div key={i} className="admin-col-4 flex gap-2">
+            <div key={i} className="admin-field-inline admin-col-4 flex gap-2">
               <input
                 className="admin-input"
                 value={v}
+                aria-label={`${label} ${i + 1}`}
                 placeholder={placeholder}
                 onChange={(e) => {
                   const next = [...values];
@@ -320,6 +360,7 @@ export function StringList({
             <input
               className="admin-input"
               value={v}
+              aria-label={`${label} ${i + 1}`}
               placeholder={placeholder}
               onChange={(e) => {
                 const next = [...values];
@@ -331,6 +372,7 @@ export function StringList({
               type="button"
               onClick={() => onChange(values.filter((_, j) => j !== i))}
               className="admin-btn admin-btn-danger admin-btn-sm shrink-0"
+              aria-label="Remove item"
             >
               <Trash2 size={14} />
             </button>
@@ -423,23 +465,22 @@ function readNaturalSize(
   });
 }
 
-export function ImageUploadInput({
-  label,
-  value,
-  onChange,
-  hint,
-  hideUrlField,
-  ratio = "auto",
-  span,
-}: ImageUploadInputProps) {
+/**
+ * Upload, replace and remove for one image value, shared by the image field
+ * and the gallery tile so both follow the same deferred-upload contract.
+ * `fileInput` must be rendered; `pick()` opens it.
+ */
+function useImageUpload(
+  value: string,
+  onChange: (url: string) => void,
+  ratioType: RatioType,
+) {
   const deferred = useDeferredUploadsOptional();
   const [uploading, setUploading] = useState(false);
   const [imgError, onImgError] = useImageError(value);
   const [uploadError, setUploadError] = useState<string | null>(null);
-  const [ratioType, setRatioType] = useState<RatioType>(ratio);
   const [meta, setMeta] = useState<PreviewMeta | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const selectId = useId();
 
   const rule = IMAGE_RATIOS[ratioType];
 
@@ -534,10 +575,10 @@ export function ImageUploadInput({
     if (fileRef.current) fileRef.current.value = "";
   };
 
-  const handleRemove = () => {
+  /** Forget a picked-but-unsaved file, so its object URL is released. */
+  const cancelPending = () => {
     if (value.startsWith("pending:") && deferred) deferred.cancel(value);
     setMeta(null);
-    onChange("");
   };
 
   const getPreviewUrl = (key: string): string => {
@@ -550,62 +591,142 @@ export function ImageUploadInput({
     return `/api/admin/images/serve/${key}`;
   };
 
-  const isPending = deferred && value.startsWith("pending:");
-  // A pending key whose object URL is already gone (flushed, or cancelled from
-  // elsewhere) resolves to "". Passing that to `src` makes the browser
-  // re-request the current page, so it counts as "no preview".
-  const previewUrl = getPreviewUrl(value);
-  // The preview frame mirrors how the public site renders this ratio, so what
-  // the editor sees here is what ships.
-  const previewFrame = rule.aspectClass
-    ? `w-48 ${rule.aspectClass}`
-    : "h-28 w-48";
-  const previewFit =
-    rule.fit === "contain" || rule.height === null
-      ? "object-contain"
-      : "object-cover";
+  return {
+    rule,
+    meta,
+    uploading,
+    uploadError,
+    imgError,
+    onImgError,
+    isPending: !!deferred && value.startsWith("pending:"),
+    // A pending key whose object URL is already gone (flushed, or cancelled
+    // from elsewhere) resolves to "". Passing that to `src` makes the browser
+    // re-request the current page, so it counts as "no preview".
+    previewUrl: getPreviewUrl(value),
+    fit:
+      rule.fit === "contain" || rule.height === null
+        ? "object-contain"
+        : "object-cover",
+    cancelPending,
+    remove: () => {
+      cancelPending();
+      onChange("");
+    },
+    pick: () => fileRef.current?.click(),
+    fileInput: (
+      <input
+        type="file"
+        ref={fileRef}
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileChange}
+      />
+    ),
+  };
+}
+
+/**
+ * Preview frame per ratio, sized by height: by width, a portrait headshot ran
+ * to 256px tall and a banner left no room beside it for the controls. The
+ * aspect still mirrors how the public site renders the ratio.
+ */
+const PREVIEW_FRAME: Record<RatioType, string> = {
+  auto: "h-28 w-44",
+  hero: "h-24 aspect-video",
+  card: "h-28 aspect-[4/3]",
+  square: "h-28 aspect-square",
+  portrait: "h-32 aspect-[3/4]",
+};
+
+function UploadError({ message }: { message: string | null }) {
+  if (!message) return null;
+  return (
+    <p className="flex items-start gap-1 text-xs text-[var(--admin-danger)]">
+      <AlertCircle size={12} className="mt-0.5 shrink-0" />
+      <span>{message}</span>
+    </p>
+  );
+}
+
+export function ImageUploadInput({
+  label,
+  value,
+  onChange,
+  hint,
+  hideUrlField,
+  ratio = "auto",
+  span,
+}: ImageUploadInputProps) {
+  const [ratioType, setRatioType] = useState<RatioType>(ratio);
+  const selectId = useId();
+  const up = useImageUpload(value, onChange, ratioType);
+  const { rule, meta } = up;
   const staleRatio = meta !== null && meta.ratioType !== ratioType;
+
+  const uploadButton = (
+    <button
+      type="button"
+      onClick={up.pick}
+      disabled={up.uploading}
+      className="admin-btn admin-btn-outline admin-btn-sm shrink-0"
+    >
+      {up.uploading ? (
+        <Loader2 size={14} className="animate-spin" />
+      ) : (
+        <Upload size={14} />
+      )}
+      {up.uploading
+        ? "Uploading…"
+        : hideUrlField
+          ? value
+            ? "Replace Image"
+            : "Upload Image"
+          : "Upload"}
+    </button>
+  );
 
   return (
     <Field label={label} hint={hint} span={span}>
+      {up.fileInput}
       {/* Preview beside the controls rather than above them — stacked, a single
           image field ran to ~320px of vertical space on its own. */}
       <div className="flex flex-wrap items-start gap-3">
         {value && (
-          <div className="shrink-0 space-y-1">
+          <div className="max-w-[11rem] shrink-0 space-y-1">
             <div
-              className={`relative overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-sunken)] ${previewFrame}`}
+              className={`relative overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-sunken)] ${PREVIEW_FRAME[ratioType]}`}
             >
-              {imgError || !previewUrl ? (
+              {up.imgError || !up.previewUrl ? (
                 <span className="flex h-full w-full items-center justify-center text-xs text-[var(--admin-text-faint)]">
                   No preview
                 </span>
               ) : (
                 // eslint-disable-next-line @next/next/no-img-element -- a deferred upload's preview is a local blob: URL, which /_next/image cannot fetch or optimize.
                 <img
-                  src={previewUrl}
+                  src={up.previewUrl}
                   alt=""
-                  className={`h-full w-full ${previewFit}`}
-                  onError={onImgError}
+                  className={`h-full w-full ${up.fit}`}
+                  onError={up.onImgError}
                 />
               )}
-              {isPending && (
-                <span className="absolute bottom-1 left-1 rounded bg-amber-500 px-1 py-0.5 text-[10px] font-semibold text-white">
+              {up.isPending && (
+                <span className="absolute bottom-1 left-1 rounded bg-[var(--admin-draft)] px-1 py-0.5 text-[10px] font-semibold text-[var(--admin-text-inverse)]">
                   Pending
                 </span>
               )}
               <button
                 type="button"
-                onClick={handleRemove}
+                onClick={up.remove}
                 className="admin-btn admin-btn-danger admin-btn-sm absolute top-1 right-1"
                 style={{ padding: "0.2rem 0.4rem" }}
                 title="Remove image"
+                aria-label="Remove image"
               >
                 <Trash2 size={12} />
               </button>
             </div>
             {meta && (
-              <p className="w-48 text-[11px] leading-tight text-[var(--admin-text-muted)]">
+              <p className="text-[11px] leading-tight text-[var(--admin-text-muted)]">
                 {meta.width && meta.height ? (
                   <span className="font-medium text-[var(--admin-text-secondary)]">
                     {meta.width} × {meta.height}
@@ -622,73 +743,36 @@ export function ImageUploadInput({
           </div>
         )}
 
-        <div className="min-w-[16rem] flex-1 space-y-2">
-          <input
-            type="file"
-            ref={fileRef}
-            accept="image/*"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-
-          {hideUrlField ? (
-            <button
-              type="button"
-              onClick={() => fileRef.current?.click()}
-              disabled={uploading}
-              className="admin-btn admin-btn-outline admin-btn-sm"
-            >
-              {uploading ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <Upload size={14} />
-              )}
-              {uploading
-                ? "Uploading…"
-                : value
-                  ? "Replace Image"
-                  : "Upload Image"}
-            </button>
-          ) : (
+        <div className="min-w-[12rem] flex-1 space-y-2">
+          {!hideUrlField && (
             <div className="flex gap-2">
               <input
                 className="admin-input min-w-0 flex-1"
-                value={isPending ? "" : value}
-                readOnly={!!isPending}
+                value={up.isPending ? "" : value}
+                readOnly={up.isPending}
                 onChange={(e) => onChange(e.target.value)}
+                aria-label={label ? `${label} URL` : "Image URL"}
                 placeholder={
-                  isPending
+                  up.isPending
                     ? "Pending upload — save to confirm"
                     : "Paste URL or upload a file"
                 }
               />
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                disabled={uploading}
-                className="admin-btn admin-btn-outline admin-btn-sm shrink-0"
-              >
-                {uploading ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <Upload size={14} />
-                )}
-                {uploading ? "…" : "Upload"}
-              </button>
+              {uploadButton}
             </div>
           )}
 
-          <div className="flex flex-wrap items-start gap-2">
-            <div className="min-w-[12rem] flex-1">
-              <label
-                htmlFor={selectId}
-                className="mb-1 block text-[11px] font-medium text-[var(--admin-text-secondary)]"
-              >
-                Image ratio
-              </label>
+          {/* The upload button and the crop it applies share one line. */}
+          <div className="flex flex-wrap items-center gap-2">
+            {hideUrlField && uploadButton}
+            <label
+              htmlFor={selectId}
+              className="flex min-w-[10rem] flex-1 items-center gap-2 text-[11px] font-medium text-[var(--admin-text-secondary)]"
+            >
+              Ratio
               <select
                 id={selectId}
-                className="admin-select"
+                className="admin-select min-w-0 flex-1"
                 value={ratioType}
                 onChange={(e) => setRatioType(e.target.value as RatioType)}
               >
@@ -704,34 +788,260 @@ export function ImageUploadInput({
                   );
                 })}
               </select>
-            </div>
-            <p className="min-w-[12rem] flex-1 pt-4 text-[11px] leading-tight text-[var(--admin-text-muted)]">
-              {rule.height !== null && (
-                <>
-                  <span className="font-medium text-[var(--admin-text-secondary)]">
-                    Required:
-                  </span>{" "}
-                  {rule.ratio} — at least {rule.width}×{rule.height}px
-                </>
-              )}
-              <span className="block">{rule.hint}</span>
-              {staleRatio && (
-                <span className="block text-[var(--admin-warning)]">
-                  Ratio changed — re-upload to apply it to this image.
-                </span>
-              )}
-            </p>
+            </label>
           </div>
 
-          {uploadError && (
-            <p className="flex items-start gap-1 text-xs text-[var(--admin-danger)]">
-              <AlertCircle size={12} className="mt-0.5 shrink-0" />
-              <span>{uploadError}</span>
-            </p>
-          )}
+          <p className="text-[11px] leading-tight text-[var(--admin-text-muted)]">
+            {rule.height !== null && (
+              <>
+                <span className="font-medium text-[var(--admin-text-secondary)]">
+                  Required:
+                </span>{" "}
+                {rule.ratio}, at least {rule.width}×{rule.height}px.{" "}
+              </>
+            )}
+            {rule.hint}
+            {staleRatio && (
+              <span className="block text-[var(--admin-warning)]">
+                Ratio changed — re-upload to apply it to this image.
+              </span>
+            )}
+          </p>
+
+          <UploadError message={up.uploadError} />
         </div>
       </div>
     </Field>
+  );
+}
+
+/**
+ * One photo of a gallery: a thumbnail with Replace under it and a remove
+ * control on it. The gallery chooses the crop once for every photo, so a tile
+ * carries no ratio picker or hint text of its own — that is what made a
+ * twelve-photo gallery a twelve-screen form. With an empty `value` and no
+ * `onRemove` it is the gallery's "add a photo" tile.
+ */
+export function ImageTile({
+  label,
+  value,
+  onChange,
+  onRemove,
+  onMoveEarlier,
+  onMoveLater,
+  ratio = "auto",
+}: {
+  /** Accessible name, e.g. "Photo 3". */
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+  /** Drops the photo's slot. Omit for the add tile. */
+  onRemove?: () => void;
+  /** Reorder arrows, drawn on the thumbnail's bottom corners when given. */
+  onMoveEarlier?: () => void;
+  onMoveLater?: () => void;
+  ratio?: RatioType;
+}) {
+  const up = useImageUpload(value, onChange, ratio);
+  return (
+    <div className="space-y-1">
+      {up.fileInput}
+      {value ? (
+        <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-sunken)]">
+          {up.imgError || !up.previewUrl ? (
+            <span className="flex h-full w-full items-center justify-center text-xs text-[var(--admin-text-faint)]">
+              No preview
+            </span>
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element -- a deferred upload's preview is a local blob: URL, which /_next/image cannot fetch or optimize.
+            <img
+              src={up.previewUrl}
+              alt=""
+              className={`h-full w-full ${up.fit}`}
+              onError={up.onImgError}
+            />
+          )}
+          {up.isPending && (
+            <span className="absolute top-1 left-1 rounded bg-[var(--admin-draft)] px-1 py-0.5 text-[10px] font-semibold text-[var(--admin-text-inverse)]">
+              Pending
+            </span>
+          )}
+          {onRemove && (
+            <button
+              type="button"
+              onClick={() => {
+                up.cancelPending();
+                onRemove();
+              }}
+              className="admin-btn admin-btn-danger admin-btn-sm absolute top-1 right-1"
+              style={{ padding: "0.2rem 0.4rem" }}
+              aria-label={`Remove ${label}`}
+              title="Remove"
+            >
+              <Trash2 size={12} />
+            </button>
+          )}
+          {/* Order matters where a lightbox pages through the photos. */}
+          {onMoveEarlier && (
+            <button
+              type="button"
+              onClick={onMoveEarlier}
+              className="admin-btn admin-btn-outline admin-btn-sm absolute bottom-1 left-1"
+              style={{ padding: "0.2rem 0.3rem" }}
+              aria-label={`Move ${label} earlier`}
+              title="Move earlier"
+            >
+              <ChevronLeft size={13} />
+            </button>
+          )}
+          {onMoveLater && (
+            <button
+              type="button"
+              onClick={onMoveLater}
+              className="admin-btn admin-btn-outline admin-btn-sm absolute right-1 bottom-1"
+              style={{ padding: "0.2rem 0.3rem" }}
+              aria-label={`Move ${label} later`}
+              title="Move later"
+            >
+              <ChevronRight size={13} />
+            </button>
+          )}
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={up.pick}
+          disabled={up.uploading}
+          className="flex aspect-[4/3] w-full flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-[var(--admin-border-control)] bg-[var(--admin-raised)] text-xs font-medium text-[var(--admin-text-secondary)] hover:bg-[var(--admin-hover)]"
+          aria-label={`Upload ${label}`}
+        >
+          {up.uploading ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : onRemove ? (
+            <Upload size={16} />
+          ) : (
+            <Plus size={16} />
+          )}
+          {up.uploading ? "Uploading…" : onRemove ? "Upload" : "Add photo"}
+        </button>
+      )}
+      {value && (
+        <button
+          type="button"
+          onClick={up.pick}
+          disabled={up.uploading}
+          className="admin-btn admin-btn-ghost admin-btn-sm w-full justify-center"
+          aria-label={`Replace ${label}`}
+        >
+          {up.uploading ? (
+            <Loader2 size={13} className="animate-spin" />
+          ) : (
+            <Upload size={13} />
+          )}
+          {up.uploading ? "Uploading…" : "Replace"}
+        </button>
+      )}
+      <UploadError message={up.uploadError} />
+    </div>
+  );
+}
+
+/**
+ * A list of photos as a grid of thumbnails, ending in an "Add photo" tile.
+ * Several to a line at any width; the crop is picked once for the gallery.
+ */
+export function ImageGallery({
+  label,
+  hint,
+  value,
+  onChange,
+  max = 12,
+  ratio = "auto",
+  span,
+  reorderable,
+}: {
+  label: string;
+  hint?: string;
+  value: string[];
+  onChange: (next: string[]) => void;
+  max?: number;
+  /** Default crop for new photos; the editor can change it here. */
+  ratio?: RatioType;
+  span?: FieldSpan;
+  /** Earlier/later arrows on each photo, for a gallery whose order shows. */
+  reorderable?: boolean;
+}) {
+  const [ratioType, setRatioType] = useState<RatioType>(ratio);
+  const ratioId = useId();
+  const list = Array.isArray(value) ? value : [];
+  const move = (from: number, to: number) => {
+    const next = [...list];
+    [next[from], next[to]] = [next[to], next[from]];
+    onChange(next);
+  };
+  return (
+    <div className={`mb-4 ${colClass(span)}`.trim()}>
+      <div className="mb-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+        {label && <span className="admin-label mb-0">{label}</span>}
+        <span className="flex items-center gap-2 text-xs text-[var(--admin-text-faint)]">
+          <label htmlFor={ratioId} className="sr-only">
+            Crop for new photos
+          </label>
+          <select
+            id={ratioId}
+            className="admin-select admin-select--compact"
+            value={ratioType}
+            onChange={(e) => setRatioType(e.target.value as RatioType)}
+            title="Crop for new photos"
+          >
+            {RATIO_TYPES.map((key) => (
+              <option key={key} value={key}>
+                {IMAGE_RATIOS[key].label}
+              </option>
+            ))}
+          </select>
+          <span className="tabular-nums">
+            {list.length} / {max}
+          </span>
+        </span>
+      </div>
+      {hint && <p className="admin-help mb-2">{hint}</p>}
+      <div className="admin-tile-grid">
+        {list.map((src, j) => (
+          <ImageTile
+            key={j}
+            label={`photo ${j + 1}`}
+            value={src}
+            ratio={ratioType}
+            // Clearing a photo drops its slot rather than leaving a gap.
+            onChange={(v) =>
+              onChange(
+                v
+                  ? list.map((x, k) => (k === j ? v : x))
+                  : list.filter((_, k) => k !== j),
+              )
+            }
+            onRemove={() => onChange(list.filter((_, k) => k !== j))}
+            onMoveEarlier={
+              reorderable && j > 0 ? () => move(j, j - 1) : undefined
+            }
+            onMoveLater={
+              reorderable && j < list.length - 1
+                ? () => move(j, j + 1)
+                : undefined
+            }
+          />
+        ))}
+        {list.length < max && (
+          <ImageTile
+            label="a new photo"
+            value=""
+            ratio={ratioType}
+            onChange={(v) => v && onChange([...list, v])}
+          />
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -893,7 +1203,7 @@ export function DocumentUploadInput({
               {displayName || value}
             </span>
             {isPending && (
-              <span className="shrink-0 rounded bg-amber-500 px-1 py-0.5 text-[10px] font-semibold text-white">
+              <span className="shrink-0 rounded bg-[var(--admin-draft)] px-1 py-0.5 text-[10px] font-semibold text-[var(--admin-text-inverse)]">
                 Pending
               </span>
             )}
@@ -965,69 +1275,207 @@ export type FieldDef = {
   max?: number;
 };
 
-/** A repeatable photo list inside an ItemsEditor card. */
-function ImagesField({
-  label,
-  hint,
-  value,
-  max,
-  onChange,
+/**
+ * One entry of a repeated list: a bordered card with its remove control in the
+ * top-right corner, level with the first row of labels. The button comes after
+ * the fields in the DOM so Tab reaches the fields first.
+ */
+export function ItemCard({
+  onRemove,
+  removeLabel = "Remove",
+  span,
+  className = "",
+  children,
 }: {
-  label: string;
-  hint?: string;
-  value: string[];
-  max: number;
-  onChange: (next: string[]) => void;
+  onRemove?: () => void;
+  /** Accessible name of the remove button, e.g. "Remove stat 2". */
+  removeLabel?: string;
+  /** Width of the card on a parent FormGrid row. */
+  span?: FieldSpan;
+  className?: string;
+  children: ReactNode;
 }) {
   return (
-    <div>
-      <div className="mb-1 flex items-center justify-between gap-2">
-        <span className="admin-label mb-0">{label}</span>
-        <span className="text-xs text-[var(--admin-text-faint)]">
-          {value.length} / {max}
-        </span>
-      </div>
-      {hint && <p className="admin-help mb-2">{hint}</p>}
-      {value.length > 0 && (
-        <div className="admin-form-grid admin-form-grid--tight mb-2">
-          {value.map((src, j) => (
-            <div key={j} className="admin-col-4 relative">
-              <ImageUploadInput
-                label=""
-                value={src}
-                // Clearing a photo drops its slot rather than leaving a gap.
-                onChange={(v) =>
-                  onChange(
-                    v
-                      ? value.map((x, k) => (k === j ? v : x))
-                      : value.filter((_, k) => k !== j),
-                  )
-                }
-                hideUrlField
-              />
-              <button
-                type="button"
-                onClick={() => onChange(value.filter((_, k) => k !== j))}
-                aria-label={`Remove photo ${j + 1}`}
-                className="admin-btn admin-btn-danger admin-btn-sm absolute top-1 right-1"
-              >
-                <Trash2 size={12} />
-              </button>
-            </div>
-          ))}
-        </div>
+    <div
+      className={`admin-item-card ${colClass(span)} ${className}`
+        .replace(/\s+/g, " ")
+        .trim()}
+    >
+      {children}
+      {onRemove && (
+        <button
+          type="button"
+          onClick={onRemove}
+          className="admin-item-remove"
+          aria-label={removeLabel}
+          title={removeLabel}
+        >
+          <Trash2 size={14} />
+        </button>
       )}
-      <button
-        type="button"
-        disabled={value.length >= max}
-        onClick={() => onChange([...value, ""])}
-        className="admin-btn admin-btn-outline admin-btn-sm disabled:opacity-50"
-      >
-        <Plus size={13} /> Add photo
-      </button>
     </div>
   );
 }
+
+export type RowColumn = {
+  key: string;
+  label: string;
+  /** Share of the line relative to the other columns. Defaults to 1. */
+  weight?: number;
+  type?: "text" | "number" | "checkbox";
+  placeholder?: string;
+  maxLength?: number;
+};
+
+/**
+ * A list whose entries are a few short values, edited as a small table: the
+ * column labels once on top, then one line per entry with its delete button
+ * at the end. A stat, a quick fact or a phone number is one line here rather
+ * than a card of stacked fields; on a container too narrow for the columns
+ * each line falls back to a card with its own labels (admin.css).
+ */
+export function RowsEditor({
+  items,
+  onChange,
+  columns,
+  newItem,
+  addLabel = "Add row",
+  max,
+}: {
+  items: Record<string, unknown>[];
+  onChange: (next: Record<string, unknown>[]) => void;
+  columns: RowColumn[];
+  newItem: () => Record<string, unknown>;
+  addLabel?: string;
+  /** Most entries allowed: Add disables there and the count is shown. */
+  max?: number;
+}) {
+  const baseId = useId();
+  const atMax = max !== undefined && items.length >= max;
+  const set = (i: number, key: string, val: unknown) =>
+    onChange(items.map((it, j) => (j === i ? { ...it, [key]: val } : it)));
+  // Checkboxes take only the width of their label; the text columns share
+  // the rest by weight. `data-cols` counts the text columns, which decide
+  // when the line is too narrow to stay a line.
+  const template = columns
+    .map((c) =>
+      c.type === "checkbox" ? "max-content" : `minmax(0, ${c.weight ?? 1}fr)`,
+    )
+    .join(" ");
+  const textColumns = columns.filter((c) => c.type !== "checkbox").length;
+
+  return (
+    <div
+      className="admin-rows"
+      data-cols={textColumns}
+      style={{ "--admin-rows-cols": template } as CSSProperties}
+    >
+      {items.length > 0 && (
+        <div className="admin-rows-head" aria-hidden="true">
+          {columns.map((c) => (
+            <span key={c.key} className="truncate">
+              {c.label}
+            </span>
+          ))}
+          <span />
+        </div>
+      )}
+      <div className="admin-rows-body">
+        {items.map((item, i) => (
+          <div key={i} className="admin-rows-row">
+            {columns.map((c) => {
+              const fieldId = `${baseId}-${i}-${c.key}`;
+              if (c.type === "checkbox") {
+                return (
+                  <label
+                    key={c.key}
+                    htmlFor={fieldId}
+                    className="admin-rows-cell admin-rows-check"
+                  >
+                    <input
+                      type="checkbox"
+                      id={fieldId}
+                      checked={Boolean(item[c.key])}
+                      onChange={(e) => set(i, c.key, e.target.checked)}
+                      aria-label={`${c.label} ${i + 1}`}
+                    />
+                    <span className="admin-rows-label">{c.label}</span>
+                  </label>
+                );
+              }
+              return (
+                <div key={c.key} className="admin-rows-cell">
+                  <label htmlFor={fieldId} className="admin-rows-label">
+                    {c.label}
+                  </label>
+                  <input
+                    type={c.type === "number" ? "number" : "text"}
+                    id={fieldId}
+                    className="admin-input"
+                    aria-label={`${c.label} ${i + 1}`}
+                    value={String(item[c.key] ?? "")}
+                    maxLength={c.maxLength}
+                    placeholder={c.placeholder}
+                    onChange={(e) =>
+                      set(
+                        i,
+                        c.key,
+                        c.type === "number"
+                          ? Number(e.target.value)
+                          : e.target.value,
+                      )
+                    }
+                  />
+                </div>
+              );
+            })}
+            <button
+              type="button"
+              onClick={() => onChange(items.filter((_, j) => j !== i))}
+              className="admin-item-remove"
+              aria-label={`Remove row ${i + 1}`}
+              title="Remove"
+            >
+              <Trash2 size={14} />
+            </button>
+          </div>
+        ))}
+        {items.length === 0 && (
+          <p className="admin-rows-empty">Nothing added yet.</p>
+        )}
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => onChange([...items, newItem()])}
+            disabled={atMax}
+            title={atMax ? `At most ${max}` : undefined}
+            className="admin-btn admin-btn-outline admin-btn-sm flex-1 justify-center disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <Plus size={13} /> {addLabel}
+          </button>
+          {max !== undefined && (
+            <span
+              className={`shrink-0 text-xs tabular-nums ${
+                atMax
+                  ? "font-medium text-[var(--admin-warning)]"
+                  : "text-[var(--admin-text-faint)]"
+              }`}
+            >
+              {items.length}/{max}
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** Field weight in a compact row, from its declared span. */
+const rowWeight = (f: FieldDef) =>
+  f.span === "full" ? 12 : (f.span ?? (f.span2 ? 12 : 6));
+
+const isPlainField = (f: FieldDef) =>
+  f.type === undefined || f.type === "text" || f.type === "number";
 
 export function ItemsEditor({
   items,
@@ -1037,6 +1485,7 @@ export function ItemsEditor({
   addLabel = "Add item",
   /** Cards per row. Repeated short items (stats, links) read better in a grid. */
   cardSpan = "full",
+  layout = "auto",
 }: {
   items: Record<string, unknown>[];
   onChange: (v: Record<string, unknown>[]) => void;
@@ -1044,57 +1493,111 @@ export function ItemsEditor({
   emptyItem: Record<string, unknown>;
   addLabel?: string;
   cardSpan?: FieldSpan;
+  /**
+   * "rows" edits each entry as one line of a small table — the column labels
+   * once on top, the fields side by side, delete at the end. "auto" picks it
+   * for two or three plain text/number fields (a label and its value, a stat)
+   * and uses one card per entry otherwise.
+   */
+  layout?: "auto" | "rows" | "cards";
 }) {
   const baseId = useId();
   const upd = (i: number, key: string, val: unknown) =>
     onChange(items.map((it, idx) => (idx === i ? { ...it, [key]: val } : it)));
   const rem = (i: number) => onChange(items.filter((_, idx) => idx !== i));
+  const read = (item: Record<string, unknown>, f: FieldDef) =>
+    String(item[f.key] ?? "");
+  const write = (i: number, f: FieldDef, raw: string) =>
+    upd(i, f.key, f.type === "number" ? Number(raw) : raw);
+
+  const addButton = (
+    <button
+      type="button"
+      onClick={() => onChange([...items, { ...emptyItem }])}
+      className="admin-btn admin-btn-outline admin-btn-sm w-full justify-center"
+    >
+      <Plus size={13} /> {addLabel}
+    </button>
+  );
+
+  // A text area or an upload cannot sit in a one-line row, whatever is asked.
+  const rows =
+    fields.every(isPlainField) &&
+    (layout === "rows" ||
+      (layout === "auto" && fields.length >= 2 && fields.length <= 3));
+
+  if (rows) {
+    return (
+      <RowsEditor
+        items={items}
+        onChange={onChange}
+        newItem={() => ({ ...emptyItem })}
+        addLabel={addLabel}
+        columns={fields.map((f) => ({
+          key: f.key,
+          label: f.label,
+          placeholder: f.placeholder,
+          type: f.type === "number" ? "number" : "text",
+          weight: rowWeight(f),
+        }))}
+      />
+    );
+  }
 
   return (
     <div className="admin-form-grid admin-form-grid--tight">
       {items.map((item, i) => (
-        <div
+        <ItemCard
           key={i}
-          className={`rounded-lg border border-[var(--admin-border)] bg-gray-50/50 p-3 ${colClass(cardSpan)}`}
+          span={cardSpan}
+          onRemove={() => rem(i)}
+          removeLabel={`Remove item ${i + 1}`}
         >
           <div className="admin-form-grid admin-form-grid--tight">
             {fields.map((f) => {
               const fieldId = `${baseId}-${i}-${f.key}`;
               const span = f.span ?? (f.span2 ? "full" : undefined);
-              // ImageUploadInput brings its own label + preview, so it replaces
-              // the row entirely rather than sitting under a bare <label>.
+              // A photo list brings its own label, count and tiles.
               if (f.type === "images") {
                 const list = Array.isArray(item[f.key])
                   ? (item[f.key] as string[])
                   : [];
                 return (
-                  <div key={f.key} className={colClass(span)}>
-                    <ImagesField
-                      label={f.label}
-                      hint={f.placeholder}
-                      value={list}
-                      max={f.max ?? 12}
-                      onChange={(v) => upd(i, f.key, v)}
-                    />
-                  </div>
+                  <ImageGallery
+                    key={f.key}
+                    span={span}
+                    label={f.label}
+                    hint={f.placeholder}
+                    value={list}
+                    max={f.max ?? 12}
+                    ratio={f.ratio}
+                    onChange={(v) => upd(i, f.key, v)}
+                  />
                 );
               }
+              // ImageUploadInput brings its own label + preview, so it replaces
+              // the row entirely rather than sitting under a bare <label>.
               if (f.type === "image") {
                 return (
-                  <div key={f.key} className={colClass(span)}>
-                    <ImageUploadInput
-                      label={f.label}
-                      value={String(item[f.key] ?? "")}
-                      onChange={(v) => upd(i, f.key, v)}
-                      hint={f.placeholder}
-                      ratio={f.ratio}
-                      hideUrlField
-                    />
-                  </div>
+                  <ImageUploadInput
+                    key={f.key}
+                    span={span}
+                    label={f.label}
+                    value={read(item, f)}
+                    onChange={(v) => upd(i, f.key, v)}
+                    hint={f.placeholder}
+                    ratio={f.ratio}
+                    hideUrlField
+                  />
                 );
               }
               return (
-                <div key={f.key} className={colClass(span)}>
+                <div
+                  key={f.key}
+                  className={`${colClass(span)} ${
+                    f.type === "textarea" ? "" : "admin-field-inline"
+                  }`.trim()}
+                >
                   <label className="admin-label" htmlFor={fieldId}>
                     {f.label}
                   </label>
@@ -1103,7 +1606,7 @@ export function ItemsEditor({
                       id={fieldId}
                       className="admin-textarea"
                       rows={f.rows ?? 2}
-                      value={String(item[f.key] ?? "")}
+                      value={read(item, f)}
                       onChange={(e) => upd(i, f.key, e.target.value)}
                       placeholder={f.placeholder}
                     />
@@ -1112,16 +1615,8 @@ export function ItemsEditor({
                       type={f.type === "number" ? "number" : "text"}
                       id={fieldId}
                       className="admin-input"
-                      value={String(item[f.key] ?? "")}
-                      onChange={(e) =>
-                        upd(
-                          i,
-                          f.key,
-                          f.type === "number"
-                            ? Number(e.target.value)
-                            : e.target.value,
-                        )
-                      }
+                      value={read(item, f)}
+                      onChange={(e) => write(i, f, e.target.value)}
                       placeholder={f.placeholder}
                     />
                   )}
@@ -1129,24 +1624,9 @@ export function ItemsEditor({
               );
             })}
           </div>
-          <button
-            type="button"
-            onClick={() => rem(i)}
-            className="admin-btn admin-btn-danger admin-btn-sm mt-2"
-          >
-            <Trash2 size={12} /> Remove
-          </button>
-        </div>
+        </ItemCard>
       ))}
-      <div className="admin-col-full">
-        <button
-          type="button"
-          onClick={() => onChange([...items, { ...emptyItem }])}
-          className="admin-btn admin-btn-outline admin-btn-sm w-full justify-center"
-        >
-          <Plus size={13} /> {addLabel}
-        </button>
-      </div>
+      <div className="admin-col-full">{addButton}</div>
     </div>
   );
 }
@@ -1178,9 +1658,10 @@ export function LabsEditor({
   return (
     <div className="space-y-3">
       {labs.map((lab, i) => (
-        <div
+        <ItemCard
           key={i}
-          className="rounded-lg border border-[var(--admin-border)] bg-gray-50/50 p-3"
+          onRemove={() => rem(i)}
+          removeLabel={`Remove lab ${i + 1}`}
         >
           <FormGrid tight>
             <TextInput
@@ -1204,15 +1685,14 @@ export function LabsEditor({
               onChange={(v) => upd(i, "equipment", v)}
               placeholder="Equipment / software…"
             />
-            <div className="admin-col-full">
-              <ImagesField
-                label="Photos (optional)"
-                hint="The first photo shows on the card; visitors click the card to see them all."
-                value={lab.images ?? []}
-                max={12}
-                onChange={(v) => upd(i, "images", v)}
-              />
-            </div>
+            <ImageGallery
+              label="Photos (optional)"
+              span="full"
+              hint="The first photo shows on the card; visitors click the card to see them all."
+              value={lab.images ?? []}
+              max={12}
+              onChange={(v) => upd(i, "images", v)}
+            />
             <TextArea
               label="More details (optional)"
               span="full"
@@ -1222,14 +1702,7 @@ export function LabsEditor({
               hint="Longer text shown in the popup when a visitor clicks the card."
             />
           </FormGrid>
-          <button
-            type="button"
-            onClick={() => rem(i)}
-            className="admin-btn admin-btn-danger admin-btn-sm"
-          >
-            <Trash2 size={12} /> Remove Lab
-          </button>
-        </div>
+        </ItemCard>
       ))}
       <button
         type="button"
@@ -1292,24 +1765,18 @@ export function Repeater<T>({
       {hint && <p className="admin-help mb-2">{hint}</p>}
       <div className="admin-form-grid admin-form-grid--tight">
         {items.map((item, i) => (
-          <div
+          <ItemCard
             key={i}
-            className={`relative rounded-lg border border-[var(--admin-border)] p-3 pr-12 ${colClass(itemSpan)}`}
+            span={itemSpan}
+            onRemove={() => handleRemove(i)}
+            removeLabel={`Remove item ${i + 1}`}
           >
-            <button
-              type="button"
-              onClick={() => handleRemove(i)}
-              className="admin-btn admin-btn-danger admin-btn-sm absolute top-2 right-2"
-              aria-label={`Remove item ${i + 1}`}
-            >
-              <Trash2 size={13} />
-            </button>
             {renderItem(item, i, (updated) => {
               const next = [...items];
               next[i] = updated;
               onChange(next);
             })}
-          </div>
+          </ItemCard>
         ))}
         {items.length === 0 && (
           <p className="admin-col-full rounded-lg border border-dashed border-[var(--admin-border)] p-4 text-center text-sm text-[var(--admin-text-faint)]">

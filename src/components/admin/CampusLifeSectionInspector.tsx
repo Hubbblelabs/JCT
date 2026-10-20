@@ -6,7 +6,9 @@ import {
   TextInput,
   TextArea,
   StringList,
+  ImageTile,
   ImageUploadInput,
+  ItemsEditor,
   Repeater,
 } from "@/components/admin/inputs";
 import type { CampusLifeEditableSection } from "@/components/layout/CampusLifePageLayout";
@@ -121,14 +123,14 @@ export function CampusLifeSectionInspector({
               <FormGrid tight>
                 <TextInput
                   label="Icon name"
-                  span="full"
+                  span={5}
                   placeholder="Users, Star, Zap…"
                   value={feat.icon}
                   onChange={(e) => update({ ...feat, icon: e.target.value })}
                 />
                 <TextInput
                   label="Title"
-                  span="full"
+                  span={7}
                   value={feat.title}
                   onChange={(e) => update({ ...feat, title: e.target.value })}
                 />
@@ -305,30 +307,25 @@ export function CampusLifeSectionInspector({
             onChange={(e) => patch({ sports: { ...sp, body: e.target.value } })}
           />
 
-          <Repeater<SportStat>
-            label="Stats (max 6)"
-            span={5}
-            itemSpan={6}
-            items={sp.stats}
-            onChange={(stats) => patch({ sports: { ...sp, stats } })}
-            newItem={() => ({ label: "", val: "" })}
-            renderItem={(stat, _i, update) => (
-              <FormGrid tight>
-                <TextInput
-                  label="Value"
-                  span="full"
-                  value={stat.val}
-                  onChange={(e) => update({ ...stat, val: e.target.value })}
-                />
-                <TextInput
-                  label="Label"
-                  span="full"
-                  value={stat.label}
-                  onChange={(e) => update({ ...stat, label: e.target.value })}
-                />
-              </FormGrid>
-            )}
-          />
+          <Field label="Stats (max 6)" span={5}>
+            <ItemsEditor
+              items={sp.stats as unknown as Record<string, unknown>[]}
+              onChange={(v) =>
+                patch({ sports: { ...sp, stats: v as unknown as SportStat[] } })
+              }
+              fields={[
+                { key: "val", label: "Value", placeholder: "25+", span: 4 },
+                {
+                  key: "label",
+                  label: "Label",
+                  placeholder: "Sports",
+                  span: 8,
+                },
+              ]}
+              emptyItem={{ label: "", val: "" }}
+              addLabel="Add stat"
+            />
+          </Field>
 
           <Field label="Highlight Card" span={7}>
             <TextInput
@@ -348,13 +345,14 @@ export function CampusLifeSectionInspector({
             />
           </Field>
 
+          {/* Four fixed slots — the public collage places each by position —
+              shown as thumbnails, several to a line. */}
           <Field label="Gallery Images (max 4)" span="full">
-            <div className="admin-form-grid admin-form-grid--tight">
+            <div className="admin-tile-grid">
               {[0, 1, 2, 3].map((idx) => (
-                <ImageUploadInput
+                <ImageTile
                   key={idx}
-                  label={`Sports Image ${idx + 1}`}
-                  span={3}
+                  label={`sports image ${idx + 1}`}
                   ratio="card"
                   value={sp.images[idx] ?? ""}
                   onChange={(url) => {
@@ -362,7 +360,11 @@ export function CampusLifeSectionInspector({
                     next[idx] = url;
                     patch({ sports: { ...sp, images: next } });
                   }}
-                  hideUrlField
+                  onRemove={() => {
+                    const next = [...sp.images];
+                    next[idx] = "";
+                    patch({ sports: { ...sp, images: next } });
+                  }}
                 />
               ))}
             </div>
@@ -438,14 +440,14 @@ export function CampusLifeSectionInspector({
               <FormGrid tight>
                 <TextInput
                   label="Icon name"
-                  span="full"
+                  span={5}
                   placeholder="Zap, Music, Trophy…"
                   value={event.icon}
                   onChange={(e) => update({ ...event, icon: e.target.value })}
                 />
                 <TextInput
                   label="Title"
-                  span="full"
+                  span={7}
                   value={event.title}
                   onChange={(e) => update({ ...event, title: e.target.value })}
                 />

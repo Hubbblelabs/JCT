@@ -1,6 +1,13 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 import { createPortal } from "react-dom";
 import {
   ArrowLeft,
@@ -25,6 +32,73 @@ export type WorkspaceSection = {
 };
 
 const WIDE_QUERY = "(min-width: 1280px)";
+
+// The edit panel can be dragged wider (or narrower) from its left edge. The
+// preview is scaled to fit whatever is left, so giving a long form or a wide
+// table more room costs nothing but zoom. Remembered per browser.
+const PANEL_WIDTH_KEY = "jct-admin-panel-width";
+const PANEL_MIN = 380;
+const PANEL_MAX = 960;
+/** Never squeeze the preview below this. */
+const PREVIEW_MIN = 560;
+
+function clampPanel(width: number): number {
+  const max = Math.min(PANEL_MAX, window.innerWidth - PREVIEW_MIN);
+  return Math.round(Math.max(PANEL_MIN, Math.min(max, width)));
+}
+
+function usePanelWidth() {
+  const [width, setWidth] = useState<number | null>(null);
+  const [dragging, setDragging] = useState(false);
+
+  // Read on mount rather than in useState so server and client render the
+  // same markup.
+  useEffect(() => {
+    try {
+      const stored = Number(window.localStorage.getItem(PANEL_WIDTH_KEY));
+      if (stored >= PANEL_MIN && stored <= PANEL_MAX)
+        setWidth(clampPanel(stored));
+    } catch {
+      // Storage blocked: keep the stylesheet's default width.
+    }
+  }, []);
+
+  const commit = (next: number | null) => {
+    setWidth(next);
+    try {
+      if (next === null) window.localStorage.removeItem(PANEL_WIDTH_KEY);
+      else window.localStorage.setItem(PANEL_WIDTH_KEY, String(next));
+    } catch {
+      // Not remembered this time; the width still applies.
+    }
+  };
+
+  // Listeners live on the document so the pointer can leave the thin handle
+  // mid-drag without the resize stalling.
+  useEffect(() => {
+    if (!dragging) return;
+    let latest: number | null = null;
+    const onMove = (e: MouseEvent) => {
+      latest = clampPanel(window.innerWidth - e.clientX);
+      setWidth(latest);
+    };
+    const onUp = () => {
+      setDragging(false);
+      if (latest !== null) commit(latest);
+    };
+    const previous = document.body.style.userSelect;
+    document.body.style.userSelect = "none";
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", onUp);
+    return () => {
+      document.body.style.userSelect = previous;
+      document.removeEventListener("mousemove", onMove);
+      document.removeEventListener("mouseup", onUp);
+    };
+  }, [dragging]);
+
+  return { width, dragging, startDrag: () => setDragging(true), commit };
+}
 
 function useIsWide(): boolean {
   const [wide, setWide] = useState(true);
@@ -147,6 +221,8 @@ export function EditorWorkspace({
   const [outlineOpen, setOutlineOpen] = useState(false);
   const scope = useId();
   const rootRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
+  const panelSize = usePanelWidth();
   const topbar = useTopbarSlot({ title, description });
 
   const current = sections.find((s) => s.id === selected);
@@ -217,7 +293,16 @@ export function EditorWorkspace({
   );
 
   return (
-    <div className="admin-workspace" ref={rootRef} data-workspace={scope}>
+    <div
+      className="admin-workspace"
+      ref={rootRef}
+      data-workspace={scope}
+      style={
+        panelSize.width
+          ? ({ "--admin-panel-w": `${panelSize.width}px` } as CSSProperties)
+          : undefined
+      }
+    >
       {topbar === undefined ? (
         <div className="admin-workspace-actions">{actions}</div>
       ) : (
@@ -253,7 +338,39 @@ export function EditorWorkspace({
         </div>
 
         {wide && (
-          <aside className="admin-workspace-panel" aria-label="Edit panel">
+          <aside
+            ref={panelRef}
+            className="admin-workspace-panel"
+            aria-label="Edit panel"
+          >
+            {/* Drag to resize; arrow keys when focused; double-click resets. */}
+            <div
+              className="admin-workspace-resize"
+              role="separator"
+              aria-orientation="vertical"
+              aria-label="Resize the edit panel"
+              aria-valuemin={PANEL_MIN}
+              aria-valuemax={PANEL_MAX}
+              aria-valuenow={panelSize.width ?? undefined}
+              tabIndex={0}
+              title="Drag to resize the panel — double-click to reset"
+              data-dragging={panelSize.dragging || undefined}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                panelSize.startDrag();
+              }}
+              onDoubleClick={() => panelSize.commit(null)}
+              onKeyDown={(e) => {
+                if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+                e.preventDefault();
+                const current =
+                  panelSize.width ?? panelRef.current?.offsetWidth ?? PANEL_MIN;
+                // The handle is the panel's left edge: left makes it wider.
+                panelSize.commit(
+                  clampPanel(current + (e.key === "ArrowLeft" ? 40 : -40)),
+                );
+              }}
+            />
             {selected && !loading ? (
               <>
                 <div className="admin-workspace-panel-head">

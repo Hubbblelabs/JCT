@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { ContentPageInspector } from "@/components/admin/ContentPageInspector";
 import {
   Field,
@@ -10,6 +10,7 @@ import {
   TextArea,
   TextAreaList,
   StringList,
+  ImageGallery,
   ImageUploadInput,
   Repeater,
 } from "@/components/admin/inputs";
@@ -46,70 +47,6 @@ const newGroup = (): GroupValue => ({
   members: [],
   activities: [],
 });
-
-/** Add/remove/replace editor for a group's event-photo gallery. */
-function GalleryEditor({
-  values,
-  onChange,
-}: {
-  values: string[];
-  onChange: (next: string[]) => void;
-}) {
-  const max = GROUPS_PAGE_LIMITS.galleryMax;
-  return (
-    <div className="admin-col-full">
-      <div className="mb-2 flex items-center justify-between gap-3">
-        <span className="admin-label mb-0">Gallery (shown in the sidebar)</span>
-        <div className="flex shrink-0 items-center gap-2">
-          <span className="text-xs font-medium text-[var(--admin-text-faint)]">
-            {values.length} / {max}
-          </span>
-          <button
-            type="button"
-            onClick={() => onChange([...values, ""])}
-            disabled={values.length >= max}
-            className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <Plus size={14} /> Add photo
-          </button>
-        </div>
-      </div>
-
-      {values.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-[var(--admin-border)] p-4 text-center text-sm text-[var(--admin-text-faint)]">
-          No gallery photos. Add up to {max}.
-        </p>
-      ) : (
-        <div className="admin-form-grid admin-form-grid--tight">
-          {values.map((url, i) => (
-            <div
-              key={i}
-              className="admin-col-4 relative rounded-lg border border-[var(--admin-border)] p-3"
-            >
-              <button
-                type="button"
-                onClick={() => onChange(values.filter((_, j) => j !== i))}
-                aria-label={`Remove photo ${i + 1}`}
-                className="admin-btn admin-btn-danger admin-btn-sm absolute top-2 right-2 z-10"
-              >
-                <Trash2 size={13} />
-              </button>
-              <ImageUploadInput
-                label={`Photo ${i + 1}`}
-                ratio="card"
-                value={url}
-                onChange={(next) =>
-                  onChange(values.map((v, j) => (j === i ? next : v)))
-                }
-                hideUrlField
-              />
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 /** Inspector title for a section key, including the per-entry `group:N` keys. */
 export function groupsSectionTitle(
@@ -324,8 +261,12 @@ function GroupFields({
         placeholder={variant === "clubs" ? "Hackathons" : "Grievance redressal"}
       />
 
-      <GalleryEditor
-        values={group.gallery ?? []}
+      <ImageGallery
+        label="Gallery (shown in the sidebar)"
+        span="full"
+        ratio="card"
+        max={GROUPS_PAGE_LIMITS.galleryMax}
+        value={group.gallery ?? []}
         onChange={(gallery) => onChange({ ...group, gallery })}
       />
 

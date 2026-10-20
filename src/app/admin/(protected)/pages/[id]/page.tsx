@@ -8,6 +8,7 @@ import {
   Field,
   FormGrid,
   ImageUploadInput,
+  ItemCard,
   TextArea,
   TextInput,
 } from "@/components/admin/inputs";
@@ -409,10 +410,11 @@ function PageEditorInner({ id }: { id: string }) {
                   onChange={(e) => setDoc({ ...doc, slug: e.target.value })}
                   hint="Lowercase letters, numbers, and dashes."
                 />
-                <Field label="Public URL" span={4}>
+                <Field label="Public URL" span={4} inline>
                   <input
                     className="admin-input"
                     value={publicPathFor(doc.institution, doc.slug)}
+                    aria-label="Public URL"
                     disabled
                   />
                 </Field>
@@ -447,9 +449,10 @@ function PageEditorInner({ id }: { id: string }) {
                     })
                   }
                 />
-                <Field label="Keywords (comma-separated)" span={8}>
+                <Field label="Keywords (comma-separated)" span={8} inline>
                   <input
                     className="admin-input"
+                    aria-label="Keywords"
                     value={(seo.keywords ?? []).join(", ")}
                     onChange={(e) =>
                       patchContent({
@@ -464,7 +467,7 @@ function PageEditorInner({ id }: { id: string }) {
                     }
                   />
                 </Field>
-                <Field label="Indexing" span={4}>
+                <Field label="Indexing" span={4} inline>
                   <label className="flex items-center gap-2 pt-2 text-sm">
                     <input
                       type="checkbox"
@@ -713,31 +716,21 @@ function PageEditorInner({ id }: { id: string }) {
                 />
                 <div className="admin-form-grid admin-form-grid--tight">
                   {galleryImages.map((img, i) => (
-                    <div
+                    <ItemCard
                       key={i}
-                      className="admin-col-4 rounded-lg border border-[var(--admin-border)] bg-white p-3"
+                      span={4}
+                      onRemove={() =>
+                        patchContent({
+                          gallery: {
+                            ...gallery,
+                            images: galleryImages.filter((_, j) => j !== i),
+                          },
+                        })
+                      }
+                      removeLabel={`Remove image ${i + 1}`}
                     >
-                      <div className="mb-2 flex items-center justify-between">
-                        <span className="text-xs font-medium text-[var(--admin-text-muted)]">
-                          Image {i + 1}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() =>
-                            patchContent({
-                              gallery: {
-                                ...gallery,
-                                images: galleryImages.filter((_, j) => j !== i),
-                              },
-                            })
-                          }
-                          className="admin-btn admin-btn-danger admin-btn-sm"
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      </div>
                       <ImageUploadInput
-                        label="Image"
+                        label={`Image ${i + 1}`}
                         ratio="card"
                         value={img.src}
                         onChange={(src) =>
@@ -755,7 +748,7 @@ function PageEditorInner({ id }: { id: string }) {
                       <FormGrid tight>
                         <TextInput
                           label="Alt Text"
-                          span="full"
+                          span={6}
                           value={img.alt ?? ""}
                           onChange={(e) =>
                             patchContent({
@@ -770,7 +763,7 @@ function PageEditorInner({ id }: { id: string }) {
                         />
                         <TextInput
                           label="Caption (optional)"
-                          span="full"
+                          span={6}
                           value={img.caption ?? ""}
                           onChange={(e) =>
                             patchContent({
@@ -786,7 +779,7 @@ function PageEditorInner({ id }: { id: string }) {
                           }
                         />
                       </FormGrid>
-                    </div>
+                    </ItemCard>
                   ))}
                   <button
                     type="button"

@@ -5,6 +5,7 @@ import {
   Field,
   FormGrid,
   ImageUploadInput,
+  ItemCard,
   Select,
   TextArea,
   TextInput,
@@ -175,7 +176,10 @@ function SectionEditor({
           </label>
           <div className="admin-form-grid admin-form-grid--tight">
             {section.items.map((it, i) => (
-              <div key={i} className="admin-col-4 flex items-center gap-2">
+              <div
+                key={i}
+                className="admin-field-inline admin-col-4 flex items-center gap-2"
+              >
                 <input
                   className="admin-input"
                   value={it}
@@ -236,31 +240,22 @@ function SectionEditor({
           />
           <div className="admin-form-grid admin-form-grid--tight">
             {section.items.map((card, i) => (
-              <div
+              <ItemCard
                 key={i}
-                className="admin-col-4 rounded-lg border border-[var(--admin-border)] bg-white p-3"
+                span={4}
+                className="admin-item-card--raised"
+                onRemove={() =>
+                  onChange({
+                    ...section,
+                    items: section.items.filter((_, j) => j !== i),
+                  })
+                }
+                removeLabel={`Remove card ${i + 1}`}
               >
-                <div className="mb-2 flex items-center justify-between">
-                  <span className="text-xs font-medium text-[var(--admin-text-muted)]">
-                    Card {i + 1}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      onChange({
-                        ...section,
-                        items: section.items.filter((_, j) => j !== i),
-                      })
-                    }
-                    className="admin-btn admin-btn-danger admin-btn-sm"
-                  >
-                    <Trash2 size={12} />
-                  </button>
-                </div>
                 <FormGrid tight>
                   <TextInput
-                    label="Title"
-                    span="full"
+                    label={`Card ${i + 1} title`}
+                    span={6}
                     value={card.title}
                     onChange={(e) =>
                       onChange({
@@ -273,7 +268,7 @@ function SectionEditor({
                   />
                   <TextInput
                     label="Link URL (optional)"
-                    span="full"
+                    span={6}
                     value={card.href ?? ""}
                     onChange={(e) =>
                       onChange({
@@ -314,7 +309,7 @@ function SectionEditor({
                     hideUrlField
                   />
                 </FormGrid>
-              </div>
+              </ItemCard>
             ))}
             <button
               type="button"
@@ -335,6 +330,7 @@ function SectionEditor({
         </>
       );
     case "cta":
+      // Label and style are short and pair up; the link takes what is left.
       return (
         <FormGrid>
           <TextInput
@@ -342,13 +338,6 @@ function SectionEditor({
             span={4}
             value={section.label}
             onChange={(e) => onChange({ ...section, label: e.target.value })}
-          />
-          <TextInput
-            label="URL"
-            span={5}
-            value={section.href ?? ""}
-            onChange={(e) => onChange({ ...section, href: e.target.value })}
-            placeholder="/path or https://..."
           />
           <Select
             label="Style"
@@ -364,6 +353,13 @@ function SectionEditor({
                 variant: e.target.value as "primary" | "secondary",
               })
             }
+          />
+          <TextInput
+            label="URL"
+            span={5}
+            value={section.href ?? ""}
+            onChange={(e) => onChange({ ...section, href: e.target.value })}
+            placeholder="/path or https://..."
           />
         </FormGrid>
       );
@@ -394,12 +390,14 @@ export function PageBodySectionsEditor({
             <span className="text-sm font-semibold text-[var(--admin-text-secondary)]">
               Block {i + 1} · {sec.name?.trim() || sec.type}
             </span>
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1">
               <button
                 type="button"
                 disabled={i === 0}
                 onClick={() => onChange(moveItem(sections, i, i - 1))}
                 className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label={`Move block ${i + 1} up`}
+                title="Move up"
               >
                 <ArrowUp size={12} />
               </button>
@@ -408,6 +406,8 @@ export function PageBodySectionsEditor({
                 disabled={i === sections.length - 1}
                 onClick={() => onChange(moveItem(sections, i, i + 1))}
                 className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+                aria-label={`Move block ${i + 1} down`}
+                title="Move down"
               >
                 <ArrowDown size={12} />
               </button>
@@ -415,8 +415,10 @@ export function PageBodySectionsEditor({
                 type="button"
                 onClick={() => onChange(sections.filter((_, j) => j !== i))}
                 className="admin-btn admin-btn-danger admin-btn-sm"
+                aria-label={`Remove block ${i + 1}`}
+                title="Remove block"
               >
-                <Trash2 size={12} /> Remove
+                <Trash2 size={12} />
               </button>
             </div>
           </div>

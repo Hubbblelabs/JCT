@@ -202,7 +202,7 @@ export function PlacementSectionInspector({
           />
 
           <Field label="Placement Office" span={7}>
-            <div className="admin-form-grid admin-form-grid--tight rounded-lg border border-[var(--admin-border-subtle)] bg-gray-50/60 p-3">
+            <div className="admin-form-grid admin-form-grid--tight rounded-lg border border-[var(--admin-border-subtle)] bg-[var(--admin-sunken)] p-3">
               <TextArea
                 label="Address"
                 span="full"
@@ -249,7 +249,7 @@ export function PlacementSectionInspector({
           </Field>
 
           <Field label="Officer Photos" span={5}>
-            <label className="flex items-start gap-2 rounded-lg border border-[var(--admin-border-subtle)] bg-gray-50/60 p-3 text-sm text-[var(--admin-text-secondary)]">
+            <label className="flex items-start gap-2 rounded-lg border border-[var(--admin-border-subtle)] bg-[var(--admin-sunken)] p-3 text-sm text-[var(--admin-text-secondary)]">
               <input
                 type="checkbox"
                 className="mt-0.5"

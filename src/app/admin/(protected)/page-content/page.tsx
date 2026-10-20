@@ -226,7 +226,7 @@ function TestimonialFormInner({
             })
           }
         />
-        <Field label="Visibility" span={4}>
+        <Field label="Visibility" span={4} inline>
           <label className="flex items-center gap-2 pt-2 text-sm">
             <input
               type="checkbox"
@@ -458,7 +458,7 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
                     {item.category}
                   </span>
                   {!item.is_active && (
-                    <span className="rounded-full bg-[var(--admin-danger-bg)] px-2 py-0.5 text-[10px] font-bold tracking-wide text-red-400 uppercase">
+                    <span className="rounded-full bg-[var(--admin-danger-bg)] px-2 py-0.5 text-[10px] font-bold tracking-wide text-[var(--admin-danger)] uppercase">
                       Inactive
                     </span>
                   )}
@@ -489,6 +489,8 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
                     });
                   }}
                   className="admin-btn admin-btn-outline admin-btn-sm"
+                  aria-label={`Edit ${item.name}`}
+                  title="Edit"
                 >
                   <Pencil size={12} />
                 </button>
@@ -497,6 +499,8 @@ function CollegeTestimonialsManager({ institution }: { institution: string }) {
                   onClick={() => handleDelete(item._id)}
                   disabled={deletingId === item._id}
                   className="admin-btn admin-btn-danger admin-btn-sm"
+                  aria-label={`Delete ${item.name}`}
+                  title="Delete"
                 >
                   {deletingId === item._id ? (
                     <Loader2 size={12} className="animate-spin" />

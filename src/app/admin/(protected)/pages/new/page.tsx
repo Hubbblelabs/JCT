@@ -158,7 +158,7 @@ export default function NewPagePage() {
 
       {/* Title, slug and scope are one row — they are three short values. */}
       <div className="admin-card admin-form-grid mb-4">
-        <div className="admin-col-5">
+        <div className="admin-field-inline admin-col-5">
           <label htmlFor="new-page-title" className="admin-label">
             Title
           </label>
@@ -170,7 +170,7 @@ export default function NewPagePage() {
             placeholder="e.g. NIRF Disclosure 2026"
           />
         </div>
-        <div className="admin-col-4">
+        <div className="admin-field-inline admin-col-4">
           <label htmlFor="new-page-slug" className="admin-label">
             Slug (URL)
           </label>
@@ -188,7 +188,7 @@ export default function NewPagePage() {
             Lowercase letters, numbers, and dashes only.
           </p>
         </div>
-        <div className="admin-col-3">
+        <div className="admin-field-inline admin-col-3">
           <label htmlFor="new-page-institution" className="admin-label">
             Institution
           </label>
@@ -220,7 +220,7 @@ export default function NewPagePage() {
                 onClick={() => setTemplate(t.id)}
                 className={`admin-col-4 flex items-start gap-3 rounded-xl border p-4 text-left transition-all ${
                   active
-                    ? "border-amber-400 bg-amber-50/40 ring-2 ring-amber-200"
+                    ? "border-[var(--admin-gold-line)] bg-[var(--admin-selected)] ring-1 ring-[var(--admin-gold-line)]"
                     : "border-[var(--admin-border)] bg-white hover:border-[var(--admin-border-strong)]"
                 }`}
               >

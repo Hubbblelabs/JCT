@@ -75,6 +75,8 @@ const CARD_EXTRA_FIELDS: FieldDef[] = [
   },
 ];
 
+// The short single-line fields come first so they pair up in the narrow side
+// panel; the description follows with a row of its own.
 const EVENT_FIELDS: FieldDef[] = [
   { key: "title", label: "Title", span: 5 },
   { key: "date", label: "Date", placeholder: "YYYY-MM-DD", span: 3 },
@@ -84,8 +86,8 @@ const EVENT_FIELDS: FieldDef[] = [
     placeholder: "Workshop / Conference…",
     span: 4,
   },
-  { key: "description", label: "Description", type: "textarea", span: 8 },
   { key: "resourcePerson", label: "Resource Person", span: 4 },
+  { key: "description", label: "Description", type: "textarea", span: 8 },
   ...CARD_EXTRA_FIELDS,
 ];
 const E_EVENT = {
@@ -98,8 +100,8 @@ const E_EVENT = {
 
 const ACHIEV_FIELDS: FieldDef[] = [
   { key: "name", label: "Name", span: 4 },
-  { key: "title", label: "Achievement Title", span: 6 },
   { key: "year", label: "Year", span: 2 },
+  { key: "title", label: "Achievement Title", span: 6 },
   { key: "detail", label: "Detail", type: "textarea", span: "full" },
   ...CARD_EXTRA_FIELDS,
 ];
@@ -129,10 +131,11 @@ const FP_CONF_FIELDS: FieldDef[] = [
 ];
 const E_FP_CONF = { title: "", faculty: "", venue: "", year: "" };
 
+// Three short values: edited as one line per pill (see ItemsEditor "rows").
 const HERO_META_FIELDS: FieldDef[] = [
-  { key: "icon", label: "Icon (optional)", placeholder: "calendar", span: 4 },
-  { key: "label", label: "Label", placeholder: "Duration", span: 8 },
-  { key: "value", label: "Value", placeholder: "4 Years", span: "full" },
+  { key: "icon", label: "Icon (optional)", placeholder: "calendar", span: 3 },
+  { key: "label", label: "Label", placeholder: "Duration", span: 4 },
+  { key: "value", label: "Value", placeholder: "4 Years", span: 5 },
 ];
 const E_HERO_META: HeroMetaItem = { icon: "", label: "", value: "" };
 
@@ -428,6 +431,9 @@ export function ProgramSectionInspector({
             <TextInput
               label="Program Name"
               span={5}
+              // The full name is long; in the narrow panel it keeps a line of
+              // its own instead of being cut off beside the abbreviation.
+              inline={false}
               value={
                 onProgramNameChange
                   ? (programName ?? "")
@@ -584,7 +590,6 @@ export function ProgramSectionInspector({
                 fields={HERO_META_FIELDS}
                 emptyItem={E_HERO_META as unknown as Record<string, unknown>}
                 addLabel="Add Pill"
-                cardSpan={4}
               />
             </Field>
           </FormGrid>

@@ -76,7 +76,7 @@ export function AdminSidebarFooter({
           </span>
           <ChevronsUpDown
             size={14}
-            className="admin-sidebar-label shrink-0 opacity-50"
+            className="admin-sidebar-label shrink-0 opacity-70"
             aria-hidden="true"
           />
         </button>

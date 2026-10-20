@@ -91,12 +91,16 @@ export function ResearchSectionInspector({
             items={data.stats as unknown as Record<string, unknown>[]}
             onChange={(v) => patch({ stats: v as unknown as Stat[] })}
             fields={[
-              { key: "value", label: "Value", placeholder: "120+" },
-              { key: "label", label: "Label", placeholder: "Publications" },
+              { key: "value", label: "Value", placeholder: "120+", span: 4 },
+              {
+                key: "label",
+                label: "Label",
+                placeholder: "Publications",
+                span: 8,
+              },
             ]}
             emptyItem={{ value: "", label: "" }}
             addLabel="Add statistic"
-            cardSpan={4}
           />
         </Field>
       );

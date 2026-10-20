@@ -456,7 +456,7 @@ function TestimonialsPageInner() {
             onChange={(e) => set("institution", e.target.value)}
             hint="Pick a college to limit where this quote appears."
           />
-          <Field label="Visibility" span={4}>
+          <Field label="Visibility" span={4} inline>
             <label className="flex items-center gap-2 pt-2">
               <input
                 type="checkbox"

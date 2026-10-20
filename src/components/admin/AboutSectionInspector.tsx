@@ -130,12 +130,16 @@ export function AboutSectionInspector({
                 })
               }
               fields={[
-                { key: "value", label: "Value", placeholder: "98%" },
-                { key: "label", label: "Label", placeholder: "Placement Rate" },
+                { key: "value", label: "Value", placeholder: "98%", span: 4 },
+                {
+                  key: "label",
+                  label: "Label",
+                  placeholder: "Placement Rate",
+                  span: 8,
+                },
               ]}
               emptyItem={{ value: "", label: "" }}
               addLabel="Add statistic"
-              cardSpan={4}
             />
           </Field>
         </FormGrid>
@@ -568,13 +572,13 @@ export function AboutSectionInspector({
             <FormGrid tight>
               <TextInput
                 label="Name"
-                span="full"
+                span={5}
                 value={item.name}
                 onChange={(e) => oc({ ...item, name: e.target.value })}
               />
               <TextInput
                 label="Description"
-                span="full"
+                span={7}
                 value={item.desc}
                 onChange={(e) => oc({ ...item, desc: e.target.value })}
               />
@@ -653,12 +657,16 @@ export function AboutSectionInspector({
                 })
               }
               fields={[
-                { key: "label", label: "Label", placeholder: "Established" },
-                { key: "value", label: "Value", placeholder: "2009" },
+                {
+                  key: "label",
+                  label: "Label",
+                  placeholder: "Established",
+                  span: 7,
+                },
+                { key: "value", label: "Value", placeholder: "2009", span: 5 },
               ]}
               emptyItem={{ label: "", value: "" }}
               addLabel="Add quick fact"
-              cardSpan={4}
             />
           </Field>
           <TextInput

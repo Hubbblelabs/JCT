@@ -178,6 +178,7 @@ function BlockEditor({
       );
 
     case "list":
+      // The two short settings first, so they share a line in the side panel.
       return (
         <FormGrid>
           <TextInput
@@ -185,13 +186,6 @@ function BlockEditor({
             span={4}
             value={block.title}
             onChange={(e) => onChange({ ...block, title: e.target.value })}
-          />
-          <TextArea
-            label="Intro (optional)"
-            span={5}
-            rows={2}
-            value={block.intro}
-            onChange={(e) => onChange({ ...block, intro: e.target.value })}
           />
           <Select
             label="Marker"
@@ -205,6 +199,13 @@ function BlockEditor({
               onChange({ ...block, ordered: e.target.value === "ordered" })
             }
           />
+          <TextArea
+            label="Intro (optional)"
+            span={5}
+            rows={2}
+            value={block.intro}
+            onChange={(e) => onChange({ ...block, intro: e.target.value })}
+          />
           <TextAreaList
             label="Items"
             span="full"
@@ -216,6 +217,8 @@ function BlockEditor({
       );
 
     case "docs":
+      // Heading, layout and link text are one line of short settings; the
+      // description gets the full width under them.
       return (
         <FormGrid>
           <TextInput
@@ -223,15 +226,6 @@ function BlockEditor({
             span={4}
             value={block.title}
             onChange={(e) => onChange({ ...block, title: e.target.value })}
-          />
-          <TextArea
-            label="Description (optional)"
-            span={8}
-            rows={2}
-            value={block.description}
-            onChange={(e) =>
-              onChange({ ...block, description: e.target.value })
-            }
           />
           <Select
             label="Layout"
@@ -255,6 +249,15 @@ function BlockEditor({
             value={block.linkLabel}
             placeholder="Download"
             onChange={(e) => onChange({ ...block, linkLabel: e.target.value })}
+          />
+          <TextArea
+            label="Description (optional)"
+            span="full"
+            rows={2}
+            value={block.description}
+            onChange={(e) =>
+              onChange({ ...block, description: e.target.value })
+            }
           />
           <Repeater<ContentDocGroupValue>
             label="Groups"
@@ -319,7 +322,7 @@ function BlockEditor({
             })}
             renderItem={(row, _i, oc) => (
               <>
-                <label className="mb-2 flex items-center gap-2 text-xs font-semibold text-[var(--admin-text-secondary)]">
+                <label className="mb-2 flex items-center gap-2 pr-8 text-xs font-semibold text-[var(--admin-text-secondary)]">
                   <input
                     type="checkbox"
                     checked={row.heading}
@@ -328,12 +331,13 @@ function BlockEditor({
                   Sub-heading row (spans every column)
                 </label>
                 {/* One editor column per table column, so a five-column table
-                    edits as a row rather than as fifteen stacked fields. */}
+                    edits as a row rather than as fifteen stacked fields —
+                    still two to a line in the narrow side panel. */}
                 <div className="admin-form-grid admin-form-grid--tight">
                   {row.cells.map((cell, ci) => (
                     <div
                       key={ci}
-                      className="admin-col-4 rounded-lg border border-[var(--admin-border-subtle)] p-2"
+                      className="admin-field-inline admin-col-4 rounded-lg border border-[var(--admin-border-subtle)] p-2"
                     >
                       <TextArea
                         label={block.columns[ci]?.trim() || `Column ${ci + 1}`}
@@ -404,15 +408,6 @@ function BlockEditor({
             value={block.title}
             onChange={(e) => onChange({ ...block, title: e.target.value })}
           />
-          <TextArea
-            label="Description (optional)"
-            span={5}
-            rows={2}
-            value={block.description}
-            onChange={(e) =>
-              onChange({ ...block, description: e.target.value })
-            }
-          />
           <Select
             label="Columns"
             span={3}
@@ -427,6 +422,15 @@ function BlockEditor({
                 ...block,
                 columns: Number(e.target.value) as 2 | 3 | 4,
               })
+            }
+          />
+          <TextArea
+            label="Description (optional)"
+            span={5}
+            rows={2}
+            value={block.description}
+            onChange={(e) =>
+              onChange({ ...block, description: e.target.value })
             }
           />
           <Repeater<ContentImageGroupValue>
@@ -510,15 +514,6 @@ function BlockEditor({
             value={block.title}
             onChange={(e) => onChange({ ...block, title: e.target.value })}
           />
-          <TextArea
-            label="Description (optional)"
-            span={5}
-            rows={2}
-            value={block.description}
-            onChange={(e) =>
-              onChange({ ...block, description: e.target.value })
-            }
-          />
           <Select
             label="First panel"
             span={3}
@@ -529,6 +524,15 @@ function BlockEditor({
             ]}
             onChange={(e) =>
               onChange({ ...block, openFirst: e.target.value === "open" })
+            }
+          />
+          <TextArea
+            label="Description (optional)"
+            span={5}
+            rows={2}
+            value={block.description}
+            onChange={(e) =>
+              onChange({ ...block, description: e.target.value })
             }
           />
           <Repeater<ContentAccordionItemValue>

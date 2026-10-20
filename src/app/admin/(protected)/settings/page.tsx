@@ -1663,7 +1663,7 @@ export default function SettingsPage() {
               <h2 className="font-semibold text-[var(--admin-danger)]">
                 Reset All Data
               </h2>
-              <p className="mt-0.5 text-sm text-red-700/80">
+              <p className="mt-0.5 text-sm text-[var(--admin-danger)]">
                 Permanently deletes every site config entry, plus every uploaded
                 file nothing references — from the database and from object
                 storage, including files the media library never tracked. Widen
@@ -1680,7 +1680,7 @@ export default function SettingsPage() {
 
           <div className="space-y-3">
             <div className="space-y-2 rounded-lg border border-[var(--admin-danger-border)] bg-white/60 p-3">
-              <p className="text-xs font-medium tracking-wide text-red-700/70 uppercase">
+              <p className="text-xs font-medium tracking-wide text-[var(--admin-danger)] uppercase">
                 Also delete
               </p>
               <label className="flex cursor-pointer items-start gap-2.5 text-sm text-[var(--admin-danger)]">
@@ -1718,7 +1718,7 @@ export default function SettingsPage() {
               )}
               {/* Users and the audit trail are never touched: wiping users
                   would lock the admin out of the panel mid-reset. */}
-              <p className="text-xs text-red-700/60">
+              <p className="text-xs text-[var(--admin-danger)]">
                 User accounts and the audit trail are never deleted.
               </p>
             </div>
@@ -1817,7 +1817,7 @@ function BuildProgress({ job }: { job: BackupJob }) {
           style={{ width: `${pct}%` }}
         />
       </div>
-      <p className="mt-1.5 text-xs text-blue-700/80">
+      <p className="mt-1.5 text-xs text-[var(--admin-info)]">
         The download starts on its own when this finishes.
       </p>
     </div>

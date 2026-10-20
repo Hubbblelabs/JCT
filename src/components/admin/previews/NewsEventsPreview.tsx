@@ -73,7 +73,7 @@ export function NewsEventsPreview({
 
   if (!config.enabled) {
     return (
-      <div className="bg-slate-100 px-6 py-10 text-center text-sm text-slate-500">
+      <div className="bg-slate-100 px-6 py-10 text-center text-sm text-slate-600">
         News &amp; Events section is switched off — visitors don&apos;t see it.
       </div>
     );

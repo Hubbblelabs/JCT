@@ -344,7 +344,7 @@ export function DataTable<T>({
                               <ArrowDown size={12} />
                             )
                           ) : (
-                            <ChevronsUpDown size={12} className="opacity-40" />
+                            <ChevronsUpDown size={12} className="opacity-70" />
                           )}
                         </span>
                       ) : (

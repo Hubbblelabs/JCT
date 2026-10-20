@@ -376,7 +376,7 @@ function BlogsPageInner() {
             <FormGrid>
               <TextInput
                 label="Title"
-                span={5}
+                span={8}
                 value={form.title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
@@ -417,7 +417,7 @@ function BlogsPageInner() {
                     scope, so the college is fixed by the URL. */}
               <TextInput
                 label="Author"
-                span={8}
+                span={5}
                 value={form.author}
                 onChange={(e) => set("author", e.target.value)}
                 placeholder="JCT Admissions Team"

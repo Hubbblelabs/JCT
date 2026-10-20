@@ -160,15 +160,6 @@ export function NaacSectionInspector({
             patchDocSection(index, { ...block, title: e.target.value })
           }
         />
-        <TextArea
-          label="Section Description"
-          span={5}
-          rows={2}
-          value={block.description}
-          onChange={(e) =>
-            patchDocSection(index, { ...block, description: e.target.value })
-          }
-        />
         <Select
           label="Layout"
           span={3}
@@ -182,6 +173,15 @@ export function NaacSectionInspector({
               ...block,
               layout: e.target.value === "chips" ? "chips" : "cards",
             })
+          }
+        />
+        <TextArea
+          label="Section Description"
+          span={5}
+          rows={2}
+          value={block.description}
+          onChange={(e) =>
+            patchDocSection(index, { ...block, description: e.target.value })
           }
         />
         <Repeater<NaacDocGroupValue>

@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
-import { Field, FormGrid, Select, TextInput } from "@/components/admin/inputs";
+import { FormGrid, Select, TextInput } from "@/components/admin/inputs";
 import {
   defaultsAsOverrides,
   SIDEBAR_ICON_OPTIONS,
@@ -84,7 +84,10 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
         in-page section you fill with content blocks. Removing a built-in only
         hides it — toggle visibility instead.
       </p>
-      {/* Two nav rows at a time: each is four short fields, not a page. */}
+      {/* Two nav items at a time on a wide screen. Each is a header line —
+          what it is, shown or hidden, its order — over a label and an icon
+          side by side; the anchor of a built-in is fixed, so it is named in
+          the header rather than given a read-only input of its own. */}
       <div className="admin-form-grid admin-form-grid--tight">
         {seeded.map((item, i) => {
           const isBuiltin = !!item.key && builtinSet.has(item.key);
@@ -93,25 +96,41 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
             ? defaults.find((d) => d.anchor === item.key)?.navLabel
             : "Item Label";
           const kindLabel = isBuiltin
-            ? `Built-in · ${item.key}`
+            ? `Built-in · #${item.key}`
             : isSection
               ? "Page Section"
               : "Custom Link";
+          const name = item.label?.trim() || placeholderLabel || kindLabel;
+          const patchItem = (next: Partial<SidebarNavItemRaw>) =>
+            update(seeded.map((it, j) => (j === i ? { ...it, ...next } : it)));
           return (
             <div
               key={item.id ?? `${item.key ?? "c"}-${i}`}
-              className="admin-col-6 rounded-lg border border-[var(--admin-border)] bg-white p-3"
+              className="admin-col-6 rounded-lg border border-[var(--admin-border)] bg-[var(--admin-raised)] p-3"
             >
               <div className="mb-2 flex items-center justify-between gap-2">
-                <span className="text-xs font-medium text-[var(--admin-text-muted)]">
+                <span
+                  className="min-w-0 truncate text-xs font-medium text-[var(--admin-text-muted)]"
+                  title={kindLabel}
+                >
                   {kindLabel}
                 </span>
-                <div className="flex items-center gap-1">
+                <div className="flex shrink-0 items-center gap-1">
+                  <label className="mr-1 flex items-center gap-1.5 text-xs font-medium text-[var(--admin-text-secondary)]">
+                    <input
+                      type="checkbox"
+                      checked={item.visible !== false}
+                      onChange={(e) => patchItem({ visible: e.target.checked })}
+                    />
+                    Visible
+                  </label>
                   <button
                     type="button"
                     disabled={i === 0}
                     onClick={() => update(moveItem(seeded, i, i - 1))}
                     className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label={`Move ${name} up`}
+                    title="Move up"
                   >
                     <ArrowUp size={12} />
                   </button>
@@ -120,6 +139,8 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                     disabled={i === seeded.length - 1}
                     onClick={() => update(moveItem(seeded, i, i + 1))}
                     className="admin-btn admin-btn-outline admin-btn-sm disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label={`Move ${name} down`}
+                    title="Move down"
                   >
                     <ArrowDown size={12} />
                   </button>
@@ -128,6 +149,8 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                       type="button"
                       onClick={() => update(seeded.filter((_, j) => j !== i))}
                       className="admin-btn admin-btn-danger admin-btn-sm"
+                      aria-label={`Remove ${name}`}
+                      title="Remove"
                     >
                       <Trash2 size={12} />
                     </button>
@@ -140,73 +163,31 @@ export function SidebarNavEditor({ defaults, value, onChange }: Props) {
                   span={6}
                   value={item.label ?? ""}
                   placeholder={placeholderLabel ?? "Item Label"}
-                  onChange={(e) =>
-                    update(
-                      seeded.map((it, j) =>
-                        j === i ? { ...it, label: e.target.value } : it,
-                      ),
-                    )
-                  }
+                  onChange={(e) => patchItem({ label: e.target.value })}
                 />
-                {isBuiltin ? (
-                  <Field label="Anchor (read-only)" span={6}>
-                    <input
-                      className="admin-input"
-                      value={item.key ?? ""}
-                      disabled
-                    />
-                  </Field>
-                ) : isSection ? (
-                  <Field label="Content" span={6}>
-                    <p className="flex h-9 items-center text-xs text-[var(--admin-text-muted)]">
-                      Edit blocks by clicking the section in the live preview.
-                    </p>
-                  </Field>
-                ) : (
-                  <TextInput
-                    label="URL / Href"
-                    span={6}
-                    value={item.href ?? ""}
-                    placeholder="/path or https://..."
-                    onChange={(e) =>
-                      update(
-                        seeded.map((it, j) =>
-                          j === i ? { ...it, href: e.target.value } : it,
-                        ),
-                      )
-                    }
-                  />
-                )}
                 <Select
                   label="Icon (optional)"
                   span={6}
                   value={item.icon ?? ""}
                   options={ICON_SELECT_OPTIONS}
-                  onChange={(e) =>
-                    update(
-                      seeded.map((it, j) =>
-                        j === i ? { ...it, icon: e.target.value } : it,
-                      ),
-                    )
-                  }
+                  onChange={(e) => patchItem({ icon: e.target.value })}
                 />
-                <Field label="Visibility" span={6}>
-                  <label className="flex h-9 items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={item.visible !== false}
-                      onChange={(e) =>
-                        update(
-                          seeded.map((it, j) =>
-                            j === i ? { ...it, visible: e.target.checked } : it,
-                          ),
-                        )
-                      }
-                    />
-                    Visible on public page
-                  </label>
-                </Field>
+                {!isBuiltin && !isSection && (
+                  <TextInput
+                    label="URL / Href"
+                    span="full"
+                    value={item.href ?? ""}
+                    placeholder="/path or https://..."
+                    onChange={(e) => patchItem({ href: e.target.value })}
+                  />
+                )}
               </FormGrid>
+              {isSection && (
+                <p className="admin-help mt-2">
+                  Edit its content blocks by clicking the section in the live
+                  preview.
+                </p>
+              )}
             </div>
           );
         })}

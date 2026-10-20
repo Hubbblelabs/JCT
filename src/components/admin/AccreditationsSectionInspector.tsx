@@ -83,6 +83,8 @@ export function AccreditationsSectionInspector({
           newItem={() => ({ ...EMPTY_ITEM })}
           renderItem={(item, _i, oc) => (
             <FormGrid tight>
+              {/* The short values lead each line so they pair up in the side
+                  panel, leaving the long names a line of their own. */}
               <TextInput
                 label="Name"
                 span={3}
@@ -91,18 +93,18 @@ export function AccreditationsSectionInspector({
                 onChange={(e) => oc({ ...item, name: e.target.value })}
               />
               <TextInput
-                label="Full Name / Expansion"
-                span={6}
-                value={item.fullName}
-                placeholder="National Assessment and Accreditation Council"
-                onChange={(e) => oc({ ...item, fullName: e.target.value })}
-              />
-              <TextInput
                 label="Grade / Score"
                 span={3}
                 value={item.grade}
                 placeholder="A+, CGPA 3.51…"
                 onChange={(e) => oc({ ...item, grade: e.target.value })}
+              />
+              <TextInput
+                label="Full Name / Expansion"
+                span={6}
+                value={item.fullName}
+                placeholder="National Assessment and Accreditation Council"
+                onChange={(e) => oc({ ...item, fullName: e.target.value })}
               />
               <TextArea
                 label="Description"
@@ -120,13 +122,6 @@ export function AccreditationsSectionInspector({
                 hideUrlField
               />
               <TextInput
-                label="Accredited By"
-                span={6}
-                value={item.accreditedBy}
-                placeholder="Issuing authority"
-                onChange={(e) => oc({ ...item, accreditedBy: e.target.value })}
-              />
-              <TextInput
                 label="Valid From"
                 span={3}
                 value={item.validFrom}
@@ -139,6 +134,13 @@ export function AccreditationsSectionInspector({
                 value={item.validTo}
                 placeholder="2027"
                 onChange={(e) => oc({ ...item, validTo: e.target.value })}
+              />
+              <TextInput
+                label="Accredited By"
+                span={6}
+                value={item.accreditedBy}
+                placeholder="Issuing authority"
+                onChange={(e) => oc({ ...item, accreditedBy: e.target.value })}
               />
               <TextInput
                 label="Certificate Link Label"

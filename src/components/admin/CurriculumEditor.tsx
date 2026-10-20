@@ -239,7 +239,7 @@ export function CurriculumEditor({
           {reg.semesters.map((sem, sI) => (
             <div
               key={sI}
-              className="rounded-lg border border-[var(--admin-border)] bg-gray-50/50 p-3"
+              className="rounded-lg border border-[var(--admin-border)] bg-[var(--admin-sunken)] p-3"
             >
               {/* Semester header */}
               <div className="mb-3 flex items-center justify-between gap-3">
