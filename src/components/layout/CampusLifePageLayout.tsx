@@ -129,7 +129,10 @@ export function CampusLifePageLayout({
         label={CAMPUS_LIFE_SECTION_LABELS.hero}
         editable={editable}
         onEditSection={onEditSection}
-        className="relative h-[85vh] w-full overflow-hidden"
+        // Sized to its text with a floor that still lets the photograph read,
+        // not 85% of the viewport: at that height the first section started
+        // below the fold on every screen.
+        className="relative flex min-h-[280px] w-full flex-col justify-end overflow-hidden md:min-h-[340px]"
       >
         {heroBg ? (
           <Image
@@ -144,15 +147,21 @@ export function CampusLifePageLayout({
           <div className="absolute inset-0 bg-[#081a34]" />
         )}
         <div className="from-navy/50 absolute inset-x-0 top-0 h-[25%] bg-gradient-to-b to-transparent" />
-        <div className="from-background/40 via-background/20 absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t to-transparent" />
+        {/* Darkens rather than fades to the page colour: in a band this short
+            the text sits inside the gradient, and a light wash under white
+            type would cost it its contrast. */}
+        <div className="from-navy/70 via-navy/30 absolute inset-x-0 bottom-0 h-[60%] bg-gradient-to-t to-transparent" />
 
-        <div className="relative z-10 container mx-auto flex h-full flex-col items-start justify-end px-4 pb-16 text-left md:pb-24">
+        <div className="relative z-10 container mx-auto px-4 pt-28 pb-8 text-left md:px-6 md:pt-32 md:pb-10">
+          <div className="mb-3">
+            <Breadcrumb tone="dark" items={[{ label: "Campus Life" }]} />
+          </div>
           {hero.title && (
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="font-serif text-4xl leading-tight font-bold text-white md:text-6xl lg:text-7xl"
+              className="font-serif text-3xl leading-tight font-bold text-white md:text-4xl lg:text-5xl"
             >
               {hero.title}
             </motion.h1>
@@ -162,7 +171,7 @@ export function CampusLifePageLayout({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="mt-4 max-w-xl font-sans text-base text-white/80 md:text-lg"
+              className="mt-2 max-w-xl font-sans text-sm text-white/80 md:text-base"
             >
               {hero.subtitle}
             </motion.p>
@@ -170,9 +179,7 @@ export function CampusLifePageLayout({
         </div>
       </EditableRegion>
 
-      <div className="container mx-auto px-4 pt-8 md:px-6">
-        <Breadcrumb items={[{ label: "Campus Life" }]} />
-
+      <div className="container mx-auto px-4 md:px-6">
         {/* ── Experience ──────────────────────────────────────────────── */}
         {(editable ||
           experience.title ||
