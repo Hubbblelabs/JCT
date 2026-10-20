@@ -289,14 +289,14 @@ AUTH_TRUST_HOST        # read by next-auth itself, not by this repo's code.
 
 ## Deployment
 
-CI is `.github/workflows/build-deploy.yml`, two jobs over `push` (branch `v3-admin` + tags matching `v*`) and `pull_request`:
+CI is `.github/workflows/build-deploy.yml`, two jobs over `push` (branch `main` + tags matching `v*`) and `pull_request`:
 
 - **`verify`** — runs on every trigger. `pnpm install --frozen-lockfile`, `pnpm lint:ci`, `pnpm typecheck`, `prettier --check .`. Nothing else in the pipeline lints: `next build` type-checks but Next 16 no longer runs ESLint as part of it.
-- **`deploy`** — `needs: verify`, gated by `if: startsWith(github.ref, 'refs/tags/v')`, so **the server is only touched when a version tag is pushed**. SSHes to the prod host and runs `git reset --hard` to the tag, then `docker compose -f docker-compose.prod.yaml build jct && docker compose -f docker-compose.prod.yaml up -d --remove-orphans`. There is no registry: the image is built on the same host it runs on, straight from `docker-compose.prod.yaml`'s `build:` block. `MONGODB_URI` is injected as a BuildKit secret, build-time only; `network: host` on that build is what lets it reach MongoDB on `127.0.0.1` — an on-prem database published on loopback only. Build without that and every DB-backed page bakes empty and stays wrong until the next revalidation.
+- **`deploy`** — `needs: verify`, gated by `if: startsWith(github.ref, 'refs/tags/v')`, so **the server is only touched when a version tag is pushed**. SSHes to the prod host and force-checks-out the tip of `main` (`git checkout --force -B main origin/main` — the branch tip, **not** the tagged commit, so tag `main`'s head), then `docker compose -f docker-compose.prod.yaml build jct && docker compose -f docker-compose.prod.yaml up -d --remove-orphans`. There is no registry: the image is built on the same host it runs on, straight from `docker-compose.prod.yaml`'s `build:` block. `MONGODB_URI` is injected as a BuildKit secret, build-time only; `network: host` on that build is what lets it reach MongoDB on `127.0.0.1` — an on-prem database published on loopback only. Build without that and every DB-backed page bakes empty and stays wrong until the next revalidation.
 
 Consequences to keep in mind:
 
-- Pushing to `v3-admin` alone does **not** deploy — `verify` still runs, but the `deploy` job's tag gate skips it. Releasing is a separate, deliberate act: tag `vX.Y.Z` and push the tag.
+- Pushing to `main` alone does **not** deploy — `verify` still runs, but the `deploy` job's tag gate skips it. Releasing is a separate, deliberate act: tag `vX.Y.Z` and push the tag.
 - The deploy step reads `DEPLOY_HOST`, `DEPLOY_USER` and `SSH_KEY` from repo secrets, falling back to `SSH_PASSWORD` while `SSH_KEY` is unset. The host address is deliberately not committed.
 - **Pushing a `v*` tag deploys to production.** Never create or push tags on your own — see Git below.
 - The reverse proxy in front of the app is **not** in this repo, but the admin backup/restore routes depend on its settings. Restore POSTs the whole ZIP as one body (currently ~7.5 GB) and backup downloads one out; nginx defaults (`client_max_body_size 1m`, request/response buffering on, 60s timeouts) break both. See `deploy/nginx-jct.conf.example` for the required directives, including the optional `internal` location that lets nginx serve the built archive with `sendfile()` (enabled by setting `BACKUP_ACCEL_PREFIX`), and the object-storage vhost that fronts Garage.

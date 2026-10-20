@@ -91,7 +91,7 @@ restart.
 ## Deployment
 
 Docker image (`output: "standalone"`) to a self-hosted server, built and
-deployed by `.github/workflows/build-deploy.yml`. Pushing to `v3-admin` runs
+deployed by `.github/workflows/build-deploy.yml`. Pushing to `main` runs
 lint, typecheck and format check only; **deployment happens only when a
 `vX.Y.Z` tag is pushed**, which SSHes to the prod host and rebuilds there.
 `docker-compose.prod.yaml` runs the app, MongoDB and Garage, all on loopback

@@ -1,7 +1,8 @@
 name: Build and Deploy
 
-# Two triggers:
+# Three triggers:
 #   - pull_request      → lint, typecheck, format check
+#   - push to main      → lint, typecheck, format check
 #   - push of a v* tag  → verify, then SSH to server to build and deploy
 #
 # Builds happen on the deployment server, not on GitHub runners, because the
@@ -12,7 +13,7 @@ name: Build and Deploy
 on:
   push:
     branches:
-      - v3-admin
+      - main
     tags:
       - "v*"
   pull_request:
@@ -79,10 +80,17 @@ jobs:
           # `set -e` is load-bearing: without it a failed `build` falls
           # through to `up -d`, which just keeps the old container running,
           # and the job still reports success because the last command did.
+          #
+          # This deploys the tip of main, not the tagged commit — tag main's
+          # head. main is fetched by explicit refspec because the server's
+          # checkout was cloned from the retired v3-admin branch: a plain
+          # `fetch --all` never creates origin/main in a --single-branch
+          # clone. `checkout --force -B` discards local edits like
+          # `reset --hard` would, and also moves the server onto a local main.
           script: |
             set -e
             cd jctSite
-            git fetch --all --tags
-            git reset --hard origin/v3-admin
+            git fetch --tags origin "+refs/heads/main:refs/remotes/origin/main"
+            git checkout --force -B main origin/main
             docker compose -f docker-compose.prod.yaml build jct
             docker compose -f docker-compose.prod.yaml up -d --remove-orphans
