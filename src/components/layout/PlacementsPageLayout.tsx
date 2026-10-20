@@ -61,6 +61,7 @@ import {
   type ResolvedSidebarItem,
   type SidebarNavDefault,
 } from "@/lib/sidebar-nav";
+import { useSectionPanels } from "@/lib/use-section-panels";
 import type {
   ContentPageValue,
   PageBodySection,
@@ -178,6 +179,16 @@ export const PLACEMENT_NAV_DEFAULTS: SidebarNavDefault[] = [
     icon: Camera,
   },
 ];
+
+// The panels whose content is the selected year's — they follow a year switch
+// without changing panel.
+const YEAR_PANELS = new Set([
+  "overview",
+  "recruiters",
+  "achievers",
+  "company-wise",
+  PLACEMENT_GALLERY_ANCHOR,
+]);
 
 // Deterministic brand-ish gradients for recruiter/notable monograms so a card
 // without a logo/photo still reads as a designed element, never a broken image.
@@ -426,9 +437,9 @@ function PlacementSideNav({
               <button
                 key={it.id}
                 type="button"
-                // Picking a section must scroll the preview, not open the
-                // sidebar inspector this nav sits inside — matching
-                // SectionNavEntry in SectionedPageShell.
+                // Picking a section must open its panel, not the sidebar
+                // inspector this nav sits inside — matching SectionNavEntry
+                // in SectionedPageShell.
                 onClick={(e) => {
                   e.stopPropagation();
                   onNavigate(it.anchor);
@@ -2221,79 +2232,25 @@ export function PlacementsPageLayout({
   );
 
   const customSections = navItems.filter((it) => it.customSection);
-  const [activeId, setActiveId] = useState<string>("");
-  const rootRef = useRef<HTMLElement>(null);
 
-  /**
-   * Sections are looked up inside this page's own subtree, never with
-   * `document.getElementById`. React's streaming leaves a second, hidden copy
-   * of the document in the DOM carrying the same ids, and a document-wide
-   * lookup resolves to that copy — scrolling to an element that is not
-   * displayed, i.e. not scrolling at all.
-   */
-  const findSection = (anchor: string) =>
-    rootRef.current?.querySelector<HTMLElement>(`[id="${anchor}"]`) ?? null;
-
-  // Scroll-spy: highlight the sidebar entry whose section is in view. Keyed on
-  // the anchor list so the observers are rebuilt only when the nav changes,
-  // not on every render.
-  const anchorKey = navItems
+  // The panels the sidebar opens, in its order. A deep link —
+  // `…/placements#gallery`, where the retired gallery route now redirects —
+  // opens its panel.
+  const panelIds = navItems
     .filter((it) => !it.customHref)
-    .map((it) => it.anchor)
-    .join(",");
+    .map((it) => it.anchor);
+  const { activeId, select, containerProps, panelProps } = useSectionPanels(
+    panelIds,
+    { syncHash: !editable },
+  );
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const anchors = anchorKey ? anchorKey.split(",") : [];
-    if (anchors.length === 0) return;
-    setActiveId((prev) => (prev && anchors.includes(prev) ? prev : anchors[0]));
-    const observers: IntersectionObserver[] = [];
-    for (const anchor of anchors) {
-      const el = findSection(anchor);
-      if (!el) continue;
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActiveId(anchor);
-        },
-        { rootMargin: "-25% 0px -65% 0px", threshold: 0 },
-      );
-      observer.observe(el);
-      observers.push(observer);
-    }
-    return () => observers.forEach((obs) => obs.disconnect());
-  }, [anchorKey]);
-
-  const handleNavigate = (anchor: string) => {
-    setActiveId(anchor);
-    const el = findSection(anchor);
-    if (!el) return;
-    const offset = window.innerWidth >= 1024 ? 120 : 90;
-    const top = el.getBoundingClientRect().top + window.scrollY - offset;
-    window.scrollTo({ top, behavior: "smooth" });
-  };
-
-  // A deep link — `…/placements#gallery`, where the retired gallery route now
-  // redirects — has to land on its section. The browser's own fragment scroll
-  // can't do it: it resolves the id to the hidden streamed copy, and even when
-  // it lands it puts the heading under the sticky header.
-  const deepLinked = useRef(false);
-  useEffect(() => {
-    if (deepLinked.current || editable) return;
-    const anchor = decodeURIComponent(window.location.hash.replace(/^#/, ""));
-    if (!anchor || !anchorKey.split(",").includes(anchor)) return;
-    if (!findSection(anchor)) return;
-    deepLinked.current = true;
-    handleNavigate(anchor);
-    // `handleNavigate` is redefined every render; the anchor list is what
-    // decides whether the target exists yet.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [anchorKey, editable]);
-
-  // Switching years from the sidebar swaps the record in place; on mobile the
-  // year pills sit above the content, so jump to the stats the choice affects.
+  // Switching years swaps the record in place. The year-wise panels show the
+  // new year at once; from any other — the history table the year was picked
+  // in, say — open the year's summary, which is what the choice changed.
   const handleSelectYear = (id: string) => {
     setSelectedId(id);
-    if (window.innerWidth < 1024) handleNavigate("overview");
+    if (!YEAR_PANELS.has(activeId) && panelIds.includes("overview"))
+      select("overview");
   };
 
   // The editor always renders the shell, even for a college with nothing yet:
@@ -2305,7 +2262,7 @@ export function PlacementsPageLayout({
   // `auto`, which makes <main> the sticky sidebar's scroll container — the
   // sidebar would then scroll away with the page instead of pinning.
   return (
-    <main ref={rootRef} className="bg-background text-foreground min-h-screen">
+    <main className="bg-background text-foreground min-h-screen">
       {!editable && <Navbar />}
       <PageHero
         title="Placements"
@@ -2335,7 +2292,7 @@ export function PlacementsPageLayout({
                 <PlacementSideNav
                   items={navItems}
                   activeId={activeId}
-                  onNavigate={handleNavigate}
+                  onNavigate={select}
                   records={records}
                   selectedId={active?._id ?? ""}
                   onSelectYear={handleSelectYear}
@@ -2346,12 +2303,19 @@ export function PlacementsPageLayout({
 
               <div className="lg:grid lg:grid-cols-[280px_1fr] lg:items-start lg:gap-10 xl:grid-cols-[300px_1fr] xl:gap-12">
                 {/* `sticky` needs the grid item to be its own box, not stretched
-                    to the row height — hence `items-start` above. */}
-                <div className="sticky top-24 hidden max-h-[calc(100vh-12rem)] overflow-y-auto overscroll-contain lg:block">
+                    to the row height — hence `items-start` above. The admin
+                    preview has no fixed navbar to clear. */}
+                <div
+                  className={`sticky hidden overflow-y-auto overscroll-contain lg:block ${
+                    editable
+                      ? "top-6 max-h-[calc(100vh-3rem)]"
+                      : "top-24 max-h-[calc(100vh-12rem)]"
+                  }`}
+                >
                   <PlacementSideNav
                     items={navItems}
                     activeId={activeId}
-                    onNavigate={handleNavigate}
+                    onNavigate={select}
                     records={records}
                     selectedId={active?._id ?? ""}
                     onSelectYear={handleSelectYear}
@@ -2360,47 +2324,59 @@ export function PlacementsPageLayout({
                   />
                 </div>
 
-                <div className="min-w-0 space-y-16">
+                {/* One panel at a time: each section sits in its own panel,
+                    opened from the sidebar. */}
+                <div {...containerProps} className="min-w-0">
                   {present.has("banner") && (
-                    <BannerSection
-                      data={info.banner}
-                      editable={editable}
-                      onEditSection={onEditSection}
-                    />
+                    <div {...panelProps("banner")}>
+                      <BannerSection
+                        data={info.banner}
+                        editable={editable}
+                        onEditSection={onEditSection}
+                      />
+                    </div>
                   )}
                   {present.has("process") && (
-                    <ProcessSection
-                      data={info.process}
-                      editable={editable}
-                      onEditSection={onEditSection}
-                    />
+                    <div {...panelProps("process")}>
+                      <ProcessSection
+                        data={info.process}
+                        editable={editable}
+                        onEditSection={onEditSection}
+                      />
+                    </div>
                   )}
                   {present.has("tpo") && (
-                    <TpoSection
-                      data={info.tpo}
-                      editable={editable}
-                      onEditSection={onEditSection}
-                    />
+                    <div {...panelProps("tpo")}>
+                      <TpoSection
+                        data={info.tpo}
+                        editable={editable}
+                        onEditSection={onEditSection}
+                      />
+                    </div>
                   )}
                   {present.has("mou") && (
-                    <MouSection
-                      data={info.mou}
-                      editable={editable}
-                      onEditSection={onEditSection}
-                    />
+                    <div {...panelProps("mou")}>
+                      <MouSection
+                        data={info.mou}
+                        editable={editable}
+                        onEditSection={onEditSection}
+                      />
+                    </div>
                   )}
                   {present.has("why-recruit") && (
-                    <WhyRecruitSection
-                      data={info.whyRecruit}
-                      label={label}
-                      editable={editable}
-                      onEditSection={onEditSection}
-                    />
+                    <div {...panelProps("why-recruit")}>
+                      <WhyRecruitSection
+                        data={info.whyRecruit}
+                        label={label}
+                        editable={editable}
+                        onEditSection={onEditSection}
+                      />
+                    </div>
                   )}
 
                   {active && (
                     <>
-                      <section id="overview" className="scroll-mt-28">
+                      <section id="overview" {...panelProps("overview")}>
                         <CurrentYear
                           record={active}
                           editable={editable}
@@ -2408,35 +2384,43 @@ export function PlacementsPageLayout({
                         />
                       </section>
                       {present.has("history") && (
-                        <PlacementHistory
-                          records={records}
-                          storedColumns={info.historyColumns}
-                          selectedId={active._id}
-                          onSelectYear={handleSelectYear}
-                          editable={editable}
-                          onEditSection={onEditSection}
-                        />
+                        <div {...panelProps("history")}>
+                          <PlacementHistory
+                            records={records}
+                            storedColumns={info.historyColumns}
+                            selectedId={active._id}
+                            onSelectYear={handleSelectYear}
+                            editable={editable}
+                            onEditSection={onEditSection}
+                          />
+                        </div>
                       )}
                       {present.has("recruiters") && (
-                        <TopRecruiters
-                          record={active}
-                          editable={editable}
-                          onEditSection={onEditSection}
-                        />
+                        <div {...panelProps("recruiters")}>
+                          <TopRecruiters
+                            record={active}
+                            editable={editable}
+                            onEditSection={onEditSection}
+                          />
+                        </div>
                       )}
                       {present.has("achievers") && (
-                        <PlacedStudents
-                          record={active}
-                          editable={editable}
-                          onEditSection={onEditSection}
-                        />
+                        <div {...panelProps("achievers")}>
+                          <PlacedStudents
+                            record={active}
+                            editable={editable}
+                            onEditSection={onEditSection}
+                          />
+                        </div>
                       )}
                       {present.has("company-wise") && (
-                        <CompanyPlacements
-                          record={active}
-                          editable={editable}
-                          onEditSection={onEditSection}
-                        />
+                        <div {...panelProps("company-wise")}>
+                          <CompanyPlacements
+                            record={active}
+                            editable={editable}
+                            onEditSection={onEditSection}
+                          />
+                        </div>
                       )}
                     </>
                   )}
@@ -2444,7 +2428,7 @@ export function PlacementsPageLayout({
                   {present.has(PLACEMENT_GALLERY_ANCHOR) && visibleGallery && (
                     <section
                       id={PLACEMENT_GALLERY_ANCHOR}
-                      className="scroll-mt-28"
+                      {...panelProps(PLACEMENT_GALLERY_ANCHOR)}
                     >
                       <EditableRegion
                         as="div"
@@ -2530,7 +2514,7 @@ export function PlacementsPageLayout({
                       label={sec.navLabel}
                       editable={editable}
                       onEditSection={onEditSection}
-                      className="scroll-mt-28"
+                      {...panelProps(sec.anchor)}
                     >
                       <SectionHeading icon={sec.icon} title={sec.navLabel} />
                       {editable && (sec.blocks?.length ?? 0) === 0 ? (

@@ -371,7 +371,7 @@ export const HELP_CHAPTERS: HelpChapter[] = [
     icon: MousePointerClick,
     summary: "Click a section on the page, edit it in the panel, publish.",
     keywords:
-      "live preview inspector click to edit section panel about coe campus life research clubs committees naac documents accreditations content page tabs",
+      "live preview inspector click to edit section panel about coe campus life research clubs committees naac documents accreditations content page tabs side menu sidebar",
     body: () => (
       <>
         <P>
@@ -407,6 +407,16 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           can still be clicked and filled in. Content that lives elsewhere —
           program cards, events — has a button in the panel that takes you
           there.
+        </P>
+
+        <H3>Pages with a side menu</H3>
+        <P>
+          About, COE, Placements, NAAC, Reports &amp; Downloads, Research and
+          the program pages show one part at a time, the same as on the live
+          site. Their side menu stays on screen while you scroll the preview:
+          click an entry to open that part, then click the part itself to edit
+          it. Picking a section from the list opens its part for you. Clicking
+          the menu itself, away from its entries, edits the menu.
         </P>
 
         <H3>Pages that contain other pages</H3>
@@ -678,12 +688,14 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           in the preview immediately and uploads it when you save. That way a
           change you abandon never leaves a stray file behind.
         </P>
+        <P>
+          There is no shape to choose. Each field already crops to the shape its
+          spot on the page uses — wide for a banner, upright for a headshot,
+          square for a logo — and the line under the field says which, and the
+          size that looks sharpest. A smaller file is still accepted; the field
+          just warns that it may look soft.
+        </P>
         <Steps>
-          <li>
-            Choose the shape first, where the field offers one — hero, card,
-            square or portrait. The image is resized to that shape on upload, so
-            the preview and the live page always agree.
-          </li>
           <li>Pick the file. It appears in the preview at once.</li>
           <li>
             Save the screen. The upload happens now, and the field is pointed at

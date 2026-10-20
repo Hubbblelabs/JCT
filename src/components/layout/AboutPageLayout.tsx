@@ -62,6 +62,7 @@ import {
   type ResolvedSidebarItem,
   type SidebarNavDefault,
 } from "@/lib/sidebar-nav";
+import { useSectionPanels } from "@/lib/use-section-panels";
 
 type Institution = "main" | "engineering" | "arts-science" | "polytechnic";
 
@@ -353,7 +354,7 @@ function AboutSideNav({
   data,
   theme,
   activeId,
-  setActiveId,
+  onSelect,
   visibleAnchors,
   hosted,
   editable,
@@ -362,9 +363,9 @@ function AboutSideNav({
   data: AboutPageValue;
   theme: ThemeTokens;
   activeId: string;
-  setActiveId: (id: string) => void;
+  onSelect: (id: string) => void;
   /** Built-in anchors that actually render — others are dropped from the nav
-   * so a link never scrolls to a section hidden for lack of content. */
+   * so an entry never opens a section hidden for lack of content. */
   visibleAnchors: Set<string>;
   /** Content pages hosted as extra panels of this sidebar (e.g. Timeline). */
   hosted?: AboutHostedItem[];
@@ -377,37 +378,12 @@ function AboutSideNav({
   ).filter(
     (n) => n.customHref || n.customSection || visibleAnchors.has(n.anchor),
   );
-  const builtins = navItems.filter((n) => !n.customHref);
-  // Only the entries with real content render an element to observe — the
-  // admin-preview link-only entries have no in-page anchor.
-  const hostedPanels = (hosted ?? []).filter((h) => !h.href);
 
-  useEffect(() => {
-    if (typeof window === "undefined" || window.innerWidth < 1024) return;
-    const observers: IntersectionObserver[] = [];
-    [...builtins, ...hostedPanels].forEach(({ anchor }) => {
-      const el = document.getElementById(anchor);
-      if (!el) return;
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActiveId(anchor);
-        },
-        { rootMargin: "-25% 0px -65% 0px", threshold: 0 },
-      );
-      observer.observe(el);
-      observers.push(observer);
-    });
-    return () => observers.forEach((obs) => obs.disconnect());
-  }, [setActiveId, builtins, hostedPanels]);
-
-  const handleClick = (id: string) => {
-    setActiveId(id);
-    if (typeof window !== "undefined" && window.innerWidth >= 1024) {
-      const el = document.getElementById(id);
-      if (!el) return;
-      const top = el.getBoundingClientRect().top + window.scrollY - 120;
-      window.scrollTo({ top, behavior: "smooth" });
-    }
+  // Stop the click short of the surrounding "sidebar" region in the admin
+  // preview: picking an entry must open its section, not the inspector.
+  const handleClick = (id: string) => (e: MouseEvent) => {
+    e.stopPropagation();
+    onSelect(id);
   };
 
   const facts = data.sidebar.quickFacts;
@@ -451,7 +427,9 @@ function AboutSideNav({
             return (
               <button
                 key={it.id}
-                onClick={editable ? undefined : () => handleClick(it.anchor)}
+                type="button"
+                onClick={handleClick(it.anchor)}
+                aria-current={isActive ? "true" : undefined}
                 className={cls}
               >
                 <Icon size={13} className="shrink-0" />
@@ -482,7 +460,9 @@ function AboutSideNav({
             return (
               <button
                 key={`h:${h.anchor}`}
-                onClick={editable ? undefined : () => handleClick(h.anchor)}
+                type="button"
+                onClick={handleClick(h.anchor)}
+                aria-current={isActive ? "true" : undefined}
                 className={cls}
               >
                 {icon}
@@ -537,7 +517,9 @@ function AboutSideNav({
             return (
               <button
                 key={it.id}
-                onClick={editable ? undefined : () => handleClick(it.anchor)}
+                type="button"
+                onClick={handleClick(it.anchor)}
+                aria-current={isActive ? "true" : undefined}
                 className={cls}
               >
                 <Icon size={16} className={iconCls} />
@@ -573,7 +555,9 @@ function AboutSideNav({
             return (
               <button
                 key={`h:${h.anchor}`}
-                onClick={editable ? undefined : () => handleClick(h.anchor)}
+                type="button"
+                onClick={handleClick(h.anchor)}
+                aria-current={isActive ? "true" : undefined}
                 className={cls}
               >
                 <span className={iconCls}>{h.icon}</span>
@@ -650,7 +634,6 @@ export function AboutPageLayout({
 }) {
   const theme = THEME[institution];
   const meta = INSTITUTION_META[institution];
-  const [activeId, setActiveId] = useState<string>("about");
   const [activePerson, setActivePerson] = useState<PersonModalData | null>(
     null,
   );
@@ -702,14 +685,6 @@ export function AboutPageLayout({
     ["name"],
   );
 
-  // In editable mode every section stays visible so it can be selected.
-  const mobileVis = (anchor: string) =>
-    editable
-      ? "block"
-      : activeId === anchor
-        ? "block opacity-100"
-        : "hidden lg:block lg:opacity-100";
-
   const sectionHasContent = (anchor: string): boolean => {
     switch (anchor) {
       case "about":
@@ -757,21 +732,21 @@ export function AboutPageLayout({
       .map((r) => r.anchor),
   );
 
-  const sectionVis = (anchor: string) => {
-    if (!editable && !visibleBuiltins.has(anchor)) return "hidden";
-    return mobileVis(anchor);
-  };
-
-  // Like sectionVis, but visible if ANY of the given anchors qualifies —
-  // used for elements (e.g. a shared heading) that span multiple sections.
-  const sectionVisAny = (...anchors: string[]) => {
-    if (!editable && !anchors.some((a) => visibleBuiltins.has(a))) {
-      return "hidden";
-    }
-    if (editable) return "block";
-    if (anchors.some((a) => activeId === a)) return "block opacity-100";
-    return "hidden lg:block lg:opacity-100";
-  };
+  // The panels the sidebar opens, in its order. A section without an entry —
+  // empty, or switched off in the sidebar editor — is never one of them; the
+  // admin preview still brings it forward when it is picked from the list.
+  const { activeId, select, containerProps, panelProps } = useSectionPanels(
+    [
+      ...resolved
+        .filter(
+          (r) =>
+            !r.customHref && (r.customSection || visibleBuiltins.has(r.anchor)),
+        )
+        .map((r) => r.anchor),
+      ...hosted.filter((h) => !h.href).map((h) => h.anchor),
+    ],
+    { syncHash: !editable },
+  );
 
   return (
     <main
@@ -807,7 +782,7 @@ export function AboutPageLayout({
             data={data}
             theme={theme}
             activeId={activeId}
-            setActiveId={setActiveId}
+            onSelect={select}
             visibleAnchors={visibleBuiltins}
             hosted={hosted}
             editable={editable}
@@ -821,13 +796,20 @@ export function AboutPageLayout({
                 fully reachable — a pinned element can't be scrolled into view
                 by the page scroll. The cap subtracts the `top-32` offset plus
                 the bottom band held by the floating Apply / WhatsApp buttons,
-                so the rail never ends underneath them. */}
-            <div className="sticky top-32 max-h-[calc(100vh-14rem)] overflow-y-auto overscroll-contain">
+                so the rail never ends underneath them. The admin preview has
+                neither the fixed navbar nor the buttons. */}
+            <div
+              className={`sticky overflow-y-auto overscroll-contain ${
+                editable
+                  ? "top-6 max-h-[calc(100vh-3rem)]"
+                  : "top-32 max-h-[calc(100vh-14rem)]"
+              }`}
+            >
               <AboutSideNav
                 data={data}
                 theme={theme}
                 activeId={activeId}
-                setActiveId={setActiveId}
+                onSelect={select}
                 visibleAnchors={visibleBuiltins}
                 hosted={hosted}
                 editable={editable}
@@ -836,7 +818,7 @@ export function AboutPageLayout({
             </div>
           </div>
 
-          <div className="mt-8 min-w-0 space-y-16 lg:mt-0">
+          <div {...containerProps} className="mt-8 min-w-0 lg:mt-0">
             {/* 1. About */}
             <EditableRegion
               as="section"
@@ -845,7 +827,7 @@ export function AboutPageLayout({
               label={ABOUT_SECTION_LABELS.about}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("about")}`}
+              {...panelProps("about")}
             >
               <SectionHeading
                 icon={Landmark}
@@ -884,7 +866,7 @@ export function AboutPageLayout({
               label={ABOUT_SECTION_LABELS.visionMission}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("vision")}`}
+              {...panelProps("vision")}
             >
               <SectionHeading
                 icon={Target}
@@ -942,7 +924,7 @@ export function AboutPageLayout({
               label={ABOUT_SECTION_LABELS.qualityPolicy}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("quality-policy")}`}
+              {...panelProps("quality-policy")}
             >
               <SectionHeading
                 icon={ShieldCheck}
@@ -974,9 +956,11 @@ export function AboutPageLayout({
               </div>
             </EditableRegion>
 
-            {/* 3. Leadership heading (shared by Principal + Management) */}
+            {/* 3. Leadership heading — tops both the Principal and the
+                Management panel */}
             <div
-              className={`text-center transition-all duration-300 ${sectionVisAny("principal", "management")}`}
+              hidden={activeId !== "principal" && activeId !== "management"}
+              className="mb-16 text-center"
             >
               <h2
                 className={`${theme.accentText} font-serif text-xl font-black tracking-wide uppercase md:text-2xl`}
@@ -1005,7 +989,7 @@ export function AboutPageLayout({
               label={ABOUT_SECTION_LABELS.principal}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("principal")}`}
+              {...panelProps("principal")}
             >
               <div
                 className={`${theme.softBg5} ${theme.border20} rounded-3xl border p-6 md:p-10`}
@@ -1110,7 +1094,7 @@ export function AboutPageLayout({
               label={ABOUT_SECTION_LABELS.management}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("management")}`}
+              {...panelProps("management")}
             >
               {data.management.description && (
                 <p className="text-muted-foreground mb-6 text-center text-sm leading-relaxed md:text-base">
@@ -1179,7 +1163,7 @@ export function AboutPageLayout({
               label={ABOUT_SECTION_LABELS.hod}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("hod")}`}
+              {...panelProps("hod")}
             >
               <SectionHeading
                 icon={BookOpen}
@@ -1232,7 +1216,7 @@ export function AboutPageLayout({
               label={ABOUT_SECTION_LABELS.governingCouncil}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("governing-council")}`}
+              {...panelProps("governing-council")}
             >
               <SectionHeading
                 icon={Users}
@@ -1281,7 +1265,7 @@ export function AboutPageLayout({
               label={ABOUT_SECTION_LABELS.planningBoard}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("planning-board")}`}
+              {...panelProps("planning-board")}
             >
               <SectionHeading
                 icon={ClipboardList}
@@ -1334,7 +1318,7 @@ export function AboutPageLayout({
               label={ABOUT_SECTION_LABELS.coreValues}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("core-values")}`}
+              {...panelProps("core-values")}
             >
               <SectionHeading icon={Heart} title="Core Values" theme={theme} />
               <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
@@ -1372,7 +1356,7 @@ export function AboutPageLayout({
               label={ABOUT_SECTION_LABELS.accreditations}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("accreditations")}`}
+              {...panelProps("accreditations")}
             >
               <SectionHeading
                 icon={Award}
@@ -1417,7 +1401,7 @@ export function AboutPageLayout({
               label={ABOUT_SECTION_LABELS.campusHighlights}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("campus")}`}
+              {...panelProps("campus")}
             >
               <SectionHeading
                 icon={School}
@@ -1459,7 +1443,7 @@ export function AboutPageLayout({
               label={ABOUT_SECTION_LABELS.whyJct}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("why-jct")}`}
+              {...panelProps("why-jct")}
             >
               <SectionHeading icon={Star} title={meta.whyTitle} theme={theme} />
               <div className="flex flex-wrap gap-2.5">
@@ -1488,7 +1472,7 @@ export function AboutPageLayout({
                 label={sec.navLabel}
                 editable={editable}
                 onEditSection={onEditSection}
-                className={`scroll-mt-28 transition-all duration-300 ${mobileVis(sec.anchor)}`}
+                {...panelProps(sec.anchor)}
               >
                 <h2
                   className={`mb-6 flex items-center gap-3 font-serif text-2xl font-bold md:text-3xl`}
@@ -1527,7 +1511,7 @@ export function AboutPageLayout({
                   <section
                     key={h.anchor}
                     id={h.anchor}
-                    className={`scroll-mt-28 transition-all duration-300 ${mobileVis(h.anchor)}`}
+                    {...panelProps(h.anchor)}
                   >
                     <EditableRegion
                       as="div"

@@ -19,6 +19,10 @@ import {
 } from "lucide-react";
 import { InspectorOverlay } from "@/components/admin/InspectorOverlay";
 import { useTopbarSlot } from "@/components/admin/shell/topbar-slot";
+import {
+  REVEAL_PANEL_EVENT,
+  SECTION_PANEL_ATTR,
+} from "@/lib/use-section-panels";
 import { ScaledPreview } from "./ScaledPreview";
 
 /** One editable part of the page, as listed in the side panel. */
@@ -131,15 +135,36 @@ function sectionSelector(scope: string, id: string): string {
   return `${root} [data-preview-section="${v}"], ${root} [data-edit-section="${v}"]`;
 }
 
+const isRendered = (el: Element) => el.getClientRects().length > 0;
+
+const HIDDEN_PANEL = `[${SECTION_PANEL_ATTR}][hidden]`;
+
 /**
  * Bring a section into view unless it already is — so choosing one from the
  * list or the sidebar finds it, while clicking it in the preview (where it is
  * visible by definition) doesn't jerk the page around.
+ *
+ * A page with a sidebar shows one panel at a time (`useSectionPanels`), so the
+ * section may sit on a closed one: the page is asked to open it first, and
+ * answers synchronously. A region can also render twice — a sidebar's phone
+ * and desktop copies, one hidden by CSS — so the copy on screen wins.
  */
 function revealInPreview(root: HTMLElement, scope: string, id: string) {
-  const el = root.querySelector(sectionSelector(scope, id));
+  const matches = Array.from(
+    root.querySelectorAll<HTMLElement>(sectionSelector(scope, id)),
+  );
+  const el =
+    matches.find(isRendered) ?? matches.find((m) => m.closest(HIDDEN_PANEL));
   const pane = root.querySelector(".admin-workspace-preview");
   if (!el || !pane) return;
+  for (
+    let panel = el.closest<HTMLElement>(HIDDEN_PANEL);
+    panel;
+    panel = panel.parentElement?.closest<HTMLElement>(HIDDEN_PANEL) ?? null
+  ) {
+    panel.dispatchEvent(new CustomEvent(REVEAL_PANEL_EVENT, { bubbles: true }));
+  }
+  if (!isRendered(el)) return;
   const r = el.getBoundingClientRect();
   const p = pane.getBoundingClientRect();
   const visible = r.bottom > p.top + 40 && r.top < p.bottom - 40;

@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import {
   CheckCircle2,
@@ -21,6 +20,7 @@ import { EditableRegion } from "@/components/admin/EditableRegion";
 import { getImageUrl } from "@/lib/utils";
 import { sanitizeHtml } from "@/lib/sanitize-html";
 import { lookupSidebarIcon } from "@/lib/sidebar-nav";
+import { useSectionPanels } from "@/lib/use-section-panels";
 import type {
   ResearchPageValue,
   ResearchTabValue,
@@ -251,8 +251,17 @@ function TabSectionRenderer({ section }: { section: ResearchTabSectionValue }) {
   return null;
 }
 
-function ResearchTabsView({ tabs }: { tabs: ResearchTabValue[] }) {
-  const [activeId, setActiveId] = useState(tabs[0]?.id ?? "");
+function ResearchTabsView({
+  tabs,
+  editable = false,
+}: {
+  tabs: ResearchTabValue[];
+  editable?: boolean;
+}) {
+  const { activeId, select, containerProps } = useSectionPanels(
+    tabs.map((t) => t.id),
+    { syncHash: !editable },
+  );
   // Falling back to the first tab keeps the pane populated if a stored active
   // id no longer matches any tab (e.g. the admin renamed or removed one).
   const active = tabs.find((t) => t.id === activeId) ?? tabs[0];
@@ -260,7 +269,14 @@ function ResearchTabsView({ tabs }: { tabs: ResearchTabValue[] }) {
   return (
     <div className="flex flex-col gap-6 lg:flex-row lg:gap-10">
       <aside className="shrink-0 lg:w-72">
-        <div className="sticky top-24 z-30 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto lg:overscroll-contain lg:rounded-2xl lg:border lg:border-white/10 lg:bg-white/5 lg:p-3">
+        {/* The admin preview has no fixed navbar to clear. */}
+        <div
+          className={`sticky z-30 lg:overflow-y-auto lg:overscroll-contain lg:rounded-2xl lg:border lg:border-white/10 lg:bg-white/5 lg:p-3 ${
+            editable
+              ? "top-6 lg:max-h-[calc(100vh-3rem)]"
+              : "top-24 lg:max-h-[calc(100vh-12rem)]"
+          }`}
+        >
           <nav className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:flex lg:flex-col lg:gap-1">
             {tabs.map((tab) => {
               const Icon = lookupSidebarIcon(tab.icon) ?? FlaskConical;
@@ -269,7 +285,12 @@ function ResearchTabsView({ tabs }: { tabs: ResearchTabValue[] }) {
                 <button
                   key={tab.id}
                   type="button"
-                  onClick={() => setActiveId(tab.id)}
+                  // Stop short of the surrounding "tabs" region in the admin
+                  // preview: picking a tab must open it, not the inspector.
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    select(tab.id);
+                  }}
                   aria-current={isActive ? "true" : undefined}
                   className={`flex w-full items-center justify-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition-colors lg:justify-start lg:px-4 lg:py-3 ${
                     isActive
@@ -286,7 +307,7 @@ function ResearchTabsView({ tabs }: { tabs: ResearchTabValue[] }) {
         </div>
       </aside>
 
-      <div className="min-w-0 flex-1">
+      <div {...containerProps} className="min-w-0 flex-1">
         {active && (
           <>
             <h2 className="text-foreground mb-6 font-serif text-2xl font-bold md:text-3xl">
@@ -363,7 +384,7 @@ export function ResearchPageLayout({
               onEditSection={onEditSection}
             >
               {hasTabs ? (
-                <ResearchTabsView tabs={tabs} />
+                <ResearchTabsView tabs={tabs} editable={editable} />
               ) : (
                 <EmptyHint>
                   Click to add sidebar tabs (Overview, Purpose, Committee…)

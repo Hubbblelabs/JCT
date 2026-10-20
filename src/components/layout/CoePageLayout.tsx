@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import type { MouseEvent } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -34,6 +34,7 @@ import {
   type ResolvedSidebarItem,
   type SidebarNavDefault,
 } from "@/lib/sidebar-nav";
+import { useSectionPanels } from "@/lib/use-section-panels";
 
 // ─── Editable sections ───────────────────────────────────────────────────────
 
@@ -116,13 +117,13 @@ function SectionHeading({
 function CoeSideNav({
   data,
   activeId,
-  setActiveId,
+  onSelect,
   editable,
   onEditSection,
 }: {
   data: CoePageValue;
   activeId: string;
-  setActiveId: (id: string) => void;
+  onSelect: (id: string) => void;
   editable?: boolean;
   onEditSection?: (section: string) => void;
 }) {
@@ -130,34 +131,12 @@ function CoeSideNav({
     COE_NAV_DEFAULTS,
     data.sidebar.navItems,
   );
-  const builtins = navItems.filter((n) => !n.customHref);
 
-  useEffect(() => {
-    if (typeof window === "undefined" || window.innerWidth < 1024) return;
-    const observers: IntersectionObserver[] = [];
-    builtins.forEach(({ anchor }) => {
-      const el = document.getElementById(anchor);
-      if (!el) return;
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) setActiveId(anchor);
-        },
-        { rootMargin: "-25% 0px -65% 0px", threshold: 0 },
-      );
-      observer.observe(el);
-      observers.push(observer);
-    });
-    return () => observers.forEach((obs) => obs.disconnect());
-  }, [setActiveId, builtins]);
-
-  const handleClick = (id: string) => {
-    setActiveId(id);
-    const el = document.getElementById(id);
-    if (!el) return;
-    const offset =
-      typeof window !== "undefined" && window.innerWidth >= 1024 ? 120 : 90;
-    const top = el.getBoundingClientRect().top + window.scrollY - offset;
-    window.scrollTo({ top, behavior: "smooth" });
+  // Stop the click short of the surrounding "sidebar" region in the admin
+  // preview: picking an entry must open its section, not the inspector.
+  const handleClick = (id: string) => (e: MouseEvent) => {
+    e.stopPropagation();
+    onSelect(id);
   };
 
   return (
@@ -198,7 +177,9 @@ function CoeSideNav({
             return (
               <button
                 key={it.id}
-                onClick={editable ? undefined : () => handleClick(it.anchor)}
+                type="button"
+                onClick={handleClick(it.anchor)}
+                aria-current={isActive ? "true" : undefined}
                 className={cls}
               >
                 <Icon size={13} className="shrink-0" />
@@ -253,7 +234,9 @@ function CoeSideNav({
             return (
               <button
                 key={it.id}
-                onClick={editable ? undefined : () => handleClick(it.anchor)}
+                type="button"
+                onClick={handleClick(it.anchor)}
+                aria-current={isActive ? "true" : undefined}
                 className={cls}
               >
                 <Icon size={16} className={iconCls} />
@@ -311,27 +294,16 @@ export function CoePageLayout({
   editable?: boolean;
   onEditSection?: (section: string) => void;
 }) {
-  const [activeId, setActiveId] = useState<string>("overview");
-
   const resolved = resolveSidebarItems(COE_NAV_DEFAULTS, data.sidebar.navItems);
-  const visibleBuiltins = new Set(
-    resolved
-      .filter((r) => !r.customHref && !r.customSection)
-      .map((r) => r.anchor),
-  );
   const customSections = resolved.filter((r) => r.customSection);
 
-  const mobileVis = (anchor: string) =>
-    editable
-      ? "block"
-      : activeId === anchor
-        ? "block opacity-100"
-        : "hidden lg:block lg:opacity-100";
-
-  const sectionVis = (anchor: string) => {
-    if (!editable && !visibleBuiltins.has(anchor)) return "hidden";
-    return mobileVis(anchor);
-  };
+  // The panels the sidebar opens, in its order. A section switched off in the
+  // sidebar editor is never one of them; the admin preview still brings it
+  // forward when it is picked from the list.
+  const { activeId, select, containerProps, panelProps } = useSectionPanels(
+    resolved.filter((r) => !r.customHref).map((r) => r.anchor),
+    { syncHash: !editable },
+  );
 
   const ctrl = data.overview.controller;
   // Published values are read straight out of Mongo without re-parsing the Zod
@@ -371,7 +343,7 @@ export function CoePageLayout({
           <CoeSideNav
             data={data}
             activeId={activeId}
-            setActiveId={setActiveId}
+            onSelect={select}
             editable={editable}
             onEditSection={onEditSection}
           />
@@ -381,19 +353,26 @@ export function CoePageLayout({
           <div className="hidden lg:block">
             {/* Capped to the viewport (the `top-32` offset plus the bottom band
                 held by the floating Apply / WhatsApp buttons) and scrollable so
-                a long nav list stays fully reachable. */}
-            <div className="sticky top-32 max-h-[calc(100vh-14rem)] overflow-y-auto overscroll-contain">
+                a long nav list stays fully reachable. The admin preview has
+                neither the fixed navbar nor the buttons. */}
+            <div
+              className={`sticky overflow-y-auto overscroll-contain ${
+                editable
+                  ? "top-6 max-h-[calc(100vh-3rem)]"
+                  : "top-32 max-h-[calc(100vh-14rem)]"
+              }`}
+            >
               <CoeSideNav
                 data={data}
                 activeId={activeId}
-                setActiveId={setActiveId}
+                onSelect={select}
                 editable={editable}
                 onEditSection={onEditSection}
               />
             </div>
           </div>
 
-          <div className="mt-8 min-w-0 space-y-16 lg:mt-0">
+          <div {...containerProps} className="mt-8 min-w-0 lg:mt-0">
             {/* 1. Overview */}
             <EditableRegion
               as="section"
@@ -402,7 +381,7 @@ export function CoePageLayout({
               label={COE_SECTION_LABELS.overview}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("overview")}`}
+              {...panelProps("overview")}
             >
               <SectionHeading icon={Landmark} title="Office of the COE" />
 
@@ -494,7 +473,7 @@ export function CoePageLayout({
               label={COE_SECTION_LABELS.responsibilities}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("responsibilities")}`}
+              {...panelProps("responsibilities")}
             >
               <SectionHeading
                 icon={ClipboardList}
@@ -549,7 +528,7 @@ export function CoePageLayout({
               label={COE_SECTION_LABELS.obe}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("obe")}`}
+              {...panelProps("obe")}
             >
               <SectionHeading
                 icon={BookOpen}
@@ -585,7 +564,7 @@ export function CoePageLayout({
               label={COE_SECTION_LABELS.academicCalendar}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("academic-calendar")}`}
+              {...panelProps("academic-calendar")}
             >
               <SectionHeading
                 icon={CalendarDays}
@@ -679,7 +658,7 @@ export function CoePageLayout({
               label={COE_SECTION_LABELS.downloads}
               editable={editable}
               onEditSection={onEditSection}
-              className={`scroll-mt-28 transition-all duration-300 ${sectionVis("downloads")}`}
+              {...panelProps("downloads")}
             >
               <SectionHeading icon={Download} title="Circulars & Downloads" />
               <p className="text-muted-foreground mb-8 text-sm leading-relaxed md:text-base">
@@ -736,7 +715,7 @@ export function CoePageLayout({
                 label={sec.navLabel}
                 editable={editable}
                 onEditSection={onEditSection}
-                className={`scroll-mt-28 transition-all duration-300 ${mobileVis(sec.anchor)}`}
+                {...panelProps(sec.anchor)}
               >
                 <SectionHeading icon={sec.icon} title={sec.navLabel} />
                 {editable && (!sec.blocks || sec.blocks.length === 0) ? (

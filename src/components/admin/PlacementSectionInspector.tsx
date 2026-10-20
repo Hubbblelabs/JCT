@@ -45,9 +45,7 @@ export function PlacementSectionInspector({
             Poster-style images for the &ldquo;Highlights&rdquo; section — the
             first item in the page&apos;s sidebar — e.g. the annual
             &ldquo;Distinguished Alumni Students&rdquo; sheet. Each one renders
-            full width at its own shape, so upload it with the{" "}
-            <span className="font-medium">Auto / Original</span> ratio to keep
-            the artwork uncropped.
+            full width at its own shape, so the artwork is never cropped.
           </p>
           <TextInput
             label="Heading (optional)"

@@ -22,6 +22,8 @@ export function EditableRegion<S extends string>({
   onEditSection,
   className = "",
   style,
+  hidden,
+  "data-section-panel": panel,
   children,
 }: {
   as?: ElementType;
@@ -32,6 +34,9 @@ export function EditableRegion<S extends string>({
   onEditSection?: (section: S) => void;
   className?: string;
   style?: CSSProperties;
+  /** With `data-section-panel`, from `useSectionPanels().panelProps`. */
+  hidden?: boolean;
+  "data-section-panel"?: string;
   children: ReactNode;
 }) {
   const Component = as ?? "section";
@@ -53,6 +58,8 @@ export function EditableRegion<S extends string>({
           : ""
       }`}
       style={style}
+      hidden={hidden}
+      data-section-panel={panel}
       onClick={editable ? handleSelect : undefined}
       onKeyDown={
         editable

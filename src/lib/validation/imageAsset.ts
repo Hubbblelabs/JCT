@@ -38,8 +38,11 @@ export const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 // clear "file too large" message instead of an opaque "Upload failed".
 export const MAX_DIRECT_UPLOAD_SIZE = 4 * 1024 * 1024; // 4 MB (headroom under 4.5)
 
-// The editor picks a ratio at upload time and sharp resizes to exactly these
-// dimensions, so the admin preview and the public rendering always agree.
+// Each image field fixes its ratio in code (the `ratio` prop on the admin
+// inputs) — there is no per-upload picker, since the field already knows the
+// frame it renders into, and a mismatched choice only cropped twice. sharp
+// resizes to these dimensions, so the admin preview and the public rendering
+// agree.
 //
 // This supersedes the old per-category CATEGORY_RULES: `category` is now pure
 // taxonomy (filtering/scoping) and carries no dimension semantics. Having one
@@ -55,7 +58,7 @@ export const RATIO_TYPES = [
 export type RatioType = (typeof RATIO_TYPES)[number];
 
 export type RatioRule = {
-  /** Shown in the upload picker */
+  /** Shown beside an uploaded image's dimensions */
   label: string;
   /** Human-readable ratio, stored on the asset as `aspect_ratio` */
   ratio: string;
@@ -70,6 +73,7 @@ export type RatioRule = {
   fit: "cover" | "contain";
   /** Tailwind class used for the admin preview box; null = intrinsic */
   aspectClass: string | null;
+  /** Shown under the field: what happens to the file, and the size to aim for */
   hint: string;
 };
 
@@ -81,7 +85,7 @@ export const IMAGE_RATIOS: Record<RatioType, RatioRule> = {
     height: null,
     fit: "cover",
     aspectClass: null,
-    hint: "Keeps the source shape; only caps width at 1920px.",
+    hint: "Keeps its own shape; anything wider than 1920px is scaled down.",
   },
   hero: {
     label: "Hero Banner",
@@ -94,7 +98,7 @@ export const IMAGE_RATIOS: Record<RatioType, RatioRule> = {
     height: 1080,
     fit: "cover",
     aspectClass: "aspect-video",
-    hint: "Full-width banners and page heroes.",
+    hint: "Cropped to 16:9 from the centre. 1920×1080px or larger stays sharp.",
   },
   card: {
     label: "Standard Card",
@@ -103,7 +107,7 @@ export const IMAGE_RATIOS: Record<RatioType, RatioRule> = {
     height: 600,
     fit: "cover",
     aspectClass: "aspect-[4/3]",
-    hint: "Course, program, and campus cards.",
+    hint: "Cropped to 4:3 from the centre. 800×600px or larger stays sharp.",
   },
   square: {
     label: "Logo / Icon",
@@ -112,7 +116,7 @@ export const IMAGE_RATIOS: Record<RatioType, RatioRule> = {
     height: 500,
     fit: "contain",
     aspectClass: "aspect-square",
-    hint: "Recruiter logos and icons — padded, never cropped.",
+    hint: "Fitted into a 1:1 square and padded, never cropped.",
   },
   portrait: {
     label: "Portrait",
@@ -121,26 +125,54 @@ export const IMAGE_RATIOS: Record<RatioType, RatioRule> = {
     height: 800,
     fit: "cover",
     aspectClass: "aspect-[3/4]",
-    hint: "Faculty photos and testimonial headshots.",
+    hint: "Cropped to 3:4 from the centre. 600×800px or larger stays sharp.",
   },
 };
 
 /**
- * A "cover" resize to a fixed frame will happily upscale a small source into a
- * blurry result. Reject that at the boundary instead, and tell the editor the
- * minimum they need. "contain" is exempt: it pads rather than upscales, which
- * is the correct behaviour for a small logo.
+ * Size the upload pipeline produces from a `width` x `height` source.
+ *
+ * - "auto" keeps the source shape and only caps the width.
+ * - "contain" always yields the rule's canvas.
+ * - "cover" gives exactly rule.width x rule.height for a source at least that
+ *   large. A smaller one is cropped to the same shape at the largest size it
+ *   can fill, never upscaled — an upscale only stores a blurrier copy of the
+ *   same pixels. Such sources used to be refused, but with the ratio fixed per
+ *   field that would leave no way to upload them at all, so the admin input
+ *   warns instead (`belowRatioTarget`).
  */
-export function ratioSourceTooSmall(
+export function ratioOutputSize(
   rule: RatioRule,
   width: number,
   height: number,
-): string | null {
-  if (rule.height === null || rule.fit !== "cover") return null;
-  if (width < rule.width || height < rule.height) {
-    return `Image is ${width}x${height}px, too small for ${rule.label} (${rule.ratio}). Supply at least ${rule.width}x${rule.height}px.`;
+): { width: number; height: number } {
+  if (rule.height === null) {
+    const scale = Math.min(1, rule.width / width);
+    return {
+      width: Math.max(1, Math.round(width * scale)),
+      height: Math.max(1, Math.round(height * scale)),
+    };
   }
-  return null;
+  if (rule.fit === "contain") return { width: rule.width, height: rule.height };
+  const scale = Math.min(1, width / rule.width, height / rule.height);
+  return {
+    width: Math.max(1, Math.round(rule.width * scale)),
+    height: Math.max(1, Math.round(rule.height * scale)),
+  };
+}
+
+/**
+ * True when a source is smaller than a fixed "cover" frame, so it is stored
+ * below the target size and may look soft. "contain" and "auto" never crop,
+ * so they never warn.
+ */
+export function belowRatioTarget(
+  rule: RatioRule,
+  width: number,
+  height: number,
+): boolean {
+  if (rule.height === null || rule.fit !== "cover") return false;
+  return width < rule.width || height < rule.height;
 }
 
 export const ImageUploadFieldsSchema = z.object({

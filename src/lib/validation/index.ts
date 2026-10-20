@@ -176,7 +176,8 @@ export {
   MAX_FILE_SIZE,
   IMAGE_RATIOS,
   RATIO_TYPES,
-  ratioSourceTooSmall,
+  ratioOutputSize,
+  belowRatioTarget,
 } from "./imageAsset";
 export type { RatioType, RatioRule, ImageUploadFields } from "./imageAsset";
 

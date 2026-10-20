@@ -1625,15 +1625,6 @@
   min-width: 9rem;
 }
 
-/* A setting that rides along in a list's header (a gallery's crop): small
-   enough to sit beside the label rather than take a row of its own. */
-.admin-select--compact {
-  width: auto;
-  min-height: 28px;
-  padding: 0.125rem var(--admin-space-2);
-  font-size: var(--admin-text-sm);
-}
-
 /* ── Search field ─────────────────────────────────────────────────────────
    Icon inside the box, text clear of it. The padding has to live here for the
    same cascade reason: `.admin-input` sets the `padding` shorthand unlayered,
@@ -2549,8 +2540,12 @@
   width: 100%;
 }
 
+/* `clip`, not `hidden`: both cut the page to the rounded frame, but `hidden`
+   also makes the frame a scroll container — one that never scrolls — so every
+   `position: sticky` sidebar in the preview pinned to it and scrolled away
+   with the page instead of staying on screen. */
 .admin-preview-frame {
-  overflow: hidden;
+  overflow: clip;
   border-radius: var(--admin-radius-lg);
   background: #ffffff;
   box-shadow: var(--admin-shadow-md);

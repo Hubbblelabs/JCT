@@ -224,7 +224,9 @@ function SidebarLayout({ content }: { content: PageContent }) {
   );
   return (
     <div className="container mx-auto grid grid-cols-1 gap-8 px-4 py-10 md:px-6 md:py-14 lg:grid-cols-[280px_1fr]">
-      <aside className="bg-surface border-border rounded-3xl border p-6">
+      {/* Pinned like every other sidebar on the site. `self-start` keeps the
+          grid item its own height, which `sticky` needs. */}
+      <aside className="bg-surface border-border rounded-3xl border p-6 lg:sticky lg:top-24 lg:max-h-[calc(100vh-12rem)] lg:self-start lg:overflow-y-auto lg:overscroll-contain">
         <h3 className="mb-5 border-b border-white/10 pb-4 text-sm font-bold tracking-wider uppercase">
           On This Page
         </h3>

@@ -25,7 +25,8 @@ import {
   ALLOWED_MIME_TYPES,
   MAX_DIRECT_UPLOAD_SIZE,
   IMAGE_RATIOS,
-  RATIO_TYPES,
+  ratioOutputSize,
+  belowRatioTarget,
   type RatioType,
 } from "@/lib/validation/imageAsset";
 
@@ -429,9 +430,9 @@ interface ImageUploadInputProps {
   /** Hide the URL text field — show only the upload button + preview */
   hideUrlField?: boolean;
   /**
-   * Default ratio preset for this field, e.g. "hero" on a banner field. The
-   * editor can still change it per upload. Omitted = "auto", which preserves
-   * the pre-ratio behaviour (cap width, keep the source shape).
+   * Ratio preset for this field, matching the frame it renders into on the
+   * public page, e.g. "hero" on a banner field. Fixed per field — editors do
+   * not pick it. Omitted = "auto" (cap width, keep the source shape).
    */
   ratio?: RatioType;
   span?: FieldSpan;
@@ -445,6 +446,8 @@ type PreviewMeta = {
   ratioType: RatioType;
   /** Absent while an upload is still pending — the processed size isn't known yet. */
   fileSize?: number;
+  /** The source was smaller than the ratio's target, so it is stored smaller. */
+  belowTarget?: boolean;
 };
 
 function formatBytes(bytes: number): string {
@@ -452,7 +455,7 @@ function formatBytes(bytes: number): string {
   return `${Math.max(1, Math.round(bytes / 1024))} KB`;
 }
 
-/** Natural dimensions of a picked file, for "auto" pending previews. */
+/** Natural dimensions of a picked file, for pending previews. */
 function readNaturalSize(
   objectUrl: string,
 ): Promise<{ width: number; height: number } | null> {
@@ -515,24 +518,22 @@ function useImageUpload(
       });
       onChange(placeholder);
 
-      // A fixed ratio resizes to known dimensions, so they can be shown before
-      // the upload happens. "auto" keeps the source shape — read it off the file.
-      if (rule.height !== null) {
-        setMeta({
-          width: rule.width,
-          height: rule.height,
-          aspectRatio: rule.ratio,
-          ratioType,
-        });
-      } else {
-        const natural = await readNaturalSize(previewUrl);
-        setMeta({
-          width: natural?.width,
-          height: natural?.height,
-          aspectRatio: rule.ratio,
-          ratioType,
-        });
-      }
+      // The output size follows from the file's own size, so it can be shown
+      // — and a too-small file flagged — before the upload happens.
+      const natural = await readNaturalSize(previewUrl);
+      const out = natural
+        ? ratioOutputSize(rule, natural.width, natural.height)
+        : rule.height !== null
+          ? { width: rule.width, height: rule.height }
+          : undefined;
+      setMeta({
+        width: out?.width,
+        height: out?.height,
+        aspectRatio: rule.ratio,
+        ratioType,
+        belowTarget:
+          !!natural && belowRatioTarget(rule, natural.width, natural.height),
+      });
     } else {
       setUploading(true);
       setUploadError(null);
@@ -546,12 +547,19 @@ function useImageUpload(
       if (r.ok) {
         const data = (await r.json()) as Record<string, unknown>;
         onChange((data.url as string) || (data.storage_key as string));
+        const width = data.width as number | undefined;
+        const height = data.height as number | undefined;
         setMeta({
-          width: data.width as number | undefined,
-          height: data.height as number | undefined,
+          width,
+          height,
           aspectRatio: (data.aspect_ratio as string) ?? rule.ratio,
           ratioType: ((data.ratio_type as RatioType) ?? ratioType) as RatioType,
           fileSize: data.file_size as number | undefined,
+          // A "cover" output only falls short of the target when its source did.
+          belowTarget:
+            width !== undefined &&
+            height !== undefined &&
+            belowRatioTarget(rule, width, height),
         });
       } else if (r.status === 413) {
         setUploadError(PAYLOAD_TOO_LARGE_MSG);
@@ -657,11 +665,8 @@ export function ImageUploadInput({
   ratio = "auto",
   span,
 }: ImageUploadInputProps) {
-  const [ratioType, setRatioType] = useState<RatioType>(ratio);
-  const selectId = useId();
-  const up = useImageUpload(value, onChange, ratioType);
+  const up = useImageUpload(value, onChange, ratio);
   const { rule, meta } = up;
-  const staleRatio = meta !== null && meta.ratioType !== ratioType;
 
   const uploadButton = (
     <button
@@ -694,7 +699,7 @@ export function ImageUploadInput({
         {value && (
           <div className="max-w-[11rem] shrink-0 space-y-1">
             <div
-              className={`relative overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-sunken)] ${PREVIEW_FRAME[ratioType]}`}
+              className={`relative overflow-hidden rounded-lg border border-[var(--admin-border)] bg-[var(--admin-sunken)] ${PREVIEW_FRAME[ratio]}`}
             >
               {up.imgError || !up.previewUrl ? (
                 <span className="flex h-full w-full items-center justify-center text-xs text-[var(--admin-text-faint)]">
@@ -762,48 +767,14 @@ export function ImageUploadInput({
             </div>
           )}
 
-          {/* The upload button and the crop it applies share one line. */}
-          <div className="flex flex-wrap items-center gap-2">
-            {hideUrlField && uploadButton}
-            <label
-              htmlFor={selectId}
-              className="flex min-w-[10rem] flex-1 items-center gap-2 text-[11px] font-medium text-[var(--admin-text-secondary)]"
-            >
-              Ratio
-              <select
-                id={selectId}
-                className="admin-select min-w-0 flex-1"
-                value={ratioType}
-                onChange={(e) => setRatioType(e.target.value as RatioType)}
-              >
-                {RATIO_TYPES.map((key) => {
-                  const r = IMAGE_RATIOS[key];
-                  return (
-                    <option key={key} value={key}>
-                      {r.label}
-                      {r.height === null
-                        ? " — original shape"
-                        : ` — ${r.ratio} (${r.width}×${r.height})`}
-                    </option>
-                  );
-                })}
-              </select>
-            </label>
-          </div>
+          {hideUrlField && uploadButton}
 
           <p className="text-[11px] leading-tight text-[var(--admin-text-muted)]">
-            {rule.height !== null && (
-              <>
-                <span className="font-medium text-[var(--admin-text-secondary)]">
-                  Required:
-                </span>{" "}
-                {rule.ratio}, at least {rule.width}×{rule.height}px.{" "}
-              </>
-            )}
             {rule.hint}
-            {staleRatio && (
+            {meta?.belowTarget && (
               <span className="block text-[var(--admin-warning)]">
-                Ratio changed — re-upload to apply it to this image.
+                Smaller than {rule.width}×{rule.height}px — it may look soft on
+                the page.
               </span>
             )}
           </p>
@@ -817,10 +788,10 @@ export function ImageUploadInput({
 
 /**
  * One photo of a gallery: a thumbnail with Replace under it and a remove
- * control on it. The gallery chooses the crop once for every photo, so a tile
- * carries no ratio picker or hint text of its own — that is what made a
- * twelve-photo gallery a twelve-screen form. With an empty `value` and no
- * `onRemove` it is the gallery's "add a photo" tile.
+ * control on it. Every photo shares the gallery's crop, so a tile carries no
+ * hint text of its own — that is what made a twelve-photo gallery a
+ * twelve-screen form. With an empty `value` and no `onRemove` it is the
+ * gallery's "add a photo" tile.
  */
 export function ImageTile({
   label,
@@ -948,7 +919,7 @@ export function ImageTile({
 
 /**
  * A list of photos as a grid of thumbnails, ending in an "Add photo" tile.
- * Several to a line at any width; the crop is picked once for the gallery.
+ * Several to a line at any width; every photo is cropped to `ratio`.
  */
 export function ImageGallery({
   label,
@@ -965,14 +936,12 @@ export function ImageGallery({
   value: string[];
   onChange: (next: string[]) => void;
   max?: number;
-  /** Default crop for new photos; the editor can change it here. */
+  /** Crop for every photo, matching the frame they render into. */
   ratio?: RatioType;
   span?: FieldSpan;
   /** Earlier/later arrows on each photo, for a gallery whose order shows. */
   reorderable?: boolean;
 }) {
-  const [ratioType, setRatioType] = useState<RatioType>(ratio);
-  const ratioId = useId();
   const list = Array.isArray(value) ? value : [];
   const move = (from: number, to: number) => {
     const next = [...list];
@@ -983,26 +952,8 @@ export function ImageGallery({
     <div className={`mb-4 ${colClass(span)}`.trim()}>
       <div className="mb-1 flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
         {label && <span className="admin-label mb-0">{label}</span>}
-        <span className="flex items-center gap-2 text-xs text-[var(--admin-text-faint)]">
-          <label htmlFor={ratioId} className="sr-only">
-            Crop for new photos
-          </label>
-          <select
-            id={ratioId}
-            className="admin-select admin-select--compact"
-            value={ratioType}
-            onChange={(e) => setRatioType(e.target.value as RatioType)}
-            title="Crop for new photos"
-          >
-            {RATIO_TYPES.map((key) => (
-              <option key={key} value={key}>
-                {IMAGE_RATIOS[key].label}
-              </option>
-            ))}
-          </select>
-          <span className="tabular-nums">
-            {list.length} / {max}
-          </span>
+        <span className="text-xs text-[var(--admin-text-faint)] tabular-nums">
+          {list.length} / {max}
         </span>
       </div>
       {hint && <p className="admin-help mb-2">{hint}</p>}
@@ -1012,7 +963,7 @@ export function ImageGallery({
             key={j}
             label={`photo ${j + 1}`}
             value={src}
-            ratio={ratioType}
+            ratio={ratio}
             // Clearing a photo drops its slot rather than leaving a gap.
             onChange={(v) =>
               onChange(
@@ -1036,7 +987,7 @@ export function ImageGallery({
           <ImageTile
             label="a new photo"
             value=""
-            ratio={ratioType}
+            ratio={ratio}
             onChange={(v) => v && onChange([...list, v])}
           />
         )}

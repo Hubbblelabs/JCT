@@ -14,9 +14,9 @@ export interface PendingUpload {
   previewUrl: string;
   endpoint: "images" | "documents";
   /**
-   * Ratio preset chosen at pick time. Carried through the deferred queue so a
-   * deferred upload resizes identically to an immediate one — without this the
-   * editor's choice would be dropped at flush and land as "auto".
+   * The field's ratio preset. Carried through the deferred queue so a deferred
+   * upload resizes identically to an immediate one — without this the field's
+   * ratio would be dropped at flush and land as "auto".
    */
   ratioType?: RatioType;
 }

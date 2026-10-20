@@ -1,20 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { ExternalLink } from "lucide-react";
 import { EditableRegion } from "@/components/admin/EditableRegion";
+import { useSectionPanels } from "@/lib/use-section-panels";
 
 /**
  * Sidebar + panels shell for pages that absorbed what used to be separate
  * routes (the NAAC page and its AQAR / best-practices / distinctiveness
  * sub-pages, the Documents page and NIRF / financial statements / ICT
- * content).
- *
- * Every panel is rendered into the markup and toggled with `hidden`, not
- * mounted on demand — the absorbed pages carry indexable document lists and
- * tables that must stay in the server-rendered HTML. The fragment (`#nirf`)
- * deep-links a panel, which is what the old routes redirect to.
+ * content). The panel switching, deep links and the rest of the behaviour are
+ * `useSectionPanels`, which every sidebar page on the site shares.
  *
  * An item with `href` instead of `content` is a plain link. That is what the
  * admin editors use: the preview shows the same sidebar, with the other panels
@@ -58,49 +55,10 @@ export function SectionedPageShell({
   navSection?: string;
   onEditSection?: (section: string) => void;
 }) {
-  const panelIds = useMemo(
-    () => items.filter((i) => !i.href).map((i) => i.id),
-    [items],
+  const { activeId, select, containerProps, panelProps } = useSectionPanels(
+    items.filter((i) => !i.href).map((i) => i.id),
+    { syncHash: !editable },
   );
-  const panelKey = panelIds.join(",");
-  const [activeId, setActiveId] = useState(panelIds[0] ?? "");
-  const panelsRef = useRef<HTMLDivElement>(null);
-
-  // Deep links (`…/naac#aqar-report`) and back/forward both arrive as a hash
-  // change, so the same handler serves the first paint and later navigations.
-  useEffect(() => {
-    const ids = new Set(panelKey ? panelKey.split(",") : []);
-    const apply = () => {
-      const hash = decodeURIComponent(window.location.hash.replace(/^#/, ""));
-      if (hash && ids.has(hash)) setActiveId(hash);
-    };
-    apply();
-    window.addEventListener("hashchange", apply);
-    return () => window.removeEventListener("hashchange", apply);
-  }, [panelKey]);
-
-  // Keep the selection valid if the panel list changes under us (the admin
-  // preview re-renders as content is edited).
-  useEffect(() => {
-    setActiveId((prev) => {
-      const ids = panelKey ? panelKey.split(",") : [];
-      return prev && ids.includes(prev) ? prev : (ids[0] ?? "");
-    });
-  }, [panelKey]);
-
-  const select = (id: string) => {
-    setActiveId(id);
-    // `replaceState` rather than assigning `location.hash`: the latter would
-    // scroll to the anchor itself and push a history entry per click.
-    window.history.replaceState(null, "", `#${id}`);
-    const el = panelsRef.current;
-    if (!el) return;
-    const offset = window.innerWidth >= 1024 ? 120 : 90;
-    const top = el.getBoundingClientRect().top + window.scrollY - offset;
-    // Only pull the page up when the panel has scrolled out of reach; jumping
-    // down for someone already at the top of the page would be disorienting.
-    if (window.scrollY > top) window.scrollTo({ top, behavior: "smooth" });
-  };
 
   if (items.length === 0) return null;
 
@@ -133,14 +91,19 @@ export function SectionedPageShell({
       </EditableRegion>
 
       {/* Desktop: sticky card. `sticky` needs the grid item to be its own box,
-          not stretched to the row height — hence `items-start` above. */}
+          not stretched to the row height — hence `items-start` above. The
+          admin preview has no fixed navbar to clear. */}
       <EditableRegion
         as="nav"
         section={navSection ?? ""}
         label={navTitle}
         editable={navEditable}
         onEditSection={onEditSection}
-        className="border-border sticky top-24 hidden max-h-[calc(100vh-12rem)] overflow-y-auto overscroll-contain rounded-2xl border bg-white p-5 shadow-sm lg:block"
+        className={`border-border sticky hidden overflow-y-auto overscroll-contain rounded-2xl border bg-white p-5 shadow-sm lg:block ${
+          editable
+            ? "top-6 max-h-[calc(100vh-3rem)]"
+            : "top-24 max-h-[calc(100vh-12rem)]"
+        }`}
       >
         <h2 className="text-navy border-border mb-4 border-b pb-3 text-xs font-bold tracking-[0.15em] uppercase">
           {navTitle}
@@ -158,16 +121,11 @@ export function SectionedPageShell({
         </div>
       </EditableRegion>
 
-      <div ref={panelsRef} className="min-w-0">
+      <div {...containerProps} className="min-w-0">
         {items
           .filter((item) => !item.href)
           .map((item) => (
-            <div
-              key={item.id}
-              id={item.id}
-              hidden={item.id !== activeId}
-              className="scroll-mt-28"
-            >
+            <div key={item.id} id={item.id} {...panelProps(item.id)}>
               {item.content}
             </div>
           ))}

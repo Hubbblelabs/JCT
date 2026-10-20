@@ -66,6 +66,7 @@ import {
 } from "@/lib/program-table-columns";
 import { useDeferredUploadsOptional } from "@/lib/deferred-uploads";
 import { useImageError } from "@/lib/use-image-error";
+import { bringIntoReach } from "@/lib/use-section-panels";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { PageBlocksRenderer } from "@/components/shared/PageBlocksRenderer";
@@ -2628,6 +2629,9 @@ export function ProgramPageLayout({
   const [activeTab, setActiveTab] = useState<string>(
     visibleTabs[0]?.id ?? "overview",
   );
+  // A tab opened from the pinned sidebar pulls the content back into view,
+  // like every other sidebar page (see `useSectionPanels`).
+  const tabContentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (
@@ -2910,7 +2914,14 @@ export function ProgramPageLayout({
               onEditSection={onEditSection}
               className="shrink-0 lg:w-72"
             >
-              <div className="sticky top-24 z-40 lg:max-h-[calc(100vh-12rem)] lg:overflow-y-auto lg:overscroll-contain lg:rounded-2xl lg:border lg:border-slate-200/60 lg:bg-white lg:p-3 lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+              {/* The builder preview has no fixed navbar to clear. */}
+              <div
+                className={`sticky z-40 lg:overflow-y-auto lg:overscroll-contain lg:rounded-2xl lg:border lg:border-slate-200/60 lg:bg-white lg:p-3 lg:shadow-[0_8px_30px_rgb(0,0,0,0.04)] ${
+                  editable
+                    ? "top-6 lg:max-h-[calc(100vh-3rem)]"
+                    : "top-24 lg:max-h-[calc(100vh-12rem)]"
+                }`}
+              >
                 <nav className="grid grid-cols-2 gap-2 pb-4 sm:grid-cols-3 lg:flex lg:flex-col lg:items-stretch lg:gap-1 lg:pb-0">
                   {visibleTabs.map((tab) => {
                     const Icon =
@@ -2951,6 +2962,8 @@ export function ProgramPageLayout({
                         onClick={(e) => {
                           e.stopPropagation();
                           setActiveTab(tab.id);
+                          if (tabContentRef.current)
+                            bringIntoReach(tabContentRef.current);
                           if (editable && !isKnownTab(tab.id))
                             onEditTab?.(tab.id);
                         }}
@@ -2988,7 +3001,7 @@ export function ProgramPageLayout({
             </EditableRegion>
 
             {/* ── Tab Content Container ───────────────────────────────── */}
-            <div className="min-w-0 flex-1 pb-16">
+            <div ref={tabContentRef} className="min-w-0 flex-1 pb-16">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeTab}

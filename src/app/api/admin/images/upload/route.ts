@@ -19,7 +19,7 @@ import {
   ALLOWED_MIME_TYPES,
   MAX_FILE_SIZE,
   IMAGE_RATIOS,
-  ratioSourceTooSmall,
+  ratioOutputSize,
 } from "@/lib/validation";
 
 // sharp decode + resize is CPU-bound and can outrun the default limit on a
@@ -105,8 +105,8 @@ export async function POST(req: NextRequest) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
 
-    // Inspect the source dimensions before resizing so the too-small guard
-    // judges what the editor actually supplied, not the resized artifact.
+    // Inspect the source dimensions before resizing: a "cover" ratio sizes its
+    // output from them, so a small source is cropped rather than upscaled.
     //
     // failOn:"error" makes sharp abort on broken/malicious inputs instead
     // of silently producing partial output. limitInputPixels caps the
@@ -134,20 +134,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const dimError = ratioSourceTooSmall(rule, origWidth, origHeight);
-    if (dimError) {
-      return validationError([
-        {
-          path: ["file"],
-          message: dimError,
-          code: "custom",
-        } as never,
-      ]);
-    }
-
-    // Resize to the selected ratio. "auto" keeps the source shape and only
-    // caps the width; the fixed ratios produce exactly rule.width x rule.height
-    // so the admin preview and the public frame can never disagree.
+    // Resize to the field's ratio. "auto" keeps the source shape and only caps
+    // the width; the fixed ratios produce the rule's shape so the admin preview
+    // and the public frame agree — at rule.width x rule.height, or smaller when
+    // the source is (see ratioOutputSize).
+    const size = ratioOutputSize(rule, origWidth, origHeight);
     const resized =
       rule.height === null
         ? sharpInstance.resize({
@@ -166,8 +157,8 @@ export async function POST(req: NextRequest) {
               withoutEnlargement: true,
             })
           : sharpInstance.resize({
-              width: rule.width,
-              height: rule.height,
+              width: size.width,
+              height: size.height,
               fit: "cover",
               position: "center",
             });
@@ -186,8 +177,7 @@ export async function POST(req: NextRequest) {
       return validationError([
         {
           path: ["file"],
-          message:
-            "Could not process this image at the selected ratio. Try a different file.",
+          message: "Could not process this image. Try a different file.",
           code: "custom",
         } as never,
       ]);
