@@ -7,6 +7,7 @@ import { findNavTrail, isImmersiveRoute, type NavScope } from "@/lib/admin-nav";
 import { AdminSidebar } from "./AdminSidebar";
 import { AdminTopbar, fallbackCrumb } from "./AdminTopbar";
 import { AdminCommandPalette } from "./AdminCommandPalette";
+import { ChangePasswordDrawer } from "./ChangePasswordDrawer";
 import { TopbarSlotProvider, useTopbarSlotState } from "./topbar-slot";
 
 const COLLAPSED_KEY = "jct-admin-sidebar-collapsed";
@@ -26,8 +27,8 @@ function ShellInner({ children }: { children: ReactNode }) {
   const user = (session?.user ?? {}) as Record<string, unknown>;
   const role = (user.role as string) ?? "editor";
   const institution = (user.institution as string) ?? "";
-  const userName =
-    (session?.user?.name as string) ?? (session?.user?.email as string) ?? "";
+  const userEmail = (session?.user?.email as string) ?? "";
+  const userName = (session?.user?.name as string) ?? userEmail;
 
   const url: NavScope = useMemo(
     () => ({
@@ -48,6 +49,7 @@ function ShellInner({ children }: { children: ReactNode }) {
   const [userCollapsed, setUserCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [passwordOpen, setPasswordOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   // Mirrors admin.css's mobile breakpoint so the toggle, the button's label
@@ -180,7 +182,7 @@ function ShellInner({ children }: { children: ReactNode }) {
         url={url}
         collapsed={collapsed && !drawerOpen}
         userName={userName}
-        onOpenPalette={() => setPaletteOpen(true)}
+        onChangePassword={() => setPasswordOpen(true)}
         onNavigate={() => setDrawerOpen(false)}
       />
 
@@ -214,6 +216,12 @@ function ShellInner({ children }: { children: ReactNode }) {
         institution={institution}
         open={paletteOpen}
         onOpenChange={setPaletteOpen}
+      />
+
+      <ChangePasswordDrawer
+        open={passwordOpen}
+        onClose={() => setPasswordOpen(false)}
+        email={userEmail}
       />
     </div>
   );

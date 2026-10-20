@@ -9,6 +9,7 @@ export interface IUser extends Document {
   programs: string[];
   is_active: boolean;
   last_login?: Date;
+  password_changed_at?: Date;
   created_at: Date;
   updated_at: Date;
 }
@@ -30,6 +31,10 @@ const UserSchema = new Schema<IUser>(
     programs: { type: [String], default: [] },
     is_active: { type: Boolean, default: true },
     last_login: Date,
+    // Set on every password change. A session signed in before it is ended on
+    // its next revalidation (see the jwt callback in src/auth.ts), so changing
+    // a leaked password actually locks the other holder out.
+    password_changed_at: Date,
   },
   { timestamps: { createdAt: "created_at", updatedAt: "updated_at" } },
 );

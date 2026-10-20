@@ -138,6 +138,14 @@ export async function PATCH(
       revalidateTargets(target);
       revalidatePaths(publicPathFor(doc.institution, doc.slug));
     }
+    // A rename or a move to another scope changes the URL; the old one is a
+    // cached page of its own and kept serving the page until its ISR window
+    // ran out.
+    if (current.slug !== doc.slug || current.institution !== doc.institution) {
+      const oldTarget = institutionTarget(current.institution);
+      if (oldTarget && oldTarget !== target) revalidateTargets(oldTarget);
+      revalidatePaths(publicPathFor(current.institution, current.slug));
+    }
     await logAudit(
       "page",
       "updated",

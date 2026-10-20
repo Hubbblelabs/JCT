@@ -575,7 +575,7 @@ const ADMIN_GROUPS: AdminNavGroup[] = [
         href: "/admin/settings",
         icon: DatabaseBackup,
         description:
-          "Export or schedule an archive, restore one, or reset everything.",
+          "Export or schedule an archive, restore one, clear the page cache, or reset everything.",
         minRole: "admin",
       },
     ],

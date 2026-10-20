@@ -168,6 +168,9 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   engineeringDocuments: ["engineering"],
   polytechnicCommittees: ["polytechnic"],
   polytechnicClubs: ["polytechnic"],
+  // Legacy: no editor writes it any more, but the Clubs & Cells page still
+  // starts from it until `polytechnicClubs` is saved (see polytechnic-clubs.ts).
+  polytechnicFineArtsClub: ["polytechnic"],
   campusLifePage: ["home"],
   mainAccreditations: ["home"],
   engineeringAccreditations: ["engineering"],
@@ -258,14 +261,13 @@ export function revalidatePaths(...paths: string[]): void {
  * Drop every cache the app owns: the in-memory public API cache and the whole
  * ISR/data cache tree.
  *
- * The targeted helpers above are the right tool after a write — they know which
- * pages a change can possibly affect. This is the operator's escape hatch for
- * when they don't match reality: a restore that wrote documents behind the
- * routes' backs, a config key with no `SITE_CONFIG_KEY_TARGETS` entry, or a
- * page that is simply still showing yesterday's content. `revalidatePath("/",
- * "layout")` invalidates the root layout and therefore every page beneath it,
- * which is every public route including the dynamic detail pages the path lists
- * enumerate one by one.
+ * The targeted helpers above are the right tool after a single write — they
+ * know which pages a change can possibly affect. This is for writes too broad
+ * to enumerate (restore, reset, the site chrome) and for the operator's Clear
+ * cache button, which covers what no route can see: a document edited directly
+ * in the database. `revalidatePath("/", "layout")` invalidates the root layout
+ * and therefore every page beneath it, which is every public route including
+ * the dynamic detail pages the path lists don't enumerate.
  *
  * Nothing is re-rendered here. Route handlers only *mark* paths stale, so the
  * cost lands on the next visitor to each page rather than on this request.

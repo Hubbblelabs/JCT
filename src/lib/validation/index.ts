@@ -156,11 +156,16 @@ export type { ProgramValue, ProgramContentValue } from "./programs";
 export {
   UserCreateSchema,
   UserUpdateSchema,
+  PasswordChangeSchema,
   ROLES as USER_ROLES,
   INSTITUTIONS as USER_INSTITUTIONS,
   LIMITS as LIMITS_user,
 } from "./users";
-export type { UserCreateValue, UserUpdateValue } from "./users";
+export type {
+  UserCreateValue,
+  UserUpdateValue,
+  PasswordChangeValue,
+} from "./users";
 
 export {
   ImageUploadFieldsSchema,

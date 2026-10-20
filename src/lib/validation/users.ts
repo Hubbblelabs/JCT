@@ -67,5 +67,29 @@ export const UserUpdateSchema = z
     }
   });
 
+/**
+ * A signed-in user changing their own password. The current one is required
+ * so a session left open on a shared machine can't be turned into a takeover.
+ */
+export const PasswordChangeSchema = z
+  .object({
+    current_password: z
+      .string()
+      .min(1, "Enter your current password")
+      .max(200, "Password is too long"),
+    new_password: zPasswordMin8,
+  })
+  .strict()
+  .superRefine((data, ctx) => {
+    if (data.current_password === data.new_password) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["new_password"],
+        message: "The new password must be different from the current one",
+      });
+    }
+  });
+
 export type UserCreateValue = z.infer<typeof UserCreateSchema>;
 export type UserUpdateValue = z.infer<typeof UserUpdateSchema>;
+export type PasswordChangeValue = z.infer<typeof PasswordChangeSchema>;

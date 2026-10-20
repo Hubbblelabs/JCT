@@ -91,6 +91,14 @@ export async function PATCH(
       if (body.is_active === false) {
         return badRequest("You cannot deactivate your own account");
       }
+      // Your own password goes through /api/admin/account/password, which
+      // asks for the current one. Here it would skip that check, and the
+      // stamp below would sign this very session out a minute later.
+      if (body.password) {
+        return badRequest(
+          "Change your own password from the account menu at the bottom of the sidebar",
+        );
+      }
     }
 
     // Last-admin guard: don't allow demoting or deactivating the final
@@ -113,8 +121,12 @@ export async function PATCH(
     if (body.programs) update.programs = body.programs;
     if (body.full_name) update.full_name = body.full_name;
     if (typeof body.is_active === "boolean") update.is_active = body.is_active;
-    if (body.password)
+    if (body.password) {
       update.password_hash = await bcrypt.hash(body.password, 12);
+      // Signs the person out everywhere within a minute (src/auth.ts) — a
+      // reset is usually because the old password got out.
+      update.password_changed_at = new Date();
+    }
 
     const user = await User.findByIdAndUpdate(
       id,
@@ -144,7 +156,7 @@ export async function PATCH(
       "user",
       "updated",
       currentUserEmail(session),
-      `Updated user ${user.email}`,
+      `Updated user ${user.email}${body.password ? " (password reset)" : ""}`,
     );
     return json(user);
   } catch (e) {

@@ -509,7 +509,7 @@
   background: var(--admin-gold);
 }
 
-/* Search, public site, Clear cache and the account menu. */
+/* The account menu. */
 .admin-sidebar-footer {
   flex-shrink: 0;
   display: flex;
@@ -580,22 +580,6 @@
   font-family: inherit;
   text-align: left;
   cursor: pointer;
-}
-
-.admin-sidebar-tool:disabled {
-  cursor: progress;
-}
-
-.admin-sidebar-kbd {
-  margin-left: auto;
-  padding: 1px 5px;
-  border: 1px solid rgb(255 255 255 / 0.18);
-  border-radius: var(--admin-radius-sm);
-  font-family: inherit;
-  font-size: var(--admin-text-xs);
-  font-weight: 600;
-  color: var(--admin-text-on-navy-muted);
-  line-height: 1.4;
 }
 
 /* Collapsed rail — labels are hidden, icons stay centred and tooltipped. */
@@ -1260,98 +1244,7 @@
   color: var(--admin-text-faint);
 }
 
-/* ── Dashboard ────────────────────────────────────────────────────────────
-   Stat tiles, the "waiting to be published" list, quick links per college
-   and the activity feed. Kept generic enough (`admin-stat`, `admin-list`) for
-   any overview screen that needs the same shapes. */
-.admin-stat-grid {
-  display: grid;
-  /* Two-up on a phone rather than four full-width tiles stacked down a
-     screen and a half. */
-  grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
-  gap: var(--admin-space-4);
-  margin-bottom: var(--admin-space-6);
-}
-
-.admin-stat {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: var(--admin-space-3);
-  padding: var(--admin-space-5);
-  overflow: hidden;
-  color: inherit;
-  text-decoration: none;
-}
-
-.admin-stat-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--admin-space-3);
-}
-
-.admin-stat-label {
-  font-size: var(--admin-text-base);
-  font-weight: 600;
-  color: var(--admin-text-secondary);
-}
-
-.admin-stat-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  flex-shrink: 0;
-  border-radius: var(--admin-radius-md);
-  background: var(--admin-gold-soft);
-  color: var(--admin-gold-deep);
-}
-
-.admin-stat-icon[data-tone="info"] {
-  background: var(--admin-info-bg);
-  color: var(--admin-info);
-}
-.admin-stat-icon[data-tone="success"] {
-  background: var(--admin-success-bg);
-  color: var(--admin-success);
-}
-.admin-stat-icon[data-tone="neutral"] {
-  background: var(--admin-neutral-bg);
-  color: var(--admin-text-secondary);
-}
-
-.admin-stat-value {
-  font-size: 2rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  color: var(--admin-text);
-  font-variant-numeric: tabular-nums;
-}
-
-.admin-stat-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--admin-space-2);
-  font-size: var(--admin-text-sm);
-  color: var(--admin-text-muted);
-}
-
-.admin-dash-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--admin-space-6);
-  margin-bottom: var(--admin-space-6);
-}
-
-@media (min-width: 1180px) {
-  .admin-dash-grid {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  }
-}
-
+/* ── Dashboard: recent activity — a panel head and the feed. */
 .admin-panel-head {
   display: flex;
   align-items: center;
@@ -1368,143 +1261,6 @@
   font-size: var(--admin-text-body);
   font-weight: 650;
   color: var(--admin-text);
-}
-
-.admin-panel-count {
-  padding: 0 var(--admin-space-2);
-  border-radius: var(--admin-radius-full);
-  background: var(--admin-draft-bg);
-  color: var(--admin-draft);
-  font-size: var(--admin-text-xs);
-  font-weight: 700;
-  line-height: 1.6;
-}
-
-/* A list of linked rows inside a card — one record per row. */
-.admin-list {
-  list-style: none;
-  margin: 0;
-  padding: var(--admin-space-2);
-}
-
-.admin-list-row {
-  display: flex;
-  align-items: center;
-  gap: var(--admin-space-3);
-  padding: var(--admin-space-2) var(--admin-space-3);
-  border-radius: var(--admin-radius-md);
-  color: inherit;
-  text-decoration: none;
-  transition: background var(--admin-duration-fast);
-}
-
-a.admin-list-row:hover {
-  background: var(--admin-hover);
-}
-
-a.admin-list-row:focus-visible {
-  outline: none;
-  box-shadow: var(--admin-focus-ring-tight);
-}
-
-.admin-list-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  border-radius: var(--admin-radius);
-  background: var(--admin-neutral-bg);
-  color: var(--admin-text-secondary);
-}
-
-.admin-list-text {
-  display: flex;
-  flex: 1;
-  min-width: 0;
-  flex-direction: column;
-}
-
-.admin-list-title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-weight: 600;
-  color: var(--admin-text);
-}
-
-.admin-list-sub {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: var(--admin-text-sm);
-  color: var(--admin-text-muted);
-}
-
-.admin-list-chevron {
-  flex-shrink: 0;
-  color: var(--admin-text-faint);
-  transition: transform var(--admin-duration-fast);
-}
-
-a.admin-list-row:hover .admin-list-chevron {
-  transform: translateX(2px);
-  color: var(--admin-text-secondary);
-}
-
-/* Quick links: one block per college. */
-.admin-quick-college + .admin-quick-college {
-  border-top: 1px solid var(--admin-border-subtle);
-}
-
-.admin-quick-college {
-  padding: var(--admin-space-4) var(--admin-space-5);
-}
-
-.admin-quick-college-name {
-  display: flex;
-  align-items: center;
-  gap: var(--admin-space-2);
-  margin-bottom: var(--admin-space-2);
-  font-size: var(--admin-text-base);
-  font-weight: 650;
-  color: var(--admin-text);
-}
-
-.admin-quick-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--admin-space-2);
-}
-
-.admin-chip-link {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--admin-space-1);
-  padding: 0.3125rem var(--admin-space-3);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius-full);
-  background: var(--admin-raised);
-  color: var(--admin-text-secondary);
-  font-size: var(--admin-text-base);
-  font-weight: 500;
-  text-decoration: none;
-  transition:
-    border-color var(--admin-duration-fast),
-    color var(--admin-duration-fast),
-    background var(--admin-duration-fast);
-}
-
-.admin-chip-link:hover {
-  border-color: var(--admin-gold);
-  background: var(--admin-selected);
-  color: var(--admin-text);
-}
-
-.admin-chip-link:focus-visible {
-  outline: none;
-  box-shadow: var(--admin-focus-ring);
 }
 
 /* Activity feed — avatar, sentence, when. */
@@ -3523,18 +3279,6 @@ a.admin-list-row:hover .admin-list-chevron {
 
   .admin-page-title {
     font-size: var(--admin-text-xl);
-  }
-
-  .admin-stat-grid {
-    gap: var(--admin-space-3);
-  }
-
-  .admin-stat {
-    padding: var(--admin-space-4);
-  }
-
-  .admin-stat-value {
-    font-size: 1.625rem;
   }
 
   .admin-savebar {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { Field, FormGrid, TextInput, Select } from "@/components/admin/inputs";
 import {
   Check,
@@ -69,6 +70,7 @@ const instLabel = (v: string) =>
 export default function UsersPage() {
   const toast = useToast();
   const confirm = useConfirm();
+  const { data: session } = useSession();
 
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -82,6 +84,10 @@ export default function UsersPage() {
   const [form, setForm] = useState<Form>(EMPTY);
   const [saving, setSaving] = useState(false);
   const [apiError, setApiError] = useState<ApiErrorPayload | null>(null);
+
+  // Your own password is changed from the account menu, which asks for the
+  // current one; the API refuses it here.
+  const editingSelf = !!editing && editing._id === session?.user?.id;
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -421,20 +427,29 @@ export default function UsersPage() {
             />
           )}
 
-          <TextInput
-            label={editing ? "New password" : "Password"}
-            span={editing ? 6 : 4}
-            type="password"
-            value={form.password}
-            onChange={(e) => set("password", e.target.value)}
-            required={!editing}
-            autoComplete="new-password"
-            hint={
-              editing
-                ? "Leave blank to keep their current password."
-                : "At least 8 characters."
-            }
-          />
+          {editingSelf ? (
+            <Field label="Password" span={6}>
+              <p className="admin-help">
+                Change your own password from the menu with your name at the
+                bottom of the sidebar.
+              </p>
+            </Field>
+          ) : (
+            <TextInput
+              label={editing ? "New password" : "Password"}
+              span={editing ? 6 : 4}
+              type="password"
+              value={form.password}
+              onChange={(e) => set("password", e.target.value)}
+              required={!editing}
+              autoComplete="new-password"
+              hint={
+                editing
+                  ? "Leave blank to keep their current password. Setting a new one signs them out everywhere within a minute."
+                  : "At least 8 characters."
+              }
+            />
+          )}
 
           <Select
             label="Role"

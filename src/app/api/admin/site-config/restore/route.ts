@@ -9,7 +9,7 @@ import { connectDB } from "@/lib/mongodb";
 import { requireRole, badRequest } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { isBackupCollection } from "@/lib/backup-collections";
-import { revalidateTargets } from "@/lib/revalidate";
+import { revalidateEverything } from "@/lib/revalidate";
 import { isStorageConfigured } from "@/lib/storage";
 import { backupDir } from "@/lib/backup-jobs";
 import {
@@ -332,7 +332,12 @@ export async function POST(req: NextRequest) {
           }
         }
 
-        revalidateTargets("home", "all-institutions");
+        // Not `revalidateTargets` — a restore rewrites Program, Page, Event
+        // and Blog documents too, whose public routes are dynamic segments no
+        // target covers. "home" + "all-institutions" left every program, page
+        // and event detail page serving its pre-restore copy for a full ISR
+        // window (24h on the program pages). Same reasoning as reset.
+        revalidateEverything();
         await logAudit(
           "site-config",
           "restored",

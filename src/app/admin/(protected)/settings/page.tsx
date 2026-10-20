@@ -18,6 +18,7 @@ import {
   FileText,
   CalendarClock,
   HardDrive,
+  RefreshCw,
 } from "lucide-react";
 
 /** A backup build, as reported by `/api/admin/site-config/backup`. */
@@ -1003,9 +1004,8 @@ export default function SettingsPage() {
       description={
         <>
           Export an archive of everything on this site, schedule that export to
-          run on its own, restore one, or reset the site back to its defaults.
-          To clear the page cache, use <strong>Clear cache</strong> at the foot
-          of the sidebar.
+          run on its own, restore one, clear the page cache, or reset the site
+          back to its defaults.
         </>
       }
     >
@@ -1651,6 +1651,8 @@ export default function SettingsPage() {
           )}
         </div>
 
+        <ClearCacheCard />
+
         {/* ── Reset ── */}
         <div className="admin-card border-[var(--admin-danger-border)] bg-red-50/30 lg:col-span-2">
           <div className="mb-4 flex items-start gap-3">
@@ -1818,6 +1820,80 @@ function BuildProgress({ job }: { job: BackupJob }) {
       <p className="mt-1.5 text-xs text-blue-700/80">
         The download starts on its own when this finishes.
       </p>
+    </div>
+  );
+}
+
+/**
+ * Every write made in this panel — restore and reset included — already
+ * refreshes the pages it affects, so this is not part of editing. It is for a
+ * document changed behind the panel's back (edited directly in the database),
+ * which no route can know to refresh: without it that page keeps its old copy
+ * for up to a day.
+ */
+function ClearCacheCard() {
+  const [busy, setBusy] = useState(false);
+  const [status, setStatus] = useState<Status | null>(null);
+
+  const clear = async () => {
+    setBusy(true);
+    setStatus(null);
+    try {
+      const res = await fetch("/api/admin/cache", { method: "POST" });
+      setStatus(
+        res.ok
+          ? {
+              type: "success",
+              message:
+                "Cache cleared. Each public page rebuilds on its next visit.",
+            }
+          : { type: "error", message: "Could not clear the cache. Try again." },
+      );
+    } catch {
+      setStatus({
+        type: "error",
+        message: "Could not clear the cache. Try again.",
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="admin-card lg:col-span-2">
+      <div className="mb-4 flex items-start gap-3">
+        <div className="rounded-lg bg-[var(--admin-neutral-bg)] p-2">
+          <RefreshCw size={18} className="text-[var(--admin-text-secondary)]" />
+        </div>
+        <div>
+          <h2 className="font-semibold text-[var(--admin-text)]">
+            Clear page cache
+          </h2>
+          <p className="mt-0.5 text-sm text-[var(--admin-text-muted)]">
+            Publishing, restoring and resetting already refresh the public pages
+            they change — you do not need this after editing. Use it only when
+            content was changed outside this panel, directly in the database:
+            every public page then rebuilds on its next visit, which briefly
+            adds load to the database.
+          </p>
+        </div>
+      </div>
+
+      <StatusBanner status={status} />
+
+      <button
+        type="button"
+        onClick={clear}
+        disabled={busy}
+        className="admin-btn admin-btn-outline"
+      >
+        {busy ? (
+          <Loader2 size={15} className="animate-spin" />
+        ) : (
+          <RefreshCw size={15} />
+        )}
+        {busy ? "Clearing…" : "Clear cache"}
+      </button>
     </div>
   );
 }

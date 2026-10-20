@@ -77,9 +77,10 @@ export async function PATCH(
     // imagery there and PATCH replaces the whole blob — cleaning only the
     // card-level `image` orphaned every asset inside it.
     const existing = await Program.findById(id)
-      .select("institution image content published_content")
+      .select("institution slug image content published_content")
       .lean<{
         institution?: string;
+        slug?: string;
         image?: string;
         content?: unknown;
         published_content?: unknown;
@@ -129,6 +130,20 @@ export async function PATCH(
     if (target) {
       revalidateTargets(target);
       revalidatePaths(`/institutions/${doc.institution}/programs/${doc.slug}`);
+    }
+    // A rename or a move to another college changes the URL. The old one is
+    // a cached page of its own, and without this it kept serving the program
+    // for a full ISR window (24h) after the edit that retired it.
+    if (
+      existing.slug &&
+      existing.institution &&
+      (existing.slug !== doc.slug || existing.institution !== doc.institution)
+    ) {
+      const oldTarget = institutionTarget(existing.institution);
+      if (oldTarget && oldTarget !== target) revalidateTargets(oldTarget);
+      revalidatePaths(
+        `/institutions/${existing.institution}/programs/${existing.slug}`,
+      );
     }
     await logAudit(
       "program",

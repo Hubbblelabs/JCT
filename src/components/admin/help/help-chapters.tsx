@@ -164,6 +164,14 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           set a new password for you.
         </P>
 
+        <H3>Changing your password</H3>
+        <P>
+          Open the menu with your name at the bottom of the sidebar and choose{" "}
+          <UI>Change password</UI>. Enter your current password and the new one
+          twice. You stay signed in here; any other computer or phone signed in
+          to your account is signed out within a minute.
+        </P>
+
         <H3>What your account can do</H3>
         <P>There are two kinds of account.</P>
         <Defs
@@ -235,23 +243,17 @@ export const HELP_CHAPTERS: HelpChapter[] = [
         <H3>Search</H3>
         <P>
           Press <Key>Ctrl</Key> <Key>K</Key> (<Key>⌘</Key> <Key>K</Key> on a
-          Mac) anywhere in the panel, or click <UI>Search pages…</UI> at the
-          bottom of the sidebar. Type a few letters of a page name, move with
-          the arrow keys, press <Key>Enter</Key> to go. <Key>Esc</Key> closes
-          it. This is usually faster than clicking through the tree.
+          Mac) anywhere in the panel, or click <UI>Search pages…</UI> in the top
+          bar. Type a few letters of a page name, move with the arrow keys,
+          press <Key>Enter</Key> to go. <Key>Esc</Key> closes it. This is
+          usually faster than clicking through the tree.
         </P>
 
         <H3>Seeing the real page</H3>
-        <Bullets>
-          <li>
-            <UI>View public site</UI> at the bottom of the sidebar opens the
-            public website in a new tab.
-          </li>
-          <li>
-            The live-preview editors have their own <UI>View live page</UI>{" "}
-            button in the top bar that opens the exact page you are editing.
-          </li>
-        </Bullets>
+        <P>
+          The live-preview editors have a <UI>View live page</UI> button in the
+          top bar that opens the exact page you are editing in a new tab.
+        </P>
 
         <H3>More room to work</H3>
         <P>
@@ -354,8 +356,8 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           </li>
           <li>Try it in a private window, which has no old copy to reuse.</li>
           <li>
-            Still old? Ask an admin to press <UI>Clear cache</UI> at the bottom
-            of the sidebar. Every public page then rebuilds on its next visit.
+            Still old? Check the change was published, not just saved as a draft
+            — then tell an admin.
           </li>
         </Steps>
       </>
@@ -806,7 +808,13 @@ export const HELP_CHAPTERS: HelpChapter[] = [
         <Bullets>
           <li>
             Open the person and edit any field. Leave the password box empty to
-            keep their current password; type a new one to replace it.
+            keep their current password; type a new one to replace it — that
+            also signs them out on every device within a minute.
+          </li>
+          <li>
+            Your own password is not changed here: use <UI>Change password</UI>{" "}
+            in the menu with your name at the bottom of the sidebar, which asks
+            for your current one.
           </li>
           <li>
             Moving someone between colleges is a role change, not a new account
@@ -946,7 +954,7 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           rows={[
             {
               term: "I saved, but the site still shows the old version",
-              body: "Either the change is still a draft — hover the dot next to Publish in its editor, and if it says “Draft saved — not on the live site yet”, press Publish — or the page is cached. Hard refresh, try a private window, then ask an admin to press Clear cache.",
+              body: "Either the change is still a draft — hover the dot next to Publish in its editor, and if it says “Draft saved — not on the live site yet”, press Publish — or your browser is showing its old copy. Hard refresh or try a private window; if it is still old, tell an admin.",
             },
             {
               term: "My edit vanished",
@@ -1027,7 +1035,7 @@ export const HELP_CHAPTERS: HelpChapter[] = [
           },
           {
             term: "Cache",
-            body: "A stored copy of a public page, kept so it loads fast. Publishing refreshes it; Clear cache forces every page to rebuild.",
+            body: "A stored copy of a public page, kept so it loads fast. Publishing refreshes every page the change appears on.",
           },
           {
             term: "Landing page",

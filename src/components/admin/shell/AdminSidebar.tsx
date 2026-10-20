@@ -51,7 +51,7 @@ export function AdminSidebar({
   url,
   collapsed,
   userName,
-  onOpenPalette,
+  onChangePassword,
   onNavigate,
 }: {
   role: string;
@@ -60,7 +60,7 @@ export function AdminSidebar({
   url: NavScope;
   collapsed: boolean;
   userName: string;
-  onOpenPalette: () => void;
+  onChangePassword: () => void;
   /** Closes the mobile drawer once a destination is picked. */
   onNavigate?: () => void;
 }) {
@@ -220,7 +220,7 @@ export function AdminSidebar({
         userName={userName}
         userRole={role}
         collapsed={collapsed}
-        onOpenPalette={onOpenPalette}
+        onChangePassword={onChangePassword}
         onNavigate={onNavigate}
       />
     </aside>

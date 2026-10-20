@@ -28,9 +28,8 @@ function hrefPath(href: string): string {
  * that wrong means publishing Engineering copy onto Arts & Science.
  *
  * The right-hand side is empty until a screen fills it (see `useTopbarSlot`):
- * page editors put View live page, Save draft and Publish there. Search, the
- * public-site link, Clear cache and the account menu live at the foot of the
- * sidebar.
+ * page editors put View live page, Save draft and Publish there. Search sits
+ * just left of them; the account menu lives at the foot of the sidebar.
  */
 export function AdminTopbar({
   trail,

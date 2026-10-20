@@ -148,6 +148,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
      *
      * The lookup is throttled to one per SESSION_REVALIDATE_MS per token, so
      * this costs at most one indexed findById per minute per active admin.
+     *
+     * `authAt` is when this token signed in — not `iat`, which is reissued on
+     * every refresh. A password changed after it ends the session, which is
+     * what makes changing a leaked password worth doing. A token minted before
+     * `authAt` existed reads as 0, so it ends too once its password changes.
      */
     async jwt({ token, user }) {
       if (user) {
@@ -155,6 +160,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         token.role = user.role;
         token.institution = user.institution;
         token.programs = user.programs;
+        token.authAt = Date.now();
         token.checkedAt = Date.now();
         return token;
       }
@@ -169,9 +175,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       try {
         await connectDB();
         const fresh = await User.findById(uid)
-          .select("role institution programs is_active")
+          .select("role institution programs is_active password_changed_at")
           .lean();
         if (!fresh || fresh.is_active === false) return null;
+        const authAt = typeof token.authAt === "number" ? token.authAt : 0;
+        if (
+          fresh.password_changed_at &&
+          new Date(fresh.password_changed_at).getTime() > authAt
+        ) {
+          return null;
+        }
         token.role = String(fresh.role || "");
         token.institution = String(fresh.institution || "");
         token.programs = Array.isArray(fresh.programs)
