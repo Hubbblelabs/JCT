@@ -127,7 +127,14 @@ export function NaacSectionInspector({
           <PageBodySectionsEditor
             value={(item.blocks ?? []) as PageBodySection[]}
             onChange={(blocks) => updateItem({ blocks })}
-            allowedTypes={["heading", "text", "image", "list", "cards"]}
+            allowedTypes={[
+              "heading",
+              "text",
+              "image",
+              "documents",
+              "list",
+              "cards",
+            ]}
           />
         </Field>
       </FormGrid>

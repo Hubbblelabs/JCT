@@ -415,7 +415,14 @@ export function ProgramSectionInspector({
           <PageBodySectionsEditor
             value={(tab.blocks ?? []) as PageBodySection[]}
             onChange={(blocks) => updateTab({ blocks })}
-            allowedTypes={["heading", "text", "image", "list", "cards"]}
+            allowedTypes={[
+              "heading",
+              "text",
+              "image",
+              "documents",
+              "list",
+              "cards",
+            ]}
           />
         </Field>
       </FormGrid>
@@ -1161,7 +1168,7 @@ export function ProgramSectionInspector({
 
 /**
  * Appended to every built-in section's inspector. Lets the admin add
- * free-form blocks (heading/text/image/list/cards/CTA) alongside a
+ * free-form blocks (heading/text/image/documents/list/cards/CTA) alongside a
  * section's structured fields — the same mechanism custom tabs use — and
  * choose whether they render before or after the section's fixed content.
  */
@@ -1210,9 +1217,9 @@ function SectionBlocksEditor({
       defaultOpen={blocks.length > 0}
     >
       <p className="mb-3 text-xs text-[var(--admin-text-muted)]">
-        Add extra paragraphs, images, lists, cards, or a call-to-action button
-        alongside this section&apos;s fields above — the same block types
-        available on custom tabs.
+        Add extra paragraphs, images, downloadable documents (PDF), lists,
+        cards, or a call-to-action button alongside this section&apos;s fields
+        above.
       </p>
       {blocks.length > 0 && (
         <div className="mb-3">

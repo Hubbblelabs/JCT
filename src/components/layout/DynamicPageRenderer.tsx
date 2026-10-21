@@ -6,6 +6,7 @@ import type {
   PageTemplate,
 } from "@/lib/validation";
 import { getImageUrl } from "@/lib/utils";
+import { PageDocumentsBlock } from "@/components/shared/PageDocumentsBlock";
 
 function resolveImage(src: string | undefined): string {
   if (!src) return "";
@@ -62,6 +63,8 @@ function BodySection({ section }: { section: PageBodySection }) {
           )}
         </figure>
       ) : null;
+    case "documents":
+      return <PageDocumentsBlock section={section} />;
     case "list": {
       const ListTag = section.ordered ? "ol" : "ul";
       const cls = section.ordered

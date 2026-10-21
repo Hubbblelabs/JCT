@@ -29,6 +29,7 @@ import {
   belowRatioTarget,
   type RatioType,
 } from "@/lib/validation/imageAsset";
+import { DOCUMENT_UPLOAD_MIME } from "@/lib/validation/documentUploads";
 
 // Mirrors /api/admin/documents/upload + /presign (kept in sync by hand —
 // there is no shared client-safe constant for the document limit).
@@ -69,10 +70,21 @@ const DOC_MIME_TYPES = [
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 ];
 const DOC_ACCEPT = `${DOC_MIME_TYPES.join(",")},.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx`;
+// A deferred pick is uploaded at save time through /api/admin/documents/presign,
+// which takes PDF only (DOCUMENT_UPLOAD_MIME). Checked against the list above
+// instead, a Word file passed the pick and then failed the whole save.
+const PRESIGN_ACCEPT = `${DOCUMENT_UPLOAD_MIME.join(",")},.pdf`;
 
-function validateDocumentFile(file: File): string | null {
-  if (!DOC_MIME_TYPES.includes(file.type))
-    return `Invalid file type${file.type ? ` "${file.type}"` : ""}. Accepted: PDF, Word, Excel and PowerPoint.`;
+function validateDocumentFile(file: File, presigned: boolean): string | null {
+  const allowed: readonly string[] = presigned
+    ? DOCUMENT_UPLOAD_MIME
+    : DOC_MIME_TYPES;
+  if (!allowed.includes(file.type))
+    return `Invalid file type${file.type ? ` "${file.type}"` : ""}. ${
+      presigned
+        ? "Only PDF files are accepted."
+        : "Accepted: PDF, Word, Excel and PowerPoint."
+    }`;
   if (file.size > DOC_MAX_FILE_SIZE)
     return `File too large (${asMb(file.size)} MB). Max is ${DOC_MAX_FILE_SIZE / 1024 / 1024} MB.`;
   return null;
@@ -1082,7 +1094,7 @@ export function DocumentUploadInput({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const validationMsg = validateDocumentFile(file);
+    const validationMsg = validateDocumentFile(file, !!deferred);
     if (validationMsg) {
       setUploadError(validationMsg);
       if (fileRef.current) fileRef.current.value = "";
@@ -1171,7 +1183,7 @@ export function DocumentUploadInput({
         <input
           type="file"
           ref={fileRef}
-          accept={DOC_ACCEPT}
+          accept={deferred ? PRESIGN_ACCEPT : DOC_ACCEPT}
           className="hidden"
           onChange={handleFileChange}
         />

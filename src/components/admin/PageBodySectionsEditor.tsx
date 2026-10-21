@@ -2,6 +2,7 @@
 
 import { ArrowDown, ArrowUp, Plus, Trash2 } from "lucide-react";
 import {
+  DocumentUploadInput,
   Field,
   FormGrid,
   ImageUploadInput,
@@ -18,6 +19,7 @@ const SECTION_TYPES: { value: Section["type"]; label: string }[] = [
   { value: "heading", label: "Heading" },
   { value: "text", label: "Paragraphs" },
   { value: "image", label: "Image" },
+  { value: "documents", label: "Documents" },
   { value: "list", label: "Bullet/Numbered List" },
   { value: "cards", label: "Card Grid" },
   { value: "cta", label: "Call-to-Action Button" },
@@ -31,6 +33,11 @@ function emptySection(type: Section["type"]): Section {
       return { type: "text", paragraphs: [""] };
     case "image":
       return { type: "image", src: "", alt: "", caption: "" };
+    case "documents":
+      return {
+        type: "documents",
+        items: [{ label: "", description: "", file: "" }],
+      };
     case "list":
       return { type: "list", ordered: false, items: [""] };
     case "cards":
@@ -160,6 +167,83 @@ function SectionEditor({
             hideUrlField
           />
         </FormGrid>
+      );
+    case "documents":
+      return (
+        <div className="admin-form-grid admin-form-grid--tight">
+          {section.items.map((doc, i) => (
+            <ItemCard
+              key={i}
+              span={6}
+              className="admin-item-card--raised"
+              onRemove={() =>
+                onChange({
+                  ...section,
+                  items: section.items.filter((_, j) => j !== i),
+                })
+              }
+              removeLabel={`Remove document ${i + 1}`}
+            >
+              <FormGrid tight>
+                <TextInput
+                  label={`Document ${i + 1} label`}
+                  span={6}
+                  value={doc.label}
+                  placeholder="Defaults to the file name"
+                  onChange={(e) =>
+                    onChange({
+                      ...section,
+                      items: section.items.map((d, j) =>
+                        j === i ? { ...d, label: e.target.value } : d,
+                      ),
+                    })
+                  }
+                />
+                <TextInput
+                  label="Description (optional)"
+                  span={6}
+                  value={doc.description ?? ""}
+                  onChange={(e) =>
+                    onChange({
+                      ...section,
+                      items: section.items.map((d, j) =>
+                        j === i ? { ...d, description: e.target.value } : d,
+                      ),
+                    })
+                  }
+                />
+                <DocumentUploadInput
+                  label="File"
+                  span="full"
+                  value={doc.file ?? ""}
+                  onChange={(file) =>
+                    onChange({
+                      ...section,
+                      items: section.items.map((d, j) =>
+                        j === i ? { ...d, file } : d,
+                      ),
+                    })
+                  }
+                />
+              </FormGrid>
+            </ItemCard>
+          ))}
+          <button
+            type="button"
+            onClick={() =>
+              onChange({
+                ...section,
+                items: [
+                  ...section.items,
+                  { label: "", description: "", file: "" },
+                ],
+              })
+            }
+            className="admin-btn admin-btn-outline admin-btn-sm admin-col-full"
+          >
+            <Plus size={12} /> Add Document
+          </button>
+        </div>
       );
     case "list":
       return (

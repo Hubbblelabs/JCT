@@ -32,6 +32,7 @@ export const PAGE_LIMITS = {
   listItemMax: 300,
   listItemsMax: 100,
   cardsMax: 24,
+  documentsMax: 40,
   galleryImagesMax: 80,
   keywordsMax: 15,
   keywordMax: 40,
@@ -91,6 +92,20 @@ const ImageSection = z.object({
   caption: zClampedString(0, 300).optional(),
 });
 
+// One downloadable file. `file` is a storage key ("documents/…") or a URL;
+// with no `label` the public page names it after the file.
+const DocumentItem = z.object({
+  label: zClampedString(0, 200).default(""),
+  description: zClampedString(0, 300).optional(),
+  file: zUrl.optional().or(z.literal("")),
+});
+
+const DocumentsSection = z.object({
+  type: z.literal("documents"),
+  name: zBlockName,
+  items: z.array(DocumentItem).max(PAGE_LIMITS.documentsMax).default([]),
+});
+
 const ListSection = z.object({
   type: z.literal("list"),
   name: zBlockName,
@@ -127,6 +142,7 @@ export const PageBodySectionSchema = z.discriminatedUnion("type", [
   HeadingSection,
   TextSection,
   ImageSection,
+  DocumentsSection,
   ListSection,
   CardsSection,
   CtaSection,

@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { PageBodySection } from "@/lib/validation";
 import { getImageUrl } from "@/lib/utils";
+import { PageDocumentsBlock } from "@/components/shared/PageDocumentsBlock";
 
 function resolveImage(src: string | undefined): string {
   if (!src) return "";
@@ -58,6 +59,8 @@ function Block({ section }: { section: PageBodySection }) {
           )}
         </figure>
       ) : null;
+    case "documents":
+      return <PageDocumentsBlock section={section} />;
     case "list": {
       const ListTag = section.ordered ? "ol" : "ul";
       const cls = section.ordered
