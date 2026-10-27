@@ -104,6 +104,7 @@ export async function PUT(req: NextRequest) {
               value,
               published_value: value,
               status: "published",
+              published_at: new Date(),
               updated_by: session!.user?.email,
             }
           : // Draft save: the live page keeps serving `published_value`

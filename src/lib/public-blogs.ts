@@ -72,18 +72,28 @@ export async function listPublicBlogs({
 }
 
 export async function listPublicBlogSlugs(): Promise<{ slug: string }[]> {
+  const entries = await listPublicBlogEntries();
+  return entries.map(({ slug }) => ({ slug }));
+}
+
+/** Active slugs with their last write, for the sitemap. */
+export async function listPublicBlogEntries(): Promise<
+  { slug: string; lastModified?: Date }[]
+> {
   // Runs inside generateStaticParams at build time. If the DB is briefly
   // unreachable during `next build`, degrade to zero prerendered slugs — blog
   // pages still render on demand via ISR.
   try {
     await connectDB();
     const docs = await Blog.find({ is_active: true })
-      .select("slug")
-      .lean<{ slug?: string }[]>();
+      .select("slug updated_at")
+      .lean<{ slug?: string; updated_at?: Date }[]>();
     return docs
-      .map((doc) => doc.slug)
-      .filter((slug): slug is string => typeof slug === "string" && !!slug)
-      .map((slug) => ({ slug }));
+      .filter((doc) => typeof doc.slug === "string" && !!doc.slug)
+      .map((doc) => ({
+        slug: doc.slug as string,
+        lastModified: doc.updated_at,
+      }));
   } catch (err) {
     console.warn(
       "[public-blogs] listPublicBlogSlugs failed; " +

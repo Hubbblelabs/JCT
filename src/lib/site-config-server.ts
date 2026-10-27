@@ -70,6 +70,34 @@ export async function getPublishedConfigValue(
  * stores entries verbatim) rendered as an uncaught TypeError and a 500 instead
  * of the empty page the fallback exists for.
  */
+/**
+ * When each key was last published, for sitemap `lastmod`. `published_at` is
+ * the right stamp here: `published_value` is only ever written by a publish,
+ * so a draft save never moves it. Unpublished keys and a DB failure are both
+ * simply absent from the result.
+ */
+export async function getConfigPublishedAt(
+  keys: string[],
+): Promise<Record<string, Date>> {
+  try {
+    await connectDB();
+    const docs = await SiteConfig.find({
+      config_key: { $in: keys },
+      published_at: { $ne: null },
+    })
+      .select("config_key published_at")
+      .lean<{ config_key: string; published_at?: Date }[]>();
+    const out: Record<string, Date> = {};
+    for (const doc of docs) {
+      if (doc.published_at) out[doc.config_key] = doc.published_at;
+    }
+    return out;
+  } catch (err) {
+    console.warn("[site-config-server] getConfigPublishedAt failed:", err);
+    return {};
+  }
+}
+
 export async function getPublishedConfig<T>(
   key: string,
   schema: ZodType<T>,

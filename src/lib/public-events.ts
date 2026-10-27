@@ -150,18 +150,29 @@ export async function listNewsEvents({
 }
 
 export async function listPublicEventSlugs(): Promise<{ slug: string }[]> {
+  const entries = await listPublicEventEntries();
+  return entries.map(({ slug }) => ({ slug }));
+}
+
+/** Active slugs with their last write, for the sitemap. */
+export async function listPublicEventEntries(): Promise<
+  { slug: string; institution?: string; lastModified?: Date }[]
+> {
   // Runs inside generateStaticParams at build time. If the DB is briefly
   // unreachable during `next build`, degrade to zero prerendered slugs —
   // event pages still render on demand via ISR.
   try {
     await connectDB();
     const docs = await Event.find({ is_active: true })
-      .select("slug")
-      .lean<{ slug?: string }[]>();
+      .select("slug institution updated_at")
+      .lean<{ slug?: string; institution?: string; updated_at?: Date }[]>();
     return docs
-      .map((doc) => doc.slug)
-      .filter((slug): slug is string => typeof slug === "string" && !!slug)
-      .map((slug) => ({ slug }));
+      .filter((doc) => typeof doc.slug === "string" && !!doc.slug)
+      .map((doc) => ({
+        slug: doc.slug as string,
+        institution: doc.institution,
+        lastModified: doc.updated_at,
+      }));
   } catch (err) {
     console.warn(
       "[public-events] listPublicEventSlugs failed; " +

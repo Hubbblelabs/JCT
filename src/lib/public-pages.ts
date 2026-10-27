@@ -51,6 +51,17 @@ function asPublic(doc: PageLean): PublicPage | null {
 export async function listPublishedPageSlugs(
   institution: PublicPage["institution"],
 ): Promise<{ slug: string }[]> {
+  const entries = await listPublishedPageEntries(institution);
+  return entries.map(({ slug }) => ({ slug }));
+}
+
+/**
+ * Published slugs with their last write, for the sitemap. `updated_at`, not
+ * `published_at`, because the title is read live off the document.
+ */
+export async function listPublishedPageEntries(
+  institution: PublicPage["institution"],
+): Promise<{ slug: string; lastModified?: Date }[]> {
   // Runs inside generateStaticParams at build time. If the DB is briefly
   // unreachable during `next build`, degrade to zero prerendered slugs
   // instead of aborting the entire build — pages still render on demand
@@ -62,12 +73,11 @@ export async function listPublishedPageSlugs(
       status: "published",
       published_content: { $exists: true, $ne: null },
     })
-      .select("slug")
-      .lean<{ slug?: string }[]>();
+      .select("slug updated_at")
+      .lean<{ slug?: string; updated_at?: Date }[]>();
     return docs
-      .map((d) => d.slug)
-      .filter((s): s is string => typeof s === "string" && s.length > 0)
-      .map((slug) => ({ slug }));
+      .filter((d) => typeof d.slug === "string" && d.slug.length > 0)
+      .map((d) => ({ slug: d.slug as string, lastModified: d.updated_at }));
   } catch (err) {
     console.warn(
       `[public-pages] listPublishedPageSlugs(${institution}) failed; ` +

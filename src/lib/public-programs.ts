@@ -171,6 +171,18 @@ export async function listPublicPrograms({
 export async function listPublishedProgramSlugs(
   institution: ProgramInstitution,
 ): Promise<{ slug: string }[]> {
+  const entries = await listPublishedProgramEntries(institution);
+  return entries.map(({ slug }) => ({ slug }));
+}
+
+/**
+ * Published slugs with their last write, for the sitemap. `updated_at` rather
+ * than `published_at`: card fields (name, image, seats) go live without a
+ * publish, so the publish stamp can be older than what the page shows.
+ */
+export async function listPublishedProgramEntries(
+  institution: ProgramInstitution,
+): Promise<{ slug: string; lastModified?: Date }[]> {
   // Runs inside generateStaticParams at build time. If the DB is briefly
   // unreachable during `next build`, degrade to zero prerendered slugs
   // instead of aborting the entire build — program pages still render on
@@ -183,14 +195,16 @@ export async function listPublishedProgramSlugs(
       is_active: true,
       ...PUBLISHED_QUERY,
     })
-      .select("slug")
+      .select("slug updated_at")
       .sort({ sort_order: 1, name: 1 })
-      .lean<{ slug?: string }[]>();
+      .lean<{ slug?: string; updated_at?: Date }[]>();
 
     return docs
-      .map((doc) => doc.slug)
-      .filter((slug): slug is string => typeof slug === "string" && !!slug)
-      .map((slug) => ({ slug }));
+      .filter((doc) => typeof doc.slug === "string" && !!doc.slug)
+      .map((doc) => ({
+        slug: doc.slug as string,
+        lastModified: doc.updated_at,
+      }));
   } catch (err) {
     console.warn(
       `[public-programs] listPublishedProgramSlugs(${institution}) failed; ` +

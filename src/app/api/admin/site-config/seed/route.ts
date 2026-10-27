@@ -329,7 +329,10 @@ export async function POST(req: NextRequest) {
         updated_by: session!.user?.email ?? "",
         status: seed.publish ? "published" : "draft",
       };
-      if (seed.publish) fields.published_value = seed.value;
+      if (seed.publish) {
+        fields.published_value = seed.value;
+        fields.published_at = new Date();
+      }
 
       // publish:true                   → always overwrite (admin is explicitly re-seeding live content)
       // publish:false or insertOnly    → only insert if the doc is missing; never clobber stored content
