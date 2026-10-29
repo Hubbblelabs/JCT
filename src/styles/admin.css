@@ -2401,6 +2401,11 @@
 .admin-workspace-preview {
   min-height: 0;
   overflow-y: auto;
+  /* ScaledPreview zooms to this box's width, and the zoom decides whether the
+     page overflows. A short page (the footer) sits right at that threshold, so
+     a scrollbar that comes and goes changes the width, which changes the zoom,
+     which toggles the scrollbar again — the preview shakes. Always reserve it. */
+  scrollbar-gutter: stable;
   padding: var(--admin-space-4);
   background: var(--admin-sunken);
 }
