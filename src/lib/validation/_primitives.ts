@@ -48,7 +48,9 @@ export const zUrl = z
     (v) =>
       v === "" ||
       /^https?:\/\//i.test(v) ||
-      v.startsWith("/") ||
+      // Root-relative, but not `//host` or `/\host`: browsers read both as
+      // another site, while the renderers treat a leading "/" as internal.
+      /^\/(?![/\\])/.test(v) ||
       v.startsWith("#") ||
       /^[a-z0-9][a-z0-9/_.-]*$/i.test(v),
     "Must be an http(s) URL, a root-relative path, or a storage key",

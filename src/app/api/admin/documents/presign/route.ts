@@ -25,9 +25,12 @@ export async function POST(req: NextRequest) {
   const { filename, size } = parsed.data;
 
   try {
-    const safeName = filename
+    const cleaned = filename
       .replace(/\s+/g, "-")
       .replace(/[^a-zA-Z0-9._-]/g, "_");
+    // Only PDFs come through here, so the key says so whatever the browser
+    // called the file — an `.html` key is the first half of serving a page.
+    const safeName = /\.pdf$/i.test(cleaned) ? cleaned : `${cleaned}.pdf`;
     const storageKey = `documents/${Date.now()}-${safeName}`;
     // Pin the byte count into the signature so the actual upload can't exceed
     // the size we validated above (the limit is otherwise unenforceable).

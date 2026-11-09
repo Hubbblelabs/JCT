@@ -53,7 +53,13 @@ export async function getPublishedConfigValue(
       `[site-config-server] getPublishedConfigValue(${key}) failed:`,
       err,
     );
-    return null;
+    // Only `next build` may degrade to "nothing published": that keeps a build
+    // on a machine without the DB from aborting. At runtime a swallowed error
+    // read as "unpublished", and Next cached the resulting 404 or empty page —
+    // status and all — for the whole ISR window. Throwing makes Next keep
+    // serving the last good render and retry on the next request instead.
+    if (process.env.NEXT_PHASE === "phase-production-build") return null;
+    throw err;
   }
 }
 

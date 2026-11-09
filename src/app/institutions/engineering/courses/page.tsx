@@ -45,13 +45,18 @@ function CourseCard({
       className="group flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white shadow-sm transition-all hover:shadow-md"
     >
       <div className="relative aspect-[16/9] overflow-hidden">
-        <Image
-          src={course.image}
-          alt={course.name}
-          fill
-          sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
+        {/* A program without a picture has image "" — an empty src is a
+            broken image (and a next/image error), as the other two colleges'
+            course pages already guard against. */}
+        {course.image && (
+          <Image
+            src={course.image}
+            alt={course.name}
+            fill
+            sizes="(min-width: 1280px) 25vw, (min-width: 768px) 33vw, 50vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+          />
+        )}
         <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent" />
         {showBadges && course.accreditations.length > 0 && (
           <div className="absolute top-3 right-3 flex items-center gap-2 rounded-full bg-white/92 px-2.5 py-1 shadow-sm backdrop-blur-sm">
@@ -194,7 +199,7 @@ export default function EngineeringCoursesPage() {
           <Breadcrumb
             tone="dark"
             items={[
-              { label: "Institutions", href: "/institutions" },
+              { label: "Home", href: "/" }, // /institutions has no page (404)
               { label: "Engineering", href: "/institutions/engineering" },
               { label: "Courses" },
             ]}

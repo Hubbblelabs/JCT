@@ -1,17 +1,14 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Playfair_Display, Inter } from "next/font/google";
 import "@/styles/globals.css";
 import { GlobalElements } from "@/components/layout/GlobalElements";
 import { GlobalConfig } from "@/components/layout/GlobalConfig";
 import { RouteQuickNav } from "@/components/layout/RouteQuickNav";
 import { MerittoScript } from "@/components/layout/MerittoScript";
+import { GoogleAnalytics } from "@/components/layout/GoogleAnalytics";
 import { InstitutionProvider } from "@/contexts/InstitutionContext";
 
 const SITE_URL = process.env.NEXTAUTH_URL ?? "https://jct.ac.in";
-
-/** Google Analytics 4 measurement id. */
-const GA_MEASUREMENT_ID = "G-ME2FVQ6817";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -39,11 +36,10 @@ export const metadata: Metadata = {
     "NAAC Accredited",
     "NBA Accredited",
   ],
+  // Site-wide fields only. A page without its own openGraph inherits this
+  // whole object, so a title or url here labelled every such page's social
+  // preview as the home page. The home page sets those itself.
   openGraph: {
-    title: "JCT Institutions — Three Colleges, One Commitment to Excellence",
-    description:
-      "Premier Engineering, Arts & Science, and Polytechnic colleges in Coimbatore. Established 2009. 98% Placement Rate.",
-    url: SITE_URL,
     siteName: "JCT Institutions",
     locale: "en_IN",
     type: "website",
@@ -109,18 +105,8 @@ export default function RootLayout({
           {process.env.NODE_ENV !== "production" && <RouteQuickNav />}
         </InstitutionProvider>
 
-        {/* Google Analytics (gtag.js) — googletagmanager.com must stay
-            allowlisted in the CSP script-src in next.config.ts. */}
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="ga-gtag" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${GA_MEASUREMENT_ID}');`}
-        </Script>
+        {/* Public pages only — see GoogleAnalytics. */}
+        <GoogleAnalytics />
       </body>
     </html>
   );

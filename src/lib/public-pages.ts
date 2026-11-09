@@ -1,7 +1,7 @@
 import "server-only";
 import { connectDB } from "@/lib/mongodb";
 import { Page } from "@/lib/models";
-import type { PageContent } from "@/lib/validation";
+import { PageContentSchema, type PageContent } from "@/lib/validation";
 
 export type PublicPage = {
   _id: string;
@@ -34,13 +34,24 @@ function asPublic(doc: PageLean): PublicPage | null {
   ) {
     return null;
   }
+  // Parsed rather than cast. Restore writes rich content back untouched, so a
+  // legacy or hand-edited section can lack the `paragraphs`/`items` the
+  // renderer maps over — a TypeError and a 500 for the page. Parsing fills
+  // those from the schema defaults.
+  const parsed = PageContentSchema.safeParse(doc.published_content);
+  if (!parsed.success) {
+    console.error(
+      `[public-pages] ${doc.institution}/${doc.slug}: published content failed validation`,
+      parsed.error.issues.slice(0, 5),
+    );
+  }
   return {
     _id: String(doc._id),
     slug: doc.slug ?? "",
     institution: (doc.institution as PublicPage["institution"]) ?? "main",
     title: doc.title ?? "",
     template: (doc.template as PublicPage["template"]) ?? "standard",
-    content: doc.published_content as PageContent,
+    content: parsed.success ? parsed.data : PageContentSchema.parse({}),
     version: doc.version ?? 1,
     ...(doc.published_at
       ? { published_at: new Date(doc.published_at).toISOString() }

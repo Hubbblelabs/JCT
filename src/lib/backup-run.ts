@@ -1,5 +1,6 @@
 import { rm } from "fs/promises";
 import { logAudit } from "@/lib/audit";
+import { runningMaintenance } from "@/lib/maintenance-lock";
 import { planBackup, writeBackupArchive } from "@/lib/backup-archive";
 import {
   activeBuild,
@@ -58,15 +59,41 @@ export type StartBackupResult =
        * browser poll. */
       done: Promise<BackupJob | null>;
     }
-  | { ok: false; reason: "busy"; message: string; job: BackupJob }
+  /** `job` is absent while the other build is still being prepared. */
+  | { ok: false; reason: "busy"; message: string; job?: BackupJob }
   | { ok: false; reason: "dir" | "space" | "plan"; message: string };
 
-export async function startBackupBuild(opts: {
+type StartOptions = {
   wantImages: boolean;
   wantDocs: boolean;
   origin: BackupOrigin;
   actor: string;
-}): Promise<StartBackupResult> {
+};
+
+/**
+ * Set from the busy check until the job is registered. `activeBuild()` only
+ * sees a job once `createJob` has run, and everything before that — the
+ * directory probe, a prune, a listing of the whole bucket, the space check —
+ * is slow, so two callers (two admins, or the scheduler and an admin) could
+ * both pass the check and start two multi-gigabyte builds against the same
+ * free space.
+ */
+let starting = false;
+
+/**
+ * True while a backup is being prepared but has not registered its job, so
+ * `activeBuild()` cannot see it yet. Restore and reset check both: a restore
+ * that slipped into that window would land while the build is reading the
+ * site, which is the half-restored archive `maintenance-lock.ts` exists to
+ * prevent.
+ */
+export function backupStarting(): boolean {
+  return starting;
+}
+
+export async function startBackupBuild(
+  opts: StartOptions,
+): Promise<StartBackupResult> {
   const busy = activeBuild();
   if (busy) {
     // Two concurrent builds would compete for the same bandwidth and disk and
@@ -78,7 +105,30 @@ export async function startBackupBuild(opts: {
       job: busy,
     };
   }
+  if (starting) {
+    return {
+      ok: false,
+      reason: "busy",
+      message: "A backup is already being prepared",
+    };
+  }
+  const maintenance = runningMaintenance();
+  if (maintenance) {
+    return {
+      ok: false,
+      reason: "busy",
+      message: `A ${maintenance} is in progress — back up once it has finished`,
+    };
+  }
+  starting = true;
+  try {
+    return await startUnguarded(opts);
+  } finally {
+    starting = false;
+  }
+}
 
+async function startUnguarded(opts: StartOptions): Promise<StartBackupResult> {
   // Before the plan: creating the directory and fixing its mode is cheap, while
   // reading the whole asset list only to fail on the first write would waste
   // minutes and tell the operator nothing useful.

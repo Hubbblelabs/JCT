@@ -308,7 +308,13 @@ function BlockEditor({
             span="full"
             columns
             values={block.columns}
-            onChange={(columns) => onChange({ ...block, columns })}
+            onChange={(columns) =>
+              onChange({
+                ...block,
+                columns,
+                rows: realignTableRows(block.rows, block.columns, columns),
+              })
+            }
             placeholder="S.No"
           />
           <Repeater<ContentTableRowValue>
@@ -615,6 +621,36 @@ function BlockEditor({
         </FormGrid>
       );
   }
+}
+
+/**
+ * Keep every row's cells under the heading they were typed for. Headings and
+ * cells are separate lists and the table renders cells by index, so deleting
+ * heading 2 of 5 used to slide every row's data one column left. StringList
+ * only ever removes one entry or appends one at the end, which is all this
+ * has to mirror.
+ */
+function realignTableRows(
+  rows: ContentTableRowValue[],
+  prev: string[],
+  next: string[],
+): ContentTableRowValue[] {
+  if (next.length === prev.length - 1) {
+    let removed = next.findIndex((value, i) => value !== prev[i]);
+    if (removed === -1) removed = next.length;
+    return rows.map((row) => ({
+      ...row,
+      cells: row.cells.filter((_, j) => j !== removed),
+    }));
+  }
+  if (next.length === prev.length + 1) {
+    return rows.map((row) =>
+      row.cells.length === prev.length
+        ? { ...row, cells: [...row.cells, { text: "", href: "" }] }
+        : row,
+    );
+  }
+  return rows;
 }
 
 // ─── Block list (add / reorder / remove) ────────────────────────────────────

@@ -116,17 +116,26 @@ export function cleanupStorageKeys(
         continue;
       }
 
-      deleteObject(key).catch((err) =>
-        console.warn(`[${context}] storage cleanup failed for "${key}":`, err),
-      );
-
+      // The row goes only once the object is gone, as in the reset sweep: a
+      // row dropped beside a failed delete left the object in the bucket with
+      // nothing in the media library to find it by.
       const Model = key.startsWith("images/") ? ImageAsset : DocumentAsset;
-      Model.deleteOne({ storage_key: key }).catch((err: unknown) =>
-        console.warn(
-          `[${context}] asset row cleanup failed for "${key}":`,
-          err,
-        ),
-      );
+      deleteObject(key)
+        .then(
+          () => Model.deleteOne({ storage_key: key }),
+          (err) => {
+            console.warn(
+              `[${context}] storage cleanup failed for "${key}":`,
+              err,
+            );
+          },
+        )
+        .catch((err: unknown) =>
+          console.warn(
+            `[${context}] asset row cleanup failed for "${key}":`,
+            err,
+          ),
+        );
     }
   })();
 }

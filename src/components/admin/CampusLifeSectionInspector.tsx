@@ -356,7 +356,13 @@ export function CampusLifeSectionInspector({
                   ratio="card"
                   value={sp.images[idx] ?? ""}
                   onChange={(url) => {
-                    const next = [...sp.images];
+                    // Dense, never sparse: filling slot 4 of a one-image list
+                    // left holes that JSON writes as null, which the schema
+                    // rejects — the save failed with "expected string".
+                    const next = Array.from(
+                      { length: Math.max(sp.images.length, idx + 1) },
+                      (_, i) => sp.images[i] ?? "",
+                    );
                     next[idx] = url;
                     patch({ sports: { ...sp, images: next } });
                   }}

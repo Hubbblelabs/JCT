@@ -18,10 +18,18 @@ import type { Metadata } from "next";
 
 export const revalidate = 86400;
 
-// No fallbacks: with no CMS entry the root layout's metadata stands, which
-// keeps the home page's siteName/locale/twitter tags intact.
+// The page title still comes from the root layout when the CMS has none; the
+// social preview text lives here now, since the root openGraph carries only
+// site-wide fields (see src/app/layout.tsx).
 export async function generateMetadata(): Promise<Metadata> {
-  return seoMetadata({ scope: "main", path: "/" });
+  return seoMetadata({
+    scope: "main",
+    path: "/",
+    fallbackOgTitle:
+      "JCT Institutions — Three Colleges, One Commitment to Excellence",
+    fallbackOgDescription:
+      "Premier Engineering, Arts & Science, and Polytechnic colleges in Coimbatore. Established 2009. 98% Placement Rate.",
+  });
 }
 
 export default async function HomePage() {

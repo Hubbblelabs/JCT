@@ -29,15 +29,27 @@ export function slugifyGroupName(name: string): string {
  * the clean URL and later ones stay reachable.
  */
 export function resolveGroupSlugs(groups: GroupValue[]): string[] {
-  const used = new Map<string, number>();
-  return groups.map((g, i) => {
-    const base =
+  const bases = groups.map(
+    (g, i) =>
       slugifyGroupName((g.slug || "").trim()) ||
       slugifyGroupName(g.name || "") ||
-      `item-${i + 1}`;
-    const seen = used.get(base) ?? 0;
-    used.set(base, seen + 1);
-    return seen === 0 ? base : `${base}-${seen + 1}`;
+      `item-${i + 1}`,
+  );
+  // A suffix must not land on a slug another group derives on its own —
+  // ["Science Club", "Science Club", "Science Club 2"] used to give the
+  // second and third both `science-club-2`, leaving the third unreachable.
+  const reserved = new Set(bases);
+  const taken = new Set<string>();
+  return bases.map((base) => {
+    if (!taken.has(base)) {
+      taken.add(base);
+      return base;
+    }
+    let n = 2;
+    while (taken.has(`${base}-${n}`) || reserved.has(`${base}-${n}`)) n++;
+    const slug = `${base}-${n}`;
+    taken.add(slug);
+    return slug;
   });
 }
 

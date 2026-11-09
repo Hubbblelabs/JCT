@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Testimonial } from "@/lib/models";
 import { getImageUrl } from "@/lib/utils";
-import { publicCacheGet, publicCacheSet } from "@/lib/public-cache";
+import {
+  publicCacheGeneration,
+  publicCacheGet,
+  publicCacheSet,
+} from "@/lib/public-cache";
 
 // Reading query params makes this handler dynamic, so route-level ISR
 // (`export const revalidate`) does not apply — responses are instead served
@@ -27,6 +31,8 @@ export async function GET(req: Request) {
   const cacheKey = `testimonials:${institution}`;
   const cached = publicCacheGet<{ source: string; data: unknown }>(cacheKey);
   if (cached) return NextResponse.json(cached);
+  // Captured before the read — see publicCacheGeneration.
+  const generation = publicCacheGeneration();
 
   try {
     await connectDB();
@@ -57,7 +63,7 @@ export async function GET(req: Request) {
 
     if (testimonials.length === 0) {
       const payload = { source: "empty", data: [] };
-      publicCacheSet(cacheKey, payload);
+      publicCacheSet(cacheKey, payload, { generation });
       return NextResponse.json(payload);
     }
 
@@ -69,7 +75,7 @@ export async function GET(req: Request) {
     }));
 
     const payload = { source: "db", data: transformedTestimonials };
-    publicCacheSet(cacheKey, payload);
+    publicCacheSet(cacheKey, payload, { generation });
     return NextResponse.json(payload);
   } catch (e) {
     console.error("[public/testimonials]", e);

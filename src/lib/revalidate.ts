@@ -49,6 +49,9 @@ const POLYTECHNIC_PATHS = [
   "/institutions/polytechnic/accreditations",
   "/institutions/polytechnic/committees",
   "/institutions/polytechnic/clubs-and-cells",
+  // An ISR redirect whose target depends on whether the Fine Arts Club is
+  // listed on Clubs & Cells.
+  "/institutions/polytechnic/fine-arts-club",
   ...CONTENT_PAGES.filter((p) => p.institution === "polytechnic").map(
     (p) => p.path,
   ),
@@ -134,8 +137,9 @@ const SITE_CONFIG_KEY_TARGETS: Record<string, RevalidateTarget[]> = {
   artsSciencePlacementInfo: ["arts-science"],
   polytechnicPlacementInfo: ["polytechnic"],
   lifeAtJct: ["home"],
-  // The strip is also server-rendered into the chrome of the site-wide pages
-  // (/events, /blogs, …) a visitor reaches from a college, hence "home".
+  // The strip is server-rendered into the chrome of every public page, so
+  // these are also in SITE_WIDE_CONFIG_KEYS, and that set wins. Kept here so
+  // the keys still have a mapping if they ever leave it.
   engineeringAnnouncement: ["engineering", "home"],
   artsScienceAnnouncement: ["arts-science", "home"],
   polytechnicAnnouncement: ["polytechnic", "home"],
@@ -246,6 +250,18 @@ export function revalidateEventDetailPages(): void {
   }
 }
 
+/**
+ * Every blog post page. Each one lists related posts beside the article, so
+ * adding, editing, hiding or deleting any post changes the others too.
+ */
+export function revalidateBlogDetailPages(): void {
+  try {
+    revalidatePath("/blogs/[slug]", "page");
+  } catch {
+    /* non-fatal */
+  }
+}
+
 export function revalidatePaths(...paths: string[]): void {
   publicCacheClear();
   for (const path of [...paths, ...FEED_PATHS]) {
@@ -296,6 +312,13 @@ const SITE_WIDE_CONFIG_KEYS = new Set([
   "artsScienceNavbar",
   "polytechnicNavbar",
   "footer",
+  // The announcement strip is part of the same chrome (SITE_CHROME_CONFIG_KEYS
+  // in site-config-server.ts). Targeting the college and "home" lists alone
+  // left it stale on every program, CMS-page, event and blog detail page — a
+  // full day on program pages — after an urgent notice was published.
+  "engineeringAnnouncement",
+  "artsScienceAnnouncement",
+  "polytechnicAnnouncement",
   // Server-rendered in the root layout (GlobalConfig), so it is baked into
   // every public page, detail routes included.
   "floatingElements",

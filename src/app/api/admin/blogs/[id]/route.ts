@@ -13,7 +13,7 @@ import {
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 import { BlogUpdateSchema } from "@/lib/validation";
-import { revalidatePaths } from "@/lib/revalidate";
+import { revalidateBlogDetailPages, revalidatePaths } from "@/lib/revalidate";
 import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 
 // Blogs publish to one institution-agnostic listing plus their own detail
@@ -22,6 +22,8 @@ function revalidateBlogPages(...slugs: (string | undefined)[]) {
   const paths = new Set(["/blogs"]);
   for (const slug of slugs) if (slug) paths.add(`/blogs/${slug}`);
   revalidatePaths(...paths);
+  // Every post page lists related posts in its sidebar.
+  revalidateBlogDetailPages();
 }
 
 function isDuplicateKeyError(e: unknown): boolean {

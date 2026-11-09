@@ -74,5 +74,9 @@ export function resolveIcon(
   fallback: LucideIcon,
 ): LucideIcon {
   if (!name) return fallback;
-  return ICONS[name.trim().toLowerCase()] ?? fallback;
+  const key = name.trim().toLowerCase();
+  // Own keys only: the name is free text from the CMS, and "constructor" or
+  // "__proto__" would otherwise resolve to Object / Object.prototype, which
+  // React refuses to render — taking the whole page down with it.
+  return Object.hasOwn(ICONS, key) ? ICONS[key] : fallback;
 }

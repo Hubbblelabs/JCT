@@ -10,7 +10,7 @@
     "lint:ci": "eslint .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
-    "seed:admin": "node scripts/seed-admin.js",
+    "seed:admin": "node --env-file-if-exists=.env.local --env-file-if-exists=.env scripts/seed-admin.js",
     "seed:news-events": "node scripts/news-events/seed-news-events.mjs",
     "dedupe:events": "node scripts/news-events/dedupe-events.mjs"
   },

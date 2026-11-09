@@ -334,7 +334,8 @@ export function CoePageLayout({
             <Breadcrumb
               tone="dark"
               items={[
-                { label: "Institutions", href: "/institutions" },
+                // `/institutions` has no page of its own (it 404s).
+                { label: "Home", href: "/" },
                 { label: "Engineering", href: "/institutions/engineering" },
                 { label: "COE" },
               ]}

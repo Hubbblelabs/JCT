@@ -96,11 +96,19 @@ function zonedToUtc(
 ): Date {
   const wall = Date.UTC(y, m - 1, d, hour, minute, 0, 0);
   // First pass uses the offset at the wrong instant (off by the offset
-  // itself); the second corrects it. One refinement is enough everywhere
-  // except inside a DST transition, and India — the default — has none.
-  let ts = wall - zoneOffsetMs(new Date(wall), tz);
-  ts = wall - zoneOffsetMs(new Date(ts), tz);
-  return new Date(ts);
+  // itself); the second corrects it. India — the default — has no DST, and
+  // there either candidate is right.
+  const first = wall - zoneOffsetMs(new Date(wall), tz);
+  const second = wall - zoneOffsetMs(new Date(first), tz);
+  const wallOf = (ts: number) => ts + zoneOffsetMs(new Date(ts), tz);
+  if (wallOf(second) === wall) return new Date(second);
+  if (wallOf(first) === wall) return new Date(first);
+  // Neither reads back as the requested time: it falls in a spring-forward
+  // gap and does not exist that day. The refinement alone landed an hour
+  // early — on the previous day when the gap is at midnight (Santiago), which
+  // computeNextRun then handed back as already past, and the scheduler re-ran
+  // the backup every minute until the hour was over. Run just after the gap.
+  return new Date(Math.max(first, second));
 }
 
 /** Civil date and weekday `tz` is showing at `instant`. */
@@ -165,33 +173,45 @@ export function computeNextRun(
   const at = (y: number, m: number, d: number) =>
     zonedToUtc(y, m, d, schedule.hour, schedule.minute, tz);
 
+  // Every branch keeps looking until a candidate is strictly after `from` —
+  // returning one that is not would have the scheduler fire again at once.
   if (schedule.frequency === "daily") {
-    const today = at(now.year, now.month, now.day);
-    if (today > from) return today;
-    const next = addDays(now.year, now.month, now.day, 1);
-    return at(next.year, next.month, next.day);
+    for (let i = 0; ; i++) {
+      const c = addDays(now.year, now.month, now.day, i);
+      const when = at(c.year, c.month, c.day);
+      if (when > from) return when;
+    }
   }
 
   if (schedule.frequency === "weekly") {
     // Eight candidates, not seven: today may already be the target weekday
     // with its time gone, in which case the answer is the same weekday next
-    // week — the eighth day out.
-    for (let i = 0; i <= 7; i++) {
+    // week — the eighth day out. The weekday is the civil date's own, not
+    // the one read back off the instant, which a DST gap can shift a day.
+    for (let i = 0; i <= 14; i++) {
       const c = addDays(now.year, now.month, now.day, i);
+      if (
+        new Date(Date.UTC(c.year, c.month - 1, c.day)).getUTCDay() !==
+        schedule.weekday
+      )
+        continue;
       const when = at(c.year, c.month, c.day);
-      if (when <= from) continue;
-      if (zonedParts(when, tz).weekday === schedule.weekday) return when;
+      if (when > from) return when;
     }
     // Unreachable for a weekday in 0..6, which the schema guarantees.
     const fallback = addDays(now.year, now.month, now.day, 7);
     return at(fallback.year, fallback.month, fallback.day);
   }
 
-  const thisMonth = at(now.year, now.month, schedule.day_of_month);
-  if (thisMonth > from) return thisMonth;
-  const y = now.month === 12 ? now.year + 1 : now.year;
-  const m = now.month === 12 ? 1 : now.month + 1;
-  return at(y, m, schedule.day_of_month);
+  for (let i = 0; ; i++) {
+    const month0 = now.month - 1 + i;
+    const when = at(
+      now.year + Math.floor(month0 / 12),
+      (month0 % 12) + 1,
+      schedule.day_of_month,
+    );
+    if (when > from) return when;
+  }
 }
 
 /* ─────────────────────────────── persistence ────────────────────────────── */

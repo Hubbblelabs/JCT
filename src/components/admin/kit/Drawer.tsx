@@ -65,8 +65,12 @@ export function Drawer({
   // Restore the editor's preferred inspector width. Read on mount rather than
   // in useState so server and client render the same markup.
   useEffect(() => {
-    const stored = Number(window.localStorage.getItem(WIDTH_KEY));
-    if (stored >= MIN_WIDTH && stored <= MAX_WIDTH) setWidth(stored);
+    try {
+      const stored = Number(window.localStorage.getItem(WIDTH_KEY));
+      if (stored >= MIN_WIDTH && stored <= MAX_WIDTH) setWidth(stored);
+    } catch {
+      // Storage blocked — keep the default width rather than crash the form.
+    }
   }, []);
 
   const requestClose = useCallback(async () => {
@@ -143,7 +147,11 @@ export function Drawer({
     function onUp() {
       setDragging(false);
       setWidth((w) => {
-        window.localStorage.setItem(WIDTH_KEY, String(w));
+        try {
+          window.localStorage.setItem(WIDTH_KEY, String(w));
+        } catch {
+          /* Storage blocked — the width just isn't remembered. */
+        }
         return w;
       });
     }

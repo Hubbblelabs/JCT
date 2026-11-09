@@ -10,6 +10,14 @@ import {
   ExternalLink,
   Mail,
   UserRound,
+  BookOpen,
+  GraduationCap,
+  Users,
+  Trophy,
+  TrendingUp,
+  Image as ImageIcon,
+  MessageSquare,
+  Briefcase,
   type LucideIcon,
 } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
@@ -50,6 +58,30 @@ export const RESEARCH_SECTION_ORDER: ResearchEditableSection[] = [
   "centres",
   "publications",
 ];
+
+/**
+ * The names the Research tab editor's icon picker stores (ProgramTabsEditor's
+ * ICON_OPTIONS). They are lowercase role names, not icon-registry keys, so
+ * looking them up in the sidebar registry alone matched nothing and every tab
+ * showed the flask whatever was picked.
+ */
+const RESEARCH_TAB_ICONS: Record<string, LucideIcon> = {
+  overview: BookOpen,
+  academics: GraduationCap,
+  faculty: Users,
+  facilities: FlaskConical,
+  life: Trophy,
+  career: TrendingUp,
+  image: ImageIcon,
+  message: MessageSquare,
+  briefcase: Briefcase,
+};
+
+function researchTabIcon(name: string | undefined): LucideIcon {
+  if (name && Object.hasOwn(RESEARCH_TAB_ICONS, name))
+    return RESEARCH_TAB_ICONS[name];
+  return lookupSidebarIcon(name) ?? FlaskConical;
+}
 
 function SectionHeading({
   icon: Icon,
@@ -279,7 +311,7 @@ function ResearchTabsView({
         >
           <nav className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:flex lg:flex-col lg:gap-1">
             {tabs.map((tab) => {
-              const Icon = lookupSidebarIcon(tab.icon) ?? FlaskConical;
+              const Icon = researchTabIcon(tab.icon);
               const isActive = tab.id === active?.id;
               return (
                 <button

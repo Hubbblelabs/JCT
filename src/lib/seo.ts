@@ -50,6 +50,12 @@ export async function getPageSeo(
  * in. `canonical` is left relative — the root layout sets `metadataBase`, so
  * Next resolves it against the deployed origin.
  */
+/**
+ * A page openGraph replaces the root layout's whole object rather than
+ * merging into it, so the site-wide fields have to ride along each time.
+ */
+const OG_SITE = { siteName: "JCT Institutions", locale: "en_IN" } as const;
+
 export async function seoMetadata({
   scope,
   path,
@@ -86,6 +92,7 @@ export async function seoMetadata({
       ...(ogDescription ? { description: ogDescription } : {}),
       url: path,
       type: "website",
+      ...OG_SITE,
     };
   }
   return metadata;
@@ -113,6 +120,6 @@ export function programMetadata({
     title,
     description,
     alternates: { canonical: path },
-    openGraph: { title, description, url: path, type: "website" },
+    openGraph: { title, description, url: path, type: "website", ...OG_SITE },
   };
 }

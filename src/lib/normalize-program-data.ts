@@ -1,4 +1,5 @@
 import type {
+  FacultyMember,
   ProgramData,
   HeroMetaItem,
   LabelsTree,
@@ -135,8 +136,56 @@ function arr<T>(v: unknown): T[] {
   return Array.isArray(v) ? (v as T[]) : [];
 }
 
-function obj<T>(v: unknown, fallback: T): T {
-  return v && typeof v === "object" && !Array.isArray(v) ? (v as T) : fallback;
+/**
+ * Curriculum as regulations → semesters → subjects, every level an array.
+ * The editor still reads an older flat shape (a bare list of semesters with no
+ * `regulationName`); passed through unchanged, the layout's
+ * `r.semesters.flatMap` threw and took the Academics tab — and the page — down.
+ */
+function normalizeCurriculum(v: unknown): ProgramData["curriculum"] {
+  const list = arr<Record<string, unknown>>(v).filter(
+    (x) => x && typeof x === "object",
+  );
+  const regulations =
+    list.length > 0 && !("regulationName" in list[0]!)
+      ? [{ regulationName: "Default", semesters: list }]
+      : list;
+  return regulations.map((reg) => ({
+    ...(reg as object),
+    regulationName: str(reg.regulationName) || "Default",
+    semesters: arr<Record<string, unknown>>(reg.semesters)
+      .filter((s) => s && typeof s === "object")
+      .map((sem) => ({
+        ...(sem as object),
+        semester:
+          typeof sem.semester === "number"
+            ? sem.semester
+            : Number(sem.semester) || 0,
+        subjects: arr(sem.subjects),
+      })),
+  })) as ProgramData["curriculum"];
+}
+
+/**
+ * A nested section object, with every field the fallback declares present and
+ * of the fallback's type. Returning the stored object as-is let a partial one
+ * through: the editor writes one sub-key at a time, so typing only a library
+ * description stored `{description}`, and the layout's
+ * `library.books.toLocaleString()` / `digitalAccess.map` threw — in the
+ * builder (losing unsaved edits) and on the published page.
+ */
+function obj<T extends object>(v: unknown, fallback: T): T {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return fallback;
+  const stored = v as Record<string, unknown>;
+  const out: Record<string, unknown> = { ...stored };
+  for (const [key, def] of Object.entries(fallback)) {
+    const value = stored[key];
+    const ok = Array.isArray(def)
+      ? Array.isArray(value)
+      : typeof value === typeof def;
+    if (!ok) out[key] = def;
+  }
+  return out as T;
 }
 
 /**
@@ -253,7 +302,7 @@ export function normalizeProgramData(
     advisoryBoard: arr(c.advisoryBoard),
     pac: arr(c.pac),
     bos: arr(c.bos),
-    curriculum: arr(c.curriculum),
+    curriculum: normalizeCurriculum(c.curriculum),
 
     teachingLearning: obj(c.teachingLearning, {
       overview: "",
@@ -263,8 +312,20 @@ export function normalizeProgramData(
     }),
 
     valueAddedCourses: arr(c.valueAddedCourses),
-    faculty: arr(c.faculty),
-    labs: arr(c.labs),
+    // `auFin` (Anna University faculty ID) is kept for records and never
+    // rendered, so it is dropped here rather than shipped in the public
+    // program API and every page's serialized props.
+    faculty: arr<FacultyMember>(c.faculty).map((member) => {
+      if (!member || typeof member !== "object") return member;
+      const { auFin: _auFin, ...rest } = member;
+      return rest;
+    }),
+    // Older lab entries carry no equipment list; the layout maps over it.
+    labs: arr<Record<string, unknown>>(c.labs).map((lab) =>
+      lab && typeof lab === "object"
+        ? { ...lab, equipment: arr(lab.equipment) }
+        : lab,
+    ) as ProgramData["labs"],
 
     library: obj(c.library, {
       books: 0,
@@ -291,13 +352,26 @@ export function normalizeProgramData(
 
     magazine:
       c.magazine && typeof c.magazine === "object" && !Array.isArray(c.magazine)
-        ? (c.magazine as ProgramData["magazine"])
+        ? obj(c.magazine, {
+            name: "",
+            description: "",
+            frequency: "",
+            latestIssue: "",
+            highlights: [] as string[],
+          })
         : undefined,
 
     careerProgression: {
       topRecruiters: arr(c.topRecruiters),
       higherStudies: arr(c.higherStudies),
       averagePackage: str(c.averagePackage),
+      // The builder writes it flat; older content nested it.
+      highestPackage:
+        str(c.highestPackage) ||
+        str(
+          (c.careerProgression as Record<string, unknown> | undefined)
+            ?.highestPackage,
+        ),
       placementRate: str(c.placementRate),
     },
 

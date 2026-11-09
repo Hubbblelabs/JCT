@@ -204,7 +204,10 @@ export const SiteConfigPutSchema = z
   });
 
 export function isKnownSiteConfigKey(key: string): key is SiteConfigKey {
-  return key in SITE_CONFIG_SCHEMAS;
+  // Own keys only: `in` also matched inherited names, so a restore archive
+  // carrying `config_key: "toString"` reached `.safeParse` on a function and
+  // aborted the whole config restore.
+  return typeof key === "string" && Object.hasOwn(SITE_CONFIG_SCHEMAS, key);
 }
 
 // Maps college-specific config keys to their institution.

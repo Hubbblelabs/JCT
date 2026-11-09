@@ -991,10 +991,12 @@ function Inner() {
       group: "Page sections",
       keys: [
         { key: "lifeAtJct", defaultValue: LIFE_AT_JCT_DEFAULT },
-        // Loaded so "Copy to …" can write them; saved with the page.
+        // Loaded so "Copy to …" can write them; saved with the page only
+        // when copied to, never published just because a draft exists.
         ...LIFE_AT_JCT_INSTITUTIONS.map(({ key }) => ({
           key,
           defaultValue: LIFE_AT_JCT_DEFAULT,
+          copyTarget: true,
         })),
       ],
       render: (io) => (

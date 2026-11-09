@@ -104,6 +104,7 @@ function LivePageEditorInner<T>({
     setDrafts: setHosted,
     setDraft: setHostedDraft,
     loading: hostedLoading,
+    error: hostedError,
     saveAll: saveHosted,
   } = useHostedDrafts(publicPath);
 
@@ -237,11 +238,12 @@ function LivePageEditorInner<T>({
 
   return (
     <EditorWorkspace
+      busy={saving !== null}
       title={title}
       description={subtitle}
       publicHref={publicPath}
-      loading={!ready && !error}
-      error={error}
+      loading={!ready && !error && !hostedError}
+      error={error ?? hostedError}
       sections={sections}
       selected={selected}
       onSelect={setSelected}

@@ -5,6 +5,7 @@ import {
   requireRole,
   enforceInstitutionScope,
   json,
+  badRequest,
   notFound,
   serverError,
   validateBody,
@@ -28,6 +29,14 @@ function institutionTarget(inst: string): RevalidateTarget | null {
   )
     return inst;
   return null;
+}
+
+function isDuplicateKeyError(e: unknown): boolean {
+  return (
+    typeof e === "object" &&
+    e !== null &&
+    (e as { code?: number }).code === 11000
+  );
 }
 
 export async function GET(
@@ -153,6 +162,13 @@ export async function PATCH(
     );
     return json(doc);
   } catch (e) {
+    // A rename (or a move to another college) onto a slug that college
+    // already uses trips the {institution, slug} unique index.
+    if (isDuplicateKeyError(e)) {
+      return badRequest(
+        "A program with this slug already exists for this institution",
+      );
+    }
     console.error(e);
     return serverError();
   }

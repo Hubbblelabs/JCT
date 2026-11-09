@@ -59,8 +59,11 @@ export function EditorSaveBar({
   const status = (() => {
     if (saving === "draft") return { dot: "dirty", text: "Saving draft…" };
     if (saving === "publish") return { dot: "dirty", text: "Publishing…" };
-    if (dirty) return { dot: "dirty", text: "Unsaved changes" };
+    // Before `dirty`: a failed save leaves the page dirty, so checking dirty
+    // first replaced every save error with a plain "Unsaved changes" and the
+    // editor never learned why the save did not happen.
     if (message && !message.ok) return { dot: "error", text: message.text };
+    if (dirty) return { dot: "dirty", text: "Unsaved changes" };
     if (message) return { dot: "saved", text: message.text };
     if (unpublished)
       return {

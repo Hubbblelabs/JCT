@@ -24,6 +24,26 @@ const InstitutionContext = createContext<InstitutionContextType | undefined>(
 
 const STORAGE_KEY = "currentInstitution";
 
+// Guarded: with site storage blocked (Chrome "Block all cookies", some in-app
+// webviews) even touching `window.sessionStorage` throws, and this provider
+// sits in the root layout — so one throw put every public page on the global
+// error screen. Remembering the college is a nicety; losing it is fine.
+function readSession(): string | null {
+  try {
+    return window.sessionStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeSession(value: string): void {
+  try {
+    window.sessionStorage.setItem(STORAGE_KEY, value);
+  } catch {
+    /* storage blocked */
+  }
+}
+
 function getPathnameInstitution(path: string): Institution | null {
   if (path === "/") return "main";
   if (path.startsWith("/institutions/engineering")) return "engineering";
@@ -57,9 +77,7 @@ export function InstitutionProvider({
   // on the client's first pass and break hydration.
   useEffect(() => {
     if (pathInstitution !== null) return;
-    const stored = window.sessionStorage.getItem(
-      STORAGE_KEY,
-    ) as Institution | null;
+    const stored = readSession() as Institution | null;
     if (stored && INSTITUTIONS.includes(stored)) setRemembered(stored);
     // Runs once — a later navigation to a college route writes the value
     // through the effect below instead.
@@ -69,14 +87,12 @@ export function InstitutionProvider({
   useEffect(() => {
     if (pathInstitution === null) return;
     setRemembered(pathInstitution);
-    window.sessionStorage.setItem(STORAGE_KEY, pathInstitution);
+    writeSession(pathInstitution);
   }, [pathInstitution]);
 
   const setInstitution = (inst: Institution) => {
     setRemembered(inst);
-    if (typeof window !== "undefined") {
-      window.sessionStorage.setItem(STORAGE_KEY, inst);
-    }
+    if (typeof window !== "undefined") writeSession(inst);
   };
 
   return (

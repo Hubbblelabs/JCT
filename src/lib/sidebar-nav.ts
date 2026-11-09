@@ -129,7 +129,8 @@ const ICON_REGISTRY: Record<string, LucideIcon> = {
 
 export function lookupSidebarIcon(name?: string): LucideIcon | null {
   if (!name) return null;
-  return ICON_REGISTRY[name] ?? null;
+  // Own keys only — see resolveIcon in lucide-icon.ts.
+  return Object.hasOwn(ICON_REGISTRY, name) ? ICON_REGISTRY[name] : null;
 }
 
 export function resolveSidebarItems(

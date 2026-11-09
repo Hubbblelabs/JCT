@@ -16,9 +16,9 @@ import {
   EngineeringAboutSchema,
   ArtsScienceAboutSchema,
   PolytechnicAboutSchema,
-  MainAboutSchema,
 } from "@/lib/validation";
 import type { AboutPageValue } from "@/lib/validation";
+import { DEFAULT_MAIN_ABOUT } from "@/lib/main-about-default";
 
 type Institution = "main" | "engineering" | "arts-science" | "polytechnic";
 
@@ -58,8 +58,9 @@ const INSTITUTION_MAP: Record<
 };
 
 function getDefaultDraft(institution: Institution): AboutPageValue {
-  if (institution === "main")
-    return MainAboutSchema.parse({}) as AboutPageValue;
+  // The page /about-us actually shows before anything is published — a blank
+  // start here made the first publish erase that copy from the live page.
+  if (institution === "main") return DEFAULT_MAIN_ABOUT;
   if (institution === "arts-science")
     return ArtsScienceAboutSchema.parse({}) as AboutPageValue;
   if (institution === "polytechnic")

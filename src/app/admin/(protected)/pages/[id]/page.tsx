@@ -53,7 +53,22 @@ type PageDoc = {
   status: Status;
   version: number;
   content: PageContent;
+  /** What the live page renders; absent until the first publish. */
+  published_content?: PageContent | null;
 };
+
+/**
+ * Whether a saved draft differs from the live page. `status` cannot say so: a
+ * draft save never changes it (public reads need "published"), so after the
+ * first publish it stayed "published" for good and Publish was greyed out on
+ * a saved, unpublished draft.
+ */
+function hasUnpublishedDraft(d: PageDoc): boolean {
+  if (d.status !== "published" || !d.published_content) return true;
+  return (
+    JSON.stringify(d.content ?? {}) !== JSON.stringify(d.published_content)
+  );
+}
 
 const ALL: Template[] = [
   "standard",
@@ -317,6 +332,7 @@ function PageEditorInner({ id }: { id: string }) {
 
   return (
     <EditorWorkspace
+      busy={saving || publishing}
       title={doc.title || "(untitled page)"}
       description={`${institutionLabel[doc.institution]} · ${publicPathFor(doc.institution, doc.slug)}. Click any part of the page to edit it.`}
       publicHref={
@@ -874,7 +890,7 @@ function PageEditorInner({ id }: { id: string }) {
         <EditorSaveBar
           dirty={dirty}
           saving={saving ? "draft" : publishing ? "publish" : null}
-          unpublished={doc.status !== "published"}
+          unpublished={hasUnpublishedDraft(doc)}
           message={msg && { text: msg.text, ok: msg.kind === "ok" }}
           onSaveDraft={() => void save()}
           onPublish={() => void publish()}

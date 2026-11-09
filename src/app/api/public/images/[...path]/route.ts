@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getObject } from "@/lib/storage";
+import { assetResponseHeaders, getObject } from "@/lib/storage";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +20,7 @@ export async function GET(
     const { body, contentType } = await getObject(key);
     return new NextResponse(body as ReadableStream, {
       headers: {
-        "Content-Type": contentType,
+        ...assetResponseHeaders(contentType),
         "Cache-Control": "public, max-age=86400, immutable",
       },
     });

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, Suspense } from "react";
+import { useEffect, useMemo, useRef, useState, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import {
   PROGRAM_CONTENT_SECTION_LABELS,
@@ -17,6 +17,7 @@ import { ValidationErrors } from "@/components/admin/ValidationErrors";
 import {
   EditorSaveBar,
   EditorWorkspace,
+  confirmDiscardIfDirty,
   type WorkspaceSection,
 } from "@/components/admin/kit";
 import { parseApiError, type ApiErrorPayload } from "@/lib/validation-helpers";
@@ -147,8 +148,18 @@ function ProgramDetailInner() {
   );
   /** The saved `{prog, content}` the editor compares against. */
   const [baseline, setBaseline] = useState<string | null>(null);
+  /**
+   * `published_content` as JSON — what the live page renders. Compared with
+   * the saved draft to tell "everything is live" from "a saved draft is
+   * waiting", which `status` cannot say: it is also the public gate, so a
+   * draft save must leave it at "published" or the live page goes dark.
+   */
+  const [publishedJson, setPublishedJson] = useState<string | null>(null);
+  /** The content of the last successful save, for `publish` to adopt. */
+  const savedContentJson = useRef<string | null>(null);
 
   const [loading, setLoading] = useState(!isNew);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -158,8 +169,29 @@ function ProgramDetailInner() {
   useEffect(() => {
     if (isNew) return;
     (async () => {
-      const pRes = await fetch(`/api/admin/programs/${id}`);
-      const pData = (await pRes.json()) as Record<string, unknown>;
+      let pData: Record<string, unknown>;
+      try {
+        const pRes = await fetch(`/api/admin/programs/${id}`);
+        if (!pRes.ok) {
+          // A 403 (another college's program) or 404 used to be spread into
+          // the form as an editable "Untitled program".
+          const err = await parseApiError(pRes);
+          setLoadError(
+            pRes.status === 404
+              ? "This program no longer exists."
+              : (err?.message ??
+                  err?.error ??
+                  "This program could not be loaded."),
+          );
+          setLoading(false);
+          return;
+        }
+        pData = (await pRes.json()) as Record<string, unknown>;
+      } catch {
+        setLoadError("This program could not be loaded. Reload to retry.");
+        setLoading(false);
+        return;
+      }
 
       const { _id, content: c, status: st, ...pRest } = pData;
       void _id;
@@ -171,10 +203,25 @@ function ProgramDetailInner() {
       setProg(loadedProg);
       setContent(loadedContent);
       setBaseline(JSON.stringify({ prog: loadedProg, content: loadedContent }));
+      savedContentJson.current = JSON.stringify(loadedContent);
+      setPublishedJson(
+        pData.published_content
+          ? JSON.stringify(pData.published_content)
+          : null,
+      );
       setStatus(typeof st === "string" ? st : "draft");
       setLoading(false);
     })();
   }, [id, isNew]);
+
+  /** A saved draft the live page does not show yet (or never published). */
+  const hasUnpublishedDraft = useMemo(() => {
+    if (isNew) return false;
+    if (status !== "published" || publishedJson === null) return true;
+    if (baseline === null) return false;
+    const saved = (JSON.parse(baseline) as { content?: unknown }).content;
+    return JSON.stringify(saved ?? {}) !== publishedJson;
+  }, [isNew, status, publishedJson, baseline]);
 
   // ── Live-preview data (raw content → normalized ProgramData) ───────────────
   const previewData = useMemo(() => {
@@ -272,13 +319,17 @@ function ProgramDetailInner() {
         return true;
       }
 
+      // No `status` here. Public reads require `status: "published"`, so
+      // sending "draft" with every save took a live program off the site
+      // until someone published again — while the bar said "not on the live
+      // site yet". The draft lives in `content`; `published_content` is what
+      // the public page renders, and only publish replaces it.
       const pRes = await fetch(`/api/admin/programs/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...flushedProg,
           content: flushedContent,
-          status: "draft",
         }),
       });
       if (!pRes.ok) {
@@ -291,7 +342,7 @@ function ProgramDetailInner() {
         return false;
       }
 
-      setStatus("draft");
+      savedContentJson.current = JSON.stringify(flushedContent);
       setBaseline(
         JSON.stringify({
           prog: { ...prog, ...(flushedProg as Partial<ProgramFields>) },
@@ -324,6 +375,8 @@ function ProgramDetailInner() {
       });
       if (r.ok) {
         setStatus("published");
+        // Publish copies the draft that `save` just wrote.
+        setPublishedJson(savedContentJson.current);
         setMsg({ text: "Published — the live page is updated", ok: true });
       } else {
         const err = await parseApiError(r);
@@ -345,12 +398,17 @@ function ProgramDetailInner() {
       confirmLabel: "Deactivate",
       destructive: true,
     });
-    if (!ok) return;
-    await fetch(`/api/admin/programs/${id}`, {
+    if (!ok || !confirmDiscardIfDirty()) return;
+    const r = await fetch(`/api/admin/programs/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ is_active: false }),
     });
+    if (!r.ok) {
+      const err = await parseApiError(r);
+      toast.error(err?.message ?? err?.error ?? "Could not hide the program.");
+      return;
+    }
     toast.success("Program deactivated.");
     router.push(`/admin/programs?college=${prog.institution}`);
   };
@@ -358,15 +416,24 @@ function ProgramDetailInner() {
   const activate = async () => {
     const ok = await confirm({
       title: "Activate program",
-      message: "Make this program active (as a draft)?",
+      message:
+        "Show this program on the site again? Its published version goes back live; if it was never published, publish it to show it.",
       confirmLabel: "Activate",
     });
-    if (!ok) return;
-    await fetch(`/api/admin/programs/${id}`, {
+    if (!ok || !confirmDiscardIfDirty()) return;
+    const r = await fetch(`/api/admin/programs/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ is_active: true, status: "draft" }),
+      // Visibility only. Sending `status: "draft"` here kept a program that
+      // had been published off the site — public reads require "published" —
+      // so "Show on site" left it 404 until someone published again.
+      body: JSON.stringify({ is_active: true }),
     });
+    if (!r.ok) {
+      const err = await parseApiError(r);
+      toast.error(err?.message ?? err?.error ?? "Could not show the program.");
+      return;
+    }
     router.push(`/admin/programs?college=${prog.institution}`);
   };
 
@@ -434,6 +501,7 @@ function ProgramDetailInner() {
 
   return (
     <EditorWorkspace
+      busy={saving || publishing}
       title={isNew ? "New Program" : prog.name || "Untitled program"}
       description={
         isNew
@@ -446,10 +514,13 @@ function ProgramDetailInner() {
           : undefined
       }
       loading={loading}
+      error={loadError}
       headerExtra={
         <>
           <button
-            onClick={() => router.push(backHref)}
+            onClick={() => {
+              if (confirmDiscardIfDirty()) router.push(backHref);
+            }}
             className="admin-btn admin-btn-ghost admin-btn-sm"
             title="Back to all programs"
           >
@@ -576,7 +647,7 @@ function ProgramDetailInner() {
         <EditorSaveBar
           dirty={dirty}
           saving={saving ? "draft" : publishing ? "publish" : null}
-          unpublished={!isNew && status !== "published"}
+          unpublished={hasUnpublishedDraft}
           message={msg}
           disabled={loading}
           onSaveDraft={() => void save()}

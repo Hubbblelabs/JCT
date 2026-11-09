@@ -37,6 +37,7 @@ import {
   Info,
   BookMarked,
   Zap,
+  Clock,
   Pencil,
   Images,
   X,
@@ -108,6 +109,10 @@ const DEFAULT_TABS: TabConfigItem[] = KNOWN_TAB_IDS.map((id) => ({
   label: DEFAULT_TAB_LABELS[id],
 }));
 
+/** The sidebar a program shows while its `tabsConfig` is empty — exported so
+ * the builder can start editing from it rather than from an empty list. */
+export const DEFAULT_PROGRAM_TABS: readonly TabConfigItem[] = DEFAULT_TABS;
+
 const ICON_REGISTRY: Record<string, ElementType> = {
   bookOpen: BookOpen,
   graduationCap: GraduationCap,
@@ -132,11 +137,23 @@ const ICON_REGISTRY: Record<string, ElementType> = {
   info: Info,
   bookMarked: BookMarked,
   zap: Zap,
+  clock: Clock,
 };
+
+/** Keyed in lowercase so a lookup ignores case. */
+const ICONS_BY_LOWER_NAME: Record<string, ElementType> = Object.fromEntries(
+  Object.entries(ICON_REGISTRY).map(([key, icon]) => [key.toLowerCase(), icon]),
+);
 
 function iconFromName(name?: string): ElementType | undefined {
   if (!name) return undefined;
-  return ICON_REGISTRY[name];
+  // Case-insensitive, own keys only. The built-in hero pills and the
+  // documented tabsConfig shape use PascalCase ("GraduationCap", "BookOpen")
+  // while the registry is camelCase, so every one of them rendered iconless.
+  const key = name.toLowerCase();
+  return Object.hasOwn(ICONS_BY_LOWER_NAME, key)
+    ? ICONS_BY_LOWER_NAME[key]
+    : undefined;
 }
 
 function isKnownTab(id: string): id is TabId {
@@ -352,10 +369,10 @@ function hasAboutStats(d: ProgramData, editable?: boolean) {
     hasText(d.about.affiliation)
   );
 }
-function hasAboutSection(d: ProgramData, editable?: boolean) {
+function hasAboutSectionOwn(d: ProgramData, editable?: boolean) {
   return editable || hasArr(d.about.paragraphs);
 }
-function hasHodSection(d: ProgramData, editable?: boolean) {
+function hasHodSectionOwn(d: ProgramData, editable?: boolean) {
   return (
     editable ||
     hasText(d.hod.name) ||
@@ -366,14 +383,14 @@ function hasHodSection(d: ProgramData, editable?: boolean) {
     hasArr(d.hod.message)
   );
 }
-function hasVisionMissionSection(d: ProgramData, editable?: boolean) {
+function hasVisionMissionSectionOwn(d: ProgramData, editable?: boolean) {
   return (
     editable ||
     hasText(d.visionMission.vision) ||
     hasArr(d.visionMission.mission)
   );
 }
-function hasProgramOutcomesSection(d: ProgramData, editable?: boolean) {
+function hasProgramOutcomesSectionOwn(d: ProgramData, editable?: boolean) {
   return editable || hasArr(d.programOutcomes);
 }
 function hasOverviewContent(
@@ -393,13 +410,13 @@ function hasOverviewContent(
   );
 }
 
-function hasCurriculumSection(d: ProgramData, editable?: boolean) {
+function hasCurriculumSectionOwn(d: ProgramData, editable?: boolean) {
   return (
     editable ||
     (hasArr(d.curriculum) && d.curriculum.some((r) => hasArr(r.semesters)))
   );
 }
-function hasTeachingLearningSection(d: ProgramData, editable?: boolean) {
+function hasTeachingLearningSectionOwn(d: ProgramData, editable?: boolean) {
   return (
     editable ||
     hasText(d.teachingLearning.overview) ||
@@ -408,7 +425,7 @@ function hasTeachingLearningSection(d: ProgramData, editable?: boolean) {
     hasArr(d.teachingLearning.practices)
   );
 }
-function hasValueAddedSection(d: ProgramData, editable?: boolean) {
+function hasValueAddedSectionOwn(d: ProgramData, editable?: boolean) {
   return editable || hasArr(d.valueAddedCourses);
 }
 function hasAcademicsContent(
@@ -429,16 +446,16 @@ function hasAcademicsContent(
   );
 }
 
-function hasCoreFacultySection(d: ProgramData, editable?: boolean) {
+function hasCoreFacultySectionOwn(d: ProgramData, editable?: boolean) {
   return editable || hasArr(d.faculty);
 }
-function hasAdvisorySection(d: ProgramData, editable?: boolean) {
+function hasAdvisorySectionOwn(d: ProgramData, editable?: boolean) {
   return editable || hasArr(d.advisoryBoard);
 }
-function hasPacSection(d: ProgramData, editable?: boolean) {
+function hasPacSectionOwn(d: ProgramData, editable?: boolean) {
   return editable || hasArr(d.pac);
 }
-function hasBosSection(d: ProgramData, editable?: boolean) {
+function hasBosSectionOwn(d: ProgramData, editable?: boolean) {
   return editable || hasArr(d.bos);
 }
 function hasFacultyContent(
@@ -457,10 +474,10 @@ function hasFacultyContent(
   );
 }
 
-function hasLabsSection(d: ProgramData, editable?: boolean) {
+function hasLabsSectionOwn(d: ProgramData, editable?: boolean) {
   return editable || hasArr(d.labs);
 }
-function hasLibrarySection(d: ProgramData, editable?: boolean) {
+function hasLibrarySectionOwn(d: ProgramData, editable?: boolean) {
   return (
     editable ||
     hasText(d.library.description) ||
@@ -484,23 +501,25 @@ function hasFacilitiesContent(
   );
 }
 
-function hasEventsSection(d: ProgramData, editable?: boolean) {
+function hasEventsSectionOwn(d: ProgramData, editable?: boolean) {
   return editable || hasArr(d.events);
 }
-function hasStudentAchievementsSection(d: ProgramData, editable?: boolean) {
+function hasStudentAchievementsSectionOwn(d: ProgramData, editable?: boolean) {
   return editable || hasArr(d.studentAchievements);
 }
-function hasFacultyAchievementsSection(d: ProgramData, editable?: boolean) {
+function hasFacultyAchievementsSectionOwn(d: ProgramData, editable?: boolean) {
   return editable || hasArr(d.facultyAchievements);
 }
-function hasMagazineSection(d: ProgramData, editable?: boolean) {
+function hasMagazineSectionOwn(d: ProgramData, editable?: boolean) {
   return editable || !!d.magazine;
 }
-function hasParticipationSection(d: ProgramData, editable?: boolean) {
+function hasParticipationSectionOwn(d: ProgramData, editable?: boolean) {
   return (
     editable ||
     hasArr(d.studentParticipation.clubs) ||
-    hasArr(d.facultyParticipation.workshops)
+    hasArr(d.facultyParticipation.workshops) ||
+    hasArr(d.studentParticipation.highlights) ||
+    hasArr(d.facultyParticipation.conferences)
   );
 }
 function hasLifeContent(d: ProgramData, l?: LifeLabels, editable?: boolean) {
@@ -522,16 +541,17 @@ function hasLifeContent(d: ProgramData, l?: LifeLabels, editable?: boolean) {
   );
 }
 
-function hasCareerProgressionSection(d: ProgramData, editable?: boolean) {
+function hasCareerProgressionSectionOwn(d: ProgramData, editable?: boolean) {
   return (
     editable ||
     hasText(d.careerProgression.placementRate) ||
     hasText(d.careerProgression.averagePackage) ||
+    hasText(d.careerProgression.highestPackage) ||
     hasArr(d.careerProgression.topRecruiters) ||
     hasArr(d.careerProgression.higherStudies)
   );
 }
-function hasFeedbackSection(d: ProgramData, editable?: boolean) {
+function hasFeedbackSectionOwn(d: ProgramData, editable?: boolean) {
   return (
     editable ||
     hasArr(d.feedback.curriculumProcess) ||
@@ -554,6 +574,109 @@ function hasCareerContent(
     ) ||
     sec(l?.feedback?.visible, hasFeedbackSection(d, editable))
   );
+}
+
+/**
+ * Extra content blocks a section carries (the builder's "Additional Content
+ * Blocks"). Every section check below counts them: before, a section whose
+ * own fields were empty was hidden on the public page — blocks and all —
+ * while the builder's preview (where `editable` shows everything) showed
+ * them, so content an editor added there never went live.
+ */
+function hasSectionBlocks(d: ProgramData, key: string): boolean {
+  const blocks = d.sectionBlocks?.[key];
+  return Array.isArray(blocks) && blocks.length > 0;
+}
+
+function hasAboutSection(d: ProgramData, editable?: boolean) {
+  return hasAboutSectionOwn(d, editable) || hasSectionBlocks(d, "about");
+}
+function hasHodSection(d: ProgramData, editable?: boolean) {
+  return hasHodSectionOwn(d, editable) || hasSectionBlocks(d, "hod");
+}
+function hasVisionMissionSection(d: ProgramData, editable?: boolean) {
+  return (
+    hasVisionMissionSectionOwn(d, editable) ||
+    hasSectionBlocks(d, "visionMission")
+  );
+}
+function hasProgramOutcomesSection(d: ProgramData, editable?: boolean) {
+  return (
+    hasProgramOutcomesSectionOwn(d, editable) ||
+    hasSectionBlocks(d, "programOutcomes")
+  );
+}
+function hasCurriculumSection(d: ProgramData, editable?: boolean) {
+  return (
+    hasCurriculumSectionOwn(d, editable) || hasSectionBlocks(d, "curriculum")
+  );
+}
+function hasTeachingLearningSection(d: ProgramData, editable?: boolean) {
+  return (
+    hasTeachingLearningSectionOwn(d, editable) ||
+    hasSectionBlocks(d, "teachingLearning")
+  );
+}
+function hasValueAddedSection(d: ProgramData, editable?: boolean) {
+  return (
+    hasValueAddedSectionOwn(d, editable) ||
+    hasSectionBlocks(d, "valueAddedCourses")
+  );
+}
+function hasCoreFacultySection(d: ProgramData, editable?: boolean) {
+  return (
+    hasCoreFacultySectionOwn(d, editable) || hasSectionBlocks(d, "faculty")
+  );
+}
+function hasAdvisorySection(d: ProgramData, editable?: boolean) {
+  return (
+    hasAdvisorySectionOwn(d, editable) || hasSectionBlocks(d, "advisoryBoard")
+  );
+}
+function hasPacSection(d: ProgramData, editable?: boolean) {
+  return hasPacSectionOwn(d, editable) || hasSectionBlocks(d, "pac");
+}
+function hasBosSection(d: ProgramData, editable?: boolean) {
+  return hasBosSectionOwn(d, editable) || hasSectionBlocks(d, "bos");
+}
+function hasLabsSection(d: ProgramData, editable?: boolean) {
+  return hasLabsSectionOwn(d, editable) || hasSectionBlocks(d, "labs");
+}
+function hasLibrarySection(d: ProgramData, editable?: boolean) {
+  return hasLibrarySectionOwn(d, editable) || hasSectionBlocks(d, "library");
+}
+function hasEventsSection(d: ProgramData, editable?: boolean) {
+  return hasEventsSectionOwn(d, editable) || hasSectionBlocks(d, "events");
+}
+function hasStudentAchievementsSection(d: ProgramData, editable?: boolean) {
+  return (
+    hasStudentAchievementsSectionOwn(d, editable) ||
+    hasSectionBlocks(d, "studentAchievements")
+  );
+}
+function hasFacultyAchievementsSection(d: ProgramData, editable?: boolean) {
+  return (
+    hasFacultyAchievementsSectionOwn(d, editable) ||
+    hasSectionBlocks(d, "facultyAchievements")
+  );
+}
+function hasMagazineSection(d: ProgramData, editable?: boolean) {
+  return hasMagazineSectionOwn(d, editable) || hasSectionBlocks(d, "magazine");
+}
+function hasParticipationSection(d: ProgramData, editable?: boolean) {
+  return (
+    hasParticipationSectionOwn(d, editable) ||
+    hasSectionBlocks(d, "participation")
+  );
+}
+function hasCareerProgressionSection(d: ProgramData, editable?: boolean) {
+  return (
+    hasCareerProgressionSectionOwn(d, editable) ||
+    hasSectionBlocks(d, "careerProgression")
+  );
+}
+function hasFeedbackSection(d: ProgramData, editable?: boolean) {
+  return hasFeedbackSectionOwn(d, editable) || hasSectionBlocks(d, "feedback");
 }
 
 function hasContentForTab(id: string, dept: ProgramData, editable?: boolean) {
@@ -2226,81 +2349,85 @@ function LifeTab({
           )}
 
           {/* Magazine */}
-          {showMagazine && dept.magazine && (
-            <EditableRegion
-              section="magazine"
-              dept={dept}
-              editable={editable}
-              onEditSection={onEditSection}
-            >
-              <SectionHeading
-                icon={Newspaper}
-                title={labels?.magazine?.title || "Newsletter / Magazine"}
-                ac={ac}
-              />
-              <FadeUp>
-                <Card hover={false} className="overflow-hidden">
-                  <div
-                    className="relative p-6 text-white sm:p-8"
-                    style={{
-                      background: `linear-gradient(135deg, ${bg} 0%, color-mix(in srgb, ${bg} 60%, #000) 100%)`,
-                    }}
-                  >
-                    <div
-                      className="pointer-events-none absolute -top-8 -right-8 h-28 w-28 rounded-full opacity-25 blur-xl"
-                      style={{ backgroundColor: ac }}
-                    />
-                    <p className="mb-1 text-[10px] font-black tracking-widest text-white/60 uppercase">
-                      Department Publication
-                    </p>
-                    <h3 className="text-2xl font-black">
-                      {dept.magazine.name}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed text-white/75">
-                      {dept.magazine.description}
-                    </p>
-                  </div>
-                  <div className="p-6 sm:p-8">
-                    <div className="mb-5 flex gap-8">
-                      <div>
-                        <p className="text-[10px] font-black tracking-widest text-gray-400 uppercase">
-                          Frequency
+          {showMagazine &&
+            (dept.magazine || hasSectionBlocks(dept, "magazine")) && (
+              <EditableRegion
+                section="magazine"
+                dept={dept}
+                editable={editable}
+                onEditSection={onEditSection}
+              >
+                <SectionHeading
+                  icon={Newspaper}
+                  title={labels?.magazine?.title || "Newsletter / Magazine"}
+                  ac={ac}
+                />
+                {/* Blocks alone still show; the card needs the magazine itself. */}
+                {dept.magazine && (
+                  <FadeUp>
+                    <Card hover={false} className="overflow-hidden">
+                      <div
+                        className="relative p-6 text-white sm:p-8"
+                        style={{
+                          background: `linear-gradient(135deg, ${bg} 0%, color-mix(in srgb, ${bg} 60%, #000) 100%)`,
+                        }}
+                      >
+                        <div
+                          className="pointer-events-none absolute -top-8 -right-8 h-28 w-28 rounded-full opacity-25 blur-xl"
+                          style={{ backgroundColor: ac }}
+                        />
+                        <p className="mb-1 text-[10px] font-black tracking-widest text-white/60 uppercase">
+                          Department Publication
                         </p>
-                        <p className="mt-1 font-bold text-gray-900">
-                          {dept.magazine.frequency}
+                        <h3 className="text-2xl font-black">
+                          {dept.magazine.name}
+                        </h3>
+                        <p className="mt-2 text-sm leading-relaxed text-white/75">
+                          {dept.magazine.description}
                         </p>
                       </div>
-                      <div>
-                        <p className="text-[10px] font-black tracking-widest text-gray-400 uppercase">
-                          Latest Issue
+                      <div className="p-6 sm:p-8">
+                        <div className="mb-5 flex gap-8">
+                          <div>
+                            <p className="text-[10px] font-black tracking-widest text-gray-400 uppercase">
+                              Frequency
+                            </p>
+                            <p className="mt-1 font-bold text-gray-900">
+                              {dept.magazine.frequency}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] font-black tracking-widest text-gray-400 uppercase">
+                              Latest Issue
+                            </p>
+                            <p className="mt-1 font-bold text-gray-900">
+                              {dept.magazine.latestIssue}
+                            </p>
+                          </div>
+                        </div>
+                        <p className="mb-3 text-[10px] font-black tracking-widest text-gray-400 uppercase">
+                          Recent Highlights
                         </p>
-                        <p className="mt-1 font-bold text-gray-900">
-                          {dept.magazine.latestIssue}
-                        </p>
+                        <ul className="space-y-2.5">
+                          {dept.magazine.highlights.map((h, i) => (
+                            <li
+                              key={i}
+                              className="flex items-start gap-2.5 text-sm text-gray-700"
+                            >
+                              <ChevronRight
+                                className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                                style={{ color: ac }}
+                              />
+                              <span>{h}</span>
+                            </li>
+                          ))}
+                        </ul>
                       </div>
-                    </div>
-                    <p className="mb-3 text-[10px] font-black tracking-widest text-gray-400 uppercase">
-                      Recent Highlights
-                    </p>
-                    <ul className="space-y-2.5">
-                      {dept.magazine.highlights.map((h, i) => (
-                        <li
-                          key={i}
-                          className="flex items-start gap-2.5 text-sm text-gray-700"
-                        >
-                          <ChevronRight
-                            className="mt-0.5 h-3.5 w-3.5 shrink-0"
-                            style={{ color: ac }}
-                          />
-                          <span>{h}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </Card>
-              </FadeUp>
-            </EditableRegion>
-          )}
+                    </Card>
+                  </FadeUp>
+                )}
+              </EditableRegion>
+            )}
         </div>
       </div>
 
@@ -2354,6 +2481,64 @@ function LifeTab({
               </Card>
             </FadeUp>
           </div>
+          {/* Both are edited in the builder's Participation section and were
+              never rendered anywhere. */}
+          {(dept.studentParticipation.highlights.length > 0 ||
+            dept.facultyParticipation.conferences.length > 0) && (
+            <div className="mt-5 grid gap-5 md:grid-cols-2">
+              {dept.studentParticipation.highlights.length > 0 && (
+                <FadeUp>
+                  <Card hover={false} className="p-6 sm:p-8">
+                    <h4 className="mb-4 font-bold text-gray-900">
+                      Student Highlights
+                    </h4>
+                    <ul className="space-y-3">
+                      {dept.studentParticipation.highlights.map((h, i) => (
+                        <li key={`${h.title}-${i}`} className="text-sm">
+                          <p className="font-semibold text-gray-900">
+                            {h.title}
+                            {h.year && (
+                              <span className="ml-2 font-normal text-gray-500">
+                                {h.year}
+                              </span>
+                            )}
+                          </p>
+                          {h.description && (
+                            <p className="mt-0.5 text-gray-600">
+                              {h.description}
+                            </p>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </Card>
+                </FadeUp>
+              )}
+              {dept.facultyParticipation.conferences.length > 0 && (
+                <FadeUp delay={0.08}>
+                  <Card hover={false} className="p-6 sm:p-8">
+                    <h4 className="mb-4 font-bold text-gray-900">
+                      Faculty Conferences
+                    </h4>
+                    <ul className="space-y-3">
+                      {dept.facultyParticipation.conferences.map((c, i) => (
+                        <li key={`${c.title}-${i}`} className="text-sm">
+                          <p className="font-semibold text-gray-900">
+                            {c.title}
+                          </p>
+                          <p className="mt-0.5 text-gray-600">
+                            {[c.faculty, c.venue, c.year]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </p>
+                        </li>
+                      ))}
+                    </ul>
+                  </Card>
+                </FadeUp>
+              )}
+            </div>
+          )}
         </EditableRegion>
       )}
     </div>
@@ -2396,7 +2581,13 @@ function CareerTab({
             ac={ac}
           />
           <FadeUp>
-            <div className="mb-6 grid grid-cols-2 gap-4">
+            <div
+              className={`mb-6 grid gap-4 ${
+                dept.careerProgression.highestPackage
+                  ? "grid-cols-2 sm:grid-cols-3"
+                  : "grid-cols-2"
+              }`}
+            >
               <StatBento
                 label={
                   labels?.careerProgression?.placementRateLabel ||
@@ -2414,6 +2605,15 @@ function CareerTab({
                 ac={ac}
                 icon={Briefcase}
               />
+              {/* Entered in the builder's Career section; it was never shown. */}
+              {dept.careerProgression.highestPackage && (
+                <StatBento
+                  label="Highest Package"
+                  value={dept.careerProgression.highestPackage}
+                  ac={ac}
+                  icon={Award}
+                />
+              )}
             </div>
           </FadeUp>
 
@@ -2866,7 +3066,8 @@ export function ProgramPageLayout({
               }}
               className="mb-4 text-3xl leading-[1.1] font-black tracking-tight text-white sm:text-4xl lg:text-5xl"
             >
-              {degreePrefix}
+              {/* Spaced: "B.E." and the name used to run together. */}
+              {degreePrefix ? `${degreePrefix.trim()} ` : null}
               {dept.name}
             </motion.h1>
 

@@ -71,7 +71,13 @@ function ShellInner({ children }: { children: ReactNode }) {
   // and sub-links kept rendering at full size inside a 60px column and were
   // merely clipped. A stored preference still wins — the toggle has to work.
   useEffect(() => {
-    const stored = window.localStorage.getItem(COLLAPSED_KEY);
+    let stored: string | null = null;
+    try {
+      stored = window.localStorage.getItem(COLLAPSED_KEY);
+    } catch {
+      // Storage blocked (privacy settings, some embedded browsers). A throw
+      // here took the whole admin shell into the error boundary.
+    }
     if (stored !== null) {
       setUserCollapsed(stored === "1");
       return;
@@ -98,7 +104,11 @@ function ShellInner({ children }: { children: ReactNode }) {
     }
     setUserCollapsed((prev) => {
       const next = !prev;
-      window.localStorage.setItem(COLLAPSED_KEY, next ? "1" : "0");
+      try {
+        window.localStorage.setItem(COLLAPSED_KEY, next ? "1" : "0");
+      } catch {
+        /* Storage blocked — the toggle still works for this visit. */
+      }
       return next;
     });
   };

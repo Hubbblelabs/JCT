@@ -15,7 +15,9 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { session, error } = await requireRole(req, "editor");
+  // Admin-only — documents have no institution to scope an editor by; see
+  // the note on GET /api/admin/documents.
+  const { session, error } = await requireRole(req, "admin");
   if (error) return error;
 
   try {

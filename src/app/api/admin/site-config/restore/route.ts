@@ -6,12 +6,19 @@ import { mkdtemp, rm } from "fs/promises";
 import path from "path";
 import unzipper from "unzipper";
 import { connectDB } from "@/lib/mongodb";
-import { requireRole, badRequest } from "@/lib/api-helpers";
+import { requireRole, badRequest, json } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
+import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 import { isBackupCollection } from "@/lib/backup-collections";
 import { revalidateEverything } from "@/lib/revalidate";
 import { isStorageConfigured } from "@/lib/storage";
-import { backupDir } from "@/lib/backup-jobs";
+import { activeBuild, backupDir } from "@/lib/backup-jobs";
+import { backupStarting } from "@/lib/backup-run";
+import {
+  endMaintenance,
+  runningMaintenance,
+  tryBeginMaintenance,
+} from "@/lib/maintenance-lock";
 import {
   discardUpload,
   isUploadId,
@@ -94,6 +101,15 @@ async function readJson(entry: CentralEntry): Promise<unknown> {
   }
 }
 
+/** Why `readJson` gave nothing back for an entry the restore needed. */
+function unreadableJsonWarning(entry: CentralEntry, consequence: string) {
+  const why =
+    entry.uncompressedSize > MAX_JSON_BYTES
+      ? `is larger than ${MAX_JSON_BYTES / 1024 / 1024} MB`
+      : "is not a valid JSON array";
+  return `${entry.path} ${why} — ${consequence}`;
+}
+
 /**
  * Write the request body to a temp file, reporting progress as it lands.
  * Counting happens in a Transform so `pipeline` keeps ownership of
@@ -153,7 +169,29 @@ export async function POST(req: NextRequest) {
     return badRequest("No such upload session");
   }
 
-  await connectDB();
+  // 409s leave a staged archive in place, so the operator can retry the
+  // restore once the other operation finishes without uploading it again.
+  if (activeBuild() || backupStarting()) {
+    return json(
+      { error: "A backup is being built — restore once it has finished" },
+      409,
+    );
+  }
+  if (!tryBeginMaintenance("restore")) {
+    return json(
+      {
+        error: `A ${runningMaintenance()} is already in progress — wait for it to finish`,
+      },
+      409,
+    );
+  }
+
+  try {
+    await connectDB();
+  } catch (e) {
+    endMaintenance("restore");
+    throw e;
+  }
 
   const mode =
     req.nextUrl.searchParams.get("mode") === "replace" ? "replace" : "merge";
@@ -161,10 +199,32 @@ export async function POST(req: NextRequest) {
   const encoder = new TextEncoder();
   const reqBody = req.body;
 
+  /**
+   * Set once the client stops reading — a closed tab, a dropped link, a proxy
+   * timeout. From then on progress has nowhere to go, but the restore itself
+   * must keep running: by that point the archive is entirely on disk, and
+   * stopping halfway leaves site config restored with the collections and
+   * assets not, while `finally` throws the staged archive away. A throwing
+   * `enqueue` used to do exactly that at the next progress line.
+   */
+  let clientGone = false;
+
   const body = new ReadableStream<Uint8Array>({
+    cancel() {
+      clientGone = true;
+    },
     async start(controller) {
-      const emit = (event: Record<string, unknown>) =>
-        controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
+      const emit = (event: Record<string, unknown>) => {
+        if (clientGone) return;
+        try {
+          controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
+        } catch {
+          clientGone = true;
+          console.warn(
+            "[site-config/restore] client disconnected; finishing the restore without progress output",
+          );
+        }
+      };
 
       const warnings: string[] = [];
       let configsRestored = 0;
@@ -244,6 +304,11 @@ export async function POST(req: NextRequest) {
 
         let collectionsRejected = 0;
         let collectionsPruned = 0;
+        // Storage keys held only by documents replace mode pruned. Cleaned up
+        // once, after every collection and asset is back: cleaning per
+        // collection scanned for references before later collections were
+        // restored, and could delete a file a not-yet-restored page still used.
+        const doomedKeys = new Set<string>();
         for (const entry of files) {
           if (
             !entry.path.startsWith("collections/") ||
@@ -254,7 +319,14 @@ export async function POST(req: NextRequest) {
           const name = entry.path.slice("collections/".length, -".json".length);
           if (!isBackupCollection(name)) continue;
           const docs = await readJson(entry);
-          if (!Array.isArray(docs)) continue;
+          if (!Array.isArray(docs)) {
+            // Too large to parse whole, or not valid JSON. Skipping it without
+            // a word reported a clean restore with a collection missing.
+            warnings.push(
+              unreadableJsonWarning(entry, `${name} was not restored`),
+            );
+            continue;
+          }
           if (docs.length === 0 && mode !== "replace") continue;
           // An empty archive file in replace mode means "delete everything in
           // this collection" — only trust that from an archive new enough to
@@ -269,6 +341,7 @@ export async function POST(req: NextRequest) {
           collectionDocs += result.restored;
           collectionsRejected += result.rejected;
           collectionsPruned += result.pruned;
+          for (const key of result.doomedKeys) doomedKeys.add(key);
           warnings.push(...result.errors);
           emit({
             stage: "collection",
@@ -279,14 +352,21 @@ export async function POST(req: NextRequest) {
           });
         }
 
-        const imageMetaEntry = byPath.get("images/_metadata.json");
-        const docMetaEntry = byPath.get("documents/_metadata.json");
-        const imageMeta = imageMetaEntry
-          ? indexMetaByKey(await readJson(imageMetaEntry))
-          : {};
-        const docMeta = docMetaEntry
-          ? indexMetaByKey(await readJson(docMetaEntry))
-          : {};
+        const readMeta = async (entry: CentralEntry | undefined) => {
+          if (!entry) return {};
+          const raw = await readJson(entry);
+          if (!Array.isArray(raw)) {
+            warnings.push(
+              unreadableJsonWarning(
+                entry,
+                "files restore without their media-library entries",
+              ),
+            );
+          }
+          return indexMetaByKey(raw);
+        };
+        const imageMeta = await readMeta(byPath.get("images/_metadata.json"));
+        const docMeta = await readMeta(byPath.get("documents/_metadata.json"));
 
         const assets = files.filter((f) => isSafeStorageKey(f.path));
         // An asset-shaped entry the key guard refused is a file the archive
@@ -332,6 +412,11 @@ export async function POST(req: NextRequest) {
           }
         }
 
+        if (doomedKeys.size > 0) {
+          // Re-checks every key against the restored database first.
+          cleanupStorageKeys(doomedKeys, "restore/replace");
+        }
+
         // Not `revalidateTargets` — a restore rewrites Program, Page, Event
         // and Blog documents too, whose public routes are dynamic segments no
         // target covers. "home" + "all-institutions" left every program, page
@@ -357,25 +442,33 @@ export async function POST(req: NextRequest) {
         });
       } catch (e) {
         console.error("[site-config/restore]", e);
-        // The common failure is the client hanging up mid-upload, which also
-        // tears down this response — enqueueing onto it would throw a second,
-        // less useful error over the first.
-        try {
-          emit({
-            done: true,
-            error: "Restore failed while reading the archive",
-            // Whatever landed before the failure stays applied; say so rather
-            // than letting the operator assume nothing changed.
-            partial: {
-              configs: configsRestored,
-              collections: collectionDocs,
-              assets: assetsRestored,
-            },
-            warnings,
-          });
-        } catch {
-          // Response already gone; the console.error above is the record.
+        // Whatever was written stays written, so the pages it changed must be
+        // refreshed and the partial restore recorded — the success path's
+        // revalidate and audit entry are both behind the throw.
+        if (configsRestored + collectionDocs + assetsRestored > 0) {
+          revalidateEverything();
+          await logAudit(
+            "site-config",
+            "restore-failed",
+            userEmail,
+            `Restore failed partway: ${configsRestored} configs, ${collectionDocs} content documents, ${assetsRestored} asset files had been applied`,
+          );
         }
+        // The common failure is the client hanging up mid-upload, which also
+        // tears down this response; `emit` is a no-op then, and the
+        // console.error above is the record.
+        emit({
+          done: true,
+          error: "Restore failed while reading the archive",
+          // Whatever landed before the failure stays applied; say so rather
+          // than letting the operator assume nothing changed.
+          partial: {
+            configs: configsRestored,
+            collections: collectionDocs,
+            assets: assetsRestored,
+          },
+          warnings,
+        });
       } finally {
         if (dir) {
           await rm(dir, { recursive: true, force: true }).catch((err) =>
@@ -392,6 +485,7 @@ export async function POST(req: NextRequest) {
           );
           await pruneUploads();
         }
+        endMaintenance("restore");
         try {
           controller.close();
         } catch {

@@ -214,6 +214,7 @@ export function EditorWorkspace({
   panel,
   saveBar,
   banner,
+  busy = false,
 }: {
   /** Names the page in the breadcrumb when the nav trail doesn't. */
   title: string;
@@ -241,6 +242,12 @@ export function EditorWorkspace({
   saveBar: ReactNode;
   /** Full-width notice above the page — e.g. validation errors. */
   banner?: ReactNode;
+  /**
+   * A save is in flight. The panel goes inert until it lands: a save writes
+   * back the value it started from (with uploads swapped in) and marks that
+   * clean, so anything typed during a slow upload was silently reverted.
+   */
+  busy?: boolean;
 }) {
   const wide = useIsWide();
   const [outlineOpen, setOutlineOpen] = useState(false);
@@ -279,7 +286,13 @@ export function EditorWorkspace({
   const editor = (
     <>
       {help && <p className="admin-workspace-help">{help}</p>}
-      {panel}
+      <div
+        inert={busy || undefined}
+        aria-busy={busy || undefined}
+        style={busy ? { opacity: 0.6 } : undefined}
+      >
+        {panel}
+      </div>
     </>
   );
 

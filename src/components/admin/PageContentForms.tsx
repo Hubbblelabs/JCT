@@ -226,8 +226,11 @@ function IntervalInput({
       value={draft}
       onChange={(e) => setDraft(e.target.value)}
       onBlur={() => {
-        const num = Number(draft);
+        // Whole milliseconds: the schema takes an integer, so 2500.5 used to
+        // pass here and then fail the save with "expected int".
+        const num = Math.round(Number(draft));
         if (draft !== "" && !isNaN(num) && num >= min && num <= max) {
+          setDraft(String(num));
           onChange(num);
         } else {
           setDraft(String(value ?? 6000));
@@ -2035,7 +2038,11 @@ export function PolytechnicAdmissionsForm({
   value: AdmissionsVal;
   onChange: (v: AdmissionsVal) => void;
 }) {
-  const criteria = Array.isArray(value.criteria) ? value.criteria : [];
+  // Each block normalised too: restore stores values verbatim, and a
+  // criterion without `items` crashed the panel on `block.items.map`.
+  const criteria = (Array.isArray(value.criteria) ? value.criteria : []).map(
+    (b) => ({ ...b, items: Array.isArray(b.items) ? b.items : [] }),
+  );
   const criteriaAtMax =
     criteria.length >= LIMITS_polytechnicAdmissions.criteriaMax;
   // Heading → CTA → the criteria columns → the contact strip beneath them,
@@ -2416,7 +2423,11 @@ export function AdmissionsForm({
   onChange: (v: GenericAdmissionsVal) => void;
   showContact?: boolean;
 }) {
-  const criteria = Array.isArray(value.criteria) ? value.criteria : [];
+  // Each block normalised too: restore stores values verbatim, and a
+  // criterion without `items` crashed the panel on `block.items.map`.
+  const criteria = (Array.isArray(value.criteria) ? value.criteria : []).map(
+    (b) => ({ ...b, items: Array.isArray(b.items) ? b.items : [] }),
+  );
   const criteriaAtMax = criteria.length >= ADMISSIONS_LIMITS.criteriaMax;
   // Heading → CTA → criteria columns → contact strip, as rendered publicly.
   return (

@@ -41,8 +41,9 @@ import type { BackupJobReport } from "@/lib/backup-jobs";
  * since its transfer time dwarfs the request latency being hidden.
  */
 const SMALL_ASSET_BYTES = 32 * 1024 * 1024;
-/** Concurrent small-object fetches. Below the SDK agent's 50-socket pool. */
-const FETCH_CONCURRENCY = 64;
+/** Concurrent small-object fetches. Below the SDK agent's 50-socket pool, so
+ * none queue for a socket (which the SDK logs as "socket usage at capacity"). */
+const FETCH_CONCURRENCY = 48;
 /** Ceiling on buffered-but-not-yet-archived bytes, so memory stays bounded. */
 const FETCH_BUDGET_BYTES = 512 * 1024 * 1024;
 
@@ -105,6 +106,19 @@ export async function planBackup(opts: {
 
   const objects = sources.length > 0 ? await listBackupObjects(sources) : [];
 
+  // A key storage never listed carries size 0. When the listing itself
+  // failed that is every key, and the disk check would approve a build of
+  // "0 bytes" that then grows to the real size — so count what the media
+  // library recorded for it instead.
+  const rowSize = new Map<string, number>();
+  for (const row of [...images, ...docs]) {
+    if (
+      typeof row.storage_key === "string" &&
+      typeof row.file_size === "number"
+    )
+      rowSize.set(row.storage_key, row.file_size);
+  }
+
   return {
     configs,
     images,
@@ -113,7 +127,10 @@ export async function planBackup(opts: {
     includeImages,
     includeDocs,
     assetsUnavailable,
-    assetBytes: objects.reduce((sum, o) => sum + o.size, 0),
+    assetBytes: objects.reduce(
+      (sum, o) => sum + (o.size || rowSize.get(o.key) || 0),
+      0,
+    ),
   };
 }
 
@@ -293,10 +310,13 @@ export async function writeBackupArchive(
   // + manifest + report + per-asset entries.
   const entriesTotal = plan.objects.length + BACKUP_COLLECTIONS.length + 4;
   if (onProgress) {
+    // Carried between the two events so an `entry` tick reports the last known
+    // count rather than resetting the admin's "n/total files" to zero.
+    let entriesDone = 0;
     archive.on("entry", () => {
       onProgress({
         bytes: archive.pointer(),
-        entriesDone: 0,
+        entriesDone,
         entriesTotal,
       });
     });
@@ -304,9 +324,10 @@ export async function writeBackupArchive(
     // asset. `progress` fires as source bytes are consumed, so the byte count
     // keeps moving inside a single large entry.
     archive.on("progress", (p: { entries: { processed: number } }) => {
+      entriesDone = p.entries.processed;
       onProgress({
         bytes: archive.pointer(),
-        entriesDone: p.entries.processed,
+        entriesDone,
         entriesTotal,
       });
     });

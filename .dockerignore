@@ -2,6 +2,12 @@ node_modules
 .next
 .git
 Dockerfile
+dockerfile
+# Prod-host secrets that live in the checkout but must never enter an image
+# or the builder cache: Garage's rpc_secret/admin_token, deploy keys.
+deploy/garage.toml
+.ssh
+*.pem
 dist
 coverage
 .vscode

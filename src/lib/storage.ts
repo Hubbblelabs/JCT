@@ -126,8 +126,44 @@ export async function getPresignedPutUrl(
         ? { ContentLength: contentLength }
         : {}),
     }),
-    { expiresIn },
+    {
+      expiresIn,
+      // The presigner leaves content-type unsigned by default, so the uploader
+      // could store any type it liked — `text/html` included, which the asset
+      // routes would then serve as a page on this origin. Signing it pins the
+      // upload to the type the server chose.
+      signableHeaders: new Set(["content-type"]),
+    },
   );
+}
+
+/**
+ * Types an asset route may hand a browser to render inline. Everything else —
+ * HTML, SVG, XML, scripts, and whatever type an object was stored with — could
+ * run as this origin, so it is only ever served as an opaque download. (A
+ * `Content-Security-Policy: sandbox` here would be replaced by the site-wide
+ * CSP rule in next.config.ts, so the type and disposition do the work.)
+ */
+const INLINE_SAFE_TYPES = new Set([
+  "image/webp",
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/avif",
+  "application/pdf",
+]);
+
+/** Response headers for serving a stored object from this app's origin. */
+export function assetResponseHeaders(
+  contentType: string,
+): Record<string, string> {
+  const type = contentType.split(";")[0]!.trim().toLowerCase();
+  if (INLINE_SAFE_TYPES.has(type)) return { "Content-Type": type };
+  return {
+    "Content-Type": "application/octet-stream",
+    "Content-Disposition": "attachment",
+    "X-Content-Type-Options": "nosniff",
+  };
 }
 
 /** The public URL an object is served from once it exists in the bucket. */

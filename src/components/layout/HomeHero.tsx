@@ -365,7 +365,10 @@ export function HomeHero() {
               return (
                 <Link
                   key={cta.label}
-                  href={cta.href.startsWith("#") ? "/admissions" : cta.href}
+                  // An in-page anchor stays on the home page (the hero lives
+                  // there). It used to be rewritten to /admissions, a route
+                  // that does not exist, so every such CTA landed on a 404.
+                  href={cta.href.startsWith("#") ? `/${cta.href}` : cta.href}
                   target={cta.href.startsWith("http") ? "_blank" : undefined}
                   rel={
                     cta.href.startsWith("http")

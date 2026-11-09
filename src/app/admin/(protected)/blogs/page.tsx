@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense, useCallback } from "react";
+import { useEffect, useRef, useState, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   FormGrid,
@@ -96,14 +96,32 @@ function BlogsPageInner() {
   // college's posts. Authoring only happens inside a college scope.
   const isMain = !filterInst;
 
+  /** Ignores a response that a newer load has superseded. */
+  const loadSeq = useRef(0);
   const load = useCallback(async () => {
+    const seq = ++loadSeq.current;
     setLoading(true);
-    const url = filterInst
-      ? `/api/admin/blogs?institution=${filterInst}`
-      : "/api/admin/blogs";
-    const r = await fetch(url);
-    setBlogs(await r.json());
-    setLoading(false);
+    try {
+      const url = filterInst
+        ? `/api/admin/blogs?institution=${filterInst}`
+        : "/api/admin/blogs";
+      const r = await fetch(url);
+      // An error body (a 401 once a revoked session ends, a 500) is an
+      // object, and the table threw on it — taking the page down.
+      if (!r.ok) throw new Error(`Request failed (${r.status})`);
+      const data = await r.json();
+      if (seq === loadSeq.current) setBlogs(Array.isArray(data) ? data : []);
+    } catch (err) {
+      if (seq === loadSeq.current) {
+        setBlogs([]);
+        toast.error(
+          `Could not load posts: ${err instanceof Error ? err.message : "network error"}`,
+        );
+      }
+    } finally {
+      if (seq === loadSeq.current) setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterInst]);
 
   useEffect(() => {
@@ -184,7 +202,12 @@ function BlogsPageInner() {
       destructive: true,
     });
     if (!ok) return;
-    await fetch(`/api/admin/blogs/${id}`, { method: "DELETE" });
+    const r = await fetch(`/api/admin/blogs/${id}`, { method: "DELETE" });
+    if (!r.ok) {
+      const err = await parseApiError(r);
+      toast.error(err?.message ?? err?.error ?? "Could not delete the post.");
+      return;
+    }
     toast.success("Blog deleted.");
     await load();
   };

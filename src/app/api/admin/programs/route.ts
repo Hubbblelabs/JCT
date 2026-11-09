@@ -24,6 +24,14 @@ function institutionTarget(inst: string): RevalidateTarget | null {
   return null;
 }
 
+function isDuplicateKeyError(e: unknown): boolean {
+  return (
+    typeof e === "object" &&
+    e !== null &&
+    (e as { code?: number }).code === 11000
+  );
+}
+
 export async function GET(req: NextRequest) {
   const { session, error } = await requireRole(req, "editor");
   if (error) return error;
@@ -90,6 +98,12 @@ export async function POST(req: NextRequest) {
     );
     return json(doc, 201);
   } catch (e) {
+    // Two concurrent creates can both pass the pre-check above.
+    if (isDuplicateKeyError(e)) {
+      return badRequest(
+        "A program with this slug already exists for this institution",
+      );
+    }
     console.error(e);
     return serverError();
   }

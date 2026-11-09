@@ -25,6 +25,13 @@ const ICON_OPTIONS = [
   { value: "briefcase", label: "Briefcase" },
 ];
 
+function nextTabId(tabs: Tab[]): string {
+  const taken = new Set(tabs.map((t) => t.id));
+  let n = tabs.length + 1;
+  while (taken.has(`tab-${n}`)) n++;
+  return `tab-${n}`;
+}
+
 function emptySection(kind: Section["kind"]): Section {
   switch (kind) {
     case "richText":
@@ -665,7 +672,10 @@ export function ProgramTabsEditor({ tabs, onChange }: Props) {
           onChange([
             ...tabs,
             {
-              id: `tab-${tabs.length + 1}`,
+              // Unique, not `tab-${length + 1}`: after a deletion that
+              // repeated an existing id, and the layout selects tabs by id,
+              // so the second one could never be opened.
+              id: nextTabId(tabs),
               label: "New Tab",
               icon: "overview",
               sections: [],

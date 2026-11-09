@@ -75,7 +75,10 @@ admin_token   = "your-32-hex-random-string-here"
 #
 #      garage status
 #      garage layout assign -z jct -c 300G <node-id>
-#      garage layout apply --version 2
+#      garage layout apply --version 1
+#
+#    (A fresh cluster is at layout version 0, and `apply` takes the current
+#    version + 1. Later changes use 2, 3, … — `garage layout show` says which.)
 #
 # 2. Create bucket and API key for the app:
 #

@@ -107,9 +107,10 @@ function accreditationsFrom(
 
 function asCard(doc: ProgramLean): PublicProgramCard {
   // Card image mirrors the program-detail hero image; fall back to the
-  // card-level `image` when no hero image is set.
-  const heroImage =
-    heroImageFrom(doc.published_content) ?? heroImageFrom(doc.content);
+  // card-level `image` when no hero image is set. Never the draft `content`:
+  // this feeds the unauthenticated card list, and an unpublished hero image
+  // surfaced there the moment it was saved.
+  const heroImage = heroImageFrom(doc.published_content);
   return {
     _id: String(doc._id),
     name: doc.name ?? "",
@@ -160,7 +161,7 @@ export async function listPublicPrograms({
 
   const docs = await Program.find(query)
     .select(
-      "name abbr slug institution degree duration seats image highlight description outcomes accreditations sort_order published_content.heroImage content.heroImage",
+      "name abbr slug institution degree duration seats image highlight description outcomes accreditations sort_order published_content.heroImage",
     )
     .sort({ sort_order: 1, name: 1 })
     .lean<ProgramLean[]>();

@@ -24,11 +24,12 @@
 
 # WebSocket/upgrade handling. Sending a bare `Connection: upgrade` on every
 # request (the previous config did) breaks keepalive to the upstream and
-# confuses HTTP/1.1 clients on ordinary responses; this maps it to "close"
-# unless the client actually asked to upgrade.
+# confuses HTTP/1.1 clients on ordinary responses. An ordinary request maps to
+# an empty Connection header — not "close", which would end every upstream
+# connection after one request and leave `keepalive 32` below unused.
 map $http_upgrade $connection_upgrade {
     default upgrade;
-    ''      close;
+    ''      "";
 }
 
 upstream jct_app {
@@ -137,9 +138,12 @@ server {
     # meaningfully, because TLS terminates out here.
     add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
 
-    # POST /api/admin/site-config/restore takes the whole backup ZIP as one raw
-    # body — currently ~7.5 GB. Any finite limit here truncates it.
-    client_max_body_size 0;
+    # Bounded here; the two restore locations below lift it for themselves.
+    # Unlimited at server level let any anonymous client POST hundreds of GB
+    # to `/`, which nginx spools to disk before proxying — onto the volume
+    # MongoDB and Garage share. 16m covers the app's own uploads (images up to
+    # 10 MB, direct documents up to 9 MB) plus multipart overhead.
+    client_max_body_size 16m;
     client_body_timeout 600s;
 
     # Long, because both directions of the backup path are multi-gigabyte.
@@ -235,6 +239,8 @@ server {
         proxy_set_header Connection "";
         expires 1y;
         add_header Cache-Control "public, max-age=31536000, immutable";
+        # Any add_header here drops the server-level ones, HSTS included.
+        add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
     }
 
     # Set BACKUP_ACCEL_PREFIX=/internal-backups in .env to enable. The download
@@ -285,9 +291,8 @@ server {
     # them marginally larger.
     gzip off;
 
-    # Presigned browser PUTs are whole documents; a prospectus PDF runs to
-    # hundreds of MB.
-    client_max_body_size 0;
+    # Public reads carry no body; only the signed location below takes one.
+    client_max_body_size 1m;
     client_body_timeout 600s;
     proxy_connect_timeout 60s;
     proxy_send_timeout 600s;
@@ -295,6 +300,14 @@ server {
 
     # ── Signed S3 API ────────────────────────────────────────────────────────
     location /jct-assets/ {
+        # Presigned browser PUTs are whole documents; a prospectus PDF runs to
+        # hundreds of MB. The signature itself pins the length.
+        client_max_body_size 0;
+
+        # add_header here replaces every server-level add_header, HSTS
+        # included, so it is repeated.
+        add_header Strict-Transport-Security "max-age=31536000" always;
+
         # CORS lives here and only here. Uploads are presign → browser PUT, so
         # the browser talks to Garage directly and without these headers the
         # upload fails in the browser with nothing in the server log. Garage
@@ -352,8 +365,12 @@ server {
         # (images/1781339322153-…webp) and never rewritten in place, so a long
         # browser cache is safe. Deleting an asset removes the key entirely
         # rather than replacing its bytes.
+        # Not `always` on Cache-Control: a 404 (a key briefly missing during a
+        # restore or reset) must not be cached as missing for 30 days.
         expires 30d;
-        add_header Cache-Control "public, max-age=2592000" always;
+        add_header Cache-Control "public, max-age=2592000";
         add_header X-Content-Type-Options "nosniff" always;
+        # Any add_header here drops the server-level ones, HSTS included.
+        add_header Strict-Transport-Security "max-age=31536000" always;
     }
 }

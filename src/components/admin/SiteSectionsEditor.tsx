@@ -52,6 +52,13 @@ export type SiteSectionDef = {
      * `reconcileSeoPages`). Must be pure and idempotent.
      */
     reconcile?: (value: unknown) => unknown;
+    /**
+     * Loaded only so this page can write it (Home's "Copy to …" targets are
+     * the colleges' Life at JCT keys). Saved when edited here, but a draft
+     * saved elsewhere is that page's business: it is not swept into this
+     * page's Publish, nor counted as this page's unpublished work.
+     */
+    copyTarget?: boolean;
   }[];
   render?: (io: SectionIO) => ReactNode;
   /** A self-saving editor (e.g. testimonials) shown in the panel. */
@@ -190,7 +197,10 @@ function SiteSectionsEditorInner({
           nextValues[def.key] = value;
           nextBase[def.key] = stable(value);
           if (doc) nextStored.add(def.key);
-          if (doc?.status === "draft") nextDrafted.add(def.key);
+          // Publishing sweeps up every drafted key — so a copy target here
+          // would put another college's unreviewed draft live.
+          if (doc?.status === "draft" && !def.copyTarget)
+            nextDrafted.add(def.key);
         }
         setValues(nextValues);
         setBaseline(nextBase);
@@ -322,6 +332,7 @@ function SiteSectionsEditorInner({
 
   return (
     <EditorWorkspace
+      busy={saving !== null}
       title={title}
       description={description}
       publicHref={publicHref}

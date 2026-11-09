@@ -19,6 +19,14 @@ export interface PendingUpload {
    * ratio would be dropped at flush and land as "auto".
    */
   ratioType?: RatioType;
+  /**
+   * Set once the file has been uploaded. The entry is kept, preview and all,
+   * until the placeholder stops appearing in a flushed value: callers adopt
+   * the flushed value only after their own save succeeds, so after a failed
+   * save they still hold the placeholder, and the retry must resolve it to
+   * this key rather than abort with "image pick was lost".
+   */
+  uploadedKey?: string;
 }
 
 export interface DeferredUploadsContextValue {
@@ -74,15 +82,19 @@ export function DeferredUploadsProvider({ children }: { children: ReactNode }) {
             map.delete(placeholderKey);
             return;
           }
+          if (info.uploadedKey) {
+            // Uploaded by an earlier flush whose save then failed.
+            replacements.set(placeholderKey, info.uploadedKey);
+            return;
+          }
           try {
             const realKey = await doUpload(
               info.file,
               info.endpoint,
               info.ratioType,
             );
+            info.uploadedKey = realKey;
             replacements.set(placeholderKey, realKey);
-            URL.revokeObjectURL(info.previewUrl);
-            map.delete(placeholderKey);
           } catch (err) {
             errors.push(err instanceof Error ? err.message : "Upload failed");
           }

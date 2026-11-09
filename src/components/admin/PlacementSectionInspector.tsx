@@ -12,7 +12,8 @@ import { SidebarNavEditor } from "@/components/admin/SidebarNavEditor";
 import { useDeferredUploads } from "@/lib/deferred-uploads";
 import { PLACEMENT_NAV_DEFAULTS } from "@/components/layout/PlacementsPageLayout";
 import type { SidebarNavItemRaw } from "@/lib/sidebar-nav";
-import type { PlacementInfoValue } from "@/lib/validation";
+import type { PageBodySection, PlacementInfoValue } from "@/lib/validation";
+import { PageBodySectionsEditor } from "@/components/admin/PageBodySectionsEditor";
 
 type BannerImage = PlacementInfoValue["banner"]["images"][number];
 type MouItem = PlacementInfoValue["mou"]["items"][number];
@@ -34,7 +35,10 @@ export function PlacementSectionInspector({
   data: PlacementInfoValue;
   onChange: (next: PlacementInfoValue) => void;
 }) {
-  const { discardAll } = useDeferredUploads();
+  // Only the removed item's own pick is released. Discarding everything here
+  // wiped every pending image on the page — other sections' and the year
+  // records' — and the next save aborted with "image picks were lost".
+  const { cancel } = useDeferredUploads();
   const patch = (p: Partial<PlacementInfoValue>) => onChange({ ...data, ...p });
 
   switch (section) {
@@ -73,7 +77,7 @@ export function PlacementSectionInspector({
             items={data.banner.images}
             onChange={(images) => patch({ banner: { ...data.banner, images } })}
             onItemRemove={(item) => {
-              if (item.image.startsWith("pending:")) discardAll();
+              if (item.image.startsWith("pending:")) cancel(item.image);
             }}
             newItem={() => ({ image: "", alt: "", caption: "", href: "" })}
             renderItem={(item, i, onItemChange) => (
@@ -273,7 +277,7 @@ export function PlacementSectionInspector({
             items={data.tpo.contacts}
             onChange={(contacts) => patch({ tpo: { ...data.tpo, contacts } })}
             onItemRemove={(item) => {
-              if (item.image.startsWith("pending:")) discardAll();
+              if (item.image.startsWith("pending:")) cancel(item.image);
             }}
             newItem={() => ({
               name: "",
@@ -364,7 +368,7 @@ export function PlacementSectionInspector({
             items={data.mou.items}
             onChange={(items) => patch({ mou: { ...data.mou, items } })}
             onItemRemove={(item) => {
-              if (item.logo.startsWith("pending:")) discardAll();
+              if (item.logo.startsWith("pending:")) cancel(item.logo);
             }}
             newItem={() => ({
               organization: "",
@@ -521,15 +525,55 @@ export function PlacementSectionInspector({
       );
 
     default:
-      // Custom in-page sections are defined as blocks on their sidebar item —
-      // point the editor at the one place that owns them.
+      // A custom in-page section: its blocks live on its sidebar item. This
+      // used to point at the Sidebar Navigation editor, which has no block
+      // editor (and points back here) — so such a section could never get
+      // content. Same editor as About, CoE and NAAC.
       if (section.startsWith("custom:")) {
+        const anchor = section.slice("custom:".length);
+        const items = data.sidebar.navItems ?? [];
+        const idx = items.findIndex((it) => (it.id || "") === anchor);
+        if (idx === -1) {
+          return (
+            <p className="text-sm text-[var(--admin-text-muted)]">
+              This section no longer exists. Re-open the inspector.
+            </p>
+          );
+        }
+        const item = items[idx]!;
+        const updateItem = (next: Partial<typeof item>) =>
+          patch({
+            sidebar: {
+              ...data.sidebar,
+              navItems: items.map((it, j) =>
+                j === idx ? { ...it, ...next } : it,
+              ),
+            },
+          });
         return (
-          <p className="text-sm text-[var(--admin-text-muted)]">
-            This section&apos;s content blocks are edited from the{" "}
-            <span className="font-medium">Sidebar Navigation</span> section —
-            click the sidebar card in the preview.
-          </p>
+          <FormGrid>
+            <TextInput
+              label="Sidebar Label"
+              span={5}
+              value={item.label ?? ""}
+              placeholder="Section name shown in the sidebar"
+              onChange={(e) => updateItem({ label: e.target.value })}
+            />
+            <Field label="Content Blocks" span="full">
+              <PageBodySectionsEditor
+                value={(item.blocks ?? []) as PageBodySection[]}
+                onChange={(blocks) => updateItem({ blocks })}
+                allowedTypes={[
+                  "heading",
+                  "text",
+                  "image",
+                  "documents",
+                  "list",
+                  "cards",
+                ]}
+              />
+            </Field>
+          </FormGrid>
         );
       }
       return (

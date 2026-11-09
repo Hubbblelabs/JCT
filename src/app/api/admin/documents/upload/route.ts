@@ -10,6 +10,7 @@ import {
   enforceUploadRateLimit,
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
+import { DIRECT_DOCUMENT_UPLOAD_MAX } from "@/lib/validation/documentUploads";
 
 // PDFs cover most downloads, but pages such as ICT Content publish faculty
 // slide decks and some statutory returns arrive as Word/Excel — those have to
@@ -23,7 +24,7 @@ const ALLOWED_MIME = [
   "application/vnd.ms-powerpoint",
   "application/vnd.openxmlformats-officedocument.presentationml.presentation",
 ] as const;
-const MAX_SIZE = 25 * 1024 * 1024; // 25 MB
+const MAX_SIZE = DIRECT_DOCUMENT_UPLOAD_MAX;
 
 export const maxDuration = 60;
 
@@ -45,7 +46,7 @@ export async function POST(req: NextRequest) {
     }
     if (file.size > MAX_SIZE) {
       return badRequest(
-        `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max is 25 MB.`,
+        `File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max is ${MAX_SIZE / 1024 / 1024} MB here.`,
       );
     }
 

@@ -20,6 +20,15 @@ export const DOCUMENT_UPLOAD_LIMITS = {
 
 export const DOCUMENT_UPLOAD_MIME = ["application/pdf"] as const;
 
+/**
+ * Cap for `POST /api/admin/documents/upload`, the multipart route the bytes
+ * pass through. `proxy.ts` matches it, and Next truncates a matched request
+ * body at 10 MB without rejecting it — so a larger file reached the handler
+ * cut short and died in `formData()` as a bare 500. Larger files go through
+ * presign, which never sends the bytes to this app.
+ */
+export const DIRECT_DOCUMENT_UPLOAD_MAX = 9 * 1024 * 1024;
+
 export const DocumentPresignSchema = z.object({
   filename: zClampedString(1, DOCUMENT_UPLOAD_LIMITS.filenameMax, "Filename"),
   size: z

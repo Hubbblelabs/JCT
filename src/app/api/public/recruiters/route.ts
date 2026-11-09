@@ -2,7 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Placement } from "@/lib/models";
 import { getImageUrl } from "@/lib/utils";
-import { publicCacheGet, publicCacheSet } from "@/lib/public-cache";
+import {
+  publicCacheGeneration,
+  publicCacheGet,
+  publicCacheSet,
+} from "@/lib/public-cache";
 
 // The recruiter logos shown in the homepage / institution carousel come from
 // each college's placement records (Placement.top_recruiters) — there is no
@@ -29,6 +33,8 @@ export async function GET(req: NextRequest) {
   const cacheKey = `recruiters:${college ?? "*"}`;
   const cached = publicCacheGet<{ source: string; data: unknown }>(cacheKey);
   if (cached) return NextResponse.json(cached);
+  // Captured before the read — see publicCacheGeneration.
+  const generation = publicCacheGeneration();
 
   try {
     await connectDB();
@@ -66,12 +72,12 @@ export async function GET(req: NextRequest) {
     const data = [...seen.values()];
     if (data.length === 0) {
       const payload = { source: "empty", data: [] };
-      publicCacheSet(cacheKey, payload);
+      publicCacheSet(cacheKey, payload, { generation });
       return NextResponse.json(payload);
     }
 
     const payload = { source: "db", data };
-    publicCacheSet(cacheKey, payload);
+    publicCacheSet(cacheKey, payload, { generation });
     return NextResponse.json(payload);
   } catch (e) {
     console.error("[public/recruiters]", e);

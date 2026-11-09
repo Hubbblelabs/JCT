@@ -3,7 +3,11 @@ import {
   getPublishedProgramBySlug,
   type ProgramInstitution,
 } from "@/lib/public-programs";
-import { publicCacheGet, publicCacheSet } from "@/lib/public-cache";
+import {
+  publicCacheGeneration,
+  publicCacheGet,
+  publicCacheSet,
+} from "@/lib/public-cache";
 
 // Reading query params makes this handler dynamic, so route-level ISR
 // (`export const revalidate`) does not apply — responses are instead served
@@ -32,6 +36,8 @@ export async function GET(
     const cacheKey = `program:${institution}:${slug}`;
     const cached = publicCacheGet<{ source: string; data: unknown }>(cacheKey);
     if (cached) return NextResponse.json(cached);
+    // Captured before the read — see publicCacheGeneration.
+    const generation = publicCacheGeneration();
 
     const program = await getPublishedProgramBySlug({ institution, slug });
     if (!program) {
@@ -39,7 +45,7 @@ export async function GET(
     }
 
     const payload = { source: "db", data: program };
-    publicCacheSet(cacheKey, payload);
+    publicCacheSet(cacheKey, payload, { generation });
     return NextResponse.json(payload);
   } catch (e) {
     console.error("[public/programs/slug]", e);

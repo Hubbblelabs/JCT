@@ -101,6 +101,7 @@ function PlacementsPageEditorInner() {
     setDrafts: setHostedDrafts,
     setDraft: setHostedDraft,
     loading: hostedLoading,
+    error: hostedError,
     saveAll: saveHosted,
   } = useHostedDrafts(publicPath);
   const gallerySlug = hostedDefs[0]?.slug;
@@ -130,9 +131,13 @@ function PlacementsPageEditorInner() {
     setBaseline(null);
     setLoadError(null);
     setMsg(null);
+    // No per-call catch: a key that was never saved resolves with a null
+    // value, so a rejection here is a real failure. Swallowing it opened the
+    // editor on defaults with no years, and the next Save published those
+    // defaults over the stored page.
     Promise.all([
-      loadEditableConfig<PlacementInfoValue>(configKey).catch(() => null),
-      loadPlacementRecords(college).catch(() => [] as AdminPlacementRecord[]),
+      loadEditableConfig<PlacementInfoValue>(configKey),
+      loadPlacementRecords(college),
     ])
       .then(([configRes, placementRecords]) => {
         if (cancelled) return;
@@ -423,13 +428,14 @@ function PlacementsPageEditorInner() {
 
   return (
     <EditorWorkspace
+      busy={saving !== null}
       // A college switch is a different page: drop the selection.
       key={college}
       title={`${label} — Placements Page`}
       description="Click any part of the page to edit it. The page text follows Save draft / Publish; year-wise records go live as soon as they are saved."
       publicHref={publicPath}
-      loading={!ready && !loadError}
-      error={loadError}
+      loading={!ready && !loadError && !hostedError}
+      error={loadError ?? hostedError}
       sections={sections}
       selected={selected}
       onSelect={setSelected}

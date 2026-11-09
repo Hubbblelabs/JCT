@@ -55,11 +55,25 @@ export function publicCacheGet<T>(key: string): T | undefined {
   return entry.value as T;
 }
 
+/**
+ * Bumped by every clear. A caller captures it before its database read and
+ * hands it back to `publicCacheSet`, so a read that was already in flight when
+ * an admin write cleared the cache cannot store its pre-write result after the
+ * clear — which kept the published change off /api/public/* for a full TTL.
+ */
+let generation = 0;
+
+export function publicCacheGeneration(): number {
+  return generation;
+}
+
 export function publicCacheSet(
   key: string,
   value: unknown,
-  ttlMs = DEFAULT_TTL_MS,
+  opts: { ttlMs?: number; generation?: number } = {},
 ): void {
+  if (opts.generation !== undefined && opts.generation !== generation) return;
+  const ttlMs = opts.ttlMs ?? DEFAULT_TTL_MS;
   ensureSweeper();
   store.delete(key);
   store.set(key, { value, expiresAt: Date.now() + ttlMs });
@@ -76,5 +90,6 @@ export function publicCacheSet(
  * (rather than tracking fine-grained dependencies) is the simple, safe call.
  */
 export function publicCacheClear(): void {
+  generation += 1;
   store.clear();
 }

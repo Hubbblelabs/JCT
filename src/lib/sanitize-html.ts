@@ -18,7 +18,10 @@ const ALLOWED_TAGS = [
   "blockquote",
   "br",
   "code",
+  "div",
   "em",
+  "figcaption",
+  "figure",
   "h1",
   "h2",
   "h3",
@@ -27,6 +30,7 @@ const ALLOWED_TAGS = [
   "h6",
   "hr",
   "i",
+  "img",
   "li",
   "ol",
   "p",
@@ -46,10 +50,27 @@ const ALLOWED_TAGS = [
   "ul",
 ];
 
-const ALLOWED_ATTR = ["href", "title", "target", "rel", "colspan", "rowspan"];
+// No `class`, `id`, `name` or `style`: with Tailwind on the page a class list
+// is enough to lay a full-screen link over the site, and an id/name can
+// clobber globals such as `dataLayer` that analytics and the chatbot read.
+const ALLOWED_ATTR = [
+  "href",
+  "title",
+  "target",
+  "rel",
+  "colspan",
+  "rowspan",
+  "src",
+  "alt",
+  "width",
+  "height",
+];
 
 export function sanitizeHtml(input: unknown): string {
   if (typeof input !== "string" || input.length === 0) return "";
+  // No `USE_PROFILES`: DOMPurify replaces ALLOWED_TAGS/ALLOWED_ATTR with the
+  // whole HTML profile when it is set, which silently turned the allowlist
+  // above into DOMPurify's full default set.
   return DOMPurify.sanitize(input, {
     ALLOWED_TAGS,
     ALLOWED_ATTR,
@@ -57,6 +78,5 @@ export function sanitizeHtml(input: unknown): string {
     FORBID_TAGS: ["style", "script", "iframe", "object", "embed", "form"],
     FORBID_ATTR: ["style", "onerror", "onload", "onclick"],
     KEEP_CONTENT: true,
-    USE_PROFILES: { html: true },
   });
 }

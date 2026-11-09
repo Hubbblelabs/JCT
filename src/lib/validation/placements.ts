@@ -8,6 +8,11 @@ import {
 } from "./_primitives";
 import { zCells } from "./tableColumns";
 
+const zPercentage = z
+  .number()
+  .min(0, "Must be zero or positive")
+  .max(100, "Must be at most 100");
+
 // Per-college — placements are not a shared ("all") resource; each college
 // owns its own year-wise records.
 export const INSTITUTIONS = [
@@ -69,7 +74,8 @@ const PlacementBaseSchema = z.object({
   median_package: zOptionalString(LIMITS.packageMax),
   students_placed: zNonNegativeInt,
   total_students: zNonNegativeInt,
-  placement_percentage: zNonNegativeInt,
+  // A percentage, so 92.5 is valid and 150 is not.
+  placement_percentage: zPercentage,
   offers_made: zNonNegativeInt,
   companies_visited: zNonNegativeInt,
   top_recruiters: z.array(TopRecruiterSchema).max(LIMITS.topRecruitersMax),
@@ -93,7 +99,7 @@ export const PlacementCreateSchema = PlacementBaseSchema.extend({
   median_package: zOptionalString(LIMITS.packageMax).default(""),
   students_placed: zNonNegativeInt.optional().default(0),
   total_students: zNonNegativeInt.optional().default(0),
-  placement_percentage: zNonNegativeInt.optional().default(0),
+  placement_percentage: zPercentage.optional().default(0),
   offers_made: zNonNegativeInt.optional().default(0),
   companies_visited: zNonNegativeInt.optional().default(0),
   top_recruiters: z

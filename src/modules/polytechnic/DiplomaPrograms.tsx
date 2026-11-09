@@ -198,6 +198,9 @@ function CourseCarouselSection({ courses }: { courses: PolytechnicCourse[] }) {
       if (autoScrollRef.current) clearInterval(autoScrollRef.current);
     };
     const resume = () => {
+      // Cleared first: a second resume (two touchends, a mouseleave without a
+      // matching enter) otherwise orphaned the running interval for good.
+      if (autoScrollRef.current) clearInterval(autoScrollRef.current);
       autoScrollRef.current = setInterval(() => scrollCarousel("right"), 1500);
     };
 

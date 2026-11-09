@@ -4,6 +4,7 @@ import { PageCreateSchema, PAGE_STATUSES } from "./pages";
 import { PlacementCreateSchema } from "./placements";
 import { TestimonialCreateSchema } from "./testimonials";
 import { EventCreateSchema } from "./events";
+import { BlogCreateSchema } from "./blogs";
 
 /**
  * A field stored as a BSON date. Backup writes it as an ISO string and
@@ -46,6 +47,11 @@ export const RESTORE_SCHEMAS: Record<string, ZodType> = {
   placements: PlacementCreateSchema,
   testimonials: TestimonialCreateSchema,
   events: EventCreateSchema.extend({ event_date: zRestoreDate }),
+  // Every collection in BACKUP_COLLECTIONS needs an entry here. Without this
+  // one, every archive carried `collections/blogs.json` and every restore
+  // skipped it with "No restore schema registered for blogs" — the posts were
+  // backed up and could never come back.
+  blogs: BlogCreateSchema.extend({ published_at: zRestoreDate }),
   // There is no `recruiters` Mongo collection — the public recruiter carousel
   // is derived from `Placement.top_recruiters`. The entry stays in the backup
   // registry so archives that already carry `collections/recruiters.json` keep

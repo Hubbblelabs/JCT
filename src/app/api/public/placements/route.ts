@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { listPublicPlacements } from "@/lib/public-placements";
-import { publicCacheGet, publicCacheSet } from "@/lib/public-cache";
+import {
+  publicCacheGeneration,
+  publicCacheGet,
+  publicCacheSet,
+} from "@/lib/public-cache";
 
 // Year-wise placement records for one college, in the same normalized shape the
 // public page renders (logos/photos already resolved to URLs). Used by the
@@ -24,11 +28,13 @@ export async function GET(req: NextRequest) {
   const cacheKey = `placements:${institution}`;
   const cached = publicCacheGet<{ source: string; data: unknown }>(cacheKey);
   if (cached) return NextResponse.json(cached);
+  // Captured before the read — see publicCacheGeneration.
+  const generation = publicCacheGeneration();
 
   try {
     const data = await listPublicPlacements(institution);
     const payload = { source: data.length ? "db" : "empty", data };
-    publicCacheSet(cacheKey, payload);
+    publicCacheSet(cacheKey, payload, { generation });
     return NextResponse.json(payload);
   } catch (e) {
     console.error("[public/placements]", e);

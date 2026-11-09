@@ -2,7 +2,6 @@ import mongoose from "mongoose";
 import type { Readable } from "stream";
 import { SiteConfig, ImageAsset, DocumentAsset } from "@/lib/models";
 import { uploadObjectStream, extractStorageKeys } from "@/lib/storage";
-import { cleanupStorageKeys } from "@/lib/asset-cleanup";
 import {
   backupCollection,
   reviveDoc,
@@ -86,6 +85,19 @@ export async function restoreConfigs(
     return Number.isNaN(d.getTime()) ? null : d;
   };
 
+  /**
+   * What to publish when the archive carries no usable `published_value`.
+   *
+   * `published_value` is the only thing the public site reads, so a draft must
+   * never be promoted into it. Every archive format writes `published_value:
+   * null` for a key that was saved as a draft and never published; falling
+   * back to `value` there put unreviewed drafts live on the next restore.
+   * Only a `published` entry may fall back — a publish writes the same value to
+   * both fields, so its `value` is what was live.
+   */
+  const liveFallbackOf = (entry: Record<string, unknown>): unknown =>
+    entry.status === "published" ? (entry.value ?? null) : null;
+
   for (const item of rawConfigs) {
     if (typeof item !== "object" || item === null) {
       warnings.push("Each config entry must be an object");
@@ -111,7 +123,7 @@ export async function restoreConfigs(
       valid.push({
         config_key: key,
         value: entry.value,
-        published_value: entry.published_value ?? entry.value,
+        published_value: entry.published_value ?? liveFallbackOf(entry),
         status: entry.status === "published" ? "published" : "draft",
         version: versionOf(entry),
         published_at: publishedAtOf(entry),
@@ -131,15 +143,17 @@ export async function restoreConfigs(
       continue;
     }
 
-    let publishedValue: unknown = entry.value;
+    let publishedValue: unknown = liveFallbackOf(entry);
     // A draft-only config exports `published_value: null`; that is expected,
-    // not a schema failure, so don't warn about it.
+    // not a schema failure, so don't warn about it — and it stays unpublished.
     if (entry.published_value !== undefined && entry.published_value !== null) {
       if (schema.safeParse(entry.published_value).success) {
         publishedValue = entry.published_value;
       } else {
         warnings.push(
-          `${key}.published_value: rejected by schema, reverting to draft value`,
+          publishedValue === null
+            ? `${key}.published_value: rejected by schema — left unpublished rather than publishing the draft`
+            : `${key}.published_value: rejected by schema, reverting to draft value`,
         );
       }
     }
@@ -235,6 +249,9 @@ export async function restoreCollectionDocs(
   rejected: number;
   pruned: number;
   errors: string[];
+  /** Storage keys held only by documents replace mode pruned. The caller
+   * cleans them up once the whole restore has landed. */
+  doomedKeys: string[];
 }> {
   const spec = backupCollection(name);
   if (!spec) {
@@ -243,6 +260,7 @@ export async function restoreCollectionDocs(
       rejected: 0,
       pruned: 0,
       errors: [`Unknown collection: ${name}`],
+      doomedKeys: [],
     };
   }
   const schema = RESTORE_SCHEMAS[name];
@@ -254,6 +272,7 @@ export async function restoreCollectionDocs(
       rejected: 0,
       pruned: 0,
       errors: [`No restore schema registered for ${name}`],
+      doomedKeys: [],
     };
   }
 
@@ -264,6 +283,7 @@ export async function restoreCollectionDocs(
       rejected: 0,
       pruned: 0,
       errors: ["No database connection"],
+      doomedKeys: [],
     };
   }
   const col = db.collection(name);
@@ -328,6 +348,7 @@ export async function restoreCollectionDocs(
   }
 
   let pruned = 0;
+  const doomedKeys = new Set<string>();
   if (mode === "replace" && rejected === 0 && errors.length === 0) {
     // Collect the doomed documents' storage keys BEFORE deleting them.
     // `deleteMany` on the raw driver bypasses every model hook, so without
@@ -344,7 +365,6 @@ export async function restoreCollectionDocs(
         console.warn(`[restore] ${name}: could not read docs to prune:`, err);
         return [] as PlainDoc[];
       });
-    const doomedKeys = new Set<string>();
     for (const doc of doomed) extractStorageKeys(doc, doomedKeys);
 
     const res = await col.deleteMany({ _id: { $nin: writtenIds } });
@@ -354,15 +374,12 @@ export async function restoreCollectionDocs(
         `[restore] ${name}: replace mode removed ${pruned} document(s) absent from the archive`,
       );
     }
-    // cleanupStorageKeys re-checks every key against the surviving documents
-    // (this collection included, since the delete has already happened), so a
-    // key the restored rows still use is kept.
-    if (doomedKeys.size > 0) {
-      cleanupStorageKeys(doomedKeys, `restore/${name}`);
-    }
+    // Not cleaned up here: the reference scan would run before later
+    // collections are restored. The route cleans every collection's doomed
+    // keys once the whole restore has landed.
   }
 
-  return { restored, rejected, pruned, errors };
+  return { restored, rejected, pruned, errors, doomedKeys: [...doomedKeys] };
 }
 
 /**

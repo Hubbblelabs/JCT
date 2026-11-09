@@ -303,6 +303,7 @@ export type ProgramData = {
     topRecruiters: string[];
     higherStudies: string[];
     averagePackage: string;
+    highestPackage: string;
     placementRate: string;
   };
 

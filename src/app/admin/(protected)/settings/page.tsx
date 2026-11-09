@@ -172,9 +172,16 @@ function formatWhen(iso: string | null | undefined, timeZone?: string): string {
   const at = new Date(iso);
   if (Number.isNaN(at.getTime())) return "—";
   try {
+    // Spelled out field by field because `dateStyle`/`timeStyle` cannot be
+    // combined with `timeZoneName`, and without it "5:30 AM" never said which
+    // clock it was read on.
     return new Intl.DateTimeFormat(undefined, {
-      dateStyle: "medium",
-      timeStyle: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+      timeZoneName: "short",
       timeZone,
     }).format(at);
   } catch {
@@ -212,6 +219,13 @@ const RESTORE_CHUNK_BYTES = 16 * 1024 * 1024;
 
 /** Attempts per chunk before the upload gives up. */
 const CHUNK_ATTEMPTS = 5;
+
+/**
+ * How long to keep waiting while the server reports this session busy (423).
+ * Past nginx's 300 s `client_body_timeout` on the upload location, with room
+ * to spare, since that is what finally ends an abandoned append.
+ */
+const BUSY_WAIT_MS = 6 * 60 * 1000;
 
 const UPLOAD_URL = "/api/admin/site-config/restore/upload";
 
@@ -332,6 +346,7 @@ async function stageArchive(
 
   while (offset < file.size) {
     let attempt = 0;
+    let busySince: number | null = null;
     for (;;) {
       attempt += 1;
       // Re-derived every attempt: a retry after a resync must send the chunk
@@ -364,7 +379,22 @@ async function stageArchive(
         // server. 422: this chunk arrived corrupted and was rolled back.
         // Both mean "wait, re-read, send this chunk again" — never "advance",
         // which is how a hole gets into the middle of the archive.
-        if (res.status === 423 || res.status === 422) {
+        if (res.status === 423) {
+          // Not a failed attempt. After a dropped connection the dead
+          // request holds the server's lock until nginx's body timeout ends
+          // it (300 s on this location), far longer than five back-offs —
+          // so the attempt budget would run out on exactly the network blip
+          // staging exists to survive. Wait it out on a clock instead.
+          busySince ??= Date.now();
+          if (Date.now() - busySince > BUSY_WAIT_MS)
+            throw new Error(await errorFrom(res, "Chunk upload failed"));
+          attempt -= 1;
+          await sleep(10_000);
+          const held = await stagedBytes(uploadId).catch(() => null);
+          if (held !== null) offset = held;
+          continue;
+        }
+        if (res.status === 422) {
           if (attempt >= CHUNK_ATTEMPTS)
             throw new Error(await errorFrom(res, "Chunk upload failed"));
           await sleep(Math.min(30_000, 1000 * 2 ** (attempt - 1)));
@@ -410,12 +440,15 @@ async function runRestore(
   uploadId: string,
   mode: RestoreMode,
   onProgress: (state: RestoreProgressState) => void,
+  /** Called once the server has accepted the restore and owns the archive. */
+  onAccepted: () => void,
 ): Promise<RestoreEvent | null> {
   const res = await fetch(
     `/api/admin/site-config/restore?mode=${mode}&uploadId=${uploadId}`,
     { method: "POST" },
   );
   if (!res.ok) throw new Error(await errorFrom(res, "Restore failed"));
+  onAccepted();
   if (!res.body)
     throw new Error("Restore failed — the server sent no response");
 
@@ -546,6 +579,19 @@ export default function SettingsPage() {
     const tick = async () => {
       try {
         const res = await fetch(`/api/admin/site-config/backup?jobId=${jobId}`);
+        if (res.status === 404) {
+          // The job is gone (deleted elsewhere, or lost from the index).
+          // Polling it every 1.5 s forever would never change that.
+          if (!cancelled) {
+            setJob(null);
+            setExportStatus({
+              type: "error",
+              message:
+                "That backup is no longer on the server. Start a new export.",
+            });
+          }
+          return;
+        }
         if (!res.ok) return;
         const next = (await res.json()) as BackupJob;
         if (!cancelled) setJob(next);
@@ -786,7 +832,7 @@ export default function SettingsPage() {
       setScheduleStatus({
         type: "success",
         message: data.enabled
-          ? `Saved. Next automatic backup: ${formatWhen(data.next_run_at)}.`
+          ? `Saved. Next automatic backup: ${formatWhen(data.next_run_at, data.timezone)}.`
           : "Saved. Automatic backups are off — nothing will run.",
       });
     } catch {
@@ -831,19 +877,26 @@ export default function SettingsPage() {
     });
     try {
       const uploadId = await stageArchive(restoreFile, setProgress);
-      // The server consumes the staged archive whether the restore succeeds or
-      // not, so the resume pointer is spent the moment the restore starts.
-      try {
-        localStorage.removeItem(resumeKey(restoreFile));
-      } catch {
-        /* Nothing stored; nothing to clear. */
-      }
-      const final = await runRestore(uploadId, restoreMode, setProgress);
+      const file = restoreFile;
+      // The server consumes the staged archive once the restore starts,
+      // whether it succeeds or not — so the resume pointer is spent then, and
+      // not before: a restore refused up front (409, a dropped request) leaves
+      // the staged archive in place for the retry to reuse.
+      const final = await runRestore(uploadId, restoreMode, setProgress, () => {
+        try {
+          localStorage.removeItem(resumeKey(file));
+        } catch {
+          /* Nothing stored; nothing to clear. */
+        }
+      });
 
       if (!final) {
         setRestoreStatus({
           type: "error",
-          message: "Restore ended unexpectedly — the connection was cut.",
+          // The server finishes a restore it has accepted even when the
+          // browser stops listening, so this is not "nothing happened".
+          message:
+            "The connection was cut before the restore reported back. It keeps running on the server — check the Audit Log for its result before starting another.",
         });
         return;
       }
@@ -1267,9 +1320,10 @@ export default function SettingsPage() {
               <p className="mt-0.5 text-sm text-[var(--admin-text-muted)]">
                 Builds the same archive as the button above, on a schedule, and
                 keeps it on the server. Nothing is emailed or uploaded elsewhere
-                — download a copy from the list below, or restore straight from
-                it. The server must be running at the scheduled time; a run
-                missed while it was down starts as soon as it is back.
+                — download a copy from the list below; to restore one, upload
+                that file under Restore from Backup. The server must be running
+                at the scheduled time; a run missed while it was down starts as
+                soon as it is back.
               </p>
             </div>
           </div>
@@ -1489,7 +1543,7 @@ export default function SettingsPage() {
                   </dt>
                   <dd className="font-medium text-[var(--admin-text)]">
                     {schedule.enabled
-                      ? formatWhen(schedule.next_run_at)
+                      ? formatWhen(schedule.next_run_at, schedule.timezone)
                       : "Not scheduled"}
                   </dd>
                 </div>

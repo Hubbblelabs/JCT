@@ -219,9 +219,9 @@ export const PageCreateSchema = z.object({
 export type PageCreateValue = z.infer<typeof PageCreateSchema>;
 
 // `status` deliberately excludes "published" — publishing must go through
-// POST /api/admin/pages/[id]/publish (admin-only), which also snapshots
-// `content` into `published_content`. Allowing it here would let editors
-// flip a page live and bypass that flow.
+// POST /api/admin/pages/[id]/publish (scoped to the editor's college), which
+// also snapshots `content` into `published_content`. Allowing it here would
+// flip a page live without that snapshot.
 export const PageUpdateSchema = PageDocumentSchema.partial().extend({
   status: z.enum(["draft", "archived"]).optional(),
 });

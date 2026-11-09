@@ -139,7 +139,7 @@ export default function ArtsScienceCoursesPage() {
           <Breadcrumb
             tone="dark"
             items={[
-              { label: "Institutions", href: "/institutions" },
+              { label: "Home", href: "/" }, // /institutions has no page (404)
               { label: "Arts & Science", href: "/institutions/arts-science" },
               { label: "Courses" },
             ]}

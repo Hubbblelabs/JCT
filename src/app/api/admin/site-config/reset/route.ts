@@ -12,6 +12,13 @@ import { logAudit } from "@/lib/audit";
 import { revalidateEverything } from "@/lib/revalidate";
 import { ResetOptionsSchema } from "@/lib/validation";
 import { sweepAssets, wipeContent, type ResetReport } from "@/lib/reset";
+import { activeBuild } from "@/lib/backup-jobs";
+import { backupStarting } from "@/lib/backup-run";
+import {
+  endMaintenance,
+  runningMaintenance,
+  tryBeginMaintenance,
+} from "@/lib/maintenance-lock";
 
 /**
  * A reset walks the whole bucket and issues one delete per object. On this site
@@ -42,6 +49,21 @@ export async function POST(req: NextRequest) {
 
   const resetContent = parsed.data.content === true;
   const purgeAll = parsed.data.assets === true;
+
+  if (activeBuild() || backupStarting()) {
+    return json(
+      { error: "A backup is being built — reset once it has finished" },
+      409,
+    );
+  }
+  if (!tryBeginMaintenance("reset")) {
+    return json(
+      {
+        error: `A ${runningMaintenance()} is already in progress — wait for it to finish`,
+      },
+      409,
+    );
+  }
 
   try {
     await connectDB();
@@ -92,5 +114,7 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     console.error("[site-config/reset]", e);
     return serverError();
+  } finally {
+    endMaintenance("reset");
   }
 }

@@ -65,7 +65,11 @@ function siteHosts(): Set<string> {
   ]) {
     if (!raw) continue;
     try {
-      hosts.add(new URL(raw).host.toLowerCase());
+      const host = new URL(raw).host.toLowerCase();
+      hosts.add(host);
+      // The site answers on both the bare and the www. name, and links get
+      // pasted from either — so a navbar URL on the other one is still ours.
+      hosts.add(host.startsWith("www.") ? host.slice(4) : `www.${host}`);
     } catch {
       // Malformed env value — ignore rather than break orphan detection.
     }

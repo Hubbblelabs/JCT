@@ -13,7 +13,7 @@ export { EditorSaveBar, type EditorSaveMode } from "./EditorSaveBar";
 export { EditorWorkspace, type WorkspaceSection } from "./EditorWorkspace";
 export { ScaledPreview } from "./ScaledPreview";
 export { SortableList } from "./SortableList";
-export { useUnsavedGuard } from "./useUnsavedGuard";
+export { useUnsavedGuard, confirmDiscardIfDirty } from "./useUnsavedGuard";
 export {
   Banner,
   EmptyState,

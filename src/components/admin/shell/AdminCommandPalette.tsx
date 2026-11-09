@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CornerDownLeft, Search } from "lucide-react";
 import { allNavItems } from "@/lib/admin-nav";
+import { confirmDiscardIfDirty } from "@/components/admin/kit/useUnsavedGuard";
 
 const RECENTS_KEY = "jct-admin-recent-pages";
 const MAX_RECENTS = 6;
@@ -110,6 +111,8 @@ export function AdminCommandPalette({
   }, [cursor]);
 
   const go = (item: Entry) => {
+    // router.push is invisible to the unsaved-changes click guard.
+    if (!confirmDiscardIfDirty()) return;
     try {
       const next = [item.href, ...recents.filter((h) => h !== item.href)].slice(
         0,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense, useCallback } from "react";
+import { useEffect, useRef, useState, Suspense, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   Field,
@@ -116,14 +116,32 @@ function EventsPageInner() {
   // college's events. Authoring only happens inside a college scope.
   const isMain = !filterInst;
 
+  /** Ignores a response that a newer load has superseded. */
+  const loadSeq = useRef(0);
   const load = useCallback(async () => {
+    const seq = ++loadSeq.current;
     setLoading(true);
-    const url = filterInst
-      ? `/api/admin/events?institution=${filterInst}`
-      : "/api/admin/events";
-    const r = await fetch(url);
-    setEvents(await r.json());
-    setLoading(false);
+    try {
+      const url = filterInst
+        ? `/api/admin/events?institution=${filterInst}`
+        : "/api/admin/events";
+      const r = await fetch(url);
+      // An error body (a 401 once a revoked session ends, a 500) is an
+      // object, and the table threw on it — taking the page down.
+      if (!r.ok) throw new Error(`Request failed (${r.status})`);
+      const data = await r.json();
+      if (seq === loadSeq.current) setEvents(Array.isArray(data) ? data : []);
+    } catch (err) {
+      if (seq === loadSeq.current) {
+        setEvents([]);
+        toast.error(
+          `Could not load events: ${err instanceof Error ? err.message : "network error"}`,
+        );
+      }
+    } finally {
+      if (seq === loadSeq.current) setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filterInst]);
 
   useEffect(() => {
@@ -215,7 +233,12 @@ function EventsPageInner() {
       destructive: true,
     });
     if (!ok) return;
-    await fetch(`/api/admin/events/${id}`, { method: "DELETE" });
+    const r = await fetch(`/api/admin/events/${id}`, { method: "DELETE" });
+    if (!r.ok) {
+      const err = await parseApiError(r);
+      toast.error(err?.message ?? err?.error ?? "Could not delete the event.");
+      return;
+    }
     toast.success("Event deleted.");
     await load();
   };

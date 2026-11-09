@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { SiteConfig } from "@/lib/models";
-import { publicCacheGet, publicCacheSet } from "@/lib/public-cache";
+import {
+  publicCacheGeneration,
+  publicCacheGet,
+  publicCacheSet,
+} from "@/lib/public-cache";
 import { isKnownSiteConfigKey } from "@/lib/validation/siteConfig";
 import { publicAssetBaseUrl } from "@/lib/storage-public";
 
@@ -57,6 +61,8 @@ export async function GET(req: Request) {
   const cacheKey = JSON.stringify(["site-config", key]);
   const cached = publicCacheGet<Envelope>(cacheKey);
   if (cached) return NextResponse.json(cached);
+  // Captured before the read — see publicCacheGeneration.
+  const generation = publicCacheGeneration();
 
   try {
     await connectDB();
@@ -80,14 +86,14 @@ export async function GET(req: Request) {
         }
         payload = { source: "db", data: value };
       }
-      publicCacheSet(cacheKey, payload);
+      publicCacheSet(cacheKey, payload, { generation });
       return NextResponse.json(payload);
     }
 
     const docs = await SiteConfig.find();
     if (docs.length === 0) {
       const payload: Envelope = { source: "empty", data: {} };
-      publicCacheSet(cacheKey, payload);
+      publicCacheSet(cacheKey, payload, { generation });
       return NextResponse.json(payload);
     }
 
@@ -102,7 +108,7 @@ export async function GET(req: Request) {
     }
 
     const payload: Envelope = { source: "db", data };
-    publicCacheSet(cacheKey, payload);
+    publicCacheSet(cacheKey, payload, { generation });
     return NextResponse.json(payload);
   } catch (e) {
     console.error("[public/site-config]", e);

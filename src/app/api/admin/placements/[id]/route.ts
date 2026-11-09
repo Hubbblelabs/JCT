@@ -112,6 +112,11 @@ export async function PATCH(
     }
 
     revalidateTargets(doc.institution as RevalidateTarget);
+    // A record moved to another college leaves the old college's placements
+    // page holding it until that page's ISR window runs out.
+    if (existing.institution && existing.institution !== doc.institution) {
+      revalidateTargets(existing.institution as RevalidateTarget);
+    }
     await logAudit(
       "placement",
       "updated",

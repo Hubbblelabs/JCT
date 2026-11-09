@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getPublishedConfigValue } from "@/lib/site-config-server";
 import { CoePageLayout } from "@/components/layout/CoePageLayout";
-import type { CoePageValue } from "@/lib/validation";
+import { CoePageSchema, type CoePageValue } from "@/lib/validation";
 import type { Metadata } from "next";
 import { seoMetadata } from "@/lib/seo";
 
@@ -25,5 +25,17 @@ export default async function COEPage() {
 
   if (!value || typeof value !== "object") return notFound();
 
-  return <CoePageLayout data={value as CoePageValue} />;
+  // Parsed, not cast: a stored value may predate a field (restore keeps the
+  // archive's value verbatim), and the layout dereferences `data.sidebar`,
+  // `data.overview` and friends without guards — a 500 for the whole page.
+  // Parsing fills every missing part from the schema defaults.
+  const parsed = CoePageSchema.safeParse(value);
+  if (!parsed.success) {
+    console.error(
+      "[coe] published engineeringCoe failed validation:",
+      parsed.error.issues.slice(0, 5),
+    );
+    return notFound();
+  }
+  return <CoePageLayout data={parsed.data as CoePageValue} />;
 }

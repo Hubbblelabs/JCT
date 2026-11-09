@@ -134,6 +134,8 @@ export function PlacementRecordInspector({
             patch({ placement_percentage: Number(e.target.value) })
           }
           min={0}
+          max={100}
+          step="any"
         />
         <NumberInput
           label="Offers Made"

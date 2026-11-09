@@ -29,7 +29,10 @@ import {
   belowRatioTarget,
   type RatioType,
 } from "@/lib/validation/imageAsset";
-import { DOCUMENT_UPLOAD_MIME } from "@/lib/validation/documentUploads";
+import {
+  DIRECT_DOCUMENT_UPLOAD_MAX,
+  DOCUMENT_UPLOAD_MIME,
+} from "@/lib/validation/documentUploads";
 
 // Mirrors /api/admin/documents/upload + /presign (kept in sync by hand —
 // there is no shared client-safe constant for the document limit).
@@ -85,8 +88,11 @@ function validateDocumentFile(file: File, presigned: boolean): string | null {
         ? "Only PDF files are accepted."
         : "Accepted: PDF, Word, Excel and PowerPoint."
     }`;
-  if (file.size > DOC_MAX_FILE_SIZE)
-    return `File too large (${asMb(file.size)} MB). Max is ${DOC_MAX_FILE_SIZE / 1024 / 1024} MB.`;
+  // The non-deferred path posts the bytes through the app, which the proxy
+  // cuts off at 10 MB; the deferred one goes straight to storage.
+  const max = presigned ? DOC_MAX_FILE_SIZE : DIRECT_DOCUMENT_UPLOAD_MAX;
+  if (file.size > max)
+    return `File too large (${asMb(file.size)} MB). Max is ${max / 1024 / 1024} MB.`;
   return null;
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AlertTriangle, Loader2, Trash2 } from "lucide-react";
 import { DataTable, type Column } from "@/components/admin/kit/DataTable";
@@ -69,6 +69,14 @@ export function AuditLogTable({
   const [rows, setRows] = useState<AuditRow[]>(initialRows);
   const [hasMore, setHasMore] = useState(initialHasMore);
   const [loadingMore, setLoadingMore] = useState(false);
+
+  // `router.refresh()` after a purge hands down new initial rows but keeps
+  // this component's state, so the purged entries stayed listed until a hard
+  // reload. Adopt the server's rows whenever they change.
+  useEffect(() => {
+    setRows(initialRows);
+    setHasMore(initialHasMore);
+  }, [initialRows, initialHasMore]);
 
   const [actor, setActor] = useState("");
   const [entity, setEntity] = useState("");

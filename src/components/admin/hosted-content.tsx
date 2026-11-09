@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { EditableRegion } from "@/components/admin/EditableRegion";
 import { ContentPageInspector } from "@/components/admin/ContentPageInspector";
 import {
@@ -47,8 +47,17 @@ export function useHostedDrafts(hostPath: string) {
   const defs = useMemo(() => hostedContentPages(hostPath), [hostPath]);
   const [drafts, setDrafts] = useState<HostedDrafts>({});
   const [loading, setLoading] = useState(defs.length > 0);
+  /**
+   * Set when any panel failed to load. A failed load used to open as an empty
+   * page indistinguishable from an unseeded one — and the next Save wrote that
+   * empty page over the real one (whose PDFs the save's cleanup then deleted).
+   */
+  const [error, setError] = useState<string | null>(null);
+  const failed = useRef(new Set<string>());
 
   useEffect(() => {
+    failed.current = new Set();
+    setError(null);
     if (defs.length === 0) {
       setDrafts({});
       setLoading(false);
@@ -56,21 +65,39 @@ export function useHostedDrafts(hostPath: string) {
     }
     let cancelled = false;
     setLoading(true);
+    const LOAD_FAILED = Symbol("load failed");
     Promise.all(
       defs.map((def) =>
         loadEditableConfig<ContentPageValue>(def.configKey)
           .then((res) => res.value)
-          .catch(() => null),
+          .catch((err: unknown) => {
+            console.error(`[hosted-content:${def.configKey}]`, err);
+            return LOAD_FAILED;
+          }),
       ),
     )
       .then((values) => {
         if (cancelled) return;
         const next: HostedDrafts = {};
+        const broken: string[] = [];
         defs.forEach((def, i) => {
+          const value = values[i];
+          if (value === LOAD_FAILED) {
+            failed.current.add(def.slug);
+            broken.push(def.host?.navLabel ?? def.label);
+          }
           // An unseeded key still has to open with something editable.
-          next[def.slug] = values[i] ?? ContentPageSchema.parse({});
+          next[def.slug] =
+            value && value !== LOAD_FAILED
+              ? (value as ContentPageValue)
+              : ContentPageSchema.parse({});
         });
         setDrafts(next);
+        if (broken.length > 0) {
+          setError(
+            `${broken.join(", ")} could not be loaded. Reload to retry — saving now would overwrite ${broken.length === 1 ? "it" : "them"} with an empty page.`,
+          );
+        }
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -93,7 +120,8 @@ export function useHostedDrafts(hostPath: string) {
     async (values: HostedDrafts, mode: SaveMode) => {
       await Promise.all(
         defs
-          .filter((def) => values[def.slug])
+          // A panel that never loaded holds a placeholder, not its content.
+          .filter((def) => values[def.slug] && !failed.current.has(def.slug))
           .map((def) =>
             saveEditableConfig(def.configKey, values[def.slug], mode),
           ),
@@ -102,7 +130,7 @@ export function useHostedDrafts(hostPath: string) {
     [defs],
   );
 
-  return { defs, drafts, setDrafts, setDraft, loading, saveAll };
+  return { defs, drafts, setDrafts, setDraft, loading, error, saveAll };
 }
 
 /** Heading + body of one hosted page, every region click-to-edit. */

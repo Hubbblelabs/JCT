@@ -25,11 +25,18 @@ export const FINE_ARTS_CLUB_SLUG = "fine-arts-club";
 
 const DESCRIPTION_MAX = 1500;
 
+/** GroupSchema caps `image` here, below the gallery's own src limit. */
+const IMAGE_MAX = 500;
+
 function firstImage(blocks: ContentBlockValue[]): string {
   for (const block of blocks) {
     if (block.type !== "gallery") continue;
     for (const group of block.groups) {
-      const src = group.images.find((img) => img.src.trim() !== "")?.src;
+      // A longer src passes the gallery schema but would make the
+      // GroupsPageSchema.parse below throw and take the clubs pages down.
+      const src = group.images.find(
+        (img) => img.src.trim() !== "" && img.src.length <= IMAGE_MAX,
+      )?.src;
       if (src) return src;
     }
   }

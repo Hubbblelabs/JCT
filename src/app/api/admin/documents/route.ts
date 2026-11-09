@@ -11,8 +11,12 @@ import {
 } from "@/lib/api-helpers";
 import { logAudit } from "@/lib/audit";
 
+// Admin-only, like the deletes below. A DocumentAsset carries no institution,
+// so there is no college scope to hold an editor to — and with "editor" any
+// college's editor could list and delete another college's NAAC/NIRF PDFs.
+// Nothing in the admin UI calls these; they are for manual administration.
 export async function GET(req: NextRequest) {
-  const { error } = await requireRole(req, "editor");
+  const { error } = await requireRole(req, "admin");
   if (error) return error;
 
   try {
@@ -35,7 +39,7 @@ export async function GET(req: NextRequest) {
  * orphan diff; this endpoint is for manual/administrative use.
  */
 export async function DELETE(req: NextRequest) {
-  const { session, error } = await requireRole(req, "editor");
+  const { session, error } = await requireRole(req, "admin");
   if (error) return error;
 
   const key = new URL(req.url).searchParams.get("storage_key");

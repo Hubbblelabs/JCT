@@ -42,10 +42,26 @@ function LoginForm() {
     } else {
       // Only follow same-origin relative paths. A raw callbackUrl would let
       // `/admin/login?callbackUrl=https://evil.com` (or `//evil.com`) bounce
-      // a freshly-authenticated user off-site — an open redirect.
+      // a freshly-authenticated user off-site — an open redirect. Resolving
+      // it is what catches the variants a prefix test misses: browsers read
+      // `/\evil.com` as `//evil.com`.
       const raw = searchParams.get("callbackUrl") ?? "/admin/dashboard";
-      const callbackUrl =
-        raw.startsWith("/") && !raw.startsWith("//") ? raw : "/admin/dashboard";
+      let callbackUrl = "/admin/dashboard";
+      try {
+        const target = new URL(raw, window.location.origin);
+        // The resolved path is checked too: dot segments normalise
+        // `/.//evil.com` to a pathname of `//evil.com`, which router.push
+        // would read as another host all over again.
+        if (
+          raw.startsWith("/") &&
+          target.origin === window.location.origin &&
+          !/^\/[/\\]/.test(target.pathname)
+        ) {
+          callbackUrl = `${target.pathname}${target.search}${target.hash}`;
+        }
+      } catch {
+        // Unparseable — keep the dashboard.
+      }
       router.push(callbackUrl);
     }
   };

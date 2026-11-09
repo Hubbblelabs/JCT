@@ -387,9 +387,10 @@ export const ProgramCreateSchema = ProgramSchema.extend({
  * of card-level fields plus an optional new `content` object.
  *
  * `status` deliberately excludes "published" — publishing must go through
- * POST /api/admin/programs/[id]/publish (admin-only), which also snapshots
- * `content` into `published_content`. Allowing it here would let editors
- * flip a program live and bypass that flow.
+ * POST /api/admin/programs/[id]/publish (scoped to the editor's college),
+ * which also snapshots `content` into `published_content`. Allowing it here
+ * would flip a program live without that snapshot. Sending "draft" takes a
+ * live program off the site, so the builder's ordinary save omits `status`.
  */
 export const ProgramFullUpdateSchema = ProgramBaseSchema.partial().extend({
   content: ProgramContentSchema.optional(),

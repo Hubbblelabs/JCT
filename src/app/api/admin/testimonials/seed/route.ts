@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { Testimonial } from "@/lib/models";
 import { requireRole, json, serverError } from "@/lib/api-helpers";
+import { logAudit } from "@/lib/audit";
 import { revalidateTargets } from "@/lib/revalidate";
 
 // Avatars are deliberately empty. They used to be hardcoded /avatars/*.png
@@ -80,7 +81,7 @@ const TESTIMONIALS = [
 ];
 
 export async function POST(req: NextRequest) {
-  const { error } = await requireRole(req, "admin");
+  const { session, error } = await requireRole(req, "admin");
   if (error) return error;
 
   try {
@@ -98,6 +99,12 @@ export async function POST(req: NextRequest) {
     }
 
     revalidateTargets("home", "all-institutions");
+    await logAudit(
+      "testimonial",
+      "seeded",
+      session!.user?.email ?? "",
+      `Seeded ${seeded} default testimonials`,
+    );
     return json({ message: `Seeded ${seeded} testimonials` });
   } catch (e) {
     console.error(e);

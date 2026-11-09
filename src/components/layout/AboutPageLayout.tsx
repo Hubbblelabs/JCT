@@ -771,7 +771,7 @@ export function AboutPageLayout({
                 institution === "main"
                   ? [{ label: "Home", href: "/" }, { label: "About Us" }]
                   : [
-                      { label: "Institutions", href: "/institutions" },
+                      { label: "Home", href: "/" }, // /institutions has no page (404)
                       { label: meta.label, href: meta.breadcrumbHref },
                       { label: "About" },
                     ]

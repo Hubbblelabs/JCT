@@ -311,9 +311,18 @@ export function Navbar({ forceSolidOnTop = false }: NavbarProps) {
       window.location.pathname === basePath ||
       (basePath === "" && window.location.pathname === logoLink)
     ) {
-      e.preventDefault();
-      const target = document.querySelector(hash) as HTMLElement | null;
+      // By id, not querySelector: a fragment that is not a valid CSS selector
+      // (`#2024-25`, `#1st-year`, percent-encoded text) threw there — after
+      // preventDefault, so the click went nowhere.
+      let id = hash.slice(1);
+      try {
+        id = decodeURIComponent(id);
+      } catch {
+        /* keep the raw fragment */
+      }
+      const target = document.getElementById(id);
       if (!target) return;
+      e.preventDefault();
 
       const nav = document.querySelector("nav") as HTMLElement | null;
       const offset = (nav?.offsetHeight ?? 88) + 8;

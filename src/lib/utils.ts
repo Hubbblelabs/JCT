@@ -23,6 +23,10 @@ export function formatEventDate(iso: string): string {
     day: "2-digit",
     month: "short",
     year: "numeric",
+    // Dates are entered as YYYY-MM-DD and stored as UTC midnight. In the
+    // viewer's own zone a visitor west of UTC saw the previous day — and the
+    // client render disagreed with the server's, a hydration mismatch.
+    timeZone: "UTC",
   });
 }
 

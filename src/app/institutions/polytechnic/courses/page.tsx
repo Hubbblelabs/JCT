@@ -137,7 +137,7 @@ export default function PolytechnicCoursesPage() {
           <Breadcrumb
             tone="dark"
             items={[
-              { label: "Institutions", href: "/institutions" },
+              { label: "Home", href: "/" }, // /institutions has no page (404)
               { label: "Polytechnic", href: "/institutions/polytechnic" },
               { label: "Courses" },
             ]}

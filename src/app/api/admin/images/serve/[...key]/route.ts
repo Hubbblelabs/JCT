@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import { ImageAsset } from "@/lib/models";
 import { requireRole, enforceAssetScope } from "@/lib/api-helpers";
-import { getObject } from "@/lib/storage";
+import { assetResponseHeaders, getObject } from "@/lib/storage";
 
 export async function GET(
   req: NextRequest,
@@ -47,8 +47,10 @@ export async function GET(
     const { body, contentType } = await getObject(storageKey);
     return new NextResponse(body, {
       headers: {
-        "Content-Type": contentType,
-        "Cache-Control": "public, max-age=31536000, immutable",
+        ...assetResponseHeaders(contentType),
+        // `private`: this response passed an auth and college-scope check, so
+        // no shared cache may hand it to anyone else.
+        "Cache-Control": "private, max-age=31536000, immutable",
       },
     });
   } catch {

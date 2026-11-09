@@ -37,8 +37,12 @@ openssl rand -base64 32
 Create the first admin user, then start the dev server:
 
 ```bash
-pnpm seed:admin && pnpm dev
+pnpm seed:admin --email you@jct.ac.in --password 'at-least-8-chars' --name 'Your Name'
+pnpm dev
 ```
+
+The script reads `MONGODB_URI` from `.env.local` or `.env`. Re-running it for
+an existing email resets that account's password and signs out its sessions.
 
 Site at http://localhost:3000, CMS at http://localhost:3000/admin.
 

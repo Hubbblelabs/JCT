@@ -23,6 +23,7 @@ import { SeoFields } from "@/components/admin/SeoFields";
 import { TableEditor } from "@/components/admin/TableEditor";
 import type { PageBodySection } from "@/lib/validation";
 import type { HeroMetaItem, LabelsTree, TabConfigItem } from "@/types/program";
+import { DEFAULT_PROGRAM_TABS } from "@/components/layout/ProgramPageLayout";
 import {
   programTableBuiltins,
   programTableColumns,
@@ -164,6 +165,16 @@ const TAB_CONFIG_FIELDS: FieldDef[] = [
   },
 ];
 const E_TAB_CONFIG: TabConfigItem = { id: "", label: "", icon: "", href: "" };
+
+/** The sidebar entries to edit: the stored list, or the built-in six. */
+function tabConfigItems(content: Record<string, unknown>) {
+  const stored = flatArr<Record<string, unknown>>(content, "tabsConfig");
+  if (stored.length > 0) return stored;
+  return DEFAULT_PROGRAM_TABS.map((tab) => ({
+    ...E_TAB_CONFIG,
+    ...tab,
+  })) as unknown as Record<string, unknown>[];
+}
 
 // ─── Read-side helpers (flat first, nested fallback) ────────────────────────
 
@@ -1105,7 +1116,12 @@ export function ProgramSectionInspector({
               in the preview to add its content blocks.
             </p>
             <ItemsEditor
-              items={flatArr<Record<string, unknown>>(content, "tabsConfig")}
+              // An empty tabsConfig means "the six built-in tabs", and the
+              // public page replaces those with whatever tabsConfig holds.
+              // Starting from an empty list here meant adding one custom tab
+              // removed Overview…Career from the live sidebar, with their
+              // ids never shown to re-add. Start from what the page shows.
+              items={tabConfigItems(content)}
               onChange={(v) => set("tabsConfig", v)}
               fields={TAB_CONFIG_FIELDS}
               emptyItem={E_TAB_CONFIG as unknown as Record<string, unknown>}
@@ -1114,7 +1130,20 @@ export function ProgramSectionInspector({
             />
             <button
               type="button"
-              onClick={() => set("tabsConfig", [])}
+              onClick={() => {
+                const hasBlocks = flatArr<Record<string, unknown>>(
+                  content,
+                  "tabsConfig",
+                ).some((t) => Array.isArray(t.blocks) && t.blocks.length > 0);
+                if (
+                  hasBlocks &&
+                  !window.confirm(
+                    "Reset the sidebar to the six built-in tabs? Custom tabs and their content blocks will be removed.",
+                  )
+                )
+                  return;
+                set("tabsConfig", []);
+              }}
               className="admin-btn admin-btn-outline admin-btn-sm mt-2"
             >
               Reset to default 6 tabs

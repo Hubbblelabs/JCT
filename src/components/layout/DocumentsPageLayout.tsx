@@ -260,6 +260,9 @@ export function DocumentsPageLayout({
         {sections.length > 0 ? (
           <SectionedPageShell
             navTitle="Documents"
+            // In the admin preview: no hash sync (it rewrote the editor's own
+            // URL) and the preview's sticky offsets — as NAAC already does.
+            editable={editable}
             items={[
               {
                 id: DOCUMENTS_OVERVIEW_SECTION_ID,

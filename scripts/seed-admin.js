@@ -22,7 +22,6 @@ function parseArgs() {
 }
 
 const { email, password, name } = parseArgs();
-const fullName = name || "Admin User";
 const uri = process.env.MONGODB_URI;
 
 if (!email || !password) usage();
@@ -49,17 +48,24 @@ async function main() {
     const update = {
       $set: {
         password_hash,
-        full_name: fullName,
         role: "admin",
         institution: "all",
         is_active: true,
+        // Ends every session signed in before this run (src/auth.ts compares
+        // it with the token's sign-in time). This script is the break-glass
+        // reset for a compromised admin, so the attacker's session must go.
+        password_changed_at: now,
         updated_at: now,
+        // Only when given: re-running to reset a password must not rename the
+        // account to the placeholder.
+        ...(name ? { full_name: name } : {}),
       },
       $setOnInsert: {
         email: emailLower,
         programs: [],
         last_login: null,
         created_at: now,
+        ...(name ? {} : { full_name: "Admin User" }),
       },
     };
 

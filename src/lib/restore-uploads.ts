@@ -139,71 +139,85 @@ export async function appendChunk(
       received: (await receivedBytes(id)) ?? 0,
     };
   }
-
-  const current = await receivedBytes(id);
-  if (current === null) return { ok: false, reason: "missing", received: 0 };
-  if (offset !== current) {
-    return { ok: false, reason: "offset", received: current };
-  }
-
-  const free = await freeBytes();
-  if (free !== null && free < MIN_FREE_BYTES) {
-    return { ok: false, reason: "no-space", received: current };
-  }
-
+  // Claimed in the same tick as the check. Taking it after the awaits below
+  // let several requests through the check at once — five of twelve
+  // concurrent appends got in, and two bodies landed interleaved on disk,
+  // each still passing its own checksum.
   appending.add(id);
+
+  try {
+    const current = await receivedBytes(id);
+    if (current === null) return { ok: false, reason: "missing", received: 0 };
+    if (offset !== current) {
+      return { ok: false, reason: "offset", received: current };
+    }
+
+    const free = await freeBytes();
+    if (free !== null && free < MIN_FREE_BYTES) {
+      return { ok: false, reason: "no-space", received: current };
+    }
+
+    return await writeChunk(id, offset, body, digest);
+  } finally {
+    appending.delete(id);
+  }
+}
+
+/** The write half of `appendChunk`; the caller holds the session's lock. */
+async function writeChunk(
+  id: string,
+  offset: number,
+  body: ReadableStream<Uint8Array>,
+  digest?: string,
+): Promise<AppendResult> {
   const file = uploadPath(id);
   const rollback = () =>
     truncate(file, offset).catch((err) =>
       console.error("[restore/upload] rollback failed", err),
     );
 
+  // Nothing should exist past `offset`, but an earlier crash between the
+  // write and its rollback would leave some; start from a known state.
+  await truncate(file, offset);
+
+  let written = 0;
+  const hash = digest ? createHash("sha256") : null;
+  const source = Readable.fromWeb(
+    body as Parameters<typeof Readable.fromWeb>[0],
+  );
+
   try {
-    // Nothing should exist past `offset`, but an earlier crash between the
-    // write and its rollback would leave some; start from a known state.
-    await truncate(file, offset);
-
-    let written = 0;
-    const hash = digest ? createHash("sha256") : null;
-    const source = Readable.fromWeb(
-      body as Parameters<typeof Readable.fromWeb>[0],
-    );
-
-    try {
-      await pipeline(
-        source,
-        async function* (chunks: AsyncIterable<Buffer>) {
-          for await (const chunk of chunks) {
-            written += chunk.length;
-            if (offset + written > MAX_UPLOAD_BYTES) {
-              throw new Error("too-large");
-            }
-            hash?.update(chunk);
-            yield chunk;
+    await pipeline(
+      source,
+      async function* (chunks: AsyncIterable<Buffer>) {
+        for await (const chunk of chunks) {
+          written += chunk.length;
+          if (offset + written > MAX_UPLOAD_BYTES) {
+            throw new Error("too-large");
           }
-        },
-        createWriteStream(file, { flags: "r+", start: offset }),
-      );
-    } catch (err) {
-      await rollback();
-      if (err instanceof Error && err.message === "too-large") {
-        return { ok: false, reason: "too-large", received: offset };
-      }
-      throw err;
+          hash?.update(chunk);
+          yield chunk;
+        }
+      },
+      createWriteStream(file, { flags: "r+", start: offset }),
+    );
+  } catch (err) {
+    await rollback();
+    if (err instanceof Error && err.message === "too-large") {
+      return { ok: false, reason: "too-large", received: offset };
     }
-
-    if (hash) {
-      const got = hash.digest("hex");
-      if (got !== digest) {
-        await rollback();
-        return { ok: false, reason: "checksum", received: offset, got };
-      }
-    }
-
-    return { ok: true, received: offset + written };
-  } finally {
-    appending.delete(id);
+    throw err;
   }
+
+  if (hash) {
+    const got = hash.digest("hex");
+    if (got !== digest) {
+      await rollback();
+      return { ok: false, reason: "checksum", received: offset, got };
+    }
+  }
+
+  return { ok: true, received: offset + written };
 }
 
 export async function discardUpload(id: string): Promise<void> {

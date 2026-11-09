@@ -37,6 +37,18 @@ export async function POST(req: NextRequest) {
     if (!head || head.size === 0) {
       return badRequest("Upload not found in storage — upload the file first");
     }
+    // The presigned PUT now signs its content type, but an object stored any
+    // other way (or before that change) must not be registered as a document.
+    if (
+      head.contentType.split(";")[0]!.trim().toLowerCase() !== "application/pdf"
+    ) {
+      try {
+        await deleteObject(storage_key);
+      } catch {
+        /* non-fatal */
+      }
+      return badRequest("Only PDF documents can be uploaded here");
+    }
 
     const publicUrl = publicAssetUrl(storage_key);
 

@@ -42,7 +42,9 @@ const MONTHS = [
 function yearMonth(iso: string): { year: number; month: number } | null {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return null;
-  return { year: d.getFullYear(), month: d.getMonth() };
+  // UTC, like formatEventDate: dates are stored as UTC midnight, so a local
+  // reading filed a 1 January event under the previous year west of UTC.
+  return { year: d.getUTCFullYear(), month: d.getUTCMonth() };
 }
 
 /**

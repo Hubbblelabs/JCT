@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { listPublicPrograms } from "@/lib/public-programs";
-import { publicCacheGet, publicCacheSet } from "@/lib/public-cache";
+import {
+  publicCacheGeneration,
+  publicCacheGet,
+  publicCacheSet,
+} from "@/lib/public-cache";
 
 // Reading query params makes this handler dynamic, so route-level ISR
 // (`export const revalidate`) does not apply — responses are instead served
@@ -39,6 +43,8 @@ export async function GET(req: Request) {
   const cacheKey = JSON.stringify(["programs", institution, degree]);
   const cached = publicCacheGet<{ source: string; data: unknown }>(cacheKey);
   if (cached) return NextResponse.json(cached);
+  // Captured before the read — see publicCacheGeneration.
+  const generation = publicCacheGeneration();
 
   try {
     const programs = await listPublicPrograms({
@@ -49,7 +55,7 @@ export async function GET(req: Request) {
       programs.length === 0
         ? { source: "empty", data: [] }
         : { source: "db", data: programs };
-    publicCacheSet(cacheKey, payload);
+    publicCacheSet(cacheKey, payload, { generation });
     return NextResponse.json(payload);
   } catch (e) {
     console.error("[public/programs]", e);

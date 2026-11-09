@@ -131,11 +131,14 @@ async function readIndex(): Promise<BackupJob[]> {
 }
 
 /** Write via a temp file and rename, so a crash mid-write cannot leave the
- * index truncated and lose track of archives still occupying the disk. */
+ * index truncated and lose track of archives still occupying the disk. The
+ * temp name is unique per write: two writers sharing one could interleave
+ * into a file `readIndex` can't parse, which reads as an empty history and
+ * strands every archive on disk. */
 async function writeIndex(jobs: BackupJob[]): Promise<void> {
   try {
     await mkdir(backupDir(), { recursive: true });
-    const tmp = `${indexPath()}.tmp`;
+    const tmp = `${indexPath()}.${randomUUID()}.tmp`;
     await writeFile(tmp, JSON.stringify(jobs, null, 2), "utf8");
     await rename(tmp, indexPath());
   } catch (err) {
@@ -143,12 +146,28 @@ async function writeIndex(jobs: BackupJob[]): Promise<void> {
   }
 }
 
-async function upsertIndex(job: BackupJob): Promise<void> {
-  const jobs = await readIndex();
-  const at = jobs.findIndex((j) => j.id === job.id);
-  if (at === -1) jobs.unshift(job);
-  else jobs[at] = job;
-  await writeIndex(jobs);
+/**
+ * Every read-modify-write of the index runs through this queue. Unserialized,
+ * a prune sweep reading the index while `finishJob` was writing it could
+ * write back the stale copy and lose the "ready" record — after a restart that
+ * archive then read as "the server restarted" and was deleted at 24 hours.
+ */
+let indexQueue: Promise<unknown> = Promise.resolve();
+
+function withIndex<T>(fn: () => Promise<T>): Promise<T> {
+  const run = indexQueue.then(fn, fn);
+  indexQueue = run.catch(() => {});
+  return run;
+}
+
+function upsertIndex(job: BackupJob): Promise<void> {
+  return withIndex(async () => {
+    const jobs = await readIndex();
+    const at = jobs.findIndex((j) => j.id === job.id);
+    if (at === -1) jobs.unshift(job);
+    else jobs[at] = job;
+    await writeIndex(jobs);
+  });
 }
 
 /** Only one build at a time — two concurrent exports would fight for both
@@ -249,14 +268,16 @@ async function removeJob(id: string): Promise<void> {
   // at call time, long after module evaluation.
   const pending = sweeps.get(id);
   if (pending) {
-    clearTimeout(pending);
+    clearTimeout(pending.timer);
     sweeps.delete(id);
   }
   await Promise.all([
     rm(archivePath(id), { force: true }),
     rm(partialPath(id), { force: true }),
   ]).catch((err) => console.error(`[backup-jobs] Cleanup of ${id}:`, err));
-  await writeIndex((await readIndex()).filter((j) => j.id !== id));
+  await withIndex(async () =>
+    writeIndex((await readIndex()).filter((j) => j.id !== id)),
+  );
 }
 
 /**
@@ -298,22 +319,29 @@ const MIN_AGE_MS = 3 * 60 * 60 * 1000;
  * `unref()` so a pending sweep can never hold the process open, and one timer
  * per id so repeated prunes don't stack. A restart drops them, which is why
  * the route also prunes on the job-list GET.
+ *
+ * The earlier deadline wins. The newest manual archive gets a timer for its
+ * MAX_AGE expiry; once a newer export supersedes it, it needs the much sooner
+ * MIN_AGE one, and keeping the first timer left it on disk for up to a day.
  */
-const sweeps = new Map<string, NodeJS.Timeout>();
+const sweeps = new Map<string, { timer: NodeJS.Timeout; due: number }>();
 
 function scheduleSweep(id: string, delay: number): void {
-  if (sweeps.has(id)) return;
-  const timer = setTimeout(
-    () => {
-      sweeps.delete(id);
-      void pruneJobs().catch((err) =>
-        console.error("[backup-jobs] Scheduled prune failed:", err),
-      );
-    },
-    Math.max(delay, 1_000),
-  );
+  const wait = Math.max(delay, 1_000);
+  const due = Date.now() + wait;
+  const existing = sweeps.get(id);
+  if (existing) {
+    if (existing.due <= due) return;
+    clearTimeout(existing.timer);
+  }
+  const timer = setTimeout(() => {
+    sweeps.delete(id);
+    void pruneJobs().catch((err) =>
+      console.error("[backup-jobs] Scheduled prune failed:", err),
+    );
+  }, wait);
   timer.unref?.();
-  sweeps.set(id, timer);
+  sweeps.set(id, { timer, due });
 }
 
 export async function pruneJobs(): Promise<void> {
@@ -347,6 +375,11 @@ export async function pruneJobs(): Promise<void> {
       await removeJob(job.id);
     } else if (superseded) {
       scheduleSweep(job.id, MIN_AGE_MS - age);
+    } else if (!(auto && job.state === "ready")) {
+      // Rule 3 needs a clock of its own. Without one the newest manual
+      // archive — never superseded while nobody exports again — sat on disk
+      // for as long as nobody opened Settings, well past MAX_AGE.
+      scheduleSweep(job.id, MAX_AGE_MS - age + 1_000);
     }
   }
 }
